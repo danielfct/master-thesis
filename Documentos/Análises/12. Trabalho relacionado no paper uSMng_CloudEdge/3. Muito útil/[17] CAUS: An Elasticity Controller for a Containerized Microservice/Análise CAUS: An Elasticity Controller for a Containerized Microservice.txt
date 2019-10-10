@@ -1,0 +1,7 @@
+p93-klinaku CAUS: An Elasticity Controller for a Containerized Microservice
+Link: TODO
+
+Resumo: 
+We propose a novel heuristic adaptation process which enables elasticity for a particular containerized microservice. The proposed method consists of two mechanisms that complement each other. One part reacts to changes in load intensity by scaling container instances depending on their processing capability. The other mechanism manages additional containers as a buffer to handle unpredictable workload changes
+
+TODO: Leitura detalhada do paper

@@ -1,0 +1,67 @@
+2018.cal.microservices
+
+Resumindo: A adaptação do uso de microserviços força uma mudança no desenho de cloud datacenters, em aspetos como:
+ - o tempo gasto em modo kernel vs modo user
+ - o racio computação vs comunicação
+ - o debate entre grandes vs pequenos servidores
+ - a pressão colocada no desempenho da computação single-thread
+ - a pressão colocada no i-cache
+
+1. Abstract
+
+- Mudanças que serão necessarias na cloud para acomodar a adaptação do uso de microserviços em detrimento do uso de aplicações monoliticas. Implicações do uso de microserviços no desenho de cloud datacenters
+
+- Exemplos de microserviços (movie renting and streaming service)
+
+
+1. Introduction 
+
+- Microservices vs monolithic applications
+
+- Introdução ao conteudo contido no paper
+
+
+2. Related Work
+
+- Cloudsuite: has been used to study the architectural implications of cloud benchmarks
+
+- Tail-bench: aggregates a set of interactive benchmarks
+
+- Sirius: focuses on intelligent personal assistant workloads. has been used to study the acceleration potential of interactive ML applications
+
+- Related work tem limitações porque foca-se exclusivamente em single-tier workloads
+
+
+3. The end-to-end movie streaming service
+
+- Descrição de dois gráficos de dependencias para representar ações (ver filmes, e adicionar review) numa aplicação de movie streaming
+
+- Resolving performance issues requires determining which microservice is the culprit of a QoS violation: RPCs and REST requests are timestamped upon arrival toand departure from each microservice, and data is accumulated, and stored in a centralized Cassandra database. We additionally track the time spent processing network request
+
+4. Evaluation
+
+4.1 Scalability and Query Diversity
+
+- 3 charts with throughput-tail latency (99th percentile) curves for representative operations of the Movie Streaming service: Browse Movie Info, Add Movie Review, and Movie Rent+Stream. Across all three request types the system saturates following queueing principles, although requests that process payments for renting a movie incur much higher latencies, and saturate at much lower load compared to other requests, due 
+to the high bandwidth demands of streaming large video files
+
+4.2 Implications in Server Design
+
+- At low load, the frontend dominates the overall latency that a request takes.
+However, at high load, overall performance is now also limited by the back-end databases and the microservices that manage them. This shows that bottlenecks shift across microservices as load increases,
+hence resource management must be agile, dynamic, and able to leverage tracing information to track how per-microservice latency changes over time.
+
+- (...) denoting that current systems are poorly provisioned for microservices-based applications. The same end-to-end service built as a monolithic Java application providing the exact same functionality, and running on a single node experiences significantly reduced front-end stalls, due to the lack of network requests, which translate to an improved IPC.
+
+- A grande variedade de microserviços, faz com que hajam diferentes locais de bottlenecks, o que torna a otimização generalizada muito dificil, e impoe também um obstaculo na criação de otimizadores costumizados
+
+- High number of cycles spent at kernel mode because applications like memcached and
+MongoDB spend most time in the kernel to handle interrupts, process TCP packets, and activate and schedule idling interactive services. The high number of library cycles is also justified given that microservices optimize for speed of development, and hence leverage a lot of existing libraries, as opposed to reimplementing the functionality from scratch
+
+- Microservices additionally shift the computation to communication ratio in cloud applications significantly compared to monoliths. Despite the increased pressure in the network fabric, microservices allow individual components to scale independently, unlike monoliths, improving elasticity, modularity, and abstraction
+
+- Microservices offer an appealing target for small cores, given the limited amount of computation per microservice. But, despite the higher tail latency of the end-to-end service, microservices are much more sensitive to poor single-thread performance than traditional cloud applications. Although initially
+counterintuitive, this result is not surprising, given the fact that each individual microservice must meet much stricter tail latency constraints compared to an end-to-end monolith, putting more pressure on performance predictability. Low-power machines can still be used formicroservices out of the critical path, or insensitive to frequency scaling by leveraging the per-microservice characterization
+
+
+- I-cache pressure:: (...) hence we conclude that it is the simplicity of microservices which results in better i-cache locality. In comparison, the monolithic design experiences extremely high i-cache misses, due to its large code footprint, and consistent with prior studies of cloud applications

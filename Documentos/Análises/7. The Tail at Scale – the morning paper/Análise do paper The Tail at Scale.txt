@@ -1,0 +1,27 @@
+Análise do paper The Tail at Scale
+
+Resumindo: O que é a tail-tolerance e como desenhar sistemas que tolerem tail-latency.
+
+Um pedido com um valor elevado de 99% percentile aplicado a uma resposta que involva múltiplos servidores aumenta muito a % de utilizadores que experienciam uma resposta lenta. (e.g. 99% percentile de 1 segundo, numa resposta que involva 100 servidores, 63% das respostas são a cima de 1 segundo. O cálculo é 1 - 0.99^100).
+
+Dando um exemplo, num sistema da Google, um pedido com 10ms de latencia e um 99% percentile, o conjunto dos pedidos demora 140ms, e o valor de 95% percentile é 70ms. O que quer dizer que os 5% pedidos mais lentos são responsáveis por metade do tempo de espera. Com isto, é possivel concluir que se for possivel melhorar o tempo de resposta desses 5% de pedidos, o sistema global melhora muito o seu desempenho de serviço.
+
+O problema está em como desenhar sistemas que tolerem tail-latency, mas que continuem globalmente responsivos.
+Uma forma passa por tentar reduzir a variabilidade dos tempos de resposta, ao prioritarizar pedidos interativos, e separar um workload elevado em workloads mais leves, de forma a permitir interleaving. 
+Outra forma de reduzir a variabilidade é sincronizar a execução de uma tarefa de background para executar em todas as máquinas, em vez de se distribuir o workload. A razão para isso reduzir a variabilidade é o facto de todas as máquinas ficarem ocupadas ao mesmo tempo, e portanto, os tempos de resposta continuam semelhantes. Pelo contrário, se o workload for distribuido, alguns servidores podem estar sempre ocupados com tarefas de background, contribuindo para um tail-latency sempre elevado.
+
+No então, é muito dificil limitar a variabilidade dos tempos de resposta. Existem padrões de desenho para tornar os sistemas tail-tolerance:
+
+1. Hedged requests. Pode ser incluido no sistema de gestão?
+
+2. Tied requests. Pode ser incluido no sistema de gestão?
+
+3. Micro-partition. O uso de containers são uma forma de micro-partition?
+
+4. Selectively increase replication factors: Pode ser incluido no sistema de gestão, com a componente de previsão de acontecimentos.
+
+5. Put slow machines on probation. Pode ser incluido no sistema de gestão, com uma especie de histórico do tempo de respostas.
+
+6. Consider ‘good enough’ responses
+
+7. Canary requests

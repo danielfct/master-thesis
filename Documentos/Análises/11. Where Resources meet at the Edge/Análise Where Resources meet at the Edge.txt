@@ -1,0 +1,62 @@
+GDWXT6-08031490 Where Resources meet at the Edge
+Link: TODO
+Versão completa: K. Toczé and S. Nadjm-Tehrani, “Resource management at the edge: A survey”
+
+Resumo: We begin by a brief description of the edge paradigm, the most generic edge architecture, and the terminology associated to it. Then, we propose and elaborate on a preliminary taxonomy for edge resource management, together with a substantial review of works in the area. Finally, we identify some research challenges.
+
+I. INTRODUCTION
+
+- Explicação da necessidade da computação edge/fog, devido ao aumento de dispositivos, aumento de transferencia de dados, aplicações com QoS restritas, etc.
+
+- In order to achieve this and to make edge computing a reality and a success, there is a need for efficient resource management at the edge.
+
+- However, there are more areas in resource management than just offloading and this paper aims at providing a brief overview of the current work done in those areas, focusing on work where the resources are at the edge or where the resource management is performed at the edge. Therefore, work considering direct interactions from a device to a cloud [18] or from the cloud to the edge [19] are not considered. É EXATAMENTE O MESMO QUE O NOSSO SISTEMA CONSIDERA
+
+II. TERMINOLOGY
+
+- Figura 1 pode ser usada na dissertação para explicar a hierarquia edge/cloud computing
+
+- The edge device usually has relatively high computational power, though it remains less powerful than a conventional datacenter used in the cloud computing paradigm. In the literature, such edge devices are named for example cloudlets[21], [22] or micro datacenters [23] and they can be located for example in shops, companies or co-located with the base stations of the telecom access network
+
+III. TAXONOMY OF EDGE RESOURCE MANAGEMENT
+Possivel uso parcial da figura 2 na dissertação
+
+A. Resource type
+	1) Physical (nós)
+		- Commonly considered resources are computational or storage resources (such as CPU), needed to execute the task. Other common resources are communication resources, such as bandwidth or spectrum.
+		- The storage resources that can be needed for applications with more data.
+		- The next resource is energy, mobile devices (and especially smartphones) are constrained by their limited battery life, and there is a rising awareness about the need to use less energy.
+		- Wireless bandwidth between edge devices
+	2) Virtual (containers)
+		- First, virtual resources can be represented through the use of virtual machines (VMs).
+		- Another approach is to abstract the physical resources into virtual resources and manage those instead
+
+B. Objective
+	1) Resource estimation
+		- This is the ability to estimate how much resource will be needed to complete a task, or carry a load. 
+		No caso dos containers, já é considerada a memória que é expectável que usem (em MB). Será possivel fazer o mesmo para outro tipo de métricas?
+	2) Resource allocation
+		- The next area is to actually allocate resources so that the task can be executed. This problem can be tackled from different perspectives: where to allocate, when to allocate, and how much to allocate.
+		[27] Y. Liu, M. J. Lee, and Y. Zheng, “Adaptive multi-resource allocation for cloudlet-based mobile cloud computing system,” IEEE Transactions on Mobile Computing, vol. 15, no. 10, pp. 2398–2410, Oct 2016.
+		[25] F. Z. Yousaf and T. Taleb, “Fine-grained resource-aware virtual network function management for 5G carrier cloud,” IEEE Network, vol. 30, no. 2, pp. 110–115, March 2016.
+		[31] L. Gu, D. Zeng, S. Guo, A. Barnawi, and Y. Xiang, “Cost efficient resource management in fog computing supported medical cyber-physical system,” IEEE Transactions on Emerging Topics in Computing, vol. 5, no. 1, pp. 108–119, Jan 2017
+		[33] J. Plachy, Z. Becvar, and E. C. Strinati, “Dynamic resource allocation exploiting mobility prediction in mobile edge computing,” in 2016 IEEE 27th Annual International Symposium on Personal, Indoor, and Mobile Radio Communications (PIMRC), Sept 2016, pp. 1–6.
+		PREVISÂO DE MOVIMENTAÇÃO DOS UTILIZADORES
+	3) Resource sharing
+		Pouco relevante para esta dissertação
+	4) Resource optimization
+		- Latency
+		- Energy
+		- Communication cost
+		- Financial cost
+
+C. Resource use
+	1) Functional properties
+	Resources are used in order to get the requested service, i.e. for satisfying functional properties. For example, resources can be used for video stream services
+	2) Non-functional properties
+	Consider the cost of VM migration.
+	Overhead of the mechanisms that provide the properties enforced by edge computing such as privacy [40] or context adaptation [41]
+
+IV. DISCUSSION
+
+- There is not a lot of work on the resource footprint of edge algorithms dealing with aspects such as security, privacy or context adaptation. It is especially important to research on the resource overhead for providing those properties, since a too high overhead can signify a technology which is not usable in practice.

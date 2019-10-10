@@ -1,0 +1,11 @@
+Resource optimization of container orchestration: a case study in multi­-cloud microservices-­based applications
+
+Link: TODO
+
+Resumo:
+An approach to optimize the deployment of microservices-based applications using
+containers in multi-cloud architectures is presented. The optimization objectives are
+three: cloud service cost, network latency among microservices, and time to start a
+new microservice when a provider becomes unavailable. The decision variables are:
+the scale level of the microservices; their allocation in the virtual machines; the
+provider and virtual machine type selection; and the number of virtual machines

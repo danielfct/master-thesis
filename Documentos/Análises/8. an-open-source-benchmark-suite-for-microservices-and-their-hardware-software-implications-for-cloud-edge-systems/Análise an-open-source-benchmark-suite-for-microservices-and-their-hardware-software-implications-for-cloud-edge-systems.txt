@@ -1,0 +1,67 @@
+an-open-source-benchmark-suite-for-microservices-and-their-hardware-software-implications-for-cloud-edge-systems
+
+http://www.csl.cornell.edu/~delimitrou/papers/2019.asplos.microservices.pdf
+http://microservices.ece.cornell.edu
+
+- Specifically we show that, similarly to traditional cloud applications, microservices spend a large fraction of time in the kernel. Unlike monolithic services though, microservices spend much more time sending and processing network requests over RPCs or other REST APIs
+
+- microservices significantly complicate cluster management. Even though the cluster manager can scale out individual microservices on-demand instead of the entire monolith, dependencies between microservices introduce backpressure effects and cascading QoS violations that quickly propagate through the system, making performance unpredictable. Existing cluster managers that optimize for performance and/or utilization [29, 32, 33, 36, 45, 60–62, 64, 66–68, 73, 80, 84] are not expressive enough to account for the impact each pair-wise dependency has on end-to-end performance
+
+- Principios de desenho do DeathStarBench: Representativeness, End-to-end operation, Heterogeneity, Modularity, Reconfigurability
+
+- Descrição, incluindo os graficos de depedencias, das 6 aplicações compostas por microserviços. IMPORTANTE para o desenvolvimento das dependencias, bem como para o complementar os testes, para além do sockshop.
+
+- Resolving performance issues requires determining which microservice(s) is the culprit of a QoS violation, which typically happens through distributed tracing - ver o tracing distribuido que foi desenvolvido, caso seja necessário
+
+- The ratio of resources between tiers varies significantly across end-to-end services, highlighting the need for application-aware resource management.
+ 
+- Microservices complicate cluster management, because dependencies between tiers can introduce backpressure  effects, leading to system-wide hotspots [56, 59, 82, 85, 87]. Backpressure can additionally trick the cluster manager into penalizing or upsizing a saturated microservice, even though its saturation is the result of backpressure from another, potentially not-saturated service.
+
+- Conversely, there are microservices with relatively low utilization and degraded performance, for example, due to waiting on a blocking/synchronous request from another, saturated tier. This highlights the need for cluster managers that account for the impact dependencies between microservices have on end-to-end performance when allocating resources - IMPORTANTE para explicar a necessidade da inclusão da deteção de dependencias no sistema
+ 
+ - However, while the cluster manager can simply instantiate new copies of the monolith and rebalance the load, autoscaling takes longer to improve performance.This is because, as shown in Fig. 20b, the autoscaler simply upsizes the resources of saturated services - seen by the progressively darker colors of highly-utilized microservices. However, services with the highest utilization are not necessarily the culprits of a QoS violation [61], taking the system much longer to identify the correct source behind the degraded performance and upsizing it. As a result, by the time the culprit is identified, long queues have already built up which take considerable time to drain.
+
+- Such dependencies are difficult for developers or users to describe, and furthermore, they change frequently, as old microservices are swapped out and replaced by newer services.
+
+-In general, the more complex an application’s microservices graph, the more impactful slow servers are, as the probability that a service on the critical path will be degraded increases.
+
+
+https://blog.acolyer.org/2019/05/13/an-open-source-benchmark-suite-for-microservices-and-their-hardware-software-implications-for-cloud-edge-systems/
+
+Resumo:
+The paper examines the implications of microservices at the hardware, OS and networking stack, cluster
+management, and application framework levels, as well as the impact of tail latency.
+
+- 6 exemplos de aplicações baseadas em microserviços:
+	- social network
+	- movie reviewing
+	- e-commerce website
+	- banking system
+	- swarm cloud
+	- swarm edge
+
+- exemplo de diagrama de dependências entre microserviços
+
+
+- microservices are much more sensitive to poor single-thread performance than traditional cloud
+applications. Although initially counterintuitive, this result is not surprising, given the fact that each
+individual microservice must meet much stricter tail latency constraints compared to an end-to-end
+monolith, putting more pressure on performance predictability.
+
+- For interactive, latency-critical services, where even a small improvement in tail latency is significant,
+network acceleration provides a major boost in performance.
+
+- Microservices significantly complicate cluster management. Even though the cluster manager can scale out
+individual microservices on-demand instead of the entire monolith, dependencies between microservices
+introduce back-pressure effects and cascading QoS violations that quickly propagate through the system,
+making performance unpredictable.
+
+- Once back-end services have high utilisation this propagates all the way to the front-end, and can put even higher pressure on microservices in the middle. There are also microservices that show relatively low utilisation
+but still have degraded performance (due to blocking).
+The authors draw two conclusions from their analysis here:
+		- Cluster managers need to account for the impact dependencies have on end-to-end performance when allocating resources (but how will they learn this?)
+		- Once microservices experience a QoS violation they need longer to recover than traditional monolithic applications, even in the presence of autoscaling mechanisms which most cloud providers employ. 
+Bottleneck locations also vary with load.
+
+- The general finding is that the more complex the interaction graph of a microservices application, the
+more impactful slow services are as the probability that a service on the critical path will be degraded increases.

@@ -1,0 +1,86 @@
+1810.00305 Resource Management in Fog/Edge Computing: A Survey
+TODO: link
+
+Resumo: Identify and classify the architectures, infrastructure, and underlying algorithms for managing resources in fog/edge computing
+
+
+I. INTRODUCTION
+
+- A computing model that makes use of resources located at the edge of the network is referred to as ‘edge computing’ [4], [5]. A model that makes use of both edge resources and the cloud is referred to as ‘fog computing’ [6], [7]
+
+- Possivel imagem (parcial) (fig 2) para usar no documento dissertação
+Algoritmos, Arquiteturas, Infrastruturas
+
+II. ARCHITECTURES
+
+- Data flow
+	No nosso sistema não há movimentos de workloads
+
+- Data control (Hierarquico)
+	Atualmente, o controlo de nós é centralizado, mas vai passar a ser hierarquico, com a inclusão de gestores locais
+	O texto não dá mais detalhe sobre arquiteturas de controlo hierarquicas, apenas centralizadas e distribuidas
+
+- Data tenancy (Multi-tenancy - Multiple Application, Multiple User (MAMU))
+	
+	Microserviços de aplicações diferentes podem estar no mesmo nó, e vários utilizadores podem aceder aos microserviços.
+	É necessário: 
+		1. Sistema de Virtualização (Containers Docker)
+		Virtualization makes it possible to isolate resources for individual applications, whereby users can access applications hosted in a virtualized environment. For example, different containers of multiple applications may be concurrently hosted on an edge node.
+		2. Network Slicing (Vertente não considerada na dissertação)
+
+
+III. INFRASTRUCTURE
+
+- Hardware (É preciso considerar onde irão executar os containers? Possivel teste em Rasberry PIs?)
+	1. Computing devices (Single-board computers, e.g. raspberry pi, e commodity products, e.g. desktops, laptops, smartphones)
+	2. Network devices (Gateway and routers, Wifi APs, Edge racks)
+- Software (Apps executam dentro de Containers)
+	1. VMs/Containers que executam nos nós edge e cloud
+	2. Network virtualization
+- Middleware
+	- Hierarchical Fog/Edge Computing: A Hierarchical fog/edge computing platform provides middleware that exploits both conventional cloud computing and recent fog/edge computing paradigms. Tasks that require prompt reaction are processed in fog/edge nodes whereas complex or long-term analysis tasks are performed at more powerful cloud nodes [138], [139], [140].
+	- Cloud Orchestration Management: 
+	Ver referências para possivel trabalho relacionado:
+	[112] R. Morabito and N. Beijar, “Enabling Data Processing at the Network Edge Through Lightweight Virtualization Technologies,” in IEEE International Conference on Sensing, Communication and Networking, 2016, pp. 1–6.
+	[147] M. Selimi, A. M. Khan, E. Dimogerontakis, F. Freitag, and R. P. Centelles, “Cloud services in the guifi. net community network,” Computer Networks, vol. 93, pp. 373–388, 2015.
+	[148] A. M. Khan and F. Freitag, “On Edge Cloud Service Provision with Distributed Home Servers,” in Cloud Computing Technology and Science (CloudCom), 2017 IEEE International Conference on. IEEE, 2017, pp. 223–226.
+	[93] B. Amento, B. Balasubramanian, R. J. Hall, K. Joshi, G. Jung, and K. H. Purdy, “FocusStack: Orchestrating Edge Clouds Using Location-Based Focus of Attention,” in Edge Computing (SEC), IEEE/ACM Symposium on. IEEE, 2016, pp. 179–191.
+	[150] D. Santoro, D. Zozin, D. Pizzolli, F. De Pellegrini, and S. Cretti, “Foggy: A Platform for Workload Orchestration in a Fog Computing Environment,” in IEEE International Conference on Cloud Computing Technology and Science, 2017, pp. 231–234.
+	[151] M. Vögler, J. Schleicher, C. Inzinger, S. Nastic, S. Sehic, and S. Dustdar, “LEONORE–Large-Scale Provisioning of Resource-constrained IoT Deployments,” in IEEE Symposium on Service-Oriented System Engineering, 2015, pp. 78–87.
+	[152] S. Nastic, S. Sehic, D.-H. Le, H.-L. Truong, and S. Dustdar, “Provisioning Software-Defined IoT Cloud Systems,” in International Conference on Future Internet of Things and Cloud, 2014, pp. 288–295.
+	[153] S. Nastic, H.-L. Truong, and S. Dustdar, “A Middleware Infrastructure for Utility-based Provisioning of IoT Cloud Systems,” in IEEE/ACM Symposium on Edge Computing, 2016, pp. 28–40.
+
+IV. ALGORITHMS
+
+- Discovery de dispositivos (não será considerado no trabalho, visto que os dispositivos são fixos e de conhecimento prévio)
+
+- Benchmarking:
+	Benchmarking is a de facto approach for capturing the performance (of entities such as memory, CPU, storage, network, etc) of a computing system.
+	The majority of edge benchmarking research evaluates power, CPU, and memory performance of edge processors
+	Ver referências:
+	[163] B. Varghese, L. T. Subba, L. Thai, and A. Barker, “DocLite: A Docker-Based Lightweight Cloud Benchmarking Tool,” in 16th IEEE/ACM International Symposium on Cluster, Cloud and Grid Computing, 2016, pp. 213–222.
+	[164] Z. Kozhirbayev and R. O. Sinnott, “A Performance Comparison of Container-based Technologies for the Cloud,” Future Generation Computer Systems, vol. 68, pp. 175 – 182, 2017
+
+- Load-balacing
+	1. Particle swarm optimization
+	Ver referências:
+	[171] X. He, Z. Ren, C. Shi, and J. Fang, “A Novel Load Balancing Strategy of Software-defined Cloud/Fog Networking in the Internet of Vehicles,” China Communications, vol. 13, no. 2, pp. 140–149, 2016.
+	[172] K. E. Parsopoulos, M. N. Vrahatis et al., “Particle Swarm Optimization Method for Constrained Optimization Problems,” Intelligent Technologies–Theory and Application: New Trends in Intelligent Technologies, vol. 76, no. 1, pp. 214–220, 2002.
+	2. Cooperative load balancing
+	Ver referências:
+	[173] R. Beraldi, A. Mtibaa, and H. Alnuweiri, “Cooperative Load Balancing Scheme for Edge Computing Resources,” in 2nd International Conference on Fog and Mobile Edge Computing. IEEE, 2017, pp. 94–100
+	3. Graph-based balancing
+	Ver referências:
+	[174] S. Ningning, G. Chao, A. Xingshuo, and Z. Qiang, “Fog Computing Dynamic Load Balancing Mechanism Based on Graph Repartitioning,” China Communications, vol. 13, no. 3, pp. 156–164, 2016.
+	4. Breadth-first search
+	Ver referências:
+	[175] D. Puthal, M. S. Obaidat, P. Nanda, M. Prasad, S. P. Mohanty, and A. Y. Zomaya, “Secure and Sustainable Load Balancing of Edge Data Centers in Fog Computing,” IEEE Communications Magazine, vol. 56, no. 5, pp. 60–65, 2018.
+
+- Placement (Talvez seja o ponto mais relevante para esta dissertação)
+	- Dynamic condition-aware techniques
+	[177] S. Wang, R. Urgaonkar, T. He, K. Chan, M. Zafer, and K. K. Leung, “Dynamic service placement for mobile micro-clouds with predicted future costs,” IEEE Transactions on Parallel and Distributed Systems, vol. 28, no. 4, pp. 1002–1016, 2017
+	- Iterative techniques
+		- Iterative over resources
+		[178] M. Taneja and A. Davy, “Resource aware placement of iot application modules in fog-cloud computing paradigm,” in Integrated Network and Service Management (IM), 2017 IFIP/IEEE Symposium on. IEEE, 2017, pp. 1222–1228.
+		- Iterative over the problem spaces
+		[180] O. Skarlat, M. Nardelli, S. Schulte, and S. Dustdar, “Towards qos-aware fog service placement,” in Fog and Edge Computing (ICFEC), 2017 IEEE 1st International Conference on. IEEE, 2017, pp. 89–96.

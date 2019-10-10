@@ -1,0 +1,5 @@
+Unsupervised Learning Approach for Web Application Auto-Decomposition into Microservices
+Link: TODO
+
+Resumo: 
+Our proposed decomposition method is based on a black-box approach that uses the application access logs and an unsupervised machine-learning method to auto-decompose the application into microservices mapped to URL partitions having similar performance and resource requirements. In particular, we propose a complete automated system to decompose an application into microservices, deploy the microservices using appropriate resources, and auto-scale the microservices to maintain the desired response time.
