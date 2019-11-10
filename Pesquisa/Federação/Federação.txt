@@ -1,0 +1,9 @@
+FEDERAÇÃO
+
+> Tipo de aplicações que beneficiam
+
+	Sensiveis a latência:
+
+> Problema
+
+> Solução

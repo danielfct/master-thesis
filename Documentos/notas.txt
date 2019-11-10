@@ -193,6 +193,10 @@ https://istio.io/docs/examples/bookinfo/#deploying-the-application
 . Remover os containers do docker
 	docker rm $(docker ps -a -q)
 
+. Remover as images do docker
+	docker rmi $(docker images -a -q)
+
+
 > AWS
 
 . Fazer uma conexão à máquina ec2

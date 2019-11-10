@@ -22,6 +22,19 @@ Capitulo 2 Addressing the Challenges in Federating Edge Resources
 - 2.4 Resource challenges (Defined Edge Nodes, Unified Architectures to Account for Heterogeneity, Public Usability of Edge Nodes, Interoperability with Communication Networks, Network Slices for Edge Systems) and modeling challenges. Edge simulator
 - 2.5 Conclusions
 
+M. Satyanarayanan. Edge computing: Vision and challenges. IEEE Internet of
+Things Journal, 3(5): 637–646, June 2016.
+N. Wang, B. Varghese, M. Matthaiou, and D. S. Nikolopoulos. ENORM:
+A framework for edge node resource management. IEEE Transactions on
+Services Computing, PP(99): 1–1, September 2017.
+B. Varghese, N. Wang, S. Barbhuiya, P. Kilpatrick, and D. S. Nikolopoulos.
+Challenges and opportunities in edge computing. In Proceedings of the
+International Conference on Smart cloud, New York, USA, November
+18–20, 2016.
+Z. Hao, E. Novak, S. Yi, and Q. Li. Challenges and software archi-
+tecture for fog computing. IEEE Internet Computing, 21(2): 44–53,
+March 2011.
+
 
 Capitulo 3 Integrating IoT + Fog + Cloud Infrastructures: System Modeling and Research Challenges
 
