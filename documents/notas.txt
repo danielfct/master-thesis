@@ -173,10 +173,10 @@ https://istio.io/docs/examples/bookinfo/#deploying-the-application
 . Mudar a versão java
 	sudo update-alternatives --config java
 
-> Replication Migration
+> Master Manager
 
 . Diretoria
-	cd Dissertação/Código/Microservices\ management\ main\ components/replication-migration/
+	cd Dissertação/Código/Microservices\ management\ main\ components/managerMaster/
 
 . Executar localmente
 	Alterar os EdgeHosts no ficheiro de base de dados data.sql para incluir o pc onde se executa localmente
