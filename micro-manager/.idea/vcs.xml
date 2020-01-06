@@ -2,21 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/docker-images/docker-alpine" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/docker-images/docker-consul" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/docker-images/docker-java" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/docker-images/docker-mongo3" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/java-client-register-go" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/master-manager" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/microservices/sock-shop/carts" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/microservices/sock-shop/docker-rabbitmq" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/microservices/sock-shop/front-end" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/microservices/sock-shop/orders" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/microservices/sock-shop/queue-master" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/microservices/sock-shop/shipping" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/nginx-basic-auth-proxy" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/nginx-load-balancer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/prometheus" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/java/registration-server" vcs="Git" />
   </component>
 </project>
