@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/java/java-client-register-go" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/java-client-register-go" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/java-client-register-go" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/local-manager" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/java/local-manager" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/java/master-manager" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/master-manager" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/microservices/sock-shop/carts" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/java/microservices/sock-shop/carts" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/java/microservices/sock-shop/orders" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/microservices/sock-shop/orders" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/microservices/sock-shop/queue-master" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/java/microservices/sock-shop/queue-master" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/java/microservices/sock-shop/shipping" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/microservices/sock-shop/shipping" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/registration-server" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/java/registration-server" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/local-manager" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/master-manager" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservices/sock-shop/carts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservices/sock-shop/orders" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservices/sock-shop/queue-master" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservices/sock-shop/shipping" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/registration-server" charset="UTF-8" />
   </component>
 </project>
