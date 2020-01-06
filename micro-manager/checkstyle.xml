@@ -229,7 +229,7 @@
 		<module name="AvoidStarImport"/>
 		<module name="AvoidStaticImport"/>
 		<module name="ImportOrder">
-			<property name="groups" value="/^pt.unl.fct./,/^java\./"/>
+			<property name="groups" value="/^pt.unl.fct./,/^java\./,/^javax\./"/>
 			<property name="separated" value="true"/>
 			<property name="option" value="top"/>
 			<property name="sortStaticImportsAlphabetically" value="true"/>
