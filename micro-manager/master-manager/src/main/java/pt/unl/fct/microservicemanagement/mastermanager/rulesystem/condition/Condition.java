@@ -36,7 +36,8 @@ import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.Operator;
 @Setter
 @ToString
 @EqualsAndHashCode
-final class Condition {
+//TODO protected
+public final class Condition {
 
   private final String fieldName;
   private final Double value;

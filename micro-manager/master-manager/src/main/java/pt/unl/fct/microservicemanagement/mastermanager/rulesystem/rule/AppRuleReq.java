@@ -27,7 +27,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule;
 import lombok.Data;
 
 @Data
-class AppRuleReq {
+//TODO protected
+public class AppRuleReq {
 
   private final long appId;
   private final long ruleId;

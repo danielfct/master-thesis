@@ -25,9 +25,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.ComponentTypeRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.DecisionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.FieldRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.ComponentTypeRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.monitoring.metric.FieldRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.ComponentTypeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.RulesService;
 

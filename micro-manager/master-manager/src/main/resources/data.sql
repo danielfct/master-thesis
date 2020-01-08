@@ -1,6 +1,6 @@
 -- TODO: insert without ids
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     1,
@@ -17,7 +17,7 @@ VALUES (
     209715200
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     2,
@@ -34,7 +34,7 @@ VALUES (
     62914560
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     3,
@@ -51,7 +51,7 @@ VALUES (
     62914560
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     4,
@@ -68,7 +68,7 @@ VALUES (
     62914560
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     5,
@@ -85,7 +85,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     6,
@@ -102,7 +102,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     7,
@@ -119,7 +119,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     8,
@@ -136,7 +136,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     9,
@@ -153,7 +153,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     10,
@@ -170,7 +170,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     11,
@@ -187,7 +187,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     12,
@@ -204,7 +204,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     13,
@@ -221,7 +221,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     14,
@@ -238,7 +238,7 @@ VALUES (
     262144000
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     15,
@@ -255,7 +255,7 @@ VALUES (
     10485760
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     16,
@@ -272,7 +272,7 @@ VALUES (
     10485760
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     17,
@@ -289,7 +289,7 @@ VALUES (
     52428800
 );
 
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     18,
@@ -307,7 +307,7 @@ VALUES (
 );
 
 
-/*INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+/*INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     19,
@@ -323,7 +323,7 @@ VALUES (
     'system',
     '0' --TODO
 )
-INSERT INTO service (id, service_name, docker_repo, default_external_port, default_internal_port, default_db,
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     20,
@@ -645,7 +645,7 @@ VALUES (
 INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
 VALUES (
     2,
-    '192.168.1.104',
+    '192.168.1.68',
     'daniel',
     'enhj',
     'eu-central-1',

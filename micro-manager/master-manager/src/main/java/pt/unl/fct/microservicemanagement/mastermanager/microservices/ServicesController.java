@@ -24,6 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.microservices;
 
+import pt.unl.fct.microservicemanagement.mastermanager.prediction.SaveServiceEventPredictionReq;
+import pt.unl.fct.microservicemanagement.mastermanager.prediction.ServiceEventPrediction;
+
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -111,9 +114,12 @@ public class ServicesController {
     servicesService.updateServiceEventPrediction(serviceId, serviceEventPredictionId, serviceEventPrediction);
   }*/
 
+  //TODO move to an eventpredictioncontroller
+
   @RequestMapping(value = "/{serviceId}/eventPrediction/", method = RequestMethod.POST)
   public @ResponseBody long saveServiceEventPrediction(@PathVariable long serviceId,
-                                  @RequestBody SaveServiceEventPredictionReq serviceEventPredictionReq) {
+                                                       @RequestBody SaveServiceEventPredictionReq
+                                                           serviceEventPredictionReq) {
     return servicesService.saveServiceEventPrediction(serviceId, serviceEventPredictionReq);
   }
 
@@ -125,8 +131,8 @@ public class ServicesController {
 
   //TODO change to ?search=
   @PostMapping("/search/dockerRepo")
-  public List<Service> getServiceByDockerRepo(@RequestBody SearchDockerRepo searchDockerRepo) {
-    return servicesService.getServicesByDockerRepo(searchDockerRepo.getDockerRepo());
+  public List<Service> getServiceByDockerRepo(@RequestBody SearchDockerRepository searchDockerRepository) {
+    return servicesService.getServicesByDockerRepo(searchDockerRepository.getDockerRepo());
   }
 
   //TODO change to ?search=

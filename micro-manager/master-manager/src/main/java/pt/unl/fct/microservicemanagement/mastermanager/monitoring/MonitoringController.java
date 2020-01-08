@@ -25,7 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostFieldAvg;
-import pt.unl.fct.microservicemanagement.mastermanager.tests.TestLogsService;
 
 import java.util.List;
 

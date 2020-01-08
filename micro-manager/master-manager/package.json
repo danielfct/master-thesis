@@ -1,7 +1,7 @@
 {
-  "name": "manager-master",
+  "name": "master-manager",
   "version": "0.0.1",
-  "description": "Microservices replication and migration main management",
+  "description": "Master manager on a Microservices management system",
   "contributors": [
     {
       "name": "André Carrusca",

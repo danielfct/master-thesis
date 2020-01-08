@@ -25,8 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.monitoring.metric;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.ServiceSimulatedMetricsRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.SpecificHostSimulatedMetricsRepository;
 
 import java.util.HashMap;
 import java.util.List;

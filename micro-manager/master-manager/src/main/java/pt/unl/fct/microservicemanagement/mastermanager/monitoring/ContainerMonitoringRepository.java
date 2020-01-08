@@ -51,29 +51,29 @@ public interface ContainerMonitoringRepository extends CrudRepository<ServiceMon
   List<ServiceMonitoring> getMonitoringServiceLogByContainer(@Param("containerId") String containerId);
 
   //TODO fix path
-  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.entities.service."
-      + "ServiceFieldAvg(log.serviceName, log.field, log.sumValue / log.count, log.count) "
+  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.monitoring"
+      + ".ServiceFieldAvg(log.serviceName, log.field, log.sumValue / log.count, log.count) "
       + "from ServiceMonitoring log "
       + "where log.serviceName = :serviceName and log.field = :field")
   ServiceFieldAvg getAvgServiceField(@Param("serviceName") String serviceName, @Param("field") String field);
 
   //TODO fix path
-  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.entities.service."
-      + "ServiceFieldAvg(log.serviceName, log.field, log.sumValue / log.count, log.count) "
+  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.monitoring"
+      + ".ServiceFieldAvg(log.serviceName, log.field, log.sumValue / log.count, log.count) "
       + "from ServiceMonitoring log "
       + "where log.serviceName = :serviceName")
   List<ServiceFieldAvg> getAvgServiceFields(@Param("serviceName") String serviceName);
 
   //TODO fix path
-  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.entities.container."
-      + "ContainerFieldAvg(log.containerId, log.field, log.sumValue / log.count, log.count) "
+  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.monitoring"
+      + ".ContainerFieldAvg(log.containerId, log.field, log.sumValue / log.count, log.count) "
       + "from ServiceMonitoring log "
       + "where log.containerId = :containerId and log.field = :field")
   ContainerFieldAvg getAvgContainerField(@Param("containerId") String containerId, @Param("field") String field);
 
   //TODO fix path
-  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.entities.container."
-      + "ContainerFieldAvg(log.containerId, log.field, log.sumValue / log.count, log.count) "
+  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.monitoring"
+      + ".ContainerFieldAvg(log.containerId, log.field, log.sumValue / log.count, log.count) "
       + "from ServiceMonitoring log "
       + "where log.containerId = :containerId")
   List<ContainerFieldAvg> getAvgContainerFields(@Param("containerId") String containerId);

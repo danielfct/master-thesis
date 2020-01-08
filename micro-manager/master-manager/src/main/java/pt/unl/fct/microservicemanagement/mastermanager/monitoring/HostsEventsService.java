@@ -24,9 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.monitoring;
 
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.HostEventRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionsService;
+import pt.unl.fct.microservicemanagement.mastermanager.monitoring.event.HostEventRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.event.HostEventEntity;
 
 import java.util.List;

@@ -27,7 +27,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.rulesystem.condition;
 import lombok.Data;
 
 @Data
-class ConditionReq {
+//TODO protected
+public class ConditionReq {
 
   private final long valueModeId;
   private final long fieldId;

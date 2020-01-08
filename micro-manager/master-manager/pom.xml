@@ -27,17 +27,17 @@
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>pt.unl.fct.microserviceManagement.masterManager</groupId>
-	<artifactId>masterManager</artifactId>
+	<groupId>pt.unl.fct.microservicemanagement.mastermanager</groupId>
+	<artifactId>master-manager</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
-	<name>MasterManager</name>
+	<name>Master Manager</name>
 	<description>Microservices master manager. Decides to replicate and/or migrate
 		docker containered micro-services between cloud and edge endpoints, based on
 		predefined rules and metrics collected globally</description>
 	<repositories>
 		<repository>
-			<id>masterManager</id>
+			<id>master-manager</id>
 			<name>Master Manager</name>
 			<url>https://github.com/danielfct/micro-manager/master-manager</url>
 		</repository>
@@ -56,13 +56,11 @@
         <relativePath/>
         <!-- lookup parent from repository -->
 	</parent>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
 	</properties>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -74,7 +72,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -110,6 +107,11 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 		</dependency>
@@ -126,11 +128,6 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.59</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.spotify</groupId>
@@ -159,14 +156,12 @@
 			<version>2.4.0</version>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-
 			<!-- tag::frontend-maven-plugin[] -->
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
@@ -207,6 +202,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+					<forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <source>11</source>
                     <target>11</target>
                 </configuration>
@@ -214,5 +210,4 @@
             <!-- end::frontend-maven-plugin[] -->
 		</plugins>
 	</build>
-
 </project>

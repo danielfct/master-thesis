@@ -33,12 +33,12 @@ import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.location.LocationRequestService;
 import pt.unl.fct.microservicemanagement.mastermanager.microservices.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.monitoring.event.ContainerEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionsService;
-import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.monitoring.metric.SimulatedMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.ContainerDecisionResult;
+import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.event.ServiceEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.tests.TestLogsService;
+import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.RulesService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -54,6 +54,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import com.spotify.docker.client.messages.ContainerStats;
+import com.spotify.docker.client.messages.CpuStats;
+import com.spotify.docker.client.messages.MemoryStats;
+import com.spotify.docker.client.messages.NetworkStats;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -70,10 +74,10 @@ public class ContainersMonitoringService {
   private final ServicesService servicesConfigService;
   private final RulesService rulesService;
   private final ServicesEventsService servicesEventsService;
-  private final ContainerMetricsService containerMetricsService;
   private final HostsService hostsService;
   private final LocationRequestService requestLocationMonitoringService;
   private final DecisionsService decisionsService;
+  private final SimulatedMetricsService simulatedMetricsService;
   private final TestLogsService testLogsService;
 
   private final long monitorPeriod;
@@ -84,20 +88,21 @@ public class ContainersMonitoringService {
   public ContainersMonitoringService(ContainerMonitoringRepository containersMonitoring,
                                      DockerContainersService dockerContainersService,
                                      ServicesService servicesConfigService, RulesService rulesService,
-                                     ServicesEventsService servicesEventsService,
-                                     ContainerMetricsService containerMetricsService, HostsService hostsService,
+                                     ServicesEventsService servicesEventsService, HostsService hostsService,
                                      LocationRequestService requestLocationMonitoringService,
-                                     DecisionsService decisionsService, TestLogsService testLogsService,
+                                     DecisionsService decisionsService,
+                                     SimulatedMetricsService simulatedMetricsService,
+                                     TestLogsService testLogsService,
                                      ContainerProperties containerProperties) {
     this.containersMonitoring = containersMonitoring;
     this.dockerContainersService = dockerContainersService;
     this.servicesConfigService = servicesConfigService;
     this.rulesService = rulesService;
     this.servicesEventsService = servicesEventsService;
-    this.containerMetricsService = containerMetricsService;
     this.hostsService = hostsService;
     this.requestLocationMonitoringService = requestLocationMonitoringService;
     this.decisionsService = decisionsService;
+    this.simulatedMetricsService = simulatedMetricsService;
     this.testLogsService = testLogsService;
     this.monitorPeriod = containerProperties.getMonitorPeriod();
     this.stopContainerOnEventCount = containerProperties.getStopContainerOnEventCount();
@@ -177,7 +182,7 @@ public class ContainersMonitoringService {
       String containerId = container.getId();
       String serviceName = container.getLabels().get(DockerContainer.Label.SERVICE_NAME);
       String serviceHostname = container.getHostname();
-      final Map<String, Double> newFields = containerMetricsService.getContainerStats(container, secondsFromLastRun);
+      final Map<String, Double> newFields = getContainerStats(container, secondsFromLastRun);
       newFields.forEach((field, value) -> {
         saveMonitoringServiceLog(containerId, serviceName, field, value);
         //TODO utilidade?
@@ -400,6 +405,82 @@ public class ContainersMonitoringService {
         decisionsService.saveComponentDecisionServiceLog(containerId, serviceName, decision, ruleId, otherInfo);
     decisionsService.saveComponentDecisionValueLogsFromFields(componentDecisionServiceLog.getComponentDecisionLog(),
         fields);
+  }
+
+
+  //TODO from containerMetricsService
+
+
+  Map<String, Double> getContainerStats(SimpleContainer container, double secondsInterval) {
+    String containerId = container.getId();
+    String containerHostname = container.getHostname();
+    String containerName = container.getNames().get(0);
+    String serviceName = container.getLabels().getOrDefault(DockerContainer.Label.SERVICE_NAME, containerName);
+    ContainerStats containerStats = dockerContainersService.getContainerStats(containerId, containerHostname);
+    CpuStats cpuStats = containerStats.cpuStats();
+    CpuStats preCpuStats = containerStats.precpuStats();
+    double cpu = cpuStats.cpuUsage().totalUsage().doubleValue();
+    double cpuPercent = getContainerCpuPercent(preCpuStats, cpuStats);
+    MemoryStats memoryStats = containerStats.memoryStats();
+    double ram = memoryStats.usage().doubleValue();
+    double ramPercent = getContainerRamPercent(memoryStats);
+    double rxBytes = 0;
+    double txBytes = 0;
+    for (NetworkStats stats : containerStats.networks().values()) {
+      rxBytes += stats.rxBytes().doubleValue();
+      txBytes += stats.txBytes().doubleValue();
+    }
+    // Metrics from docker
+    final var fields = new HashMap<>(Map.of(
+        "cpu", cpu,
+        "ram", ram,
+        "cpu-%", cpuPercent,
+        "ram-%", ramPercent,
+        "rx-bytes", rxBytes,
+        "tx-bytes", txBytes));
+    // Simulated metrics
+    if (container.getLabels().containsKey(DockerContainer.Label.SERVICE_NAME)) {
+      Map<String, Double> simulatedFields = simulatedMetricsService.getContainerFieldsValue(serviceName, containerId);
+      fields.putAll(simulatedFields);
+    }
+    // Calculated metrics
+    //TODO use monitoring previous update to calculate interval, instead of passing through argument
+    Map.of("rx-bytes", rxBytes, "tx-bytes", txBytes).forEach((field, value) -> {
+      ServiceMonitoring monitoring = getServiceMonitoring(containerId, field);
+      double lastValue = monitoring == null ? 0 : monitoring.getLastValue();
+      double bytesPerSec = Math.max(0, (value - lastValue) / secondsInterval);
+      fields.put(field + "-per-sec", bytesPerSec);
+    });
+    return fields;
+  }
+
+  private double getContainerCpuPercent(CpuStats preCpuStats, CpuStats cpuStats) {
+    final var systemDelta = cpuStats.systemCpuUsage().doubleValue() - preCpuStats.systemCpuUsage().doubleValue();
+    final var cpuDelta = cpuStats.cpuUsage().totalUsage().doubleValue()
+        - preCpuStats.cpuUsage().totalUsage().doubleValue();
+    double cpuPercent = 0.0;
+    if (systemDelta > 0.0 && cpuDelta > 0.0) {
+      final double onlineCpus = cpuStats.cpuUsage().percpuUsage().stream().filter(cpuUsage -> cpuUsage >= 1).count();
+      assert onlineCpus == getOnlineCpus(cpuStats.cpuUsage().percpuUsage());
+      cpuPercent = (cpuDelta / systemDelta) * onlineCpus * 100.0;
+    }
+    return cpuPercent;
+  }
+
+  //TODO apagar
+  private int getOnlineCpus(List<Long> perCpuUsage) {
+    var count = 0;
+    for (Long cpuUsage : perCpuUsage) {
+      if (cpuUsage < 1) {
+        break;
+      }
+      count++;
+    }
+    return count;
+  }
+
+  private double getContainerRamPercent(MemoryStats memStats) {
+    return memStats.limit() < 1 ? 0.0 : (memStats.usage().doubleValue() / memStats.limit().doubleValue()) * 100.0;
   }
 
 }

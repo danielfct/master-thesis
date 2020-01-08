@@ -43,9 +43,8 @@ import org.springframework.stereotype.Service;
 public class MasterManagerMonitoringService {
 
   private final DockerContainersService dockerContainersService;
-  private final ContainerMetricsService containerMetricsService;
-  private final DockerApiProxyService dockerApiProxyService;
   private final ContainersMonitoringService containersMonitoringService;
+  private final DockerApiProxyService dockerApiProxyService;
 
   private final long monitorPeriod;
   private final boolean isTestLogsEnable;
@@ -53,12 +52,10 @@ public class MasterManagerMonitoringService {
   private boolean isProxyRunning;
 
   public MasterManagerMonitoringService(DockerContainersService dockerContainersService,
-                                        ContainerMetricsService containerMetricsService,
-                                        DockerApiProxyService dockerApiProxyService,
                                         ContainersMonitoringService containersMonitoringService,
+                                        DockerApiProxyService dockerApiProxyService,
                                         MasterManagerProperties masterManagerProperties) {
     this.dockerContainersService = dockerContainersService;
-    this.containerMetricsService = containerMetricsService;
     this.dockerApiProxyService = dockerApiProxyService;
     this.containersMonitoringService = containersMonitoringService;
     this.monitorPeriod = masterManagerProperties.getMonitorPeriod();
@@ -102,7 +99,7 @@ public class MasterManagerMonitoringService {
   }
 
   private void saveMasterManagerContainerFields(SimpleContainer container, int secondsFromLastRun) {
-    final var newFields = containerMetricsService.getContainerStats(container, secondsFromLastRun);
+    final var newFields = containersMonitoringService.getContainerStats(container, secondsFromLastRun);
     newFields.forEach((field, value) -> {
       final var containerId = container.getId();
       final var serviceName = "master-manager";

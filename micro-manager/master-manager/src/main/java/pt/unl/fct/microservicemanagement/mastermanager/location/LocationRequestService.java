@@ -24,9 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.location;
 
-import org.springframework.data.util.Pair;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.swarm.node.DockerNodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.swarm.node.SimpleNode;
@@ -45,24 +42,26 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class LocationRequestService {
 
   // TODO refactor
-  private static final double PERCENT = 0.01;
   public static final String REQUEST_LOCATION_MONITOR = "request-location-monitor";
+  private static final double PERCENT = 0.01;
 
   private final DockerNodesService dockerNodesService;
   private final DockerContainersService dockerContainersService;
   private final RegionsService regionsService;
-  private final LocationRequestService locationRequestService;
   private final HostsService hostsService;
 
   private final int defaultPort;
@@ -70,16 +69,12 @@ public class LocationRequestService {
   private final RestTemplate restTemplate;
   private final HttpHeaders headers;
 
-  public LocationRequestService(DockerContainersService dockerContainersService,
-                                final DockerNodesService dockerNodesService,
-                                final RegionsService regionsService,
-                                final LocationRequestService locationRequestService,
-                                final HostsService hostsService,
-                                final LocationRequestProperties locationRequestProperties) {
+  public LocationRequestService(DockerContainersService dockerContainersService, DockerNodesService dockerNodesService,
+                                RegionsService regionsService, HostsService hostsService,
+                                LocationRequestProperties locationRequestProperties) {
     this.dockerNodesService = dockerNodesService;
     this.dockerContainersService = dockerContainersService;
     this.regionsService = regionsService;
-    this.locationRequestService = locationRequestService;
     this.hostsService = hostsService;
     this.defaultPort = locationRequestProperties.getPort();
     this.minimumRequestCountPercentage = locationRequestProperties.getMinimumRequestCountPercentage();
@@ -92,8 +87,8 @@ public class LocationRequestService {
   }
 
   public List<LocationMonitoringResp> getAllMonitoringDataTop(String requestLocationHostname, int seconds) {
-    String url = String.format("http://%s:%s/api/monitoringinfo/all/top/%d", requestLocationHostname,
-        defaultPort, seconds);
+    String url = String.format("http://%s:%s/api/monitoringinfo/all/top/%d", requestLocationHostname, defaultPort,
+        seconds);
     HttpEntity<String> request = new HttpEntity<>(headers);
     List<LocationMonitoringResp> locationMonitoringResps = new ArrayList<>();
     try {
@@ -137,7 +132,7 @@ public class LocationRequestService {
 
     for (SimpleNode node : nodes) {
       String hostname = node.getHostname();
-      allLocationMonitoringData.addAll(locationRequestService.getAllMonitoringDataTop(hostname, seconds));
+      allLocationMonitoringData.addAll(getAllMonitoringDataTop(hostname, seconds));
     }
     for (LocationMonitoringResp locationMonitoringResp : allLocationMonitoringData) {
       int count = locationMonitoringResp.getLocationData().getCount();

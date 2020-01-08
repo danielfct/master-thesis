@@ -25,8 +25,9 @@
 package pt.unl.fct.microservicemanagement.mastermanager.microservices;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.ServiceEventPredictionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.ServiceRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.prediction.SaveServiceEventPredictionReq;
+import pt.unl.fct.microservicemanagement.mastermanager.prediction.ServiceEventPrediction;
+import pt.unl.fct.microservicemanagement.mastermanager.prediction.ServiceEventPredictionRepository;
 
 import java.sql.Date;
 import java.sql.Timestamp;

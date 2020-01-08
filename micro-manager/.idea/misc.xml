@@ -21,11 +21,13 @@
         <option value="$PROJECT_DIR$/local-manager/pom.xml" />
         <option value="$PROJECT_DIR$/master-manager/pom.xml" />
         <option value="$PROJECT_DIR$/microservices/sock-shop/carts/pom.xml" />
-        <option value="$PROJECT_DIR$/microservices/sock-shop/orders/pom.xml" />
         <option value="$PROJECT_DIR$/microservices/sock-shop/queue-master/pom.xml" />
         <option value="$PROJECT_DIR$/microservices/sock-shop/shipping/pom.xml" />
+        <option value="$PROJECT_DIR$/microservices/sock-shop/orders/pom.xml" />
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="11.0.4" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="false" project-jdk-name="11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$" />
+  </component>
 </project>

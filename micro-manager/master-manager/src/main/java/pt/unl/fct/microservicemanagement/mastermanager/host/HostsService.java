@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.host;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainersService;
@@ -64,7 +65,7 @@ public class HostsService {
   private final SshService sshService;
   private final HostMetricsService hostMetricsService;
   private final PrometheusService prometheusService;
-  private final LocationRequestService requestLocationMonitoringService;
+  private final LocationRequestService locationRequestService;
   private final DockerApiProxyService dockerApiProxyService;
   private final String managerHostname;
   private final int maxWorkers;
@@ -73,7 +74,8 @@ public class HostsService {
   public HostsService(DockerNodesService dockerNodesService, DockerContainersService dockerContainersService,
                       DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
                       AwsService awsService, SshService sshService, HostMetricsService hostMetricsService,
-                      PrometheusService prometheusService, LocationRequestService requestLocationMonitoringService,
+                      //TODO fix lazy
+                      PrometheusService prometheusService, @Lazy LocationRequestService locationRequestService,
                       DockerApiProxyService dockerApiProxyService, DockerProperties dockerProperties,
                       AwsProperties awsProperties) {
     this.dockerNodesService = dockerNodesService;
@@ -84,7 +86,7 @@ public class HostsService {
     this.sshService = sshService;
     this.hostMetricsService = hostMetricsService;
     this.prometheusService = prometheusService;
-    this.requestLocationMonitoringService = requestLocationMonitoringService;
+    this.locationRequestService = locationRequestService;
     this.dockerApiProxyService = dockerApiProxyService;
     this.managerHostname = dockerProperties.getSwarm().getManager();
     this.maxWorkers = dockerProperties.getSwarm().getMaxWorkers();
@@ -113,7 +115,7 @@ public class HostsService {
   }
 
   public String getAvailableNodeHostname(double avgContainerMem, String region, String country, String city) {
-    //TODO try to improve code of method
+    //TODO try to improve method
     log.info("\nLooking for available nodes to host container with at least '{}' memory...", avgContainerMem);
     var otherRegionsHosts = new LinkedList<String>();
     var sameRegionHosts = new LinkedList<String>();
@@ -257,7 +259,7 @@ public class HostsService {
     // TODO why now?
     dockerNodesService.deleteUnresponsiveNodes();
     prometheusService.launchPrometheus(managerHostname);
-    requestLocationMonitoringService.launchRequestLocationMonitor(managerHostname);
+    locationRequestService.launchRequestLocationMonitor(managerHostname);
     /*dockerContainersService.launchEureka() TODO*/
   }
 
@@ -328,7 +330,7 @@ public class HostsService {
       dockerApiProxyService.launchDockerApiProxy(hostname);
       dockerSwarmService.joinSwarm(hostname);
       prometheusService.launchPrometheus(hostname);
-      requestLocationMonitoringService.launchRequestLocationMonitor(hostname);
+      locationRequestService.launchRequestLocationMonitor(hostname);
     }
   }
 

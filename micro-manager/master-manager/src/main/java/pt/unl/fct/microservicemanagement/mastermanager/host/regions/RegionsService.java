@@ -26,7 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.host.regions;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.RegionRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.location.RegionRepository;
 
 import org.springframework.stereotype.Service;
 

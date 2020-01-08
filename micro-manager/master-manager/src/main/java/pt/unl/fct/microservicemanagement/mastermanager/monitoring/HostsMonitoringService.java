@@ -35,7 +35,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.host.HostProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.microservices.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.monitoring.event.HostEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.HostMonitoringRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.RulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.HostDecisionResult;

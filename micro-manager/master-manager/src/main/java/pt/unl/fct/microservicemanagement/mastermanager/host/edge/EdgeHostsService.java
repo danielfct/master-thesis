@@ -24,8 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.host.edge;
 
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.EdgeHostRepository;
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;

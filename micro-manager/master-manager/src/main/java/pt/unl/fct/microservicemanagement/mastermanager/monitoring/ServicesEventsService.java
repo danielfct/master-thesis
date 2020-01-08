@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.monitoring;
 
-import pt.unl.fct.microservicemanagement.mastermanager.repositories.ServiceEventRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.prediction.ServiceEventRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.event.ServiceEvent;

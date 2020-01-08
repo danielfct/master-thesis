@@ -25,7 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule;
 
 import pt.unl.fct.microservicemanagement.mastermanager.monitoring.event.EventType;
-import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.Condition;
+import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.condition.Condition;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.RuleDecision;
 
 import java.util.ArrayList;

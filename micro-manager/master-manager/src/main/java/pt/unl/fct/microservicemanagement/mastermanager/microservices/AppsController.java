@@ -25,7 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.microservices;
 
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.AppRule;
-import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.AppRuleReq;
+import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.AppRuleReq;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.RulesService;
 
 import java.util.List;
@@ -85,6 +85,9 @@ public final class AppsController {
   public List<ServiceOrder> getServicesByAppId(@PathVariable long appId) {
     return appPackagesService.getServiceByAppId(appId);
   }
+
+
+  //TODO move to rules service
 
   @GetMapping("/{appId}/rules")
   public List<AppRule> getAppRulesByAppId(@PathVariable long appId) {
