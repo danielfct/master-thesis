@@ -2,12 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/go-client-register-go" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/microservices/sock-shop/catalogue" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/microservices/sock-shop/payment" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/microservices/sock-shop/user" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/nginx-load-balancer-api" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/register-go" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/request-location-monitor" vcs="Git" />
   </component>
 </project>
