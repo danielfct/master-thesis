@@ -656,6 +656,18 @@ VALUES (
 
 INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
 VALUES (
+    2,
+    '192.168.1.72',
+    'daniel',
+    'enhj',
+    'eu-central-1',
+    'pt',
+    'lisbon',
+    TRUE
+);
+
+INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
+VALUES (
     3,
     '127.0.0.1',
     'daniel',
