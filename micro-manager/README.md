@@ -40,7 +40,7 @@ This is a project developed in the context of MIEI master thesis at [FCT-UNL](ht
 
 # Usage
 
-Open the project in your IDE as a Maven project, build the root module and then run the Main class in [launcher](micro-manager/launcher).
+Open the project in your IDE as a Maven project, build the root module and then run the Main class in [launcher](launcher).
 
 # License
 
