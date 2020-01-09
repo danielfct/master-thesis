@@ -1,5 +1,13 @@
 -- TODO: insert without ids
 
+--TODO add sock-shop name to docker-repository names
+
+INSERT INTO app_package (id, app_name)
+VALUES (
+    1,
+    'Sock Shop'
+);
+
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
                         launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
@@ -18,7 +26,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     2,
     'user',
@@ -35,7 +43,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     3,
     'catalogue',
@@ -52,7 +60,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     4,
     'payment',
@@ -69,7 +77,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     5,
     'carts',
@@ -86,7 +94,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     6,
     'orders',
@@ -103,7 +111,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     7,
     'shipping',
@@ -120,7 +128,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     8,
     'queue-master',
@@ -137,7 +145,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     9,
     'rabbitmq',
@@ -154,26 +162,9 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     10,
-    'eureka-server',
-    'registration-server',
-    '8761',
-    '8761',
-    'NOT_APPLICABLE',
-    '${externalPort} ${internalPort} ${hostname} ${zone}',
-    1,
-    0,
-    '${eurekaHost}',
-    'system',
-    262144000
-);
-
-INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
-VALUES (
-    11,
     'user-db',
     'user-db',
     '27017',
@@ -188,9 +179,9 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
-    12,
+    11,
     'catalogue-db',
     'catalogue-db',
     '3306',
@@ -205,9 +196,9 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
-    13,
+    12,
     'carts-db',
     'mongo3',
     '27016',
@@ -222,9 +213,9 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
-    14,
+    13,
     'orders-db',
     'mongo3',
     '27015',
@@ -239,7 +230,24 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+VALUES (
+    14,
+    'eureka-server',
+    'registration-server',
+    '8761',
+    '8761',
+    'NOT_APPLICABLE',
+    '${externalPort} ${internalPort} ${hostname} ${zone}',
+    1,
+    0,
+    '${eurekaHost}',
+    'system',
+    262144000
+);
+
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
+                     launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     15,
     'load-balancer',
@@ -256,7 +264,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     16,
     'docker-api-proxy',
@@ -273,7 +281,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     17,
     'prometheus',
@@ -290,7 +298,7 @@ VALUES (
 );
 
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     18,
     'request-location-monitor',
@@ -306,11 +314,44 @@ VALUES (
     52428800
 );
 
-
-/*INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
     19,
+    'master-manager',
+    'master-manager',
+    '1919',
+    '1919',
+    'NOT_APPLICABLE',
+    '', -- TODO
+    1,
+    1,
+    '${masterManagerHost}',
+    'system',
+    0 --TODO
+);
+
+INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+VALUES (
+    20,
+    'local-manager',
+    'local-manager',
+    '1919',
+    '1919',
+    'NOT_APPLICABLE',
+    '', -- TODO
+    1,
+    0,
+    '${localManagerHost}',
+    'system',
+    0 --TODO
+);
+
+/*INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
+                      launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+VALUES (
+    21,
     'consul-server',
     'docker-consul',
     '8500+8600/udp',
@@ -324,9 +365,9 @@ VALUES (
     '0' --TODO
 )
 INSERT INTO service (id, service_name, docker_repository, default_external_port, default_internal_port, default_db,
-                        launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
+                    launch_command, min_replics, max_replics, output_label, service_type, expected_memory_consumption)
 VALUES (
-    20,
+    22,
     'consul-client',
     'docker-consul',
     '8500-8600/udp',
@@ -340,12 +381,6 @@ VALUES (
     '0' --TODO
 )
 */
-
-INSERT INTO app_package (id, app_name)
-VALUES (
-    1,
-    'Sock Shop'
-);
 
 ----- APP SERVICES -----
 INSERT INTO app_service (id, app_package_id, service_id, launch_order)
@@ -633,42 +668,6 @@ VALUES (
 INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
 VALUES (
     1,
-    '192.168.1.76',
-    'daniel',
-    'enhj',
-    'eu-central-1',
-    'pt',
-    'lisbon',
-    TRUE
-);
-
-INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
-VALUES (
-    2,
-    '192.168.1.68',
-    'daniel',
-    'enhj',
-    'eu-central-1',
-    'pt',
-    'lisbon',
-    TRUE
-);
-
-INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
-VALUES (
-    2,
-    '192.168.1.72',
-    'daniel',
-    'enhj',
-    'eu-central-1',
-    'pt',
-    'lisbon',
-    TRUE
-);
-
-INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
-VALUES (
-    3,
     '127.0.0.1',
     'daniel',
     'enhj',
@@ -680,7 +679,43 @@ VALUES (
 
 INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
 VALUES (
+    2,
+    '192.168.1.76',
+    'daniel',
+    'enhj',
+    'eu-central-1',
+    'pt',
+    'lisbon',
+    TRUE
+);
+
+INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
+VALUES (
+    3,
+    '192.168.1.68',
+    'daniel',
+    'enhj',
+    'eu-central-1',
+    'pt',
+    'lisbon',
+    TRUE
+);
+
+INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
+VALUES (
     4,
+    '192.168.1.72',
+    'daniel',
+    'enhj',
+    'eu-central-1',
+    'pt',
+    'lisbon',
+    TRUE
+);
+
+INSERT INTO edge_host (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
+VALUES (
+    5,
     '10.22.245.206',
     'daniel',
     'enhj',

@@ -41,6 +41,7 @@ public class DockerApiProxyService {
 
   private final String dockerApiProxyUsername;
   private final String dockerApiProxyPassword;
+  private final String dockerHubUsername;
 
   public DockerApiProxyService(ServicesService serviceService, SshService sshService,
                                DockerProperties dockerProperties) {
@@ -48,6 +49,7 @@ public class DockerApiProxyService {
     this.sshService = sshService;
     this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
     this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
+    this.dockerHubUsername = dockerProperties.getHub().getUsername();
   }
 
   public void launchDockerApiProxy(String hostname) {
@@ -61,12 +63,12 @@ public class DockerApiProxyService {
     String command = String.format("COUNT_API_PROXY=$(docker ps --filter 'name=%s' | grep '%s' | wc -l) && "
             + "if [ $COUNT_API_PROXY = 1 ]; then echo 'Proxy is running'; "
             + "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
-            + "docker pull %s && "
+            + "docker pull %s/%s && "
             + "docker run -itd --name=docker-api-proxy -p %s:%s --rm "
             + "-e BASIC_AUTH_USERNAME=%s -e BASIC_AUTH_PASSWORD=%s -e PROXY_PASS=http://$PRIVATE_IP:2376 "
             + "-l serviceName=%s -l serviceType=%s -l serviceAddr=%s:%s -l serviceHostname=%s %s && "
             + "echo 'Proxy launched'; fi",
-        serviceName, dockerRepositoryName, dockerRepositoryName, externalPort, internalPort,
+        serviceName, dockerRepositoryName, dockerHubUsername, dockerRepositoryName, externalPort, internalPort,
         dockerApiProxyUsername, dockerApiProxyPassword, serviceName, serviceType, hostname, externalPort,
         hostname, dockerRepositoryName);
     CommandResult commandResult = sshService.execCommand(hostname, command);
