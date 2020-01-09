@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11.0.5-jdk-stretch
 
 WORKDIR /usr/src/app
 COPY ./src/main/resources/aws/ec2.pem ./ec2.pem

@@ -1,7 +1,7 @@
 aws:
   access:
     key: AKIAIKTSO6FUZZS4WZ4Q
-    key-file-path: src/main/resources/aws/ec2.pem
+    key-file-path: ${awsAccessKeyFilePath:src/main/resources/aws/ec2.pem}
     secret-key: jEa50X8gKLMNHzColmL4ahT1NU9ntS1PxASUMm72
     username: ubuntu
   instance:

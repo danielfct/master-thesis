@@ -66,11 +66,11 @@ public class DockerApiProxyService {
             + "docker pull %s/%s && "
             + "docker run -itd --name=docker-api-proxy -p %s:%s --rm "
             + "-e BASIC_AUTH_USERNAME=%s -e BASIC_AUTH_PASSWORD=%s -e PROXY_PASS=http://$PRIVATE_IP:2376 "
-            + "-l serviceName=%s -l serviceType=%s -l serviceAddr=%s:%s -l serviceHostname=%s %s && "
+            + "-l serviceName=%s -l serviceType=%s -l serviceAddr=%s:%s -l serviceHostname=%s %s/%s && "
             + "echo 'Proxy launched'; fi",
         serviceName, dockerRepositoryName, dockerHubUsername, dockerRepositoryName, externalPort, internalPort,
         dockerApiProxyUsername, dockerApiProxyPassword, serviceName, serviceType, hostname, externalPort,
-        hostname, dockerRepositoryName);
+        hostname, dockerHubUsername, dockerRepositoryName);
     CommandResult commandResult = sshService.execCommand(hostname, command);
     if (!commandResult.isSuccessful()) {
       throw new LaunchDockerApiProxyException("Unsuccessful launch of docker api proxy on host %s: %s", hostname,
