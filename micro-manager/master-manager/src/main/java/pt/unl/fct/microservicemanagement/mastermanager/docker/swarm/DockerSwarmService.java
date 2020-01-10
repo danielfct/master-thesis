@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.docker.swarm;
 
 import pt.unl.fct.microservicemanagement.mastermanager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.DockerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.remote.ssh.CommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.remote.ssh.SshService;
 
 import java.util.List;
@@ -58,9 +59,13 @@ public class DockerSwarmService {
 
   public void initSwarm() {
     try (DockerClient swarmManager = getSwarmManager()) {
+      log.info("\nStarting docker swarm '{}' on host '{}'...", swarmManager.inspectSwarm().id(), dockerSwarmManager);
       var command = String.format("docker swarm init --advertise-addr %s", dockerSwarmManager);
-      if (sshService.execCommand(dockerSwarmManager, command).isSuccessful()) {
-        log.info("\nStarted docker swarm '{}' on host '{}'", swarmManager.inspectSwarm().id(), dockerSwarmManager);
+      CommandResult result = sshService.execCommand(dockerSwarmManager, command);
+      if (result.isSuccessful()) {
+        log.info("\ndone");
+      } else {
+        log.info("\nfailed with exit status '{}' due to '{}'", result.getExitStatus(), result.getResult());
       }
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();

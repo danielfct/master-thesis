@@ -86,7 +86,10 @@ public final class DockerNodesService {
   }
 
   public void deleteUnresponsiveNodes() {
+    log.info("\nDeleting unresponsive nodes...");
+    log.info("\nbefore: {}", getNodes());
     deleteNodes(n -> !n.status().state().equals("ready"));
+    log.info("\nafter: {}", getNodes());
   }
 
   public void deleteHostNodes(String nodeHostname) {

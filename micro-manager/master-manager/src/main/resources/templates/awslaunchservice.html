@@ -44,36 +44,29 @@
             </select>
             <label for="instanceId">Instance</label>
           </div>
-
           <div class="input-field col s12">
             <select name="service" id="service" onchange="onChangeServicesSelect();">
               <option value="" disabled="disabled" selected="selected">Choose service</option>
             </select>
             <label for="service">Service</label>
           </div>
-
           <div class="input-field col s12">
             <input type="text" name="internalPort" id="internalPort" autocomplete="off"/>
             <label for="internalPort">Internal Port</label>
           </div>
-
           <div class="input-field col s12">
             <input type="text" name="externalPort" id="externalPort" autocomplete="off"/>
             <label for="externalPort">External Port</label>
           </div>
-
           <div class="input-field col s12">
             <input type="text" name="eurekaHost" id="eurekaHost" autocomplete="off"/>
             <label for="eurekaHost">Eureka Host</label>
           </div>
-
           <div class="input-field col s12">
             <input type="text" name="database" id="database" autocomplete="off"/>
             <label for="database">Database</label>
           </div>
-
           <div id ="loader-placeholder"></div>
-
           <button class="btn waves-effect waves-light" type="submit" name="action">
             Launch
             <i class="material-icons right">send</i>

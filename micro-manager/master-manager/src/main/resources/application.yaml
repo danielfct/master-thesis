@@ -25,7 +25,7 @@ docker:
     username: danielfct
   install-script-path: src/main/resources/scripts/docker-install.sh
   swarm:
-    manager: ${dockerMaster:192.168.1.68}
+    manager: ${dockerManager:127.0.0.1}
     max-workers: ${maxWorkers:1}
 eureka:
   port: 8761
@@ -38,7 +38,6 @@ host:
   start-host-on-events-count: 3
   stop-host-on-events-count: 3
 master-manager:
-  hostname: ${master:192.168.1.76}
   monitor-period: 30000
   tests:
     test-logs-enable: ${testLogs:true}

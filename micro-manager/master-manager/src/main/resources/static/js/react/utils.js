@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-let $ = require('jquery');
-const React = require('react');
+import $ from "jquery";
+import React from "react";
 
 class Utils {
 

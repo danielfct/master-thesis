@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.host;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainersService;
@@ -43,14 +42,18 @@ import pt.unl.fct.microservicemanagement.mastermanager.monitoring.prometheus.Pro
 import pt.unl.fct.microservicemanagement.mastermanager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Text;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.amazonaws.services.ec2.model.Instance;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -251,36 +254,64 @@ public class HostsService {
     }
   }
 
-  public void initManager() {
-    if (!dockerNodesService.hasNode(n ->
-        Objects.equals(n.status().addr(), managerHostname) && Objects.equals(n.spec().role(), "manager"))) {
-      dockerSwarmService.initSwarm();
+  public void clusterHosts() {
+    var hostnames = new LinkedList<String>();
+    hostnames.add(managerHostname);
+    if (!edgeHostsService.hasEdgeHost(managerHostname)) {
+      log.info("\nSwarm manager '{}' is on cloud", managerHostname);
+      hostnames.addAll(getWorkerAwsNodes());
+    } else {
+      EdgeHost dockerMasterHost = edgeHostsService.getEdgeHostByHostname(managerHostname);
+      if (!dockerMasterHost.isLocal()) {
+        log.info("\nSwarm manager '{}' is an edge node, and accessible through internet", managerHostname);
+        hostnames.addAll(getWorkerAwsNodes());
+      } else {
+        log.info("\nSwarm manager '{}' is local", managerHostname);
+        hostnames.addAll(getWorkerEdgeNodes());
+      }
     }
-    // TODO why now?
-    dockerNodesService.deleteUnresponsiveNodes();
-    prometheusService.launchPrometheus(managerHostname);
-    locationRequestService.launchRequestLocationMonitor(managerHostname);
-    /*dockerContainersService.launchEureka() TODO*/
+    log.info("\nClustering hosts into the swarm...");
+    hostnames.forEach(this::setupHost);
   }
 
-  public void clusterSimilarEdgeHosts() {
-    String partialHostname = managerHostname.substring(0, managerHostname.lastIndexOf('.'));
-    edgeHostsService.getHostsByPartialHostname(partialHostname).stream()
-        .limit(maxWorkers)
-        .filter(host -> !Objects.equals(host.getHostname(), managerHostname))
-        .map(EdgeHost::getHostname)
-        .forEach(this::setupHost);
+  private void setupHost(String hostname) {
+    log.info("\nSetting up host '{}'", hostname);
+    dockerApiProxyService.launchDockerApiProxy(hostname);
+    if (Objects.equals(hostname, managerHostname)) {
+      if (!dockerNodesService.hasNode(n ->
+          Objects.equals(n.status().addr(), hostname) && Objects.equals(n.spec().role(), "manager"))) {
+        dockerSwarmService.initSwarm();
+      } else {
+        log.info("\nManager {} is already a swarm manager", hostname);
+      }
+      // TODO why now?
+      dockerNodesService.deleteUnresponsiveNodes();
+    } else {
+      dockerSwarmService.joinSwarm(hostname);
+    }
+    prometheusService.launchPrometheus(hostname);
+    locationRequestService.launchRequestLocationMonitor(hostname);
   }
 
-  public void clusterAwsNodes() {
+  private List<String> getWorkerAwsNodes() {
     int presentWorkers = dockerNodesService.getAvailableNodes().size() - 1;
     int maxInitialWorkers = Math.max(0, maxInstances - 1);
     int workersToAdd = maxInitialWorkers - presentWorkers;
+    List<String> hostnames = new ArrayList<>(workersToAdd);
     for (var i = 0; i < workersToAdd; i++) {
-      String hostname = chooseCloudHost();
-      setupHost(hostname);
-      log.info("\nClustered AWS node '{}' into the swarm. ({}/{})", hostname, i + 1, workersToAdd);
+      hostnames.add(chooseCloudHost());
     }
+    return hostnames;
+  }
+
+  private List<String> getWorkerEdgeNodes() {
+    String partialHostname = managerHostname.substring(0, managerHostname.lastIndexOf('.'));
+    return edgeHostsService.getHostsByPartialHostname(partialHostname).stream()
+        .map(EdgeHost::getHostname)
+        .filter(hostname -> !Objects.equals(hostname, managerHostname))
+        .filter(this::isHostRunning)
+        .limit(maxWorkers)
+        .collect(Collectors.toList());
   }
 
   /*public void assertHostIsRunning(String hostname, long timeout) {
@@ -302,9 +333,9 @@ public class HostsService {
         : edgeHostsService.getHostsByCountry(country);
     return edgeHosts.stream()
         .filter(edgeHost -> Text.isNullOrEmpty(city) || Objects.equals(edgeHost.getCity(), city))
-        .filter(edgeHost -> !dockerNodesService.isNode(edgeHost.getHostname()))
-        .filter(edgeHost -> isHostRunning(edgeHost.getHostname()))
         .map(EdgeHost::getHostname)
+        .filter(Predicate.not(dockerNodesService::isNode))
+        .filter(this::isHostRunning)
         .findFirst();
   }
 
@@ -323,15 +354,6 @@ public class HostsService {
       }
     }
     return awsService.createNewAwsInstance();
-  }
-
-  private void setupHost(String hostname) {
-    if (!dockerNodesService.hasNode(n -> Objects.equals(n.status().addr(), hostname))) {
-      dockerApiProxyService.launchDockerApiProxy(hostname);
-      dockerSwarmService.joinSwarm(hostname);
-      prometheusService.launchPrometheus(hostname);
-      locationRequestService.launchRequestLocationMonitor(hostname);
-    }
   }
 
 }

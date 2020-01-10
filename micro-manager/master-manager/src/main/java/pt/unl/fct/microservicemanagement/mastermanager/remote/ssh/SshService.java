@@ -81,14 +81,16 @@ public class SshService {
     if (edgeHostsService.hasEdgeHost(hostname)) {
       EdgeHost edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
       String username = edgeHost.getSshUsername();
+      //TODO improve security password
       String password = new String(Base64.getDecoder().decode(edgeHost.getSshPassword()));
       sshClient.authPassword(username, password);
-      log.info("\nInitEdgeClient > hostname:{}, username={}, password={}", hostname, username, password);
+      log.info("\nLogged in to edge hostname '{}' with username '{}' and password '{}'",
+          hostname, username, password);
     } else {
       var keyFile = new PKCS8KeyFile();
       keyFile.init(new File(awsKeyFilePath));
       sshClient.authPublickey(awsUser, keyFile);
-      log.info("\nInitAwsClient > hostname:{}", hostname);
+      log.info("\nLogged in to cloud hostname '{}' with pem key '{}'", hostname, awsKeyFilePath);
     }
     return sshClient;
   }
@@ -109,9 +111,9 @@ public class SshService {
   }
 
   public CommandResult execCommand(String hostname, String command) {
-    log.info("\nExecCommand > Hostname: {}, Command: {}", hostname, command);
     try (var sshClient = initClient(hostname);
          var session = sshClient.startSession()) {
+      log.info("\nExecuting '{}' \non hostname '{}'", command, hostname);
       Session.Command cmd = session.exec(command);
       cmd.join(EXEC_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
       String result = Arrays.stream(IOUtils.readFully(cmd.getInputStream()).toString().split("\\n"))
@@ -122,7 +124,7 @@ public class SshService {
           .collect(Collectors.joining());
       error = error.isEmpty() ? "None" : error;
       int exitStatus = cmd.getExitStatus();
-      log.info("\nExecCommandResult > Result: {}, Error: {}, Exit status: {}", result, error, exitStatus);
+      log.info("\nresult = '{}' with exit status '{}' and error '{}'", result, exitStatus, error);
       return new CommandResult(command, result, exitStatus);
     } catch (IOException e) {
       e.printStackTrace();

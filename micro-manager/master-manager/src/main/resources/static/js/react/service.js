@@ -187,9 +187,9 @@ export class ServicePage extends Component {
         }
         let isEdit = paramId === 0;
         let serviceInitialValues = {
-            id: paramId, serviceName: '', dockerRepo: '', defaultExternalPort: '',
+            id: paramId, serviceName: '', dockerRepository: '', defaultExternalPort: '',
             defaultInternalPort: '', defaultDb: '', launchCommand: '', minReplics: 0,
-            maxReplics: 0, outputLabel: '', serviceType: '', avgMem: 0
+            maxReplics: 0, outputLabel: '', serviceType: '', expectedMemoryConsumption: 0
         };
         let thisBreadcrumbs = [{title: 'Services configs', link: '/ui/services'}];
         this.state = {breadcrumbs: thisBreadcrumbs, service: serviceInitialValues, dependencies: [],

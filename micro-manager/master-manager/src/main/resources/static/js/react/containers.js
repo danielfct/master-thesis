@@ -441,25 +441,15 @@ export class LaunchContainer extends Component {
     };
 
     renderServicesSelect = () => {
-        let servicesNodes;
-        if (this.state.services) {
-            servicesNodes = pt.unl.fct.microserviceManagement.managerMaster.entities.service.map(function (service) {
-                return (
-                    <option key={service.id} value={service.serviceName}>{service.serviceName}</option>
-                );
-            });
-            return servicesNodes;
-        }
+        return this.state.services && this.state.services.map((service) =>
+            <option key={service.id} value={service.serviceName}>{service.serviceName}</option>
+        );
     };
 
     renderHostnamesSelect = () => {
-        if (this.state.nodes) {
-            return this.state.nodes.map(function (node) {
-                return (
-                    <option key={node.id} value={node.hostname}>{node.hostname}</option>
-                );
-            });
-        }
+        return this.state.nodes && this.state.nodes.map((node) =>
+            <option key={node.id} value={node.hostname}>{node.hostname}</option>
+        );
     };
 
     onSubmitForm = (event) => {

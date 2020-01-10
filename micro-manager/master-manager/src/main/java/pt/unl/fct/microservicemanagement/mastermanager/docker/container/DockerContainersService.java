@@ -197,6 +197,7 @@ public class DockerContainersService {
    */
   private String launchContainer(String hostname, Service service, List<String> customEnvs,
                                  Map<String, String> customLabels, Map<String, String> dynamicLaunchParams) {
+    log.info("\nLaunching container...");
     String serviceName = service.getServiceName();
     long serviceId = service.getId();
     String serviceType = service.getServiceType();
@@ -224,7 +225,7 @@ public class DockerContainersService {
         launchCommand = launchCommand.replace(outputLabel, eurekaAddr.get());
       } else {
         //TODO apagar depois de ver se não houver erro
-        log.error("\n Eureka address at region '{}' not found", region);
+        log.error("\neureka address at region '{}' not found", region);
       }
     }
     for (Service databaseService : serviceService.getDependenciesByType(serviceId, "database")) {
@@ -253,8 +254,8 @@ public class DockerContainersService {
         DockerContainer.Label.SERVICE_CITY, city));
     labels.putAll(customLabels);
     //TODO porquê repetir informação nos envs e labels?
-    log.info("\nLaunching container: hostname={}, internalPort={}, externalPort={}, "
-            + "containerName={}, dockerRepo={}, launchCommand={}, envs={}, labels={}",
+    log.info("\nhostname = '{}', internalPort = '{}', externalPort = '{}', containerName = '{}', "
+            + "dockerRepository = '{}', launchCommand = '{}', envs = '{}', labels = '{}'",
         hostname, internalPort, externalPort, containerName, dockerRepository, launchCommand, envs, labels);
     HostConfig hostConfig = HostConfig.builder()
         .autoRemove(true)
@@ -274,7 +275,7 @@ public class DockerContainersService {
       ContainerCreation container = dockerClient.createContainer(containerConfig, containerName);
       String containerId = container.id();
       dockerClient.startContainer(containerId);
-      log.info("\nSuccessfully launched container '{}'", containerId);
+      log.info("\nsuccessfully launched container = '{}'", containerId);
       if (Objects.equals(serviceType, "frontend")) {
         nginxLoadBalancerService.addToLoadBalancer(hostname, serviceName, serviceAddr, continent, region, country,
             city);
@@ -287,15 +288,23 @@ public class DockerContainersService {
   }
 
   /**
-   * Launches a service which must have 0 replicas
+   * Launches a singleton service (which means just 1 service per host)
    * @param hostname
    * @param serviceName
    * @return
    */
   public String launchSingletonService(String hostname, String serviceName) {
+    log.info("\nLaunching singleton service '{}' at hostname '{}' ...", serviceName, hostname);
     List<SimpleContainer> containers = getContainers(hostname,
         DockerClient.ListContainersParam.withLabel(DockerContainer.Label.SERVICE_NAME, serviceName));
-    return containers.isEmpty() ? launchContainer(hostname, serviceName) : containers.get(0).getId();
+    String containerId;
+    if (containers.isEmpty()) {
+      containerId = launchContainer(hostname, serviceName);
+    } else {
+      containerId = containers.get(0).getId();
+      log.info("\ncontainer '{}' is already running service '{}' at hostname '{}'", containerId, serviceName, hostname);
+    }
+    return containerId;
   }
 
   /**

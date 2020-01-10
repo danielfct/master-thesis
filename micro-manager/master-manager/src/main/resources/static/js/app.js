@@ -23,13 +23,9 @@
  * SOFTWARE.
  */
 
-const React = require('react');
-const Component = React.Component;
-const ReactDOM = require('react-dom');
-const BrowserRouter = require('react-router-dom').BrowserRouter;
-const Route = require('react-router-dom').Route;
-const Redirect = require('react-router-dom').Redirect;
+import React from "react";
 
+const Component = React.Component;
 import {MainLayout} from './react/globalComponents';
 import {EdgeHosts} from './react/edgeHost';
 import {AppPackages} from './react/appPackage';
@@ -61,6 +57,10 @@ import {EurekaPage} from './react/eureka';
 import {LoadBalancerPage} from './react/loadBalancer'
 
 /* Home Component */
+import ReactDOM from "react-dom";
+
+import {BrowserRouter, Redirect, Route} from "react-router-dom";
+
 class Home extends Component {
     constructor(props) {
         super(props);       
@@ -106,7 +106,6 @@ ReactDOM.render((
             <Route exact path="/ui/nodes/add" component={AddNode} />
             <Route exact path="/ui/eureka" component={EurekaPage} />
             <Route exact path="/ui/loadbalancer" component={LoadBalancerPage} />
-
             <Route exact path="/ui/simulatedMetrics/management" component={SimulatedMetricsLandingPage} />
             <Route exact path="/ui/simulatedMetrics/services" component={ServiceSimulatedMetrics} />
             <Route exact path="/ui/simulatedMetrics/services/detail/:id?" component={ServiceSimulatedMetricsDetail} />
@@ -116,7 +115,6 @@ ReactDOM.render((
             <Route exact path="/ui/simulatedMetrics/defaultHosts/detail/:id?" component={DefaultHostSimulatedMetricsDetail} />
             <Route exact path="/ui/simulatedMetrics/specificHosts" component={SpecificHostSimulatedMetrics} />
             <Route exact path="/ui/simulatedMetrics/specificHosts/detail/:id?" component={SpecificHostSimulatedMetricsDetail} />
-
             <Route exact path="/ui/regions" component={Regions} />
         </div>
     </BrowserRouter>

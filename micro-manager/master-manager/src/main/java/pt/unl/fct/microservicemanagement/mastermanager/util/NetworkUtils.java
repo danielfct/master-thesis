@@ -22,22 +22,26 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.location;
+package pt.unl.fct.microservicemanagement.mastermanager.util;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
-@NoArgsConstructor
-@Getter
-@Setter
-@Configuration
-@ConfigurationProperties("location-request")
-public class LocationRequestProperties {
+import lombok.experimental.UtilityClass;
 
-  private int port;
-  private double minimumRequestCountPercentage;
+@UtilityClass
+public class NetworkUtils {
+
+  public String getLocalIp() {
+    try (DatagramSocket socket = new DatagramSocket()) {
+      socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+      return socket.getLocalAddress().getHostAddress();
+    } catch (SocketException | UnknownHostException e) {
+      e.printStackTrace();
+    }
+    return "";
+  }
 
 }

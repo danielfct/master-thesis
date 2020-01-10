@@ -59,18 +59,18 @@ public class DockerApiProxyService {
     String serviceType = dockerApiProxy.getServiceType();
     String externalPort = dockerApiProxy.getDefaultExternalPort();
     String internalPort = dockerApiProxy.getDefaultInternalPort();
-    String dockerRepositoryName = dockerApiProxy.getDockerRepository();
+    var dockerRepository = String.format("%s/%s", dockerHubUsername, dockerApiProxy.getDockerRepository());
     String command = String.format("COUNT_API_PROXY=$(docker ps --filter 'name=%s' | grep '%s' | wc -l) && "
             + "if [ $COUNT_API_PROXY = 1 ]; then echo 'Proxy is running'; "
             + "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
-            + "docker pull %s/%s && "
+            + "docker pull %s && "
             + "docker run -itd --name=docker-api-proxy -p %s:%s --rm "
             + "-e BASIC_AUTH_USERNAME=%s -e BASIC_AUTH_PASSWORD=%s -e PROXY_PASS=http://$PRIVATE_IP:2376 "
-            + "-l serviceName=%s -l serviceType=%s -l serviceAddr=%s:%s -l serviceHostname=%s %s/%s && "
+            + "-l serviceName=%s -l serviceType=%s -l serviceAddr=%s:%s -l serviceHostname=%s %s && "
             + "echo 'Proxy launched'; fi",
-        serviceName, dockerRepositoryName, dockerHubUsername, dockerRepositoryName, externalPort, internalPort,
+        serviceName, dockerRepository, dockerRepository, externalPort, internalPort,
         dockerApiProxyUsername, dockerApiProxyPassword, serviceName, serviceType, hostname, externalPort,
-        hostname, dockerHubUsername, dockerRepositoryName);
+        hostname, dockerRepository);
     CommandResult commandResult = sshService.execCommand(hostname, command);
     if (!commandResult.isSuccessful()) {
       throw new LaunchDockerApiProxyException("Unsuccessful launch of docker api proxy on host %s: %s", hostname,

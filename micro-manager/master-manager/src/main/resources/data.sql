@@ -2,6 +2,8 @@
 
 --TODO add sock-shop name to docker-repository names
 
+--TODO try without ids
+
 INSERT INTO app_package (id, app_name)
 VALUES (
     1,

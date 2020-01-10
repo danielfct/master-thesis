@@ -24,11 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager;
 
-import pt.unl.fct.microservicemanagement.mastermanager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHost;
-import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.monitoring.ContainersMonitoringService;
 import pt.unl.fct.microservicemanagement.mastermanager.monitoring.HostsMonitoringService;
 import pt.unl.fct.microservicemanagement.mastermanager.monitoring.MasterManagerMonitoringService;
@@ -42,51 +38,24 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MasterManagerStartup implements ApplicationListener<ApplicationReadyEvent> {
 
-  private final EdgeHostsService edgeHostsService;
   private final HostsService hostsService;
   private final ContainersMonitoringService containersMonitoringService;
   private final HostsMonitoringService hostsMonitoringService;
   private final MasterManagerMonitoringService masterManagerMonitoringService;
-  private final DockerApiProxyService dockerApiProxyService;
 
-  private final String swarmManagerHostname;
-
-  public MasterManagerStartup(EdgeHostsService edgeHostsService, HostsService hostsService,
+  public MasterManagerStartup(HostsService hostsService,
                               ContainersMonitoringService containersMonitoringService,
                               HostsMonitoringService hostsMonitoringService,
-                              MasterManagerMonitoringService masterManagerMonitoringService,
-                              DockerApiProxyService dockerApiProxyService,
-                              DockerProperties dockerProperties) {
-    this.edgeHostsService = edgeHostsService;
+                              MasterManagerMonitoringService masterManagerMonitoringService) {
     this.hostsService = hostsService;
     this.containersMonitoringService = containersMonitoringService;
     this.hostsMonitoringService = hostsMonitoringService;
     this.masterManagerMonitoringService = masterManagerMonitoringService;
-    this.dockerApiProxyService = dockerApiProxyService;
-    this.swarmManagerHostname = dockerProperties.getSwarm().getManager();
   }
 
   @Override
   public void onApplicationEvent(ApplicationReadyEvent event) {
-    this.initDockerComponents();
-  }
-
-  private void initDockerComponents() {
-    dockerApiProxyService.launchDockerApiProxy(swarmManagerHostname);
-    hostsService.initManager();
-    if (!edgeHostsService.hasEdgeHost(swarmManagerHostname)) {
-      // Master is on AWS
-      hostsService.clusterAwsNodes();
-    } else {
-      EdgeHost dockerMasterHost = edgeHostsService.getEdgeHostByHostname(swarmManagerHostname);
-      if (!dockerMasterHost.isLocal()) {
-        // Master is accessible through internet
-        hostsService.clusterAwsNodes();
-      } else {
-        // Master is local only
-        hostsService.clusterSimilarEdgeHosts();
-      }
-    }
+    hostsService.clusterHosts();
     containersMonitoringService.initContainerMonitorTimer();
     hostsMonitoringService.initHostMonitorTimer();
     masterManagerMonitoringService.initMasterManagerMonitorTimer();
