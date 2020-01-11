@@ -26,8 +26,8 @@ let React = require('react');
 let Component = React.Component;
 let Link = require('react-router-dom').Link;
 let Redirect = require('react-router-dom').Redirect
-import Utils from './utils';
-import {CardItem, MainLayout} from './globalComponents';
+import Utils from '../react/utils';
+import {CardItem, MainLayout} from '../react/globalComponents';
 
 class NodeCard extends Component {
 

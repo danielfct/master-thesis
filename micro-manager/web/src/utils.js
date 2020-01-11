@@ -22,40 +22,35 @@
  * SOFTWARE.
  */
 
-import $ from "jquery";
-import React from "react";
+const displayProgressBar = () =>
+    $("#loader-placeholder").html('<div class="progress"><div class="indeterminate"></div></div>');
+
+const hideProgressBar = (delay) =>
+    //TODO remove delay when server and client are on different machines
+    setTimeout(() => $("#loader-placeholder").html(""), delay);
 
 class Utils {
-
     ajaxGet = (url, successFunction) => {
         $.ajax({
             url: url,
             type: 'GET',
             cache: false,
-            beforeSend: function () {
-                let loader = '<div class="progress"><div class="indeterminate"></div></div>';
-                $("#loader-placeholder").html(loader);
-            },
-            success: function (data) {
+            beforeSend: () =>
+                displayProgressBar(),
+            success: (data) => {
                 successFunction(data);
-                setTimeout(function(){
-                    $("#loader-placeholder").html("");
-                }, 200);
+                hideProgressBar(200);
             },
-            error: function (xhr, status, err) {
-                setTimeout(function(){
-                    $("#loader-placeholder").html("");
-                }, 200);
+            error: (xhr, status, err) => {
                 M.toast({html: "<div>Error: " + xhr.statusText + "; Code: " + xhr.status + "</div>"});
+                hideProgressBar(200);
             }
         });
     };
-
     convertFormToJson = (formId) => {
         let form = $("#" + formId).serializeArray();
         let formObject = {};
-        $.each(form,
-            function (i, v) {
+        $.each(form, (i, v) => {
                 let valueTest = v.value.replace(",", ".");
                 let number = Number(valueTest);
                 if (isNaN(number) || v.value === '') {
@@ -67,7 +62,6 @@ class Utils {
         );
         return JSON.stringify(formObject);
     };
-
     formSubmit = (formUrl, formMethod, formData, successFunction) => {
         $.ajax({
             url: formUrl,
@@ -76,26 +70,19 @@ class Utils {
             dataType: "json",
             contentType: 'application/json',
             cache: false,
-            beforeSend: function () {
-                let loader = '<div class="progress"><div class="indeterminate"></div></div>';
-                $("#loader-placeholder").html(loader);
-            },
-            success: function (data) {
-                setTimeout(function() {
-                    $("#loader-placeholder").html("");
-                }, 200);
+            beforeSend: () =>
+                displayProgressBar(),
+            success: (data) => {
+                hideProgressBar(200);
                 successFunction(data);
             },
-            error: function (xhr, status, err) {
-                setTimeout(function() {
-                    $("#loader-placeholder").html("");
-                }, 200);
+            error: (xhr, status, err) => {
+                hideProgressBar(200);
                 M.toast({html: "<div>Error: " + xhr.statusText + "; Code: " + xhr.status + "</div>"});
             }
         });
         return false;
     };
-
 }
 
 export default (new Utils);
