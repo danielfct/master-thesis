@@ -22,17 +22,16 @@
  * SOFTWARE.
  */
 
-import React from "react";
-import {MainLayout} from "./sharedComponents/mainLayout";
-
+import React from 'react';
+import { MainLayout } from './sharedComponents/mainLayout';
 
 export class Landing extends React.Component {
-    render() {
-        let style = { maxWidth: "100%" };
-        return (
-            <MainLayout title='Microservices management'>
-                <img src="/images/Arquitetura2.png" alt="Arquitetura do componente" style={style}/>
-            </MainLayout>
-        );
-    }
+  render () {
+    const style = { maxWidth: '100%' };
+    return (
+      <MainLayout title='Microservices management'>
+        <img src="/images/Arquitetura2.png" alt="Arquitetura do componente" style={style}/>
+      </MainLayout>
+    );
+  }
 }

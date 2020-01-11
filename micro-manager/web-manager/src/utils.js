@@ -22,69 +22,71 @@
  * SOFTWARE.
  */
 
-import $ from "jquery";
+import $ from 'jquery';
 
 const displayProgressBar = () =>
-    $("#loader-placeholder").html('<div class="progress"><div class="indeterminate"></div></div>');
+  $('#loader-placeholder').html('<div class="progress"><div class="indeterminate"></div></div>');
 
 const hideProgressBar = (delay) =>
-    //TODO remove delay when server and client are on different machines
-    setTimeout(() => $("#loader-placeholder").html(""), delay);
+// TODO remove delay when server and client are on different machines
+  setTimeout(() => $('#loader-placeholder').html(''), delay);
 
 class Utils {
     ajaxGet = (url, successFunction) => {
-        $.ajax({
-            url: url,
-            type: 'GET',
-            cache: false,
-            beforeSend: () =>
-                displayProgressBar(),
-            success: (data) => {
-                successFunction(data);
-                hideProgressBar(200);
-            },
-            error: (xhr, status, err) => {
-                M.toast({html: "<div>Error: " + xhr.statusText + "; Code: " + xhr.status + "</div>"});
-                hideProgressBar(200);
-            }
-        });
+      $.ajax({
+        url: url,
+        type: 'GET',
+        cache: false,
+        beforeSend: () =>
+          displayProgressBar(),
+        success: (data) => {
+          successFunction(data);
+          hideProgressBar(200);
+        },
+        error: (xhr, status, err) => {
+          M.toast({ html: '<div>Error: ' + xhr.statusText + '; Code: ' + xhr.status + '</div>' });
+          hideProgressBar(200);
+        }
+      });
     };
+
     convertFormToJson = (formId) => {
-        let form = $("#" + formId).serializeArray();
-        let formObject = {};
-        $.each(form, (i, v) => {
-                let valueTest = v.value.replace(",", ".");
-                let number = Number(valueTest);
-                if (isNaN(number) || v.value === '') {
-                    formObject[v.name] = v.value;
-                } else {
-                    formObject[v.name] = number;
-                }
-            }
-        );
-        return JSON.stringify(formObject);
+      const form = $('#' + formId).serializeArray();
+      const formObject = {};
+      $.each(form, (i, v) => {
+        const valueTest = v.value.replace(',', '.');
+        const number = Number(valueTest);
+        if (isNaN(number) || v.value === '') {
+          formObject[v.name] = v.value;
+        } else {
+          formObject[v.name] = number;
+        }
+      }
+      );
+      return JSON.stringify(formObject);
     };
+
     formSubmit = (formUrl, formMethod, formData, successFunction) => {
-        $.ajax({
-            url: formUrl,
-            type: formMethod,
-            data: formData,
-            dataType: "json",
-            contentType: 'application/json',
-            cache: false,
-            beforeSend: () =>
-                displayProgressBar(),
-            success: (data) => {
-                hideProgressBar(200);
-                successFunction(data);
-            },
-            error: (xhr, status, err) => {
-                hideProgressBar(200);
-                M.toast({html: "<div>Error: " + xhr.statusText + "; Code: " + xhr.status + "</div>"});
-            }
-        });
-        return false;
+      $.ajax({
+        url: formUrl,
+        type: formMethod,
+        data: formData,
+        dataType: 'json',
+        contentType: 'application/json',
+        cache: false,
+        beforeSend: () =>
+          displayProgressBar(),
+        success: (data) => {
+          hideProgressBar(200);
+          successFunction(data);
+        },
+        error: (xhr, status, err) => {
+          hideProgressBar(200);
+          M.toast({ html: '<div>Error: ' + xhr.statusText + '; Code: ' + xhr.status + '</div>' });
+        }
+      });
+      return false;
     };
 }
 
-export default (new Utils);
+export default (new Utils());

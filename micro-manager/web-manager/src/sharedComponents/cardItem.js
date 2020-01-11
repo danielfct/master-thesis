@@ -22,24 +22,22 @@
  * SOFTWARE.
  */
 
-import React from "react";
+import React from 'react';
 
 export class CardItem extends React.Component {
+  constructor (props) {
+    super(props);
+    const propLabel = this.props.label;
+    const propValue = this.props.value;
+    this.state = { label: propLabel, value: propValue };
+  }
 
-    constructor(props) {
-        super(props);
-        let propLabel = this.props.label;
-        let propValue = this.props.value;
-        this.state = {label: propLabel, value: propValue};
-    }
-
-    render() {
-        return (
-            <div>
-                <h5>{this.state.label}</h5>
-                <div>{this.state.value}</div>
-            </div>
-        );
-    }
-
+  render () {
+    return (
+      <div>
+        <h5>{this.state.label}</h5>
+        <div>{this.state.value}</div>
+      </div>
+    );
+  }
 }

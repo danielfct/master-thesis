@@ -22,51 +22,48 @@
  * SOFTWARE.
  */
 
-import React from "react";
-import {Link} from "react-router-dom";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 export class PageTitle extends React.Component {
+  constructor (props) {
+    super(props);
+    let initialBreadcrumbs = [];
+    if (this.props.breadcrumbs) { initialBreadcrumbs = this.props.breadcrumbs; }
 
-    constructor(props) {
-        super(props);
-        let initialBreadcrumbs = [];
-        if (this.props.breadcrumbs)
-            initialBreadcrumbs = this.props.breadcrumbs;
-
-        initialBreadcrumbs.push({link: '', title: this.props.title});
-        this.state = {breadcrumbs: initialBreadcrumbs};
-    }
+    initialBreadcrumbs.push({ link: '', title: this.props.title });
+    this.state = { breadcrumbs: initialBreadcrumbs };
+  }
 
     renderBreadcrumbs = () => {
-        let breadcrumbs;
-        let style = {marginBottom: '10px'};
-        if (this.state.breadcrumbs) {
-            breadcrumbs = this.state.breadcrumbs.map(function (breadcrumb, index) {
-                if (breadcrumb.link === '') {
-                    return (
-                        <span key={index} className="breadcrumb">
-                            {breadcrumb.title}
-                        </span>
-                    )
-                }
-                return (
-                    <Link key={index} className="breadcrumb" to={breadcrumb.link}>
-                        {breadcrumb.title}
-                    </Link>
-                );
-            });
-        }
-        return (
-            <div style={style} className="row">
-                <div className="col s12">
-                    {breadcrumbs}
-                </div>
-            </div>
-        );
+      let breadcrumbs;
+      const style = { marginBottom: '10px' };
+      if (this.state.breadcrumbs) {
+        breadcrumbs = this.state.breadcrumbs.map(function (breadcrumb, index) {
+          if (breadcrumb.link === '') {
+            return (
+              <span key={index} className="breadcrumb">
+                {breadcrumb.title}
+              </span>
+            );
+          }
+          return (
+            <Link key={index} className="breadcrumb" to={breadcrumb.link}>
+              {breadcrumb.title}
+            </Link>
+          );
+        });
+      }
+      return (
+        <div style={style} className="row">
+          <div className="col s12">
+            {breadcrumbs}
+          </div>
+        </div>
+      );
     };
 
-    render() {
-        return this.renderBreadcrumbs();
+    render () {
+      return this.renderBreadcrumbs();
     }
-
 }

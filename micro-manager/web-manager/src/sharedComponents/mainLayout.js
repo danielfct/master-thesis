@@ -22,40 +22,39 @@
  * SOFTWARE.
  */
 
-import React from "react";
-import {AppLinksDropdown} from "./appLinksDropdown";
-import {PageTitle} from "./pageTitle";
-import {AppLinks} from "./appLinks";
+import React from 'react';
+import { AppLinksDropdown } from './appLinksDropdown';
+import { PageTitle } from './pageTitle';
+import { AppLinks } from './appLinks';
 
 export class MainLayout extends React.Component {
+  constructor (props) {
+    super(props);
+    const navLinks = [
+      { link: '/ui/services', name: 'Services configs' },
+      { link: '/ui/apps', name: 'Apps packages' },
+      { link: '/ui/edgeHosts', name: 'Edge Hosts' },
+      { link: '/ui/regions', name: 'Regions' },
+      { link: '/ui/containers', name: 'Containers' },
+      { link: '/ui/nodes', name: 'Nodes' },
+      { link: '/ui/eureka', name: 'Eureka servers' },
+      { link: '/ui/loadBalancer', name: 'Load balancers' },
+      { link: '/ui/rules/management', name: 'Rules Management' },
+      { link: '/ui/simulatedMetrics/management', name: 'Simulated metrics Management' }
+    ];
+    this.state = { links: navLinks };
+  }
 
-    constructor(props) {
-        super(props);
-        let navLinks = [
-            {link: '/ui/services', name: 'Services configs'},
-            {link: '/ui/apps', name: 'Apps packages'},
-            {link: '/ui/edgeHosts', name: 'Edge Hosts'},
-            {link: '/ui/regions', name: 'Regions'},
-            {link: '/ui/containers', name: 'Containers'},
-            {link: '/ui/nodes', name: 'Nodes'},
-            {link: '/ui/eureka', name: 'Eureka servers'},
-            {link: '/ui/loadBalancer', name: 'Load balancers'},
-            {link: '/ui/rules/management', name: 'Rules Management'},
-            {link: '/ui/simulatedMetrics/management', name: 'Simulated metrics Management'}
-        ];
-        this.state = {links: navLinks};
-    }
-
-    render() {
-        return (
-            <div className='row'>
-                <AppLinksDropdown links={this.state.links}/>
-                <PageTitle title={this.props.title} breadcrumbs={this.props.breadcrumbs}/>
-                <div className='col s12 m8'>
-                    {this.props.children}
-                </div>
-                <AppLinks links={this.state.links}/>
-            </div>
-        );
-    }
+  render () {
+    return (
+      <div className='row'>
+        <AppLinksDropdown links={this.state.links}/>
+        <PageTitle title={this.props.title} breadcrumbs={this.props.breadcrumbs}/>
+        <div className='col s12 m8'>
+          {this.props.children}
+        </div>
+        <AppLinks links={this.state.links}/>
+      </div>
+    );
+  }
 }
