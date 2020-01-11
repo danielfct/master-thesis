@@ -22,14 +22,15 @@
  * SOFTWARE.
  */
 
-let React = require('react');
-let Component = React.Component;
-let Link = require('react-router-dom').Link;
-let Redirect = require('react-router-dom').Redirect
+import React from "react";
+import {Link, Redirect} from "react-router-dom";
+import M from 'materialize-css'
+import $ from "jquery";
 import Utils from '../utils';
-import {CardItem, MainLayout} from '../globalComponents';
+import {MainLayout} from "../sharedComponents/mainLayout";
+import {CardItem} from "../sharedComponents/cardItem";
 
-class NodeCard extends Component {
+class NodeCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -75,7 +76,7 @@ class NodeCard extends Component {
     }
 }
 
-export class Nodes extends Component {
+export class Nodes extends React.Component {
 
     constructor(props) {
         super(props);
@@ -124,7 +125,7 @@ export class Nodes extends Component {
     }
 }
 
-export class AddNode extends Component {
+export class AddNode extends React.Component {
 
     constructor(props) {
         super(props);

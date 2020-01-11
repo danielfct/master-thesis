@@ -22,20 +22,20 @@
  * SOFTWARE.
  */
 
-
 import React from "react";
+import M from 'materialize-css'
 import $ from "jquery";
 import Utils from '../utils';
-import {CardItem, MainLayout} from '../globalComponents';
-let Component = React.Component;
+import {MainLayout} from "../sharedComponents/mainLayout";
+import {CardItem} from "../sharedComponents/cardItem";
 
-class RegionCard extends Component {
+class RegionCard extends React.Component {
 
     constructor(props) {
         super(props);
         let region = this.props.region;
         region.active = region.active ? "true" : "false";
-        let defaultIsEdit = this.props.region.id == 0;
+        let defaultIsEdit = this.props.region.id === 0;
         this.state = {data: region, loading: false, isEdit: defaultIsEdit};
     }
 
@@ -147,7 +147,7 @@ class RegionCard extends Component {
     }
 }
 
-export class Regions extends Component {
+export class Regions extends React.Component {
 
     constructor(props) {
         super(props);

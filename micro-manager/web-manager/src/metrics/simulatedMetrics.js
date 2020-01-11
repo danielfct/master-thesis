@@ -22,15 +22,14 @@
  * SOFTWARE.
  */
 
-let $ = require('jquery');
-let React = require('react');
-let Component = React.Component;
-let Redirect = require('react-router-dom').Redirect;
-let Link = require('react-router-dom').Link;
+import React from "react";
+import {Link, Redirect} from "react-router-dom";
+import M from 'materialize-css'
 import Utils from '../utils';
-import {CardItem, MainLayout} from '../globalComponents';
+import {MainLayout} from "../sharedComponents/mainLayout";
+import {CardItem} from "../sharedComponents/cardItem";
 
-export class SimulatedMetricsLandingPage extends Component {
+export class SimulatedMetricsLandingPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -72,7 +71,7 @@ export class SimulatedMetricsLandingPage extends Component {
     }
 }
 
-class ServiceSimulatedMetricsCard extends Component {
+class ServiceSimulatedMetricsCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -116,7 +115,7 @@ class ServiceSimulatedMetricsCard extends Component {
     }
 }
 
-export class ServiceSimulatedMetrics extends Component {
+export class ServiceSimulatedMetrics extends React.Component {
 
     constructor(props) {
         super(props);
@@ -169,7 +168,7 @@ export class ServiceSimulatedMetrics extends Component {
     }
 }
 
-export class ServiceSimulatedMetricsDetail extends Component {
+export class ServiceSimulatedMetricsDetail extends React.Component {
 
     constructor(props) {
         super(props);
@@ -332,7 +331,7 @@ export class ServiceSimulatedMetricsDetail extends Component {
     }
 }
 
-class ContainerSimulatedMetricsCard extends Component {
+class ContainerSimulatedMetricsCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -376,7 +375,7 @@ class ContainerSimulatedMetricsCard extends Component {
     }
 }
 
-export class ContainerSimulatedMetrics extends Component {
+export class ContainerSimulatedMetrics extends React.Component {
 
     constructor(props) {
         super(props);
@@ -428,7 +427,7 @@ export class ContainerSimulatedMetrics extends Component {
     }
 }
 
-export class ContainerSimulatedMetricsDetail extends Component {
+export class ContainerSimulatedMetricsDetail extends React.Component {
 
     constructor(props) {
         super(props);
@@ -591,7 +590,7 @@ export class ContainerSimulatedMetricsDetail extends Component {
     }
 }
 
-class DefaultHostSimulatedMetricsCard extends Component {
+class DefaultHostSimulatedMetricsCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -634,7 +633,7 @@ class DefaultHostSimulatedMetricsCard extends Component {
     }
 }
 
-export class DefaultHostSimulatedMetrics extends Component {
+export class DefaultHostSimulatedMetrics extends React.Component {
 
     constructor(props) {
         super(props);
@@ -687,7 +686,7 @@ export class DefaultHostSimulatedMetrics extends Component {
     }
 }
 
-export class DefaultHostSimulatedMetricsDetail extends Component {
+export class DefaultHostSimulatedMetricsDetail extends React.Component {
 
     constructor(props) {
         super(props);
@@ -820,7 +819,7 @@ export class DefaultHostSimulatedMetricsDetail extends Component {
     }
 }
 
-class SpecificHostSimulatedMetricsCard extends Component {
+class SpecificHostSimulatedMetricsCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -864,7 +863,7 @@ class SpecificHostSimulatedMetricsCard extends Component {
     }
 }
 
-export class SpecificHostSimulatedMetrics extends Component {
+export class SpecificHostSimulatedMetrics extends React.Component {
 
     constructor(props) {
         super(props);
@@ -917,7 +916,7 @@ export class SpecificHostSimulatedMetrics extends Component {
     }
 }
 
-export class SpecificHostSimulatedMetricsDetail extends Component {
+export class SpecificHostSimulatedMetricsDetail extends React.Component {
 
     constructor(props) {
         super(props);

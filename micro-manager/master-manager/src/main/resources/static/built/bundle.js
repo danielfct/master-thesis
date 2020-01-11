@@ -18864,20 +18864,15 @@
 	            type: 'GET',
 	            cache: false,
 	            beforeSend: function beforeSend() {
-	                var loader = '<div class="progress"><div class="indeterminate"></div></div>';
-	                (0, _jquery2.default)("#loader-placeholder").html(loader);
+	                return displayProgressBar();
 	            },
 	            success: function success(data) {
 	                successFunction(data);
-	                setTimeout(function () {
-	                    (0, _jquery2.default)("#loader-placeholder").html("");
-	                }, 200);
+	                hideProgressBar(200);
 	            },
 	            error: function error(xhr, status, err) {
-	                setTimeout(function () {
-	                    (0, _jquery2.default)("#loader-placeholder").html("");
-	                }, 200);
 	                M.toast({ html: "<div>Error: " + xhr.statusText + "; Code: " + xhr.status + "</div>" });
+	                hideProgressBar(200);
 	            }
 	        });
 	    };
@@ -18906,24 +18901,32 @@
 	            contentType: 'application/json',
 	            cache: false,
 	            beforeSend: function beforeSend() {
-	                var loader = '<div class="progress"><div class="indeterminate"></div></div>';
-	                (0, _jquery2.default)("#loader-placeholder").html(loader);
+	                return displayProgressBar();
 	            },
 	            success: function success(data) {
-	                setTimeout(function () {
-	                    (0, _jquery2.default)("#loader-placeholder").html("");
-	                }, 200);
+	                hideProgressBar(200);
 	                successFunction(data);
 	            },
 	            error: function error(xhr, status, err) {
-	                setTimeout(function () {
-	                    (0, _jquery2.default)("#loader-placeholder").html("");
-	                }, 200);
+	                hideProgressBar(200);
 	                M.toast({ html: "<div>Error: " + xhr.statusText + "; Code: " + xhr.status + "</div>" });
 	            }
 	        });
 	        return false;
 	    };
+	};
+	
+	var displayProgressBar = function displayProgressBar() {
+	    return (0, _jquery2.default)("#loader-placeholder").html('<div class="progress"><div class="indeterminate"></div></div>');
+	};
+	
+	var hideProgressBar = function hideProgressBar(delay) {
+	    return (
+	        //TODO remove delay when server and client are on different machine
+	        setTimeout(function () {
+	            return (0, _jquery2.default)("#loader-placeholder").html("");
+	        }, delay)
+	    );
 	};
 	
 	exports.default = new Utils();

@@ -22,14 +22,13 @@
  * SOFTWARE.
  */
 
-let $ = require('jquery');
-let React = require('react');
-let Component = React.Component;
+import React from "react";
+import M from 'materialize-css'
+import $ from "jquery";
 import Utils from '../utils';
-import {MainLayout} from '../globalComponents';
+import {MainLayout} from "../sharedComponents/mainLayout";
 
-
-class EdgeHostCard extends Component {
+class EdgeHostCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -190,7 +189,7 @@ class EdgeHostCard extends Component {
 }
 
 
-export class EdgeHosts extends Component {
+export class EdgeHosts extends React.Component {
 
     constructor(props) {
         super(props);

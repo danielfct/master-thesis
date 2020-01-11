@@ -24,9 +24,11 @@
 
 import React from "react";
 import {Link, Redirect} from "react-router-dom";
+import M from 'materialize-css'
 import $ from "jquery";
 import Utils from '../utils';
-import {CardItem, MainLayout} from '../globalComponents';
+import {MainLayout} from "../sharedComponents/mainLayout";
+import {CardItem} from "../sharedComponents/cardItem";
 
 class ServiceEventPredictionCard extends React.Component {
 

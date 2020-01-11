@@ -1,5 +1,7 @@
 # Componente de gestão de micro-serviços
 
+[![js-standard-style](https://img.shields.io/badge/code%20style-checkstyle-brightgreen.svg)](https://checkstyle.org/)
+
 ## Run
 ```
 java -jar replication-migration.jar --dockermaster=127.0.0.1

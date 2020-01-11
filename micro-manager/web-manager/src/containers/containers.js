@@ -24,9 +24,11 @@
 
 import React from "react";
 import {Link, Redirect} from "react-router-dom";
+import M from 'materialize-css'
 import $ from "jquery";
 import Utils from '../utils';
-import {CardItem, MainLayout} from '../globalComponents';
+import {MainLayout} from "../sharedComponents/mainLayout";
+import {CardItem} from "../sharedComponents/cardItem";
 
 class ContainerPort extends React.Component {
 
@@ -46,7 +48,7 @@ class ContainerPort extends React.Component {
     }
 }
 
-class ContainerCard extends Component {
+class ContainerCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -291,7 +293,7 @@ class ContainerCard extends Component {
     }
 }
 
-export class Containers extends Component {
+export class Containers extends React.Component {
 
     constructor(props) {
         super(props);
@@ -396,7 +398,7 @@ export class Containers extends Component {
     }
 }
 
-export class LaunchContainer extends Component {
+export class LaunchContainer extends React.Component {
 
     constructor(props) {
         super(props);

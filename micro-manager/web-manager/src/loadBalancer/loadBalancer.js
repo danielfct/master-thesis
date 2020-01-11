@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-let $ = require('jquery');
-let React = require('react');
-let Redirect = require('react-router-dom').Redirect;
-let Component = React.Component;
+import React from "react";
+import {Redirect} from "react-router-dom";
+import M from 'materialize-css'
+import $ from "jquery";
 import Utils from '../utils';
-import {MainLayout} from '../globalComponents';
+import {MainLayout} from "../sharedComponents/mainLayout";
 
-export class LoadBalancerPage extends Component {
+export class LoadBalancerPage extends React.Component {
 
     constructor(props) {
         super(props);

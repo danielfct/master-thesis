@@ -1,7 +1,7 @@
 {
   "name": "master-manager",
-  "version": "0.0.1",
-  "description": "Master manager on a Microservices management system",
+  "version": "0.1.0",
+  "description": "Master manager on a Microservices Dynamic Management System",
   "contributors": [
     {
       "name": "André Carrusca",

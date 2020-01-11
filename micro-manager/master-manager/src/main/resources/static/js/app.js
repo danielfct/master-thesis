@@ -26,11 +26,11 @@
 import React from "react";
 
 const Component = React.Component;
-import {MainLayout} from './react/globalComponents';
-import {EdgeHosts} from './react/edgeHost';
-import {AppPackages} from './react/appPackage';
-import {Services, ServicePage} from './react/service';
-import {Containers, LaunchContainer} from './react/containers';
+import {MainLayout} from './globalComponents';
+import {EdgeHosts} from './hosts/edgeHost';
+import {AppPackages} from './microservices/appPackage';
+import {Services, ServicePage} from './microservices/service';
+import {Containers, LaunchContainer} from './containers/containers';
 import {
     Conditions, ConditionPage, 
     RulesLandingPage, Rules, RulePage,
@@ -38,9 +38,9 @@ import {
     HostsRulesList, HostRulesPage, 
     GenericHostsRulesList, GenericHostRulesPage,
     ServicesRulesList, ServiceRulesPage
-} from './react/rule';
-import {ServiceEventPredictions, ServiceEventPredictionDetail} from './react/serviceEventPrediction';
-import {Nodes, AddNode} from './react/node';
+} from './rules/rule';
+import {ServiceEventPredictions, ServiceEventPredictionDetail} from './eventPrediction/serviceEventPrediction';
+import {Nodes, AddNode} from './nodes/node';
 import {
     SimulatedMetricsLandingPage, 
     ServiceSimulatedMetrics, 
@@ -51,10 +51,10 @@ import {
     DefaultHostSimulatedMetricsDetail,
     SpecificHostSimulatedMetrics,
     SpecificHostSimulatedMetricsDetail
-} from './react/simulatedMetrics';
-import {Regions} from './react/region';
-import {EurekaPage} from './react/eureka';
-import {LoadBalancerPage} from './react/loadBalancer'
+} from './metrics/simulatedMetrics';
+import {Regions} from './region/region';
+import {EurekaPage} from './eureka/eureka';
+import {LoadBalancerPage} from './loadBalancer/loadBalancer'
 
 /* Home Component */
 import ReactDOM from "react-dom";

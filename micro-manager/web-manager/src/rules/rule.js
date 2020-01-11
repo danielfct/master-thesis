@@ -23,12 +23,14 @@
  */
 
 import React from "react";
-let Component = React.Component;
-import Utils from '../utils';
-import {CardItem, MainLayout} from '../globalComponents';
 import {Link, Redirect} from "react-router-dom";
+import M from 'materialize-css'
+import $ from "jquery";
+import Utils from '../utils';
+import {MainLayout} from "../sharedComponents/mainLayout";
+import {CardItem} from "../sharedComponents/cardItem";
 
-export class RulesLandingPage extends Component {
+export class RulesLandingPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -73,7 +75,7 @@ export class RulesLandingPage extends Component {
     }
 }
 
-export class ConditionCard extends Component {
+export class ConditionCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -127,7 +129,7 @@ export class ConditionCard extends Component {
     }
 }
 
-export class Conditions extends Component {
+export class Conditions extends React.Component {
 
     constructor(props) {
         super(props);
@@ -173,7 +175,7 @@ export class Conditions extends Component {
     }
 }
 
-export class ConditionPage extends Component {
+export class ConditionPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -379,7 +381,7 @@ export class ConditionPage extends Component {
     }
 }
 
-export class RuleCard extends Component {
+export class RuleCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -474,7 +476,7 @@ export class RuleCard extends Component {
     }
 }
 
-export class Rules extends Component {
+export class Rules extends React.Component {
 
     constructor(props) {
         super(props);
@@ -520,7 +522,7 @@ export class Rules extends Component {
     }
 }
 
-export class RulePage extends Component {
+export class RulePage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -810,7 +812,7 @@ export class RulePage extends Component {
     }
 }
 
-class AppRules extends Component {
+class AppRules extends React.Component {
 
     constructor(props) {
         super(props);
@@ -858,7 +860,7 @@ class AppRules extends Component {
     }
 }
 
-export class AppsRulesList extends Component {
+export class AppsRulesList extends React.Component {
 
     constructor(props) {
         super(props);
@@ -917,7 +919,7 @@ export class AppsRulesList extends Component {
     }
 }
 
-export class AppRulesPage extends Component {
+export class AppRulesPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -1070,7 +1072,7 @@ export class AppRulesPage extends Component {
     }
 }
 
-class HostRules extends Component {
+class HostRules extends React.Component {
 
     constructor(props) {
         super(props);
@@ -1118,7 +1120,7 @@ class HostRules extends Component {
     }
 }
 
-export class HostsRulesList extends Component {
+export class HostsRulesList extends React.Component {
 
     constructor(props) {
         super(props);
@@ -1179,7 +1181,7 @@ export class HostsRulesList extends Component {
     }
 }
 
-export class HostRulesPage extends Component {
+export class HostRulesPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -1322,7 +1324,7 @@ export class HostRulesPage extends Component {
     }
 }
 
-class GenericHostRules extends Component {
+class GenericHostRules extends React.Component {
 
     constructor(props) {
         super(props);
@@ -1371,7 +1373,7 @@ class GenericHostRules extends Component {
     }
 }
 
-export class GenericHostsRulesList extends Component {
+export class GenericHostsRulesList extends React.Component {
 
     constructor(props) {
         super(props);
@@ -1395,7 +1397,7 @@ export class GenericHostsRulesList extends Component {
     }
 }
 
-export class GenericHostRulesPage extends Component {
+export class GenericHostRulesPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -1523,7 +1525,7 @@ export class GenericHostRulesPage extends Component {
 }
 
 
-class ServiceRules extends Component {
+class ServiceRules extends React.Component {
 
     constructor(props) {
         super(props);
@@ -1571,7 +1573,7 @@ class ServiceRules extends Component {
     }
 }
 
-export class ServicesRulesList extends Component {
+export class ServicesRulesList extends React.Component {
 
     constructor(props) {
         super(props);
@@ -1630,7 +1632,7 @@ export class ServicesRulesList extends Component {
     }
 }
 
-export class ServiceRulesPage extends Component {
+export class ServiceRulesPage extends React.Component {
 
     constructor(props) {
         super(props);

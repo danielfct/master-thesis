@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-let $ = require('jquery');
-let React = require('react');
-let Component = React.Component;
+import React from "react";
+import M from 'materialize-css'
+import $ from "jquery";
 import Utils from '../utils';
-import {MainLayout} from '../globalComponents';
 import {ServiceCard} from './service';
+import {MainLayout} from "../sharedComponents/mainLayout";
 
-class AppPackageCard extends Component {
+class AppPackageCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -284,7 +284,7 @@ class AppPackageCard extends Component {
     }
 }
 
-export class AppPackages extends Component {
+export class AppPackages extends React.Component {
 
     constructor(props) {
         super(props);

@@ -22,14 +22,12 @@
  * SOFTWARE.
  */
 
-let $ = require('jquery');
-let React = require('react');
-let Redirect = require('react-router-dom').Redirect;
-let Component = React.Component;
-import Utils from './utils';
-import {MainLayout} from './globalComponents';
+import React from "react";
+import {Redirect} from "react-router-dom";
+import Utils from '../utils';
+import {MainLayout} from '../globalComponents';
 
-export class EurekaPage extends Component {
+export class EurekaPage extends React.Component {
     
     constructor(props) {
         super(props);

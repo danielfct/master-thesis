@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-let $ = require('jquery');
-let React = require('react');
-let Link = require('react-router-dom').Link;
-let Redirect = require('react-router-dom').Redirect;
-let Component = React.Component;
+import React from "react";
+import {Link, Redirect} from "react-router-dom";
+import M from 'materialize-css'
+import $ from "jquery";
 import Utils from '../utils';
-import {MainLayout, CardItem} from '../globalComponents';
+import {MainLayout} from "../sharedComponents/mainLayout";
+import {CardItem} from "../sharedComponents/cardItem";
 
-export class ServiceCard extends Component {
+export class ServiceCard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -58,7 +58,7 @@ export class ServiceCard extends Component {
             <div>
                 {linkDetails}
                 <CardItem label='Service name' value={this.state.data.serviceName}/>
-                <CardItem label='Docker Repository' value={this.state.data.dockerRepo}/>
+                <CardItem label='Docker Repository' value={this.state.data.dockerRepository}/>
                 <CardItem label='Default external port' value={this.state.data.defaultExternalPort}/>
                 <CardItem label='Default internal port' value={this.state.data.defaultInternalPort}/>
                 <CardItem label='Default database' value={this.state.data.defaultDb}/>
@@ -67,7 +67,7 @@ export class ServiceCard extends Component {
                 <CardItem label='Maximum Replics' value={this.state.data.maxReplics}/>
                 <CardItem label='Output label' value={this.state.data.outputLabel}/>
                 <CardItem label='Service type' value={this.state.data.serviceType}/>
-                <CardItem label='Average Memory (bytes)' value={this.state.data.avgMem}/>
+                <CardItem label='Average Memory (bytes)' value={this.state.data.expectedMemoryConsumption}/>
             </div>
         )
     };
@@ -91,7 +91,7 @@ export class ServiceCard extends Component {
     }
 }
 
-export class Services extends Component {
+export class Services extends React.Component {
 
     constructor(props) {
         super(props);
@@ -177,7 +177,7 @@ export class Services extends Component {
     }
 }
 
-export class ServicePage extends Component {
+export class ServicePage extends React.Component {
 
     constructor(props) {
         super(props);
