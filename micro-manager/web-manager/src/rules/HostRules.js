@@ -23,13 +23,51 @@
  */
 
 import React from 'react';
-import MainLayout from './sharedComponents/MainLayout';
+import Utils from '../utils';
 
-export default function Landing() {
-  const style = { maxWidth: '100%' };
-  return (
-    <MainLayout title='Microservices dynamic system management'>
-      <img src="/resources/images/architecture.png" alt="System architecture" style={style}/>
-    </MainLayout>
-  );
-};
+export default class HostRules extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = { hostRules: [], loading: false };
+  }
+
+  componentDidMount () {
+    this.loadHostRules();
+  }
+
+  loadHostRules () {
+    this.setState({ loading: true });
+    const self = this;
+    Utils.ajaxGet('/hosts/' + self.props.host.hostname + '/rules',
+      function (data) {
+        self.setState({ hostRules: data, loading: false });
+      });
+  };
+
+  renderHostRules () {
+    let hostRulesNodes;
+    if (this.state.hostRules) {
+      hostRulesNodes = this.state.hostRules.map(function (hostRule) {
+        return (
+          <div key={hostRule.rule.id}>
+            <div className='card'>
+              <div className='card-content'>
+                {hostRule.rule.ruleName}
+              </div>
+            </div>
+          </div>
+        );
+      });
+    }
+    return hostRulesNodes;
+  }
+
+  render () {
+    return (
+      <div>
+        <h5>Rules</h5>
+        {this.renderHostRules()}
+      </div>
+    );
+  }
+}

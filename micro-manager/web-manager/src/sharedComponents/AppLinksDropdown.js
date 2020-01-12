@@ -23,13 +23,47 @@
  */
 
 import React from 'react';
-import MainLayout from './sharedComponents/MainLayout';
+import M from 'materialize-css';
+import { Link } from 'react-router-dom';
 
-export default function Landing() {
-  const style = { maxWidth: '100%' };
-  return (
-    <MainLayout title='Microservices dynamic system management'>
-      <img src="/resources/images/architecture.png" alt="System architecture" style={style}/>
-    </MainLayout>
-  );
-};
+export default class AppLinksDropdown extends React.Component {
+  constructor (props) {
+    super(props);
+    const navLinks = this.props.links;
+    this.state = { links: navLinks };
+  }
+
+  componentDidMount () {
+    const elems = document.querySelectorAll('.dropdown-trigger');
+    M.Dropdown.init(elems, { coverTrigger: false });
+  }
+
+  renderNavLinks () {
+    let links;
+    links = this.state.links.map(function (link, index) {
+      return (
+        <li key={index}>
+          <Link to={link.link}>
+            {link.name}
+          </Link>
+        </li>
+      );
+    });
+    return links;
+  };
+
+  render () {
+    return (
+      <div className='col s12 hide-on-med-and-up'>
+        <button className='dropdown-trigger btn btn-small waves-effect waves-teal btn-flat col s12' href='#'
+          data-target='linksDropdown'>
+          <i className="material-icons right">menu</i>
+                    Menu
+        </button>
+        <ul id='linksDropdown' className='dropdown-content'>
+          {this.renderNavLinks()}
+        </ul>
+      </div>
+    );
+  }
+}

@@ -23,13 +23,51 @@
  */
 
 import React from 'react';
-import MainLayout from './sharedComponents/MainLayout';
+import Utils from '../utils';
 
-export default function Landing() {
-  const style = { maxWidth: '100%' };
-  return (
-    <MainLayout title='Microservices dynamic system management'>
-      <img src="/resources/images/architecture.png" alt="System architecture" style={style}/>
-    </MainLayout>
-  );
-};
+export default class ServiceRules extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = { serviceRules: [], loading: false };
+  }
+
+  componentDidMount () {
+    this.loadServiceRules();
+  }
+
+  loadServiceRules () {
+    this.setState({ loading: true });
+    const self = this;
+    Utils.ajaxGet('/services/' + self.props.service.id + '/rules', // TODO confirm
+      function (data) {
+        self.setState({ serviceRules: data, loading: false });
+      });
+  };
+
+  renderServiceRules () {
+    let serviceRulesNodes;
+    if (this.state.serviceRules) {
+      serviceRulesNodes = this.state.serviceRules.map(function (serviceRule) {
+        return (
+          <div key={serviceRule.rule.id}>
+            <div className='card'>
+              <div className='card-content'>
+                {serviceRule.rule.ruleName}
+              </div>
+            </div>
+          </div>
+        );
+      });
+    }
+    return serviceRulesNodes;
+  }
+
+  render () {
+    return (
+      <div>
+        <h5>Rules</h5>
+        {this.renderServiceRules()}
+      </div>
+    );
+  }
+}

@@ -23,13 +23,25 @@
  */
 
 import React from 'react';
-import MainLayout from './sharedComponents/MainLayout';
+import MainLayout from '../sharedComponents/MainLayout';
+import { Link } from 'react-router-dom';
+import GenericHostRules from './GenericHostRules';
 
-export default function Landing() {
-  const style = { maxWidth: '100%' };
-  return (
-    <MainLayout title='Microservices dynamic system management'>
-      <img src="/resources/images/architecture.png" alt="System architecture" style={style}/>
-    </MainLayout>
-  );
-};
+export default class GenericHostsRulesList extends React.Component {
+  render () {
+    return (
+      <MainLayout title='Generic hosts rules'>
+        <div className="right-align">
+          <div className="row">
+            <div className="col s12">
+              <Link className="waves-effect waves-light btn-small" to={'/ui/rules/generic/hosts/detail'}>
+                View details
+              </Link>
+            </div>
+          </div>
+        </div>
+        <GenericHostRules/>
+      </MainLayout>
+    );
+  }
+}

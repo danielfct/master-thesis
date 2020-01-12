@@ -23,13 +23,14 @@
  */
 
 import React from 'react';
-import MainLayout from './sharedComponents/MainLayout';
 
-export default function Landing() {
-  const style = { maxWidth: '100%' };
+export default function ContainerPort (props) {
   return (
-    <MainLayout title='Microservices dynamic system management'>
-      <img src="/resources/images/architecture.png" alt="System architecture" style={style}/>
-    </MainLayout>
+    <div>
+      <h6>Public port : Private port</h6>
+      <div>{props.port.publicPort + ' : ' + props.port.privatePort}</div>
+      <h6>IP / Type</h6>
+      <div>{props.port.ip + ' / ' + props.port.type}</div>
+    </div>
   );
-};
+}

@@ -23,13 +23,32 @@
  */
 
 import React from 'react';
-import MainLayout from './sharedComponents/MainLayout';
+import { NavLink } from 'react-router-dom';
 
-export default function Landing() {
-  const style = { maxWidth: '100%' };
-  return (
-    <MainLayout title='Microservices dynamic system management'>
-      <img src="/resources/images/architecture.png" alt="System architecture" style={style}/>
-    </MainLayout>
-  );
-};
+export default class AppLinks extends React.Component {
+  constructor (props) {
+    super(props);
+    const navLinks = this.props.links;
+    this.state = { links: navLinks };
+  }
+
+  renderNavLinks () {
+    return this.state.links.map(function (link, index) {
+      return (
+        <NavLink key={index} exact to={link.link} className='collection-item' activeClassName='active'>
+          {link.name}
+        </NavLink>
+      );
+    });
+  };
+
+  render () {
+    return (
+      <div className='col s12 m4 hide-on-small-only'>
+        <div className='collection'>
+          {this.renderNavLinks()}
+        </div>
+      </div>
+    );
+  }
+}

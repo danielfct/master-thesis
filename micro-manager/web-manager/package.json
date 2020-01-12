@@ -2,45 +2,46 @@
   "name": "web-manager",
   "version": "0.1.0",
   "private": true,
-  "description": "Website to visually interact with the Microservices Dynamic Management System",
-  "contributors": [
-    {
-      "name": "André Carrusca",
-      "email": "a.carrusca@campus.fct.unl.pt"
-    },
-    {
-      "name": "Daniel Pimenta",
-      "email": "d.pimenta@campus.fct.unl.pt"
-    }
-  ],
   "dependencies": {
-    "@types/jest": "24.0.25",
-    "@types/node": "13.1.4",
-    "@types/react": "16.9.17",
-    "@types/react-dom": "16.9.4",
-    "jquery": "^3.4.1",
-    "materialize-css": "^1.0.0-rc.2",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^24.0.25",
+    "@types/node": "^12.12.24",
+    "@types/react": "^16.9.17",
+    "@types/react-dom": "^16.9.4",
+    "materialize-css": "^1.0.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
+    "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "0.9.5",
-    "typescript": "3.7.4"
+    "react-scripts": "3.3.0",
+    "typescript": "^3.7.4",
+    "jquery": "^3.4.1"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.15.0",
-    "@typescript-eslint/parser": "^2.15.0",
-    "eslint": "^5.16.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-react": "^7.17.0",
-    "eslint-plugin-standard": "^4.0.1"
+    "@types/materialize-css": "^1.0.7",
+    "@types/react-router-dom": "^5.1.3"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
