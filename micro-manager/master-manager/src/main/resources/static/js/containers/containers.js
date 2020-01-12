@@ -64,7 +64,7 @@ class ContainerCard extends Component {
         M.Collapsible.init(document.querySelectorAll('.collapsible'));
     }
 
-    renderNames = () => {
+    renderNames () {
         return this.props.container.names.map(function (name, index) {
             let counter = index + 1;
             return (
@@ -73,7 +73,7 @@ class ContainerCard extends Component {
         });
     };
 
-    renderPorts = () => {
+    renderPorts () {
         return this.props.container.ports.map(function (port, index) {
             return (
                 <ContainerPort key={'port' + index} port={port}/>
@@ -81,7 +81,7 @@ class ContainerCard extends Component {
         });
     };
 
-    renderLabels = () => {
+    renderLabels () {
         let propsLabels = this.props.container.labels;
         return Object.keys(propsLabels).map(function(key, index) {
             return (
@@ -100,7 +100,7 @@ class ContainerCard extends Component {
         );
     }*/
 
-    onClickStop = () => {
+    onClickStop () {
         let action = '/containers/'+ this.props.container.id;
         let dataObject = {
             hostname : this.props.container.hostname,
@@ -114,7 +114,7 @@ class ContainerCard extends Component {
         });
     };
 
-    loadAvailableNodes = () => {
+    loadAvailableNodes () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/nodes', function(data){
@@ -122,17 +122,17 @@ class ContainerCard extends Component {
         });
     };
 
-    onClickReplicate = () => {
+    onClickReplicate () {
         this.loadAvailableNodes();
         this.setState({ isReplicate: true });
     };
 
-    onClickMigrate = () => {
+    onClickMigrate () {
         this.loadAvailableNodes();
         this.setState({ isMigrate: true });
     };
 
-    onClickCancelReplicate = () => {
+    onClickCancelReplicate () {
         let instance = M.FormSelect.getInstance(this.hostname);
         instance.destroy();
         this.setState({ isReplicate: false, isMigrate: false });
@@ -142,7 +142,7 @@ class ContainerCard extends Component {
         this.setState({hostnameSelected: event.target.value});
     };
 
-    onSubmitReplicate = () => {
+    onSubmitReplicate () {
         let self = this;
         let url = '/containers/' + this.props.container.id + '/replicate';
         let dataToSend = JSON.stringify({fromHostname: this.props.container.hostname,
@@ -154,7 +154,7 @@ class ContainerCard extends Component {
         });
     };
 
-    onSubmitMigrate = () => {
+    onSubmitMigrate () {
         let self = this;
         let url = '/containers/' + this.props.container.id + '/migrate';
         let dataToSend = JSON.stringify({fromHostname: this.props.container.hostname,
@@ -167,7 +167,7 @@ class ContainerCard extends Component {
         });
     };
 
-    renderHostnamesSelect = () => {
+    renderHostnamesSelect () {
         let hostnameNodes;
         if (this.state.nodes) {
             hostnameNodes = this.state.nodes.map(function (node) {
@@ -179,7 +179,7 @@ class ContainerCard extends Component {
         }
     };
 
-    renderSelectTotal = () => {
+    renderSelectTotal () {
         return (
             <div className="input-field col s6">
                 <select ref={hostname => this.hostname = hostname} defaultValue="" name="hostname" id="hostname" onChange={this.handleChangeHostname}>
@@ -191,7 +191,7 @@ class ContainerCard extends Component {
         )
     };
 
-    renderReplicate = () => {
+    renderReplicate () {
         let style = {marginLeft: "10px"};
         let cancelButton =
             <a title="Cancel" style={style} className="btn-floating waves-effect waves-light red darken-4" onClick={this.onClickCancelReplicate}>
@@ -308,7 +308,7 @@ export class Containers extends Component {
         this.state.tooltipInstances[0].destroy();
     }
 
-    onReplicate = () => {
+    onReplicate () {
         this.loadContainers();
     };
 
@@ -320,7 +320,7 @@ export class Containers extends Component {
         });
     };
 
-    applyFilter = () => {
+    applyFilter () {
         let filterVal = this.state.filter;
         let data = this.state.data;
         let filteredContainers = [];
@@ -333,7 +333,7 @@ export class Containers extends Component {
         this.setState({filtContainers: filteredContainers});
     };
 
-    clearFilter = () => {
+    clearFilter () {
         let self = this;
         this.setState({filter: ''}, function(){
             self.applyFilter();
@@ -341,7 +341,7 @@ export class Containers extends Component {
         });
     };
 
-    loadContainers = () => {
+    loadContainers () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/containers',
@@ -421,7 +421,7 @@ export class LaunchContainer extends Component {
         M.FormSelect.init(elems);
     }
 
-    loadAvailableNodes = () => {
+    loadAvailableNodes () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/nodes', function(data){
@@ -429,7 +429,7 @@ export class LaunchContainer extends Component {
         });
     };
 
-    loadServices = () => {
+    loadServices () {
         this.setState({ loading: true });
         let self = this;
         let url = '/services';
@@ -438,13 +438,13 @@ export class LaunchContainer extends Component {
         });
     };
 
-    renderServicesSelect = () => {
+    renderServicesSelect () {
         return this.state.services && this.state.services.map((service) =>
             <option key={service.id} value={service.serviceName}>{service.serviceName}</option>
         );
     };
 
-    renderHostnamesSelect = () => {
+    renderHostnamesSelect () {
         return this.state.nodes && this.state.nodes.map((node) =>
             <option key={node.id} value={node.hostname}>{node.hostname}</option>
         );
@@ -483,7 +483,7 @@ export class LaunchContainer extends Component {
         }
     };
 
-    renderForm = () => {
+    renderForm () {
         let servicesSelect = this.renderServicesSelect();
         let hostnamesSelect = this.renderHostnamesSelect();
         return(

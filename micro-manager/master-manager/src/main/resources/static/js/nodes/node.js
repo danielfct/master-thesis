@@ -35,7 +35,7 @@ class NodeCard extends Component {
         super(props);
     }
 
-    onClickStop = () => {
+    onClickStop () {
         let action = '/api/nodes';
         let dataObject = {
             hostname : this.props.node.hostname
@@ -92,7 +92,7 @@ export class Nodes extends Component {
         this.state.tooltipInstances[0].destroy();
     }
 
-    loadNodes = () => {
+    loadNodes () {
         this.setState({ loading: true });  
         let self = this;
         Utils.ajaxGet('/nodes',
@@ -143,7 +143,7 @@ export class AddNode extends Component {
         M.FormSelect.init(document.querySelectorAll('select'));
     }
 
-    loadRegions = () => {
+    loadRegions () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/regions',
@@ -152,7 +152,7 @@ export class AddNode extends Component {
             });
     };
 
-    renderRegionsSelect = () => {
+    renderRegionsSelect () {
         let regions;
         if (this.state.availableRegions) {
             regions = this.state.availableRegions.map(function (region) {
@@ -176,7 +176,7 @@ export class AddNode extends Component {
         });
     };
 
-    renderForm = () => {
+    renderForm () {
         let regionSelect = this.renderRegionsSelect();
         return (
             <form id="form-node" onSubmit={this.onSubmitForm}>               

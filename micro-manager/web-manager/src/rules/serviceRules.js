@@ -22,33 +22,52 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager;
+import React from 'react';
+import Utils from '../utils';
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-@Controller
-@RequestMapping("/")
-public class MasterManagerController {
-
-  @RequestMapping("html")
-  public String giveMePlainHtml() {
-    return "html";
+export class ServiceRules extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = { serviceRules: [], loading: false };
   }
 
-  @RequestMapping({"/", "/ui/**"})
-  public String root() {
-    return "indexreact";
+  componentDidMount () {
+    this.loadServiceRules();
   }
 
-  @RequestMapping("/execute")
-  public String executeCommand() {
-    return "executecommand";
+  loadServiceRules () {
+    this.setState({ loading: true });
+    const self = this;
+    Utils.ajaxGet('/services/' + self.props.service.id + '/rules', // TODO confirm
+      function (data) {
+        self.setState({ serviceRules: data, loading: false });
+      });
+  };
+
+  renderServiceRules () {
+    let serviceRulesNodes;
+    if (this.state.serviceRules) {
+      serviceRulesNodes = this.state.serviceRules.map(function (serviceRule) {
+        return (
+          <div key={serviceRule.rule.id}>
+            <div className='card'>
+              <div className='card-content'>
+                {serviceRule.rule.ruleName}
+              </div>
+            </div>
+          </div>
+        );
+      });
+    }
+    return serviceRulesNodes;
   }
 
-  @RequestMapping("/newservice")
-  public String launchService() {
-    return "launchservice";
+  render () {
+    return (
+      <div>
+        <h5>Rules</h5>
+        {this.renderServiceRules()}
+      </div>
+    );
   }
-
 }

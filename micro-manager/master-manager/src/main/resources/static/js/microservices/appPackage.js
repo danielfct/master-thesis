@@ -39,11 +39,11 @@ class AppPackageCard extends Component {
             regionSelected: '', countrySelected:'', citySelected:'', loading: false, isEdit: defaultEdit};
     }
 
-    componentDidMount() {
+    componentDidMount () {
         this.loadAppServices();
     };
 
-    componentDidUpdate() {
+    componentDidUpdate () {
         M.updateTextFields();
         M.Collapsible.init(document.querySelectorAll('.collapsible'));
         if (this.state.isLaunchActive) {
@@ -52,7 +52,7 @@ class AppPackageCard extends Component {
         }
     };
 
-    loadRegions = () => {
+    loadRegions () {
         this.setState({loading: true});
         let self = this;
         let url = '/regions';
@@ -61,7 +61,7 @@ class AppPackageCard extends Component {
         });
     };
 
-    loadAppServices = () => {
+    loadAppServices () {
         this.setState({loading: true});
         let self = this;
         let url = '/apps/' + this.state.appPackage.id + '/services';
@@ -82,7 +82,7 @@ class AppPackageCard extends Component {
         this.setState({citySelected: event.target.value});
     };
 
-    renderRegionsSelect = () => {
+    renderRegionsSelect () {
         let regions;
         if (this.state.availableRegions) {
             regions = this.state.availableRegions.map(function (region) {
@@ -94,7 +94,7 @@ class AppPackageCard extends Component {
         }
     };
 
-    renderRegionsSelectTotal = () => {
+    renderRegionsSelectTotal () {
         return (
             <div className="input-field col s6">
                 <select ref={ region => this.region = region} defaultValue="" name="region" id="region" onChange={this.handleChangeRegion} >
@@ -106,7 +106,7 @@ class AppPackageCard extends Component {
         )
     };
 
-    renderNormal = () => {
+    renderNormal () {
         return (
             <div>
                 <h5>App name</h5>
@@ -115,18 +115,18 @@ class AppPackageCard extends Component {
         );
     };
 
-    onClickLaunch = () => {
+    onClickLaunch () {
         this.loadRegions();
         this.setState({isLaunchActive: true});
     };
 
-    onClickCancelLaunch = () => {
+    onClickCancelLaunch () {
         let instance = M.FormSelect.getInstance(this.region);
         instance.destroy();
         this.setState({isLaunchActive: false});
     };
 
-    renderLaunchApp = () => {
+    renderLaunchApp () {
         let style = {marginLeft: "10px"};
         let cancelButton =
             <a title="Cancel" style={style} className="btn-floating waves-effect waves-light red darken-4" onClick={this.onClickCancelLaunch}>
@@ -170,7 +170,7 @@ class AppPackageCard extends Component {
         }
     };
 
-    onClickEdit = () => {
+    onClickEdit () {
         let setEdit = !this.state.isEdit;
         if (!setEdit && this.state.appPackage.id === 0) {
             this.props.updateNewApp(true);
@@ -178,7 +178,7 @@ class AppPackageCard extends Component {
         this.setState({isEdit: setEdit});
     };
 
-    onClickRemove = () => {
+    onClickRemove () {
         let formAction = '/apps/' + this.state.appPackage.id;
         let self = this;
         Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
@@ -187,7 +187,7 @@ class AppPackageCard extends Component {
         });
     };
 
-    onLaunchApp = () => {
+    onLaunchApp () {
         let formAction = '/containers/app/' + this.state.appPackage.id;
         let self = this;
         let dataToSend = JSON.stringify({
@@ -230,7 +230,7 @@ class AppPackageCard extends Component {
         });
     };
 
-    renderForm = () => {
+    renderForm () {
         return (
             <form id={this.state.appPackage.id + 'appForm'} onSubmit={this.onSubmitForm}>
                 <div className="input-field">
@@ -308,7 +308,7 @@ export class AppPackages extends Component {
         }
     }
 
-    loadApps = () => {
+    loadApps () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/apps',
@@ -330,7 +330,7 @@ export class AppPackages extends Component {
         this.setState({tooltipInstances: instances});
     };
 
-    addApp = () => {
+    addApp () {
         let newApp = {
             id: 0, appName: ''
         };

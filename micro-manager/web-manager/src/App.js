@@ -29,32 +29,39 @@ import M from 'materialize-css';
 import { Landing } from './Landing';
 import { EdgeHosts } from './hosts/edgeHost';
 import { AppPackages } from './microservices/appPackage';
-import { Services, ServicePage } from './microservices/service';
-import { Containers, LaunchContainer } from './containers/containers';
+import { Services} from './microservices/service';
+import { Containers } from './containers/containers';
 import {
-  Conditions, ConditionPage,
-  RulesLandingPage, Rules, RulePage,
-  AppsRulesList, AppRulesPage,
-  HostsRulesList, HostRulesPage,
-  GenericHostsRulesList, GenericHostRulesPage,
-  ServicesRulesList, ServiceRulesPage
-} from './rules/rule';
-import { ServiceEventPredictions, ServiceEventPredictionDetail } from './eventPrediction/serviceEventPrediction';
+  RulesLandingPage, GenericHostsRulesList, ServicesRulesList, ServiceRulesPage
+} from './rules/rulesLandingPage';
+import { ServiceEventPredictions } from './eventPrediction/serviceEventPrediction';
 import { Nodes, AddNode } from './nodes/node';
 import {
-  SimulatedMetricsLandingPage,
-  ServiceSimulatedMetrics,
-  ServiceSimulatedMetricsDetail,
-  ContainerSimulatedMetrics,
-  ContainerSimulatedMetricsDetail,
-  DefaultHostSimulatedMetrics,
-  DefaultHostSimulatedMetricsDetail,
-  SpecificHostSimulatedMetrics,
-  SpecificHostSimulatedMetricsDetail
+  ServiceSimulatedMetricsDetail
 } from './metrics/simulatedMetrics';
 import { Regions } from './region/region';
 import { EurekaPage } from './eureka/eureka';
 import { LoadBalancerPage } from './loadBalancer/loadBalancer';
+import { LaunchContainer } from './containers/launchContainer';
+import { ServiceEventPredictionDetail } from './eventPrediction/serviceEventPredictionDetail';
+import {GenericHostRulesPage} from "./rules/genericHostRulesPage";
+import {SimulatedMetricsLandingPage} from "./metrics/simulatedMetricsLandingPage";
+import {ServiceSimulatedMetrics} from "./metrics/serviceSimulatedMetrics";
+import {ContainerSimulatedMetrics} from "./metrics/containerSimulatedMetrics";
+import {ContainerSimulatedMetricsDetail} from "./metrics/containerSimulatedMetricsDetail";
+import {DefaultHostSimulatedMetrics} from "./metrics/defaultHostSimulatedMetrics";
+import {DefaultHostSimulatedMetricsDetail} from "./metrics/defaultHostSimulatedMetricsDetail";
+import {SpecificHostSimulatedMetrics} from "./metrics/specificHostSimulatedMetrics";
+import {SpecificHostSimulatedMetricsDetail} from "./metrics/specificHostSimulatedMetricsDetail";
+import {Conditions} from "./rules/conditions";
+import {ConditionPage} from "./rules/conditionPage";
+import {Rules} from "./rules/rules";
+import {RulePage} from "./rules/rulePage";
+import {AppsRulesList} from "./rules/appsRulesList";
+import {AppRulesPage} from "./rules/appRulesPage";
+import {HostsRulesList} from "./rules/hostsRulesList";
+import {HostRulesPage} from "./rules/hostRulesPage";
+import {ServicePage} from "./microservices/servicePage";
 
 class App extends React.Component {
   componentDidMount () {

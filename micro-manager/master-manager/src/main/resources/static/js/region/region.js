@@ -47,7 +47,7 @@ class RegionCard extends Component {
         M.FormSelect.init(document.querySelectorAll('select'));
     }
 
-    onClickEdit = () => {
+    onClickEdit () {
         let setEdit = !this.state.isEdit;
         if (!setEdit && this.state.data.id === 0) {
             this.props.updateNewRegion(true);
@@ -80,7 +80,7 @@ class RegionCard extends Component {
         });
     };
 
-    onClickRemove = () => {
+    onClickRemove () {
         let formAction = '/regions/'+ this.state.data.id;
         let self = this;
         Utils.formSubmit(formAction, 'DELETE', {}, function (data) {            
@@ -89,7 +89,7 @@ class RegionCard extends Component {
         });
     };
 
-    renderNormal = () => {
+    renderNormal () {
         return (
             <div>
                 <CardItem label='Region name' value={this.state.data.regionName}/>
@@ -99,7 +99,7 @@ class RegionCard extends Component {
         );
     };
 
-    renderForm = () => {
+    renderForm () {
         return ( 
             <form id={this.state.data.id + 'regionForm'} onSubmit={this.onSubmitForm}>
                 <div className="input-field">
@@ -188,7 +188,7 @@ export class Regions extends Component {
         this.setState({tooltipInstances: instances});
     };
 
-    addRegion = () => {
+    addRegion () {
         let newRegion = {
             id: 0, regionName: '', regionDescription: '', active: ''
         };

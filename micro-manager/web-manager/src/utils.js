@@ -23,6 +23,7 @@
  */
 
 import $ from 'jquery';
+import M from 'materialize-css';
 
 const displayProgressBar = () =>
   $('#loader-placeholder').html('<div class="progress"><div class="indeterminate"></div></div>');
@@ -32,61 +33,69 @@ const hideProgressBar = (delay) =>
   setTimeout(() => $('#loader-placeholder').html(''), delay);
 
 class Utils {
-    ajaxGet = (url, successFunction) => {
-      $.ajax({
-        url: url,
-        type: 'GET',
-        cache: false,
-        beforeSend: () =>
-          displayProgressBar(),
-        success: (data) => {
-          successFunction(data);
-          hideProgressBar(200);
-        },
-        error: (xhr, status, err) => {
-          M.toast({ html: '<div>Error: ' + xhr.statusText + '; Code: ' + xhr.status + '</div>' });
-          hideProgressBar(200);
-        }
-      });
-    };
-
-    convertFormToJson = (formId) => {
-      const form = $('#' + formId).serializeArray();
-      const formObject = {};
-      $.each(form, (i, v) => {
-        const valueTest = v.value.replace(',', '.');
-        const number = Number(valueTest);
-        if (isNaN(number) || v.value === '') {
-          formObject[v.name] = v.value;
-        } else {
-          formObject[v.name] = number;
-        }
+  ajaxGet (url, successFunction) {
+    displayProgressBar();
+    fetch(`http://${url}`, {
+      method: 'GET'
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
       }
-      );
-      return JSON.stringify(formObject);
-    };
+      // throw new Error(response.statusText);
+      M.toast({ html: '<div>Error: ' + response.statusText + '; Code: ' + response.status + '</div>' });
+    }).then(json => {
+      successFunction(json);
+      hideProgressBar(200);
+    });
+    /*      success: (data) => {
+        console.log(data);
+        // successFunction(data);
+        hideProgressBar(200);
+      },
+      error: (xhr, status, err) => {
+        M.toast({ html: '<div>Error: ' + xhr.statusText + '; Code: ' + xhr.status + '</div>' });
+        hideProgressBar(200);
+      }
+    }); */
+  };
 
-    formSubmit = (formUrl, formMethod, formData, successFunction) => {
-      $.ajax({
-        url: formUrl,
-        type: formMethod,
-        data: formData,
-        dataType: 'json',
-        contentType: 'application/json',
-        cache: false,
-        beforeSend: () =>
-          displayProgressBar(),
-        success: (data) => {
-          hideProgressBar(200);
-          successFunction(data);
-        },
-        error: (xhr, status, err) => {
-          hideProgressBar(200);
-          M.toast({ html: '<div>Error: ' + xhr.statusText + '; Code: ' + xhr.status + '</div>' });
-        }
-      });
-      return false;
-    };
+  convertFormToJson (formId) {
+    const form = $('#' + formId).serializeArray();
+    const formObject = {};
+    $.each(form, (i, v) => {
+      const valueTest = v.value.replace(',', '.');
+      const number = Number(valueTest);
+      if (isNaN(number) || v.value === '') {
+        formObject[v.name] = v.value;
+      } else {
+        formObject[v.name] = number;
+      }
+    }
+    );
+    return JSON.stringify(formObject);
+  };
+
+  formSubmit (formUrl, formMethod, formData, successFunction) {
+    $.ajax({
+      url: formUrl,
+      type: formMethod,
+      data: formData,
+      dataType: 'json',
+      contentType: 'application/json',
+      cache: false,
+      beforeSend: () =>
+        displayProgressBar(),
+      success: (data) => {
+        hideProgressBar(200);
+        successFunction(data);
+      },
+      error: (xhr, status, err) => {
+        hideProgressBar(200);
+        M.toast({ html: '<div>Error: ' + xhr.statusText + '; Code: ' + xhr.status + '</div>' });
+      }
+    });
+    return false;
+  };
 }
 
 export default (new Utils());

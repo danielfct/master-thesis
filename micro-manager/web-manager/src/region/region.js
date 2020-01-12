@@ -26,126 +26,8 @@ import React from 'react';
 import M from 'materialize-css';
 import $ from 'jquery';
 import Utils from '../utils';
-import { MainLayout } from '../sharedComponents/mainLayout';
-import { CardItem } from '../sharedComponents/cardItem';
-
-class RegionCard extends React.Component {
-  constructor (props) {
-    super(props);
-    const region = this.props.region;
-    region.active = region.active ? 'true' : 'false';
-    const defaultIsEdit = this.props.region.id === 0;
-    this.state = { data: region, loading: false, isEdit: defaultIsEdit };
-  }
-
-  componentDidMount () {
-    M.FormSelect.init(document.querySelectorAll('select'));
-  }
-
-  componentDidUpdate () {
-    M.updateTextFields();
-    M.FormSelect.init(document.querySelectorAll('select'));
-  }
-
-    onClickEdit = () => {
-      const setEdit = !this.state.isEdit;
-      if (!setEdit && this.state.data.id === 0) {
-        this.props.updateNewRegion(true);
-      }
-      this.setState({ isEdit: setEdit });
-    };
-
-    handleChange = (event) => {
-      const name = event.target.name;
-      const newData = this.state.data;
-      newData[name] = event.target.value;
-      this.setState({ data: newData });
-    };
-
-    onSubmitForm = (event) => {
-      event.preventDefault();
-      const formId = this.state.data.id + 'regionForm';
-      const formAction = '/regions/' + this.state.data.id;
-      const formData = Utils.convertFormToJson(formId);
-      const self = this;
-      Utils.formSubmit(formAction, 'POST', formData, function (data) {
-        const newData = self.state.data;
-        const oldId = newData.id;
-        newData.id = data;
-        if (oldId == 0) {
-          self.props.updateNewRegion(false);
-        }
-        self.setState({ isEdit: false });
-        M.toast({ html: '<div>Region saved successfully!</div>' });
-      });
-    };
-
-    onClickRemove = () => {
-      const formAction = '/regions/' + this.state.data.id;
-      const self = this;
-      Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
-        M.toast({ html: '<div>Region deleted successfully!</div>' });
-        self.props.onRemove();
-      });
-    };
-
-    renderNormal = () => {
-      return (
-        <div>
-          <CardItem label='Region name' value={this.state.data.regionName}/>
-          <CardItem label='Region description' value={this.state.data.regionDescription}/>
-          <CardItem label='Is active' value={this.state.data.active}/>
-        </div>
-      );
-    };
-
-    renderForm = () => {
-      return (
-        <form id={this.state.data.id + 'regionForm'} onSubmit={this.onSubmitForm}>
-          <div className="input-field">
-            <input onChange={this.handleChange} defaultValue={this.state.data.regionName} name='regionName' id={this.state.data.id + 'regionName'} type="text" autoComplete="off"/>
-            <label htmlFor={this.state.data.id + 'regionName'}>Region name</label>
-          </div>
-          <div className="input-field">
-            <input onChange={this.handleChange} defaultValue={this.state.data.regionDescription} name='regionDescription' id={this.state.data.id + 'regionDescription'} type="text" autoComplete="off"/>
-            <label htmlFor={this.state.data.id + 'regionDescription'}>Region description</label>
-          </div>
-          <div className="input-field">
-            <select onChange={this.handleChange} defaultValue={this.state.data.active} name="active" id={this.state.data.id + 'active'}>
-              <option value="" disabled="disabled">Choose active</option>
-              <option value='true'>True</option>
-              <option value='false'>False</option>
-            </select>
-            <label htmlFor={this.state.data.id + 'active'}>Active</label>
-          </div>
-          <button className="btn waves-effect waves-light" type="submit" name="action">
-                    Save
-            <i className="material-icons right">send</i>
-          </button>
-        </form>
-      );
-    };
-
-    render () {
-      const nodes = this.state.isEdit ? this.renderForm() : this.renderNormal();
-      const style = { marginLeft: '5px' };
-      return (
-        <div id={'region' + this.props.index} className='row'>
-          <div className='col s12'>
-            <div className='card'>
-              <div className='card-content'>
-                <div className="right-align">
-                  <a className="waves-effect waves-light btn-small" onClick={this.onClickEdit}>{this.state.isEdit ? 'Cancel' : 'Edit'}</a>
-                  <a disabled={this.state.data.id === 0} style={style} className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>Remove</a>
-                </div>
-                {nodes}
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-}
+import {MainLayout} from '../sharedComponents/mainLayout';
+import {RegionCard} from "./regionCard";
 
 export class Regions extends React.Component {
   constructor (props) {
@@ -174,55 +56,55 @@ export class Regions extends React.Component {
     this.state.tooltipInstances[0].destroy();
   }
 
-    updateNewRegion = (isCancel) => {
-      const newData = this.state.data;
-      if (isCancel) {
-        newData.splice(newData.length - 1, 1);
-        this.setState({ data: newData, showAdd: true });
-      } else {
-        this.setState({ showAdd: true });
-      }
-      const instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
-      this.setState({ tooltipInstances: instances });
-    };
-
-    addRegion = () => {
-      const newRegion = {
-        id: 0, regionName: '', regionDescription: '', active: ''
-      };
-      const newData = this.state.data;
-      newData.push(newRegion);
-      this.setState({ data: newData, showAdd: false });
-    };
-
-    loadRegions = () => {
-      this.setState({ loading: true });
-      const self = this;
-      Utils.ajaxGet('/regions',
-        function (data) {
-          self.setState({ data: data, loading: false });
-        });
-    };
-
-    render () {
-      let regionNodes;
-      const self = this;
-      if (this.state.data) {
-        regionNodes = this.state.data.map(function (region, index) {
-          return (
-            <RegionCard key={index} index={index} region={region} updateNewRegion={self.updateNewRegion} onRemove={self.loadRegions}/>
-          );
-        });
-      }
-      return (
-        <MainLayout title='Regions'>
-          {regionNodes}
-          <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add region">
-            <button disabled={!this.state.showAdd} className="waves-effect waves-light btn-floating btn-large grey darken-4" onClick={this.addRegion}>
-              <i className="large material-icons">add</i>
-            </button>
-          </div>
-        </MainLayout>
-      );
+  updateNewRegion (isCancel) {
+    const newData = this.state.data;
+    if (isCancel) {
+      newData.splice(newData.length - 1, 1);
+      this.setState({ data: newData, showAdd: true });
+    } else {
+      this.setState({ showAdd: true });
     }
+    const instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+    this.setState({ tooltipInstances: instances });
+  };
+
+  addRegion () {
+    const newRegion = {
+      id: 0, regionName: '', regionDescription: '', active: ''
+    };
+    const newData = this.state.data;
+    newData.push(newRegion);
+    this.setState({ data: newData, showAdd: false });
+  };
+
+  loadRegions () {
+    this.setState({ loading: true });
+    const self = this;
+    Utils.ajaxGet('/regions',
+      function (data) {
+        self.setState({ data: data, loading: false });
+      });
+  };
+
+  render () {
+    let regionNodes;
+    const self = this;
+    if (this.state.data) {
+      regionNodes = this.state.data.map(function (region, index) {
+        return (
+          <RegionCard key={index} index={index} region={region} updateNewRegion={self.updateNewRegion} onRemove={self.loadRegions}/>
+        );
+      });
+    }
+    return (
+      <MainLayout title='Regions'>
+        {regionNodes}
+        <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add region">
+          <button disabled={!this.state.showAdd} className="waves-effect waves-light btn-floating btn-large grey darken-4" onClick={this.addRegion}>
+            <i className="large material-icons">add</i>
+          </button>
+        </div>
+      </MainLayout>
+    );
+  }
 }

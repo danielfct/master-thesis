@@ -43,7 +43,7 @@ export class SimulatedMetricsLandingPage extends Component {
         this.state = {links: simulatedMetricsLinks, loading: false};
     }
 
-    renderLinks = () => {
+    renderLinks () {
         return this.state.links.map(function (link) {
             return (
                 <li key={link.name} className="collection-item">
@@ -78,7 +78,7 @@ class ServiceSimulatedMetricsCard extends Component {
         super(props);
     }
 
-    onClickRemove = () => {
+    onClickRemove () {
         let action = '/simulatedMetrics/services/' + this.props.simulatedMetric.id;
         let self = this;
         Utils.formSubmit(action, 'DELETE', {}, function (data) {
@@ -132,7 +132,7 @@ export class ServiceSimulatedMetrics extends Component {
         this.state.tooltipInstances[0].destroy();
     }
 
-    loadSimulatedMetrics = () => {
+    loadSimulatedMetrics () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/simulatedMetrics/services',
@@ -142,7 +142,7 @@ export class ServiceSimulatedMetrics extends Component {
             });
     };
 
-    renderSimulatedMetrics = () => {
+    renderSimulatedMetrics () {
         let simulatedMetricsNodes;
         let self = this;
         if (this.state.data) {
@@ -196,7 +196,7 @@ export class ServiceSimulatedMetricsDetail extends Component {
         M.FormSelect.init(elems);
     }
 
-    loadServices = () => {
+    loadServices () {
         this.setState({ loading: true });  
         let self = this;
         let url = '/services';
@@ -205,7 +205,7 @@ export class ServiceSimulatedMetricsDetail extends Component {
         });
     };
 
-    loadFields = () => {
+    loadFields () {
         this.setState({ loading: true });
         let self = this;
         let url = '/rules/fields';
@@ -214,7 +214,7 @@ export class ServiceSimulatedMetricsDetail extends Component {
         });
     };
 
-    loadServiceSimulatedMetrics = () => {
+    loadServiceSimulatedMetrics () {
         if (this.state.id !== 0) {
             this.setState({ loading: true });
             let self = this;
@@ -225,7 +225,7 @@ export class ServiceSimulatedMetricsDetail extends Component {
         }
     };
 
-    renderServicesSelect = () => {
+    renderServicesSelect () {
         let servicesNodes;
         if (this.state.services) {
             servicesNodes = pt.unl.fct.microserviceManagement.managerMaster.entities.service.map(function (service) {
@@ -237,7 +237,7 @@ export class ServiceSimulatedMetricsDetail extends Component {
         }
     };
 
-    renderFieldsSelect = () => {
+    renderFieldsSelect () {
         let fieldsNodes;
         if (this.state.fields) {
             fieldsNodes = this.state.fields.map(function (field) {
@@ -268,7 +268,7 @@ export class ServiceSimulatedMetricsDetail extends Component {
         this.setState({values: newValues});
     };
 
-    renderForm = () => {
+    renderForm () {
         let servicesSelect = this.renderServicesSelect();
         let fieldsSelect = this.renderFieldsSelect();
         return (
@@ -338,7 +338,7 @@ class ContainerSimulatedMetricsCard extends Component {
         super(props);
     }
 
-    onClickRemove = () => {
+    onClickRemove () {
         let action = '/simulatedMetrics/containers/' + this.props.simulatedMetric.id;
         let self = this;
         Utils.formSubmit(action, 'DELETE', {}, function (data) {
@@ -392,7 +392,7 @@ export class ContainerSimulatedMetrics extends Component {
         this.state.tooltipInstances[0].destroy();
     }
 
-    loadSimulatedMetrics = () => {
+    loadSimulatedMetrics () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/simulatedMetrics/containers',
@@ -401,7 +401,7 @@ export class ContainerSimulatedMetrics extends Component {
             });
     };
 
-    renderSimulatedMetrics = () => {
+    renderSimulatedMetrics () {
         let simulatedMetricsNodes;
         let self = this;
         if (this.state.data) {
@@ -455,7 +455,7 @@ export class ContainerSimulatedMetricsDetail extends Component {
         M.FormSelect.init(elems);
     }
 
-    loadContainers = () => {
+    loadContainers () {
         this.setState({loading: true});
         let self = this;
         let url = '/containers';
@@ -464,7 +464,7 @@ export class ContainerSimulatedMetricsDetail extends Component {
         });
     };
 
-    loadFields = () => {
+    loadFields () {
         this.setState({loading: true});
         let self = this;
         let url = '/rules/fields';
@@ -473,7 +473,7 @@ export class ContainerSimulatedMetricsDetail extends Component {
         });
     };
 
-    loadContainerSimulatedMetrics = () => {
+    loadContainerSimulatedMetrics () {
         if (this.state.id !== 0) {
             this.setState({loading: true});
             let self = this;
@@ -484,7 +484,7 @@ export class ContainerSimulatedMetricsDetail extends Component {
         }
     };
 
-    renderContainersSelect = () => {
+    renderContainersSelect () {
         let containersNodes;
         if (this.state.containers) {
             containersNodes = this.state.containers.map(function (container) {
@@ -496,7 +496,7 @@ export class ContainerSimulatedMetricsDetail extends Component {
         }
     };
 
-    renderFieldsSelect = () => {
+    renderFieldsSelect () {
         let fieldsNodes;
         if (this.state.fields) {
             fieldsNodes = this.state.fields.map(function (field) {
@@ -527,7 +527,7 @@ export class ContainerSimulatedMetricsDetail extends Component {
         this.setState({values: newValues});
     };
 
-    renderForm = () => {
+    renderForm () {
         let containersSelect = this.renderContainersSelect();
         let fieldsSelect = this.renderFieldsSelect();
         return (
@@ -597,7 +597,7 @@ class DefaultHostSimulatedMetricsCard extends Component {
         super(props);
     }
 
-    onClickRemove = () => {
+    onClickRemove () {
         let action = '/simulatedMetrics/defaultHosts/' + this.props.simulatedMetric.id; //TODO confirm
         let self = this;
         Utils.formSubmit(action, 'DELETE', {}, function (data) {
@@ -650,7 +650,7 @@ export class DefaultHostSimulatedMetrics extends Component {
         this.state.tooltipInstances[0].destroy();
     }
 
-    loadSimulatedMetrics = () => {
+    loadSimulatedMetrics () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/simulatedMetrics/defaultHosts',
@@ -660,7 +660,7 @@ export class DefaultHostSimulatedMetrics extends Component {
     };
 
 
-    renderSimulatedMetrics = () => {
+    renderSimulatedMetrics () {
         let simulatedMetricsNodes;
         let self = this;
         if (this.state.data) {
@@ -713,7 +713,7 @@ export class DefaultHostSimulatedMetricsDetail extends Component {
         M.FormSelect.init(elems);
     }
 
-    loadFields = () => {
+    loadFields () {
         this.setState({ loading: true });  
         let self = this;
         let url = '/fields';
@@ -722,7 +722,7 @@ export class DefaultHostSimulatedMetricsDetail extends Component {
         });
     };
 
-    loadDefaultHostSimulatedMetrics = () => {
+    loadDefaultHostSimulatedMetrics () {
         if (this.state.id !== 0) {
             this.setState({ loading: true });  
             let self = this;
@@ -733,7 +733,7 @@ export class DefaultHostSimulatedMetricsDetail extends Component {
         }
     };
 
-    renderFieldsSelect = () => {
+    renderFieldsSelect () {
         let fieldsNodes;
         if (this.state.fields) {
             fieldsNodes = this.state.fields.map(function (field) {
@@ -764,7 +764,7 @@ export class DefaultHostSimulatedMetricsDetail extends Component {
         this.setState({values: newValues});
     };
 
-    renderForm = () => {
+    renderForm () {
         let fieldsSelect = this.renderFieldsSelect();
         return (
             <form id="form-service" onSubmit={this.onSubmitForm}>                
@@ -826,7 +826,7 @@ class SpecificHostSimulatedMetricsCard extends Component {
         super(props);
     }
 
-    onClickRemove = () => {
+    onClickRemove () {
         let action = '/simulatedMetrics/specificHosts/' + this.props.simulatedMetric.id;
         let self = this;
         Utils.formSubmit(action, 'DELETE', {}, function (data) {
@@ -881,7 +881,7 @@ export class SpecificHostSimulatedMetrics extends Component {
         this.state.tooltipInstances[0].destroy();
     }
 
-    loadSimulatedMetrics = () => {
+    loadSimulatedMetrics () {
         this.setState({loading: true});
         let self = this;
         Utils.ajaxGet('/simulatedMetrics/specificHosts',
@@ -890,7 +890,7 @@ export class SpecificHostSimulatedMetrics extends Component {
             });
     };
 
-    renderSimulatedMetrics = () => {
+    renderSimulatedMetrics () {
         let simulatedMetricsNodes;
         let self = this;
         if (this.state.data) {
@@ -945,7 +945,7 @@ export class SpecificHostSimulatedMetricsDetail extends Component {
         M.FormSelect.init(elems);
     }
 
-    loadNodes = () => {
+    loadNodes () {
         this.setState({loading: true});
         let self = this;
         let url = '/nodes';
@@ -954,7 +954,7 @@ export class SpecificHostSimulatedMetricsDetail extends Component {
         });
     };
 
-    loadFields = () => {
+    loadFields () {
         this.setState({loading: true});
         let self = this;
         let url = '/rules/fields';
@@ -963,7 +963,7 @@ export class SpecificHostSimulatedMetricsDetail extends Component {
         });
     };
 
-    loadSpecificHostSimulatedMetrics = () => {
+    loadSpecificHostSimulatedMetrics () {
         if (this.state.id !== 0) {
             this.setState({loading: true});
             let self = this;
@@ -974,7 +974,7 @@ export class SpecificHostSimulatedMetricsDetail extends Component {
         }
     };
 
-    renderNodesSelect = () => {
+    renderNodesSelect () {
         let nodes;
         if (this.state.nodes) {
             nodes = this.state.nodes.map(function (node) {
@@ -986,7 +986,7 @@ export class SpecificHostSimulatedMetricsDetail extends Component {
         }
     };
 
-    renderFieldsSelect = () => {
+    renderFieldsSelect () {
         let fieldsNodes;
         if (this.state.fields) {
             fieldsNodes = this.state.fields.map(function (field) {
@@ -1017,7 +1017,7 @@ export class SpecificHostSimulatedMetricsDetail extends Component {
         this.setState({values: newValues});
     };
 
-    renderForm = () => {
+    renderForm () {
         let nodesSelect = this.renderNodesSelect();
         let fieldsSelect = this.renderFieldsSelect();
         return (

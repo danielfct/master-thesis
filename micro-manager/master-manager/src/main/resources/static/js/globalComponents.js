@@ -36,7 +36,7 @@ class AppLinks extends Component {
         this.state = { links: navLinks };
     }
 
-    renderNavLinks = () => {
+    renderNavLinks () {
         let links;
         links = this.state.links.map(function (link, index) {
             return (
@@ -72,7 +72,7 @@ class AppLinksDropdown extends Component {
         M.Dropdown.init(elems, {coverTrigger: false});
     }
 
-    renderNavLinks = () => {
+    renderNavLinks () {
         let links;
         links = this.state.links.map(function (link, index) {
             return (
@@ -113,7 +113,7 @@ class PageTitle extends Component {
         this.state = { breadcrumbs: initialBreadcrumbs };
     }
 
-    renderBreadcrumbs = () => {
+    renderBreadcrumbs () {
         let breadcrumbs;
         let style = {marginBottom: '10px'};
         if (this.state.breadcrumbs) {
@@ -189,7 +189,7 @@ export class CardItem extends Component {
         this.state = {label: propLabel, value: propValue};
     }
 
-    renderNormal = () => {
+    renderNormal () {
         return (
             <div>
                 <h5>{this.state.label}</h5>

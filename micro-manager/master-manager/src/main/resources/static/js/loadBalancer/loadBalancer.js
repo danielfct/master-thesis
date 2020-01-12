@@ -46,7 +46,7 @@ export class LoadBalancerPage extends Component {
         M.FormSelect.init(elems);
     }
 
-    loadServices = () => {
+    loadServices () {
         this.setState({ loading: true });  
         let self = this;
         Utils.ajaxGet('/services',
@@ -61,7 +61,7 @@ export class LoadBalancerPage extends Component {
             });
     };
 
-    loadRegions = () => {
+    loadRegions () {
         this.setState({ loading: true });  
         let self = this;
         Utils.ajaxGet('/regions',
@@ -116,7 +116,7 @@ export class LoadBalancerPage extends Component {
         
     };
 
-    renderServicesSelect = () => {
+    renderServicesSelect () {
         let servicesNodes;
         if (this.state.services) {
             servicesNodes = this.state.services.map(function (service) {
@@ -145,7 +145,7 @@ export class LoadBalancerPage extends Component {
         });
     };
 
-    renderChosenRegions = () => {
+    renderChosenRegions () {
         let regionsNodes;
         let self = this;
         let style = {marginTop: '-4px'};
@@ -166,7 +166,7 @@ export class LoadBalancerPage extends Component {
         return regionsNodes;
     };
 
-    renderAvailableRegions = () => {
+    renderAvailableRegions () {
         let regionsNodes;
         let style = {marginTop: '-4px'};
         let self = this;
@@ -191,7 +191,7 @@ export class LoadBalancerPage extends Component {
         )
     };
 
-    renderLoadBalancerPageComponents = () => {
+    renderLoadBalancerPageComponents () {
         return (
             <div>
                 <div className="input-field col s12">

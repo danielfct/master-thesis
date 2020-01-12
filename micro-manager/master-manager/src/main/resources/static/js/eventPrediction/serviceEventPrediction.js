@@ -34,7 +34,7 @@ class ServiceEventPredictionCard extends React.Component {
         super(props);
     }
 
-    onClickRemove = () => {
+    onClickRemove () {
         let action = '/services/serviceEventPredictions/' + this.props.serviceEvent.id;
         let self = this;
         Utils.formSubmit(action, 'DELETE', {}, function (data) {
@@ -87,7 +87,7 @@ export class ServiceEventPredictions extends React.Component {
         this.state.tooltipInstances[0].destroy();
     }
 
-    loadServiceEventPredictions = () => {
+    loadServiceEventPredictions () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/services/serviceEventPredictions',
@@ -96,7 +96,7 @@ export class ServiceEventPredictions extends React.Component {
             });
     };
 
-    renderServiceEvents = () => {
+    renderServiceEvents () {
         let serviceEventsNodes;
         let self = this;
         if (this.state.data) {
@@ -160,7 +160,7 @@ export class ServiceEventPredictionDetail extends React.Component {
         M.FormSelect.init(elems);
     }
 
-    loadServices = () => {
+    loadServices () {
         this.setState({loading: true});
         let self = this;
         let url = '/services';
@@ -169,7 +169,7 @@ export class ServiceEventPredictionDetail extends React.Component {
         });
     };
 
-    loadServiceEventPrediction = () => {
+    loadServiceEventPrediction () {
         if (this.state.id !== 0) {
             this.setState({ loading: true });
             let self = this;
@@ -184,7 +184,7 @@ export class ServiceEventPredictionDetail extends React.Component {
         }
     };
 
-    renderServicesSelect = () => {
+    renderServicesSelect () {
         let servicesNodes;
         if (this.state.services) {
             servicesNodes = this.state.services.map(function (service) {
@@ -202,7 +202,7 @@ export class ServiceEventPredictionDetail extends React.Component {
         this.setState({values: newValues});
     };
 
-    addEventListenersPickers = () => {
+    addEventListenersPickers () {
         let self = this;
         let elems = $(document).find('.datepicker,.timepicker');
         for (let i = 0; i < elems.length; i++) {
@@ -235,7 +235,7 @@ export class ServiceEventPredictionDetail extends React.Component {
         this.setState({values: newValues});
     };
 
-    renderForm = () => {
+    renderForm () {
         let servicesSelect = this.renderServicesSelect();
         return (
             <form id="form-service" onSubmit={this.onSubmitForm}>                

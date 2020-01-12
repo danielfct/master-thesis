@@ -38,7 +38,7 @@ export class EurekaPage extends React.Component {
         this.loadRegions();
     }
 
-    loadRegions = () => {
+    loadRegions () {
         this.setState({ loading: true });  
         let self = this;
         Utils.ajaxGet('/regions',
@@ -104,7 +104,7 @@ export class EurekaPage extends React.Component {
         });
     };
 
-    renderChosenRegions = () => {
+    renderChosenRegions () {
         let regionsNodes;
         let self = this;
         let style = {marginTop: '-4px'};
@@ -150,7 +150,7 @@ export class EurekaPage extends React.Component {
         )
     };
 
-    renderEurekaPageComponents = () => {
+    renderEurekaPageComponents () {
         return (
             <div>
                 <h5>Chosen Regions</h5>

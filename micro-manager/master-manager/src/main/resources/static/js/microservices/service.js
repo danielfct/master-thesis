@@ -38,7 +38,7 @@ export class ServiceCard extends Component {
         this.state = { data: service, loading: false };
     }
 
-    renderLink = () => {
+    renderLink () {
         return (
             <div className="right-align">
                 <div className="row">
@@ -52,7 +52,7 @@ export class ServiceCard extends Component {
         )
     };
 
-    renderSimple = () => {
+    renderSimple () {
         let linkDetails = this.props.viewDetails ? this.renderLink() : null;
         return (
             <div>
@@ -72,7 +72,7 @@ export class ServiceCard extends Component {
         )
     };
 
-    renderCard = () => {
+    renderCard () {
         return (
             <div className='row'>
                 <div className='col s12'>
@@ -115,7 +115,7 @@ export class Services extends Component {
         });
     };
 
-    applyFilter = () => {
+    applyFilter () {
         let filterVal = this.state.filter;
         let data = this.state.data;
         let filteredServices = [];
@@ -128,7 +128,7 @@ export class Services extends Component {
         this.setState({filtServices: filteredServices});
     };
 
-    clearFilter = () => {
+    clearFilter () {
         let self = this;
         this.setState({filter: ''}, function(){
             self.applyFilter();
@@ -136,7 +136,7 @@ export class Services extends Component {
         });
     };
 
-    loadServices = () => {
+    loadServices () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/services',
@@ -211,7 +211,7 @@ export class ServicePage extends Component {
         M.FormSelect.init(document.querySelectorAll('select'));
     }
 
-    loadService = () => {
+    loadService () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/services/' + this.state.service.id,
@@ -220,7 +220,7 @@ export class ServicePage extends Component {
             });
     };
 
-    loadDependencies = () => {
+    loadDependencies () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/services/' + this.state.service.id + '/dependencies',
@@ -229,7 +229,7 @@ export class ServicePage extends Component {
             });
     };
 
-    renderDependencies = () => {
+    renderDependencies () {
         if (this.state.loadedDependencies) {
             let dependencies;
             if (this.state.dependencies.length > 0) {
@@ -259,12 +259,12 @@ export class ServicePage extends Component {
         }
     };
 
-    onClickEdit = () => {
+    onClickEdit () {
         let edit = !this.state.isEdit;
         this.setState({isEdit: edit});
     };
 
-    onClickRemove = () => {
+    onClickRemove () {
         let formAction = '/services/' + this.state.service.id;
         let self = this;
         Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
@@ -297,7 +297,7 @@ export class ServicePage extends Component {
         });
     };
 
-    renderButton = () => {
+    renderButton () {
         if (this.state.isEdit) {
             return (
                 <button className="btn waves-effect waves-light" type="submit" name="action">
@@ -309,7 +309,7 @@ export class ServicePage extends Component {
         return null;
     };
 
-    renderServiceForm = () => {
+    renderServiceForm () {
         let editLabel = this.state.isEdit ? "Cancel" : "Edit";
         let style = {marginLeft: '5px'};
         return (

@@ -3033,9 +3033,16 @@
 	
 	        var _this = _possibleConstructorReturn(this, (AppLinks.__proto__ || Object.getPrototypeOf(AppLinks)).call(this, props));
 	
-	        _this.renderNavLinks = function () {
+	        var navLinks = _this.props.links;
+	        _this.state = { links: navLinks };
+	        return _this;
+	    }
+	
+	    _createClass(AppLinks, [{
+	        key: 'renderNavLinks',
+	        value: function renderNavLinks() {
 	            var links = void 0;
-	            links = _this.state.links.map(function (link, index) {
+	            links = this.state.links.map(function (link, index) {
 	                return React.createElement(
 	                    NavLink,
 	                    { key: index, exact: true, to: link.link, className: 'collection-item', activeClassName: 'active' },
@@ -3043,14 +3050,8 @@
 	                );
 	            });
 	            return links;
-	        };
-	
-	        var navLinks = _this.props.links;
-	        _this.state = { links: navLinks };
-	        return _this;
-	    }
-	
-	    _createClass(AppLinks, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return React.createElement(
@@ -3076,9 +3077,22 @@
 	
 	        var _this2 = _possibleConstructorReturn(this, (AppLinksDropdown.__proto__ || Object.getPrototypeOf(AppLinksDropdown)).call(this, props));
 	
-	        _this2.renderNavLinks = function () {
+	        var navLinks = _this2.props.links;
+	        _this2.state = { links: navLinks };
+	        return _this2;
+	    }
+	
+	    _createClass(AppLinksDropdown, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            var elems = document.querySelectorAll('.dropdown-trigger');
+	            M.Dropdown.init(elems, { coverTrigger: false });
+	        }
+	    }, {
+	        key: 'renderNavLinks',
+	        value: function renderNavLinks() {
 	            var links = void 0;
-	            links = _this2.state.links.map(function (link, index) {
+	            links = this.state.links.map(function (link, index) {
 	                return React.createElement(
 	                    'li',
 	                    { key: index },
@@ -3090,18 +3104,6 @@
 	                );
 	            });
 	            return links;
-	        };
-	
-	        var navLinks = _this2.props.links;
-	        _this2.state = { links: navLinks };
-	        return _this2;
-	    }
-	
-	    _createClass(AppLinksDropdown, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            var elems = document.querySelectorAll('.dropdown-trigger');
-	            M.Dropdown.init(elems, { coverTrigger: false });
 	        }
 	    }, {
 	        key: 'render',
@@ -3139,11 +3141,21 @@
 	
 	        var _this3 = _possibleConstructorReturn(this, (PageTitle.__proto__ || Object.getPrototypeOf(PageTitle)).call(this, props));
 	
-	        _this3.renderBreadcrumbs = function () {
+	        var initialBreadcrumbs = [];
+	        if (_this3.props.breadcrumbs) initialBreadcrumbs = _this3.props.breadcrumbs;
+	
+	        initialBreadcrumbs.push({ link: '', title: _this3.props.title });
+	        _this3.state = { breadcrumbs: initialBreadcrumbs };
+	        return _this3;
+	    }
+	
+	    _createClass(PageTitle, [{
+	        key: 'renderBreadcrumbs',
+	        value: function renderBreadcrumbs() {
 	            var breadcrumbs = void 0;
 	            var style = { marginBottom: '10px' };
-	            if (_this3.state.breadcrumbs) {
-	                breadcrumbs = _this3.state.breadcrumbs.map(function (breadcrumb, index) {
+	            if (this.state.breadcrumbs) {
+	                breadcrumbs = this.state.breadcrumbs.map(function (breadcrumb, index) {
 	                    if (breadcrumb.link === '') {
 	                        return React.createElement(
 	                            'span',
@@ -3167,17 +3179,8 @@
 	                    breadcrumbs
 	                )
 	            );
-	        };
-	
-	        var initialBreadcrumbs = [];
-	        if (_this3.props.breadcrumbs) initialBreadcrumbs = _this3.props.breadcrumbs;
-	
-	        initialBreadcrumbs.push({ link: '', title: _this3.props.title });
-	        _this3.state = { breadcrumbs: initialBreadcrumbs };
-	        return _this3;
-	    }
-	
-	    _createClass(PageTitle, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return this.renderBreadcrumbs();
@@ -3229,23 +3232,6 @@
 	
 	        var _this5 = _possibleConstructorReturn(this, (CardItem.__proto__ || Object.getPrototypeOf(CardItem)).call(this, props));
 	
-	        _this5.renderNormal = function () {
-	            return React.createElement(
-	                'div',
-	                null,
-	                React.createElement(
-	                    'h5',
-	                    null,
-	                    _this5.state.label
-	                ),
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    _this5.state.value
-	                )
-	            );
-	        };
-	
 	        var propLabel = _this5.props.label;
 	        var propValue = _this5.props.value;
 	        _this5.state = { label: propLabel, value: propValue };
@@ -3253,6 +3239,24 @@
 	    }
 	
 	    _createClass(CardItem, [{
+	        key: 'renderNormal',
+	        value: function renderNormal() {
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(
+	                    'h5',
+	                    null,
+	                    this.state.label
+	                ),
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    this.state.value
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return this.renderNormal();
@@ -18396,14 +18400,6 @@
 	
 	        var _this = _possibleConstructorReturn(this, (EdgeHostCard.__proto__ || Object.getPrototypeOf(EdgeHostCard)).call(this, props));
 	
-	        _this.onClickEdit = function () {
-	            var setEdit = !_this.state.isEdit;
-	            if (!setEdit && _this.state.data.id === 0) {
-	                _this.props.updateNewEdgeHost(true);
-	            }
-	            _this.setState({ isEdit: setEdit });
-	        };
-	
 	        _this.handleChange = function (event) {
 	            var name = event.target.name;
 	            var newData = _this.state.data;
@@ -18429,216 +18425,6 @@
 	            });
 	        };
 	
-	        _this.renderNormal = function () {
-	            return React.createElement(
-	                'div',
-	                null,
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    React.createElement(
-	                        'h5',
-	                        null,
-	                        'Hostname'
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        null,
-	                        _this.state.data.hostname
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    React.createElement(
-	                        'h5',
-	                        null,
-	                        'SSH username'
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        null,
-	                        _this.state.data.sshUsername
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    React.createElement(
-	                        'h5',
-	                        null,
-	                        'SSH password (Base64)'
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        null,
-	                        _this.state.data.sshPassword
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    React.createElement(
-	                        'h5',
-	                        null,
-	                        'Region'
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        null,
-	                        _this.state.data.region
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    React.createElement(
-	                        'h5',
-	                        null,
-	                        'Country'
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        null,
-	                        _this.state.data.country
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    React.createElement(
-	                        'h5',
-	                        null,
-	                        'City'
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        null,
-	                        _this.state.data.city
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    React.createElement(
-	                        'h5',
-	                        null,
-	                        'Is local'
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        null,
-	                        _this.state.data.local
-	                    )
-	                )
-	            );
-	        };
-	
-	        _this.renderForm = function () {
-	            return React.createElement(
-	                'form',
-	                { id: _this.state.data.id + 'edgeHostForm', onSubmit: _this.onSubmitForm },
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement('input', { onChange: _this.handleChange, defaultValue: _this.state.data.hostname, name: 'hostname', id: _this.state.data.id + 'hostname', type: 'text', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'hostname' },
-	                        'Hostname'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement('input', { onChange: _this.handleChange, defaultValue: _this.state.data.sshUsername, name: 'sshUsername', id: _this.state.data.id + 'sshUsername', type: 'text', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'sshUsername' },
-	                        'SSH username'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement('input', { onChange: _this.handleChange, defaultValue: _this.state.data.sshPassword, name: 'sshPassword', id: _this.state.data.id + 'sshPassword', type: 'text', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'sshPassword' },
-	                        'SSH password (Base64)'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement('input', { onChange: _this.handleChange, defaultValue: _this.state.data.region, name: 'region', id: _this.state.data.id + 'region', type: 'text', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'region' },
-	                        'Region'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement('input', { onChange: _this.handleChange, defaultValue: _this.state.data.country, name: 'country', id: _this.state.data.id + 'country', type: 'text', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'country' },
-	                        'Country'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement('input', { onChange: _this.handleChange, defaultValue: _this.state.data.city, name: 'city', id: _this.state.data.id + 'city', type: 'text', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'city' },
-	                        'City'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement(
-	                        'select',
-	                        { onChange: _this.handleChange, defaultValue: _this.state.data.local, name: 'local', id: _this.state.data.id + 'local' },
-	                        React.createElement(
-	                            'option',
-	                            { value: '', disabled: 'disabled' },
-	                            'Choose is local'
-	                        ),
-	                        React.createElement(
-	                            'option',
-	                            { value: 'true' },
-	                            'True'
-	                        ),
-	                        React.createElement(
-	                            'option',
-	                            { value: 'false' },
-	                            'False'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'local' },
-	                        'Is local'
-	                    )
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
-	                    'Save',
-	                    React.createElement(
-	                        'i',
-	                        { className: 'material-icons right' },
-	                        'send'
-	                    )
-	                )
-	            );
-	        };
-	
 	        var edgeHost = _this.props.edgeHost;
 	        edgeHost.local = edgeHost.local ? "true" : "false";
 	        var defaultIsEdit = _this.props.edgeHost.id === 0;
@@ -18658,6 +18444,15 @@
 	            M.FormSelect.init(document.querySelectorAll('select'));
 	        }
 	    }, {
+	        key: 'onClickEdit',
+	        value: function onClickEdit() {
+	            var setEdit = !this.state.isEdit;
+	            if (!setEdit && this.state.data.id === 0) {
+	                this.props.updateNewEdgeHost(true);
+	            }
+	            this.setState({ isEdit: setEdit });
+	        }
+	    }, {
 	        key: 'onClickRemove',
 	        value: function onClickRemove() {
 	            var formAction = '/hosts/edge/' + this.state.data.id;
@@ -18666,6 +18461,218 @@
 	                M.toast({ html: "<div>Edge host deleted successfully!</div>" });
 	                self.props.onRemove();
 	            });
+	        }
+	    }, {
+	        key: 'renderNormal',
+	        value: function renderNormal() {
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    React.createElement(
+	                        'h5',
+	                        null,
+	                        'Hostname'
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        null,
+	                        this.state.data.hostname
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    React.createElement(
+	                        'h5',
+	                        null,
+	                        'SSH username'
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        null,
+	                        this.state.data.sshUsername
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    React.createElement(
+	                        'h5',
+	                        null,
+	                        'SSH password (Base64)'
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        null,
+	                        this.state.data.sshPassword
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    React.createElement(
+	                        'h5',
+	                        null,
+	                        'Region'
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        null,
+	                        this.state.data.region
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    React.createElement(
+	                        'h5',
+	                        null,
+	                        'Country'
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        null,
+	                        this.state.data.country
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    React.createElement(
+	                        'h5',
+	                        null,
+	                        'City'
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        null,
+	                        this.state.data.city
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    React.createElement(
+	                        'h5',
+	                        null,
+	                        'Is local'
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        null,
+	                        this.state.data.local
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'renderForm',
+	        value: function renderForm() {
+	            return React.createElement(
+	                'form',
+	                { id: this.state.data.id + 'edgeHostForm', onSubmit: this.onSubmitForm },
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field' },
+	                    React.createElement('input', { onChange: this.handleChange, defaultValue: this.state.data.hostname, name: 'hostname', id: this.state.data.id + 'hostname', type: 'text', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: this.state.data.id + 'hostname' },
+	                        'Hostname'
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field' },
+	                    React.createElement('input', { onChange: this.handleChange, defaultValue: this.state.data.sshUsername, name: 'sshUsername', id: this.state.data.id + 'sshUsername', type: 'text', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: this.state.data.id + 'sshUsername' },
+	                        'SSH username'
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field' },
+	                    React.createElement('input', { onChange: this.handleChange, defaultValue: this.state.data.sshPassword, name: 'sshPassword', id: this.state.data.id + 'sshPassword', type: 'text', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: this.state.data.id + 'sshPassword' },
+	                        'SSH password (Base64)'
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field' },
+	                    React.createElement('input', { onChange: this.handleChange, defaultValue: this.state.data.region, name: 'region', id: this.state.data.id + 'region', type: 'text', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: this.state.data.id + 'region' },
+	                        'Region'
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field' },
+	                    React.createElement('input', { onChange: this.handleChange, defaultValue: this.state.data.country, name: 'country', id: this.state.data.id + 'country', type: 'text', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: this.state.data.id + 'country' },
+	                        'Country'
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field' },
+	                    React.createElement('input', { onChange: this.handleChange, defaultValue: this.state.data.city, name: 'city', id: this.state.data.id + 'city', type: 'text', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: this.state.data.id + 'city' },
+	                        'City'
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field' },
+	                    React.createElement(
+	                        'select',
+	                        { onChange: this.handleChange, defaultValue: this.state.data.local, name: 'local', id: this.state.data.id + 'local' },
+	                        React.createElement(
+	                            'option',
+	                            { value: '', disabled: 'disabled' },
+	                            'Choose is local'
+	                        ),
+	                        React.createElement(
+	                            'option',
+	                            { value: 'true' },
+	                            'True'
+	                        ),
+	                        React.createElement(
+	                            'option',
+	                            { value: 'false' },
+	                            'False'
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: this.state.data.id + 'local' },
+	                        'Is local'
+	                    )
+	                ),
+	                React.createElement(
+	                    'button',
+	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
+	                    'Save',
+	                    React.createElement(
+	                        'i',
+	                        { className: 'material-icons right' },
+	                        'send'
+	                    )
+	                )
+	            );
 	        }
 	    }, {
 	        key: 'render',
@@ -18996,24 +19003,6 @@
 	
 	        var _this = _possibleConstructorReturn(this, (AppPackageCard.__proto__ || Object.getPrototypeOf(AppPackageCard)).call(this, props));
 	
-	        _this.loadRegions = function () {
-	            _this.setState({ loading: true });
-	            var self = _this;
-	            var url = '/regions';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ availableRegions: data, loading: false });
-	            });
-	        };
-	
-	        _this.loadAppServices = function () {
-	            _this.setState({ loading: true });
-	            var self = _this;
-	            var url = '/apps/' + _this.state.appPackage.id + '/services';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
 	        _this.handleChangeRegion = function (event) {
 	            _this.setState({ regionSelected: event.target.value });
 	        };
@@ -19024,183 +19013,6 @@
 	
 	        _this.handleChangeCity = function (event) {
 	            _this.setState({ citySelected: event.target.value });
-	        };
-	
-	        _this.renderRegionsSelect = function () {
-	            var regions = void 0;
-	            if (_this.state.availableRegions) {
-	                regions = _this.state.availableRegions.map(function (region) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: region.regionName, value: region.regionName },
-	                        region.regionName + ' (' + region.regionDescription + ')'
-	                    );
-	                });
-	                return regions;
-	            }
-	        };
-	
-	        _this.renderRegionsSelectTotal = function () {
-	            return React.createElement(
-	                'div',
-	                { className: 'input-field col s6' },
-	                React.createElement(
-	                    'select',
-	                    { ref: function ref(region) {
-	                            return _this.region = region;
-	                        }, defaultValue: '', name: 'region', id: 'region', onChange: _this.handleChangeRegion },
-	                    React.createElement(
-	                        'option',
-	                        { value: '', disabled: 'disabled' },
-	                        'Choose region'
-	                    ),
-	                    _this.renderRegionsSelect()
-	                ),
-	                React.createElement(
-	                    'label',
-	                    { htmlFor: 'Region' },
-	                    'Region'
-	                )
-	            );
-	        };
-	
-	        _this.renderNormal = function () {
-	            return React.createElement(
-	                'div',
-	                null,
-	                React.createElement(
-	                    'h5',
-	                    null,
-	                    'App name'
-	                ),
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    _this.state.appPackage.appName
-	                )
-	            );
-	        };
-	
-	        _this.onClickLaunch = function () {
-	            _this.loadRegions();
-	            _this.setState({ isLaunchActive: true });
-	        };
-	
-	        _this.onClickCancelLaunch = function () {
-	            var instance = M.FormSelect.getInstance(_this.region);
-	            instance.destroy();
-	            _this.setState({ isLaunchActive: false });
-	        };
-	
-	        _this.renderLaunchApp = function () {
-	            var style = { marginLeft: "10px" };
-	            var cancelButton = React.createElement(
-	                'a',
-	                { title: 'Cancel', style: style, className: 'btn-floating waves-effect waves-light red darken-4', onClick: _this.onClickCancelLaunch },
-	                React.createElement(
-	                    'i',
-	                    { className: 'material-icons' },
-	                    'clear'
-	                )
-	            );
-	            if (_this.state.isLaunchActive) {
-	                return React.createElement(
-	                    'div',
-	                    null,
-	                    React.createElement(
-	                        'div',
-	                        { className: 'row' },
-	                        _this.renderRegionsSelectTotal(),
-	                        React.createElement(
-	                            'div',
-	                            { className: 'input-field col s6' },
-	                            React.createElement('input', { onChange: _this.handleChangeCountry, defaultValue: _this.state.countrySelected, name: 'country', id: 'country', type: 'text', autoComplete: 'off' }),
-	                            React.createElement(
-	                                'label',
-	                                { htmlFor: 'country' },
-	                                'Country'
-	                            )
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'row' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'input-field col s6' },
-	                            React.createElement('input', { onChange: _this.handleChangeCity, defaultValue: _this.state.citySelected, name: 'city', id: 'city', type: 'text', autoComplete: 'off' }),
-	                            React.createElement(
-	                                'label',
-	                                { htmlFor: 'city' },
-	                                'City'
-	                            )
-	                        ),
-	                        React.createElement(
-	                            'div',
-	                            { className: 'input-field col s6' },
-	                            React.createElement(
-	                                'a',
-	                                { title: 'Launch App', style: style, className: 'btn-floating waves-effect waves-light', onClick: _this.onLaunchApp },
-	                                React.createElement(
-	                                    'i',
-	                                    { className: 'material-icons' },
-	                                    'send'
-	                                )
-	                            ),
-	                            cancelButton
-	                        )
-	                    )
-	                );
-	            } else {
-	                return React.createElement(
-	                    'div',
-	                    { className: 'row' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'col s12' },
-	                        React.createElement(
-	                            'button',
-	                            { disabled: _this.state.appPackage.id === 0, style: style, className: 'waves-effect waves-light btn-small', onClick: _this.onClickLaunch },
-	                            'Launch'
-	                        )
-	                    )
-	                );
-	            }
-	        };
-	
-	        _this.onClickEdit = function () {
-	            var setEdit = !_this.state.isEdit;
-	            if (!setEdit && _this.state.appPackage.id === 0) {
-	                _this.props.updateNewApp(true);
-	            }
-	            _this.setState({ isEdit: setEdit });
-	        };
-	
-	        _this.onClickRemove = function () {
-	            var formAction = '/apps/' + _this.state.appPackage.id;
-	            var self = _this;
-	            _utils2.default.formSubmit(formAction, 'DELETE', {}, function (data) {
-	                M.toast({ html: "<div>App deleted successfully!</div>" });
-	                self.props.onRemove();
-	            });
-	        };
-	
-	        _this.onLaunchApp = function () {
-	            var formAction = '/containers/app/' + _this.state.appPackage.id;
-	            var self = _this;
-	            var dataToSend = JSON.stringify({
-	                region: self.state.regionSelected,
-	                country: self.state.countrySelected,
-	                city: self.state.citySelected
-	            });
-	            _utils2.default.formSubmit(formAction, 'POST', dataToSend, function (data) {
-	                console.log(data);
-	                M.toast({
-	                    html: "<div>App launched successfully!</div>",
-	                    options: { displayLength: 10000 }
-	                });
-	                self.onClickCancelLaunch();
-	            });
 	        };
 	
 	        _this.handleChange = function (event) {
@@ -19228,33 +19040,6 @@
 	            });
 	        };
 	
-	        _this.renderForm = function () {
-	            return React.createElement(
-	                'form',
-	                { id: _this.state.appPackage.id + 'appForm', onSubmit: _this.onSubmitForm },
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement('input', { value: _this.state.appPackage.appName, onChange: _this.handleChange, placeholder: 'App Name', name: 'appName', id: _this.state.appPackage.id + 'appName', type: 'text', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.appPackage.id + 'hostname' },
-	                        'App Name'
-	                    )
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
-	                    'Save',
-	                    React.createElement(
-	                        'i',
-	                        { className: 'material-icons right' },
-	                        'send'
-	                    )
-	                )
-	            );
-	        };
-	
 	        var propAppPackage = _this.props.appPackage;
 	        var defaultEdit = propAppPackage.id === 0;
 	        _this.state = { isLaunchActive: false, appPackage: propAppPackage, data: [], availableRegions: [],
@@ -19276,6 +19061,242 @@
 	                var elems = this.region;
 	                M.FormSelect.init(elems);
 	            }
+	        }
+	    }, {
+	        key: 'loadRegions',
+	        value: function loadRegions() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/regions';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ availableRegions: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadAppServices',
+	        value: function loadAppServices() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/apps/' + this.state.appPackage.id + '/services';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderRegionsSelect',
+	        value: function renderRegionsSelect() {
+	            var regions = void 0;
+	            if (this.state.availableRegions) {
+	                regions = this.state.availableRegions.map(function (region) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: region.regionName, value: region.regionName },
+	                        region.regionName + ' (' + region.regionDescription + ')'
+	                    );
+	                });
+	                return regions;
+	            }
+	        }
+	    }, {
+	        key: 'renderRegionsSelectTotal',
+	        value: function renderRegionsSelectTotal() {
+	            var _this2 = this;
+	
+	            return React.createElement(
+	                'div',
+	                { className: 'input-field col s6' },
+	                React.createElement(
+	                    'select',
+	                    { ref: function ref(region) {
+	                            return _this2.region = region;
+	                        }, defaultValue: '', name: 'region', id: 'region', onChange: this.handleChangeRegion },
+	                    React.createElement(
+	                        'option',
+	                        { value: '', disabled: 'disabled' },
+	                        'Choose region'
+	                    ),
+	                    this.renderRegionsSelect()
+	                ),
+	                React.createElement(
+	                    'label',
+	                    { htmlFor: 'Region' },
+	                    'Region'
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'renderNormal',
+	        value: function renderNormal() {
+	            return React.createElement(
+	                'div',
+	                null,
+	                React.createElement(
+	                    'h5',
+	                    null,
+	                    'App name'
+	                ),
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    this.state.appPackage.appName
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'onClickLaunch',
+	        value: function onClickLaunch() {
+	            this.loadRegions();
+	            this.setState({ isLaunchActive: true });
+	        }
+	    }, {
+	        key: 'onClickCancelLaunch',
+	        value: function onClickCancelLaunch() {
+	            var instance = M.FormSelect.getInstance(this.region);
+	            instance.destroy();
+	            this.setState({ isLaunchActive: false });
+	        }
+	    }, {
+	        key: 'renderLaunchApp',
+	        value: function renderLaunchApp() {
+	            var style = { marginLeft: "10px" };
+	            var cancelButton = React.createElement(
+	                'a',
+	                { title: 'Cancel', style: style, className: 'btn-floating waves-effect waves-light red darken-4', onClick: this.onClickCancelLaunch },
+	                React.createElement(
+	                    'i',
+	                    { className: 'material-icons' },
+	                    'clear'
+	                )
+	            );
+	            if (this.state.isLaunchActive) {
+	                return React.createElement(
+	                    'div',
+	                    null,
+	                    React.createElement(
+	                        'div',
+	                        { className: 'row' },
+	                        this.renderRegionsSelectTotal(),
+	                        React.createElement(
+	                            'div',
+	                            { className: 'input-field col s6' },
+	                            React.createElement('input', { onChange: this.handleChangeCountry, defaultValue: this.state.countrySelected, name: 'country', id: 'country', type: 'text', autoComplete: 'off' }),
+	                            React.createElement(
+	                                'label',
+	                                { htmlFor: 'country' },
+	                                'Country'
+	                            )
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        { className: 'row' },
+	                        React.createElement(
+	                            'div',
+	                            { className: 'input-field col s6' },
+	                            React.createElement('input', { onChange: this.handleChangeCity, defaultValue: this.state.citySelected, name: 'city', id: 'city', type: 'text', autoComplete: 'off' }),
+	                            React.createElement(
+	                                'label',
+	                                { htmlFor: 'city' },
+	                                'City'
+	                            )
+	                        ),
+	                        React.createElement(
+	                            'div',
+	                            { className: 'input-field col s6' },
+	                            React.createElement(
+	                                'a',
+	                                { title: 'Launch App', style: style, className: 'btn-floating waves-effect waves-light', onClick: this.onLaunchApp },
+	                                React.createElement(
+	                                    'i',
+	                                    { className: 'material-icons' },
+	                                    'send'
+	                                )
+	                            ),
+	                            cancelButton
+	                        )
+	                    )
+	                );
+	            } else {
+	                return React.createElement(
+	                    'div',
+	                    { className: 'row' },
+	                    React.createElement(
+	                        'div',
+	                        { className: 'col s12' },
+	                        React.createElement(
+	                            'button',
+	                            { disabled: this.state.appPackage.id === 0, style: style, className: 'waves-effect waves-light btn-small', onClick: this.onClickLaunch },
+	                            'Launch'
+	                        )
+	                    )
+	                );
+	            }
+	        }
+	    }, {
+	        key: 'onClickEdit',
+	        value: function onClickEdit() {
+	            var setEdit = !this.state.isEdit;
+	            if (!setEdit && this.state.appPackage.id === 0) {
+	                this.props.updateNewApp(true);
+	            }
+	            this.setState({ isEdit: setEdit });
+	        }
+	    }, {
+	        key: 'onClickRemove',
+	        value: function onClickRemove() {
+	            var formAction = '/apps/' + this.state.appPackage.id;
+	            var self = this;
+	            _utils2.default.formSubmit(formAction, 'DELETE', {}, function (data) {
+	                M.toast({ html: "<div>App deleted successfully!</div>" });
+	                self.props.onRemove();
+	            });
+	        }
+	    }, {
+	        key: 'onLaunchApp',
+	        value: function onLaunchApp() {
+	            var formAction = '/containers/app/' + this.state.appPackage.id;
+	            var self = this;
+	            var dataToSend = JSON.stringify({
+	                region: self.state.regionSelected,
+	                country: self.state.countrySelected,
+	                city: self.state.citySelected
+	            });
+	            _utils2.default.formSubmit(formAction, 'POST', dataToSend, function (data) {
+	                console.log(data);
+	                M.toast({
+	                    html: "<div>App launched successfully!</div>",
+	                    options: { displayLength: 10000 }
+	                });
+	                self.onClickCancelLaunch();
+	            });
+	        }
+	    }, {
+	        key: 'renderForm',
+	        value: function renderForm() {
+	            return React.createElement(
+	                'form',
+	                { id: this.state.appPackage.id + 'appForm', onSubmit: this.onSubmitForm },
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field' },
+	                    React.createElement('input', { value: this.state.appPackage.appName, onChange: this.handleChange, placeholder: 'App Name', name: 'appName', id: this.state.appPackage.id + 'appName', type: 'text', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: this.state.appPackage.id + 'hostname' },
+	                        'App Name'
+	                    )
+	                ),
+	                React.createElement(
+	                    'button',
+	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
+	                    'Save',
+	                    React.createElement(
+	                        'i',
+	                        { className: 'material-icons right' },
+	                        'send'
+	                    )
+	                )
+	            );
 	        }
 	    }, {
 	        key: 'render',
@@ -19355,39 +19376,22 @@
 	    function AppPackages(props) {
 	        _classCallCheck(this, AppPackages);
 	
-	        var _this2 = _possibleConstructorReturn(this, (AppPackages.__proto__ || Object.getPrototypeOf(AppPackages)).call(this, props));
+	        var _this3 = _possibleConstructorReturn(this, (AppPackages.__proto__ || Object.getPrototypeOf(AppPackages)).call(this, props));
 	
-	        _this2.loadApps = function () {
-	            _this2.setState({ loading: true });
-	            var self = _this2;
-	            _utils2.default.ajaxGet('/apps', function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
-	        _this2.updateNewApp = function (isCancel) {
-	            var newData = _this2.state.data;
+	        _this3.updateNewApp = function (isCancel) {
+	            var newData = _this3.state.data;
 	            if (isCancel) {
 	                newData.splice(newData.length - 1, 1);
-	                _this2.setState({ data: newData, showAdd: true });
+	                _this3.setState({ data: newData, showAdd: true });
 	            } else {
-	                _this2.setState({ showAdd: true });
+	                _this3.setState({ showAdd: true });
 	            }
 	            var instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
-	            _this2.setState({ tooltipInstances: instances });
+	            _this3.setState({ tooltipInstances: instances });
 	        };
 	
-	        _this2.addApp = function () {
-	            var newApp = {
-	                id: 0, appName: ''
-	            };
-	            var newData = _this2.state.data;
-	            newData.push(newApp);
-	            _this2.setState({ data: newData, showAdd: false });
-	        };
-	
-	        _this2.state = { data: [], loading: false, showAdd: true };
-	        return _this2;
+	        _this3.state = { data: [], loading: false, showAdd: true };
+	        return _this3;
 	    }
 	
 	    _createClass(AppPackages, [{
@@ -19408,6 +19412,25 @@
 	                    this.state.tooltipInstances[0].destroy();
 	                }
 	            }
+	        }
+	    }, {
+	        key: 'loadApps',
+	        value: function loadApps() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/apps', function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'addApp',
+	        value: function addApp() {
+	            var newApp = {
+	                id: 0, appName: ''
+	            };
+	            var newData = this.state.data;
+	            newData.push(newApp);
+	            this.setState({ data: newData, showAdd: false });
 	        }
 	    }, {
 	        key: 'componentWillUnmount',
@@ -19513,7 +19536,14 @@
 	
 	        var _this = _possibleConstructorReturn(this, (ServiceCard.__proto__ || Object.getPrototypeOf(ServiceCard)).call(this, props));
 	
-	        _this.renderLink = function () {
+	        var service = _this.props.service;
+	        _this.state = { data: service, loading: false };
+	        return _this;
+	    }
+	
+	    _createClass(ServiceCard, [{
+	        key: 'renderLink',
+	        value: function renderLink() {
 	            return React.createElement(
 	                'div',
 	                { className: 'right-align' },
@@ -19525,35 +19555,37 @@
 	                        { className: 'col s12' },
 	                        React.createElement(
 	                            Link,
-	                            { className: 'waves-effect waves-light btn-small', to: '/ui/services/detail/' + _this.state.data.id },
+	                            { className: 'waves-effect waves-light btn-small', to: '/ui/services/detail/' + this.state.data.id },
 	                            'View details'
 	                        )
 	                    )
 	                )
 	            );
-	        };
-	
-	        _this.renderSimple = function () {
-	            var linkDetails = _this.props.viewDetails ? _this.renderLink() : null;
+	        }
+	    }, {
+	        key: 'renderSimple',
+	        value: function renderSimple() {
+	            var linkDetails = this.props.viewDetails ? this.renderLink() : null;
 	            return React.createElement(
 	                'div',
 	                null,
 	                linkDetails,
-	                React.createElement(_globalComponents.CardItem, { label: 'Service name', value: _this.state.data.serviceName }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Docker Repository', value: _this.state.data.dockerRepo }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Default external port', value: _this.state.data.defaultExternalPort }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Default internal port', value: _this.state.data.defaultInternalPort }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Default database', value: _this.state.data.defaultDb }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Launch command', value: _this.state.data.launchCommand }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Minimum Replics', value: _this.state.data.minReplics }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Maximum Replics', value: _this.state.data.maxReplics }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Output label', value: _this.state.data.outputLabel }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Service type', value: _this.state.data.serviceType }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Average Memory (bytes)', value: _this.state.data.avgMem })
+	                React.createElement(_globalComponents.CardItem, { label: 'Service name', value: this.state.data.serviceName }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Docker Repository', value: this.state.data.dockerRepo }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Default external port', value: this.state.data.defaultExternalPort }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Default internal port', value: this.state.data.defaultInternalPort }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Default database', value: this.state.data.defaultDb }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Launch command', value: this.state.data.launchCommand }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Minimum Replics', value: this.state.data.minReplics }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Maximum Replics', value: this.state.data.maxReplics }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Output label', value: this.state.data.outputLabel }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Service type', value: this.state.data.serviceType }),
+	                React.createElement(_globalComponents.CardItem, { label: 'Average Memory (bytes)', value: this.state.data.avgMem })
 	            );
-	        };
-	
-	        _this.renderCard = function () {
+	        }
+	    }, {
+	        key: 'renderCard',
+	        value: function renderCard() {
 	            return React.createElement(
 	                'div',
 	                { className: 'row' },
@@ -19566,19 +19598,13 @@
 	                        React.createElement(
 	                            'div',
 	                            { className: 'card-content' },
-	                            _this.renderSimple()
+	                            this.renderSimple()
 	                        )
 	                    )
 	                )
 	            );
-	        };
-	
-	        var service = _this.props.service;
-	        _this.state = { data: service, loading: false };
-	        return _this;
-	    }
-	
-	    _createClass(ServiceCard, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return this.props.renderSimple ? this.renderSimple() : this.renderCard();
@@ -19604,36 +19630,6 @@
 	            });
 	        };
 	
-	        _this2.applyFilter = function () {
-	            var filterVal = _this2.state.filter;
-	            var data = _this2.state.data;
-	            var filteredServices = [];
-	            for (var index = 0; index < data.length; index++) {
-	                var service = data[index];
-	                if (service.serviceName.includes(filterVal)) {
-	                    filteredServices.push(service);
-	                }
-	            }
-	            _this2.setState({ filtServices: filteredServices });
-	        };
-	
-	        _this2.clearFilter = function () {
-	            var self = _this2;
-	            _this2.setState({ filter: '' }, function () {
-	                self.applyFilter();
-	                $('#filter').val('');
-	            });
-	        };
-	
-	        _this2.loadServices = function () {
-	            _this2.setState({ loading: true });
-	            var self = _this2;
-	            _utils2.default.ajaxGet('/services', function (data) {
-	                var services = data;
-	                self.setState({ data: services, filtServices: services, loading: false });
-	            });
-	        };
-	
 	        _this2.state = { data: [], filtServices: [], filter: '', loading: false };
 	        return _this2;
 	    }
@@ -19649,6 +19645,39 @@
 	        key: 'componentWillUnmount',
 	        value: function componentWillUnmount() {
 	            this.state.tooltipInstances[0].destroy();
+	        }
+	    }, {
+	        key: 'applyFilter',
+	        value: function applyFilter() {
+	            var filterVal = this.state.filter;
+	            var data = this.state.data;
+	            var filteredServices = [];
+	            for (var index = 0; index < data.length; index++) {
+	                var service = data[index];
+	                if (service.serviceName.includes(filterVal)) {
+	                    filteredServices.push(service);
+	                }
+	            }
+	            this.setState({ filtServices: filteredServices });
+	        }
+	    }, {
+	        key: 'clearFilter',
+	        value: function clearFilter() {
+	            var self = this;
+	            this.setState({ filter: '' }, function () {
+	                self.applyFilter();
+	                $('#filter').val('');
+	            });
+	        }
+	    }, {
+	        key: 'loadServices',
+	        value: function loadServices() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/services', function (data) {
+	                var services = data;
+	                self.setState({ data: services, filtServices: services, loading: false });
+	            });
 	        }
 	    }, {
 	        key: 'render',
@@ -19714,27 +19743,88 @@
 	
 	        var _this3 = _possibleConstructorReturn(this, (ServicePage.__proto__ || Object.getPrototypeOf(ServicePage)).call(this, props));
 	
-	        _this3.loadService = function () {
-	            _this3.setState({ loading: true });
+	        _this3.handleChange = function (event) {
+	            var name = event.target.name;
+	            var newData = _this3.state.service;
+	            newData[name] = event.target.value;
+	            _this3.setState({ service: newData });
+	        };
+	
+	        _this3.onSubmitForm = function (event) {
+	            event.preventDefault();
+	            var formAction = '/services';
+	            var formData = _utils2.default.convertFormToJson('form-service');
 	            var self = _this3;
-	            _utils2.default.ajaxGet('/services/' + _this3.state.service.id, function (data) {
+	            _utils2.default.formSubmit(formAction, 'POST', formData, function (data) {
+	                var newService = self.state.service;
+	                if (newService.id === 0) {
+	                    var title = document.title;
+	                    history.replaceState({}, title, '/ui/services/detail/' + data);
+	                }
+	                newService.id = data;
+	                self.setState({ service: newService });
+	                M.toast({ html: "<div>Service config saved successfully!</div>" });
+	            });
+	        };
+	
+	        var paramId = 0;
+	        if (_this3.props.match.params.id) {
+	            paramId = _this3.props.match.params.id;
+	        }
+	        var isEdit = paramId === 0;
+	        var serviceInitialValues = {
+	            id: paramId, serviceName: '', dockerRepository: '', defaultExternalPort: '',
+	            defaultInternalPort: '', defaultDb: '', launchCommand: '', minReplics: 0,
+	            maxReplics: 0, outputLabel: '', serviceType: '', expectedMemoryConsumption: 0
+	        };
+	        var thisBreadcrumbs = [{ title: 'Services configs', link: '/ui/services' }];
+	        _this3.state = { breadcrumbs: thisBreadcrumbs, service: serviceInitialValues, dependencies: [],
+	            loadedDependencies: false, loading: false, isEdit: isEdit, isDeleted: false };
+	        return _this3;
+	    }
+	
+	    _createClass(ServicePage, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            if (this.state.service.id !== 0) {
+	                this.loadDependencies();
+	                this.loadService();
+	            }
+	            M.updateTextFields();
+	            M.FormSelect.init(document.querySelectorAll('select'));
+	        }
+	    }, {
+	        key: 'componentDidUpdate',
+	        value: function componentDidUpdate() {
+	            M.updateTextFields();
+	            M.Collapsible.init(document.querySelectorAll('.collapsible'));
+	            M.FormSelect.init(document.querySelectorAll('select'));
+	        }
+	    }, {
+	        key: 'loadService',
+	        value: function loadService() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/services/' + this.state.service.id, function (data) {
 	                self.setState({ service: data, loading: false });
 	            });
-	        };
-	
-	        _this3.loadDependencies = function () {
-	            _this3.setState({ loading: true });
-	            var self = _this3;
-	            _utils2.default.ajaxGet('/services/' + _this3.state.service.id + '/dependencies', function (data) {
+	        }
+	    }, {
+	        key: 'loadDependencies',
+	        value: function loadDependencies() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/services/' + this.state.service.id + '/dependencies', function (data) {
 	                self.setState({ dependencies: data, loadedDependencies: true, loading: false });
 	            });
-	        };
-	
-	        _this3.renderDependencies = function () {
-	            if (_this3.state.loadedDependencies) {
+	        }
+	    }, {
+	        key: 'renderDependencies',
+	        value: function renderDependencies() {
+	            if (this.state.loadedDependencies) {
 	                var dependencies = void 0;
-	                if (_this3.state.dependencies.length > 0) {
-	                    dependencies = _this3.state.dependencies.map(function (dependency) {
+	                if (this.state.dependencies.length > 0) {
+	                    dependencies = this.state.dependencies.map(function (dependency) {
 	                        return React.createElement(
 	                            'li',
 	                            { key: 'dependency-' + dependency.id },
@@ -19773,48 +19863,27 @@
 	                    )
 	                );
 	            }
-	        };
-	
-	        _this3.onClickEdit = function () {
-	            var edit = !_this3.state.isEdit;
-	            _this3.setState({ isEdit: edit });
-	        };
-	
-	        _this3.onClickRemove = function () {
-	            var formAction = '/services/' + _this3.state.service.id;
-	            var self = _this3;
+	        }
+	    }, {
+	        key: 'onClickEdit',
+	        value: function onClickEdit() {
+	            var edit = !this.state.isEdit;
+	            this.setState({ isEdit: edit });
+	        }
+	    }, {
+	        key: 'onClickRemove',
+	        value: function onClickRemove() {
+	            var formAction = '/services/' + this.state.service.id;
+	            var self = this;
 	            _utils2.default.formSubmit(formAction, 'DELETE', {}, function (data) {
 	                self.setState({ isDeleted: true });
 	                M.toast({ html: "<div>Service config removed successfully!</div>" });
 	            });
-	        };
-	
-	        _this3.handleChange = function (event) {
-	            var name = event.target.name;
-	            var newData = _this3.state.service;
-	            newData[name] = event.target.value;
-	            _this3.setState({ service: newData });
-	        };
-	
-	        _this3.onSubmitForm = function (event) {
-	            event.preventDefault();
-	            var formAction = '/services';
-	            var formData = _utils2.default.convertFormToJson('form-service');
-	            var self = _this3;
-	            _utils2.default.formSubmit(formAction, 'POST', formData, function (data) {
-	                var newService = self.state.service;
-	                if (newService.id === 0) {
-	                    var title = document.title;
-	                    history.replaceState({}, title, '/ui/services/detail/' + data);
-	                }
-	                newService.id = data;
-	                self.setState({ service: newService });
-	                M.toast({ html: "<div>Service config saved successfully!</div>" });
-	            });
-	        };
-	
-	        _this3.renderButton = function () {
-	            if (_this3.state.isEdit) {
+	        }
+	    }, {
+	        key: 'renderButton',
+	        value: function renderButton() {
+	            if (this.state.isEdit) {
 	                return React.createElement(
 	                    'button',
 	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
@@ -19827,10 +19896,11 @@
 	                );
 	            }
 	            return null;
-	        };
-	
-	        _this3.renderServiceForm = function () {
-	            var editLabel = _this3.state.isEdit ? "Cancel" : "Edit";
+	        }
+	    }, {
+	        key: 'renderServiceForm',
+	        value: function renderServiceForm() {
+	            var editLabel = this.state.isEdit ? "Cancel" : "Edit";
 	            var style = { marginLeft: '5px' };
 	            return React.createElement(
 	                'div',
@@ -19846,12 +19916,12 @@
 	                            { className: 'col s12' },
 	                            React.createElement(
 	                                'a',
-	                                { className: 'waves-effect waves-light btn-small', onClick: _this3.onClickEdit },
+	                                { className: 'waves-effect waves-light btn-small', onClick: this.onClickEdit },
 	                                editLabel
 	                            ),
 	                            React.createElement(
 	                                'button',
-	                                { disabled: _this3.state.service.id === 0, style: style, className: 'waves-effect waves-light btn-small red darken-4', onClick: _this3.onClickRemove },
+	                                { disabled: this.state.service.id === 0, style: style, className: 'waves-effect waves-light btn-small red darken-4', onClick: this.onClickRemove },
 	                                'Remove'
 	                            )
 	                        )
@@ -19859,11 +19929,11 @@
 	                ),
 	                React.createElement(
 	                    'form',
-	                    { id: 'form-service', onSubmit: _this3.onSubmitForm },
+	                    { id: 'form-service', onSubmit: this.onSubmitForm },
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.serviceName, onChange: _this3.handleChange, name: 'serviceName', id: 'serviceName', type: 'text', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.serviceName, onChange: this.handleChange, name: 'serviceName', id: 'serviceName', type: 'text', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'serviceName' },
@@ -19873,7 +19943,7 @@
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.dockerRepo, onChange: _this3.handleChange, name: 'dockerRepo', id: 'dockerRepo', type: 'text', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.dockerRepo, onChange: this.handleChange, name: 'dockerRepo', id: 'dockerRepo', type: 'text', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'dockerRepo' },
@@ -19883,7 +19953,7 @@
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.defaultExternalPort, onChange: _this3.handleChange, name: 'defaultExternalPort', id: 'defaultExternalPort', type: 'text', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.defaultExternalPort, onChange: this.handleChange, name: 'defaultExternalPort', id: 'defaultExternalPort', type: 'text', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'defaultExternalPort' },
@@ -19893,7 +19963,7 @@
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.defaultInternalPort, onChange: _this3.handleChange, name: 'defaultInternalPort', id: 'defaultInternalPort', type: 'text', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.defaultInternalPort, onChange: this.handleChange, name: 'defaultInternalPort', id: 'defaultInternalPort', type: 'text', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'defaultInternalPort' },
@@ -19903,7 +19973,7 @@
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.defaultDb, onChange: _this3.handleChange, name: 'defaultDb', id: 'defaultDb', type: 'text', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.defaultDb, onChange: this.handleChange, name: 'defaultDb', id: 'defaultDb', type: 'text', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'defaultDb' },
@@ -19913,7 +19983,7 @@
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.launchCommand, onChange: _this3.handleChange, name: 'launchCommand', id: 'launchCommand', type: 'text', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.launchCommand, onChange: this.handleChange, name: 'launchCommand', id: 'launchCommand', type: 'text', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'launchCommand' },
@@ -19923,7 +19993,7 @@
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.minReplics, onChange: _this3.handleChange, name: 'minReplics', id: 'minReplics', type: 'number', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.minReplics, onChange: this.handleChange, name: 'minReplics', id: 'minReplics', type: 'number', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'minReplics' },
@@ -19933,7 +20003,7 @@
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.maxReplics, onChange: _this3.handleChange, name: 'maxReplics', id: 'maxReplics', type: 'number', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.maxReplics, onChange: this.handleChange, name: 'maxReplics', id: 'maxReplics', type: 'number', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'maxReplics' },
@@ -19943,7 +20013,7 @@
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.outputLabel, onChange: _this3.handleChange, name: 'outputLabel', id: 'outputLabel', type: 'text', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.outputLabel, onChange: this.handleChange, name: 'outputLabel', id: 'outputLabel', type: 'text', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'outputLabel' },
@@ -19955,7 +20025,7 @@
 	                        { className: 'input-field col s12' },
 	                        React.createElement(
 	                            'select',
-	                            { disabled: !_this3.state.isEdit, value: _this3.state.service.serviceType, onChange: _this3.handleChange, name: 'serviceType', id: 'serviceType' },
+	                            { disabled: !this.state.isEdit, value: this.state.service.serviceType, onChange: this.handleChange, name: 'serviceType', id: 'serviceType' },
 	                            React.createElement(
 	                                'option',
 	                                { value: '', disabled: 'disabled' },
@@ -19991,50 +20061,16 @@
 	                    React.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: !_this3.state.isEdit, value: _this3.state.service.avgMem, onChange: _this3.handleChange, name: 'avgMem', id: 'avgMem', type: 'number', autoComplete: 'off' }),
+	                        React.createElement('input', { disabled: !this.state.isEdit, value: this.state.service.avgMem, onChange: this.handleChange, name: 'avgMem', id: 'avgMem', type: 'number', autoComplete: 'off' }),
 	                        React.createElement(
 	                            'label',
 	                            { htmlFor: 'avgMem' },
 	                            'Average Memory (bytes)'
 	                        )
 	                    ),
-	                    _this3.renderButton()
+	                    this.renderButton()
 	                )
 	            );
-	        };
-	
-	        var paramId = 0;
-	        if (_this3.props.match.params.id) {
-	            paramId = _this3.props.match.params.id;
-	        }
-	        var isEdit = paramId === 0;
-	        var serviceInitialValues = {
-	            id: paramId, serviceName: '', dockerRepository: '', defaultExternalPort: '',
-	            defaultInternalPort: '', defaultDb: '', launchCommand: '', minReplics: 0,
-	            maxReplics: 0, outputLabel: '', serviceType: '', expectedMemoryConsumption: 0
-	        };
-	        var thisBreadcrumbs = [{ title: 'Services configs', link: '/ui/services' }];
-	        _this3.state = { breadcrumbs: thisBreadcrumbs, service: serviceInitialValues, dependencies: [],
-	            loadedDependencies: false, loading: false, isEdit: isEdit, isDeleted: false };
-	        return _this3;
-	    }
-	
-	    _createClass(ServicePage, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            if (this.state.service.id !== 0) {
-	                this.loadDependencies();
-	                this.loadService();
-	            }
-	            M.updateTextFields();
-	            M.FormSelect.init(document.querySelectorAll('select'));
-	        }
-	    }, {
-	        key: 'componentDidUpdate',
-	        value: function componentDidUpdate() {
-	            M.updateTextFields();
-	            M.Collapsible.init(document.querySelectorAll('.collapsible'));
-	            M.FormSelect.init(document.querySelectorAll('select'));
 	        }
 	    }, {
 	        key: 'render',
@@ -20058,7 +20094,7 @@
 /* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -20066,6 +20102,16 @@
 	exports.LaunchContainer = exports.Containers = undefined;
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouterDom = __webpack_require__(10);
+	
+	var _jquery = __webpack_require__(9);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
 	
 	var _utils = __webpack_require__(58);
 	
@@ -20079,40 +20125,32 @@
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MIT License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright (c) 2020 micro-manager
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in all
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies or substantial portions of the Software.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * SOFTWARE.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
-	/*
-	 * MIT License
-	 *
-	 * Copyright (c) 2020 micro-manager
-	 *
-	 * Permission is hereby granted, free of charge, to any person obtaining a copy
-	 * of this software and associated documentation files (the "Software"), to deal
-	 * in the Software without restriction, including without limitation the rights
-	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	 * copies of the Software, and to permit persons to whom the Software is
-	 * furnished to do so, subject to the following conditions:
-	 *
-	 * The above copyright notice and this permission notice shall be included in all
-	 * copies or substantial portions of the Software.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	 * SOFTWARE.
-	 */
-	
-	var $ = __webpack_require__(9);
-	var React = __webpack_require__(1);
-	var Component = React.Component;
-	var Redirect = __webpack_require__(10).Redirect;
-	var Link = __webpack_require__(10).Link;
-	
-	var ContainerPort = function (_Component) {
-	    _inherits(ContainerPort, _Component);
+	var ContainerPort = function (_React$Component) {
+	    _inherits(ContainerPort, _React$Component);
 	
 	    function ContainerPort(props) {
 	        _classCallCheck(this, ContainerPort);
@@ -20121,28 +20159,28 @@
 	    }
 	
 	    _createClass(ContainerPort, [{
-	        key: 'render',
+	        key: "render",
 	        value: function render() {
-	            return React.createElement(
-	                'div',
+	            return _react2.default.createElement(
+	                "div",
 	                null,
-	                React.createElement(
-	                    'h6',
+	                _react2.default.createElement(
+	                    "h6",
 	                    null,
-	                    'Public port : Private port'
+	                    "Public port : Private port"
 	                ),
-	                React.createElement(
-	                    'div',
+	                _react2.default.createElement(
+	                    "div",
 	                    null,
 	                    this.props.port.publicPort + ' : ' + this.props.port.privatePort
 	                ),
-	                React.createElement(
-	                    'h6',
+	                _react2.default.createElement(
+	                    "h6",
 	                    null,
-	                    'IP / Type'
+	                    "IP / Type"
 	                ),
-	                React.createElement(
-	                    'div',
+	                _react2.default.createElement(
+	                    "div",
 	                    null,
 	                    this.props.port.ip + ' / ' + this.props.port.type
 	                )
@@ -20151,214 +20189,18 @@
 	    }]);
 	
 	    return ContainerPort;
-	}(Component);
+	}(_react2.default.Component);
 	
-	var ContainerCard = function (_Component2) {
-	    _inherits(ContainerCard, _Component2);
+	var ContainerCard = function (_Component) {
+	    _inherits(ContainerCard, _Component);
 	
 	    function ContainerCard(props) {
 	        _classCallCheck(this, ContainerCard);
 	
 	        var _this2 = _possibleConstructorReturn(this, (ContainerCard.__proto__ || Object.getPrototypeOf(ContainerCard)).call(this, props));
 	
-	        _this2.renderNames = function () {
-	            return _this2.props.container.names.map(function (name, index) {
-	                var counter = index + 1;
-	                return React.createElement(_globalComponents.CardItem, { key: name + index, label: 'Name ' + counter, value: name });
-	            });
-	        };
-	
-	        _this2.renderPorts = function () {
-	            return _this2.props.container.ports.map(function (port, index) {
-	                return React.createElement(ContainerPort, { key: 'port' + index, port: port });
-	            });
-	        };
-	
-	        _this2.renderLabels = function () {
-	            var propsLabels = _this2.props.container.labels;
-	            return Object.keys(propsLabels).map(function (key, index) {
-	                return React.createElement(
-	                    'div',
-	                    { key: key },
-	                    key + ': ' + propsLabels[key]
-	                );
-	            });
-	        };
-	
-	        _this2.onClickStop = function () {
-	            var action = '/containers/' + _this2.props.container.id;
-	            var dataObject = {
-	                hostname: _this2.props.container.hostname,
-	                containerId: _this2.props.container.id
-	            };
-	            var dataToSend = JSON.stringify(dataObject);
-	            var self = _this2;
-	            _utils2.default.formSubmit(action, 'DELETE', dataToSend, function (data) {
-	                M.toast({ html: "<div>Container stopped successfully!</div>" });
-	                self.props.containerStopped(self.props.container.id);
-	            });
-	        };
-	
-	        _this2.loadAvailableNodes = function () {
-	            _this2.setState({ loading: true });
-	            var self = _this2;
-	            _utils2.default.ajaxGet('/nodes', function (data) {
-	                self.setState({ nodes: data, loading: false });
-	            });
-	        };
-	
-	        _this2.onClickReplicate = function () {
-	            _this2.loadAvailableNodes();
-	            _this2.setState({ isReplicate: true });
-	        };
-	
-	        _this2.onClickMigrate = function () {
-	            _this2.loadAvailableNodes();
-	            _this2.setState({ isMigrate: true });
-	        };
-	
-	        _this2.onClickCancelReplicate = function () {
-	            var instance = M.FormSelect.getInstance(_this2.hostname);
-	            instance.destroy();
-	            _this2.setState({ isReplicate: false, isMigrate: false });
-	        };
-	
 	        _this2.handleChangeHostname = function (event) {
 	            _this2.setState({ hostnameSelected: event.target.value });
-	        };
-	
-	        _this2.onSubmitReplicate = function () {
-	            var self = _this2;
-	            var url = '/containers/' + _this2.props.container.id + '/replicate';
-	            var dataToSend = JSON.stringify({ fromHostname: _this2.props.container.hostname,
-	                containerId: _this2.props.container.id, toHostname: _this2.state.hostnameSelected });
-	            _utils2.default.formSubmit(url, 'POST', dataToSend, function (data) {
-	                self.onClickCancelReplicate();
-	                self.props.onReplicate();
-	                M.toast({ html: "<div>Container replicated successfully!</div>" });
-	            });
-	        };
-	
-	        _this2.onSubmitMigrate = function () {
-	            var self = _this2;
-	            var url = '/containers/' + _this2.props.container.id + '/migrate';
-	            var dataToSend = JSON.stringify({ fromHostname: _this2.props.container.hostname,
-	                containerId: _this2.props.container.id, toHostname: _this2.state.hostnameSelected,
-	                secondsBeforeStop: _this2.state.seconds });
-	            _utils2.default.formSubmit(url, 'POST', dataToSend, function (data) {
-	                self.onClickCancelReplicate();
-	                self.props.onReplicate();
-	                M.toast({ html: "<div>Container migrated successfully!</div>" });
-	            });
-	        };
-	
-	        _this2.renderHostnamesSelect = function () {
-	            var hostnameNodes = void 0;
-	            if (_this2.state.nodes) {
-	                hostnameNodes = _this2.state.nodes.map(function (node) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: node.id, value: node.hostname },
-	                        node.hostname
-	                    );
-	                });
-	                return hostnameNodes;
-	            }
-	        };
-	
-	        _this2.renderSelectTotal = function () {
-	            return React.createElement(
-	                'div',
-	                { className: 'input-field col s6' },
-	                React.createElement(
-	                    'select',
-	                    { ref: function ref(hostname) {
-	                            return _this2.hostname = hostname;
-	                        }, defaultValue: '', name: 'hostname', id: 'hostname', onChange: _this2.handleChangeHostname },
-	                    React.createElement(
-	                        'option',
-	                        { value: '', disabled: 'disabled' },
-	                        'Choose hostname'
-	                    ),
-	                    _this2.renderHostnamesSelect()
-	                ),
-	                React.createElement(
-	                    'label',
-	                    { htmlFor: 'hostname' },
-	                    'Hostname'
-	                )
-	            );
-	        };
-	
-	        _this2.renderReplicate = function () {
-	            var style = { marginLeft: "10px" };
-	            var cancelButton = React.createElement(
-	                'a',
-	                { title: 'Cancel', style: style, className: 'btn-floating waves-effect waves-light red darken-4', onClick: _this2.onClickCancelReplicate },
-	                React.createElement(
-	                    'i',
-	                    { className: 'material-icons' },
-	                    'clear'
-	                )
-	            );
-	            if (_this2.state.isReplicate) {
-	                return React.createElement(
-	                    'div',
-	                    { className: 'row' },
-	                    _this2.renderSelectTotal(),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s6' },
-	                        React.createElement(
-	                            'a',
-	                            { title: 'Replicate', style: style, className: 'btn-floating waves-effect waves-light', onClick: _this2.onSubmitReplicate },
-	                            React.createElement(
-	                                'i',
-	                                { className: 'material-icons' },
-	                                'send'
-	                            )
-	                        ),
-	                        cancelButton
-	                    )
-	                );
-	            } else if (_this2.state.isMigrate) {
-	                return React.createElement(
-	                    'div',
-	                    { className: 'row' },
-	                    _this2.renderSelectTotal(),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s6' },
-	                        React.createElement(
-	                            'a',
-	                            { title: 'Migrate', style: style, className: 'btn-floating waves-effect waves-light', onClick: _this2.onSubmitMigrate },
-	                            React.createElement(
-	                                'i',
-	                                { className: 'material-icons' },
-	                                'send'
-	                            )
-	                        ),
-	                        cancelButton
-	                    )
-	                );
-	            } else if (!_this2.state.isReplicate && !_this2.state.isMigrate) return React.createElement(
-	                'div',
-	                { className: 'row' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'col s12' },
-	                    React.createElement(
-	                        'a',
-	                        { style: style, className: 'waves-effect waves-light btn-small', onClick: _this2.onClickMigrate },
-	                        'Migrate'
-	                    ),
-	                    React.createElement(
-	                        'a',
-	                        { style: style, className: 'waves-effect waves-light btn-small', onClick: _this2.onClickReplicate },
-	                        'Replicate'
-	                    )
-	                )
-	            );
 	        };
 	
 	        _this2.state = { nodes: [], isReplicate: false, isMigrate: false, hostnameSelected: '', seconds: 0, loading: false };
@@ -20366,7 +20208,7 @@
 	    }
 	
 	    _createClass(ContainerCard, [{
-	        key: 'componentDidUpdate',
+	        key: "componentDidUpdate",
 	        value: function componentDidUpdate() {
 	            if (this.state.isReplicate || this.state.isMigrate) {
 	                var elems = this.hostname;
@@ -20374,10 +20216,40 @@
 	            }
 	        }
 	    }, {
-	        key: 'componentDidMount',
+	        key: "componentDidMount",
 	        value: function componentDidMount() {
 	            M.Collapsible.init(document.querySelectorAll('.collapsible'));
 	        }
+	    }, {
+	        key: "renderNames",
+	        value: function renderNames() {
+	            return this.props.container.names.map(function (name, index) {
+	                var counter = index + 1;
+	                return _react2.default.createElement(_globalComponents.CardItem, { key: name + index, label: 'Name ' + counter, value: name });
+	            });
+	        }
+	    }, {
+	        key: "renderPorts",
+	        value: function renderPorts() {
+	            return this.props.container.ports.map(function (port, index) {
+	                return _react2.default.createElement(ContainerPort, { key: 'port' + index, port: port });
+	            });
+	        }
+	    }, {
+	        key: "renderLabels",
+	        value: function renderLabels() {
+	            var propsLabels = this.props.container.labels;
+	            return Object.keys(propsLabels).map(function (key, index) {
+	                return _react2.default.createElement(
+	                    "div",
+	                    { key: key },
+	                    key + ': ' + propsLabels[key]
+	                );
+	            });
+	        }
+	    }, {
+	        key: "onClickStop",
+	
 	
 	        /*renderLogs() {
 	            return (
@@ -20387,75 +20259,257 @@
 	            );
 	        }*/
 	
+	        value: function onClickStop() {
+	            var action = '/containers/' + this.props.container.id;
+	            var dataObject = {
+	                hostname: this.props.container.hostname,
+	                containerId: this.props.container.id
+	            };
+	            var dataToSend = JSON.stringify(dataObject);
+	            var self = this;
+	            _utils2.default.formSubmit(action, 'DELETE', dataToSend, function (data) {
+	                M.toast({ html: "<div>Container stopped successfully!</div>" });
+	                self.props.containerStopped(self.props.container.id);
+	            });
+	        }
 	    }, {
-	        key: 'render',
+	        key: "loadAvailableNodes",
+	        value: function loadAvailableNodes() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/nodes', function (data) {
+	                self.setState({ nodes: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: "onClickReplicate",
+	        value: function onClickReplicate() {
+	            this.loadAvailableNodes();
+	            this.setState({ isReplicate: true });
+	        }
+	    }, {
+	        key: "onClickMigrate",
+	        value: function onClickMigrate() {
+	            this.loadAvailableNodes();
+	            this.setState({ isMigrate: true });
+	        }
+	    }, {
+	        key: "onClickCancelReplicate",
+	        value: function onClickCancelReplicate() {
+	            var instance = M.FormSelect.getInstance(this.hostname);
+	            instance.destroy();
+	            this.setState({ isReplicate: false, isMigrate: false });
+	        }
+	    }, {
+	        key: "onSubmitReplicate",
+	        value: function onSubmitReplicate() {
+	            var self = this;
+	            var url = '/containers/' + this.props.container.id + '/replicate';
+	            var dataToSend = JSON.stringify({ fromHostname: this.props.container.hostname,
+	                containerId: this.props.container.id, toHostname: this.state.hostnameSelected });
+	            _utils2.default.formSubmit(url, 'POST', dataToSend, function (data) {
+	                self.onClickCancelReplicate();
+	                self.props.onReplicate();
+	                M.toast({ html: "<div>Container replicated successfully!</div>" });
+	            });
+	        }
+	    }, {
+	        key: "onSubmitMigrate",
+	        value: function onSubmitMigrate() {
+	            var self = this;
+	            var url = '/containers/' + this.props.container.id + '/migrate';
+	            var dataToSend = JSON.stringify({ fromHostname: this.props.container.hostname,
+	                containerId: this.props.container.id, toHostname: this.state.hostnameSelected,
+	                secondsBeforeStop: this.state.seconds });
+	            _utils2.default.formSubmit(url, 'POST', dataToSend, function (data) {
+	                self.onClickCancelReplicate();
+	                self.props.onReplicate();
+	                M.toast({ html: "<div>Container migrated successfully!</div>" });
+	            });
+	        }
+	    }, {
+	        key: "renderHostnamesSelect",
+	        value: function renderHostnamesSelect() {
+	            var hostnameNodes = void 0;
+	            if (this.state.nodes) {
+	                hostnameNodes = this.state.nodes.map(function (node) {
+	                    return _react2.default.createElement(
+	                        "option",
+	                        { key: node.id, value: node.hostname },
+	                        node.hostname
+	                    );
+	                });
+	                return hostnameNodes;
+	            }
+	        }
+	    }, {
+	        key: "renderSelectTotal",
+	        value: function renderSelectTotal() {
+	            var _this3 = this;
+	
+	            return _react2.default.createElement(
+	                "div",
+	                { className: "input-field col s6" },
+	                _react2.default.createElement(
+	                    "select",
+	                    { ref: function ref(hostname) {
+	                            return _this3.hostname = hostname;
+	                        }, defaultValue: "", name: "hostname", id: "hostname", onChange: this.handleChangeHostname },
+	                    _react2.default.createElement(
+	                        "option",
+	                        { value: "", disabled: "disabled" },
+	                        "Choose hostname"
+	                    ),
+	                    this.renderHostnamesSelect()
+	                ),
+	                _react2.default.createElement(
+	                    "label",
+	                    { htmlFor: "hostname" },
+	                    "Hostname"
+	                )
+	            );
+	        }
+	    }, {
+	        key: "renderReplicate",
+	        value: function renderReplicate() {
+	            var style = { marginLeft: "10px" };
+	            var cancelButton = _react2.default.createElement(
+	                "a",
+	                { title: "Cancel", style: style, className: "btn-floating waves-effect waves-light red darken-4", onClick: this.onClickCancelReplicate },
+	                _react2.default.createElement(
+	                    "i",
+	                    { className: "material-icons" },
+	                    "clear"
+	                )
+	            );
+	            if (this.state.isReplicate) {
+	                return _react2.default.createElement(
+	                    "div",
+	                    { className: "row" },
+	                    this.renderSelectTotal(),
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "input-field col s6" },
+	                        _react2.default.createElement(
+	                            "a",
+	                            { title: "Replicate", style: style, className: "btn-floating waves-effect waves-light", onClick: this.onSubmitReplicate },
+	                            _react2.default.createElement(
+	                                "i",
+	                                { className: "material-icons" },
+	                                "send"
+	                            )
+	                        ),
+	                        cancelButton
+	                    )
+	                );
+	            } else if (this.state.isMigrate) {
+	                return _react2.default.createElement(
+	                    "div",
+	                    { className: "row" },
+	                    this.renderSelectTotal(),
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "input-field col s6" },
+	                        _react2.default.createElement(
+	                            "a",
+	                            { title: "Migrate", style: style, className: "btn-floating waves-effect waves-light", onClick: this.onSubmitMigrate },
+	                            _react2.default.createElement(
+	                                "i",
+	                                { className: "material-icons" },
+	                                "send"
+	                            )
+	                        ),
+	                        cancelButton
+	                    )
+	                );
+	            } else if (!this.state.isReplicate && !this.state.isMigrate) return _react2.default.createElement(
+	                "div",
+	                { className: "row" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "col s12" },
+	                    _react2.default.createElement(
+	                        "a",
+	                        { style: style, className: "waves-effect waves-light btn-small", onClick: this.onClickMigrate },
+	                        "Migrate"
+	                    ),
+	                    _react2.default.createElement(
+	                        "a",
+	                        { style: style, className: "waves-effect waves-light btn-small", onClick: this.onClickReplicate },
+	                        "Replicate"
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: "render",
 	        value: function render() {
 	            var style = { marginLeft: "5px" };
 	            var labelStyle = { paddingTop: "0px", paddingBottom: "0px" };
-	            return React.createElement(
-	                'div',
-	                { className: 'row' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'col s12' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'card' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'card-content' },
-	                            React.createElement(
-	                                'div',
-	                                { className: 'right-align' },
+	            return _react2.default.createElement(
+	                "div",
+	                { className: "row" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "col s12" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "card" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "card-content" },
+	                            _react2.default.createElement(
+	                                "div",
+	                                { className: "right-align" },
 	                                this.renderReplicate(),
-	                                React.createElement(
-	                                    'div',
-	                                    { className: 'row' },
-	                                    React.createElement(
-	                                        'div',
-	                                        { className: 'col s12' },
-	                                        React.createElement(
-	                                            'a',
-	                                            { style: style, className: 'waves-effect waves-light btn-small red darken-4', onClick: this.onClickStop },
-	                                            'Stop'
+	                                _react2.default.createElement(
+	                                    "div",
+	                                    { className: "row" },
+	                                    _react2.default.createElement(
+	                                        "div",
+	                                        { className: "col s12" },
+	                                        _react2.default.createElement(
+	                                            "a",
+	                                            { style: style, className: "waves-effect waves-light btn-small red darken-4", onClick: this.onClickStop },
+	                                            "Stop"
 	                                        )
 	                                    )
 	                                )
 	                            ),
-	                            React.createElement(_globalComponents.CardItem, { label: 'Id', value: this.props.container.id }),
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "Id", value: this.props.container.id }),
 	                            this.renderNames(),
-	                            React.createElement(_globalComponents.CardItem, { label: 'Image', value: this.props.container.image }),
-	                            React.createElement(_globalComponents.CardItem, { label: 'Command', value: this.props.container.command }),
-	                            React.createElement(_globalComponents.CardItem, { label: 'State', value: this.props.container.state }),
-	                            React.createElement(_globalComponents.CardItem, { label: 'Status', value: this.props.container.status }),
-	                            React.createElement(_globalComponents.CardItem, { label: 'Hostname', value: this.props.container.hostname }),
-	                            React.createElement(
-	                                'h5',
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "Image", value: this.props.container.image }),
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "Command", value: this.props.container.command }),
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "State", value: this.props.container.state }),
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "Status", value: this.props.container.status }),
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "Hostname", value: this.props.container.hostname }),
+	                            _react2.default.createElement(
+	                                "h5",
 	                                null,
-	                                'Ports'
+	                                "Ports"
 	                            ),
 	                            this.renderPorts(),
-	                            React.createElement(
-	                                'div',
-	                                { className: 'row' },
-	                                React.createElement(
-	                                    'ul',
-	                                    { className: 'collapsible' },
-	                                    React.createElement(
-	                                        'li',
+	                            _react2.default.createElement(
+	                                "div",
+	                                { className: "row" },
+	                                _react2.default.createElement(
+	                                    "ul",
+	                                    { className: "collapsible" },
+	                                    _react2.default.createElement(
+	                                        "li",
 	                                        null,
-	                                        React.createElement(
-	                                            'div',
-	                                            { style: labelStyle, className: 'collapsible-header' },
-	                                            React.createElement(
-	                                                'h5',
+	                                        _react2.default.createElement(
+	                                            "div",
+	                                            { style: labelStyle, className: "collapsible-header" },
+	                                            _react2.default.createElement(
+	                                                "h5",
 	                                                null,
-	                                                'Labels'
+	                                                "Labels"
 	                                            )
 	                                        ),
-	                                        React.createElement(
-	                                            'div',
-	                                            { className: 'collapsible-body' },
+	                                        _react2.default.createElement(
+	                                            "div",
+	                                            { className: "collapsible-body" },
 	                                            this.renderLabels()
 	                                        )
 	                                    )
@@ -20471,29 +20525,62 @@
 	    return ContainerCard;
 	}(Component);
 	
-	var Containers = exports.Containers = function (_Component3) {
-	    _inherits(Containers, _Component3);
+	var Containers = exports.Containers = function (_Component2) {
+	    _inherits(Containers, _Component2);
 	
 	    function Containers(props) {
 	        _classCallCheck(this, Containers);
 	
-	        var _this3 = _possibleConstructorReturn(this, (Containers.__proto__ || Object.getPrototypeOf(Containers)).call(this, props));
+	        var _this4 = _possibleConstructorReturn(this, (Containers.__proto__ || Object.getPrototypeOf(Containers)).call(this, props));
 	
-	        _this3.onReplicate = function () {
-	            _this3.loadContainers();
-	        };
-	
-	        _this3.onChangeFilter = function (event) {
+	        _this4.onChangeFilter = function (event) {
 	            var filterVal = event.target.value;
-	            var self = _this3;
-	            _this3.setState({ filter: filterVal }, function () {
+	            var self = _this4;
+	            _this4.setState({ filter: filterVal }, function () {
 	                self.applyFilter();
 	            });
 	        };
 	
-	        _this3.applyFilter = function () {
-	            var filterVal = _this3.state.filter;
-	            var data = _this3.state.data;
+	        _this4.containerStopped = function (containerId) {
+	            var newData = _this4.state.data;
+	            var self = _this4;
+	            for (var index = 0; index < newData.length; index++) {
+	                if (newData[index].id === containerId) {
+	                    newData.splice(index, 1);
+	                    break;
+	                }
+	            }
+	            _this4.setState({ data: newData }, function () {
+	                self.applyFilter();
+	            });
+	        };
+	
+	        _this4.state = { data: [], filtContainers: [], filter: '', loading: false };
+	        return _this4;
+	    }
+	
+	    _createClass(Containers, [{
+	        key: "componentDidMount",
+	        value: function componentDidMount() {
+	            this.loadContainers();
+	            var instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+	            this.setState({ tooltipInstances: instances });
+	        }
+	    }, {
+	        key: "componentWillUnmount",
+	        value: function componentWillUnmount() {
+	            this.state.tooltipInstances[0].destroy();
+	        }
+	    }, {
+	        key: "onReplicate",
+	        value: function onReplicate() {
+	            this.loadContainers();
+	        }
+	    }, {
+	        key: "applyFilter",
+	        value: function applyFilter() {
+	            var filterVal = this.state.filter;
+	            var data = this.state.data;
 	            var filteredContainers = [];
 	            for (var index = 0; index < data.length; index++) {
 	                var container = data[index];
@@ -20501,102 +20588,73 @@
 	                    filteredContainers.push(container);
 	                }
 	            }
-	            _this3.setState({ filtContainers: filteredContainers });
-	        };
-	
-	        _this3.clearFilter = function () {
-	            var self = _this3;
-	            _this3.setState({ filter: '' }, function () {
+	            this.setState({ filtContainers: filteredContainers });
+	        }
+	    }, {
+	        key: "clearFilter",
+	        value: function clearFilter() {
+	            var self = this;
+	            this.setState({ filter: '' }, function () {
 	                self.applyFilter();
-	                $('#filter').val('');
+	                (0, _jquery2.default)('#filter').val('');
 	            });
-	        };
-	
-	        _this3.loadContainers = function () {
-	            _this3.setState({ loading: true });
-	            var self = _this3;
+	        }
+	    }, {
+	        key: "loadContainers",
+	        value: function loadContainers() {
+	            this.setState({ loading: true });
+	            var self = this;
 	            _utils2.default.ajaxGet('/containers', function (containers) {
 	                self.setState({ data: containers, filtContainers: containers, loading: false });
 	            });
-	        };
-	
-	        _this3.containerStopped = function (containerId) {
-	            var newData = _this3.state.data;
-	            var self = _this3;
-	            for (var index = 0; index < newData.length; index++) {
-	                if (newData[index].id === containerId) {
-	                    newData.splice(index, 1);
-	                    break;
-	                }
-	            }
-	            _this3.setState({ data: newData }, function () {
-	                self.applyFilter();
-	            });
-	        };
-	
-	        _this3.state = { data: [], filtContainers: [], filter: '', loading: false };
-	        return _this3;
-	    }
-	
-	    _createClass(Containers, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            this.loadContainers();
-	            var instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
-	            this.setState({ tooltipInstances: instances });
 	        }
 	    }, {
-	        key: 'componentWillUnmount',
-	        value: function componentWillUnmount() {
-	            this.state.tooltipInstances[0].destroy();
-	        }
-	    }, {
-	        key: 'render',
+	        key: "render",
 	        value: function render() {
 	            var containersNodes = void 0;
 	            var self = this;
 	            if (this.state.data) {
 	                containersNodes = this.state.filtContainers.map(function (container) {
-	                    return React.createElement(ContainerCard, { onReplicate: self.onReplicate, key: container.id, container: container, containerStopped: self.containerStopped });
+	                    return _react2.default.createElement(ContainerCard, { onReplicate: self.onReplicate, key: container.id, container: container, containerStopped: self.containerStopped });
 	                });
 	            }
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
-	                { title: 'Containers' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s10' },
-	                    React.createElement('input', { onChange: this.onChangeFilter, value: this.state.filter, type: 'text', name: 'filter', id: 'filter', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'filter' },
-	                        'Filter by name'
+	                { title: "Containers" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s10" },
+	                    _react2.default.createElement("input", { onChange: this.onChangeFilter, value: this.state.filter, type: "text", name: "filter", id: "filter", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "filter" },
+	                        "Filter by name"
 	                    )
 	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s2 right-align' },
-	                    React.createElement(
-	                        'a',
-	                        { onClick: this.clearFilter, title: 'Clear filter', className: 'btn-floating waves-effect waves-light red darken-4' },
-	                        React.createElement(
-	                            'i',
-	                            { className: 'material-icons' },
-	                            'clear'
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s2 right-align" },
+	                    _react2.default.createElement(
+	                        "a",
+	                        { onClick: this.clearFilter, title: "Clear filter", className: "btn-floating waves-effect waves-light red darken-4" },
+	                        _react2.default.createElement(
+	                            "i",
+	                            { className: "material-icons" },
+	                            "clear"
 	                        )
 	                    )
 	                ),
 	                containersNodes,
-	                React.createElement(
-	                    'div',
-	                    { className: 'fixed-action-btn tooltipped', 'data-position': 'left', 'data-tooltip': 'Launch container' },
-	                    React.createElement(
-	                        Link,
-	                        { className: 'waves-effect waves-light btn-floating btn-large grey darken-4', to: '/ui/containers/launch' },
-	                        React.createElement(
-	                            'i',
-	                            { className: 'large material-icons' },
-	                            'add'
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "fixed-action-btn tooltipped", "data-position": "left", "data-tooltip": "Launch container" },
+	                    _react2.default.createElement(
+	                        _reactRouterDom.Link,
+	                        { className: "waves-effect waves-light btn-floating btn-large grey darken-4", to: "/ui/containers/launch" },
+	                        _react2.default.createElement(
+	                            "i",
+	                            { className: "large material-icons" },
+	                            "add"
 	                        )
 	                    )
 	                )
@@ -20607,57 +20665,20 @@
 	    return Containers;
 	}(Component);
 	
-	var LaunchContainer = exports.LaunchContainer = function (_Component4) {
-	    _inherits(LaunchContainer, _Component4);
+	var LaunchContainer = exports.LaunchContainer = function (_Component3) {
+	    _inherits(LaunchContainer, _Component3);
 	
 	    function LaunchContainer(props) {
 	        _classCallCheck(this, LaunchContainer);
 	
-	        var _this4 = _possibleConstructorReturn(this, (LaunchContainer.__proto__ || Object.getPrototypeOf(LaunchContainer)).call(this, props));
+	        var _this5 = _possibleConstructorReturn(this, (LaunchContainer.__proto__ || Object.getPrototypeOf(LaunchContainer)).call(this, props));
 	
-	        _this4.loadAvailableNodes = function () {
-	            _this4.setState({ loading: true });
-	            var self = _this4;
-	            _utils2.default.ajaxGet('/nodes', function (data) {
-	                self.setState({ nodes: data, loading: false });
-	            });
-	        };
-	
-	        _this4.loadServices = function () {
-	            _this4.setState({ loading: true });
-	            var self = _this4;
-	            var url = '/services';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ services: data, loading: false });
-	            });
-	        };
-	
-	        _this4.renderServicesSelect = function () {
-	            return _this4.state.services && _this4.state.services.map(function (service) {
-	                return React.createElement(
-	                    'option',
-	                    { key: service.id, value: service.serviceName },
-	                    service.serviceName
-	                );
-	            });
-	        };
-	
-	        _this4.renderHostnamesSelect = function () {
-	            return _this4.state.nodes && _this4.state.nodes.map(function (node) {
-	                return React.createElement(
-	                    'option',
-	                    { key: node.id, value: node.hostname },
-	                    node.hostname
-	                );
-	            });
-	        };
-	
-	        _this4.onSubmitForm = function (event) {
+	        _this5.onSubmitForm = function (event) {
 	            event.preventDefault();
 	            var formId = "form-service";
 	            var formAction = '/containers';
 	            var formData = _utils2.default.convertFormToJson(formId);
-	            var self = _this4;
+	            var self = _this5;
 	            _utils2.default.formSubmit(formAction, 'POST', formData, function (data) {
 	                self.setState({ isEdit: false, formSubmit: true });
 	                console.log(data);
@@ -20665,101 +20686,24 @@
 	            });
 	        };
 	
-	        _this4.onInputChange = function (event) {
+	        _this5.onInputChange = function (event) {
 	            var name = event.target.name;
-	            var newValues = _this4.state.values;
+	            var newValues = _this5.state.values;
 	            newValues[name] = event.target.value;
-	            _this4.setState({ values: newValues });
+	            _this5.setState({ values: newValues });
 	        };
 	
-	        _this4.onChangeServicesSelect = function (event) {
-	            var services = _this4.state.services;
+	        _this5.onChangeServicesSelect = function (event) {
+	            var services = _this5.state.services;
 	            for (var index = 0; index < services.length; index++) {
 	                if (services[index].serviceName === event.target.value) {
-	                    var newValues = _this4.state.values;
+	                    var newValues = _this5.state.values;
 	                    newValues.internalPort = services[index].internalPort;
 	                    newValues.externalPort = services[index].externalPort;
 	
-	                    _this4.setState({ values: newValues });
+	                    _this5.setState({ values: newValues });
 	                }
 	            }
-	        };
-	
-	        _this4.renderForm = function () {
-	            var servicesSelect = _this4.renderServicesSelect();
-	            var hostnamesSelect = _this4.renderHostnamesSelect();
-	            return React.createElement(
-	                'form',
-	                { id: 'form-service', onSubmit: _this4.onSubmitForm },
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement(
-	                        'select',
-	                        { defaultValue: '', name: 'hostname', id: 'hostname' },
-	                        React.createElement(
-	                            'option',
-	                            { value: '', disabled: 'disabled' },
-	                            'Choose hostname'
-	                        ),
-	                        hostnamesSelect
-	                    ),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'hostname' },
-	                        'Hostname'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement(
-	                        'select',
-	                        { defaultValue: '', name: 'service', id: 'service', onChange: _this4.onChangeServicesSelect },
-	                        React.createElement(
-	                            'option',
-	                            { value: '', disabled: 'disabled' },
-	                            'Choose service'
-	                        ),
-	                        servicesSelect
-	                    ),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'service' },
-	                        'Service'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { defaultValue: _this4.state.values.internalPort, type: 'text', name: 'internalPort', id: 'internalPort', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'internalPort' },
-	                        'Internal Port'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { defaultValue: _this4.state.values.externalPort, type: 'text', name: 'externalPort', id: 'externalPort', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'externalPort' },
-	                        'External Port'
-	                    )
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
-	                    'Launch',
-	                    React.createElement(
-	                        'i',
-	                        { className: 'material-icons right' },
-	                        'send'
-	                    )
-	                )
-	            );
 	        };
 	
 	        var serviceDefaultValues = [];
@@ -20768,43 +20712,162 @@
 	            internalPort: '', externalPort: ''
 	        };
 	        var thisBreadcrumbs = [{ link: '/containers', title: 'Containers' }];
-	        _this4.state = { breadcrumbs: thisBreadcrumbs, services: [], nodes: [], loading: false, values: defaultValues, formSubmit: false };
-	        return _this4;
+	        _this5.state = { breadcrumbs: thisBreadcrumbs, services: [], nodes: [], loading: false, values: defaultValues, formSubmit: false };
+	        return _this5;
 	    }
 	
 	    _createClass(LaunchContainer, [{
-	        key: 'componentDidMount',
+	        key: "componentDidMount",
 	        value: function componentDidMount() {
 	            this.loadServices();
 	            this.loadAvailableNodes();
 	        }
 	    }, {
-	        key: 'componentDidUpdate',
+	        key: "componentDidUpdate",
 	        value: function componentDidUpdate() {
 	            var elems = document.querySelectorAll('select');
 	            M.FormSelect.init(elems);
 	        }
 	    }, {
-	        key: 'render',
+	        key: "loadAvailableNodes",
+	        value: function loadAvailableNodes() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/nodes', function (data) {
+	                self.setState({ nodes: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: "loadServices",
+	        value: function loadServices() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/services';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ services: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: "renderServicesSelect",
+	        value: function renderServicesSelect() {
+	            return this.state.services && this.state.services.map(function (service) {
+	                return _react2.default.createElement(
+	                    "option",
+	                    { key: service.id, value: service.serviceName },
+	                    service.serviceName
+	                );
+	            });
+	        }
+	    }, {
+	        key: "renderHostnamesSelect",
+	        value: function renderHostnamesSelect() {
+	            return this.state.nodes && this.state.nodes.map(function (node) {
+	                return _react2.default.createElement(
+	                    "option",
+	                    { key: node.id, value: node.hostname },
+	                    node.hostname
+	                );
+	            });
+	        }
+	    }, {
+	        key: "renderForm",
+	        value: function renderForm() {
+	            var servicesSelect = this.renderServicesSelect();
+	            var hostnamesSelect = this.renderHostnamesSelect();
+	            return _react2.default.createElement(
+	                "form",
+	                { id: "form-service", onSubmit: this.onSubmitForm },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s12" },
+	                    _react2.default.createElement(
+	                        "select",
+	                        { defaultValue: "", name: "hostname", id: "hostname" },
+	                        _react2.default.createElement(
+	                            "option",
+	                            { value: "", disabled: "disabled" },
+	                            "Choose hostname"
+	                        ),
+	                        hostnamesSelect
+	                    ),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "hostname" },
+	                        "Hostname"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s12" },
+	                    _react2.default.createElement(
+	                        "select",
+	                        { defaultValue: "", name: "service", id: "service", onChange: this.onChangeServicesSelect },
+	                        _react2.default.createElement(
+	                            "option",
+	                            { value: "", disabled: "disabled" },
+	                            "Choose service"
+	                        ),
+	                        servicesSelect
+	                    ),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "service" },
+	                        "Service"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s12" },
+	                    _react2.default.createElement("input", { defaultValue: this.state.values.internalPort, type: "text", name: "internalPort", id: "internalPort", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "internalPort" },
+	                        "Internal Port"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s12" },
+	                    _react2.default.createElement("input", { defaultValue: this.state.values.externalPort, type: "text", name: "externalPort", id: "externalPort", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "externalPort" },
+	                        "External Port"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "button",
+	                    { className: "btn waves-effect waves-light", type: "submit", name: "action" },
+	                    "Launch",
+	                    _react2.default.createElement(
+	                        "i",
+	                        { className: "material-icons right" },
+	                        "send"
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: "render",
 	        value: function render() {
 	            if (this.state.formSubmit) {
-	                return React.createElement(Redirect, { to: '/ui/containers' });
+	                return _react2.default.createElement(_reactRouterDom.Redirect, { to: "/ui/containers" });
 	            }
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
-	                { title: 'Launch container', breadcrumbs: this.state.breadcrumbs },
-	                React.createElement(
-	                    'div',
-	                    { className: 'row' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'col s12' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'card' },
-	                            React.createElement(
-	                                'div',
-	                                { className: 'card-content' },
+	                { title: "Launch container", breadcrumbs: this.state.breadcrumbs },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "row" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "col s12" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "card" },
+	                            _react2.default.createElement(
+	                                "div",
+	                                { className: "card-content" },
 	                                this.renderForm()
 	                            )
 	                        )
@@ -20830,11 +20893,17 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
 	var _utils = __webpack_require__(58);
 	
 	var _utils2 = _interopRequireDefault(_utils);
 	
 	var _globalComponents = __webpack_require__(8);
+	
+	var _reactRouterDom = __webpack_require__(10);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -20842,37 +20911,31 @@
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MIT License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright (c) 2020 micro-manager
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in all
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies or substantial portions of the Software.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * SOFTWARE.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
-	/*
-	 * MIT License
-	 *
-	 * Copyright (c) 2020 micro-manager
-	 *
-	 * Permission is hereby granted, free of charge, to any person obtaining a copy
-	 * of this software and associated documentation files (the "Software"), to deal
-	 * in the Software without restriction, including without limitation the rights
-	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	 * copies of the Software, and to permit persons to whom the Software is
-	 * furnished to do so, subject to the following conditions:
-	 *
-	 * The above copyright notice and this permission notice shall be included in all
-	 * copies or substantial portions of the Software.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	 * SOFTWARE.
-	 */
-	
-	var $ = __webpack_require__(9);
-	var React = __webpack_require__(1);
-	var Link = __webpack_require__(10).Link;
-	var Redirect = __webpack_require__(10).Redirect;
-	var Component = React.Component;
+	var Component = _react2.default.Component;
 	
 	var RulesLandingPage = exports.RulesLandingPage = function (_Component) {
 	    _inherits(RulesLandingPage, _Component);
@@ -20882,19 +20945,26 @@
 	
 	        var _this = _possibleConstructorReturn(this, (RulesLandingPage.__proto__ || Object.getPrototypeOf(RulesLandingPage)).call(this, props));
 	
-	        _this.renderLinks = function () {
-	            return _this.state.links.map(function (link) {
-	                return React.createElement(
+	        var ruleLinks = [{ name: 'Conditions', link: '/ui/rules/conditions' }, { name: 'Rules', link: '/ui/rules' }, { name: 'Generic Hosts rules', link: '/ui/rules/generic/hosts' }, { name: 'Hosts rules', link: '/ui/rules/hosts' }, { name: 'Apps rules', link: '/ui/rules/apps' }, { name: 'Services rules', link: '/ui/rules/services' }, { name: 'Service event predictions', link: '/ui/rules/serviceEventPredictions' }];
+	        _this.state = { links: ruleLinks, loading: false };
+	        return _this;
+	    }
+	
+	    _createClass(RulesLandingPage, [{
+	        key: 'renderLinks',
+	        value: function renderLinks() {
+	            return this.state.links.map(function (link) {
+	                return _react2.default.createElement(
 	                    'li',
 	                    { key: link.name, className: 'collection-item' },
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        null,
 	                        link.name,
-	                        React.createElement(
-	                            Link,
+	                        _react2.default.createElement(
+	                            _reactRouterDom.Link,
 	                            { className: 'secondary-content', to: link.link },
-	                            React.createElement(
+	                            _react2.default.createElement(
 	                                'i',
 	                                { className: 'material-icons' },
 	                                'keyboard_arrow_right'
@@ -20903,26 +20973,20 @@
 	                    )
 	                );
 	            });
-	        };
-	
-	        var ruleLinks = [{ name: 'Conditions', link: '/ui/rules/conditions' }, { name: 'Rules', link: '/ui/rules' }, { name: 'Generic Hosts rules', link: '/ui/rules/generic/hosts' }, { name: 'Hosts rules', link: '/ui/rules/hosts' }, { name: 'Apps rules', link: '/ui/rules/apps' }, { name: 'Services rules', link: '/ui/rules/services' }, { name: 'Service event predictions', link: '/ui/rules/serviceEventPredictions' }];
-	        _this.state = { links: ruleLinks, loading: false };
-	        return _this;
-	    }
-	
-	    _createClass(RulesLandingPage, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Rules management' },
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'row' },
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'col s12' },
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'ul',
 	                            { className: 'collection' },
 	                            this.renderLinks()
@@ -20944,65 +21008,68 @@
 	
 	        var _this2 = _possibleConstructorReturn(this, (ConditionCard.__proto__ || Object.getPrototypeOf(ConditionCard)).call(this, props));
 	
-	        _this2.renderLink = function () {
-	            return React.createElement(
-	                'div',
-	                { className: 'right-align' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'row' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'col s12' },
-	                        React.createElement(
-	                            Link,
-	                            { className: 'waves-effect waves-light btn-small', to: '/ui/rules/conditions/detail/' + _this2.state.data.id },
-	                            'View details'
-	                        )
-	                    )
-	                )
-	            );
-	        };
-	
-	        _this2.renderSimple = function () {
-	            var linkDetails = _this2.props.viewDetails ? _this2.renderLink() : null;
-	            return React.createElement(
-	                'div',
-	                null,
-	                linkDetails,
-	                React.createElement(_globalComponents.CardItem, { label: 'Value mode', value: _this2.state.data.valueMode.valueModeName }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Field', value: _this2.state.data.field.fieldName }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Operator', value: _this2.state.data.operator.operatorSymbol }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Condition value', value: _this2.state.data.conditionValue })
-	            );
-	        };
-	
-	        _this2.renderCard = function () {
-	            return React.createElement(
-	                'div',
-	                { className: 'row' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'col s12' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'card' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'card-content' },
-	                            _this2.renderSimple()
-	                        )
-	                    )
-	                )
-	            );
-	        };
-	
 	        var condition = _this2.props.condition;
 	        _this2.state = { data: condition, loading: false };
 	        return _this2;
 	    }
 	
 	    _createClass(ConditionCard, [{
+	        key: 'renderLink',
+	        value: function renderLink() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'right-align' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'row' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'col s12' },
+	                        _react2.default.createElement(
+	                            _reactRouterDom.Link,
+	                            { className: 'waves-effect waves-light btn-small', to: '/ui/rules/conditions/detail/' + this.state.data.id },
+	                            'View details'
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'renderSimple',
+	        value: function renderSimple() {
+	            var linkDetails = this.props.viewDetails ? this.renderLink() : null;
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                linkDetails,
+	                _react2.default.createElement(_globalComponents.CardItem, { label: 'Value mode', value: this.state.data.valueMode.valueModeName }),
+	                _react2.default.createElement(_globalComponents.CardItem, { label: 'Field', value: this.state.data.field.fieldName }),
+	                _react2.default.createElement(_globalComponents.CardItem, { label: 'Operator', value: this.state.data.operator.operatorSymbol }),
+	                _react2.default.createElement(_globalComponents.CardItem, { label: 'Condition value', value: this.state.data.conditionValue })
+	            );
+	        }
+	    }, {
+	        key: 'renderCard',
+	        value: function renderCard() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'row' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'col s12' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'card' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'card-content' },
+	                            this.renderSimple()
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return this.props.renderSimple ? this.renderSimple() : this.renderCard();
@@ -21020,14 +21087,6 @@
 	
 	        var _this3 = _possibleConstructorReturn(this, (Conditions.__proto__ || Object.getPrototypeOf(Conditions)).call(this, props));
 	
-	        _this3.loadConditions = function () {
-	            _this3.setState({ loading: true });
-	            var self = _this3;
-	            _utils2.default.ajaxGet('/conditions', function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
 	        _this3.state = { data: [], loading: false };
 	        return _this3;
 	    }
@@ -21038,28 +21097,37 @@
 	            this.loadConditions();
 	        }
 	    }, {
+	        key: 'loadConditions',
+	        value: function loadConditions() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/conditions', function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var conditionNodes = void 0;
 	            if (this.state.data) {
 	                conditionNodes = this.state.data.map(function (condition) {
-	                    return React.createElement(ConditionCard, { viewDetails: true, key: condition.id, condition: condition });
+	                    return _react2.default.createElement(ConditionCard, { viewDetails: true, key: condition.id, condition: condition });
 	                });
 	            }
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Conditions' },
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'right-align' },
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'row' },
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'col s12' },
-	                            React.createElement(
-	                                Link,
+	                            _react2.default.createElement(
+	                                _reactRouterDom.Link,
 	                                { className: 'waves-effect waves-light btn-small', to: '/ui/rules/conditions/detail/' },
 	                                'New condition'
 	                            )
@@ -21082,115 +21150,11 @@
 	
 	        var _this4 = _possibleConstructorReturn(this, (ConditionPage.__proto__ || Object.getPrototypeOf(ConditionPage)).call(this, props));
 	
-	        _this4.loadCondition = function () {
-	            if (_this4.state.conditionId !== 0) {
-	                _this4.setState({ loading: true });
-	                var self = _this4;
-	                _utils2.default.ajaxGet('/conditions/' + _this4.state.conditionId, function (data) {
-	                    var currentCondition = {
-	                        valueModeId: data.valueMode.id,
-	                        fieldId: data.field.id,
-	                        operatorId: data.operator.id,
-	                        conditionValue: data.conditionValue
-	                    };
-	                    self.setState({ condition: currentCondition, loading: false });
-	                });
-	            }
-	        };
-	
-	        _this4.loadValueModes = function () {
-	            _this4.setState({ loading: true });
-	            var self = _this4;
-	            _utils2.default.ajaxGet('/rules/valueModes/', function (data) {
-	                self.setState({ valueModes: data, loading: false });
-	            });
-	        };
-	
-	        _this4.loadFields = function () {
-	            _this4.setState({ loading: true });
-	            var self = _this4;
-	            _utils2.default.ajaxGet('/rules/fields/', function (data) {
-	                self.setState({ fields: data, loading: false });
-	            });
-	        };
-	
-	        _this4.loadOperators = function () {
-	            _this4.setState({ loading: true });
-	            var self = _this4;
-	            _utils2.default.ajaxGet('/rules/operators/', function (data) {
-	                self.setState({ operators: data, loading: false });
-	            });
-	        };
-	
 	        _this4.handleChange = function (event) {
 	            var name = event.target.name;
 	            var newData = _this4.state.condition;
 	            newData[name] = event.target.value;
 	            _this4.setState({ condition: newData });
-	        };
-	
-	        _this4.renderValueModesSelect = function () {
-	            var valueModesNodes = void 0;
-	            if (_this4.state.valueModes) {
-	                valueModesNodes = _this4.state.valueModes.map(function (valueMode) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: valueMode.id, value: valueMode.id },
-	                        valueMode.valueModeName
-	                    );
-	                });
-	                return valueModesNodes;
-	            }
-	        };
-	
-	        _this4.renderFieldsSelect = function () {
-	            var fieldsNodes = void 0;
-	            if (_this4.state.fields) {
-	                fieldsNodes = _this4.state.fields.map(function (field) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: field.id, value: field.id },
-	                        field.fieldName
-	                    );
-	                });
-	                return fieldsNodes;
-	            }
-	        };
-	
-	        _this4.renderOperatorsSelect = function () {
-	            var operatorsNodes = void 0;
-	            if (_this4.state.operators) {
-	                operatorsNodes = _this4.state.operators.map(function (operator) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: operator.id, value: operator.id },
-	                        operator.operatorSymbol
-	                    );
-	                });
-	                return operatorsNodes;
-	            }
-	        };
-	
-	        _this4.renderDelete = function () {
-	            if (_this4.state.conditionId === 0) {
-	                return null;
-	            } else {
-	                var style = { marginLeft: "5px" };
-	                return React.createElement(
-	                    'a',
-	                    { style: style, className: 'waves-effect waves-light btn-small red darken-4', onClick: _this4.onDelete },
-	                    'Delete'
-	                );
-	            }
-	        };
-	
-	        _this4.onDelete = function () {
-	            var formAction = '/conditions/' + _this4.state.conditionId;
-	            var self = _this4;
-	            _utils2.default.formSubmit(formAction, 'DELETE', {}, function (data) {
-	                self.setState({ isDeleted: true });
-	                M.toast({ html: "<div>Condition successfully deleted!</div>" });
-	            });
 	        };
 	
 	        _this4.onSubmitForm = function (event) {
@@ -21202,113 +21166,6 @@
 	                self.setState({ conditionId: data, isEdit: false });
 	                M.toast({ html: "<div>Condition successfully saved!</div>" });
 	            });
-	        };
-	
-	        _this4.renderConditionForm = function () {
-	            if (_this4.state.isDeleted) {
-	                return React.createElement(Redirect, { to: '/ui/rules/conditions' });
-	            }
-	            var valueModesSelect = _this4.renderValueModesSelect();
-	            var fieldsSelect = _this4.renderFieldsSelect();
-	            var operatorsSelect = _this4.renderOperatorsSelect();
-	            return React.createElement(
-	                'div',
-	                { className: 'row' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'right-align' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'row' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'col s12' },
-	                            _this4.renderDelete()
-	                        )
-	                    )
-	                ),
-	                React.createElement(
-	                    'form',
-	                    { id: 'conditionForm', onSubmit: _this4.onSubmitForm },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s12' },
-	                        React.createElement(
-	                            'select',
-	                            { value: _this4.state.condition.valueModeId, onChange: _this4.handleChange, name: 'valueModeId', id: 'valueModeId' },
-	                            React.createElement(
-	                                'option',
-	                                { value: '', disabled: 'disabled' },
-	                                'Choose Value mode'
-	                            ),
-	                            valueModesSelect
-	                        ),
-	                        React.createElement(
-	                            'label',
-	                            { htmlFor: 'valueModeId' },
-	                            'Value mode'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s12' },
-	                        React.createElement(
-	                            'select',
-	                            { value: _this4.state.condition.fieldId, onChange: _this4.handleChange, name: 'fieldId', id: 'fieldId' },
-	                            React.createElement(
-	                                'option',
-	                                { value: '', disabled: 'disabled' },
-	                                'Choose Field'
-	                            ),
-	                            fieldsSelect
-	                        ),
-	                        React.createElement(
-	                            'label',
-	                            { htmlFor: 'fieldId' },
-	                            'Field'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s12' },
-	                        React.createElement(
-	                            'select',
-	                            { value: _this4.state.condition.operatorId, onChange: _this4.handleChange, name: 'operatorId', id: 'operatorId' },
-	                            React.createElement(
-	                                'option',
-	                                { value: '', disabled: 'disabled' },
-	                                'Choose Operator'
-	                            ),
-	                            operatorsSelect
-	                        ),
-	                        React.createElement(
-	                            'label',
-	                            { htmlFor: 'operatorId' },
-	                            'Operator'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { value: _this4.state.condition.conditionValue, onChange: _this4.handleChange, name: 'conditionValue', id: 'conditionValue', type: 'number' }),
-	                        React.createElement(
-	                            'label',
-	                            { htmlFor: 'conditionValue' },
-	                            'Condition value'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'button',
-	                        { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
-	                        'Save',
-	                        React.createElement(
-	                            'i',
-	                            { className: 'material-icons right' },
-	                            'send'
-	                        )
-	                    )
-	                )
-	            );
 	        };
 	
 	        var thisConditionId = 0;
@@ -21338,9 +21195,230 @@
 	            M.FormSelect.init(document.querySelectorAll('select'));
 	        }
 	    }, {
+	        key: 'loadCondition',
+	        value: function loadCondition() {
+	            if (this.state.conditionId !== 0) {
+	                this.setState({ loading: true });
+	                var self = this;
+	                _utils2.default.ajaxGet('/conditions/' + this.state.conditionId, function (data) {
+	                    var currentCondition = {
+	                        valueModeId: data.valueMode.id,
+	                        fieldId: data.field.id,
+	                        operatorId: data.operator.id,
+	                        conditionValue: data.conditionValue
+	                    };
+	                    self.setState({ condition: currentCondition, loading: false });
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'loadValueModes',
+	        value: function loadValueModes() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/valueModes/', function (data) {
+	                self.setState({ valueModes: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadFields',
+	        value: function loadFields() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/fields/', function (data) {
+	                self.setState({ fields: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadOperators',
+	        value: function loadOperators() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/operators/', function (data) {
+	                self.setState({ operators: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderValueModesSelect',
+	        value: function renderValueModesSelect() {
+	            var valueModesNodes = void 0;
+	            if (this.state.valueModes) {
+	                valueModesNodes = this.state.valueModes.map(function (valueMode) {
+	                    return _react2.default.createElement(
+	                        'option',
+	                        { key: valueMode.id, value: valueMode.id },
+	                        valueMode.valueModeName
+	                    );
+	                });
+	                return valueModesNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderFieldsSelect',
+	        value: function renderFieldsSelect() {
+	            var fieldsNodes = void 0;
+	            if (this.state.fields) {
+	                fieldsNodes = this.state.fields.map(function (field) {
+	                    return _react2.default.createElement(
+	                        'option',
+	                        { key: field.id, value: field.id },
+	                        field.fieldName
+	                    );
+	                });
+	                return fieldsNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderOperatorsSelect',
+	        value: function renderOperatorsSelect() {
+	            var operatorsNodes = void 0;
+	            if (this.state.operators) {
+	                operatorsNodes = this.state.operators.map(function (operator) {
+	                    return _react2.default.createElement(
+	                        'option',
+	                        { key: operator.id, value: operator.id },
+	                        operator.operatorSymbol
+	                    );
+	                });
+	                return operatorsNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderDelete',
+	        value: function renderDelete() {
+	            if (this.state.conditionId === 0) {
+	                return null;
+	            } else {
+	                var style = { marginLeft: "5px" };
+	                return _react2.default.createElement(
+	                    'a',
+	                    { style: style, className: 'waves-effect waves-light btn-small red darken-4', onClick: this.onDelete },
+	                    'Delete'
+	                );
+	            }
+	        }
+	    }, {
+	        key: 'onDelete',
+	        value: function onDelete() {
+	            var formAction = '/conditions/' + this.state.conditionId;
+	            var self = this;
+	            _utils2.default.formSubmit(formAction, 'DELETE', {}, function (data) {
+	                self.setState({ isDeleted: true });
+	                M.toast({ html: "<div>Condition successfully deleted!</div>" });
+	            });
+	        }
+	    }, {
+	        key: 'renderConditionForm',
+	        value: function renderConditionForm() {
+	            if (this.state.isDeleted) {
+	                return _react2.default.createElement(_reactRouterDom.Redirect, { to: '/ui/rules/conditions' });
+	            }
+	            var valueModesSelect = this.renderValueModesSelect();
+	            var fieldsSelect = this.renderFieldsSelect();
+	            var operatorsSelect = this.renderOperatorsSelect();
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'row' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'right-align' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'row' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'col s12' },
+	                            this.renderDelete()
+	                        )
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'form',
+	                    { id: 'conditionForm', onSubmit: this.onSubmitForm },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'input-field col s12' },
+	                        _react2.default.createElement(
+	                            'select',
+	                            { value: this.state.condition.valueModeId, onChange: this.handleChange, name: 'valueModeId', id: 'valueModeId' },
+	                            _react2.default.createElement(
+	                                'option',
+	                                { value: '', disabled: 'disabled' },
+	                                'Choose Value mode'
+	                            ),
+	                            valueModesSelect
+	                        ),
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'valueModeId' },
+	                            'Value mode'
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'input-field col s12' },
+	                        _react2.default.createElement(
+	                            'select',
+	                            { value: this.state.condition.fieldId, onChange: this.handleChange, name: 'fieldId', id: 'fieldId' },
+	                            _react2.default.createElement(
+	                                'option',
+	                                { value: '', disabled: 'disabled' },
+	                                'Choose Field'
+	                            ),
+	                            fieldsSelect
+	                        ),
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'fieldId' },
+	                            'Field'
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'input-field col s12' },
+	                        _react2.default.createElement(
+	                            'select',
+	                            { value: this.state.condition.operatorId, onChange: this.handleChange, name: 'operatorId', id: 'operatorId' },
+	                            _react2.default.createElement(
+	                                'option',
+	                                { value: '', disabled: 'disabled' },
+	                                'Choose Operator'
+	                            ),
+	                            operatorsSelect
+	                        ),
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'operatorId' },
+	                            'Operator'
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'input-field col s12' },
+	                        _react2.default.createElement('input', { value: this.state.condition.conditionValue, onChange: this.handleChange, name: 'conditionValue', id: 'conditionValue', type: 'number' }),
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'conditionValue' },
+	                            'Condition value'
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
+	                        'Save',
+	                        _react2.default.createElement(
+	                            'i',
+	                            { className: 'material-icons right' },
+	                            'send'
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Condition detail', breadcrumbs: this.state.breadcrumbs },
 	                this.renderConditionForm()
@@ -21359,100 +21437,6 @@
 	
 	        var _this5 = _possibleConstructorReturn(this, (RuleCard.__proto__ || Object.getPrototypeOf(RuleCard)).call(this, props));
 	
-	        _this5.loadConditions = function () {
-	            _this5.setState({ loading: true });
-	            var self = _this5;
-	            _utils2.default.ajaxGet('/rules/' + self.state.data.id + '/conditions', function (data) {
-	                self.setState({ conditions: data, loading: false });
-	            });
-	        };
-	
-	        _this5.renderConditions = function () {
-	            var conditionNodes = void 0;
-	            if (_this5.state.conditions) {
-	                conditionNodes = _this5.state.conditions.map(function (condition) {
-	                    return React.createElement(
-	                        'li',
-	                        { key: condition.id },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'collapsible-header' },
-	                            condition.field.fieldName + " " + condition.operator.operatorSymbol + " " + condition.conditionValue
-	                        ),
-	                        React.createElement(
-	                            'div',
-	                            { className: 'collapsible-body' },
-	                            React.createElement(ConditionCard, { renderSimple: true, viewDetails: false, condition: condition })
-	                        )
-	                    );
-	                });
-	            }
-	            return conditionNodes;
-	        };
-	
-	        _this5.renderLink = function () {
-	            return React.createElement(
-	                'div',
-	                { className: 'right-align' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'row' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'col s12' },
-	                        React.createElement(
-	                            Link,
-	                            { className: 'waves-effect waves-light btn-small', to: '/ui/rules/detail/' + _this5.state.data.id },
-	                            'View details'
-	                        )
-	                    )
-	                )
-	            );
-	        };
-	
-	        _this5.renderSimple = function () {
-	            var linkDetails = _this5.props.viewDetails ? _this5.renderLink() : null;
-	            return React.createElement(
-	                'div',
-	                null,
-	                linkDetails,
-	                React.createElement(_globalComponents.CardItem, { label: 'Rule name', value: _this5.state.data.ruleName }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Rule type', value: _this5.state.data.componentType.componentTypeName }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Priority', value: _this5.state.data.priority }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Decision', value: _this5.state.data.decision.decisionName })
-	            );
-	        };
-	
-	        _this5.renderCard = function () {
-	            return React.createElement(
-	                'div',
-	                { className: 'row' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'col s12' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'card' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'card-content' },
-	                            _this5.renderSimple(),
-	                            React.createElement(
-	                                'h5',
-	                                null,
-	                                'Rule conditions'
-	                            ),
-	                            React.createElement(
-	                                'ul',
-	                                { className: 'collapsible' },
-	                                _this5.renderConditions()
-	                            )
-	                        )
-	                    )
-	                )
-	            );
-	        };
-	
 	        var rule = _this5.props.rule;
 	        _this5.state = { data: rule, conditions: [], loading: false };
 	        return _this5;
@@ -21468,6 +21452,105 @@
 	        value: function componentDidUpdate() {
 	            var elems = document.querySelectorAll('.collapsible');
 	            M.Collapsible.init(elems);
+	        }
+	    }, {
+	        key: 'loadConditions',
+	        value: function loadConditions() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/' + self.state.data.id + '/conditions', function (data) {
+	                self.setState({ conditions: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderConditions',
+	        value: function renderConditions() {
+	            var conditionNodes = void 0;
+	            if (this.state.conditions) {
+	                conditionNodes = this.state.conditions.map(function (condition) {
+	                    return _react2.default.createElement(
+	                        'li',
+	                        { key: condition.id },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'collapsible-header' },
+	                            condition.field.fieldName + " " + condition.operator.operatorSymbol + " " + condition.conditionValue
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'collapsible-body' },
+	                            _react2.default.createElement(ConditionCard, { renderSimple: true, viewDetails: false, condition: condition })
+	                        )
+	                    );
+	                });
+	            }
+	            return conditionNodes;
+	        }
+	    }, {
+	        key: 'renderLink',
+	        value: function renderLink() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'right-align' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'row' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'col s12' },
+	                        _react2.default.createElement(
+	                            _reactRouterDom.Link,
+	                            { className: 'waves-effect waves-light btn-small', to: '/ui/rules/detail/' + this.state.data.id },
+	                            'View details'
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'renderSimple',
+	        value: function renderSimple() {
+	            var linkDetails = this.props.viewDetails ? this.renderLink() : null;
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                linkDetails,
+	                _react2.default.createElement(_globalComponents.CardItem, { label: 'Rule name', value: this.state.data.ruleName }),
+	                _react2.default.createElement(_globalComponents.CardItem, { label: 'Rule type', value: this.state.data.componentType.componentTypeName }),
+	                _react2.default.createElement(_globalComponents.CardItem, { label: 'Priority', value: this.state.data.priority }),
+	                _react2.default.createElement(_globalComponents.CardItem, { label: 'Decision', value: this.state.data.decision.decisionName })
+	            );
+	        }
+	    }, {
+	        key: 'renderCard',
+	        value: function renderCard() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'row' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'col s12' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'card' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'card-content' },
+	                            this.renderSimple(),
+	                            _react2.default.createElement(
+	                                'h5',
+	                                null,
+	                                'Rule conditions'
+	                            ),
+	                            _react2.default.createElement(
+	                                'ul',
+	                                { className: 'collapsible' },
+	                                this.renderConditions()
+	                            )
+	                        )
+	                    )
+	                )
+	            );
 	        }
 	    }, {
 	        key: 'render',
@@ -21487,14 +21570,6 @@
 	
 	        var _this6 = _possibleConstructorReturn(this, (Rules.__proto__ || Object.getPrototypeOf(Rules)).call(this, props));
 	
-	        _this6.loadRules = function () {
-	            _this6.setState({ loading: true });
-	            var self = _this6;
-	            _utils2.default.ajaxGet('/rules', function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
 	        _this6.state = { data: [], loading: false };
 	        return _this6;
 	    }
@@ -21505,28 +21580,37 @@
 	            this.loadRules();
 	        }
 	    }, {
+	        key: 'loadRules',
+	        value: function loadRules() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules', function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var ruleNodes = void 0;
 	            if (this.state.data) {
 	                ruleNodes = this.state.data.map(function (rule) {
-	                    return React.createElement(RuleCard, { viewDetails: true, key: rule.id, rule: rule });
+	                    return _react2.default.createElement(RuleCard, { viewDetails: true, key: rule.id, rule: rule });
 	                });
 	            }
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Rules' },
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'right-align' },
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'row' },
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'col s12' },
-	                            React.createElement(
-	                                Link,
+	                            _react2.default.createElement(
+	                                _reactRouterDom.Link,
 	                                { className: 'waves-effect waves-light btn-small', to: '/ui/rules/detail/' },
 	                                'New rule'
 	                            )
@@ -21549,46 +21633,6 @@
 	
 	        var _this7 = _possibleConstructorReturn(this, (RulePage.__proto__ || Object.getPrototypeOf(RulePage)).call(this, props));
 	
-	        _this7.loadConditions = function () {
-	            _this7.setState({ loadedConditions: false, loading: true });
-	            var self = _this7;
-	            _utils2.default.ajaxGet('/rules/' + self.state.ruleId + '/conditions', function (data) {
-	                self.setState({ conditions: data, loadedConditions: true, loading: false });
-	            });
-	        };
-	
-	        _this7.loadRule = function () {
-	            if (_this7.state.ruleId !== 0) {
-	                _this7.setState({ loading: true });
-	                var self = _this7;
-	                _utils2.default.ajaxGet('/rules/' + _this7.state.ruleId, function (data) {
-	                    var currentRule = {
-	                        ruleName: data.ruleName,
-	                        componentTypeId: data.componentType.id,
-	                        priority: data.priority,
-	                        decisionId: data.decision.id
-	                    };
-	                    self.setState({ rule: currentRule, loading: false });
-	                });
-	            }
-	        };
-	
-	        _this7.loadComponentTypes = function () {
-	            _this7.setState({ loading: true });
-	            var self = _this7;
-	            _utils2.default.ajaxGet('/rules/componentTypes/', function (data) {
-	                self.setState({ componentTypes: data, loading: false });
-	            });
-	        };
-	
-	        _this7.loadDecisions = function () {
-	            _this7.setState({ loading: true });
-	            var self = _this7;
-	            _utils2.default.ajaxGet('/decisions/', function (data) {
-	                self.setState({ decisions: data, loading: false });
-	            });
-	        };
-	
 	        _this7.handleChange = function (event) {
 	            var name = event.target.name;
 	            var newData = _this7.state.rule;
@@ -21606,56 +21650,6 @@
 	                    self.loadConditions();
 	                });
 	            }
-	        };
-	
-	        _this7.renderComponentTypesSelect = function () {
-	            var componentTypesNodes = void 0;
-	            if (_this7.state.componentTypes) {
-	                componentTypesNodes = _this7.state.componentTypes.map(function (componentType) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: componentType.id, value: componentType.id },
-	                        componentType.componentTypeName
-	                    );
-	                });
-	                return componentTypesNodes;
-	            }
-	        };
-	
-	        _this7.renderDecisionsSelect = function () {
-	            var decisionsNodes = void 0;
-	            if (_this7.state.decisions) {
-	                decisionsNodes = _this7.state.decisions.map(function (decision) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: decision.id, value: decision.id },
-	                        decision.decisionName + " (" + decision.componentType.componentTypeName + ")"
-	                    );
-	                });
-	                return decisionsNodes;
-	            }
-	        };
-	
-	        _this7.renderDelete = function () {
-	            if (_this7.state.conditionId === 0) {
-	                return null;
-	            } else {
-	                var style = { marginLeft: "5px" };
-	                return React.createElement(
-	                    'a',
-	                    { style: style, className: 'waves-effect waves-light btn-small red darken-4', onClick: _this7.onDelete },
-	                    'Delete'
-	                );
-	            }
-	        };
-	
-	        _this7.onDelete = function () {
-	            var formAction = '/rules/' + _this7.state.ruleId;
-	            var self = _this7;
-	            _utils2.default.formSubmit(formAction, 'DELETE', {}, function (data) {
-	                self.setState({ isDeleted: true });
-	                M.toast({ html: "<div>Rule successfully deleted!</div>" });
-	            });
 	        };
 	
 	        _this7.onRemoveCondition = function (conditionId, event) {
@@ -21676,209 +21670,6 @@
 	                self.setState({ ruleId: data, isEdit: false });
 	                M.toast({ html: "<div>Rule successfully saved!</div>" });
 	            });
-	        };
-	
-	        _this7.renderConditions = function () {
-	            var conditionNodes = void 0;
-	            var self = _this7;
-	            var style = { marginTop: '-4px' };
-	            if (_this7.state.conditions) {
-	                conditionNodes = _this7.state.conditions.map(function (condition) {
-	                    return React.createElement(
-	                        'li',
-	                        { key: condition.id, className: 'collection-item' },
-	                        React.createElement(
-	                            'div',
-	                            null,
-	                            "(" + condition.valueMode.valueModeName + ") " + condition.field.fieldName + " " + condition.operator.operatorSymbol + " " + condition.conditionValue,
-	                            React.createElement(
-	                                'a',
-	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                        return self.onRemoveCondition(condition.id, e);
-	                                    } },
-	                                React.createElement(
-	                                    'i',
-	                                    { className: 'material-icons' },
-	                                    'clear'
-	                                )
-	                            )
-	                        )
-	                    );
-	                });
-	            }
-	            return conditionNodes;
-	        };
-	
-	        _this7.loadAllConditions = function () {
-	            _this7.setState({ loading: true });
-	            var self = _this7;
-	            _utils2.default.ajaxGet('/conditions', function (data) {
-	                self.setState({ allConditions: data, loading: false });
-	            });
-	        };
-	
-	        _this7.renderAddCondition = function () {
-	            var conditionNodes = void 0;
-	            var style = { marginTop: '-4px' };
-	            var self = _this7;
-	            function canAddCondition(conditionId) {
-	                for (var i = 0; i < self.state.conditions.length; i++) {
-	                    if (self.state.conditions[i].id === conditionId) {
-	                        return false;
-	                    }
-	                }
-	                return true;
-	            }
-	            if (_this7.state.allConditions && _this7.state.loadedConditions) {
-	                conditionNodes = _this7.state.allConditions.map(function (condition) {
-	                    if (canAddCondition(condition.id)) {
-	                        return React.createElement(
-	                            'li',
-	                            { key: condition.id, className: 'collection-item' },
-	                            React.createElement(
-	                                'div',
-	                                null,
-	                                "(" + condition.valueMode.valueModeName + ") " + condition.field.fieldName + " " + condition.operator.operatorSymbol + " " + condition.conditionValue,
-	                                React.createElement(
-	                                    'a',
-	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                            return self.addCondition(condition.id, e);
-	                                        } },
-	                                    React.createElement(
-	                                        'i',
-	                                        { className: 'material-icons' },
-	                                        'add'
-	                                    )
-	                                )
-	                            )
-	                        );
-	                    }
-	                });
-	            }
-	            return React.createElement(
-	                'ul',
-	                { className: 'collection' },
-	                conditionNodes
-	            );
-	        };
-	
-	        _this7.renderRuleForm = function () {
-	            if (_this7.state.isDeleted) {
-	                return React.createElement(Redirect, { to: '/ui/rules' });
-	            }
-	            var componentTypesSelect = _this7.renderComponentTypesSelect();
-	            var decisionsSelect = _this7.renderDecisionsSelect();
-	            return React.createElement(
-	                'div',
-	                { className: 'row' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'right-align' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'row' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'col s12' },
-	                            _this7.renderDelete()
-	                        )
-	                    )
-	                ),
-	                React.createElement(
-	                    'form',
-	                    { id: 'ruleForm', onSubmit: _this7.onSubmitForm },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { value: _this7.state.rule.ruleName, onChange: _this7.handleChange, name: 'ruleName', id: 'ruleName', type: 'text', autoComplete: 'off' }),
-	                        React.createElement(
-	                            'label',
-	                            { htmlFor: 'ruleName' },
-	                            'Rule name'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s12' },
-	                        React.createElement(
-	                            'select',
-	                            { value: _this7.state.rule.componentTypeId, onChange: _this7.handleChange, name: 'componentTypeId', id: 'componentTypeId' },
-	                            React.createElement(
-	                                'option',
-	                                { value: '', disabled: 'disabled' },
-	                                'Choose rule type'
-	                            ),
-	                            componentTypesSelect
-	                        ),
-	                        React.createElement(
-	                            'label',
-	                            { htmlFor: 'componentTypeId' },
-	                            'Rule type'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { value: _this7.state.rule.priority, onChange: _this7.handleChange, name: 'priority', id: 'priority', type: 'number' }),
-	                        React.createElement(
-	                            'label',
-	                            { htmlFor: 'priority' },
-	                            'Priority'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'input-field col s12' },
-	                        React.createElement(
-	                            'select',
-	                            { value: _this7.state.rule.decisionId, onChange: _this7.handleChange, name: 'decisionId', id: 'decisionId' },
-	                            React.createElement(
-	                                'option',
-	                                { value: '', disabled: 'disabled' },
-	                                'Choose decision'
-	                            ),
-	                            decisionsSelect
-	                        ),
-	                        React.createElement(
-	                            'label',
-	                            { htmlFor: 'decisionId' },
-	                            'Decision'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'button',
-	                        { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
-	                        'Save',
-	                        React.createElement(
-	                            'i',
-	                            { className: 'material-icons right' },
-	                            'send'
-	                        )
-	                    )
-	                ),
-	                React.createElement('br', null),
-	                React.createElement(
-	                    'div',
-	                    null,
-	                    React.createElement(
-	                        'h5',
-	                        null,
-	                        'Rule conditions'
-	                    ),
-	                    React.createElement(
-	                        'ul',
-	                        { className: 'collection' },
-	                        _this7.renderConditions()
-	                    ),
-	                    React.createElement('br', null),
-	                    React.createElement(
-	                        'h5',
-	                        null,
-	                        'Add conditions'
-	                    ),
-	                    _this7.renderAddCondition()
-	                )
-	            );
 	        };
 	
 	        var thisRuleId = 0;
@@ -21910,9 +21701,314 @@
 	            M.FormSelect.init(document.querySelectorAll('select'));
 	        }
 	    }, {
+	        key: 'loadConditions',
+	        value: function loadConditions() {
+	            this.setState({ loadedConditions: false, loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/' + self.state.ruleId + '/conditions', function (data) {
+	                self.setState({ conditions: data, loadedConditions: true, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadRule',
+	        value: function loadRule() {
+	            if (this.state.ruleId !== 0) {
+	                this.setState({ loading: true });
+	                var self = this;
+	                _utils2.default.ajaxGet('/rules/' + this.state.ruleId, function (data) {
+	                    var currentRule = {
+	                        ruleName: data.ruleName,
+	                        componentTypeId: data.componentType.id,
+	                        priority: data.priority,
+	                        decisionId: data.decision.id
+	                    };
+	                    self.setState({ rule: currentRule, loading: false });
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'loadComponentTypes',
+	        value: function loadComponentTypes() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/componentTypes/', function (data) {
+	                self.setState({ componentTypes: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadDecisions',
+	        value: function loadDecisions() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/decisions/', function (data) {
+	                self.setState({ decisions: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderComponentTypesSelect',
+	        value: function renderComponentTypesSelect() {
+	            var componentTypesNodes = void 0;
+	            if (this.state.componentTypes) {
+	                componentTypesNodes = this.state.componentTypes.map(function (componentType) {
+	                    return _react2.default.createElement(
+	                        'option',
+	                        { key: componentType.id, value: componentType.id },
+	                        componentType.componentTypeName
+	                    );
+	                });
+	                return componentTypesNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderDecisionsSelect',
+	        value: function renderDecisionsSelect() {
+	            var decisionsNodes = void 0;
+	            if (this.state.decisions) {
+	                decisionsNodes = this.state.decisions.map(function (decision) {
+	                    return _react2.default.createElement(
+	                        'option',
+	                        { key: decision.id, value: decision.id },
+	                        decision.decisionName + " (" + decision.componentType.componentTypeName + ")"
+	                    );
+	                });
+	                return decisionsNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderDelete',
+	        value: function renderDelete() {
+	            if (this.state.conditionId === 0) {
+	                return null;
+	            } else {
+	                var style = { marginLeft: "5px" };
+	                return _react2.default.createElement(
+	                    'a',
+	                    { style: style, className: 'waves-effect waves-light btn-small red darken-4', onClick: this.onDelete },
+	                    'Delete'
+	                );
+	            }
+	        }
+	    }, {
+	        key: 'onDelete',
+	        value: function onDelete() {
+	            var formAction = '/rules/' + this.state.ruleId;
+	            var self = this;
+	            _utils2.default.formSubmit(formAction, 'DELETE', {}, function (data) {
+	                self.setState({ isDeleted: true });
+	                M.toast({ html: "<div>Rule successfully deleted!</div>" });
+	            });
+	        }
+	    }, {
+	        key: 'renderConditions',
+	        value: function renderConditions() {
+	            var conditionNodes = void 0;
+	            var self = this;
+	            var style = { marginTop: '-4px' };
+	            if (this.state.conditions) {
+	                conditionNodes = this.state.conditions.map(function (condition) {
+	                    return _react2.default.createElement(
+	                        'li',
+	                        { key: condition.id, className: 'collection-item' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            null,
+	                            "(" + condition.valueMode.valueModeName + ") " + condition.field.fieldName + " " + condition.operator.operatorSymbol + " " + condition.conditionValue,
+	                            _react2.default.createElement(
+	                                'a',
+	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                        return self.onRemoveCondition(condition.id, e);
+	                                    } },
+	                                _react2.default.createElement(
+	                                    'i',
+	                                    { className: 'material-icons' },
+	                                    'clear'
+	                                )
+	                            )
+	                        )
+	                    );
+	                });
+	            }
+	            return conditionNodes;
+	        }
+	    }, {
+	        key: 'loadAllConditions',
+	        value: function loadAllConditions() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/conditions', function (data) {
+	                self.setState({ allConditions: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderAddCondition',
+	        value: function renderAddCondition() {
+	            var conditionNodes = void 0;
+	            var style = { marginTop: '-4px' };
+	            var self = this;
+	            function canAddCondition(conditionId) {
+	                for (var i = 0; i < self.state.conditions.length; i++) {
+	                    if (self.state.conditions[i].id === conditionId) {
+	                        return false;
+	                    }
+	                }
+	                return true;
+	            }
+	            if (this.state.allConditions && this.state.loadedConditions) {
+	                conditionNodes = this.state.allConditions.map(function (condition) {
+	                    if (canAddCondition(condition.id)) {
+	                        return _react2.default.createElement(
+	                            'li',
+	                            { key: condition.id, className: 'collection-item' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                null,
+	                                "(" + condition.valueMode.valueModeName + ") " + condition.field.fieldName + " " + condition.operator.operatorSymbol + " " + condition.conditionValue,
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                            return self.addCondition(condition.id, e);
+	                                        } },
+	                                    _react2.default.createElement(
+	                                        'i',
+	                                        { className: 'material-icons' },
+	                                        'add'
+	                                    )
+	                                )
+	                            )
+	                        );
+	                    }
+	                });
+	            }
+	            return _react2.default.createElement(
+	                'ul',
+	                { className: 'collection' },
+	                conditionNodes
+	            );
+	        }
+	    }, {
+	        key: 'renderRuleForm',
+	        value: function renderRuleForm() {
+	            if (this.state.isDeleted) {
+	                return _react2.default.createElement(_reactRouterDom.Redirect, { to: '/ui/rules' });
+	            }
+	            var componentTypesSelect = this.renderComponentTypesSelect();
+	            var decisionsSelect = this.renderDecisionsSelect();
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'row' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'right-align' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'row' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'col s12' },
+	                            this.renderDelete()
+	                        )
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'form',
+	                    { id: 'ruleForm', onSubmit: this.onSubmitForm },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'input-field col s12' },
+	                        _react2.default.createElement('input', { value: this.state.rule.ruleName, onChange: this.handleChange, name: 'ruleName', id: 'ruleName', type: 'text', autoComplete: 'off' }),
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'ruleName' },
+	                            'Rule name'
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'input-field col s12' },
+	                        _react2.default.createElement(
+	                            'select',
+	                            { value: this.state.rule.componentTypeId, onChange: this.handleChange, name: 'componentTypeId', id: 'componentTypeId' },
+	                            _react2.default.createElement(
+	                                'option',
+	                                { value: '', disabled: 'disabled' },
+	                                'Choose rule type'
+	                            ),
+	                            componentTypesSelect
+	                        ),
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'componentTypeId' },
+	                            'Rule type'
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'input-field col s12' },
+	                        _react2.default.createElement('input', { value: this.state.rule.priority, onChange: this.handleChange, name: 'priority', id: 'priority', type: 'number' }),
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'priority' },
+	                            'Priority'
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'input-field col s12' },
+	                        _react2.default.createElement(
+	                            'select',
+	                            { value: this.state.rule.decisionId, onChange: this.handleChange, name: 'decisionId', id: 'decisionId' },
+	                            _react2.default.createElement(
+	                                'option',
+	                                { value: '', disabled: 'disabled' },
+	                                'Choose decision'
+	                            ),
+	                            decisionsSelect
+	                        ),
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'decisionId' },
+	                            'Decision'
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
+	                        'Save',
+	                        _react2.default.createElement(
+	                            'i',
+	                            { className: 'material-icons right' },
+	                            'send'
+	                        )
+	                    )
+	                ),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    _react2.default.createElement(
+	                        'h5',
+	                        null,
+	                        'Rule conditions'
+	                    ),
+	                    _react2.default.createElement(
+	                        'ul',
+	                        { className: 'collection' },
+	                        this.renderConditions()
+	                    ),
+	                    _react2.default.createElement('br', null),
+	                    _react2.default.createElement(
+	                        'h5',
+	                        null,
+	                        'Add conditions'
+	                    ),
+	                    this.renderAddCondition()
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Rule detail', breadcrumbs: this.state.breadcrumbs },
 	                this.renderRuleForm()
@@ -21931,36 +22027,6 @@
 	
 	        var _this8 = _possibleConstructorReturn(this, (AppRules.__proto__ || Object.getPrototypeOf(AppRules)).call(this, props));
 	
-	        _this8.loadAppRules = function () {
-	            _this8.setState({ loading: true });
-	            var self = _this8;
-	            _utils2.default.ajaxGet('/apps/' + self.props.app.id + '/rules', function (data) {
-	                self.setState({ appRules: data, loading: false });
-	            });
-	        };
-	
-	        _this8.renderAppRules = function () {
-	            var appRulesNodes = void 0;
-	            if (_this8.state.appRules) {
-	                appRulesNodes = _this8.state.appRules.map(function (appRule) {
-	                    return React.createElement(
-	                        'div',
-	                        { key: appRule.rule.id },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'card' },
-	                            React.createElement(
-	                                'div',
-	                                { className: 'card-content' },
-	                                appRule.rule.ruleName
-	                            )
-	                        )
-	                    );
-	                });
-	            }
-	            return appRulesNodes;
-	        };
-	
 	        _this8.state = { appRules: [], loading: false };
 	        return _this8;
 	    }
@@ -21971,12 +22037,44 @@
 	            this.loadAppRules();
 	        }
 	    }, {
+	        key: 'loadAppRules',
+	        value: function loadAppRules() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/apps/' + self.props.app.id + '/rules', function (data) {
+	                self.setState({ appRules: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderAppRules',
+	        value: function renderAppRules() {
+	            var appRulesNodes = void 0;
+	            if (this.state.appRules) {
+	                appRulesNodes = this.state.appRules.map(function (appRule) {
+	                    return _react2.default.createElement(
+	                        'div',
+	                        { key: appRule.rule.id },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'card' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'card-content' },
+	                                appRule.rule.ruleName
+	                            )
+	                        )
+	                    );
+	                });
+	            }
+	            return appRulesNodes;
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                'div',
 	                null,
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'h5',
 	                    null,
 	                    'Rules'
@@ -21997,58 +22095,6 @@
 	
 	        var _this9 = _possibleConstructorReturn(this, (AppsRulesList.__proto__ || Object.getPrototypeOf(AppsRulesList)).call(this, props));
 	
-	        _this9.loadApps = function () {
-	            _this9.setState({ loading: true });
-	            var self = _this9;
-	            _utils2.default.ajaxGet('/apps', function (data) {
-	                self.setState({ apps: data, loading: false });
-	            });
-	        };
-	
-	        _this9.renderApps = function () {
-	            var appNodes = void 0;
-	            if (_this9.state.apps) {
-	                appNodes = _this9.state.apps.map(function (app) {
-	                    return React.createElement(
-	                        'div',
-	                        { key: app.id, className: 'row' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'col s12' },
-	                            React.createElement(
-	                                'div',
-	                                { className: 'card' },
-	                                React.createElement(
-	                                    'div',
-	                                    { className: 'card-content' },
-	                                    React.createElement(
-	                                        'div',
-	                                        { className: 'right-align' },
-	                                        React.createElement(
-	                                            'div',
-	                                            { className: 'row' },
-	                                            React.createElement(
-	                                                'div',
-	                                                { className: 'col s12' },
-	                                                React.createElement(
-	                                                    Link,
-	                                                    { className: 'waves-effect waves-light btn-small', to: '/ui/rules/apps/detail/' + app.id },
-	                                                    'View details'
-	                                                )
-	                                            )
-	                                        )
-	                                    ),
-	                                    React.createElement(_globalComponents.CardItem, { label: 'App', value: app.appName }),
-	                                    React.createElement(AppRules, { app: app })
-	                                )
-	                            )
-	                        )
-	                    );
-	                });
-	            }
-	            return appNodes;
-	        };
-	
 	        _this9.state = { apps: [], loading: false };
 	        return _this9;
 	    }
@@ -22059,9 +22105,63 @@
 	            this.loadApps();
 	        }
 	    }, {
+	        key: 'loadApps',
+	        value: function loadApps() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/apps', function (data) {
+	                self.setState({ apps: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderApps',
+	        value: function renderApps() {
+	            var appNodes = void 0;
+	            if (this.state.apps) {
+	                appNodes = this.state.apps.map(function (app) {
+	                    return _react2.default.createElement(
+	                        'div',
+	                        { key: app.id, className: 'row' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'col s12' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'card' },
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'card-content' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'right-align' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'row' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'col s12' },
+	                                                _react2.default.createElement(
+	                                                    _reactRouterDom.Link,
+	                                                    { className: 'waves-effect waves-light btn-small', to: '/ui/rules/apps/detail/' + app.id },
+	                                                    'View details'
+	                                                )
+	                                            )
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(_globalComponents.CardItem, { label: 'App', value: app.appName }),
+	                                    _react2.default.createElement(AppRules, { app: app })
+	                                )
+	                            )
+	                        )
+	                    );
+	                });
+	            }
+	            return appNodes;
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Apps rules' },
 	                this.renderApps()
@@ -22079,29 +22179,6 @@
 	        _classCallCheck(this, AppRulesPage);
 	
 	        var _this10 = _possibleConstructorReturn(this, (AppRulesPage.__proto__ || Object.getPrototypeOf(AppRulesPage)).call(this, props));
-	
-	        _this10.loadApp = function () {
-	            var self = _this10;
-	            _utils2.default.ajaxGet('/apps/' + self.state.appId, function (data) {
-	                self.setState({ app: data, loading: false });
-	            });
-	        };
-	
-	        _this10.loadAppRules = function () {
-	            _this10.setState({ loadedRules: false, loading: true });
-	            var self = _this10;
-	            _utils2.default.ajaxGet('/apps/' + self.state.appId + '/rules', function (data) {
-	                self.setState({ rules: data, loadedRules: true, loading: false });
-	            });
-	        };
-	
-	        _this10.loadAllRules = function () {
-	            _this10.setState({ loading: true });
-	            var self = _this10;
-	            _utils2.default.ajaxGet('/rules/container', function (data) {
-	                self.setState({ allRules: data, loading: false });
-	            });
-	        };
 	
 	        _this10.onRemoveRule = function (ruleId, event) {
 	            var formAction = '/apps/' + _this10.state.appId + '/rules';
@@ -22129,82 +22206,6 @@
 	            });
 	        };
 	
-	        _this10.renderRules = function () {
-	            var rulesNodes = void 0;
-	            var self = _this10;
-	            var style = { marginTop: '-4px' };
-	            if (_this10.state.rules) {
-	                rulesNodes = _this10.state.rules.map(function (appRule) {
-	                    return React.createElement(
-	                        'li',
-	                        { key: appRule.rule.id, className: 'collection-item' },
-	                        React.createElement(
-	                            'div',
-	                            null,
-	                            appRule.rule.ruleName,
-	                            React.createElement(
-	                                'a',
-	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                        return self.onRemoveRule(appRule.rule.id, e);
-	                                    } },
-	                                React.createElement(
-	                                    'i',
-	                                    { className: 'material-icons' },
-	                                    'clear'
-	                                )
-	                            )
-	                        )
-	                    );
-	                });
-	            }
-	            return rulesNodes;
-	        };
-	
-	        _this10.renderAddRules = function () {
-	            var ruleNodes = void 0;
-	            var style = { marginTop: '-4px' };
-	            var self = _this10;
-	            function canAddRule(ruleId) {
-	                for (var i = 0; i < self.state.rules.length; i++) {
-	                    if (self.state.rules[i].rule.id === ruleId) {
-	                        return false;
-	                    }
-	                }
-	                return true;
-	            }
-	            if (_this10.state.allRules && _this10.state.loadedRules) {
-	                ruleNodes = _this10.state.allRules.map(function (rule) {
-	                    if (canAddRule(rule.id)) {
-	                        return React.createElement(
-	                            'li',
-	                            { key: rule.id, className: 'collection-item' },
-	                            React.createElement(
-	                                'div',
-	                                null,
-	                                rule.ruleName,
-	                                React.createElement(
-	                                    'a',
-	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                            return self.addRule(rule.id, e);
-	                                        } },
-	                                    React.createElement(
-	                                        'i',
-	                                        { className: 'material-icons' },
-	                                        'add'
-	                                    )
-	                                )
-	                            )
-	                        );
-	                    }
-	                });
-	            }
-	            return React.createElement(
-	                'ul',
-	                { className: 'collection' },
-	                ruleNodes
-	            );
-	        };
-	
 	        var thisAppId = 0;
 	        if (props.match.params.appId) {
 	            thisAppId = props.match.params.appId;
@@ -22227,39 +22228,143 @@
 	            M.updateTextFields();
 	        }
 	    }, {
+	        key: 'loadApp',
+	        value: function loadApp() {
+	            var self = this;
+	            _utils2.default.ajaxGet('/apps/' + self.state.appId, function (data) {
+	                self.setState({ app: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadAppRules',
+	        value: function loadAppRules() {
+	            this.setState({ loadedRules: false, loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/apps/' + self.state.appId + '/rules', function (data) {
+	                self.setState({ rules: data, loadedRules: true, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadAllRules',
+	        value: function loadAllRules() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/container', function (data) {
+	                self.setState({ allRules: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderRules',
+	        value: function renderRules() {
+	            var rulesNodes = void 0;
+	            var self = this;
+	            var style = { marginTop: '-4px' };
+	            if (this.state.rules) {
+	                rulesNodes = this.state.rules.map(function (appRule) {
+	                    return _react2.default.createElement(
+	                        'li',
+	                        { key: appRule.rule.id, className: 'collection-item' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            null,
+	                            appRule.rule.ruleName,
+	                            _react2.default.createElement(
+	                                'a',
+	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                        return self.onRemoveRule(appRule.rule.id, e);
+	                                    } },
+	                                _react2.default.createElement(
+	                                    'i',
+	                                    { className: 'material-icons' },
+	                                    'clear'
+	                                )
+	                            )
+	                        )
+	                    );
+	                });
+	            }
+	            return rulesNodes;
+	        }
+	    }, {
+	        key: 'renderAddRules',
+	        value: function renderAddRules() {
+	            var ruleNodes = void 0;
+	            var style = { marginTop: '-4px' };
+	            var self = this;
+	            function canAddRule(ruleId) {
+	                for (var i = 0; i < self.state.rules.length; i++) {
+	                    if (self.state.rules[i].rule.id === ruleId) {
+	                        return false;
+	                    }
+	                }
+	                return true;
+	            }
+	            if (this.state.allRules && this.state.loadedRules) {
+	                ruleNodes = this.state.allRules.map(function (rule) {
+	                    if (canAddRule(rule.id)) {
+	                        return _react2.default.createElement(
+	                            'li',
+	                            { key: rule.id, className: 'collection-item' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                null,
+	                                rule.ruleName,
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                            return self.addRule(rule.id, e);
+	                                        } },
+	                                    _react2.default.createElement(
+	                                        'i',
+	                                        { className: 'material-icons' },
+	                                        'add'
+	                                    )
+	                                )
+	                            )
+	                        );
+	                    }
+	                });
+	            }
+	            return _react2.default.createElement(
+	                'ul',
+	                { className: 'collection' },
+	                ruleNodes
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'App rules detail', breadcrumbs: this.state.breadcrumbs },
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'row' },
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: true, value: this.state.app.appName, name: 'appName', id: 'appName', type: 'text' }),
-	                        React.createElement(
+	                        _react2.default.createElement('input', { disabled: true, value: this.state.app.appName, name: 'appName', id: 'appName', type: 'text' }),
+	                        _react2.default.createElement(
 	                            'label',
 	                            { htmlFor: 'appName' },
 	                            'App name'
 	                        )
 	                    ),
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        null,
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'h5',
 	                            null,
 	                            'Rules'
 	                        ),
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'ul',
 	                            { className: 'collection' },
 	                            this.renderRules()
 	                        ),
-	                        React.createElement('br', null),
-	                        React.createElement(
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement(
 	                            'h5',
 	                            null,
 	                            'Add rules'
@@ -22282,14 +22387,6 @@
 	
 	        var _this11 = _possibleConstructorReturn(this, (HostRules.__proto__ || Object.getPrototypeOf(HostRules)).call(this, props));
 	
-	        _this11.loadHostRules = function () {
-	            _this11.setState({ loading: true });
-	            var self = _this11;
-	            _utils2.default.ajaxGet('/hosts/' + self.props.host.hostname + '/rules', function (data) {
-	                self.setState({ hostRules: data, loading: false });
-	            });
-	        };
-	
 	        _this11.state = { hostRules: [], loading: false };
 	        return _this11;
 	    }
@@ -22300,18 +22397,27 @@
 	            this.loadHostRules();
 	        }
 	    }, {
+	        key: 'loadHostRules',
+	        value: function loadHostRules() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/hosts/' + self.props.host.hostname + '/rules', function (data) {
+	                self.setState({ hostRules: data, loading: false });
+	            });
+	        }
+	    }, {
 	        key: 'renderHostRules',
 	        value: function renderHostRules() {
 	            var hostRulesNodes = void 0;
 	            if (this.state.hostRules) {
 	                hostRulesNodes = this.state.hostRules.map(function (hostRule) {
-	                    return React.createElement(
+	                    return _react2.default.createElement(
 	                        'div',
 	                        { key: hostRule.rule.id },
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'card' },
-	                            React.createElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'card-content' },
 	                                hostRule.rule.ruleName
@@ -22325,10 +22431,10 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                'div',
 	                null,
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'h5',
 	                    null,
 	                    'Rules'
@@ -22349,14 +22455,6 @@
 	
 	        var _this12 = _possibleConstructorReturn(this, (HostsRulesList.__proto__ || Object.getPrototypeOf(HostsRulesList)).call(this, props));
 	
-	        _this12.loadHosts = function () {
-	            _this12.setState({ loading: true });
-	            var self = _this12;
-	            _utils2.default.ajaxGet('/hosts', function (data) {
-	                self.setState({ hosts: data, loading: false });
-	            });
-	        };
-	
 	        _this12.state = { hosts: [], loading: false };
 	        _this12.loadHosts = _this12.loadHosts.bind(_this12);
 	        _this12.renderHosts = _this12.renderHosts.bind(_this12);
@@ -22369,42 +22467,51 @@
 	            this.loadHosts();
 	        }
 	    }, {
+	        key: 'loadHosts',
+	        value: function loadHosts() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/hosts', function (data) {
+	                self.setState({ hosts: data, loading: false });
+	            });
+	        }
+	    }, {
 	        key: 'renderHosts',
 	        value: function renderHosts() {
 	            var hostNodes = void 0;
 	            if (this.state.hosts) {
 	                hostNodes = this.state.hosts.map(function (host) {
-	                    return React.createElement(
+	                    return _react2.default.createElement(
 	                        'div',
 	                        { key: host.hostname, className: 'row' },
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'col s12' },
-	                            React.createElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'card' },
-	                                React.createElement(
+	                                _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'card-content' },
-	                                    React.createElement(
+	                                    _react2.default.createElement(
 	                                        'div',
 	                                        { className: 'right-align' },
-	                                        React.createElement(
+	                                        _react2.default.createElement(
 	                                            'div',
 	                                            { className: 'row' },
-	                                            React.createElement(
+	                                            _react2.default.createElement(
 	                                                'div',
 	                                                { className: 'col s12' },
-	                                                React.createElement(
-	                                                    Link,
+	                                                _react2.default.createElement(
+	                                                    _reactRouterDom.Link,
 	                                                    { className: 'waves-effect waves-light btn-small', to: '/ui/rules/hosts/detail/' + host.hostname },
 	                                                    'View details'
 	                                                )
 	                                            )
 	                                        )
 	                                    ),
-	                                    React.createElement(_globalComponents.CardItem, { label: 'Host', value: host.hostname }),
-	                                    React.createElement(HostRules, { host: host })
+	                                    _react2.default.createElement(_globalComponents.CardItem, { label: 'Host', value: host.hostname }),
+	                                    _react2.default.createElement(HostRules, { host: host })
 	                                )
 	                            )
 	                        )
@@ -22416,7 +22523,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Hosts rules' },
 	                this.renderHosts()
@@ -22434,22 +22541,6 @@
 	        _classCallCheck(this, HostRulesPage);
 	
 	        var _this13 = _possibleConstructorReturn(this, (HostRulesPage.__proto__ || Object.getPrototypeOf(HostRulesPage)).call(this, props));
-	
-	        _this13.loadHostRules = function () {
-	            _this13.setState({ loadedRules: false, loading: true });
-	            var self = _this13;
-	            _utils2.default.ajaxGet('/hosts/' + self.state.hostname + '/rules', function (data) {
-	                self.setState({ rules: data, loadedRules: true, loading: false });
-	            });
-	        };
-	
-	        _this13.loadAllRules = function () {
-	            _this13.setState({ loading: true });
-	            var self = _this13;
-	            _utils2.default.ajaxGet('/rules/host', function (data) {
-	                self.setState({ allRules: data, loading: false });
-	            });
-	        };
 	
 	        _this13.onRemoveRule = function (ruleId, event) {
 	            var formAction = '/hosts/' + _this13.state.hostname + '/rules';
@@ -22477,82 +22568,6 @@
 	            });
 	        };
 	
-	        _this13.renderRules = function () {
-	            var rulesNodes = void 0;
-	            var self = _this13;
-	            var style = { marginTop: '-4px' };
-	            if (_this13.state.rules) {
-	                rulesNodes = _this13.state.rules.map(function (hostRule) {
-	                    return React.createElement(
-	                        'li',
-	                        { key: hostRule.rule.id, className: 'collection-item' },
-	                        React.createElement(
-	                            'div',
-	                            null,
-	                            hostRule.rule.ruleName,
-	                            React.createElement(
-	                                'a',
-	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                        return self.onRemoveRule(hostRule.rule.id, e);
-	                                    } },
-	                                React.createElement(
-	                                    'i',
-	                                    { className: 'material-icons' },
-	                                    'clear'
-	                                )
-	                            )
-	                        )
-	                    );
-	                });
-	            }
-	            return rulesNodes;
-	        };
-	
-	        _this13.renderAddRules = function () {
-	            var ruleNodes = void 0;
-	            var style = { marginTop: '-4px' };
-	            var self = _this13;
-	            function canAddRule(ruleId) {
-	                for (var i = 0; i < self.state.rules.length; i++) {
-	                    if (self.state.rules[i].rule.id === ruleId) {
-	                        return false;
-	                    }
-	                }
-	                return true;
-	            }
-	            if (_this13.state.allRules && _this13.state.loadedRules) {
-	                ruleNodes = _this13.state.allRules.map(function (rule) {
-	                    if (canAddRule(rule.id)) {
-	                        return React.createElement(
-	                            'li',
-	                            { key: rule.id, className: 'collection-item' },
-	                            React.createElement(
-	                                'div',
-	                                null,
-	                                rule.ruleName,
-	                                React.createElement(
-	                                    'a',
-	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                            return self.addRule(rule.id, e);
-	                                        } },
-	                                    React.createElement(
-	                                        'i',
-	                                        { className: 'material-icons' },
-	                                        'add'
-	                                    )
-	                                )
-	                            )
-	                        );
-	                    }
-	                });
-	            }
-	            return React.createElement(
-	                'ul',
-	                { className: 'collection' },
-	                ruleNodes
-	            );
-	        };
-	
 	        var thisHostname = '';
 	        if (props.match.params.hostname) {
 	            thisHostname = props.match.params.hostname;
@@ -22574,39 +22589,135 @@
 	            M.updateTextFields();
 	        }
 	    }, {
+	        key: 'loadHostRules',
+	        value: function loadHostRules() {
+	            this.setState({ loadedRules: false, loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/hosts/' + self.state.hostname + '/rules', function (data) {
+	                self.setState({ rules: data, loadedRules: true, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadAllRules',
+	        value: function loadAllRules() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/host', function (data) {
+	                self.setState({ allRules: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderRules',
+	        value: function renderRules() {
+	            var rulesNodes = void 0;
+	            var self = this;
+	            var style = { marginTop: '-4px' };
+	            if (this.state.rules) {
+	                rulesNodes = this.state.rules.map(function (hostRule) {
+	                    return _react2.default.createElement(
+	                        'li',
+	                        { key: hostRule.rule.id, className: 'collection-item' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            null,
+	                            hostRule.rule.ruleName,
+	                            _react2.default.createElement(
+	                                'a',
+	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                        return self.onRemoveRule(hostRule.rule.id, e);
+	                                    } },
+	                                _react2.default.createElement(
+	                                    'i',
+	                                    { className: 'material-icons' },
+	                                    'clear'
+	                                )
+	                            )
+	                        )
+	                    );
+	                });
+	            }
+	            return rulesNodes;
+	        }
+	    }, {
+	        key: 'renderAddRules',
+	        value: function renderAddRules() {
+	            var ruleNodes = void 0;
+	            var style = { marginTop: '-4px' };
+	            var self = this;
+	            function canAddRule(ruleId) {
+	                for (var i = 0; i < self.state.rules.length; i++) {
+	                    if (self.state.rules[i].rule.id === ruleId) {
+	                        return false;
+	                    }
+	                }
+	                return true;
+	            }
+	            if (this.state.allRules && this.state.loadedRules) {
+	                ruleNodes = this.state.allRules.map(function (rule) {
+	                    if (canAddRule(rule.id)) {
+	                        return _react2.default.createElement(
+	                            'li',
+	                            { key: rule.id, className: 'collection-item' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                null,
+	                                rule.ruleName,
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                            return self.addRule(rule.id, e);
+	                                        } },
+	                                    _react2.default.createElement(
+	                                        'i',
+	                                        { className: 'material-icons' },
+	                                        'add'
+	                                    )
+	                                )
+	                            )
+	                        );
+	                    }
+	                });
+	            }
+	            return _react2.default.createElement(
+	                'ul',
+	                { className: 'collection' },
+	                ruleNodes
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Host detail', breadcrumbs: this.state.breadcrumbs },
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'row' },
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: true, value: this.state.hostname, name: 'hostname', id: 'hostname', type: 'text' }),
-	                        React.createElement(
+	                        _react2.default.createElement('input', { disabled: true, value: this.state.hostname, name: 'hostname', id: 'hostname', type: 'text' }),
+	                        _react2.default.createElement(
 	                            'label',
 	                            { htmlFor: 'hostname' },
 	                            'Hostname'
 	                        )
 	                    ),
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        null,
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'h5',
 	                            null,
 	                            'Rules'
 	                        ),
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'ul',
 	                            { className: 'collection' },
 	                            this.renderRules()
 	                        ),
-	                        React.createElement('br', null),
-	                        React.createElement(
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement(
 	                            'h5',
 	                            null,
 	                            'Add rules'
@@ -22629,14 +22740,6 @@
 	
 	        var _this14 = _possibleConstructorReturn(this, (GenericHostRules.__proto__ || Object.getPrototypeOf(GenericHostRules)).call(this, props));
 	
-	        _this14.loadGenericHostRules = function () {
-	            _this14.setState({ loading: true });
-	            var self = _this14;
-	            _utils2.default.ajaxGet('/hosts/genericRules', function (data) {
-	                self.setState({ genericHostRules: data, loading: false });
-	            });
-	        };
-	
 	        _this14.state = { genericHostRules: [], loading: false };
 	        return _this14;
 	    }
@@ -22647,21 +22750,30 @@
 	            this.loadGenericHostRules();
 	        }
 	    }, {
+	        key: 'loadGenericHostRules',
+	        value: function loadGenericHostRules() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/hosts/genericRules', function (data) {
+	                self.setState({ genericHostRules: data, loading: false });
+	            });
+	        }
+	    }, {
 	        key: 'renderGenericHostRules',
 	        value: function renderGenericHostRules() {
 	            var genericHostRulesNodes = void 0;
 	            if (this.state.genericHostRules) {
 	                genericHostRulesNodes = this.state.genericHostRules.map(function (genericHostRule) {
-	                    return React.createElement(
+	                    return _react2.default.createElement(
 	                        'div',
 	                        { key: genericHostRule.id, className: 'row' },
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'col s12' },
-	                            React.createElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'card' },
-	                                React.createElement(
+	                                _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'card-content' },
 	                                    genericHostRule.rule.ruleName
@@ -22676,7 +22788,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                'div',
 	                null,
 	                this.renderGenericHostRules()
@@ -22699,27 +22811,27 @@
 	    _createClass(GenericHostsRulesList, [{
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Generic hosts rules' },
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'right-align' },
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'row' },
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'col s12' },
-	                            React.createElement(
-	                                Link,
+	                            _react2.default.createElement(
+	                                _reactRouterDom.Link,
 	                                { className: 'waves-effect waves-light btn-small', to: '/ui/rules/generic/hosts/detail' },
 	                                'View details'
 	                            )
 	                        )
 	                    )
 	                ),
-	                React.createElement(GenericHostRules, null)
+	                _react2.default.createElement(GenericHostRules, null)
 	            );
 	        }
 	    }]);
@@ -22734,22 +22846,6 @@
 	        _classCallCheck(this, GenericHostRulesPage);
 	
 	        var _this16 = _possibleConstructorReturn(this, (GenericHostRulesPage.__proto__ || Object.getPrototypeOf(GenericHostRulesPage)).call(this, props));
-	
-	        _this16.loadHostRules = function () {
-	            _this16.setState({ loadedRules: false, loading: true });
-	            var self = _this16;
-	            _utils2.default.ajaxGet('/hosts/genericRules', function (data) {
-	                self.setState({ rules: data, loadedRules: true, loading: false });
-	            });
-	        };
-	
-	        _this16.loadAllRules = function () {
-	            _this16.setState({ loading: true });
-	            var self = _this16;
-	            _utils2.default.ajaxGet('/rules/host', function (data) {
-	                self.setState({ allRules: data, loading: false });
-	            });
-	        };
 	
 	        _this16.onRemoveRule = function (ruleId, event) {
 	            var formAction = '/hosts/genericRules/' + ruleId;
@@ -22770,82 +22866,6 @@
 	            });
 	        };
 	
-	        _this16.renderRules = function () {
-	            var rulesNodes = void 0;
-	            var self = _this16;
-	            var style = { marginTop: '-4px' };
-	            if (_this16.state.rules) {
-	                rulesNodes = _this16.state.rules.map(function (hostRule) {
-	                    return React.createElement(
-	                        'li',
-	                        { key: hostRule.rule.id, className: 'collection-item' },
-	                        React.createElement(
-	                            'div',
-	                            null,
-	                            hostRule.rule.ruleName,
-	                            React.createElement(
-	                                'a',
-	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                        return self.onRemoveRule(hostRule.rule.id, e);
-	                                    } },
-	                                React.createElement(
-	                                    'i',
-	                                    { className: 'material-icons' },
-	                                    'clear'
-	                                )
-	                            )
-	                        )
-	                    );
-	                });
-	            }
-	            return rulesNodes;
-	        };
-	
-	        _this16.renderAddRules = function () {
-	            var ruleNodes = void 0;
-	            var style = { marginTop: '-4px' };
-	            var self = _this16;
-	            function canAddRule(ruleId) {
-	                for (var i = 0; i < self.state.rules.length; i++) {
-	                    if (self.state.rules[i].rule.id === ruleId) {
-	                        return false;
-	                    }
-	                }
-	                return true;
-	            }
-	            if (_this16.state.allRules && _this16.state.loadedRules) {
-	                ruleNodes = _this16.state.allRules.map(function (rule) {
-	                    if (canAddRule(rule.id)) {
-	                        return React.createElement(
-	                            'li',
-	                            { key: rule.id, className: 'collection-item' },
-	                            React.createElement(
-	                                'div',
-	                                null,
-	                                rule.ruleName,
-	                                React.createElement(
-	                                    'a',
-	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                            return self.addRule(rule.id, e);
-	                                        } },
-	                                    React.createElement(
-	                                        'i',
-	                                        { className: 'material-icons' },
-	                                        'add'
-	                                    )
-	                                )
-	                            )
-	                        );
-	                    }
-	                });
-	            }
-	            return React.createElement(
-	                'ul',
-	                { className: 'collection' },
-	                ruleNodes
-	            );
-	        };
-	
 	        _this16.state = { rules: [], allRules: [], loadedRules: false, loading: false };
 	        return _this16;
 	    }
@@ -22862,29 +22882,125 @@
 	            M.updateTextFields();
 	        }
 	    }, {
+	        key: 'loadHostRules',
+	        value: function loadHostRules() {
+	            this.setState({ loadedRules: false, loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/hosts/genericRules', function (data) {
+	                self.setState({ rules: data, loadedRules: true, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadAllRules',
+	        value: function loadAllRules() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/host', function (data) {
+	                self.setState({ allRules: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderRules',
+	        value: function renderRules() {
+	            var rulesNodes = void 0;
+	            var self = this;
+	            var style = { marginTop: '-4px' };
+	            if (this.state.rules) {
+	                rulesNodes = this.state.rules.map(function (hostRule) {
+	                    return _react2.default.createElement(
+	                        'li',
+	                        { key: hostRule.rule.id, className: 'collection-item' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            null,
+	                            hostRule.rule.ruleName,
+	                            _react2.default.createElement(
+	                                'a',
+	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                        return self.onRemoveRule(hostRule.rule.id, e);
+	                                    } },
+	                                _react2.default.createElement(
+	                                    'i',
+	                                    { className: 'material-icons' },
+	                                    'clear'
+	                                )
+	                            )
+	                        )
+	                    );
+	                });
+	            }
+	            return rulesNodes;
+	        }
+	    }, {
+	        key: 'renderAddRules',
+	        value: function renderAddRules() {
+	            var ruleNodes = void 0;
+	            var style = { marginTop: '-4px' };
+	            var self = this;
+	            function canAddRule(ruleId) {
+	                for (var i = 0; i < self.state.rules.length; i++) {
+	                    if (self.state.rules[i].rule.id === ruleId) {
+	                        return false;
+	                    }
+	                }
+	                return true;
+	            }
+	            if (this.state.allRules && this.state.loadedRules) {
+	                ruleNodes = this.state.allRules.map(function (rule) {
+	                    if (canAddRule(rule.id)) {
+	                        return _react2.default.createElement(
+	                            'li',
+	                            { key: rule.id, className: 'collection-item' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                null,
+	                                rule.ruleName,
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                            return self.addRule(rule.id, e);
+	                                        } },
+	                                    _react2.default.createElement(
+	                                        'i',
+	                                        { className: 'material-icons' },
+	                                        'add'
+	                                    )
+	                                )
+	                            )
+	                        );
+	                    }
+	                });
+	            }
+	            return _react2.default.createElement(
+	                'ul',
+	                { className: 'collection' },
+	                ruleNodes
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Generic hosts rules detail' },
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'row' },
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        null,
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'h5',
 	                            null,
 	                            'Rules'
 	                        ),
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'ul',
 	                            { className: 'collection' },
 	                            this.renderRules()
 	                        ),
-	                        React.createElement('br', null),
-	                        React.createElement(
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement(
 	                            'h5',
 	                            null,
 	                            'Add rules'
@@ -22907,15 +23023,6 @@
 	
 	        var _this17 = _possibleConstructorReturn(this, (ServiceRules.__proto__ || Object.getPrototypeOf(ServiceRules)).call(this, props));
 	
-	        _this17.loadServiceRules = function () {
-	            _this17.setState({ loading: true });
-	            var self = _this17;
-	            _utils2.default.ajaxGet('/services/' + self.props.service.id + '/rules', //TODO confirm
-	            function (data) {
-	                self.setState({ serviceRules: data, loading: false });
-	            });
-	        };
-	
 	        _this17.state = { serviceRules: [], loading: false };
 	        return _this17;
 	    }
@@ -22926,18 +23033,28 @@
 	            this.loadServiceRules();
 	        }
 	    }, {
+	        key: 'loadServiceRules',
+	        value: function loadServiceRules() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/services/' + self.props.service.id + '/rules', //TODO confirm
+	            function (data) {
+	                self.setState({ serviceRules: data, loading: false });
+	            });
+	        }
+	    }, {
 	        key: 'renderServiceRules',
 	        value: function renderServiceRules() {
 	            var serviceRulesNodes = void 0;
 	            if (this.state.serviceRules) {
 	                serviceRulesNodes = this.state.serviceRules.map(function (serviceRule) {
-	                    return React.createElement(
+	                    return _react2.default.createElement(
 	                        'div',
 	                        { key: serviceRule.rule.id },
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'card' },
-	                            React.createElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'card-content' },
 	                                serviceRule.rule.ruleName
@@ -22951,10 +23068,10 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                'div',
 	                null,
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'h5',
 	                    null,
 	                    'Rules'
@@ -22975,58 +23092,6 @@
 	
 	        var _this18 = _possibleConstructorReturn(this, (ServicesRulesList.__proto__ || Object.getPrototypeOf(ServicesRulesList)).call(this, props));
 	
-	        _this18.loadServices = function () {
-	            _this18.setState({ loading: true });
-	            var self = _this18;
-	            _utils2.default.ajaxGet('/services', function (data) {
-	                self.setState({ services: data, loading: false });
-	            });
-	        };
-	
-	        _this18.renderServices = function () {
-	            var serviceNodes = void 0;
-	            if (_this18.state.services) {
-	                serviceNodes = pt.unl.fct.microserviceManagement.managerMaster.entities.service.map(function (service) {
-	                    return React.createElement(
-	                        'div',
-	                        { key: service.id, className: 'row' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'col s12' },
-	                            React.createElement(
-	                                'div',
-	                                { className: 'card' },
-	                                React.createElement(
-	                                    'div',
-	                                    { className: 'card-content' },
-	                                    React.createElement(
-	                                        'div',
-	                                        { className: 'right-align' },
-	                                        React.createElement(
-	                                            'div',
-	                                            { className: 'row' },
-	                                            React.createElement(
-	                                                'div',
-	                                                { className: 'col s12' },
-	                                                React.createElement(
-	                                                    Link,
-	                                                    { className: 'waves-effect waves-light btn-small', to: '/ui/rules/services/detail/' + service.id },
-	                                                    'View details'
-	                                                )
-	                                            )
-	                                        )
-	                                    ),
-	                                    React.createElement(_globalComponents.CardItem, { label: 'Service', value: service.serviceName }),
-	                                    React.createElement(ServiceRules, { service: service })
-	                                )
-	                            )
-	                        )
-	                    );
-	                });
-	            }
-	            return serviceNodes;
-	        };
-	
 	        _this18.state = { services: [], loading: false };
 	        return _this18;
 	    }
@@ -23037,9 +23102,63 @@
 	            this.loadServices();
 	        }
 	    }, {
+	        key: 'loadServices',
+	        value: function loadServices() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/services', function (data) {
+	                self.setState({ services: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderServices',
+	        value: function renderServices() {
+	            var serviceNodes = void 0;
+	            if (this.state.services) {
+	                serviceNodes = pt.unl.fct.microserviceManagement.managerMaster.entities.service.map(function (service) {
+	                    return _react2.default.createElement(
+	                        'div',
+	                        { key: service.id, className: 'row' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'col s12' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'card' },
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'card-content' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'right-align' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'row' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'col s12' },
+	                                                _react2.default.createElement(
+	                                                    _reactRouterDom.Link,
+	                                                    { className: 'waves-effect waves-light btn-small', to: '/ui/rules/services/detail/' + service.id },
+	                                                    'View details'
+	                                                )
+	                                            )
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(_globalComponents.CardItem, { label: 'Service', value: service.serviceName }),
+	                                    _react2.default.createElement(ServiceRules, { service: service })
+	                                )
+	                            )
+	                        )
+	                    );
+	                });
+	            }
+	            return serviceNodes;
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Services rules' },
 	                this.renderServices()
@@ -23057,29 +23176,6 @@
 	        _classCallCheck(this, ServiceRulesPage);
 	
 	        var _this19 = _possibleConstructorReturn(this, (ServiceRulesPage.__proto__ || Object.getPrototypeOf(ServiceRulesPage)).call(this, props));
-	
-	        _this19.loadService = function () {
-	            var self = _this19;
-	            _utils2.default.ajaxGet('/services/' + self.state.serviceId, function (data) {
-	                self.setState({ service: data, loading: false });
-	            });
-	        };
-	
-	        _this19.loadServiceRules = function () {
-	            _this19.setState({ loadedRules: false, loading: true });
-	            var self = _this19;
-	            _utils2.default.ajaxGet('/services/' + self.state.serviceId + '/rules', function (data) {
-	                self.setState({ rules: data, loadedRules: true, loading: false });
-	            });
-	        };
-	
-	        _this19.loadAllRules = function () {
-	            _this19.setState({ loading: true });
-	            var self = _this19;
-	            _utils2.default.ajaxGet('/rules/container', function (data) {
-	                self.setState({ allRules: data, loading: false });
-	            });
-	        };
 	
 	        _this19.onRemoveRule = function (ruleId, event) {
 	            var formAction = '/services/' + _this19.state.serviceId + '/rules';
@@ -23107,82 +23203,6 @@
 	            });
 	        };
 	
-	        _this19.renderRules = function () {
-	            var rulesNodes = void 0;
-	            var self = _this19;
-	            var style = { marginTop: '-4px' };
-	            if (_this19.state.rules) {
-	                rulesNodes = _this19.state.rules.map(function (serviceRule) {
-	                    return React.createElement(
-	                        'li',
-	                        { key: serviceRule.rule.id, className: 'collection-item' },
-	                        React.createElement(
-	                            'div',
-	                            null,
-	                            serviceRule.rule.ruleName,
-	                            React.createElement(
-	                                'a',
-	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                        return self.onRemoveRule(serviceRule.rule.id, e);
-	                                    } },
-	                                React.createElement(
-	                                    'i',
-	                                    { className: 'material-icons' },
-	                                    'clear'
-	                                )
-	                            )
-	                        )
-	                    );
-	                });
-	            }
-	            return rulesNodes;
-	        };
-	
-	        _this19.renderAddRules = function () {
-	            var ruleNodes = void 0;
-	            var style = { marginTop: '-4px' };
-	            var self = _this19;
-	            function canAddRule(ruleId) {
-	                for (var i = 0; i < self.state.rules.length; i++) {
-	                    if (self.state.rules[i].rule.id === ruleId) {
-	                        return false;
-	                    }
-	                }
-	                return true;
-	            }
-	            if (_this19.state.allRules && _this19.state.loadedRules) {
-	                ruleNodes = _this19.state.allRules.map(function (rule) {
-	                    if (canAddRule(rule.id)) {
-	                        return React.createElement(
-	                            'li',
-	                            { key: rule.id, className: 'collection-item' },
-	                            React.createElement(
-	                                'div',
-	                                null,
-	                                rule.ruleName,
-	                                React.createElement(
-	                                    'a',
-	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                            return self.addRule(rule.id, e);
-	                                        } },
-	                                    React.createElement(
-	                                        'i',
-	                                        { className: 'material-icons' },
-	                                        'add'
-	                                    )
-	                                )
-	                            )
-	                        );
-	                    }
-	                });
-	            }
-	            return React.createElement(
-	                'ul',
-	                { className: 'collection' },
-	                ruleNodes
-	            );
-	        };
-	
 	        var thisServiceId = 0;
 	        if (props.match.params.serviceId) {
 	            thisServiceId = props.match.params.serviceId;
@@ -23205,39 +23225,143 @@
 	            M.updateTextFields();
 	        }
 	    }, {
+	        key: 'loadService',
+	        value: function loadService() {
+	            var self = this;
+	            _utils2.default.ajaxGet('/services/' + self.state.serviceId, function (data) {
+	                self.setState({ service: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadServiceRules',
+	        value: function loadServiceRules() {
+	            this.setState({ loadedRules: false, loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/services/' + self.state.serviceId + '/rules', function (data) {
+	                self.setState({ rules: data, loadedRules: true, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadAllRules',
+	        value: function loadAllRules() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/rules/container', function (data) {
+	                self.setState({ allRules: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderRules',
+	        value: function renderRules() {
+	            var rulesNodes = void 0;
+	            var self = this;
+	            var style = { marginTop: '-4px' };
+	            if (this.state.rules) {
+	                rulesNodes = this.state.rules.map(function (serviceRule) {
+	                    return _react2.default.createElement(
+	                        'li',
+	                        { key: serviceRule.rule.id, className: 'collection-item' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            null,
+	                            serviceRule.rule.ruleName,
+	                            _react2.default.createElement(
+	                                'a',
+	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                        return self.onRemoveRule(serviceRule.rule.id, e);
+	                                    } },
+	                                _react2.default.createElement(
+	                                    'i',
+	                                    { className: 'material-icons' },
+	                                    'clear'
+	                                )
+	                            )
+	                        )
+	                    );
+	                });
+	            }
+	            return rulesNodes;
+	        }
+	    }, {
+	        key: 'renderAddRules',
+	        value: function renderAddRules() {
+	            var ruleNodes = void 0;
+	            var style = { marginTop: '-4px' };
+	            var self = this;
+	            function canAddRule(ruleId) {
+	                for (var i = 0; i < self.state.rules.length; i++) {
+	                    if (self.state.rules[i].rule.id === ruleId) {
+	                        return false;
+	                    }
+	                }
+	                return true;
+	            }
+	            if (this.state.allRules && this.state.loadedRules) {
+	                ruleNodes = this.state.allRules.map(function (rule) {
+	                    if (canAddRule(rule.id)) {
+	                        return _react2.default.createElement(
+	                            'li',
+	                            { key: rule.id, className: 'collection-item' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                null,
+	                                rule.ruleName,
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                                            return self.addRule(rule.id, e);
+	                                        } },
+	                                    _react2.default.createElement(
+	                                        'i',
+	                                        { className: 'material-icons' },
+	                                        'add'
+	                                    )
+	                                )
+	                            )
+	                        );
+	                    }
+	                });
+	            }
+	            return _react2.default.createElement(
+	                'ul',
+	                { className: 'collection' },
+	                ruleNodes
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
 	                { title: 'Service rules detail', breadcrumbs: this.state.breadcrumbs },
-	                React.createElement(
+	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'row' },
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'input-field col s12' },
-	                        React.createElement('input', { disabled: true, value: this.state.service.serviceName, name: 'serviceName', id: 'serviceName', type: 'text' }),
-	                        React.createElement(
+	                        _react2.default.createElement('input', { disabled: true, value: this.state.service.serviceName, name: 'serviceName', id: 'serviceName', type: 'text' }),
+	                        _react2.default.createElement(
 	                            'label',
 	                            { htmlFor: 'serviceName' },
 	                            'Service name'
 	                        )
 	                    ),
-	                    React.createElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        null,
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'h5',
 	                            null,
 	                            'Rules'
 	                        ),
-	                        React.createElement(
+	                        _react2.default.createElement(
 	                            'ul',
 	                            { className: 'collection' },
 	                            this.renderRules()
 	                        ),
-	                        React.createElement('br', null),
-	                        React.createElement(
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement(
 	                            'h5',
 	                            null,
 	                            'Add rules'
@@ -23256,7 +23380,7 @@
 /* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -23264,6 +23388,16 @@
 	exports.ServiceEventPredictionDetail = exports.ServiceEventPredictions = undefined;
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouterDom = __webpack_require__(10);
+	
+	var _jquery = __webpack_require__(9);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
 	
 	var _utils = __webpack_require__(58);
 	
@@ -23277,97 +23411,88 @@
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MIT License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright (c) 2020 micro-manager
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in all
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies or substantial portions of the Software.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * SOFTWARE.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
-	/*
-	 * MIT License
-	 *
-	 * Copyright (c) 2020 micro-manager
-	 *
-	 * Permission is hereby granted, free of charge, to any person obtaining a copy
-	 * of this software and associated documentation files (the "Software"), to deal
-	 * in the Software without restriction, including without limitation the rights
-	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	 * copies of the Software, and to permit persons to whom the Software is
-	 * furnished to do so, subject to the following conditions:
-	 *
-	 * The above copyright notice and this permission notice shall be included in all
-	 * copies or substantial portions of the Software.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	 * SOFTWARE.
-	 */
-	
-	var $ = __webpack_require__(9);
-	var React = __webpack_require__(1);
-	var Component = React.Component;
-	var Redirect = __webpack_require__(10).Redirect;
-	var Link = __webpack_require__(10).Link;
-	
-	var ServiceEventPredictionCard = function (_Component) {
-	    _inherits(ServiceEventPredictionCard, _Component);
+	var ServiceEventPredictionCard = function (_React$Component) {
+	    _inherits(ServiceEventPredictionCard, _React$Component);
 	
 	    function ServiceEventPredictionCard(props) {
 	        _classCallCheck(this, ServiceEventPredictionCard);
 	
-	        var _this = _possibleConstructorReturn(this, (ServiceEventPredictionCard.__proto__ || Object.getPrototypeOf(ServiceEventPredictionCard)).call(this, props));
+	        return _possibleConstructorReturn(this, (ServiceEventPredictionCard.__proto__ || Object.getPrototypeOf(ServiceEventPredictionCard)).call(this, props));
+	    }
 	
-	        _this.onClickRemove = function () {
-	            var action = '/services/serviceEventPredictions/' + _this.props.serviceEvent.id;
-	            var self = _this;
+	    _createClass(ServiceEventPredictionCard, [{
+	        key: "onClickRemove",
+	        value: function onClickRemove() {
+	            var action = '/services/serviceEventPredictions/' + this.props.serviceEvent.id;
+	            var self = this;
 	            _utils2.default.formSubmit(action, 'DELETE', {}, function (data) {
 	                M.toast({ html: "<div>Service event prediction removed successfully!</div>" });
 	                self.props.reloadServiceEvents();
 	            });
-	        };
-	
-	        return _this;
-	    }
-	
-	    _createClass(ServiceEventPredictionCard, [{
-	        key: 'render',
+	        }
+	    }, {
+	        key: "render",
 	        value: function render() {
 	            var startDate = new Date(this.props.serviceEvent.startDate).toLocaleString();
 	            var endDate = new Date(this.props.serviceEvent.endDate).toLocaleString();
-	            return React.createElement(
-	                'div',
-	                { className: 'row' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'col s12' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'card' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'card-content' },
-	                            React.createElement(
-	                                'div',
-	                                { className: 'right-align' },
-	                                React.createElement(
-	                                    'div',
-	                                    { className: 'row' },
-	                                    React.createElement(
-	                                        'div',
-	                                        { className: 'col s12' },
-	                                        React.createElement(
-	                                            'button',
-	                                            { className: 'waves-effect waves-light btn-small red darken-4', onClick: this.onClickRemove },
-	                                            'Remove'
+	            return _react2.default.createElement(
+	                "div",
+	                { className: "row" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "col s12" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "card" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "card-content" },
+	                            _react2.default.createElement(
+	                                "div",
+	                                { className: "right-align" },
+	                                _react2.default.createElement(
+	                                    "div",
+	                                    { className: "row" },
+	                                    _react2.default.createElement(
+	                                        "div",
+	                                        { className: "col s12" },
+	                                        _react2.default.createElement(
+	                                            "button",
+	                                            { className: "waves-effect waves-light btn-small red darken-4", onClick: this.onClickRemove },
+	                                            "Remove"
 	                                        )
 	                                    )
 	                                )
 	                            ),
-	                            React.createElement(_globalComponents.CardItem, { label: 'Description', value: this.props.serviceEvent.description }),
-	                            React.createElement(_globalComponents.CardItem, { label: 'Service config', value: this.props.serviceEvent.service.serviceName }),
-	                            React.createElement(_globalComponents.CardItem, { label: 'Start date', value: startDate }),
-	                            React.createElement(_globalComponents.CardItem, { label: 'End date', value: endDate }),
-	                            React.createElement(_globalComponents.CardItem, { label: 'Minimum replics', value: this.props.serviceEvent.minReplics })
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "Description", value: this.props.serviceEvent.description }),
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "Service config", value: this.props.serviceEvent.service.serviceName }),
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "Start date", value: startDate }),
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "End date", value: endDate }),
+	                            _react2.default.createElement(_globalComponents.CardItem, { label: "Minimum replics", value: this.props.serviceEvent.minReplics })
 	                        )
 	                    )
 	                )
@@ -23376,68 +23501,70 @@
 	    }]);
 	
 	    return ServiceEventPredictionCard;
-	}(Component);
+	}(_react2.default.Component);
 	
-	var ServiceEventPredictions = exports.ServiceEventPredictions = function (_Component2) {
-	    _inherits(ServiceEventPredictions, _Component2);
+	var ServiceEventPredictions = exports.ServiceEventPredictions = function (_React$Component2) {
+	    _inherits(ServiceEventPredictions, _React$Component2);
 	
 	    function ServiceEventPredictions(props) {
 	        _classCallCheck(this, ServiceEventPredictions);
 	
 	        var _this2 = _possibleConstructorReturn(this, (ServiceEventPredictions.__proto__ || Object.getPrototypeOf(ServiceEventPredictions)).call(this, props));
 	
-	        _this2.loadServiceEventPredictions = function () {
-	            _this2.setState({ loading: true });
-	            var self = _this2;
-	            _utils2.default.ajaxGet('/services/serviceEventPredictions', function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
-	        _this2.renderServiceEvents = function () {
-	            var serviceEventsNodes = void 0;
-	            var self = _this2;
-	            if (_this2.state.data) {
-	                serviceEventsNodes = _this2.state.data.map(function (serviceEvent, index) {
-	                    return React.createElement(ServiceEventPredictionCard, { key: serviceEvent.id, serviceEvent: serviceEvent, reloadServiceEvents: self.loadServiceEventPredictions });
-	                });
-	            }
-	            return serviceEventsNodes;
-	        };
-	
 	        _this2.state = { data: [], loading: false, showAdd: true };
 	        return _this2;
 	    }
 	
 	    _createClass(ServiceEventPredictions, [{
-	        key: 'componentDidMount',
+	        key: "componentDidMount",
 	        value: function componentDidMount() {
 	            this.loadServiceEventPredictions();
 	            var instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
 	            this.setState({ tooltipInstances: instances });
 	        }
 	    }, {
-	        key: 'componentWillUnmount',
+	        key: "componentWillUnmount",
 	        value: function componentWillUnmount() {
 	            this.state.tooltipInstances[0].destroy();
 	        }
 	    }, {
-	        key: 'render',
+	        key: "loadServiceEventPredictions",
+	        value: function loadServiceEventPredictions() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/services/serviceEventPredictions', function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: "renderServiceEvents",
+	        value: function renderServiceEvents() {
+	            var serviceEventsNodes = void 0;
+	            var self = this;
+	            if (this.state.data) {
+	                serviceEventsNodes = this.state.data.map(function (serviceEvent, index) {
+	                    return _react2.default.createElement(ServiceEventPredictionCard, { key: serviceEvent.id, serviceEvent: serviceEvent, reloadServiceEvents: self.loadServiceEventPredictions });
+	                });
+	            }
+	            return serviceEventsNodes;
+	        }
+	    }, {
+	        key: "render",
 	        value: function render() {
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
-	                { title: 'Service event predictions' },
+	                { title: "Service event predictions" },
 	                this.renderServiceEvents(),
-	                React.createElement(
-	                    'div',
-	                    { className: 'fixed-action-btn tooltipped', 'data-position': 'left', 'data-tooltip': 'Add service event prediction' },
-	                    React.createElement(
-	                        Link,
-	                        { className: 'waves-effect waves-light btn-floating btn-large grey darken-4', to: '/ui/rules/serviceeventpredictions/detail' },
-	                        React.createElement(
-	                            'i',
-	                            { className: 'large material-icons' },
-	                            'add'
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "fixed-action-btn tooltipped", "data-position": "left", "data-tooltip": "Add service event prediction" },
+	                    _react2.default.createElement(
+	                        _reactRouterDom.Link,
+	                        { className: "waves-effect waves-light btn-floating btn-large grey darken-4", to: "/ui/rules/serviceeventpredictions/detail" },
+	                        _react2.default.createElement(
+	                            "i",
+	                            { className: "large material-icons" },
+	                            "add"
 	                        )
 	                    )
 	                )
@@ -23446,72 +23573,20 @@
 	    }]);
 	
 	    return ServiceEventPredictions;
-	}(Component);
+	}(_react2.default.Component);
 	
-	var ServiceEventPredictionDetail = exports.ServiceEventPredictionDetail = function (_Component3) {
-	    _inherits(ServiceEventPredictionDetail, _Component3);
+	var ServiceEventPredictionDetail = exports.ServiceEventPredictionDetail = function (_React$Component3) {
+	    _inherits(ServiceEventPredictionDetail, _React$Component3);
 	
 	    function ServiceEventPredictionDetail(props) {
 	        _classCallCheck(this, ServiceEventPredictionDetail);
 	
 	        var _this3 = _possibleConstructorReturn(this, (ServiceEventPredictionDetail.__proto__ || Object.getPrototypeOf(ServiceEventPredictionDetail)).call(this, props));
 	
-	        _this3.loadServices = function () {
-	            _this3.setState({ loading: true });
-	            var self = _this3;
-	            var url = '/services';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ services: data, loading: false });
-	            });
-	        };
-	
-	        _this3.loadServiceEventPrediction = function () {
-	            if (_this3.state.id !== 0) {
-	                _this3.setState({ loading: true });
-	                var self = _this3;
-	                var url = '/services/serviceEventPredictions/' + _this3.state.id;
-	                _utils2.default.ajaxGet(url, function (data) {
-	                    var loadValues = {
-	                        serviceId: data.service.id, description: data.description, minReplics: data.minReplics,
-	                        startDate: data.startDate, startTime: data.startTime, endDate: data.endDate, endTime: data.endTime
-	                    };
-	                    self.setState({ values: loadValues, loading: false });
-	                });
-	            }
-	        };
-	
-	        _this3.renderServicesSelect = function () {
-	            var servicesNodes = void 0;
-	            if (_this3.state.services) {
-	                servicesNodes = _this3.state.services.map(function (service) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: service.id, value: service.id },
-	                        service.serviceName
-	                    );
-	                });
-	                return servicesNodes;
-	            }
-	        };
-	
 	        _this3.updateStateFromPicker = function (name, value) {
 	            var newValues = _this3.state.values;
 	            newValues[name] = value;
 	            _this3.setState({ values: newValues });
-	        };
-	
-	        _this3.addEventListenersPickers = function () {
-	            var self = _this3;
-	            var elems = $(document).find('.datepicker,.timepicker');
-	            for (var i = 0; i < elems.length; i++) {
-	                var input = elems[i];
-	                $(input).change(function (e) {
-	                    var currInput = $(e.target);
-	                    var val = currInput.val();
-	                    var inputName = currInput.attr("name");
-	                    self.updateStateFromPicker(inputName, val);
-	                });
-	            }
 	        };
 	
 	        _this3.onSubmitForm = function (event) {
@@ -23533,103 +23608,6 @@
 	            _this3.setState({ values: newValues });
 	        };
 	
-	        _this3.renderForm = function () {
-	            var servicesSelect = _this3.renderServicesSelect();
-	            return React.createElement(
-	                'form',
-	                { id: 'form-service', onSubmit: _this3.onSubmitForm },
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this3.state.values.description, onChange: _this3.onInputChange, type: 'text', name: 'description', id: 'description', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'description' },
-	                        'Description'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement(
-	                        'select',
-	                        { value: _this3.state.values.serviceId, onChange: _this3.onInputChange, name: 'serviceId', id: 'serviceId' },
-	                        React.createElement(
-	                            'option',
-	                            { value: '', disabled: 'disabled' },
-	                            'Choose service'
-	                        ),
-	                        servicesSelect
-	                    ),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'service' },
-	                        'Service'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s6' },
-	                    React.createElement('input', { className: 'datepicker', defaultValue: _this3.state.values.startDate, type: 'text', name: 'startDate', id: 'startDate', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'startDate' },
-	                        'Start date'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s6' },
-	                    React.createElement('input', { className: 'timepicker', defaultValue: _this3.state.values.startTime, type: 'text', name: 'startTime', id: 'startTime', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'startTime' },
-	                        'Start time'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s6' },
-	                    React.createElement('input', { className: 'datepicker', defaultValue: _this3.state.values.endDate, type: 'text', name: 'endDate', id: 'endDate', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'endDate' },
-	                        'End date'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s6' },
-	                    React.createElement('input', { className: 'timepicker', defaultValue: _this3.state.values.endTime, type: 'text', name: 'endTime', id: 'endTime', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'endTime' },
-	                        'End time'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this3.state.values.minReplics, onChange: _this3.onInputChange, type: 'number', name: 'minReplics', id: 'minReplics', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'minReplics' },
-	                        'Minimum replics'
-	                    )
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
-	                    'Add',
-	                    React.createElement(
-	                        'i',
-	                        { className: 'material-icons right' },
-	                        'send'
-	                    )
-	                )
-	            );
-	        };
-	
 	        var defaultId = 0;
 	        if (props.match.params.id) {
 	            defaultId = props.match.params.id;
@@ -23644,7 +23622,7 @@
 	    }
 	
 	    _createClass(ServiceEventPredictionDetail, [{
-	        key: 'componentDidMount',
+	        key: "componentDidMount",
 	        value: function componentDidMount() {
 	            this.loadServices();
 	            this.loadServiceEventPrediction();
@@ -23661,32 +23639,186 @@
 	            this.addEventListenersPickers();
 	        }
 	    }, {
-	        key: 'componentDidUpdate',
+	        key: "componentDidUpdate",
 	        value: function componentDidUpdate() {
 	            var elems = document.querySelectorAll('select');
 	            M.FormSelect.init(elems);
 	        }
 	    }, {
-	        key: 'render',
+	        key: "loadServices",
+	        value: function loadServices() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/services';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ services: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: "loadServiceEventPrediction",
+	        value: function loadServiceEventPrediction() {
+	            if (this.state.id !== 0) {
+	                this.setState({ loading: true });
+	                var self = this;
+	                var url = '/services/serviceEventPredictions/' + this.state.id;
+	                _utils2.default.ajaxGet(url, function (data) {
+	                    var loadValues = {
+	                        serviceId: data.service.id, description: data.description, minReplics: data.minReplics,
+	                        startDate: data.startDate, startTime: data.startTime, endDate: data.endDate, endTime: data.endTime
+	                    };
+	                    self.setState({ values: loadValues, loading: false });
+	                });
+	            }
+	        }
+	    }, {
+	        key: "renderServicesSelect",
+	        value: function renderServicesSelect() {
+	            var servicesNodes = void 0;
+	            if (this.state.services) {
+	                servicesNodes = this.state.services.map(function (service) {
+	                    return _react2.default.createElement(
+	                        "option",
+	                        { key: service.id, value: service.id },
+	                        service.serviceName
+	                    );
+	                });
+	                return servicesNodes;
+	            }
+	        }
+	    }, {
+	        key: "addEventListenersPickers",
+	        value: function addEventListenersPickers() {
+	            var self = this;
+	            var elems = (0, _jquery2.default)(document).find('.datepicker,.timepicker');
+	            for (var i = 0; i < elems.length; i++) {
+	                var input = elems[i];
+	                (0, _jquery2.default)(input).change(function (e) {
+	                    var currInput = (0, _jquery2.default)(e.target);
+	                    var val = currInput.val();
+	                    var inputName = currInput.attr("name");
+	                    self.updateStateFromPicker(inputName, val);
+	                });
+	            }
+	        }
+	    }, {
+	        key: "renderForm",
+	        value: function renderForm() {
+	            var servicesSelect = this.renderServicesSelect();
+	            return _react2.default.createElement(
+	                "form",
+	                { id: "form-service", onSubmit: this.onSubmitForm },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s12" },
+	                    _react2.default.createElement("input", { value: this.state.values.description, onChange: this.onInputChange, type: "text", name: "description", id: "description", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "description" },
+	                        "Description"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s12" },
+	                    _react2.default.createElement(
+	                        "select",
+	                        { value: this.state.values.serviceId, onChange: this.onInputChange, name: "serviceId", id: "serviceId" },
+	                        _react2.default.createElement(
+	                            "option",
+	                            { value: "", disabled: "disabled" },
+	                            "Choose service"
+	                        ),
+	                        servicesSelect
+	                    ),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "service" },
+	                        "Service"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s6" },
+	                    _react2.default.createElement("input", { className: "datepicker", defaultValue: this.state.values.startDate, type: "text", name: "startDate", id: "startDate", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "startDate" },
+	                        "Start date"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s6" },
+	                    _react2.default.createElement("input", { className: "timepicker", defaultValue: this.state.values.startTime, type: "text", name: "startTime", id: "startTime", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "startTime" },
+	                        "Start time"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s6" },
+	                    _react2.default.createElement("input", { className: "datepicker", defaultValue: this.state.values.endDate, type: "text", name: "endDate", id: "endDate", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "endDate" },
+	                        "End date"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s6" },
+	                    _react2.default.createElement("input", { className: "timepicker", defaultValue: this.state.values.endTime, type: "text", name: "endTime", id: "endTime", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "endTime" },
+	                        "End time"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field col s12" },
+	                    _react2.default.createElement("input", { value: this.state.values.minReplics, onChange: this.onInputChange, type: "number", name: "minReplics", id: "minReplics", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "minReplics" },
+	                        "Minimum replics"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "button",
+	                    { className: "btn waves-effect waves-light", type: "submit", name: "action" },
+	                    "Add",
+	                    _react2.default.createElement(
+	                        "i",
+	                        { className: "material-icons right" },
+	                        "send"
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: "render",
 	        value: function render() {
 	            if (this.state.formSubmit) {
-	                return React.createElement(Redirect, { to: '/ui/rules/serviceEventPredictions' });
+	                return _react2.default.createElement(_reactRouterDom.Redirect, { to: "/ui/rules/serviceEventPredictions" });
 	            }
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
-	                { title: 'Service event prediction detail', breadcrumbs: this.state.breadcrumbs },
-	                React.createElement(
-	                    'div',
-	                    { className: 'row' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'col s12' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'card' },
-	                            React.createElement(
-	                                'div',
-	                                { className: 'card-content' },
+	                { title: "Service event prediction detail", breadcrumbs: this.state.breadcrumbs },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "row" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "col s12" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "card" },
+	                            _react2.default.createElement(
+	                                "div",
+	                                { className: "card-content" },
 	                                this.renderForm()
 	                            )
 	                        )
@@ -23697,7 +23829,7 @@
 	    }]);
 	
 	    return ServiceEventPredictionDetail;
-	}(Component);
+	}(_react2.default.Component);
 
 /***/ }),
 /* 64 */
@@ -23761,25 +23893,24 @@
 	    function NodeCard(props) {
 	        _classCallCheck(this, NodeCard);
 	
-	        var _this = _possibleConstructorReturn(this, (NodeCard.__proto__ || Object.getPrototypeOf(NodeCard)).call(this, props));
+	        return _possibleConstructorReturn(this, (NodeCard.__proto__ || Object.getPrototypeOf(NodeCard)).call(this, props));
+	    }
 	
-	        _this.onClickStop = function () {
+	    _createClass(NodeCard, [{
+	        key: 'onClickStop',
+	        value: function onClickStop() {
 	            var action = '/api/nodes';
 	            var dataObject = {
-	                hostname: _this.props.node.hostname
+	                hostname: this.props.node.hostname
 	            };
 	            var dataToSend = JSON.stringify(dataObject);
-	            var self = _this;
+	            var self = this;
 	            _utils2.default.formSubmit(action, 'DELETE', dataToSend, function (data) {
 	                M.toast({ html: "<div>Node removed successfully!</div>" });
 	                self.props.reloadNodes();
 	            });
-	        };
-	
-	        return _this;
-	    }
-	
-	    _createClass(NodeCard, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return React.createElement(
@@ -23835,14 +23966,6 @@
 	
 	        var _this2 = _possibleConstructorReturn(this, (Nodes.__proto__ || Object.getPrototypeOf(Nodes)).call(this, props));
 	
-	        _this2.loadNodes = function () {
-	            _this2.setState({ loading: true });
-	            var self = _this2;
-	            _utils2.default.ajaxGet('/nodes', function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
 	        _this2.state = { data: [], loading: false };
 	        return _this2;
 	    }
@@ -23858,6 +23981,15 @@
 	        key: 'componentWillUnmount',
 	        value: function componentWillUnmount() {
 	            this.state.tooltipInstances[0].destroy();
+	        }
+	    }, {
+	        key: 'loadNodes',
+	        value: function loadNodes() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/nodes', function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
 	        }
 	    }, {
 	        key: 'render',
@@ -23901,28 +24033,6 @@
 	
 	        var _this3 = _possibleConstructorReturn(this, (AddNode.__proto__ || Object.getPrototypeOf(AddNode)).call(this, props));
 	
-	        _this3.loadRegions = function () {
-	            _this3.setState({ loading: true });
-	            var self = _this3;
-	            _utils2.default.ajaxGet('/regions', function (data) {
-	                self.setState({ availableRegions: data, loading: false });
-	            });
-	        };
-	
-	        _this3.renderRegionsSelect = function () {
-	            var regions = void 0;
-	            if (_this3.state.availableRegions) {
-	                regions = _this3.state.availableRegions.map(function (region) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: region.regionName, value: region.regionName },
-	                        region.regionName + ' (' + region.regionDescription + ')'
-	                    );
-	                });
-	                return regions;
-	            }
-	        };
-	
 	        _this3.onSubmitForm = function (event) {
 	            event.preventDefault();
 	            var formAction = '/nodes';
@@ -23933,73 +24043,6 @@
 	                var nodes = data.toString();
 	                M.toast({ html: "<div>New nodes added successfully!</br>Nodes: " + nodes + "</div>" });
 	            });
-	        };
-	
-	        _this3.renderForm = function () {
-	            var regionSelect = _this3.renderRegionsSelect();
-	            return React.createElement(
-	                'form',
-	                { id: 'form-node', onSubmit: _this3.onSubmitForm },
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement(
-	                        'select',
-	                        { defaultValue: _this3.state.values.region, name: 'region', id: 'region' },
-	                        React.createElement(
-	                            'option',
-	                            { value: '', disabled: 'disabled' },
-	                            'Choose region'
-	                        ),
-	                        regionSelect
-	                    ),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'region' },
-	                        'Region'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { defaultValue: _this3.state.values.country, type: 'text', name: 'country', id: 'country', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'country' },
-	                        'Country'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { defaultValue: _this3.state.values.city, type: 'text', name: 'city', id: 'city', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'city' },
-	                        'City'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { defaultValue: _this3.state.values.quantity, type: 'number', name: 'quantity', id: 'quantity', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: 'quantity' },
-	                        'Quantity'
-	                    )
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
-	                    'Add',
-	                    React.createElement(
-	                        'i',
-	                        { className: 'material-icons right' },
-	                        'send'
-	                    )
-	                )
-	            );
 	        };
 	
 	        var defaultValues = {
@@ -24019,6 +24062,98 @@
 	        key: 'componentDidUpdate',
 	        value: function componentDidUpdate() {
 	            M.FormSelect.init(document.querySelectorAll('select'));
+	        }
+	    }, {
+	        key: 'loadRegions',
+	        value: function loadRegions() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/regions', function (data) {
+	                self.setState({ availableRegions: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderRegionsSelect',
+	        value: function renderRegionsSelect() {
+	            var regions = void 0;
+	            if (this.state.availableRegions) {
+	                regions = this.state.availableRegions.map(function (region) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: region.regionName, value: region.regionName },
+	                        region.regionName + ' (' + region.regionDescription + ')'
+	                    );
+	                });
+	                return regions;
+	            }
+	        }
+	    }, {
+	        key: 'renderForm',
+	        value: function renderForm() {
+	            var regionSelect = this.renderRegionsSelect();
+	            return React.createElement(
+	                'form',
+	                { id: 'form-node', onSubmit: this.onSubmitForm },
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field col s12' },
+	                    React.createElement(
+	                        'select',
+	                        { defaultValue: this.state.values.region, name: 'region', id: 'region' },
+	                        React.createElement(
+	                            'option',
+	                            { value: '', disabled: 'disabled' },
+	                            'Choose region'
+	                        ),
+	                        regionSelect
+	                    ),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: 'region' },
+	                        'Region'
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field col s12' },
+	                    React.createElement('input', { defaultValue: this.state.values.country, type: 'text', name: 'country', id: 'country', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: 'country' },
+	                        'Country'
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field col s12' },
+	                    React.createElement('input', { defaultValue: this.state.values.city, type: 'text', name: 'city', id: 'city', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: 'city' },
+	                        'City'
+	                    )
+	                ),
+	                React.createElement(
+	                    'div',
+	                    { className: 'input-field col s12' },
+	                    React.createElement('input', { defaultValue: this.state.values.quantity, type: 'number', name: 'quantity', id: 'quantity', autoComplete: 'off' }),
+	                    React.createElement(
+	                        'label',
+	                        { htmlFor: 'quantity' },
+	                        'Quantity'
+	                    )
+	                ),
+	                React.createElement(
+	                    'button',
+	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
+	                    'Add',
+	                    React.createElement(
+	                        'i',
+	                        { className: 'material-icons right' },
+	                        'send'
+	                    )
+	                )
+	            );
 	        }
 	    }, {
 	        key: 'render',
@@ -24118,8 +24253,15 @@
 	
 	        var _this = _possibleConstructorReturn(this, (SimulatedMetricsLandingPage.__proto__ || Object.getPrototypeOf(SimulatedMetricsLandingPage)).call(this, props));
 	
-	        _this.renderLinks = function () {
-	            return _this.state.links.map(function (link) {
+	        var simulatedMetricsLinks = [{ name: 'Service simulated metrics', link: '/ui/simulatedMetrics/services' }, { name: 'Container simulated metrics', link: '/ui/simulatedMetrics/containers' }, { name: 'Default host simulated metrics', link: '/ui/simulatedMetrics/defaultHosts' }, { name: 'Specific host simulated metrics', link: '/ui/simulatedMetrics/specificHosts' }];
+	        _this.state = { links: simulatedMetricsLinks, loading: false };
+	        return _this;
+	    }
+	
+	    _createClass(SimulatedMetricsLandingPage, [{
+	        key: 'renderLinks',
+	        value: function renderLinks() {
+	            return this.state.links.map(function (link) {
 	                return React.createElement(
 	                    'li',
 	                    { key: link.name, className: 'collection-item' },
@@ -24139,14 +24281,8 @@
 	                    )
 	                );
 	            });
-	        };
-	
-	        var simulatedMetricsLinks = [{ name: 'Service simulated metrics', link: '/ui/simulatedMetrics/services' }, { name: 'Container simulated metrics', link: '/ui/simulatedMetrics/containers' }, { name: 'Default host simulated metrics', link: '/ui/simulatedMetrics/defaultHosts' }, { name: 'Specific host simulated metrics', link: '/ui/simulatedMetrics/specificHosts' }];
-	        _this.state = { links: simulatedMetricsLinks, loading: false };
-	        return _this;
-	    }
-	
-	    _createClass(SimulatedMetricsLandingPage, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return React.createElement(
@@ -24178,21 +24314,20 @@
 	    function ServiceSimulatedMetricsCard(props) {
 	        _classCallCheck(this, ServiceSimulatedMetricsCard);
 	
-	        var _this2 = _possibleConstructorReturn(this, (ServiceSimulatedMetricsCard.__proto__ || Object.getPrototypeOf(ServiceSimulatedMetricsCard)).call(this, props));
+	        return _possibleConstructorReturn(this, (ServiceSimulatedMetricsCard.__proto__ || Object.getPrototypeOf(ServiceSimulatedMetricsCard)).call(this, props));
+	    }
 	
-	        _this2.onClickRemove = function () {
-	            var action = '/simulatedMetrics/services/' + _this2.props.simulatedMetric.id;
-	            var self = _this2;
+	    _createClass(ServiceSimulatedMetricsCard, [{
+	        key: 'onClickRemove',
+	        value: function onClickRemove() {
+	            var action = '/simulatedMetrics/services/' + this.props.simulatedMetric.id;
+	            var self = this;
 	            _utils2.default.formSubmit(action, 'DELETE', {}, function (data) {
 	                M.toast({ html: "<div>Service simulated metric removed successfully!</div>" });
 	                self.props.reloadSimulatedMetrics();
 	            });
-	        };
-	
-	        return _this2;
-	    }
-	
-	    _createClass(ServiceSimulatedMetricsCard, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var style = { marginLeft: '10px' };
@@ -24254,25 +24389,6 @@
 	
 	        var _this3 = _possibleConstructorReturn(this, (ServiceSimulatedMetrics.__proto__ || Object.getPrototypeOf(ServiceSimulatedMetrics)).call(this, props));
 	
-	        _this3.loadSimulatedMetrics = function () {
-	            _this3.setState({ loading: true });
-	            var self = _this3;
-	            _utils2.default.ajaxGet('/simulatedMetrics/services', function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
-	        _this3.renderSimulatedMetrics = function () {
-	            var simulatedMetricsNodes = void 0;
-	            var self = _this3;
-	            if (_this3.state.data) {
-	                simulatedMetricsNodes = _this3.state.data.map(function (simulatedMetric, index) {
-	                    return React.createElement(ServiceSimulatedMetricsCard, { key: simulatedMetric.id, simulatedMetric: simulatedMetric, reloadSimulatedMetrics: self.loadSimulatedMetrics });
-	                });
-	            }
-	            return simulatedMetricsNodes;
-	        };
-	
 	        _this3.state = { data: [], loading: false, showAdd: true };
 	        return _this3;
 	    }
@@ -24288,6 +24404,27 @@
 	        key: 'componentWillUnmount',
 	        value: function componentWillUnmount() {
 	            this.state.tooltipInstances[0].destroy();
+	        }
+	    }, {
+	        key: 'loadSimulatedMetrics',
+	        value: function loadSimulatedMetrics() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/simulatedMetrics/services', function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderSimulatedMetrics',
+	        value: function renderSimulatedMetrics() {
+	            var simulatedMetricsNodes = void 0;
+	            var self = this;
+	            if (this.state.data) {
+	                simulatedMetricsNodes = this.state.data.map(function (simulatedMetric, index) {
+	                    return React.createElement(ServiceSimulatedMetricsCard, { key: simulatedMetric.id, simulatedMetric: simulatedMetric, reloadSimulatedMetrics: self.loadSimulatedMetrics });
+	                });
+	            }
+	            return simulatedMetricsNodes;
 	        }
 	    }, {
 	        key: 'render',
@@ -24324,63 +24461,6 @@
 	
 	        var _this4 = _possibleConstructorReturn(this, (ServiceSimulatedMetricsDetail.__proto__ || Object.getPrototypeOf(ServiceSimulatedMetricsDetail)).call(this, props));
 	
-	        _this4.loadServices = function () {
-	            _this4.setState({ loading: true });
-	            var self = _this4;
-	            var url = '/services';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ services: data, loading: false });
-	            });
-	        };
-	
-	        _this4.loadFields = function () {
-	            _this4.setState({ loading: true });
-	            var self = _this4;
-	            var url = '/rules/fields';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ fields: data, loading: false });
-	            });
-	        };
-	
-	        _this4.loadServiceSimulatedMetrics = function () {
-	            if (_this4.state.id !== 0) {
-	                _this4.setState({ loading: true });
-	                var self = _this4;
-	                var url = '/simulatedMetrics/services/' + _this4.state.id;
-	                _utils2.default.ajaxGet(url, function (data) {
-	                    self.setState({ values: data, loading: false });
-	                });
-	            }
-	        };
-	
-	        _this4.renderServicesSelect = function () {
-	            var servicesNodes = void 0;
-	            if (_this4.state.services) {
-	                servicesNodes = pt.unl.fct.microserviceManagement.managerMaster.entities.service.map(function (service) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: service.id, value: service.serviceName },
-	                        service.serviceName
-	                    );
-	                });
-	                return servicesNodes;
-	            }
-	        };
-	
-	        _this4.renderFieldsSelect = function () {
-	            var fieldsNodes = void 0;
-	            if (_this4.state.fields) {
-	                fieldsNodes = _this4.state.fields.map(function (field) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: field.id, value: field.fieldName },
-	                        field.fieldName
-	                    );
-	                });
-	                return fieldsNodes;
-	            }
-	        };
-	
 	        _this4.onSubmitForm = function (event) {
 	            event.preventDefault();
 	            var formId = "form-service";
@@ -24400,18 +24480,109 @@
 	            _this4.setState({ values: newValues });
 	        };
 	
-	        _this4.renderForm = function () {
-	            var servicesSelect = _this4.renderServicesSelect();
-	            var fieldsSelect = _this4.renderFieldsSelect();
+	        var defaultId = 0;
+	        if (props.match.params.id) {
+	            defaultId = props.match.params.id;
+	        }
+	        var defaultValues = {
+	            serviceName: '', field: '', minValue: '', maxValue: '', override: ''
+	        };
+	        var thisBreadcrumbs = [];
+	        _this4.state = { id: defaultId, values: defaultValues, services: [], fields: [], loading: false, formSubmit: false,
+	            breadcrumbs: thisBreadcrumbs };
+	        return _this4;
+	    }
+	
+	    _createClass(ServiceSimulatedMetricsDetail, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            this.loadServices();
+	            this.loadFields();
+	            this.loadServiceSimulatedMetrics();
+	        }
+	    }, {
+	        key: 'componentDidUpdate',
+	        value: function componentDidUpdate() {
+	            M.updateTextFields();
+	            var elems = document.querySelectorAll('select');
+	            M.FormSelect.init(elems);
+	        }
+	    }, {
+	        key: 'loadServices',
+	        value: function loadServices() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/services';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ services: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadFields',
+	        value: function loadFields() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/rules/fields';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ fields: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadServiceSimulatedMetrics',
+	        value: function loadServiceSimulatedMetrics() {
+	            if (this.state.id !== 0) {
+	                this.setState({ loading: true });
+	                var self = this;
+	                var url = '/simulatedMetrics/services/' + this.state.id;
+	                _utils2.default.ajaxGet(url, function (data) {
+	                    self.setState({ values: data, loading: false });
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'renderServicesSelect',
+	        value: function renderServicesSelect() {
+	            var servicesNodes = void 0;
+	            if (this.state.services) {
+	                servicesNodes = pt.unl.fct.microserviceManagement.managerMaster.entities.service.map(function (service) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: service.id, value: service.serviceName },
+	                        service.serviceName
+	                    );
+	                });
+	                return servicesNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderFieldsSelect',
+	        value: function renderFieldsSelect() {
+	            var fieldsNodes = void 0;
+	            if (this.state.fields) {
+	                fieldsNodes = this.state.fields.map(function (field) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: field.id, value: field.fieldName },
+	                        field.fieldName
+	                    );
+	                });
+	                return fieldsNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderForm',
+	        value: function renderForm() {
+	            var servicesSelect = this.renderServicesSelect();
+	            var fieldsSelect = this.renderFieldsSelect();
 	            return React.createElement(
 	                'form',
-	                { id: 'form-service', onSubmit: _this4.onSubmitForm },
+	                { id: 'form-service', onSubmit: this.onSubmitForm },
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this4.state.values.serviceName, onChange: _this4.onInputChange, name: 'serviceName', id: 'serviceName' },
+	                        { value: this.state.values.serviceName, onChange: this.onInputChange, name: 'serviceName', id: 'serviceName' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -24430,7 +24601,7 @@
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this4.state.values.field, onChange: _this4.onInputChange, name: 'field', id: 'field' },
+	                        { value: this.state.values.field, onChange: this.onInputChange, name: 'field', id: 'field' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -24447,7 +24618,7 @@
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this4.state.values.minValue, onChange: _this4.onInputChange, type: 'number', name: 'minValue', id: 'minValue', autoComplete: 'off' }),
+	                    React.createElement('input', { value: this.state.values.minValue, onChange: this.onInputChange, type: 'number', name: 'minValue', id: 'minValue', autoComplete: 'off' }),
 	                    React.createElement(
 	                        'label',
 	                        { htmlFor: 'minValue' },
@@ -24457,7 +24628,7 @@
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this4.state.values.maxValue, onChange: _this4.onInputChange, type: 'number', name: 'maxValue', id: 'maxValue', autoComplete: 'off' }),
+	                    React.createElement('input', { value: this.state.values.maxValue, onChange: this.onInputChange, type: 'number', name: 'maxValue', id: 'maxValue', autoComplete: 'off' }),
 	                    React.createElement(
 	                        'label',
 	                        { htmlFor: 'maxValue' },
@@ -24469,7 +24640,7 @@
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this4.state.values.override, onChange: _this4.onInputChange, name: 'override', id: 'override' },
+	                        { value: this.state.values.override, onChange: this.onInputChange, name: 'override', id: 'override' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -24503,34 +24674,6 @@
 	                    )
 	                )
 	            );
-	        };
-	
-	        var defaultId = 0;
-	        if (props.match.params.id) {
-	            defaultId = props.match.params.id;
-	        }
-	        var defaultValues = {
-	            serviceName: '', field: '', minValue: '', maxValue: '', override: ''
-	        };
-	        var thisBreadcrumbs = [];
-	        _this4.state = { id: defaultId, values: defaultValues, services: [], fields: [], loading: false, formSubmit: false,
-	            breadcrumbs: thisBreadcrumbs };
-	        return _this4;
-	    }
-	
-	    _createClass(ServiceSimulatedMetricsDetail, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            this.loadServices();
-	            this.loadFields();
-	            this.loadServiceSimulatedMetrics();
-	        }
-	    }, {
-	        key: 'componentDidUpdate',
-	        value: function componentDidUpdate() {
-	            M.updateTextFields();
-	            var elems = document.querySelectorAll('select');
-	            M.FormSelect.init(elems);
 	        }
 	    }, {
 	        key: 'render',
@@ -24571,21 +24714,20 @@
 	    function ContainerSimulatedMetricsCard(props) {
 	        _classCallCheck(this, ContainerSimulatedMetricsCard);
 	
-	        var _this5 = _possibleConstructorReturn(this, (ContainerSimulatedMetricsCard.__proto__ || Object.getPrototypeOf(ContainerSimulatedMetricsCard)).call(this, props));
+	        return _possibleConstructorReturn(this, (ContainerSimulatedMetricsCard.__proto__ || Object.getPrototypeOf(ContainerSimulatedMetricsCard)).call(this, props));
+	    }
 	
-	        _this5.onClickRemove = function () {
-	            var action = '/simulatedMetrics/containers/' + _this5.props.simulatedMetric.id;
-	            var self = _this5;
+	    _createClass(ContainerSimulatedMetricsCard, [{
+	        key: 'onClickRemove',
+	        value: function onClickRemove() {
+	            var action = '/simulatedMetrics/containers/' + this.props.simulatedMetric.id;
+	            var self = this;
 	            _utils2.default.formSubmit(action, 'DELETE', {}, function (data) {
 	                M.toast({ html: "<div>Container simulated metric removed successfully!</div>" });
 	                self.props.reloadSimulatedMetrics();
 	            });
-	        };
-	
-	        return _this5;
-	    }
-	
-	    _createClass(ContainerSimulatedMetricsCard, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var style = { marginLeft: '10px' };
@@ -24647,25 +24789,6 @@
 	
 	        var _this6 = _possibleConstructorReturn(this, (ContainerSimulatedMetrics.__proto__ || Object.getPrototypeOf(ContainerSimulatedMetrics)).call(this, props));
 	
-	        _this6.loadSimulatedMetrics = function () {
-	            _this6.setState({ loading: true });
-	            var self = _this6;
-	            _utils2.default.ajaxGet('/simulatedMetrics/containers', function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
-	        _this6.renderSimulatedMetrics = function () {
-	            var simulatedMetricsNodes = void 0;
-	            var self = _this6;
-	            if (_this6.state.data) {
-	                simulatedMetricsNodes = _this6.state.data.map(function (simulatedMetric, index) {
-	                    return React.createElement(ContainerSimulatedMetricsCard, { key: simulatedMetric.id, simulatedMetric: simulatedMetric, reloadSimulatedMetrics: self.loadSimulatedMetrics });
-	                });
-	            }
-	            return simulatedMetricsNodes;
-	        };
-	
 	        _this6.state = { data: [], loading: false, showAdd: true };
 	        return _this6;
 	    }
@@ -24681,6 +24804,27 @@
 	        key: 'componentWillUnmount',
 	        value: function componentWillUnmount() {
 	            this.state.tooltipInstances[0].destroy();
+	        }
+	    }, {
+	        key: 'loadSimulatedMetrics',
+	        value: function loadSimulatedMetrics() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/simulatedMetrics/containers', function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderSimulatedMetrics',
+	        value: function renderSimulatedMetrics() {
+	            var simulatedMetricsNodes = void 0;
+	            var self = this;
+	            if (this.state.data) {
+	                simulatedMetricsNodes = this.state.data.map(function (simulatedMetric, index) {
+	                    return React.createElement(ContainerSimulatedMetricsCard, { key: simulatedMetric.id, simulatedMetric: simulatedMetric, reloadSimulatedMetrics: self.loadSimulatedMetrics });
+	                });
+	            }
+	            return simulatedMetricsNodes;
 	        }
 	    }, {
 	        key: 'render',
@@ -24717,63 +24861,6 @@
 	
 	        var _this7 = _possibleConstructorReturn(this, (ContainerSimulatedMetricsDetail.__proto__ || Object.getPrototypeOf(ContainerSimulatedMetricsDetail)).call(this, props));
 	
-	        _this7.loadContainers = function () {
-	            _this7.setState({ loading: true });
-	            var self = _this7;
-	            var url = '/containers';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ containers: data, loading: false });
-	            });
-	        };
-	
-	        _this7.loadFields = function () {
-	            _this7.setState({ loading: true });
-	            var self = _this7;
-	            var url = '/rules/fields';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ fields: data, loading: false });
-	            });
-	        };
-	
-	        _this7.loadContainerSimulatedMetrics = function () {
-	            if (_this7.state.id !== 0) {
-	                _this7.setState({ loading: true });
-	                var self = _this7;
-	                var url = '/simulatedMetrics/containers/' + _this7.state.id;
-	                _utils2.default.ajaxGet(url, function (data) {
-	                    self.setState({ values: data, loading: false });
-	                });
-	            }
-	        };
-	
-	        _this7.renderContainersSelect = function () {
-	            var containersNodes = void 0;
-	            if (_this7.state.containers) {
-	                containersNodes = _this7.state.containers.map(function (container) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: container.id, value: container.id },
-	                        container.names[0]
-	                    );
-	                });
-	                return containersNodes;
-	            }
-	        };
-	
-	        _this7.renderFieldsSelect = function () {
-	            var fieldsNodes = void 0;
-	            if (_this7.state.fields) {
-	                fieldsNodes = _this7.state.fields.map(function (field) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: field.id, value: field.fieldName },
-	                        field.fieldName
-	                    );
-	                });
-	                return fieldsNodes;
-	            }
-	        };
-	
 	        _this7.onSubmitForm = function (event) {
 	            event.preventDefault();
 	            var formId = "form-service";
@@ -24793,18 +24880,108 @@
 	            _this7.setState({ values: newValues });
 	        };
 	
-	        _this7.renderForm = function () {
-	            var containersSelect = _this7.renderContainersSelect();
-	            var fieldsSelect = _this7.renderFieldsSelect();
+	        var defaultId = 0;
+	        if (props.match.params.id) {
+	            defaultId = props.match.params.id;
+	        }
+	        var defaultValues = {
+	            containerId: '', field: '', minValue: '', maxValue: '', override: ''
+	        };
+	        var thisBreadcrumbs = [];
+	        _this7.state = { id: defaultId, values: defaultValues, containers: [], fields: [], loading: false, formSubmit: false, breadcrumbs: thisBreadcrumbs };
+	        return _this7;
+	    }
+	
+	    _createClass(ContainerSimulatedMetricsDetail, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            this.loadContainers();
+	            this.loadFields();
+	            this.loadContainerSimulatedMetrics();
+	        }
+	    }, {
+	        key: 'componentDidUpdate',
+	        value: function componentDidUpdate() {
+	            M.updateTextFields();
+	            var elems = document.querySelectorAll('select');
+	            M.FormSelect.init(elems);
+	        }
+	    }, {
+	        key: 'loadContainers',
+	        value: function loadContainers() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/containers';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ containers: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadFields',
+	        value: function loadFields() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/rules/fields';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ fields: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadContainerSimulatedMetrics',
+	        value: function loadContainerSimulatedMetrics() {
+	            if (this.state.id !== 0) {
+	                this.setState({ loading: true });
+	                var self = this;
+	                var url = '/simulatedMetrics/containers/' + this.state.id;
+	                _utils2.default.ajaxGet(url, function (data) {
+	                    self.setState({ values: data, loading: false });
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'renderContainersSelect',
+	        value: function renderContainersSelect() {
+	            var containersNodes = void 0;
+	            if (this.state.containers) {
+	                containersNodes = this.state.containers.map(function (container) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: container.id, value: container.id },
+	                        container.names[0]
+	                    );
+	                });
+	                return containersNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderFieldsSelect',
+	        value: function renderFieldsSelect() {
+	            var fieldsNodes = void 0;
+	            if (this.state.fields) {
+	                fieldsNodes = this.state.fields.map(function (field) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: field.id, value: field.fieldName },
+	                        field.fieldName
+	                    );
+	                });
+	                return fieldsNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderForm',
+	        value: function renderForm() {
+	            var containersSelect = this.renderContainersSelect();
+	            var fieldsSelect = this.renderFieldsSelect();
 	            return React.createElement(
 	                'form',
-	                { id: 'form-service', onSubmit: _this7.onSubmitForm },
+	                { id: 'form-service', onSubmit: this.onSubmitForm },
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this7.state.values.containerId, onChange: _this7.onInputChange, name: 'containerId', id: 'containerId' },
+	                        { value: this.state.values.containerId, onChange: this.onInputChange, name: 'containerId', id: 'containerId' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -24823,7 +25000,7 @@
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this7.state.values.field, onChange: _this7.onInputChange, name: 'field', id: 'field' },
+	                        { value: this.state.values.field, onChange: this.onInputChange, name: 'field', id: 'field' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -24840,7 +25017,7 @@
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this7.state.values.minValue, onChange: _this7.onInputChange, type: 'number', name: 'minValue', id: 'minValue', autoComplete: 'off' }),
+	                    React.createElement('input', { value: this.state.values.minValue, onChange: this.onInputChange, type: 'number', name: 'minValue', id: 'minValue', autoComplete: 'off' }),
 	                    React.createElement(
 	                        'label',
 	                        { htmlFor: 'minValue' },
@@ -24850,7 +25027,7 @@
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this7.state.values.maxValue, onChange: _this7.onInputChange, type: 'number', name: 'maxValue', id: 'maxValue', autoComplete: 'off' }),
+	                    React.createElement('input', { value: this.state.values.maxValue, onChange: this.onInputChange, type: 'number', name: 'maxValue', id: 'maxValue', autoComplete: 'off' }),
 	                    React.createElement(
 	                        'label',
 	                        { htmlFor: 'maxValue' },
@@ -24862,7 +25039,7 @@
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this7.state.values.override, onChange: _this7.onInputChange, name: 'override', id: 'override' },
+	                        { value: this.state.values.override, onChange: this.onInputChange, name: 'override', id: 'override' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -24896,33 +25073,6 @@
 	                    )
 	                )
 	            );
-	        };
-	
-	        var defaultId = 0;
-	        if (props.match.params.id) {
-	            defaultId = props.match.params.id;
-	        }
-	        var defaultValues = {
-	            containerId: '', field: '', minValue: '', maxValue: '', override: ''
-	        };
-	        var thisBreadcrumbs = [];
-	        _this7.state = { id: defaultId, values: defaultValues, containers: [], fields: [], loading: false, formSubmit: false, breadcrumbs: thisBreadcrumbs };
-	        return _this7;
-	    }
-	
-	    _createClass(ContainerSimulatedMetricsDetail, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            this.loadContainers();
-	            this.loadFields();
-	            this.loadContainerSimulatedMetrics();
-	        }
-	    }, {
-	        key: 'componentDidUpdate',
-	        value: function componentDidUpdate() {
-	            M.updateTextFields();
-	            var elems = document.querySelectorAll('select');
-	            M.FormSelect.init(elems);
 	        }
 	    }, {
 	        key: 'render',
@@ -24963,21 +25113,20 @@
 	    function DefaultHostSimulatedMetricsCard(props) {
 	        _classCallCheck(this, DefaultHostSimulatedMetricsCard);
 	
-	        var _this8 = _possibleConstructorReturn(this, (DefaultHostSimulatedMetricsCard.__proto__ || Object.getPrototypeOf(DefaultHostSimulatedMetricsCard)).call(this, props));
+	        return _possibleConstructorReturn(this, (DefaultHostSimulatedMetricsCard.__proto__ || Object.getPrototypeOf(DefaultHostSimulatedMetricsCard)).call(this, props));
+	    }
 	
-	        _this8.onClickRemove = function () {
-	            var action = '/simulatedMetrics/defaultHosts/' + _this8.props.simulatedMetric.id; //TODO confirm
-	            var self = _this8;
+	    _createClass(DefaultHostSimulatedMetricsCard, [{
+	        key: 'onClickRemove',
+	        value: function onClickRemove() {
+	            var action = '/simulatedMetrics/defaultHosts/' + this.props.simulatedMetric.id; //TODO confirm
+	            var self = this;
 	            _utils2.default.formSubmit(action, 'DELETE', {}, function (data) {
 	                M.toast({ html: "<div>Default host simulated metric removed successfully!</div>" });
 	                self.props.reloadSimulatedMetrics();
 	            });
-	        };
-	
-	        return _this8;
-	    }
-	
-	    _createClass(DefaultHostSimulatedMetricsCard, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var style = { marginLeft: '10px' };
@@ -25038,25 +25187,6 @@
 	
 	        var _this9 = _possibleConstructorReturn(this, (DefaultHostSimulatedMetrics.__proto__ || Object.getPrototypeOf(DefaultHostSimulatedMetrics)).call(this, props));
 	
-	        _this9.loadSimulatedMetrics = function () {
-	            _this9.setState({ loading: true });
-	            var self = _this9;
-	            _utils2.default.ajaxGet('/simulatedMetrics/defaultHosts', function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
-	        _this9.renderSimulatedMetrics = function () {
-	            var simulatedMetricsNodes = void 0;
-	            var self = _this9;
-	            if (_this9.state.data) {
-	                simulatedMetricsNodes = _this9.state.data.map(function (simulatedMetric, index) {
-	                    return React.createElement(DefaultHostSimulatedMetricsCard, { key: simulatedMetric.id, simulatedMetric: simulatedMetric, reloadSimulatedMetrics: self.loadSimulatedMetrics });
-	                });
-	            }
-	            return simulatedMetricsNodes;
-	        };
-	
 	        _this9.state = { data: [], loading: false, showAdd: true };
 	        return _this9;
 	    }
@@ -25072,6 +25202,27 @@
 	        key: 'componentWillUnmount',
 	        value: function componentWillUnmount() {
 	            this.state.tooltipInstances[0].destroy();
+	        }
+	    }, {
+	        key: 'loadSimulatedMetrics',
+	        value: function loadSimulatedMetrics() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/simulatedMetrics/defaultHosts', function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderSimulatedMetrics',
+	        value: function renderSimulatedMetrics() {
+	            var simulatedMetricsNodes = void 0;
+	            var self = this;
+	            if (this.state.data) {
+	                simulatedMetricsNodes = this.state.data.map(function (simulatedMetric, index) {
+	                    return React.createElement(DefaultHostSimulatedMetricsCard, { key: simulatedMetric.id, simulatedMetric: simulatedMetric, reloadSimulatedMetrics: self.loadSimulatedMetrics });
+	                });
+	            }
+	            return simulatedMetricsNodes;
 	        }
 	    }, {
 	        key: 'render',
@@ -25108,40 +25259,6 @@
 	
 	        var _this10 = _possibleConstructorReturn(this, (DefaultHostSimulatedMetricsDetail.__proto__ || Object.getPrototypeOf(DefaultHostSimulatedMetricsDetail)).call(this, props));
 	
-	        _this10.loadFields = function () {
-	            _this10.setState({ loading: true });
-	            var self = _this10;
-	            var url = '/fields';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ fields: data, loading: false });
-	            });
-	        };
-	
-	        _this10.loadDefaultHostSimulatedMetrics = function () {
-	            if (_this10.state.id !== 0) {
-	                _this10.setState({ loading: true });
-	                var self = _this10;
-	                var url = '/simulatedMetrics/defaultHosts/' + _this10.state.id;
-	                _utils2.default.ajaxGet(url, function (data) {
-	                    self.setState({ values: data, loading: false });
-	                });
-	            }
-	        };
-	
-	        _this10.renderFieldsSelect = function () {
-	            var fieldsNodes = void 0;
-	            if (_this10.state.fields) {
-	                fieldsNodes = _this10.state.fields.map(function (field) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: field.id, value: field.fieldName },
-	                        field.fieldName
-	                    );
-	                });
-	                return fieldsNodes;
-	            }
-	        };
-	
 	        _this10.onSubmitForm = function (event) {
 	            event.preventDefault();
 	            var formId = "form-service";
@@ -25161,17 +25278,82 @@
 	            _this10.setState({ values: newValues });
 	        };
 	
-	        _this10.renderForm = function () {
-	            var fieldsSelect = _this10.renderFieldsSelect();
+	        var defaultId = 0;
+	        if (props.match.params.id) {
+	            defaultId = props.match.params.id;
+	        }
+	        var defaultValues = {
+	            field: '', minValue: '', maxValue: '', override: ''
+	        };
+	        var thisBreadcrumbs = [];
+	        _this10.state = { id: defaultId, values: defaultValues, fields: [], loading: false, formSubmit: false,
+	            breadcrumbs: thisBreadcrumbs };
+	        return _this10;
+	    }
+	
+	    _createClass(DefaultHostSimulatedMetricsDetail, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            this.loadFields();
+	            this.loadDefaultHostSimulatedMetrics();
+	        }
+	    }, {
+	        key: 'componentDidUpdate',
+	        value: function componentDidUpdate() {
+	            M.updateTextFields();
+	            var elems = document.querySelectorAll('select');
+	            M.FormSelect.init(elems);
+	        }
+	    }, {
+	        key: 'loadFields',
+	        value: function loadFields() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/fields';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ fields: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadDefaultHostSimulatedMetrics',
+	        value: function loadDefaultHostSimulatedMetrics() {
+	            if (this.state.id !== 0) {
+	                this.setState({ loading: true });
+	                var self = this;
+	                var url = '/simulatedMetrics/defaultHosts/' + this.state.id;
+	                _utils2.default.ajaxGet(url, function (data) {
+	                    self.setState({ values: data, loading: false });
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'renderFieldsSelect',
+	        value: function renderFieldsSelect() {
+	            var fieldsNodes = void 0;
+	            if (this.state.fields) {
+	                fieldsNodes = this.state.fields.map(function (field) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: field.id, value: field.fieldName },
+	                        field.fieldName
+	                    );
+	                });
+	                return fieldsNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderForm',
+	        value: function renderForm() {
+	            var fieldsSelect = this.renderFieldsSelect();
 	            return React.createElement(
 	                'form',
-	                { id: 'form-service', onSubmit: _this10.onSubmitForm },
+	                { id: 'form-service', onSubmit: this.onSubmitForm },
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this10.state.values.field, onChange: _this10.onInputChange, name: 'field', id: 'field' },
+	                        { value: this.state.values.field, onChange: this.onInputChange, name: 'field', id: 'field' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -25188,7 +25370,7 @@
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this10.state.values.minValue, onChange: _this10.onInputChange, type: 'number', name: 'minValue', id: 'minValue', autoComplete: 'off' }),
+	                    React.createElement('input', { value: this.state.values.minValue, onChange: this.onInputChange, type: 'number', name: 'minValue', id: 'minValue', autoComplete: 'off' }),
 	                    React.createElement(
 	                        'label',
 	                        { htmlFor: 'minValue' },
@@ -25198,7 +25380,7 @@
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this10.state.values.maxValue, onChange: _this10.onInputChange, type: 'number', name: 'maxValue', id: 'maxValue', autoComplete: 'off' }),
+	                    React.createElement('input', { value: this.state.values.maxValue, onChange: this.onInputChange, type: 'number', name: 'maxValue', id: 'maxValue', autoComplete: 'off' }),
 	                    React.createElement(
 	                        'label',
 	                        { htmlFor: 'maxValue' },
@@ -25210,7 +25392,7 @@
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this10.state.values.override, onChange: _this10.onInputChange, name: 'override', id: 'override' },
+	                        { value: this.state.values.override, onChange: this.onInputChange, name: 'override', id: 'override' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -25244,33 +25426,6 @@
 	                    )
 	                )
 	            );
-	        };
-	
-	        var defaultId = 0;
-	        if (props.match.params.id) {
-	            defaultId = props.match.params.id;
-	        }
-	        var defaultValues = {
-	            field: '', minValue: '', maxValue: '', override: ''
-	        };
-	        var thisBreadcrumbs = [];
-	        _this10.state = { id: defaultId, values: defaultValues, fields: [], loading: false, formSubmit: false,
-	            breadcrumbs: thisBreadcrumbs };
-	        return _this10;
-	    }
-	
-	    _createClass(DefaultHostSimulatedMetricsDetail, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            this.loadFields();
-	            this.loadDefaultHostSimulatedMetrics();
-	        }
-	    }, {
-	        key: 'componentDidUpdate',
-	        value: function componentDidUpdate() {
-	            M.updateTextFields();
-	            var elems = document.querySelectorAll('select');
-	            M.FormSelect.init(elems);
 	        }
 	    }, {
 	        key: 'render',
@@ -25311,21 +25466,20 @@
 	    function SpecificHostSimulatedMetricsCard(props) {
 	        _classCallCheck(this, SpecificHostSimulatedMetricsCard);
 	
-	        var _this11 = _possibleConstructorReturn(this, (SpecificHostSimulatedMetricsCard.__proto__ || Object.getPrototypeOf(SpecificHostSimulatedMetricsCard)).call(this, props));
+	        return _possibleConstructorReturn(this, (SpecificHostSimulatedMetricsCard.__proto__ || Object.getPrototypeOf(SpecificHostSimulatedMetricsCard)).call(this, props));
+	    }
 	
-	        _this11.onClickRemove = function () {
-	            var action = '/simulatedMetrics/specificHosts/' + _this11.props.simulatedMetric.id;
-	            var self = _this11;
+	    _createClass(SpecificHostSimulatedMetricsCard, [{
+	        key: 'onClickRemove',
+	        value: function onClickRemove() {
+	            var action = '/simulatedMetrics/specificHosts/' + this.props.simulatedMetric.id;
+	            var self = this;
 	            _utils2.default.formSubmit(action, 'DELETE', {}, function (data) {
 	                M.toast({ html: "<div>Specific host simulated metric removed successfully!</div>" });
 	                self.props.reloadSimulatedMetrics();
 	            });
-	        };
-	
-	        return _this11;
-	    }
-	
-	    _createClass(SpecificHostSimulatedMetricsCard, [{
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var style = { marginLeft: '10px' };
@@ -25387,25 +25541,6 @@
 	
 	        var _this12 = _possibleConstructorReturn(this, (SpecificHostSimulatedMetrics.__proto__ || Object.getPrototypeOf(SpecificHostSimulatedMetrics)).call(this, props));
 	
-	        _this12.loadSimulatedMetrics = function () {
-	            _this12.setState({ loading: true });
-	            var self = _this12;
-	            _utils2.default.ajaxGet('/simulatedMetrics/specificHosts', function (data) {
-	                self.setState({ data: data, loading: false });
-	            });
-	        };
-	
-	        _this12.renderSimulatedMetrics = function () {
-	            var simulatedMetricsNodes = void 0;
-	            var self = _this12;
-	            if (_this12.state.data) {
-	                simulatedMetricsNodes = _this12.state.data.map(function (simulatedMetric, index) {
-	                    return React.createElement(SpecificHostSimulatedMetricsCard, { key: simulatedMetric.id, simulatedMetric: simulatedMetric, reloadSimulatedMetrics: self.loadSimulatedMetrics });
-	                });
-	            }
-	            return simulatedMetricsNodes;
-	        };
-	
 	        _this12.state = { data: [], loading: false, showAdd: true };
 	        return _this12;
 	    }
@@ -25421,6 +25556,27 @@
 	        key: 'componentWillUnmount',
 	        value: function componentWillUnmount() {
 	            this.state.tooltipInstances[0].destroy();
+	        }
+	    }, {
+	        key: 'loadSimulatedMetrics',
+	        value: function loadSimulatedMetrics() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/simulatedMetrics/specificHosts', function (data) {
+	                self.setState({ data: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderSimulatedMetrics',
+	        value: function renderSimulatedMetrics() {
+	            var simulatedMetricsNodes = void 0;
+	            var self = this;
+	            if (this.state.data) {
+	                simulatedMetricsNodes = this.state.data.map(function (simulatedMetric, index) {
+	                    return React.createElement(SpecificHostSimulatedMetricsCard, { key: simulatedMetric.id, simulatedMetric: simulatedMetric, reloadSimulatedMetrics: self.loadSimulatedMetrics });
+	                });
+	            }
+	            return simulatedMetricsNodes;
 	        }
 	    }, {
 	        key: 'render',
@@ -25457,63 +25613,6 @@
 	
 	        var _this13 = _possibleConstructorReturn(this, (SpecificHostSimulatedMetricsDetail.__proto__ || Object.getPrototypeOf(SpecificHostSimulatedMetricsDetail)).call(this, props));
 	
-	        _this13.loadNodes = function () {
-	            _this13.setState({ loading: true });
-	            var self = _this13;
-	            var url = '/nodes';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ nodes: data, loading: false });
-	            });
-	        };
-	
-	        _this13.loadFields = function () {
-	            _this13.setState({ loading: true });
-	            var self = _this13;
-	            var url = '/rules/fields';
-	            _utils2.default.ajaxGet(url, function (data) {
-	                self.setState({ fields: data, loading: false });
-	            });
-	        };
-	
-	        _this13.loadSpecificHostSimulatedMetrics = function () {
-	            if (_this13.state.id !== 0) {
-	                _this13.setState({ loading: true });
-	                var self = _this13;
-	                var url = '/simulatedMetrics/specificHosts/' + _this13.state.id;
-	                _utils2.default.ajaxGet(url, function (data) {
-	                    self.setState({ values: data, loading: false });
-	                });
-	            }
-	        };
-	
-	        _this13.renderNodesSelect = function () {
-	            var nodes = void 0;
-	            if (_this13.state.nodes) {
-	                nodes = _this13.state.nodes.map(function (node) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: node.hostname, value: node.hostname },
-	                        node.hostname
-	                    );
-	                });
-	                return nodes;
-	            }
-	        };
-	
-	        _this13.renderFieldsSelect = function () {
-	            var fieldsNodes = void 0;
-	            if (_this13.state.fields) {
-	                fieldsNodes = _this13.state.fields.map(function (field) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: field.id, value: field.fieldName },
-	                        field.fieldName
-	                    );
-	                });
-	                return fieldsNodes;
-	            }
-	        };
-	
 	        _this13.onSubmitForm = function (event) {
 	            event.preventDefault();
 	            var formId = "form-service";
@@ -25533,18 +25632,109 @@
 	            _this13.setState({ values: newValues });
 	        };
 	
-	        _this13.renderForm = function () {
-	            var nodesSelect = _this13.renderNodesSelect();
-	            var fieldsSelect = _this13.renderFieldsSelect();
+	        var defaultId = 0;
+	        if (props.match.params.id) {
+	            defaultId = props.match.params.id;
+	        }
+	        var defaultValues = {
+	            hostname: '', field: '', minValue: '', maxValue: '', override: ''
+	        };
+	        var thisBreadcrumbs = [];
+	        _this13.state = { id: defaultId, values: defaultValues, nodes: [], fields: [], loading: false, formSubmit: false,
+	            breadcrumbs: thisBreadcrumbs };
+	        return _this13;
+	    }
+	
+	    _createClass(SpecificHostSimulatedMetricsDetail, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            this.loadNodes();
+	            this.loadFields();
+	            this.loadSpecificHostSimulatedMetrics();
+	        }
+	    }, {
+	        key: 'componentDidUpdate',
+	        value: function componentDidUpdate() {
+	            M.updateTextFields();
+	            var elems = document.querySelectorAll('select');
+	            M.FormSelect.init(elems);
+	        }
+	    }, {
+	        key: 'loadNodes',
+	        value: function loadNodes() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/nodes';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ nodes: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadFields',
+	        value: function loadFields() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            var url = '/rules/fields';
+	            _utils2.default.ajaxGet(url, function (data) {
+	                self.setState({ fields: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadSpecificHostSimulatedMetrics',
+	        value: function loadSpecificHostSimulatedMetrics() {
+	            if (this.state.id !== 0) {
+	                this.setState({ loading: true });
+	                var self = this;
+	                var url = '/simulatedMetrics/specificHosts/' + this.state.id;
+	                _utils2.default.ajaxGet(url, function (data) {
+	                    self.setState({ values: data, loading: false });
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'renderNodesSelect',
+	        value: function renderNodesSelect() {
+	            var nodes = void 0;
+	            if (this.state.nodes) {
+	                nodes = this.state.nodes.map(function (node) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: node.hostname, value: node.hostname },
+	                        node.hostname
+	                    );
+	                });
+	                return nodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderFieldsSelect',
+	        value: function renderFieldsSelect() {
+	            var fieldsNodes = void 0;
+	            if (this.state.fields) {
+	                fieldsNodes = this.state.fields.map(function (field) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: field.id, value: field.fieldName },
+	                        field.fieldName
+	                    );
+	                });
+	                return fieldsNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderForm',
+	        value: function renderForm() {
+	            var nodesSelect = this.renderNodesSelect();
+	            var fieldsSelect = this.renderFieldsSelect();
 	            return React.createElement(
 	                'form',
-	                { id: 'form-service', onSubmit: _this13.onSubmitForm },
+	                { id: 'form-service', onSubmit: this.onSubmitForm },
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this13.state.values.hostname, onChange: _this13.onInputChange, name: 'hostname', id: 'hostname' },
+	                        { value: this.state.values.hostname, onChange: this.onInputChange, name: 'hostname', id: 'hostname' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -25563,7 +25753,7 @@
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this13.state.values.field, onChange: _this13.onInputChange, name: 'field', id: 'field' },
+	                        { value: this.state.values.field, onChange: this.onInputChange, name: 'field', id: 'field' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -25580,7 +25770,7 @@
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this13.state.values.minValue, onChange: _this13.onInputChange, type: 'number', name: 'minValue', id: 'minValue', autoComplete: 'off' }),
+	                    React.createElement('input', { value: this.state.values.minValue, onChange: this.onInputChange, type: 'number', name: 'minValue', id: 'minValue', autoComplete: 'off' }),
 	                    React.createElement(
 	                        'label',
 	                        { htmlFor: 'minValue' },
@@ -25590,7 +25780,7 @@
 	                React.createElement(
 	                    'div',
 	                    { className: 'input-field col s12' },
-	                    React.createElement('input', { value: _this13.state.values.maxValue, onChange: _this13.onInputChange, type: 'number', name: 'maxValue', id: 'maxValue', autoComplete: 'off' }),
+	                    React.createElement('input', { value: this.state.values.maxValue, onChange: this.onInputChange, type: 'number', name: 'maxValue', id: 'maxValue', autoComplete: 'off' }),
 	                    React.createElement(
 	                        'label',
 	                        { htmlFor: 'maxValue' },
@@ -25602,7 +25792,7 @@
 	                    { className: 'input-field col s12' },
 	                    React.createElement(
 	                        'select',
-	                        { value: _this13.state.values.override, onChange: _this13.onInputChange, name: 'override', id: 'override' },
+	                        { value: this.state.values.override, onChange: this.onInputChange, name: 'override', id: 'override' },
 	                        React.createElement(
 	                            'option',
 	                            { value: '', disabled: 'disabled' },
@@ -25636,34 +25826,6 @@
 	                    )
 	                )
 	            );
-	        };
-	
-	        var defaultId = 0;
-	        if (props.match.params.id) {
-	            defaultId = props.match.params.id;
-	        }
-	        var defaultValues = {
-	            hostname: '', field: '', minValue: '', maxValue: '', override: ''
-	        };
-	        var thisBreadcrumbs = [];
-	        _this13.state = { id: defaultId, values: defaultValues, nodes: [], fields: [], loading: false, formSubmit: false,
-	            breadcrumbs: thisBreadcrumbs };
-	        return _this13;
-	    }
-	
-	    _createClass(SpecificHostSimulatedMetricsDetail, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            this.loadNodes();
-	            this.loadFields();
-	            this.loadSpecificHostSimulatedMetrics();
-	        }
-	    }, {
-	        key: 'componentDidUpdate',
-	        value: function componentDidUpdate() {
-	            M.updateTextFields();
-	            var elems = document.querySelectorAll('select');
-	            M.FormSelect.init(elems);
 	        }
 	    }, {
 	        key: 'render',
@@ -25702,7 +25864,7 @@
 /* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -25710,6 +25872,14 @@
 	exports.Regions = undefined;
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _jquery = __webpack_require__(9);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
 	
 	var _utils = __webpack_require__(58);
 	
@@ -25723,35 +25893,31 @@
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MIT License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright (c) 2020 micro-manager
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in all
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies or substantial portions of the Software.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * SOFTWARE.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
-	/*
-	 * MIT License
-	 *
-	 * Copyright (c) 2020 micro-manager
-	 *
-	 * Permission is hereby granted, free of charge, to any person obtaining a copy
-	 * of this software and associated documentation files (the "Software"), to deal
-	 * in the Software without restriction, including without limitation the rights
-	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	 * copies of the Software, and to permit persons to whom the Software is
-	 * furnished to do so, subject to the following conditions:
-	 *
-	 * The above copyright notice and this permission notice shall be included in all
-	 * copies or substantial portions of the Software.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	 * SOFTWARE.
-	 */
-	
-	var $ = __webpack_require__(9);
-	var React = __webpack_require__(1);
-	var Component = React.Component;
+	var Component = _react2.default.Component;
 	
 	var RegionCard = function (_Component) {
 	    _inherits(RegionCard, _Component);
@@ -25760,14 +25926,6 @@
 	        _classCallCheck(this, RegionCard);
 	
 	        var _this = _possibleConstructorReturn(this, (RegionCard.__proto__ || Object.getPrototypeOf(RegionCard)).call(this, props));
-	
-	        _this.onClickEdit = function () {
-	            var setEdit = !_this.state.isEdit;
-	            if (!setEdit && _this.state.data.id === 0) {
-	                _this.props.updateNewRegion(true);
-	            }
-	            _this.setState({ isEdit: setEdit });
-	        };
 	
 	        _this.handleChange = function (event) {
 	            var name = event.target.name;
@@ -25794,90 +25952,6 @@
 	            });
 	        };
 	
-	        _this.onClickRemove = function () {
-	            var formAction = '/regions/' + _this.state.data.id;
-	            var self = _this;
-	            _utils2.default.formSubmit(formAction, 'DELETE', {}, function (data) {
-	                M.toast({ html: "<div>Region deleted successfully!</div>" });
-	                self.props.onRemove();
-	            });
-	        };
-	
-	        _this.renderNormal = function () {
-	            return React.createElement(
-	                'div',
-	                null,
-	                React.createElement(_globalComponents.CardItem, { label: 'Region name', value: _this.state.data.regionName }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Region description', value: _this.state.data.regionDescription }),
-	                React.createElement(_globalComponents.CardItem, { label: 'Is active', value: _this.state.data.active })
-	            );
-	        };
-	
-	        _this.renderForm = function () {
-	            return React.createElement(
-	                'form',
-	                { id: _this.state.data.id + 'regionForm', onSubmit: _this.onSubmitForm },
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement('input', { onChange: _this.handleChange, defaultValue: _this.state.data.regionName, name: 'regionName', id: _this.state.data.id + 'regionName', type: 'text', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'regionName' },
-	                        'Region name'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement('input', { onChange: _this.handleChange, defaultValue: _this.state.data.regionDescription, name: 'regionDescription', id: _this.state.data.id + 'regionDescription', type: 'text', autoComplete: 'off' }),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'regionDescription' },
-	                        'Region description'
-	                    )
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'input-field' },
-	                    React.createElement(
-	                        'select',
-	                        { onChange: _this.handleChange, defaultValue: _this.state.data.active, name: 'active', id: _this.state.data.id + 'active' },
-	                        React.createElement(
-	                            'option',
-	                            { value: '', disabled: 'disabled' },
-	                            'Choose active'
-	                        ),
-	                        React.createElement(
-	                            'option',
-	                            { value: 'true' },
-	                            'True'
-	                        ),
-	                        React.createElement(
-	                            'option',
-	                            { value: 'false' },
-	                            'False'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'label',
-	                        { htmlFor: _this.state.data.id + 'active' },
-	                        'Active'
-	                    )
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
-	                    'Save',
-	                    React.createElement(
-	                        'i',
-	                        { className: 'material-icons right' },
-	                        'send'
-	                    )
-	                )
-	            );
-	        };
-	
 	        var region = _this.props.region;
 	        region.active = region.active ? "true" : "false";
 	        var defaultIsEdit = _this.props.region.id == 0;
@@ -25886,45 +25960,141 @@
 	    }
 	
 	    _createClass(RegionCard, [{
-	        key: 'componentDidMount',
+	        key: "componentDidMount",
 	        value: function componentDidMount() {
 	            M.FormSelect.init(document.querySelectorAll('select'));
 	        }
 	    }, {
-	        key: 'componentDidUpdate',
+	        key: "componentDidUpdate",
 	        value: function componentDidUpdate() {
 	            M.updateTextFields();
 	            M.FormSelect.init(document.querySelectorAll('select'));
 	        }
 	    }, {
-	        key: 'render',
+	        key: "onClickEdit",
+	        value: function onClickEdit() {
+	            var setEdit = !this.state.isEdit;
+	            if (!setEdit && this.state.data.id === 0) {
+	                this.props.updateNewRegion(true);
+	            }
+	            this.setState({ isEdit: setEdit });
+	        }
+	    }, {
+	        key: "onClickRemove",
+	        value: function onClickRemove() {
+	            var formAction = '/regions/' + this.state.data.id;
+	            var self = this;
+	            _utils2.default.formSubmit(formAction, 'DELETE', {}, function (data) {
+	                M.toast({ html: "<div>Region deleted successfully!</div>" });
+	                self.props.onRemove();
+	            });
+	        }
+	    }, {
+	        key: "renderNormal",
+	        value: function renderNormal() {
+	            return _react2.default.createElement(
+	                "div",
+	                null,
+	                _react2.default.createElement(_globalComponents.CardItem, { label: "Region name", value: this.state.data.regionName }),
+	                _react2.default.createElement(_globalComponents.CardItem, { label: "Region description", value: this.state.data.regionDescription }),
+	                _react2.default.createElement(_globalComponents.CardItem, { label: "Is active", value: this.state.data.active })
+	            );
+	        }
+	    }, {
+	        key: "renderForm",
+	        value: function renderForm() {
+	            return _react2.default.createElement(
+	                "form",
+	                { id: this.state.data.id + 'regionForm', onSubmit: this.onSubmitForm },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field" },
+	                    _react2.default.createElement("input", { onChange: this.handleChange, defaultValue: this.state.data.regionName, name: "regionName", id: this.state.data.id + 'regionName', type: "text", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: this.state.data.id + 'regionName' },
+	                        "Region name"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field" },
+	                    _react2.default.createElement("input", { onChange: this.handleChange, defaultValue: this.state.data.regionDescription, name: "regionDescription", id: this.state.data.id + 'regionDescription', type: "text", autoComplete: "off" }),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: this.state.data.id + 'regionDescription' },
+	                        "Region description"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "input-field" },
+	                    _react2.default.createElement(
+	                        "select",
+	                        { onChange: this.handleChange, defaultValue: this.state.data.active, name: "active", id: this.state.data.id + 'active' },
+	                        _react2.default.createElement(
+	                            "option",
+	                            { value: "", disabled: "disabled" },
+	                            "Choose active"
+	                        ),
+	                        _react2.default.createElement(
+	                            "option",
+	                            { value: "true" },
+	                            "True"
+	                        ),
+	                        _react2.default.createElement(
+	                            "option",
+	                            { value: "false" },
+	                            "False"
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: this.state.data.id + 'active' },
+	                        "Active"
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "button",
+	                    { className: "btn waves-effect waves-light", type: "submit", name: "action" },
+	                    "Save",
+	                    _react2.default.createElement(
+	                        "i",
+	                        { className: "material-icons right" },
+	                        "send"
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: "render",
 	        value: function render() {
 	            var nodes = this.state.isEdit ? this.renderForm() : this.renderNormal();
 	            var style = { marginLeft: '5px' };
-	            return React.createElement(
-	                'div',
-	                { id: 'region' + this.props.index, className: 'row' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'col s12' },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'card' },
-	                        React.createElement(
-	                            'div',
-	                            { className: 'card-content' },
-	                            React.createElement(
-	                                'div',
-	                                { className: 'right-align' },
-	                                React.createElement(
-	                                    'a',
-	                                    { className: 'waves-effect waves-light btn-small', onClick: this.onClickEdit },
+	            return _react2.default.createElement(
+	                "div",
+	                { id: 'region' + this.props.index, className: "row" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "col s12" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "card" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "card-content" },
+	                            _react2.default.createElement(
+	                                "div",
+	                                { className: "right-align" },
+	                                _react2.default.createElement(
+	                                    "a",
+	                                    { className: "waves-effect waves-light btn-small", onClick: this.onClickEdit },
 	                                    this.state.isEdit ? 'Cancel' : 'Edit'
 	                                ),
-	                                React.createElement(
-	                                    'a',
-	                                    { disabled: this.state.data.id === 0, style: style, className: 'waves-effect waves-light btn-small red darken-4', onClick: this.onClickRemove },
-	                                    'Remove'
+	                                _react2.default.createElement(
+	                                    "a",
+	                                    { disabled: this.state.data.id === 0, style: style, className: "waves-effect waves-light btn-small red darken-4", onClick: this.onClickRemove },
+	                                    "Remove"
 	                                )
 	                            ),
 	                            nodes
@@ -25958,15 +26128,6 @@
 	            _this2.setState({ tooltipInstances: instances });
 	        };
 	
-	        _this2.addRegion = function () {
-	            var newRegion = {
-	                id: 0, regionName: '', regionDescription: '', active: ''
-	            };
-	            var newData = _this2.state.data;
-	            newData.push(newRegion);
-	            _this2.setState({ data: newData, showAdd: false });
-	        };
-	
 	        _this2.loadRegions = function () {
 	            _this2.setState({ loading: true });
 	            var self = _this2;
@@ -25980,53 +26141,63 @@
 	    }
 	
 	    _createClass(Regions, [{
-	        key: 'componentDidUpdate',
+	        key: "componentDidUpdate",
 	        value: function componentDidUpdate() {
 	            if (this.state.data.length > 0) {
 	                var lastIndex = this.state.data.length - 1;
 	                if (this.state.data[lastIndex].id === 0) {
-	                    var offset = $('#region' + lastIndex).offset().top;
-	                    $(window).scrollTop(offset);
+	                    var offset = (0, _jquery2.default)('#region' + lastIndex).offset().top;
+	                    (0, _jquery2.default)(window).scrollTop(offset);
 	                    this.state.tooltipInstances[0].destroy();
 	                }
 	            }
 	        }
 	    }, {
-	        key: 'componentDidMount',
+	        key: "componentDidMount",
 	        value: function componentDidMount() {
 	            this.loadRegions();
 	            var instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
 	            this.setState({ tooltipInstances: instances });
 	        }
 	    }, {
-	        key: 'componentWillUnmount',
+	        key: "componentWillUnmount",
 	        value: function componentWillUnmount() {
 	            this.state.tooltipInstances[0].destroy();
 	        }
 	    }, {
-	        key: 'render',
+	        key: "addRegion",
+	        value: function addRegion() {
+	            var newRegion = {
+	                id: 0, regionName: '', regionDescription: '', active: ''
+	            };
+	            var newData = this.state.data;
+	            newData.push(newRegion);
+	            this.setState({ data: newData, showAdd: false });
+	        }
+	    }, {
+	        key: "render",
 	        value: function render() {
 	            var regionNodes = void 0;
 	            var self = this;
 	            if (this.state.data) {
 	                regionNodes = this.state.data.map(function (region, index) {
-	                    return React.createElement(RegionCard, { key: index, index: index, region: region, updateNewRegion: self.updateNewRegion, onRemove: self.loadRegions });
+	                    return _react2.default.createElement(RegionCard, { key: index, index: index, region: region, updateNewRegion: self.updateNewRegion, onRemove: self.loadRegions });
 	                });
 	            }
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
-	                { title: 'Regions' },
+	                { title: "Regions" },
 	                regionNodes,
-	                React.createElement(
-	                    'div',
-	                    { className: 'fixed-action-btn tooltipped', 'data-position': 'left', 'data-tooltip': 'Add region' },
-	                    React.createElement(
-	                        'button',
-	                        { disabled: !this.state.showAdd, className: 'waves-effect waves-light btn-floating btn-large grey darken-4', onClick: this.addRegion },
-	                        React.createElement(
-	                            'i',
-	                            { className: 'large material-icons' },
-	                            'add'
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "fixed-action-btn tooltipped", "data-position": "left", "data-tooltip": "Add region" },
+	                    _react2.default.createElement(
+	                        "button",
+	                        { disabled: !this.state.showAdd, className: "waves-effect waves-light btn-floating btn-large grey darken-4", onClick: this.addRegion },
+	                        _react2.default.createElement(
+	                            "i",
+	                            { className: "large material-icons" },
+	                            "add"
 	                        )
 	                    )
 	                )
@@ -26041,7 +26212,7 @@
 /* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -26049,6 +26220,12 @@
 	exports.EurekaPage = undefined;
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouterDom = __webpack_require__(10);
 	
 	var _utils = __webpack_require__(58);
 	
@@ -26062,52 +26239,37 @@
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * MIT License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright (c) 2020 micro-manager
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in all
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies or substantial portions of the Software.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * SOFTWARE.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 	
-	/*
-	 * MIT License
-	 *
-	 * Copyright (c) 2020 micro-manager
-	 *
-	 * Permission is hereby granted, free of charge, to any person obtaining a copy
-	 * of this software and associated documentation files (the "Software"), to deal
-	 * in the Software without restriction, including without limitation the rights
-	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	 * copies of the Software, and to permit persons to whom the Software is
-	 * furnished to do so, subject to the following conditions:
-	 *
-	 * The above copyright notice and this permission notice shall be included in all
-	 * copies or substantial portions of the Software.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	 * SOFTWARE.
-	 */
-	
-	var $ = __webpack_require__(9);
-	var React = __webpack_require__(1);
-	var Redirect = __webpack_require__(10).Redirect;
-	var Component = React.Component;
-	
-	var EurekaPage = exports.EurekaPage = function (_Component) {
-	    _inherits(EurekaPage, _Component);
+	var EurekaPage = exports.EurekaPage = function (_React$Component) {
+	    _inherits(EurekaPage, _React$Component);
 	
 	    function EurekaPage(props) {
 	        _classCallCheck(this, EurekaPage);
 	
 	        var _this = _possibleConstructorReturn(this, (EurekaPage.__proto__ || Object.getPrototypeOf(EurekaPage)).call(this, props));
-	
-	        _this.loadRegions = function () {
-	            _this.setState({ loading: true });
-	            var self = _this;
-	            _utils2.default.ajaxGet('/regions', function (data) {
-	                self.setState({ availableRegions: data, loading: false });
-	            });
-	        };
 	
 	        _this.addRegion = function (regionId, event) {
 	            var self = _this;
@@ -26164,107 +26326,38 @@
 	            });
 	        };
 	
-	        _this.renderChosenRegions = function () {
-	            var regionsNodes = void 0;
-	            var self = _this;
-	            var style = { marginTop: '-4px' };
-	            if (_this.state.chosenRegions) {
-	                regionsNodes = _this.state.chosenRegions.map(function (region) {
-	                    return React.createElement(
-	                        'li',
-	                        { key: region.id, className: 'collection-item' },
-	                        React.createElement(
-	                            'div',
-	                            null,
-	                            region.regionName + " (" + region.regionDescription + ")",
-	                            React.createElement(
-	                                'a',
-	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
-	                                        return self.onRemoveRegion(region.id, e);
-	                                    } },
-	                                React.createElement(
-	                                    'i',
-	                                    { className: 'material-icons' },
-	                                    'clear'
-	                                )
-	                            )
-	                        )
-	                    );
-	                });
-	            }
-	            return regionsNodes;
-	        };
-	
 	        _this.renderAvailableRegions = function () {
 	            var regionsNodes = void 0;
 	            var style = { marginTop: '-4px' };
 	            var self = _this;
 	            if (_this.state.availableRegions) {
 	                regionsNodes = _this.state.availableRegions.map(function (region) {
-	                    return React.createElement(
-	                        'li',
-	                        { key: region.id, className: 'collection-item' },
-	                        React.createElement(
-	                            'div',
+	                    return _react2.default.createElement(
+	                        "li",
+	                        { key: region.id, className: "collection-item" },
+	                        _react2.default.createElement(
+	                            "div",
 	                            null,
 	                            region.regionName + " (" + region.regionDescription + ")",
-	                            React.createElement(
-	                                'a',
-	                                { style: style, className: 'secondary-content btn-floating btn-small waves-effect waves-light', onClick: function onClick(e) {
+	                            _react2.default.createElement(
+	                                "a",
+	                                { style: style, className: "secondary-content btn-floating btn-small waves-effect waves-light", onClick: function onClick(e) {
 	                                        return self.addRegion(region.id, e);
 	                                    } },
-	                                React.createElement(
-	                                    'i',
-	                                    { className: 'material-icons' },
-	                                    'add'
+	                                _react2.default.createElement(
+	                                    "i",
+	                                    { className: "material-icons" },
+	                                    "add"
 	                                )
 	                            )
 	                        )
 	                    );
 	                });
 	            }
-	            return React.createElement(
-	                'ul',
-	                { className: 'collection' },
+	            return _react2.default.createElement(
+	                "ul",
+	                { className: "collection" },
 	                regionsNodes
-	            );
-	        };
-	
-	        _this.renderEurekaPageComponents = function () {
-	            return React.createElement(
-	                'div',
-	                null,
-	                React.createElement(
-	                    'h5',
-	                    null,
-	                    'Chosen Regions'
-	                ),
-	                React.createElement(
-	                    'ul',
-	                    { className: 'collection' },
-	                    _this.renderChosenRegions()
-	                ),
-	                React.createElement(
-	                    'form',
-	                    { id: 'launchEurekaForm', onSubmit: _this.onSubmitForm },
-	                    React.createElement(
-	                        'button',
-	                        { disabled: _this.state.chosenRegions.length === 0, className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
-	                        'Launch eureka servers',
-	                        React.createElement(
-	                            'i',
-	                            { className: 'material-icons right' },
-	                            'send'
-	                        )
-	                    )
-	                ),
-	                React.createElement('br', null),
-	                React.createElement(
-	                    'h5',
-	                    null,
-	                    'Available regions'
-	                ),
-	                _this.renderAvailableRegions()
 	            );
 	        };
 	
@@ -26273,26 +26366,106 @@
 	    }
 	
 	    _createClass(EurekaPage, [{
-	        key: 'componentDidMount',
+	        key: "componentDidMount",
 	        value: function componentDidMount() {
 	            this.loadRegions();
 	        }
 	    }, {
-	        key: 'render',
+	        key: "loadRegions",
+	        value: function loadRegions() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/regions', function (data) {
+	                self.setState({ availableRegions: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: "renderChosenRegions",
+	        value: function renderChosenRegions() {
+	            var regionsNodes = void 0;
+	            var self = this;
+	            var style = { marginTop: '-4px' };
+	            if (this.state.chosenRegions) {
+	                regionsNodes = this.state.chosenRegions.map(function (region) {
+	                    return _react2.default.createElement(
+	                        "li",
+	                        { key: region.id, className: "collection-item" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            null,
+	                            region.regionName + " (" + region.regionDescription + ")",
+	                            _react2.default.createElement(
+	                                "a",
+	                                { style: style, className: "secondary-content btn-floating btn-small waves-effect waves-light", onClick: function onClick(e) {
+	                                        return self.onRemoveRegion(region.id, e);
+	                                    } },
+	                                _react2.default.createElement(
+	                                    "i",
+	                                    { className: "material-icons" },
+	                                    "clear"
+	                                )
+	                            )
+	                        )
+	                    );
+	                });
+	            }
+	            return regionsNodes;
+	        }
+	    }, {
+	        key: "renderEurekaPageComponents",
+	        value: function renderEurekaPageComponents() {
+	            return _react2.default.createElement(
+	                "div",
+	                null,
+	                _react2.default.createElement(
+	                    "h5",
+	                    null,
+	                    "Chosen Regions"
+	                ),
+	                _react2.default.createElement(
+	                    "ul",
+	                    { className: "collection" },
+	                    this.renderChosenRegions()
+	                ),
+	                _react2.default.createElement(
+	                    "form",
+	                    { id: "launchEurekaForm", onSubmit: this.onSubmitForm },
+	                    _react2.default.createElement(
+	                        "button",
+	                        { disabled: this.state.chosenRegions.length === 0, className: "btn waves-effect waves-light", type: "submit", name: "action" },
+	                        "Launch eureka servers",
+	                        _react2.default.createElement(
+	                            "i",
+	                            { className: "material-icons right" },
+	                            "send"
+	                        )
+	                    )
+	                ),
+	                _react2.default.createElement("br", null),
+	                _react2.default.createElement(
+	                    "h5",
+	                    null,
+	                    "Available regions"
+	                ),
+	                this.renderAvailableRegions()
+	            );
+	        }
+	    }, {
+	        key: "render",
 	        value: function render() {
 	            if (this.state.formSubmit) {
-	                return React.createElement(Redirect, { to: '/ui/home' });
+	                return _react2.default.createElement(_reactRouterDom.Redirect, { to: "/ui/home" });
 	            }
-	            return React.createElement(
+	            return _react2.default.createElement(
 	                _globalComponents.MainLayout,
-	                { title: 'Launch Eureka servers', breadcrumbs: this.state.breadcrumbs },
+	                { title: "Launch Eureka servers", breadcrumbs: this.state.breadcrumbs },
 	                this.renderEurekaPageComponents()
 	            );
 	        }
 	    }]);
 	
 	    return EurekaPage;
-	}(Component);
+	}(_react2.default.Component);
 
 /***/ }),
 /* 68 */
@@ -26358,28 +26531,6 @@
 	
 	        var _this = _possibleConstructorReturn(this, (LoadBalancerPage.__proto__ || Object.getPrototypeOf(LoadBalancerPage)).call(this, props));
 	
-	        _this.loadServices = function () {
-	            _this.setState({ loading: true });
-	            var self = _this;
-	            _utils2.default.ajaxGet('/services', function (data) {
-	                var frontendServices = [];
-	                for (var index = 0; index < data.length; index++) {
-	                    if (data[index].serviceType === "frontend") {
-	                        frontendServices.push(data[index]);
-	                    }
-	                }
-	                self.setState({ services: frontendServices, loading: false });
-	            });
-	        };
-	
-	        _this.loadRegions = function () {
-	            _this.setState({ loading: true });
-	            var self = _this;
-	            _utils2.default.ajaxGet('/regions', function (data) {
-	                self.setState({ availableRegions: data, loading: false });
-	            });
-	        };
-	
 	        _this.addRegion = function (regionId, event) {
 	            var self = _this;
 	            function getIndex(regionId, regions) {
@@ -26423,20 +26574,6 @@
 	            });
 	        };
 	
-	        _this.renderServicesSelect = function () {
-	            var servicesNodes = void 0;
-	            if (_this.state.services) {
-	                servicesNodes = _this.state.services.map(function (service) {
-	                    return React.createElement(
-	                        'option',
-	                        { key: service.id, value: service.serviceName },
-	                        service.serviceName
-	                    );
-	                });
-	                return servicesNodes;
-	            }
-	        };
-	
 	        _this.onSubmitForm = function (event) {
 	            event.preventDefault();
 	            var self = _this;
@@ -26454,12 +26591,69 @@
 	            });
 	        };
 	
-	        _this.renderChosenRegions = function () {
+	        _this.state = { services: [], chosenRegions: [], availableRegions: [], formSubmit: false, loading: false };
+	        return _this;
+	    }
+	
+	    _createClass(LoadBalancerPage, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            this.loadRegions();
+	            this.loadServices();
+	        }
+	    }, {
+	        key: 'componentDidUpdate',
+	        value: function componentDidUpdate() {
+	            var elems = document.querySelectorAll('select');
+	            M.FormSelect.init(elems);
+	        }
+	    }, {
+	        key: 'loadServices',
+	        value: function loadServices() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/services', function (data) {
+	                var frontendServices = [];
+	                for (var index = 0; index < data.length; index++) {
+	                    if (data[index].serviceType === "frontend") {
+	                        frontendServices.push(data[index]);
+	                    }
+	                }
+	                self.setState({ services: frontendServices, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'loadRegions',
+	        value: function loadRegions() {
+	            this.setState({ loading: true });
+	            var self = this;
+	            _utils2.default.ajaxGet('/regions', function (data) {
+	                self.setState({ availableRegions: data, loading: false });
+	            });
+	        }
+	    }, {
+	        key: 'renderServicesSelect',
+	        value: function renderServicesSelect() {
+	            var servicesNodes = void 0;
+	            if (this.state.services) {
+	                servicesNodes = this.state.services.map(function (service) {
+	                    return React.createElement(
+	                        'option',
+	                        { key: service.id, value: service.serviceName },
+	                        service.serviceName
+	                    );
+	                });
+	                return servicesNodes;
+	            }
+	        }
+	    }, {
+	        key: 'renderChosenRegions',
+	        value: function renderChosenRegions() {
 	            var regionsNodes = void 0;
-	            var self = _this;
+	            var self = this;
 	            var style = { marginTop: '-4px' };
-	            if (_this.state.chosenRegions) {
-	                regionsNodes = _this.state.chosenRegions.map(function (region) {
+	            if (this.state.chosenRegions) {
+	                regionsNodes = this.state.chosenRegions.map(function (region) {
 	                    return React.createElement(
 	                        'li',
 	                        { key: region.id, className: 'collection-item' },
@@ -26483,14 +26677,15 @@
 	                });
 	            }
 	            return regionsNodes;
-	        };
-	
-	        _this.renderAvailableRegions = function () {
+	        }
+	    }, {
+	        key: 'renderAvailableRegions',
+	        value: function renderAvailableRegions() {
 	            var regionsNodes = void 0;
 	            var style = { marginTop: '-4px' };
-	            var self = _this;
-	            if (_this.state.availableRegions) {
-	                regionsNodes = _this.state.availableRegions.map(function (region) {
+	            var self = this;
+	            if (this.state.availableRegions) {
+	                regionsNodes = this.state.availableRegions.map(function (region) {
 	                    return React.createElement(
 	                        'li',
 	                        { key: region.id, className: 'collection-item' },
@@ -26518,9 +26713,10 @@
 	                { className: 'collection' },
 	                regionsNodes
 	            );
-	        };
-	
-	        _this.renderLoadBalancerPageComponents = function () {
+	        }
+	    }, {
+	        key: 'renderLoadBalancerPageComponents',
+	        value: function renderLoadBalancerPageComponents() {
 	            return React.createElement(
 	                'div',
 	                null,
@@ -26535,7 +26731,7 @@
 	                            { value: '', disabled: 'disabled' },
 	                            'Choose service'
 	                        ),
-	                        _this.renderServicesSelect()
+	                        this.renderServicesSelect()
 	                    ),
 	                    React.createElement(
 	                        'label',
@@ -26551,14 +26747,14 @@
 	                React.createElement(
 	                    'ul',
 	                    { className: 'collection' },
-	                    _this.renderChosenRegions()
+	                    this.renderChosenRegions()
 	                ),
 	                React.createElement(
 	                    'form',
-	                    { id: 'launchLoadBalancerForm', onSubmit: _this.onSubmitForm },
+	                    { id: 'launchLoadBalancerForm', onSubmit: this.onSubmitForm },
 	                    React.createElement(
 	                        'button',
-	                        { disabled: _this.state.chosenRegions.length === 0, className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
+	                        { disabled: this.state.chosenRegions.length === 0, className: 'btn waves-effect waves-light', type: 'submit', name: 'action' },
 	                        'Launch load balancers',
 	                        React.createElement(
 	                            'i',
@@ -26573,25 +26769,8 @@
 	                    null,
 	                    'Available regions'
 	                ),
-	                _this.renderAvailableRegions()
+	                this.renderAvailableRegions()
 	            );
-	        };
-	
-	        _this.state = { services: [], chosenRegions: [], availableRegions: [], formSubmit: false, loading: false };
-	        return _this;
-	    }
-	
-	    _createClass(LoadBalancerPage, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            this.loadRegions();
-	            this.loadServices();
-	        }
-	    }, {
-	        key: 'componentDidUpdate',
-	        value: function componentDidUpdate() {
-	            var elems = document.querySelectorAll('select');
-	            M.FormSelect.init(elems);
 	        }
 	    }, {
 	        key: 'render',

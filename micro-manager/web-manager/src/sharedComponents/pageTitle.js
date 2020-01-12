@@ -35,35 +35,35 @@ export class PageTitle extends React.Component {
     this.state = { breadcrumbs: initialBreadcrumbs };
   }
 
-    renderBreadcrumbs = () => {
-      let breadcrumbs;
-      const style = { marginBottom: '10px' };
-      if (this.state.breadcrumbs) {
-        breadcrumbs = this.state.breadcrumbs.map(function (breadcrumb, index) {
-          if (breadcrumb.link === '') {
-            return (
-              <span key={index} className="breadcrumb">
-                {breadcrumb.title}
-              </span>
-            );
-          }
+  renderBreadcrumbs () {
+    let breadcrumbs;
+    const style = { marginBottom: '10px' };
+    if (this.state.breadcrumbs) {
+      breadcrumbs = this.state.breadcrumbs.map(function (breadcrumb, index) {
+        if (breadcrumb.link === '') {
           return (
-            <Link key={index} className="breadcrumb" to={breadcrumb.link}>
+            <span key={index} className="breadcrumb">
               {breadcrumb.title}
-            </Link>
+            </span>
           );
-        });
-      }
-      return (
-        <div style={style} className="row">
-          <div className="col s12">
-            {breadcrumbs}
-          </div>
-        </div>
-      );
-    };
-
-    render () {
-      return this.renderBreadcrumbs();
+        }
+        return (
+          <Link key={index} className="breadcrumb" to={breadcrumb.link}>
+            {breadcrumb.title}
+          </Link>
+        );
+      });
     }
+    return (
+      <div style={style} className="row">
+        <div className="col s12">
+          {breadcrumbs}
+        </div>
+      </div>
+    );
+  };
+
+  render () {
+    return this.renderBreadcrumbs();
+  }
 }

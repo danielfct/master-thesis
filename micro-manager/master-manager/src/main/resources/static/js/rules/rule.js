@@ -44,7 +44,7 @@ export class RulesLandingPage extends Component {
         this.state = { links: ruleLinks, loading: false };
     }
 
-    renderLinks = () => {
+    renderLinks () {
         return this.state.links.map(function (link) {
             return (
                 <li key={link.name} className="collection-item">
@@ -81,7 +81,7 @@ export class ConditionCard extends Component {
         this.state = { data: condition, loading: false };
     }
 
-    renderLink = () => {
+    renderLink () {
         return (
             <div className="right-align">
                 <div className="row">
@@ -95,7 +95,7 @@ export class ConditionCard extends Component {
         )
     };
 
-    renderSimple = () => {
+    renderSimple () {
         let linkDetails = this.props.viewDetails ? this.renderLink() : null;
         return (
             <div>
@@ -108,7 +108,7 @@ export class ConditionCard extends Component {
         )
     };
 
-    renderCard = () => {
+    renderCard () {
         return (
             <div className='row'>
                 <div className='col s12'>
@@ -138,7 +138,7 @@ export class Conditions extends Component {
         this.loadConditions();
     }
 
-    loadConditions = () => {
+    loadConditions () {
         this.setState({ loading: true });
         let  self = this;
         Utils.ajaxGet('/conditions',
@@ -200,7 +200,7 @@ export class ConditionPage extends Component {
         M.FormSelect.init(document.querySelectorAll('select'));
     }
 
-    loadCondition = () => {
+    loadCondition () {
         if (this.state.conditionId !== 0) {
             this.setState({ loading: true });
             let self = this;
@@ -217,7 +217,7 @@ export class ConditionPage extends Component {
         }
     };
 
-    loadValueModes = () => {
+    loadValueModes () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/rules/valueModes/',
@@ -226,7 +226,7 @@ export class ConditionPage extends Component {
             });
     };
 
-    loadFields = () => {
+    loadFields () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/rules/fields/',
@@ -235,7 +235,7 @@ export class ConditionPage extends Component {
             });
     };
 
-    loadOperators = () => {
+    loadOperators () {
         this.setState({ loading: true });
         let  self = this;
         Utils.ajaxGet('/rules/operators/',
@@ -251,7 +251,7 @@ export class ConditionPage extends Component {
         this.setState({condition: newData});
     };
 
-    renderValueModesSelect = () => {
+    renderValueModesSelect () {
         let valueModesNodes;
         if (this.state.valueModes) {
             valueModesNodes = this.state.valueModes.map(function (valueMode) {
@@ -263,7 +263,7 @@ export class ConditionPage extends Component {
         }
     };
 
-    renderFieldsSelect = () => {
+    renderFieldsSelect () {
         let fieldsNodes;
         if (this.state.fields) {
             fieldsNodes = this.state.fields.map(function (field) {
@@ -275,7 +275,7 @@ export class ConditionPage extends Component {
         }
     };
 
-    renderOperatorsSelect = () => {
+    renderOperatorsSelect () {
         let operatorsNodes;
         if (this.state.operators) {
             operatorsNodes = this.state.operators.map(function (operator) {
@@ -287,7 +287,7 @@ export class ConditionPage extends Component {
         }
     };
 
-    renderDelete = () => {
+    renderDelete () {
         if (this.state.conditionId === 0) {
             return null;
         }
@@ -299,7 +299,7 @@ export class ConditionPage extends Component {
         }
     };
 
-    onDelete = () => {
+    onDelete () {
         let formAction = '/conditions/' + this.state.conditionId;
         let self = this;
         Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
@@ -319,7 +319,7 @@ export class ConditionPage extends Component {
         });
     };
 
-    renderConditionForm = () => {
+    renderConditionForm () {
         if (this.state.isDeleted) {
             return <Redirect to='/ui/rules/conditions' />;
         }
@@ -396,7 +396,7 @@ export class RuleCard extends Component {
         M.Collapsible.init(elems);
     }
 
-    loadConditions = () => {
+    loadConditions () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/rules/' + self.state.data.id + '/conditions',
@@ -405,7 +405,7 @@ export class RuleCard extends Component {
             });
     };
 
-    renderConditions = () => {
+    renderConditions () {
         let conditionNodes;
         if (this.state.conditions) {
             conditionNodes = this.state.conditions.map(function (condition) {
@@ -424,7 +424,7 @@ export class RuleCard extends Component {
         return conditionNodes;
     };
 
-    renderLink = () => {
+    renderLink () {
         return (
             <div className="right-align">
                 <div className="row">
@@ -438,7 +438,7 @@ export class RuleCard extends Component {
         )
     };
 
-    renderSimple = () => {
+    renderSimple () {
         let linkDetails = this.props.viewDetails ? this.renderLink() : null;
         return (
             <div>
@@ -451,7 +451,7 @@ export class RuleCard extends Component {
         )
     };
 
-    renderCard = () => {
+    renderCard () {
         return (
             <div className='row'>
                 <div className='col s12'>
@@ -485,7 +485,7 @@ export class Rules extends Component {
         this.loadRules();
     }
 
-    loadRules = () => {
+    loadRules () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/rules',
@@ -549,7 +549,7 @@ export class RulePage extends Component {
         M.FormSelect.init(document.querySelectorAll('select'));
     }
 
-    loadConditions = () => {
+    loadConditions () {
         this.setState({ loadedConditions: false, loading: true });
         let self = this;
         Utils.ajaxGet('/rules/' + self.state.ruleId + '/conditions',
@@ -558,7 +558,7 @@ export class RulePage extends Component {
             });
     };
 
-    loadRule = () => {
+    loadRule () {
         if (this.state.ruleId !== 0) {
             this.setState({ loading: true });
             let self = this;
@@ -575,7 +575,7 @@ export class RulePage extends Component {
         }
     };
 
-    loadComponentTypes = () => {
+    loadComponentTypes () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/rules/componentTypes/',
@@ -584,7 +584,7 @@ export class RulePage extends Component {
             });
     };
 
-    loadDecisions = () => {
+    loadDecisions () {
         this.setState({loading: true});
         let self = this;
         Utils.ajaxGet('/decisions/',
@@ -612,7 +612,7 @@ export class RulePage extends Component {
         }
     };
 
-    renderComponentTypesSelect = () => {
+    renderComponentTypesSelect () {
         let componentTypesNodes;
         if (this.state.componentTypes) {
             componentTypesNodes = this.state.componentTypes.map(function (componentType) {
@@ -624,7 +624,7 @@ export class RulePage extends Component {
         }
     };
 
-    renderDecisionsSelect = () => {
+    renderDecisionsSelect () {
         let decisionsNodes;
         if (this.state.decisions) {
             decisionsNodes = this.state.decisions.map(function (decision) {
@@ -638,7 +638,7 @@ export class RulePage extends Component {
         }
     };
 
-    renderDelete = () => {
+    renderDelete () {
         if (this.state.conditionId === 0) {
             return null
         }
@@ -650,7 +650,7 @@ export class RulePage extends Component {
         }
     };
 
-    onDelete = () => {
+    onDelete () {
         let formAction = '/rules/' + this.state.ruleId;
         let self = this;
         Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
@@ -679,7 +679,7 @@ export class RulePage extends Component {
         });
     };
 
-    renderConditions = () => {
+    renderConditions () {
         let conditionNodes;
         let self = this;
         let style = {marginTop: '-4px'};
@@ -700,7 +700,7 @@ export class RulePage extends Component {
         return conditionNodes;
     };
 
-    loadAllConditions = () => {
+    loadAllConditions () {
         this.setState({loading: true});
         let self = this;
         Utils.ajaxGet('/conditions',
@@ -709,7 +709,7 @@ export class RulePage extends Component {
             });
     };
 
-    renderAddCondition = () => {
+    renderAddCondition () {
         let conditionNodes;
         let style = {marginTop: '-4px'};
         let self = this;
@@ -744,7 +744,7 @@ export class RulePage extends Component {
         )
     };
 
-    renderRuleForm = () => {
+    renderRuleForm () {
         if (this.state.isDeleted) {
             return <Redirect to='/ui/rules' />;
         }
@@ -821,7 +821,7 @@ class AppRules extends Component {
         this.loadAppRules();
     }
 
-    loadAppRules = () => {
+    loadAppRules () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/apps/'+ self.props.app.id + '/rules',
@@ -830,7 +830,7 @@ class AppRules extends Component {
             });
     };
 
-    renderAppRules = () => {
+    renderAppRules () {
         let appRulesNodes;
         if (this.state.appRules) {
             appRulesNodes = this.state.appRules.map(function (appRule) {
@@ -869,7 +869,7 @@ export class AppsRulesList extends Component {
         this.loadApps();
     }
 
-    loadApps = () => {
+    loadApps () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/apps',
@@ -878,7 +878,7 @@ export class AppsRulesList extends Component {
             });
     };
 
-    renderApps = () => {
+    renderApps () {
         let appNodes;
         if (this.state.apps) {
             appNodes = this.state.apps.map(function (app) {
@@ -939,7 +939,7 @@ export class AppRulesPage extends Component {
         M.updateTextFields();
     }
 
-    loadApp = () => {
+    loadApp () {
         let self = this;
         Utils.ajaxGet('/apps/' + self.state.appId,
             function (data) {
@@ -947,7 +947,7 @@ export class AppRulesPage extends Component {
             });
     };
 
-    loadAppRules = () => {
+    loadAppRules () {
         this.setState({ loadedRules: false, loading: true });
         let self = this;
         Utils.ajaxGet('/apps/' + self.state.appId + '/rules',
@@ -956,7 +956,7 @@ export class AppRulesPage extends Component {
             });
     };
 
-    loadAllRules = () => {
+    loadAllRules () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/rules/container',
@@ -991,7 +991,7 @@ export class AppRulesPage extends Component {
         });
     };
 
-    renderRules = () => {
+    renderRules () {
         let rulesNodes;
         let self = this;
         let style = {marginTop: '-4px'};
@@ -1012,7 +1012,7 @@ export class AppRulesPage extends Component {
         return rulesNodes;
     };
 
-    renderAddRules = () => {
+    renderAddRules () {
         let ruleNodes;
         let style = {marginTop: '-4px'};
         let self = this;
@@ -1081,7 +1081,7 @@ class HostRules extends Component {
         this.loadHostRules();
     }
 
-    loadHostRules = () => {
+    loadHostRules () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/hosts/' + self.props.host.hostname + '/rules',
@@ -1131,7 +1131,7 @@ export class HostsRulesList extends Component {
         this.loadHosts();
     }
 
-    loadHosts = () => {
+    loadHosts () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/hosts',
@@ -1199,7 +1199,7 @@ export class HostRulesPage extends Component {
         M.updateTextFields();
     }
 
-    loadHostRules = () => {
+    loadHostRules () {
         this.setState({ loadedRules: false, loading: true });
         let self = this;
         Utils.ajaxGet('/hosts/' + self.state.hostname + '/rules',
@@ -1208,7 +1208,7 @@ export class HostRulesPage extends Component {
             });
     };
 
-    loadAllRules = () => {
+    loadAllRules () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/rules/host',
@@ -1243,7 +1243,7 @@ export class HostRulesPage extends Component {
         });
     };
 
-    renderRules = () => {
+    renderRules () {
         let rulesNodes;
         let self = this;
         let style = {marginTop: '-4px'};
@@ -1264,7 +1264,7 @@ export class HostRulesPage extends Component {
         return rulesNodes;
     };
 
-    renderAddRules = () => {
+    renderAddRules () {
         let ruleNodes;
         let style = {marginTop: '-4px'};
         let self = this;
@@ -1333,7 +1333,7 @@ class GenericHostRules extends Component {
         this.loadGenericHostRules();
     }
 
-    loadGenericHostRules = () => {
+    loadGenericHostRules () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/hosts/genericRules',
@@ -1410,7 +1410,7 @@ export class GenericHostRulesPage extends Component {
         M.updateTextFields();
     }
 
-    loadHostRules = () => {
+    loadHostRules () {
         this.setState({ loadedRules: false, loading: true });
         let self = this;
         Utils.ajaxGet('/hosts/genericRules',
@@ -1419,7 +1419,7 @@ export class GenericHostRulesPage extends Component {
             });
     };
 
-    loadAllRules = () => {
+    loadAllRules () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/rules/host',
@@ -1447,7 +1447,7 @@ export class GenericHostRulesPage extends Component {
         });
     };
 
-    renderRules = () => {
+    renderRules () {
         let rulesNodes;
         let self = this;
         let style = {marginTop: '-4px'};
@@ -1468,7 +1468,7 @@ export class GenericHostRulesPage extends Component {
         return rulesNodes;
     };
 
-    renderAddRules = () => {
+    renderAddRules () {
         let ruleNodes;
         let style = {marginTop: '-4px'};
         let self = this;
@@ -1534,7 +1534,7 @@ class ServiceRules extends Component {
         this.loadServiceRules();
     }
 
-    loadServiceRules = () => {
+    loadServiceRules () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/services/' + self.props.service.id + '/rules', //TODO confirm
@@ -1582,7 +1582,7 @@ export class ServicesRulesList extends Component {
         this.loadServices();
     }
 
-    loadServices = () => {
+    loadServices () {
         this.setState({loading: true});
         let self = this;
         Utils.ajaxGet('/services',
@@ -1591,7 +1591,7 @@ export class ServicesRulesList extends Component {
             });
     };
 
-    renderServices = () => {
+    renderServices () {
         let serviceNodes;
         if (this.state.services) {
             serviceNodes = pt.unl.fct.microserviceManagement.managerMaster.entities.service.map(function (service) {
@@ -1651,7 +1651,7 @@ export class ServiceRulesPage extends Component {
         M.updateTextFields();
     }
 
-    loadService = () => {
+    loadService () {
         let self = this;
         Utils.ajaxGet('/services/' + self.state.serviceId,
             function (data) {
@@ -1659,7 +1659,7 @@ export class ServiceRulesPage extends Component {
             });
     };
 
-    loadServiceRules = () => {
+    loadServiceRules () {
         this.setState({ loadedRules: false, loading: true });
         let self = this;
         Utils.ajaxGet('/services/' + self.state.serviceId + '/rules',
@@ -1668,7 +1668,7 @@ export class ServiceRulesPage extends Component {
             });
     };
 
-    loadAllRules = () => {
+    loadAllRules () {
         this.setState({ loading: true });
         let self = this;
         Utils.ajaxGet('/rules/container',
@@ -1704,7 +1704,7 @@ export class ServiceRulesPage extends Component {
         });
     };
 
-    renderRules = () => {
+    renderRules () {
         let rulesNodes;
         let self = this;
         let style = {marginTop: '-4px'};
@@ -1725,7 +1725,7 @@ export class ServiceRulesPage extends Component {
         return rulesNodes;
     };
 
-    renderAddRules = () => {
+    renderAddRules () {
         let ruleNodes;
         let style = {marginTop: '-4px'};
         let self = this;

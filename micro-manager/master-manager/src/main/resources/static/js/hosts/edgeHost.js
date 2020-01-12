@@ -48,7 +48,7 @@ class EdgeHostCard extends Component {
         M.FormSelect.init(document.querySelectorAll('select'));
     }
 
-    onClickEdit = () => {
+    onClickEdit () {
         let setEdit = !this.state.isEdit;
         if (!setEdit && this.state.data.id === 0) {
             this.props.updateNewEdgeHost(true);
@@ -90,7 +90,7 @@ class EdgeHostCard extends Component {
         });
     }
 
-    renderNormal = () => {
+    renderNormal () {
         return (
             <div>
                 <div>
@@ -125,7 +125,7 @@ class EdgeHostCard extends Component {
         );
     };
 
-    renderForm = () => {
+    renderForm () {
         return ( 
             <form id={this.state.data.id + 'edgeHostForm'} onSubmit={this.onSubmitForm}>
                 <div className="input-field">
