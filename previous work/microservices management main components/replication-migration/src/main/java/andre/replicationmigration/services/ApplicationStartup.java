@@ -71,7 +71,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
                 repMigMonitoringService.initRepMigMonitorTimer();
             }
         } else {
-            System.out.println("-> Doker master node is not connected. Fail to init docker components.");
+            System.out.println("-> Doker master node is not connected. Fail to init docker components: " + dockerMasterNodeHostname);
         }
     }
 

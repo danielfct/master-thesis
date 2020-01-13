@@ -29,7 +29,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.docker.swarm.node.DockerN
 import pt.unl.fct.microservicemanagement.mastermanager.docker.swarm.node.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.host.regions.RegionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.ContainerDecisionResult;
 
 import java.util.ArrayList;

@@ -2,6 +2,17 @@
   "name": "web-manager",
   "version": "0.1.0",
   "private": true,
+  "description": "Web manager to visually manage a Microservices Dynamic Management System",
+  "contributors": [
+    {
+      "name": "André Carrusca",
+      "email": "a.carrusca@campus.fct.unl.pt"
+    },
+    {
+      "name": "Daniel Pimenta",
+      "email": "d.pimenta@campus.fct.unl.pt"
+    }
+  ],
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",

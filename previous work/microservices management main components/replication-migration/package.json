@@ -1,7 +1,7 @@
 {
   "name": "replication-migration",
   "version": "0.0.1",
-  "description": "Replication and migration management",  
+  "description": "Replication and migration management",
   "author": "André Carrusca",
   "dependencies": {
     "react": "^16.3.2",

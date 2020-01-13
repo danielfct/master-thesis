@@ -547,15 +547,11 @@ INSERT INTO edge_host
 VALUES
 	(2, '192.168.184.156', 'andre', 'MTIzNDU2', 'eu-central-1', 'pt', 'lisbon', TRUE);
 
-INSERT INTO edge_host
-    (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
-VALUES
-	(3, '192.168.1.76', 'daniel', 'enhj', 'eu-central-1', 'pt', 'lisbon', TRUE);
 
-	INSERT INTO edge_host
-    (id, hostname, ssh_username, ssh_password, region, country, city, is_local)
+INSERT INTO edge_host
+	(id, hostname, ssh_username, ssh_password, region, country, city, is_local)
 VALUES
-	(4, '192.168.1.104', 'daniel', 'enhj', 'eu-central-1', 'pt', 'lisbon', TRUE);
+	(3, '192.168.1.68', 'daniel', 'enhj', 'eu-central-1', 'pt', 'lisbon', TRUE);
 
 
 ----- RULES TABLES -----

@@ -178,6 +178,7 @@ public class HostMonitoringService {
     }
 
     private void stopHost(List<DockerSimpleNode> nodes, List<HostDecisionResult> finalDecisions) {
+        //TODO : review stop host
         String hostToRemove = "";
         if (nodes.size() > minHosts) {
             for (int i = finalDecisions.size() - 1; i >= 0; i--) {
