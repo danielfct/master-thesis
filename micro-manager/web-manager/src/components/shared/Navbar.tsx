@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
             <div className="nav-wrapper container">
                 <a href="/" className="brand-logo">
                     <img src={require("../../resources/images/favicon.png")} alt=""/>
-                    Microservices management
+                    Web Manager
                 </a>
             </div>
         </nav>

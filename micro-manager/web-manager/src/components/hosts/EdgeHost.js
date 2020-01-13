@@ -86,22 +86,20 @@ export default class EdgeHosts extends React.Component {
 
   loadHosts = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/hosts/edge',
-      function (data) {
-        self.setState({ data: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/hosts/edge',
+      data =>
+        this.setState({ data: data, loading: false })
+    );
   };
 
   render = () => {
     let edgeHostsNodes;
-    const self = this;
     if (this.state.data) {
-      edgeHostsNodes = this.state.data.map(function (edgeHost, index) {
-        return (
-          <EdgeHostCard key={index} index={index} edgeHost={edgeHost} updateNewEdgeHost={self.updateNewEdgeHost} onRemove={self.loadHosts}/>
-        );
-      });
+      edgeHostsNodes = this.state.data.map((edgeHost, index) => (
+        <EdgeHostCard key={index} index={index} edgeHost={edgeHost} updateNewEdgeHost={this.updateNewEdgeHost}
+                      onRemove={this.loadHosts}/>
+      ));
     }
     return (
       <MainLayout title='Edge hosts'>

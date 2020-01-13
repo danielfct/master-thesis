@@ -68,11 +68,10 @@ export default class AppPackageCard extends React.Component {
 
   loadAppServices = () => {
     this.setState({ loading: true });
-    const self = this;
-    const url = '/apps/' + this.state.appPackage.id + '/services';
-    Utils.ajaxGet(url, function (data) {
-      self.setState({ data: data, loading: false });
-    });
+    Utils.ajaxGet(
+      `localhost/apps/${this.state.appPackage.id}/services`,
+      data => this.setState({ data: data, loading: false })
+    );
   };
 
   handleChangeRegion = event => {
@@ -93,7 +92,7 @@ export default class AppPackageCard extends React.Component {
       regions = this.state.availableRegions.map(function (region) {
         return (
           <option key={region.regionName}
-            value={region.regionName}>{region.regionName + ' (' + region.regionDescription + ')'}</option>
+                  value={region.regionName}>{region.regionName + ' (' + region.regionDescription + ')'}</option>
         );
       });
       return regions;
@@ -133,7 +132,7 @@ export default class AppPackageCard extends React.Component {
     const style = { marginLeft: '10px' };
     const cancelButton =
       <a title="Cancel" style={style} className="btn-floating waves-effect waves-light red darken-4"
-        onClick={this.onClickCancelLaunch}>
+         onClick={this.onClickCancelLaunch}>
         <i className="material-icons">clear</i>
       </a>;
     if (this.state.isLaunchActive) {
@@ -143,19 +142,19 @@ export default class AppPackageCard extends React.Component {
             {this.renderRegionsSelectTotal()}
             <div className="input-field col s6">
               <input onChange={this.handleChangeCountry} defaultValue={this.state.countrySelected} name='country'
-                id='country' type="text" autoComplete="off"/>
+                     id='country' type="text" autoComplete="off"/>
               <label htmlFor="country">Country</label>
             </div>
           </div>
           <div className="row">
             <div className="input-field col s6">
               <input onChange={this.handleChangeCity} defaultValue={this.state.citySelected} name='city' id='city'
-                type="text" autoComplete="off"/>
+                     type="text" autoComplete="off"/>
               <label htmlFor="city">City</label>
             </div>
             <div className="input-field col s6">
               <a title="Launch App" style={style} className="btn-floating waves-effect waves-light"
-                onClick={this.onLaunchApp}>
+                 onClick={this.onLaunchApp}>
                 <i className="material-icons">send</i>
               </a>
               {cancelButton}
@@ -168,7 +167,7 @@ export default class AppPackageCard extends React.Component {
         <div className="row">
           <div className="col s12">
             <button disabled={this.state.appPackage.id === 0} style={style}
-              className="waves-effect waves-light btn-small" onClick={this.onClickLaunch}>
+                    className="waves-effect waves-light btn-small" onClick={this.onClickLaunch}>
               Launch
             </button>
           </div>
@@ -187,29 +186,29 @@ export default class AppPackageCard extends React.Component {
 
   onClickRemove = () => {
     const formAction = '/apps/' + this.state.appPackage.id;
-    const self = this;
-    Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
-      M.toast({ html: '<div>App deleted successfully!</div>' });
-      self.props.onRemove();
-    });
+    Utils.formSubmit(formAction, 'DELETE', {},
+      data => {
+        M.toast({ html: '<div>App deleted successfully!</div>' });
+        this.props.onRemove();
+      });
   };
 
   onLaunchApp = () => {
     const formAction = '/containers/app/' + this.state.appPackage.id;
-    const self = this;
     const dataToSend = JSON.stringify({
-      region: self.state.regionSelected,
-      country: self.state.countrySelected,
-      city: self.state.citySelected
+      region: this.state.regionSelected,
+      country: this.state.countrySelected,
+      city: this.state.citySelected
     });
-    Utils.formSubmit(formAction, 'POST', dataToSend, function (data) {
-      console.log(data);
-      M.toast({
-        html: '<div>App launched successfully!</div>',
-        options: { displayLength: 10000 }
+    Utils.formSubmit(formAction, 'POST', dataToSend,
+      data => {
+        console.log(data);
+        M.toast({
+          html: '<div>App launched successfully!</div>',
+          options: { displayLength: 10000 }
+        });
+        this.onClickCancelLaunch();
       });
-      self.onClickCancelLaunch();
-    });
   };
 
   handleChange = event => {
@@ -221,17 +220,16 @@ export default class AppPackageCard extends React.Component {
 
   onSubmitForm = e => {
     e.preventDefault();
-    const self = this;
     const formId = this.state.appPackage.id + 'appForm';
     const formAction = '/apps/' + this.state.appPackage.id;
     const dataToSend = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', dataToSend, function (data) {
-      const newData = self.state.appPackage;
+    Utils.formSubmit(formAction, 'POST', dataToSend, data => {
+      const newData = this.state.appPackage;
       const oldId = newData.id;
       newData.id = data;
-      self.setState({ appPackage: newData, isEdit: false });
+      this.setState({ appPackage: newData, isEdit: false });
       if (oldId === 0) {
-        self.props.updateNewApp(false);
+        this.props.updateNewApp(false);
       }
       M.toast({ html: '<div>App saved successfully!</div>' });
     });
@@ -275,9 +273,9 @@ export default class AppPackageCard extends React.Component {
               <div className="right-align">
                 {this.renderLaunchApp()}
                 <a style={style} className="waves-effect waves-light btn-small"
-                  onClick={this.onClickEdit}>{this.state.isEdit ? 'Cancel' : 'Edit'}</a>
+                   onClick={this.onClickEdit}>{this.state.isEdit ? 'Cancel' : 'Edit'}</a>
                 <button disabled={this.state.appPackage.id === 0} style={style}
-                  className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>Remove
+                        className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>Remove
                 </button>
               </div>
               {app}

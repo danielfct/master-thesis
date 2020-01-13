@@ -60,41 +60,38 @@ export default class GenericHostRulesPage extends React.Component {
 
   onRemoveRule = (ruleId, event) => {
     const formAction = '/hosts/genericRules/' + ruleId;
-    const self = this;
-    Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
-      M.toast({ html: '<div>Rule successfully deleted from generic hosts rules!</div>' });
-      self.loadHostRules();
-    });
+    Utils.formSubmit(formAction, 'DELETE', {},
+      (data) => {
+        M.toast({ html: '<div>Rule successfully deleted from generic hosts rules!</div>' });
+        this.loadHostRules();
+      });
   };
 
   addRule = (ruleId, event) => {
     const formAction = '/hosts/genericRules/' + ruleId;
     const formMethod = 'POST';
-    const self = this;
-    Utils.formSubmit(formAction, formMethod, {}, function (data) {
-      M.toast({ html: '<div>Rule successfully added to generic host rules!</div>' });
-      self.loadHostRules();
-    });
+    Utils.formSubmit(formAction, formMethod, {},
+      data => {
+        M.toast({ html: '<div>Rule successfully added to generic host rules!</div>' });
+        this.loadHostRules();
+      });
   };
 
   renderRules = () => {
     let rulesNodes;
-    const self = this;
     const style = { marginTop: '-4px' };
     if (this.state.rules) {
-      rulesNodes = this.state.rules.map(function (hostRule) {
-        return (
-          <li key={hostRule.rule.id} className="collection-item">
-            <div>
-              {hostRule.rule.ruleName}
-              <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-                onClick={(e) => self.onRemoveRule(hostRule.rule.id, e)}>
-                <i className="material-icons">clear</i>
-              </a>
-            </div>
-          </li>
-        );
-      });
+      rulesNodes = this.state.rules.map(hostRule => (
+        <li key={hostRule.rule.id} className="collection-item">
+          <div>
+            {hostRule.rule.ruleName}
+            <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+               onClick={(e) => this.onRemoveRule(hostRule.rule.id, e)}>
+              <i className="material-icons">clear</i>
+            </a>
+          </div>
+        </li>
+      ));
     }
     return rulesNodes;
   };
@@ -102,26 +99,25 @@ export default class GenericHostRulesPage extends React.Component {
   renderAddRules = () => {
     let ruleNodes;
     const style = { marginTop: '-4px' };
-    const self = this;
-
-    function canAddRule (ruleId) {
-      for (let i = 0; i < self.state.rules.length; i++) {
-        if (self.state.rules[i].rule.id === ruleId) {
+    //TODO optmize function
+    const canAddRule = ruleId => {
+      for (let i = 0; i < this.state.rules.length; i++) {
+        if (this.state.rules[i].rule.id === ruleId) {
           return false;
         }
       }
       return true;
-    }
+    };
 
     if (this.state.allRules && this.state.loadedRules) {
-      ruleNodes = this.state.allRules.map(function (rule) {
+      ruleNodes = this.state.allRules.map(rule => {
         if (canAddRule(rule.id)) {
           return (
             <li key={rule.id} className="collection-item">
               <div>
                 {rule.ruleName}
                 <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-                  onClick={(e) => self.addRule(rule.id, e)}>
+                   onClick={(e) => this.addRule(rule.id, e)}>
                   <i className="material-icons">add</i>
                 </a>
               </div>

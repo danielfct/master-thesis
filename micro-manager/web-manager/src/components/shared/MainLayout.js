@@ -28,6 +28,7 @@ import PageTitle from './PageTitle';
 import AppLinks from './AppLinks';
 import Footer from "./Footer";
 import Navbar from "./Navbar";
+import $ from "jquery";
 
 export default class MainLayout extends React.Component {
   constructor (props) {
@@ -56,9 +57,6 @@ export default class MainLayout extends React.Component {
             <div id="parent-row" className="row">
               <div className="custom-loader" id="loader-placeholder"/>
               <div className="page-content">
-                <div className="progress">
-                  <div className="indeterminate"/>
-                </div>
                 <div className='row'>
                   <AppLinksDropdown links={this.state.links}/>
                   <PageTitle title={this.props.title} breadcrumbs={this.props.breadcrumbs}/>

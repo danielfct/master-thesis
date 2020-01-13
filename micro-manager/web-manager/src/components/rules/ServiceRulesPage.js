@@ -76,7 +76,7 @@ export default class ServiceRulesPage extends React.Component {
     Utils.ajaxGet(
       'localhost/rules/containers',
       data => this.setState({ allRules: data, loading: false })
-      );
+    );
   };
 
   onRemoveRule = (ruleId, event) => {
@@ -105,22 +105,19 @@ export default class ServiceRulesPage extends React.Component {
 
   renderRules = () => {
     let rulesNodes;
-    const self = this;
     const style = { marginTop: '-4px' };
     if (this.state.rules) {
-      rulesNodes = this.state.rules.map(function (serviceRule) {
-        return (
-          <li key={serviceRule.rule.id} className="collection-item">
-            <div>
-              {serviceRule.rule.ruleName}
-              <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-                onClick={(e) => self.onRemoveRule(serviceRule.rule.id, e)}>
-                <i className="material-icons">clear</i>
-              </a>
-            </div>
-          </li>
-        );
-      });
+      rulesNodes = this.state.rules.map(serviceRule => (
+        <li key={serviceRule.rule.id} className="collection-item">
+          <div>
+            {serviceRule.rule.ruleName}
+            <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+               onClick={(e) => this.onRemoveRule(serviceRule.rule.id, e)}>
+              <i className="material-icons">clear</i>
+            </a>
+          </div>
+        </li>
+      ));
     }
     return rulesNodes;
   };
@@ -128,26 +125,25 @@ export default class ServiceRulesPage extends React.Component {
   renderAddRules = () => {
     let ruleNodes;
     const style = { marginTop: '-4px' };
-    const self = this;
-
-    function canAddRule (ruleId) {
-      for (let i = 0; i < self.state.rules.length; i++) {
-        if (self.state.rules[i].rule.id === ruleId) {
+    //TODO fix code
+    const canAddRule = ruleId => {
+      for (let i = 0; i < this.state.rules.length; i++) {
+        if (this.state.rules[i].rule.id === ruleId) {
           return false;
         }
       }
       return true;
-    }
+    };
 
     if (this.state.allRules && this.state.loadedRules) {
-      ruleNodes = this.state.allRules.map(function (rule) {
+      ruleNodes = this.state.allRules.map(rule => {
         if (canAddRule(rule.id)) {
           return (
             <li key={rule.id} className="collection-item">
               <div>
                 {rule.ruleName}
                 <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-                  onClick={(e) => self.addRule(rule.id, e)}>
+                   onClick={(e) => this.addRule(rule.id, e)}>
                   <i className="material-icons">add</i>
                 </a>
               </div>

@@ -34,11 +34,11 @@ export default class NodeCard extends React.Component {
       hostname: this.props.node.hostname
     };
     const dataToSend = JSON.stringify(dataObject);
-    const self = this;
-    Utils.formSubmit(action, 'DELETE', dataToSend, function (data) {
-      M.toast({ html: '<div>Node removed successfully!</div>' });
-      self.props.reloadNodes();
-    });
+    Utils.formSubmit(action, 'DELETE', dataToSend,
+      data => {
+        M.toast({ html: '<div>Node removed successfully!</div>' });
+        this.props.reloadNodes();
+      });
   };
 
   render = () => (

@@ -64,26 +64,26 @@ export default class EdgeHostCard extends React.Component {
     const formId = this.state.data.id + 'edgeHostForm';
     const formAction = '/hosts/edge/' + this.state.data.id;
     const formData = Utils.convertFormToJson(formId);
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      const newData = self.state.data;
-      const oldId = newData.id;
-      newData.id = data;
-      if (oldId === 0) {
-        self.props.updateNewEdgeHost(false);
-      }
-      self.setState({ isEdit: false });
-      M.toast({ html: '<div>Edge host saved successfully!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        const newData = this.state.data;
+        const oldId = newData.id;
+        newData.id = data;
+        if (oldId === 0) {
+          this.props.updateNewEdgeHost(false);
+        }
+        this.setState({ isEdit: false });
+        M.toast({ html: '<div>Edge host saved successfully!</div>' });
+      });
   };
 
   onClickRemove = () => {
     const formAction = '/hosts/edge/' + this.state.data.id;
-    const self = this;
-    Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
-      M.toast({ html: '<div>Edge host deleted successfully!</div>' });
-      self.props.onRemove();
-    });
+    Utils.formSubmit(formAction, 'DELETE', {},
+      data => {
+        M.toast({ html: '<div>Edge host deleted successfully!</div>' });
+        this.props.onRemove();
+      });
   };
 
   renderNormal = () => (
@@ -177,9 +177,9 @@ export default class EdgeHostCard extends React.Component {
             <div className='card-content'>
               <div className="right-align">
                 <a className="waves-effect waves-light btn-small"
-                  onClick={this.onClickEdit}>{this.state.isEdit ? 'Cancel' : 'Edit'}</a>
+                   onClick={this.onClickEdit}>{this.state.isEdit ? 'Cancel' : 'Edit'}</a>
                 <a disabled={this.state.data.id === 0} style={style}
-                  className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>Remove</a>
+                   className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>Remove</a>
               </div>
               {nodes}
             </div>

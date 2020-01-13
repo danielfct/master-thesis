@@ -47,11 +47,10 @@ export default class RuleCard extends React.Component {
 
   loadConditions = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/rules/' + self.state.data.id + '/conditions',
-      function (data) {
-        self.setState({ conditions: data, loading: false });
-      });
+    Utils.ajaxGet(
+      `/rules/${this.state.data.id}/conditions`,
+      data => this.setState({ conditions: data, loading: false })
+    );
   };
 
   renderConditions = () => {

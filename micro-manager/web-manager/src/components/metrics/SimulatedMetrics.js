@@ -64,30 +64,27 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
 
   loadServices = () => {
     this.setState({ loading: true });
-    const self = this;
-    const url = '/services';
-    Utils.ajaxGet(url, function (data) {
-      self.setState({ services: data, loading: false });
-    });
+    Utils.ajaxGet(
+      'localhost/services',
+      data => this.setState({ services: data, loading: false })
+    );
   };
 
   loadFields = () => {
     this.setState({ loading: true });
-    const self = this;
-    const url = '/rules/fields';
-    Utils.ajaxGet(url, function (data) {
-      self.setState({ fields: data, loading: false });
-    });
+    Utils.ajaxGet(
+      'localhost/rules/fields',
+      data => this.setState({ fields: data, loading: false })
+    );
   };
 
   loadServiceSimulatedMetrics = () => {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
-      const self = this;
-      const url = '/simulatedMetrics/services/' + this.state.id;
-      Utils.ajaxGet(url, function (data) {
-        self.setState({ values: data, loading: false });
-      });
+      Utils.ajaxGet(
+        `localhost/metrics/simulated/services/${this.state.id}`,
+        data => this.setState({ values: data, loading: false })
+      );
     }
   };
 
@@ -120,11 +117,11 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
     const formId = 'form-service';
     const formAction = '/simulatedMetrics/services/' + this.state.id;
     const formData = Utils.convertFormToJson(formId);
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({ isEdit: false, formSubmit: true });
-      M.toast({ html: '<div>Service simulated metric saved successfully!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({ isEdit: false, formSubmit: true });
+        M.toast({ html: '<div>Service simulated metric saved successfully!</div>' });
+      });
   };
 
   onInputChange = event => {
@@ -171,7 +168,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
         </div>
 
         <button className="btn waves-effect waves-light" type="submit" name="action">
-                    Save
+          Save
           <i className="material-icons right">send</i>
         </button>
       </form>

@@ -79,30 +79,29 @@ export default class ServiceEventPredictionDetail extends React.Component {
 
   loadServices = () => {
     this.setState({ loading: true });
-    const self = this;
-    const url = '/services';
-    Utils.ajaxGet(url, function (data) {
-      self.setState({ services: data, loading: false });
-    });
+    Utils.ajaxGet(
+      'localhost/services',
+      data => this.setState({ services: data, loading: false })
+    );
   };
 
   loadServiceEventPrediction = () => {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
-      const self = this;
-      const url = '/services/serviceEventPredictions/' + this.state.id;
-      Utils.ajaxGet(url, function (data) {
-        const loadValues = {
-          serviceId: data.service.id,
-          description: data.description,
-          minReplics: data.minReplics,
-          startDate: data.startDate,
-          startTime: data.startTime,
-          endDate: data.endDate,
-          endTime: data.endTime
-        };
-        self.setState({ values: loadValues, loading: false });
-      });
+      Utils.ajaxGet(
+        `localhost/services/eventPredictions/${this.state.id}`,
+        data => {
+          const loadValues = {
+            serviceId: data.service.id,
+            description: data.description,
+            minReplics: data.minReplics,
+            startDate: data.startDate,
+            startTime: data.startTime,
+            endDate: data.endDate,
+            endTime: data.endTime
+          };
+          this.setState({ values: loadValues, loading: false });
+        });
     }
   };
 
@@ -125,15 +124,14 @@ export default class ServiceEventPredictionDetail extends React.Component {
   };
 
   addEventListenersPickers = () => {
-    const self = this;
     const elems = $(document).find('.datepicker,.timepicker');
     for (let i = 0; i < elems.length; i++) {
       const input = elems[i];
-      $(input).change(function (e) {
+      $(input).change(e => {
         const currInput = $(e.target);
         const val = currInput.val();
         const inputName = currInput.attr('name');
-        self.updateStateFromPicker(inputName, val);
+        this.updateStateFromPicker(inputName, val);
       });
     }
   };
@@ -143,11 +141,11 @@ export default class ServiceEventPredictionDetail extends React.Component {
     const formId = 'form-service';
     const formAction = '/services/serviceEventPredictions/' + this.state.id;
     const formData = Utils.convertFormToJson(formId);
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({ isEdit: false, formSubmit: true });
-      M.toast({ html: '<div>Service event prediction saved successfully!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({ isEdit: false, formSubmit: true });
+        M.toast({ html: '<div>Service event prediction saved successfully!</div>' });
+      });
   };
 
   onInputChange = event => {
@@ -163,7 +161,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
       <form id="form-service" onSubmit={this.onSubmitForm}>
         <div className="input-field col s12">
           <input value={this.state.values.description} onChange={this.onInputChange} type="text" name="description"
-            id="description" autoComplete="off"/>
+                 id="description" autoComplete="off"/>
           <label htmlFor="description">Description</label>
         </div>
         <div className="input-field col s12">
@@ -175,27 +173,27 @@ export default class ServiceEventPredictionDetail extends React.Component {
         </div>
         <div className="input-field col s6">
           <input className='datepicker' defaultValue={this.state.values.startDate} type="text" name="startDate"
-            id="startDate" autoComplete="off"/>
+                 id="startDate" autoComplete="off"/>
           <label htmlFor="startDate">Start date</label>
         </div>
         <div className="input-field col s6">
           <input className='timepicker' defaultValue={this.state.values.startTime} type="text" name="startTime"
-            id="startTime" autoComplete="off"/>
+                 id="startTime" autoComplete="off"/>
           <label htmlFor="startTime">Start time</label>
         </div>
         <div className="input-field col s6">
           <input className='datepicker' defaultValue={this.state.values.endDate} type="text" name="endDate" id="endDate"
-            autoComplete="off"/>
+                 autoComplete="off"/>
           <label htmlFor="endDate">End date</label>
         </div>
         <div className="input-field col s6">
           <input className='timepicker' defaultValue={this.state.values.endTime} type="text" name="endTime" id="endTime"
-            autoComplete="off"/>
+                 autoComplete="off"/>
           <label htmlFor="endTime">End time</label>
         </div>
         <div className="input-field col s12">
           <input value={this.state.values.minReplics} onChange={this.onInputChange} type="number" name="minReplics"
-            id="minReplics" autoComplete="off"/>
+                 id="minReplics" autoComplete="off"/>
           <label htmlFor="minReplics">Minimum replics</label>
         </div>
         <button className="btn waves-effect waves-light" type="submit" name="action">

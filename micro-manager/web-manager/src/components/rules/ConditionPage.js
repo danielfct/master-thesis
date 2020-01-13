@@ -170,11 +170,11 @@ export default class ConditionPage extends React.Component {
     event.preventDefault();
     const formAction = '/conditions/' + this.state.conditionId;
     const formData = Utils.convertFormToJson('conditionForm');
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({ conditionId: data, isEdit: false });
-      M.toast({ html: '<div>Condition successfully saved!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({ conditionId: data, isEdit: false });
+        M.toast({ html: '<div>Condition successfully saved!</div>' });
+      });
   };
 
   renderConditionForm = () => {

@@ -47,23 +47,19 @@ export default class ServiceSimulatedMetrics extends React.Component {
 
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/simulatedMetrics/services',
-      function (data) {
-        self.setState({ data: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/metrics/simulated/services',
+      data => this.setState({ data: data, loading: false })
+    );
   };
 
   renderSimulatedMetrics = () => {
     let simulatedMetricsNodes;
-    const self = this;
     if (this.state.data) {
-      simulatedMetricsNodes = this.state.data.map(function (simulatedMetric, index) {
-        return (
-          <ServiceSimulatedMetricsCard key={simulatedMetric.id} simulatedMetric={simulatedMetric}
-            reloadSimulatedMetrics={self.loadSimulatedMetrics}/>
-        );
-      });
+      simulatedMetricsNodes = this.state.data.map((simulatedMetric, index) => (
+        <ServiceSimulatedMetricsCard key={simulatedMetric.id} simulatedMetric={simulatedMetric}
+                                     reloadSimulatedMetrics={this.loadSimulatedMetrics}/>
+      ));
     }
     return simulatedMetricsNodes;
   };

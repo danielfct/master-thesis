@@ -37,11 +37,10 @@ export default class AppRules extends React.Component {
 
   loadAppRules = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/apps/' + self.props.app.id + '/rules',
-      function (data) {
-        self.setState({ appRules: data, loading: false });
-      });
+    Utils.ajaxGet(
+      `localhost/apps/${this.props.app.id}/rules'`,
+      data => this.setState({ appRules: data, loading: false })
+    );
   };
 
   renderAppRules = () => {

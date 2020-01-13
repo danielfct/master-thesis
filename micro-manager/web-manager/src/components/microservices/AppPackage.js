@@ -54,11 +54,10 @@ export default class AppPackages extends React.Component {
 
   loadApps = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/apps',
-      function (data) {
-        self.setState({ data: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/apps',
+      data => this.setState({ data: data, loading: false })
+    );
   };
 
   updateNewApp = isCancel => {
@@ -88,13 +87,11 @@ export default class AppPackages extends React.Component {
 
   render = () => {
     let appPackagesNodes;
-    const self = this;
     if (this.state.data) {
-      appPackagesNodes = this.state.data.map(function (appPackage, index) {
-        return (
-          <AppPackageCard key={appPackage.id} index={index} appPackage={appPackage} onRemove={self.loadApps} updateNewApp={self.updateNewApp}/>
-        );
-      });
+      appPackagesNodes = this.state.data.map((appPackage, index) => (
+        <AppPackageCard key={appPackage.id} index={index} appPackage={appPackage} onRemove={this.loadApps}
+                        updateNewApp={this.updateNewApp}/>
+      ));
     }
     return (
       <MainLayout title='App packages'>

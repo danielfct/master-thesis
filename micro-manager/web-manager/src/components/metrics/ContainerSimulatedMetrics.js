@@ -27,7 +27,7 @@ import M from 'materialize-css';
 import Utils from '../../utils';
 import ContainerSimulatedMetricsCard from './ContainerSimulatedMetricsCard';
 import MainLayout from '../shared/MainLayout';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 export default class ContainerSimulatedMetrics extends React.Component {
   constructor (props) {
@@ -47,23 +47,19 @@ export default class ContainerSimulatedMetrics extends React.Component {
 
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/simulatedMetrics/containers',
-      function (data) {
-        self.setState({ data: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/metrics/simulated/containers',
+      (data) => this.setState({ data: data, loading: false })
+    );
   };
 
   renderSimulatedMetrics = () => {
     let simulatedMetricsNodes;
-    const self = this;
     if (this.state.data) {
-      simulatedMetricsNodes = this.state.data.map(function (simulatedMetric, index) {
-        return (
-          <ContainerSimulatedMetricsCard key={simulatedMetric.id} simulatedMetric={simulatedMetric}
-            reloadSimulatedMetrics={self.loadSimulatedMetrics}/>
-        );
-      });
+      simulatedMetricsNodes = this.state.data.map((simulatedMetric, index) => (
+        <ContainerSimulatedMetricsCard key={simulatedMetric.id} simulatedMetric={simulatedMetric}
+                                       reloadSimulatedMetrics={this.loadSimulatedMetrics}/>
+      ));
     }
     return simulatedMetricsNodes;
   };

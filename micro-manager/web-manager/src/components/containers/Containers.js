@@ -52,10 +52,7 @@ export default class Containers extends React.Component {
 
   onChangeFilter = (event) => {
     const filterVal = event.target.value;
-    const self = this;
-    this.setState({ filter: filterVal }, function () {
-      self.applyFilter();
-    });
+    this.setState({ filter: filterVal }, () => this.applyFilter());
   };
 
   applyFilter = () => {
@@ -72,45 +69,38 @@ export default class Containers extends React.Component {
   };
 
   clearFilter = () => {
-    const self = this;
-    this.setState({ filter: '' }, function () {
-      self.applyFilter();
+    this.setState({ filter: '' }, () => {
+      this.applyFilter();
       $('#filter').val('');
     });
   };
 
   loadContainers = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/containers',
-      function (containers) {
-        self.setState({ data: containers, filtContainers: containers, loading: false });
-      });
+    Utils.ajaxGet(
+      '/containers',
+      containers => this.setState({ data: containers, filtContainers: containers, loading: false })
+    );
   };
 
   containerStopped = (containerId) => {
     const newData = this.state.data;
-    const self = this;
     for (let index = 0; index < newData.length; index++) {
       if (newData[index].id === containerId) {
         newData.splice(index, 1);
         break;
       }
     }
-    this.setState({ data: newData }, function () {
-      self.applyFilter();
-    });
+    this.setState({ data: newData }, () => this.applyFilter());
   };
 
   render = () => {
     let containersNodes;
-    const self = this;
     if (this.state.data) {
-      containersNodes = this.state.filtContainers.map(function (container) {
-        return (
-          <ContainerCard onReplicate={self.onReplicate} key={container.id} container={container} containerStopped={self.containerStopped}/>
-        );
-      });
+      containersNodes = this.state.filtContainers.map(container => (
+        <ContainerCard onReplicate={this.onReplicate} key={container.id} container={container}
+                       containerStopped={this.containerStopped}/>
+      ));
     }
     return (
       <MainLayout title='Containers'>

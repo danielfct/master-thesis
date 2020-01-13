@@ -31,11 +31,11 @@ import CardItem from '../shared/CardItem';
 export default class SpecificHostSimulatedMetricsCard extends React.Component {
   onClickRemove = () => {
     const action = '/simulatedMetrics/specificHosts/' + this.props.simulatedMetric.id;
-    const self = this;
-    Utils.formSubmit(action, 'DELETE', {}, function (data) {
-      M.toast({ html: '<div>Specific host simulated metric removed successfully!</div>' });
-      self.props.reloadSimulatedMetrics();
-    });
+    Utils.formSubmit(action, 'DELETE', {},
+      data => {
+        M.toast({ html: '<div>Specific host simulated metric removed successfully!</div>' });
+        this.props.reloadSimulatedMetrics();
+      });
   };
 
   render = () => {
@@ -50,9 +50,9 @@ export default class SpecificHostSimulatedMetricsCard extends React.Component {
                 <div className="row">
                   <div className="col s12">
                     <Link className="waves-effect waves-light btn-small"
-                      to={'/ui/simulatedmetrics/specifichosts/detail/' + this.props.simulatedMetric.id}>Edit</Link>
+                          to={'/ui/simulatedmetrics/specifichosts/detail/' + this.props.simulatedMetric.id}>Edit</Link>
                     <button style={style} className="waves-effect waves-light btn-small red darken-4"
-                      onClick={this.onClickRemove}>Remove
+                            onClick={this.onClickRemove}>Remove
                     </button>
                   </div>
                 </div>

@@ -71,11 +71,10 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
   loadDefaultHostSimulatedMetrics = () => {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
-      const self = this;
-      const url = '/simulatedMetrics/defaultHosts/' + this.state.id;
-      Utils.ajaxGet(url, function (data) {
-        self.setState({ values: data, loading: false });
-      });
+      Utils.ajaxGet(
+        `localhost/metrics/simulated/hosts/default/'${this.state.id}`,
+        data => this.setState({ values: data, loading: false })
+      );
     }
   };
 
@@ -96,11 +95,11 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
     const formId = 'form-service';
     const formAction = '/simulatedMetrics/defaultHosts/' + this.state.id;
     const formData = Utils.convertFormToJson(formId);
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({ isEdit: false, formSubmit: true });
-      M.toast({ html: '<div>Default host simulated metric saved successfully!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({ isEdit: false, formSubmit: true });
+        M.toast({ html: '<div>Default host simulated metric saved successfully!</div>' });
+      });
   };
 
   onInputChange = event => {

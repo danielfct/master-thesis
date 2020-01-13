@@ -47,22 +47,18 @@ export default class Nodes extends React.Component {
 
   loadNodes = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/nodes',
-      function (data) {
-        self.setState({ data: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/nodes',
+      data => this.setState({ data: data, loading: false })
+    );
   };
 
   render = () => {
     let nodes;
-    const self = this;
     if (this.state.data) {
-      nodes = this.state.data.map(function (node) {
-        return (
-          <NodeCard key={node.id} node={node} reloadNodes={self.loadNodes}/>
-        );
-      });
+      nodes = this.state.data.map(node => (
+        <NodeCard key={node.id} node={node} reloadNodes={this.loadNodes}/>
+      ));
     }
     return (
       <MainLayout title='Nodes'>

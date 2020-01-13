@@ -40,11 +40,10 @@ export default class Conditions extends React.Component {
 
   loadConditions = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/conditions',
-      function (data) {
-        self.setState({ data: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/conditions',
+      data => this.setState({ data: data, loading: false })
+    );
   };
 
   render = () => {

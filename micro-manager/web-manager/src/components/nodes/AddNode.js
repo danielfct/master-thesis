@@ -77,12 +77,12 @@ export default class AddNode extends React.Component {
     event.preventDefault();
     const formAction = '/nodes';
     const formData = Utils.convertFormToJson('form-node');
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({formSubmit: true});
-      const nodes = data.toString();
-      M.toast({html: '<div>New nodes added successfully!</br>Nodes: ' + nodes + '</div>'});
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({formSubmit: true});
+        const nodes = data.toString();
+        M.toast({html: `<div>New nodes added successfully!</br>Nodes: ${nodes}</div>`});
+      });
   };
 
   renderForm = () => {

@@ -67,53 +67,49 @@ export default class HostRulesPage extends React.Component {
     Utils.ajaxGet(
       'localhost/rules/hosts',
       data => this.setState({ allRules: data, loading: false })
-      );
+    );
   };
 
   onRemoveRule = (ruleId, event) => {
     const formAction = '/hosts/' + this.state.hostname + '/rules';
-    const self = this;
     const data = {
-      hostname: self.state.hostname,
+      hostname: this.state.hostname,
       ruleId: Number(ruleId)
     };
-    Utils.formSubmit(formAction, 'DELETE', JSON.stringify(data), function (data) {
-      M.toast({ html: '<div>Rule successfully deleted from hosts rules!</div>' });
-      self.loadHostRules();
-    });
+    Utils.formSubmit(formAction, 'DELETE', JSON.stringify(data),
+      data => {
+        M.toast({ html: '<div>Rule successfully deleted from hosts rules!</div>' });
+        this.loadHostRules();
+      });
   };
 
   addRule = (ruleId, event) => {
-    const formAction = '/hosts/' + this.state.hostname + '/rules';
-    const self = this;
     const data = {
-      hostname: self.state.hostname,
+      hostname: this.state.hostname,
       ruleId: Number(ruleId)
     };
-    Utils.formSubmit(formAction, 'POST', JSON.stringify(data), function (data) {
-      M.toast({ html: '<div>Rule successfully added to host rules!</div>' });
-      self.loadHostRules();
-    });
+    Utils.formSubmit(`/hosts/${this.state.hostname}/rules`, 'POST', JSON.stringify(data),
+      data => {
+        M.toast({ html: '<div>Rule successfully added to host rules!</div>' });
+        this.loadHostRules();
+      });
   };
 
   renderRules = () => {
     let rulesNodes;
-    const self = this;
     const style = { marginTop: '-4px' };
     if (this.state.rules) {
-      rulesNodes = this.state.rules.map(function (hostRule) {
-        return (
-          <li key={hostRule.rule.id} className="collection-item">
-            <div>
-              {hostRule.rule.ruleName}
-              <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-                 onClick={(e) => self.onRemoveRule(hostRule.rule.id, e)}>
-                <i className="material-icons">clear</i>
-              </a>
-            </div>
-          </li>
-        );
-      });
+      rulesNodes = this.state.rules.map(hostRule => (
+        <li key={hostRule.rule.id} className="collection-item">
+          <div>
+            {hostRule.rule.ruleName}
+            <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+               onClick={(e) => this.onRemoveRule(hostRule.rule.id, e)}>
+              <i className="material-icons">clear</i>
+            </a>
+          </div>
+        </li>
+      ));
     }
     return rulesNodes;
   };
@@ -121,26 +117,23 @@ export default class HostRulesPage extends React.Component {
   renderAddRules = () => {
     let ruleNodes;
     const style = { marginTop: '-4px' };
-    const self = this;
-
-    const canAddRule = (ruleId) => {
-      for (let i = 0; i < self.state.rules.length; i++) {
-        if (self.state.rules[i].rule.id === ruleId) {
+    const canAddRule = ruleId => {
+      for (let i = 0; i < this.state.rules.length; i++) {
+        if (this.state.rules[i].rule.id === ruleId) {
           return false;
         }
       }
       return true;
     };
-
     if (this.state.allRules && this.state.loadedRules) {
-      ruleNodes = this.state.allRules.map(function (rule) {
+      ruleNodes = this.state.allRules.map(rule => {
         if (canAddRule(rule.id)) {
           return (
             <li key={rule.id} className="collection-item">
               <div>
                 {rule.ruleName}
                 <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-                   onClick={(e) => self.addRule(rule.id, e)}>
+                   onClick={(e) => this.addRule(rule.id, e)}>
                   <i className="material-icons">add</i>
                 </a>
               </div>

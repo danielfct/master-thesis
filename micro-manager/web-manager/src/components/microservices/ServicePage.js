@@ -80,20 +80,18 @@ export default class ServicePage extends React.Component {
 
   loadService = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/services/' + this.state.service.id,
-      function (data) {
-        self.setState({ service: data, loading: false });
-      });
+    Utils.ajaxGet(
+      `localhost/services/${this.state.service.id}`,
+      data => this.setState({ service: data, loading: false })
+    );
   };
 
   loadDependencies = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/services/' + this.state.service.id + '/dependencies',
-      function (data) {
-        self.setState({ dependencies: data, loadedDependencies: true, loading: false });
-      });
+    Utils.ajaxGet(
+      `localhost/services/${this.state.service.id}/dependencies`,
+      data => this.setState({ dependencies: data, loadedDependencies: true, loading: false })
+    );
   };
 
   renderDependencies = () => {
@@ -132,11 +130,11 @@ export default class ServicePage extends React.Component {
 
   onClickRemove = () => {
     const formAction = '/services/' + this.state.service.id;
-    const self = this;
-    Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
-      self.setState({ isDeleted: true });
-      M.toast({ html: '<div>Service config removed successfully!</div>' });
-    });
+    Utils.formSubmit(formAction, 'DELETE', {},
+      data => {
+        this.setState({ isDeleted: true });
+        M.toast({ html: '<div>Service config removed successfully!</div>' });
+      });
   };
 
   handleChange = event => {
@@ -150,17 +148,17 @@ export default class ServicePage extends React.Component {
     event.preventDefault();
     const formAction = '/services';
     const formData = Utils.convertFormToJson('form-service');
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      const newService = self.state.service;
-      if (newService.id === 0) {
-        const title = document.title;
-        window.history.replaceState({}, title, '/ui/services/detail/' + data);
-      }
-      newService.id = data;
-      self.setState({ service: newService });
-      M.toast({ html: '<div>Service config saved successfully!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        const newService = this.state.service;
+        if (newService.id === 0) {
+          const title = document.title;
+          window.history.replaceState({}, title, '/ui/services/detail/' + data);
+        }
+        newService.id = data;
+        this.setState({ service: newService });
+        M.toast({ html: '<div>Service config saved successfully!</div>' });
+      });
   };
 
   renderButton = () => {
@@ -185,7 +183,7 @@ export default class ServicePage extends React.Component {
             <div className="col s12">
               <a className="waves-effect waves-light btn-small" onClick={this.onClickEdit}>{editLabel}</a>
               <button disabled={this.state.service.id === 0} style={style}
-                className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>Remove
+                      className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>Remove
               </button>
             </div>
           </div>
@@ -193,55 +191,55 @@ export default class ServicePage extends React.Component {
         <form id="form-service" onSubmit={this.onSubmitForm}>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.serviceName} onChange={this.handleChange}
-              name="serviceName" id="serviceName" type="text" autoComplete="off"/>
+                   name="serviceName" id="serviceName" type="text" autoComplete="off"/>
             <label htmlFor="serviceName">Service name</label>
           </div>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.dockerRepo} onChange={this.handleChange}
-              name="dockerRepo" id="dockerRepo" type="text" autoComplete="off"/>
+                   name="dockerRepo" id="dockerRepo" type="text" autoComplete="off"/>
             <label htmlFor="dockerRepo">Docker Repository</label>
           </div>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.defaultExternalPort}
-              onChange={this.handleChange} name="defaultExternalPort" id="defaultExternalPort" type="text"
-              autoComplete="off"/>
+                   onChange={this.handleChange} name="defaultExternalPort" id="defaultExternalPort" type="text"
+                   autoComplete="off"/>
             <label htmlFor="defaultExternalPort">Default external port</label>
           </div>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.defaultInternalPort}
-              onChange={this.handleChange} name="defaultInternalPort" id="defaultInternalPort" type="text"
-              autoComplete="off"/>
+                   onChange={this.handleChange} name="defaultInternalPort" id="defaultInternalPort" type="text"
+                   autoComplete="off"/>
             <label htmlFor="defaultInternalPort">Default internal port</label>
           </div>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.defaultDb} onChange={this.handleChange}
-              name="defaultDb" id="defaultDb" type="text" autoComplete="off"/>
+                   name="defaultDb" id="defaultDb" type="text" autoComplete="off"/>
             <label htmlFor="defaultDb">Default database</label>
           </div>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.launchCommand} onChange={this.handleChange}
-              name="launchCommand" id="launchCommand" type="text" autoComplete="off"/>
+                   name="launchCommand" id="launchCommand" type="text" autoComplete="off"/>
             <label htmlFor="launchCommand">Launch command</label>
           </div>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.minReplics} onChange={this.handleChange}
-              name="minReplics" id="minReplics" type="number" autoComplete="off"/>
+                   name="minReplics" id="minReplics" type="number" autoComplete="off"/>
             <label htmlFor="minReplics">Minimum Replics</label>
           </div>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.maxReplics} onChange={this.handleChange}
-              name="maxReplics" id="maxReplics" type="number" autoComplete="off"/>
+                   name="maxReplics" id="maxReplics" type="number" autoComplete="off"/>
             <label htmlFor="maxReplics">Maximum Replics</label>
           </div>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.outputLabel} onChange={this.handleChange}
-              name="outputLabel" id="outputLabel" type="text" autoComplete="off"/>
+                   name="outputLabel" id="outputLabel" type="text" autoComplete="off"/>
             <label htmlFor="outputLabel">Output label</label>
           </div>
 
           <div className="input-field col s12">
             <select disabled={!this.state.isEdit} value={this.state.service.serviceType} onChange={this.handleChange}
-              name="serviceType" id="serviceType">
+                    name="serviceType" id="serviceType">
               <option value="" disabled="disabled">Choose service type</option>
               <option value='frontend'>frontend</option>
               <option value='backend'>backend</option>
@@ -252,7 +250,7 @@ export default class ServicePage extends React.Component {
           </div>
           <div className="input-field col s12">
             <input disabled={!this.state.isEdit} value={this.state.service.avgMem} onChange={this.handleChange}
-              name="avgMem" id="avgMem" type="number" autoComplete="off"/>
+                   name="avgMem" id="avgMem" type="number" autoComplete="off"/>
             <label htmlFor="avgMem">Average Memory (bytes)</label>
           </div>
           {this.renderButton()}

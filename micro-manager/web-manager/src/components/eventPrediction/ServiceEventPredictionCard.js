@@ -30,11 +30,11 @@ import CardItem from '../shared/CardItem';
 export default class ServiceEventPredictionCard extends React.Component {
   onClickRemove = () => {
     const action = '/services/serviceEventPredictions/' + this.props.serviceEvent.id;
-    const self = this;
-    Utils.formSubmit(action, 'DELETE', {}, function (data) {
-      M.toast({ html: '<div>Service event prediction removed successfully!</div>' });
-      self.props.reloadServiceEvents();
-    });
+    Utils.formSubmit(action, 'DELETE', {},
+      data => {
+        M.toast({ html: '<div>Service event prediction removed successfully!</div>' });
+        this.props.reloadServiceEvents();
+      });
   };
 
   render = () => {
@@ -49,7 +49,7 @@ export default class ServiceEventPredictionCard extends React.Component {
                 <div className="row">
                   <div className="col s12">
                     <button className="waves-effect waves-light btn-small red darken-4"
-                      onClick={this.onClickRemove}>Remove
+                            onClick={this.onClickRemove}>Remove
                     </button>
                   </div>
                 </div>

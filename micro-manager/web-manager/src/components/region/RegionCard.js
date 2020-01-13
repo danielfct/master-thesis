@@ -65,26 +65,26 @@ export default class RegionCard extends React.Component {
     const formId = this.state.data.id + 'regionForm';
     const formAction = '/regions/' + this.state.data.id;
     const formData = Utils.convertFormToJson(formId);
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      const newData = self.state.data;
-      const oldId = newData.id;
-      newData.id = data;
-      if (oldId === 0) {
-        self.props.updateNewRegion(false);
-      }
-      self.setState({isEdit: false});
-      M.toast({html: '<div>Region saved successfully!</div>'});
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        const newData = this.state.data;
+        const oldId = newData.id;
+        newData.id = data;
+        if (oldId === 0) {
+          this.props.updateNewRegion(false);
+        }
+        this.setState({isEdit: false});
+        M.toast({html: '<div>Region saved successfully!</div>'});
+      });
   };
 
   onClickRemove = () => {
     const formAction = '/regions/' + this.state.data.id;
-    const self = this;
-    Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
-      M.toast({html: '<div>Region deleted successfully!</div>'});
-      self.props.onRemove();
-    });
+    Utils.formSubmit(formAction, 'DELETE', {},
+      data => {
+        M.toast({html: '<div>Region deleted successfully!</div>'});
+        this.props.onRemove();
+      });
   };
 
   renderNormal = () => (

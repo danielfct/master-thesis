@@ -47,11 +47,10 @@ export default class ServiceEventPredictions extends React.Component {
 
   loadServiceEventPredictions = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/services/serviceEventPredictions',
-      function (data) {
-        self.setState({ data: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/services/eventPredictions',
+      data => this.setState({ data: data, loading: false })
+    );
   };
 
   renderServiceEvents = () => {

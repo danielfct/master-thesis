@@ -40,11 +40,10 @@ export default class EurekaPage extends React.Component {
 
   loadRegions () {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/regions',
-      function (data) {
-        self.setState({ availableRegions: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/regions',
+      data => this.setState({ availableRegions: data, loading: false })
+    );
   };
 
   addRegion = (regionId, event) => {
@@ -60,7 +59,8 @@ export default class EurekaPage extends React.Component {
     const index = getIndex(regionId, newAvailableRegions);
     newAvailableRegions.splice(index, 1);
     this.setState({ loading: true });
-    Utils.ajaxGet('/regions/' + regionId,
+    Utils.ajaxGet(
+      `localhost/regions/${regionId}`,
       data => {
         const newChosenRegions = this.state.chosenRegions;
         newChosenRegions.push(data);
@@ -69,57 +69,56 @@ export default class EurekaPage extends React.Component {
   };
 
   onRemoveRegion (regionId, event) {
-    const self = this;
-    function getIndex (regionId, regions) {
+    //TODO fix
+    const getIndex = (regionId, regions) => {
       let i;
       for (i = 0; i < regions.length; i++) {
         if (regions[i].id === regionId) {
           return i;
         }
       }
-    }
-    const newChosenRegions = self.state.chosenRegions;
+    };
+    const newChosenRegions = this.state.chosenRegions;
     const index = getIndex(regionId, newChosenRegions);
     newChosenRegions.splice(index, 1);
     this.setState({ loading: true });
-    Utils.ajaxGet('/regions/' + regionId,
-      function (data) {
-        const newAvailableRegions = self.state.availableRegions;
+    Utils.ajaxGet(
+      `localhost/regions/${regionId}`,
+      data => {
+        const newAvailableRegions = this.state.availableRegions;
         newAvailableRegions.push(data);
-        self.setState({ availableRegions: newAvailableRegions, chosenRegions: newChosenRegions, loading: false });
+        this.setState({ availableRegions: newAvailableRegions, chosenRegions: newChosenRegions, loading: false });
       });
   };
 
   onSubmitForm (event) {
     event.preventDefault();
-    const self = this;
     const formAction = '/containers/eureka';
     const formMethod = 'POST';
-    const formData = JSON.stringify(self.state.chosenRegions);
-    Utils.formSubmit(formAction, formMethod, formData, function (data) {
-      self.setState({ formSubmit: true });
-      const hosts = data.toString();
-      M.toast({ html: '<div>Eureka servers successfully launched!</br>Hosts: ' + hosts + '</div>' });
-    });
+    const formData = JSON.stringify(this.state.chosenRegions);
+    Utils.formSubmit(formAction, formMethod, formData,
+      data => {
+        this.setState({ formSubmit: true });
+        const hosts = data.toString();
+        M.toast({ html: '<div>Eureka servers successfully launched!</br>Hosts: ' + hosts + '</div>' });
+      });
   };
 
   renderChosenRegions () {
     let regionsNodes;
-    const self = this;
     const style = { marginTop: '-4px' };
     if (this.state.chosenRegions) {
-      regionsNodes = this.state.chosenRegions.map(function (region) {
-        return (
-          <li key={region.id} className="collection-item">
-            <div>
-              {region.regionName + ' (' + region.regionDescription + ')'}
-              <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light" onClick={(e) => self.onRemoveRegion(region.id, e)}>
-                <i className="material-icons">clear</i>
-              </a>
-            </div>
-          </li>
-        );
-      });
+      regionsNodes = this.state.chosenRegions.map(region => (
+        <li key={region.id} className="collection-item">
+          <div>
+            {region.regionName + ' (' + region.regionDescription + ')'}
+            <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+               onClick={(e) => this.onRemoveRegion(region.id, e)}>
+              <i className="material-icons">clear</i>
+            </a>
+          </div>
+        </li>
+      ));
     }
     return regionsNodes;
   };
@@ -127,20 +126,18 @@ export default class EurekaPage extends React.Component {
   renderAvailableRegions () {
     let regionsNodes;
     const style = { marginTop: '-4px' };
-    const self = this;
     if (this.state.availableRegions) {
-      regionsNodes = this.state.availableRegions.map(function (region) {
-        return (
-          <li key={region.id} className="collection-item">
-            <div>
-              {region.regionName + ' (' + region.regionDescription + ')'}
-              <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light" onClick={(e) => self.addRegion(region.id, e)}>
-                <i className="material-icons">add</i>
-              </a>
-            </div>
-          </li>
-        );
-      });
+      regionsNodes = this.state.availableRegions.map(region => (
+        <li key={region.id} className="collection-item">
+          <div>
+            {region.regionName + ' (' + region.regionDescription + ')'}
+            <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+               onClick={(e) => this.addRegion(region.id, e)}>
+              <i className="material-icons">add</i>
+            </a>
+          </div>
+        </li>
+      ));
     }
     return (
       <ul className="collection">
@@ -158,7 +155,7 @@ export default class EurekaPage extends React.Component {
         </ul>
         <form id='launchEurekaForm' onSubmit={this.onSubmitForm}>
           <button disabled={this.state.chosenRegions.length === 0} className="btn waves-effect waves-light" type="submit" name="action">
-                        Launch eureka servers
+            Launch eureka servers
             <i className="material-icons right">send</i>
           </button>
         </form>

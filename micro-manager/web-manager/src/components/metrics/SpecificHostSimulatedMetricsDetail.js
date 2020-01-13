@@ -82,9 +82,8 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     if (this.state.id !== 0) {
       this.setState({ loading: true });
       Utils.ajaxGet(
-        `localhost/simulatedMetrics/hosts/specific/${this.state.id}`,
-         data =>
-        this.setState({ values: data, loading: false })
+        `localhost/metrics/simulated/hosts/specific/${this.state.id}`,
+        data => this.setState({ values: data, loading: false })
       );
     }
   };
@@ -118,11 +117,11 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     const formId = 'form-service';
     const formAction = '/simulatedMetrics/specificHosts/' + this.state.id;
     const formData = Utils.convertFormToJson(formId);
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({ isEdit: false, formSubmit: true });
-      M.toast({ html: '<div>Specific host simulated metric saved successfully!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({ isEdit: false, formSubmit: true });
+        M.toast({ html: '<div>Specific host simulated metric saved successfully!</div>' });
+      });
   };
 
   onInputChange = event => {

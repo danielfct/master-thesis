@@ -61,19 +61,18 @@ export default class LaunchContainer extends React.Component {
 
   loadAvailableNodes = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/nodes', function (data) {
-      self.setState({ nodes: data, loading: false });
-    });
+    Utils.ajaxGet(
+      'localhost/nodes',
+      data => this.setState({ nodes: data, loading: false })
+    );
   };
 
   loadServices = () => {
     this.setState({ loading: true });
-    const self = this;
-    const url = '/services';
-    Utils.ajaxGet(url, function (data) {
-      self.setState({ services: data, loading: false });
-    });
+    Utils.ajaxGet(
+      'localhost/services',
+      data => this.setState({ services: data, loading: false })
+    );
   };
 
   renderServicesSelect = () => {
@@ -93,12 +92,12 @@ export default class LaunchContainer extends React.Component {
     const formId = 'form-service';
     const formAction = '/containers';
     const formData = Utils.convertFormToJson(formId);
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({ isEdit: false, formSubmit: true });
-      console.log(data);
-      M.toast({ html: '<div>Container launched successfully!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({ isEdit: false, formSubmit: true });
+        console.log(data);
+        M.toast({ html: '<div>Container launched successfully!</div>' });
+      });
   };
 
   onInputChange = (event) => {
@@ -143,12 +142,12 @@ export default class LaunchContainer extends React.Component {
         </div>
         <div className="input-field col s12">
           <input defaultValue={this.state.values.internalPort} type="text" name="internalPort" id="internalPort"
-            autoComplete="off"/>
+                 autoComplete="off"/>
           <label htmlFor="internalPort">Internal Port</label>
         </div>
         <div className="input-field col s12">
           <input defaultValue={this.state.values.externalPort} type="text" name="externalPort" id="externalPort"
-            autoComplete="off"/>
+                 autoComplete="off"/>
           <label htmlFor="externalPort">External Port</label>
         </div>
         <button className="btn waves-effect waves-light" type="submit" name="action">

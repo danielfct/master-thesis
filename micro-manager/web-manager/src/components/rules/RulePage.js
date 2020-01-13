@@ -72,42 +72,40 @@ export default class RulePage extends React.Component {
     Utils.ajaxGet(
       `localhost/rules/${this.state.ruleId}/conditions`,
       data => this.setState({ conditions: data, loadedConditions: true, loading: false })
-      );
+    );
   };
 
   loadRule = () => {
     if (this.state.ruleId !== 0) {
       this.setState({ loading: true });
-      const self = this;
-      Utils.ajaxGet('/rules/' + this.state.ruleId,
-        function (data) {
+      Utils.ajaxGet(
+        `localhost/rules/${this.state.ruleId}`,
+        (data) => {
           const currentRule = {
             ruleName: data.ruleName,
             componentTypeId: data.componentType.id,
             priority: data.priority,
             decisionId: data.decision.id
           };
-          self.setState({ rule: currentRule, loading: false });
+          this.setState({ rule: currentRule, loading: false });
         });
     }
   };
 
   loadComponentTypes = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/rules/componentTypes/',
-      function (data) {
-        self.setState({ componentTypes: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/rules/componentTypes/',
+      data => this.setState({ componentTypes: data, loading: false })
+    );
   };
 
   loadDecisions = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/decisions/',
-      function (data) {
-        self.setState({ decisions: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/decisions/',
+      data => this.setState({ decisions: data, loading: false })
+    );
   };
 
   handleChange = event => {
@@ -121,11 +119,11 @@ export default class RulePage extends React.Component {
     if (this.state.ruleId !== 0) {
       const formAction = '/rules/' + this.state.ruleId + '/conditions/' + conditionId;
       const formMethod = 'POST';
-      const self = this;
-      Utils.formSubmit(formAction, formMethod, {}, function (data) {
-        M.toast({ html: '<div>Condition successfully added to rule!</div>' });
-        self.loadConditions();
-      });
+      Utils.formSubmit(formAction, formMethod, {},
+        data => {
+          M.toast({ html: '<div>Condition successfully added to rule!</div>' });
+          this.loadConditions();
+        });
     }
   };
 
@@ -168,87 +166,82 @@ export default class RulePage extends React.Component {
 
   onDelete = () => {
     const formAction = '/rules/' + this.state.ruleId;
-    const self = this;
-    Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
-      self.setState({ isDeleted: true });
-      M.toast({ html: '<div>Rule successfully deleted!</div>' });
-    });
+    Utils.formSubmit(formAction, 'DELETE', {},
+      data => {
+        this.setState({ isDeleted: true });
+        M.toast({ html: '<div>Rule successfully deleted!</div>' });
+      });
   };
 
   onRemoveCondition = (conditionId, event) => {
     const formAction = '/rules/' + this.state.ruleId + '/conditions/' + conditionId;
-    const self = this;
-    Utils.formSubmit(formAction, 'DELETE', {}, function (data) {
-      M.toast({ html: '<div>Condition successfully deleted from rule!</div>' });
-      self.loadConditions();
-    });
+    Utils.formSubmit(formAction, 'DELETE', {},
+      data => {
+        M.toast({ html: '<div>Condition successfully deleted from rule!</div>' });
+        this.loadConditions();
+      });
   };
 
   onSubmitForm = event => {
     event.preventDefault();
     const formAction = '/rules/' + this.state.ruleId;
     const formData = Utils.convertFormToJson('ruleForm');
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({ ruleId: data, isEdit: false });
-      M.toast({ html: '<div>Rule successfully saved!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({ ruleId: data, isEdit: false });
+        M.toast({ html: '<div>Rule successfully saved!</div>' });
+      });
   };
 
   renderConditions = () => {
     let conditionNodes;
-    const self = this;
     const style = { marginTop: '-4px' };
     if (this.state.conditions) {
-      conditionNodes = this.state.conditions.map(function (condition) {
-        return (
-          <li key={condition.id} className="collection-item">
-            <div>
-              {'(' + condition.valueMode.valueModeName + ') ' + condition.field.fieldName + ' ' + condition.operator.operatorSymbol + ' ' + condition.conditionValue}
-              <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-                onClick={(e) => self.onRemoveCondition(condition.id, e)}>
-                <i className="material-icons">clear</i>
-              </a>
-            </div>
-          </li>
-        );
-      });
+      conditionNodes = this.state.conditions.map(condition => (
+        <li key={condition.id} className="collection-item">
+          <div>
+            {'(' + condition.valueMode.valueModeName + ') ' + condition.field.fieldName + ' ' + condition.operator.operatorSymbol + ' ' + condition.conditionValue}
+            <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+               onClick={(e) => this.onRemoveCondition(condition.id, e)}>
+              <i className="material-icons">clear</i>
+            </a>
+          </div>
+        </li>
+      ));
     }
     return conditionNodes;
   };
 
   loadAllConditions = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/conditions',
-      function (data) {
-        self.setState({ allConditions: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/conditions',
+      data => this.setState({ allConditions: data, loading: false })
+    );
   };
 
   renderAddCondition = () => {
     let conditionNodes;
     const style = { marginTop: '-4px' };
-    const self = this;
-
-    function canAddCondition (conditionId) {
-      for (let i = 0; i < self.state.conditions.length; i++) {
-        if (self.state.conditions[i].id === conditionId) {
+    //TODO fix
+    const canAddCondition = conditionId => {
+      for (let i = 0; i < this.state.conditions.length; i++) {
+        if (this.state.conditions[i].id === conditionId) {
           return false;
         }
       }
       return true;
-    }
+    };
 
     if (this.state.allConditions && this.state.loadedConditions) {
-      conditionNodes = this.state.allConditions.map(function (condition) {
+      conditionNodes = this.state.allConditions.map(condition => {
         if (canAddCondition(condition.id)) {
           return (
             <li key={condition.id} className="collection-item">
               <div>
                 {'(' + condition.valueMode.valueModeName + ') ' + condition.field.fieldName + ' ' + condition.operator.operatorSymbol + ' ' + condition.conditionValue}
                 <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-                  onClick={(e) => self.addCondition(condition.id, e)}>
+                   onClick={(e) => this.addCondition(condition.id, e)}>
                   <i className="material-icons">add</i>
                 </a>
               </div>
@@ -282,12 +275,12 @@ export default class RulePage extends React.Component {
         <form id='ruleForm' onSubmit={this.onSubmitForm}>
           <div className="input-field col s12">
             <input value={this.state.rule.ruleName} onChange={this.handleChange} name="ruleName" id="ruleName"
-              type="text" autoComplete="off"/>
+                   type="text" autoComplete="off"/>
             <label htmlFor="ruleName">Rule name</label>
           </div>
           <div className="input-field col s12">
             <select value={this.state.rule.componentTypeId} onChange={this.handleChange} name="componentTypeId"
-              id="componentTypeId">
+                    id="componentTypeId">
               <option value="" disabled="disabled">Choose rule type</option>
               {componentTypesSelect}
             </select>
@@ -295,7 +288,7 @@ export default class RulePage extends React.Component {
           </div>
           <div className="input-field col s12">
             <input value={this.state.rule.priority} onChange={this.handleChange} name="priority" id="priority"
-              type="number"/>
+                   type="number"/>
             <label htmlFor="priority">Priority</label>
           </div>
           <div className="input-field col s12">

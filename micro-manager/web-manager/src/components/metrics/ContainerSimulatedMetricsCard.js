@@ -31,10 +31,10 @@ import CardItem from '../shared/CardItem';
 export default class ContainerSimulatedMetricsCard extends React.Component {
   onClickRemove = () => {
     const action = '/simulatedMetrics/containers/' + this.props.simulatedMetric.id;
-    const self = this;
-    Utils.formSubmit(action, 'DELETE', {}, function (data) {
+    Utils.formSubmit(action, 'DELETE', {},
+        data => {
       M.toast({ html: '<div>Container simulated metric removed successfully!</div>' });
-      self.props.reloadSimulatedMetrics();
+      this.props.reloadSimulatedMetrics();
     });
   };
 

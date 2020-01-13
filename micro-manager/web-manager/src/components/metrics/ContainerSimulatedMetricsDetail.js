@@ -64,30 +64,27 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
 
   loadContainers = () => {
     this.setState({ loading: true });
-    const self = this;
-    const url = '/containers';
-    Utils.ajaxGet(url, function (data) {
-      self.setState({ containers: data, loading: false });
-    });
+    Utils.ajaxGet(
+      '/containers',
+      data => this.setState({ containers: data, loading: false })
+    );
   };
 
   loadFields = () => {
     this.setState({ loading: true });
-    const self = this;
-    const url = '/rules/fields';
-    Utils.ajaxGet(url, function (data) {
-      self.setState({ fields: data, loading: false });
-    });
+    Utils.ajaxGet(
+      '/rules/fields',
+      data => this.setState({ fields: data, loading: false })
+    );
   };
 
   loadContainerSimulatedMetrics = () => {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
-      const self = this;
-      const url = '/simulatedMetrics/containers/' + this.state.id;
-      Utils.ajaxGet(url, function (data) {
-        self.setState({ values: data, loading: false });
-      });
+      Utils.ajaxGet(
+        `localhost/metrics/simulated/containers/${this.state.id}`,
+        data => this.setState({ values: data, loading: false })
+      );
     }
   };
 
@@ -120,11 +117,11 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
     const formId = 'form-service';
     const formAction = '/simulatedMetrics/containers/' + this.state.id;
     const formData = Utils.convertFormToJson(formId);
-    const self = this;
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({ isEdit: false, formSubmit: true });
-      M.toast({ html: '<div>Container simulated metric saved successfully!</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({ isEdit: false, formSubmit: true });
+        M.toast({ html: '<div>Container simulated metric saved successfully!</div>' });
+      });
   };
 
   onInputChange = event => {
@@ -141,7 +138,7 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
       <form id="form-service" onSubmit={this.onSubmitForm}>
         <div className="input-field col s12">
           <select value={this.state.values.containerId} onChange={this.onInputChange} name="containerId"
-            id="containerId">
+                  id="containerId">
             <option value="" disabled="disabled">Choose container</option>
             {containersSelect}
           </select>
@@ -156,12 +153,12 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
         </div>
         <div className="input-field col s12">
           <input value={this.state.values.minValue} onChange={this.onInputChange} type="number" name="minValue"
-            id="minValue" autoComplete="off"/>
+                 id="minValue" autoComplete="off"/>
           <label htmlFor="minValue">Minimum value</label>
         </div>
         <div className="input-field col s12">
           <input value={this.state.values.maxValue} onChange={this.onInputChange} type="number" name="maxValue"
-            id="maxValue" autoComplete="off"/>
+                 id="maxValue" autoComplete="off"/>
           <label htmlFor="maxValue">Maximum value</label>
         </div>
         <div className="input-field col s12">

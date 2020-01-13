@@ -47,25 +47,25 @@ export default class LoadBalancerPage extends React.Component {
 
   loadServices = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/services',
-      function (data) {
+    Utils.ajaxGet(
+      'localhost/services',
+      data => {
         const frontendServices = [];
         for (let index = 0; index < data.length; index++) {
           if (data[index].serviceType === 'frontend') {
             frontendServices.push(data[index]);
           }
         }
-        self.setState({ services: frontendServices, loading: false });
+        this.setState({ services: frontendServices, loading: false });
       });
   };
 
   loadRegions = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/regions',
-      function (data) {
-        self.setState({ availableRegions: data, loading: false });
+    Utils.ajaxGet(
+      'localhost/regions',
+      data => {
+        this.setState({ availableRegions: data, loading: false });
       });
   };
 
@@ -82,7 +82,8 @@ export default class LoadBalancerPage extends React.Component {
     const index = getIndex(regionId, newAvailableRegions);
     newAvailableRegions.splice(index, 1);
     this.setState({ loading: true });
-    Utils.ajaxGet('/regions/' + regionId,
+    Utils.ajaxGet(
+      `localhost/regions/${regionId}`,
       data => {
         const newChosenRegions = this.state.chosenRegions;
         newChosenRegions.push(data);
@@ -91,7 +92,6 @@ export default class LoadBalancerPage extends React.Component {
   };
 
   onRemoveRegion = (regionId, event) => {
-    const self = this;
     function getIndex (regionId, regions) {
       let i;
       for (i = 0; i < regions.length; i++) {
@@ -100,16 +100,16 @@ export default class LoadBalancerPage extends React.Component {
         }
       }
     }
-
-    const newChosenRegions = self.state.chosenRegions;
+    const newChosenRegions = this.state.chosenRegions;
     const index = getIndex(regionId, newChosenRegions);
     newChosenRegions.splice(index, 1);
     this.setState({ loading: true });
-    Utils.ajaxGet('/regions/' + regionId,
-      function (data) {
-        const newAvailableRegions = self.state.availableRegions;
+    Utils.ajaxGet(
+      `localhost/regions/${regionId}`,
+      data => {
+        const newAvailableRegions = this.state.availableRegions;
         newAvailableRegions.push(data);
-        self.setState({ availableRegions: newAvailableRegions, chosenRegions: newChosenRegions, loading: false });
+        this.setState({ availableRegions: newAvailableRegions, chosenRegions: newChosenRegions, loading: false });
       });
   };
 
@@ -127,38 +127,36 @@ export default class LoadBalancerPage extends React.Component {
 
   onSubmitForm = event => {
     event.preventDefault();
-    const self = this;
     const formAction = '/containers/loadBalancer';
     const service = $('#service').val();
     const dataToSend = {
       serviceName: service,
-      regions: self.state.chosenRegions
+      regions: this.state.chosenRegions
     };
     const formData = JSON.stringify(dataToSend);
-    Utils.formSubmit(formAction, 'POST', formData, function (data) {
-      self.setState({ formSubmit: true });
-      const hosts = data.toString();
-      M.toast({ html: '<div>Load balancers successfully launched!</br>Hosts: ' + hosts + '</div>' });
-    });
+    Utils.formSubmit(formAction, 'POST', formData,
+      data => {
+        this.setState({ formSubmit: true });
+        const hosts = data.toString();
+        M.toast({ html: '<div>Load balancers successfully launched!</br>Hosts: ' + hosts + '</div>' });
+      });
   };
 
   renderChosenRegions = () => {
     let regionsNodes;
-    const self = this;
     const style = { marginTop: '-4px' };
     if (this.state.chosenRegions) {
-      regionsNodes = this.state.chosenRegions.map(function (region) {
-        return (
-          <li key={region.id} className="collection-item">
-            <div>
-              {region.regionName + ' (' + region.regionDescription + ')'}
-              <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light" onClick={(e) => self.onRemoveRegion(region.id, e)}>
-                <i className="material-icons">clear</i>
-              </a>
-            </div>
-          </li>
-        );
-      });
+      regionsNodes = this.state.chosenRegions.map(region => (
+        <li key={region.id} className="collection-item">
+          <div>
+            {region.regionName + ' (' + region.regionDescription + ')'}
+            <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+               onClick={(e) => this.onRemoveRegion(region.id, e)}>
+              <i className="material-icons">clear</i>
+            </a>
+          </div>
+        </li>
+      ));
     }
     return regionsNodes;
   };
@@ -166,20 +164,18 @@ export default class LoadBalancerPage extends React.Component {
   renderAvailableRegions = () => {
     let regionsNodes;
     const style = { marginTop: '-4px' };
-    const self = this;
     if (this.state.availableRegions) {
-      regionsNodes = this.state.availableRegions.map(function (region) {
-        return (
-          <li key={region.id} className="collection-item">
-            <div>
-              {region.regionName + ' (' + region.regionDescription + ')'}
-              <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light" onClick={(e) => self.addRegion(region.id, e)}>
-                <i className="material-icons">add</i>
-              </a>
-            </div>
-          </li>
-        );
-      });
+      regionsNodes = this.state.availableRegions.map(region => (
+        <li key={region.id} className="collection-item">
+          <div>
+            {region.regionName + ' (' + region.regionDescription + ')'}
+            <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+               onClick={(e) => this.addRegion(region.id, e)}>
+              <i className="material-icons">add</i>
+            </a>
+          </div>
+        </li>
+      ));
     }
     return (
       <ul className="collection">

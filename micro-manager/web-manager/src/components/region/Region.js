@@ -79,22 +79,19 @@ export default class Regions extends React.Component {
 
   loadRegions = () => {
     this.setState({ loading: true });
-    const self = this;
-    Utils.ajaxGet('/regions',
-      function (data) {
-        self.setState({ data: data, loading: false });
-      });
+    Utils.ajaxGet(
+      'localhost/regions',
+      data => this.setState({ data: data, loading: false })
+    );
   };
 
   render = () => {
     let regionNodes;
-    const self = this;
     if (this.state.data) {
-      regionNodes = this.state.data.map(function (region, index) {
-        return (
-          <RegionCard key={index} index={index} region={region} updateNewRegion={self.updateNewRegion} onRemove={self.loadRegions}/>
-        );
-      });
+      regionNodes = this.state.data.map((region, index) => (
+        <RegionCard key={index} index={index} region={region} updateNewRegion={this.updateNewRegion}
+                    onRemove={this.loadRegions}/>
+      ));
     }
     return (
       <MainLayout title='Regions'>
