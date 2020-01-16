@@ -24,8 +24,8 @@
 
 import React from "react";
 import M from "materialize-css";
-import Utils from "../../utils";
 import CardItem from "../shared/CardItem";
+import {deleteData, postData} from "../../utils/data";
 
 export default class RegionCard extends React.Component {
   constructor (props) {
@@ -54,19 +54,16 @@ export default class RegionCard extends React.Component {
   };
 
   handleChange = event => {
-    const name = event.target.name;
-    const newData = this.state.data;
-    newData[name] = event.target.value;
-    this.setState({data: newData});
+    this.setState({ [event.target.name]: event.target.value });
   };
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formId = this.state.data.id + 'regionForm';
-    const formAction = '/regions/' + this.state.data.id;
-    const formData = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      `localhost/regions/${this.state.data.id}`,
+      event.target[0].value,
       data => {
+        //TODO wtf?
         const newData = this.state.data;
         const oldId = newData.id;
         newData.id = data;
@@ -79,9 +76,9 @@ export default class RegionCard extends React.Component {
   };
 
   onClickRemove = () => {
-    const formAction = '/regions/' + this.state.data.id;
-    Utils.formSubmit(formAction, 'DELETE', {},
-      data => {
+    deleteData(
+      `localhost/regions/${this.state.data.id}`,
+      () => {
         M.toast({html: '<div>Region deleted successfully!</div>'});
         this.props.onRemove();
       });

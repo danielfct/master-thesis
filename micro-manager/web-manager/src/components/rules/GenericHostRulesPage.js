@@ -24,8 +24,8 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
+import {deleteData, getData, postData} from "../../utils/data";
 
 export default class GenericHostRulesPage extends React.Component {
   constructor (props) {
@@ -44,33 +44,33 @@ export default class GenericHostRulesPage extends React.Component {
 
   loadHostRules = () => {
     this.setState({ loadedRules: false, loading: true });
-    Utils.fetch('localhost/rules/hosts/genericRules',
-      data => {
-        this.setState({ rules: data, loadedRules: true, loading: false });
-      });
+    getData(
+      'localhost/rules/hosts/generic',
+      data => this.setState({ rules: data, loadedRules: true, loading: false })
+    );
   };
 
   loadAllRules = () => {
     this.setState({ loading: true });
-    Utils.fetch('localhost/rules/hosts',
-      data => {
-        this.setState({ allRules: data, loading: false });
-      });
+    getData(
+      'localhost/rules/hosts',
+      data => this.setState({ allRules: data, loading: false })
+    );
   };
 
   onRemoveRule = (ruleId, event) => {
-    const formAction = '/hosts/genericRules/' + ruleId;
-    Utils.formSubmit(formAction, 'DELETE', {},
-      (data) => {
+    deleteData(
+      `localhost/hosts/generic/${ruleId}`,
+      () => {
         M.toast({ html: '<div>Rule successfully deleted from generic hosts rules!</div>' });
         this.loadHostRules();
       });
   };
 
   addRule = (ruleId, event) => {
-    const formAction = '/hosts/genericRules/' + ruleId;
-    const formMethod = 'POST';
-    Utils.formSubmit(formAction, formMethod, {},
+    postData(
+      `localhost/hosts/rules/generic/${ruleId}`,
+      event.target[0].value,
       data => {
         M.toast({ html: '<div>Rule successfully added to generic host rules!</div>' });
         this.loadHostRules();

@@ -23,11 +23,11 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
 import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
 import HostRules from './HostRules';
 import MainLayout from '../shared/MainLayout';
+import {getData} from "../../utils/data";
 
 export default class HostsRulesList extends React.Component {
   constructor (props) {
@@ -43,7 +43,7 @@ export default class HostsRulesList extends React.Component {
 
   loadHosts = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/hosts',
       data => this.setState({ hosts: data, loading: false })
     );

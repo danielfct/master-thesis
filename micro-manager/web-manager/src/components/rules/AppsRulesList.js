@@ -23,11 +23,11 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
 import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
 import AppRules from './AppRules';
 import MainLayout from '../shared/MainLayout';
+import {getData} from "../../utils/data";
 
 export default class AppsRulesList extends React.Component {
   constructor (props) {
@@ -41,7 +41,7 @@ export default class AppsRulesList extends React.Component {
 
   loadApps = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/apps',
       data => this.setState({ apps: data, loading: false })
     );
@@ -59,7 +59,7 @@ export default class AppsRulesList extends React.Component {
                   <div className="right-align">
                     <div className="row">
                       <div className="col s12">
-                        <Link className="waves-effect waves-light btn-small" to={'/ui/rules/apps/detail/' + app.id}>
+                        <Link className="waves-effect waves-light btn-small" to={'/rules/apps/detail/' + app.id}>
                           View details
                         </Link>
                       </div>

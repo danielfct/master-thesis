@@ -24,10 +24,10 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import ServiceSimulatedMetricsCard from './ServiceSimulatedMetricsCard';
 import MainLayout from '../shared/MainLayout';
 import { Link } from 'react-router-dom';
+import {getData} from "../../utils/data";
 
 export default class ServiceSimulatedMetrics extends React.Component {
   constructor (props) {
@@ -47,7 +47,7 @@ export default class ServiceSimulatedMetrics extends React.Component {
 
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/metrics/simulated/services',
       data => this.setState({ data: data, loading: false })
     );
@@ -68,8 +68,8 @@ export default class ServiceSimulatedMetrics extends React.Component {
     <MainLayout title='Service simulated metrics'>
       {this.renderSimulatedMetrics()}
       <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add service simulated metric">
-        <Link className="waves-effect waves-light btn-floating btn-large grey darken-4"
-              to='/ui/simulatedmetrics/services/detail'>
+        <Link className="waves-effect waves-light btn-floating grey darken-3"
+              to='/metrics/simulated/services/detail'>
           <i className="large material-icons">add</i>
         </Link>
       </div>

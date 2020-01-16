@@ -24,9 +24,9 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
+import {getData, postData} from "../../utils/data";
 
 export default class SpecificHostSimulatedMetricsDetail extends React.Component {
   constructor (props) {
@@ -64,7 +64,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
 
   loadNodes = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/nodes',
       data => this.setState({ nodes: data, loading: false })
     );
@@ -72,7 +72,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
 
   loadFields = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules/fields',
       data => this.setState({ fields: data, loading: false })
     );
@@ -81,7 +81,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
   loadSpecificHostSimulatedMetrics = () => {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
-      Utils.ajaxGet(
+      getData(
         `localhost/metrics/simulated/hosts/specific/${this.state.id}`,
         data => this.setState({ values: data, loading: false })
       );
@@ -114,10 +114,9 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formId = 'form-service';
-    const formAction = '/simulatedMetrics/specificHosts/' + this.state.id;
-    const formData = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      `localhost/metrics/simulated/hosts/specific/${this.state.id}`,
+      event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });
         M.toast({ html: '<div>Specific host simulated metric saved successfully!</div>' });
@@ -179,7 +178,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
 
   render = () => {
     if (this.state.formSubmit) {
-      return <Redirect to='/ui/simulatedMetrics/specificHosts'/>;
+      return <Redirect to='/metrics/simulated/hosts/specific'/>;
     }
     return (
       <MainLayout title='Specific host simulated metric detail' breadcrumbs={this.state.breadcrumbs}>

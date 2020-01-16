@@ -24,9 +24,9 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
+import {deleteData, getData, postData} from "../../utils/data";
 
 export default class ConditionPage extends React.Component {
   constructor (props) {
@@ -38,7 +38,7 @@ export default class ConditionPage extends React.Component {
     const conditionInitialValues = {
       valueModeId: '', fieldId: '', operatorId: '', conditionValue: ''
     };
-    const thisBreadcrumbs = [{ link: '/ui/rules/conditions', title: 'Conditions' }];
+    const thisBreadcrumbs = [{ link: '/rules/conditions', title: 'Conditions' }];
     this.state = {
       breadcrumbs: thisBreadcrumbs,
       conditionId: thisConditionId,
@@ -66,7 +66,7 @@ export default class ConditionPage extends React.Component {
   loadCondition = () => {
     if (this.state.conditionId !== 0) {
       this.setState({ loading: true });
-      Utils.ajaxGet(
+      getData(
         `localhost/conditions/${this.state.conditionId}`,
         data => {
           const currentCondition = {
@@ -82,7 +82,7 @@ export default class ConditionPage extends React.Component {
 
   loadValueModes = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules/valueModes',
       data => this.setState({ valueModes: data, loading: false })
     );
@@ -90,7 +90,7 @@ export default class ConditionPage extends React.Component {
 
   loadFields = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules/fields',
       data => this.setState({ fields: data, loading: false })
     );
@@ -98,17 +98,14 @@ export default class ConditionPage extends React.Component {
 
   loadOperators = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules/operators/',
       data => this.setState({ operators: data, loading: false })
     );
   };
 
   handleChange = event => {
-    const name = event.target.name;
-    const newData = this.state.condition;
-    newData[name] = event.target.value;
-    this.setState({ condition: newData });
+    this.setState({ [event.target.name]: event.target.value });
   };
 
   renderValueModesSelect = () => {
@@ -159,18 +156,19 @@ export default class ConditionPage extends React.Component {
   };
 
   onDelete = () => {
-    const formAction = '/conditions/' + this.state.conditionId;
-    Utils.formSubmit(formAction, 'DELETE', {}, data => {
-      this.setState({ isDeleted: true });
-      M.toast({ html: '<div>Condition successfully deleted!</div>' });
-    });
+    deleteData(
+      `localhost/conditions/${this.state.conditionId}`,
+      () => {
+        this.setState({ isDeleted: true });
+        M.toast({ html: '<div>Condition successfully deleted!</div>' });
+      });
   };
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formAction = '/conditions/' + this.state.conditionId;
-    const formData = Utils.convertFormToJson('conditionForm');
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      `localhost/conditions/${this.state.conditionId}`,
+      event.target[0].value,
       data => {
         this.setState({ conditionId: data, isEdit: false });
         M.toast({ html: '<div>Condition successfully saved!</div>' });
@@ -179,7 +177,7 @@ export default class ConditionPage extends React.Component {
 
   renderConditionForm = () => {
     if (this.state.isDeleted) {
-      return <Redirect to='/ui/rules/conditions'/>;
+      return <Redirect to='/rules/conditions'/>;
     }
     const valueModesSelect = this.renderValueModesSelect();
     const fieldsSelect = this.renderFieldsSelect();

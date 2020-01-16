@@ -23,7 +23,7 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
+import {getData} from "../../utils/data";
 
 export default class GenericHostRules extends React.Component {
   constructor (props) {
@@ -37,7 +37,7 @@ export default class GenericHostRules extends React.Component {
 
   loadGenericHostRules = () => {
     this.setState({ loading: true });
-    Utils.fetch('localhost/rules/hosts/genericRules',
+    getData('localhost/rules/hosts/genericRules',
       data => {
         this.setState({ genericHostRules: data, loading: false });
       });

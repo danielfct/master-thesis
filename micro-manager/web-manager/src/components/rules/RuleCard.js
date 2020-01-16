@@ -24,10 +24,10 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import ConditionCard from './ConditionCard';
 import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
+import {getData} from "../../utils/data";
 
 export default class RuleCard extends React.Component {
   constructor (props) {
@@ -47,8 +47,8 @@ export default class RuleCard extends React.Component {
 
   loadConditions = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
-      `/rules/${this.state.data.id}/conditions`,
+    getData(
+      `localhost/rules/${this.state.data.id}/conditions`,
       data => this.setState({ conditions: data, loading: false })
     );
   };
@@ -56,18 +56,16 @@ export default class RuleCard extends React.Component {
   renderConditions = () => {
     let conditionNodes;
     if (this.state.conditions) {
-      conditionNodes = this.state.conditions.map(function (condition) {
-        return (
-          <li key={condition.id}>
-            <div className="collapsible-header">
-              {condition.field.fieldName + ' ' + condition.operator.operatorSymbol + ' ' + condition.conditionValue}
-            </div>
-            <div className="collapsible-body">
-              <ConditionCard renderSimple={true} viewDetails={false} condition={condition}/>
-            </div>
-          </li>
-        );
-      });
+      conditionNodes = this.state.conditions.map(condition => (
+        <li key={condition.id}>
+          <div className="collapsible-header">
+            {condition.field.fieldName + ' ' + condition.operator.operatorSymbol + ' ' + condition.conditionValue}
+          </div>
+          <div className="collapsible-body">
+            <ConditionCard renderSimple={true} viewDetails={false} condition={condition}/>
+          </div>
+        </li>
+      ));
     }
     return conditionNodes;
   };
@@ -76,7 +74,7 @@ export default class RuleCard extends React.Component {
     <div className="right-align">
       <div className="row">
         <div className="col s12">
-          <Link className="waves-effect waves-light btn-small" to={'/ui/rules/detail/' + this.state.data.id}>
+          <Link className="waves-effect waves-light btn-small" to={'/rules/detail/' + this.state.data.id}>
             View details
           </Link>
         </div>

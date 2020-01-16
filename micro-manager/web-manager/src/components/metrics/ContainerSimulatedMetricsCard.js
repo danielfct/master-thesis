@@ -23,19 +23,19 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
 import M from 'materialize-css';
 import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
+import {deleteData} from "../../utils/data";
 
 export default class ContainerSimulatedMetricsCard extends React.Component {
   onClickRemove = () => {
-    const action = '/simulatedMetrics/containers/' + this.props.simulatedMetric.id;
-    Utils.formSubmit(action, 'DELETE', {},
-        data => {
-      M.toast({ html: '<div>Container simulated metric removed successfully!</div>' });
-      this.props.reloadSimulatedMetrics();
-    });
+    deleteData(
+      `localhost/metrics/simulated/containers/${this.props.simulatedMetric.id}`,
+      data => {
+        M.toast({ html: '<div>Container simulated metric removed successfully!</div>' });
+        this.props.reloadSimulatedMetrics();
+      });
   };
 
   render = () => {
@@ -50,9 +50,9 @@ export default class ContainerSimulatedMetricsCard extends React.Component {
                 <div className="row">
                   <div className="col s12">
                     <Link className="waves-effect waves-light btn-small"
-                      to={'/ui/simulatedmetrics/containers/detail/' + this.props.simulatedMetric.id}>Edit</Link>
+                          to={'/metrics/simulated/containers/detail/' + this.props.simulatedMetric.id}>Edit</Link>
                     <button style={style} className="waves-effect waves-light btn-small red darken-4"
-                      onClick={this.onClickRemove}>Remove
+                            onClick={this.onClickRemove}>Remove
                     </button>
                   </div>
                 </div>

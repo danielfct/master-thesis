@@ -30,13 +30,13 @@ export default class RulesLandingPage extends React.Component {
   constructor (props) {
     super(props);
     const ruleLinks = [
-      { name: 'Conditions', link: '/ui/rules/conditions' },
-      { name: 'Rules', link: '/ui/rules' },
-      { name: 'Generic Hosts rules', link: '/ui/rules/generic/hosts' },
-      { name: 'Hosts rules', link: '/ui/rules/hosts' },
-      { name: 'Apps rules', link: '/ui/rules/apps' },
-      { name: 'Services rules', link: '/ui/rules/services' },
-      { name: 'Service event predictions', link: '/ui/rules/serviceEventPredictions' }
+      { name: 'Conditions', link: '/rules/conditions' },
+      { name: 'Rules', link: '/rules' },
+      { name: 'Generic Hosts rules', link: '/rules/generic/hosts' },
+      { name: 'Hosts rules', link: '/rules/hosts' },
+      { name: 'Apps rules', link: '/rules/apps' },
+      { name: 'Services rules', link: '/rules/services' },
+      { name: 'Service event predictions', link: '/rules/serviceEventPredictions' }
     ];
     this.state = { links: ruleLinks, loading: false };
   }

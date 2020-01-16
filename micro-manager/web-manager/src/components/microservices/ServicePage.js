@@ -24,10 +24,10 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import ServiceCard from './ServiceCard';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
+import {deleteData, getData, postData} from "../../utils/data";
 
 export default class ServicePage extends React.Component {
   constructor (props) {
@@ -51,7 +51,7 @@ export default class ServicePage extends React.Component {
       serviceType: '',
       expectedMemoryConsumption: 0
     };
-    const thisBreadcrumbs = [{ title: 'Services configs', link: '/ui/services' }];
+    const thisBreadcrumbs = [{ title: 'Services', link: '/services' }];
     this.state = {
       breadcrumbs: thisBreadcrumbs,
       service: serviceInitialValues,
@@ -80,7 +80,7 @@ export default class ServicePage extends React.Component {
 
   loadService = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/services/${this.state.service.id}`,
       data => this.setState({ service: data, loading: false })
     );
@@ -88,7 +88,7 @@ export default class ServicePage extends React.Component {
 
   loadDependencies = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/services/${this.state.service.id}/dependencies`,
       data => this.setState({ dependencies: data, loadedDependencies: true, loading: false })
     );
@@ -98,18 +98,16 @@ export default class ServicePage extends React.Component {
     if (this.state.loadedDependencies) {
       let dependencies;
       if (this.state.dependencies.length > 0) {
-        dependencies = this.state.dependencies.map(function (dependency) {
-          return (
-            <li key={'dependency-' + dependency.id}>
-              <div className="collapsible-header">{dependency.serviceName}</div>
-              <div className="collapsible-body">
-                <ServiceCard renderSimple={true} service={dependency}/>
-              </div>
-            </li>
-          );
-        });
+        dependencies = this.state.dependencies.map(dependency => (
+          <li key={dependency.id}>
+            <div className="collapsible-header">{dependency.serviceName}</div>
+            <div className="collapsible-body">
+              <ServiceCard renderSimple={true} service={dependency}/>
+            </div>
+          </li>
+        ));
       } else {
-        const style = { padding: '15px' };
+        const style = { padding: '15px' }; //TODO css
         dependencies = <div style={style}>No dependencies</div>;
       }
       return (
@@ -129,35 +127,32 @@ export default class ServicePage extends React.Component {
   };
 
   onClickRemove = () => {
-    const formAction = '/services/' + this.state.service.id;
-    Utils.formSubmit(formAction, 'DELETE', {},
-      data => {
+    deleteData(
+      `localhost/services/${this.state.service.id}`,
+      () => {
         this.setState({ isDeleted: true });
         M.toast({ html: '<div>Service config removed successfully!</div>' });
       });
   };
 
   handleChange = event => {
-    const name = event.target.name;
-    const newData = this.state.service;
-    newData[name] = event.target.value;
-    this.setState({ service: newData });
+    this.setState({ [event.target.name]: event.target.value });
   };
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formAction = '/services';
-    const formData = Utils.convertFormToJson('form-service');
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      'localhost/services',
+      event.target[0].value,
       data => {
         const newService = this.state.service;
         if (newService.id === 0) {
           const title = document.title;
-          window.history.replaceState({}, title, '/ui/services/detail/' + data);
+          window.history.replaceState({}, title, '/services/detail/' + data);
         }
         newService.id = data;
         this.setState({ service: newService });
-        M.toast({ html: '<div>Service config saved successfully!</div>' });
+        M.toast({ html: '<div>Service saved successfully!</div>' });
       });
   };
 
@@ -170,20 +165,21 @@ export default class ServicePage extends React.Component {
         </button>
       );
     }
-    return null;
   };
 
   renderServiceForm = () => {
-    const editLabel = this.state.isEdit ? 'Cancel' : 'Edit';
-    const style = { marginLeft: '5px' };
+    const style = { marginLeft: '5px' }; //TODO move to css file
     return (
       <div className='row'>
         <div className="right-align">
           <div className="row">
             <div className="col s12">
-              <a className="waves-effect waves-light btn-small" onClick={this.onClickEdit}>{editLabel}</a>
+              <a className="waves-effect waves-light btn-small" onClick={this.onClickEdit}>
+                {this.state.isEdit ? 'Cancel' : 'Edit'}
+              </a>
               <button disabled={this.state.service.id === 0} style={style}
-                      className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>Remove
+                      className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>
+                Remove
               </button>
             </div>
           </div>
@@ -261,10 +257,10 @@ export default class ServicePage extends React.Component {
 
   render = () => {
     if (this.state.isDeleted) {
-      return <Redirect to='/ui/services'/>;
+      return <Redirect to='/services'/>;
     }
     return (
-      <MainLayout title='Service config detail' breadcrumbs={this.state.breadcrumbs}>
+      <MainLayout title={this.state.service.serviceName} breadcrumbs={this.state.breadcrumbs}>
         {this.renderServiceForm()}
         {this.renderDependencies()}
       </MainLayout>

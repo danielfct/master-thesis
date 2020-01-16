@@ -25,9 +25,9 @@
 import React from 'react';
 import M from 'materialize-css';
 import $ from 'jquery';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
 import RegionCard from "./RegionCard";
+import {getData} from "../../utils/data";
 
 export default class Regions extends React.Component {
   constructor (props) {
@@ -36,7 +36,7 @@ export default class Regions extends React.Component {
   }
 
   componentDidUpdate = () => {
-    if (this.state.data.length > 0) {
+    if (this.state.data && this.state.data.length > 0) {
       const lastIndex = this.state.data.length - 1;
       if (this.state.data[lastIndex].id === 0) {
         const offset = $('#region' + lastIndex).offset().top;
@@ -79,7 +79,7 @@ export default class Regions extends React.Component {
 
   loadRegions = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/regions',
       data => this.setState({ data: data, loading: false })
     );
@@ -97,7 +97,7 @@ export default class Regions extends React.Component {
       <MainLayout title='Regions'>
         {regionNodes}
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add region">
-          <button disabled={!this.state.showAdd} className="waves-effect waves-light btn-floating btn-large grey darken-4" onClick={this.addRegion}>
+          <button disabled={!this.state.showAdd} className="waves-effect waves-light btn-floating grey darken-3" onClick={this.addRegion}>
             <i className="large material-icons">add</i>
           </button>
         </div>

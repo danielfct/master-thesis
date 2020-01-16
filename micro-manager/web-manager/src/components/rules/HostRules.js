@@ -23,7 +23,7 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
+import {getData} from "../../utils/data";
 
 export default class HostRules extends React.Component {
   constructor (props) {
@@ -37,34 +37,24 @@ export default class HostRules extends React.Component {
 
   loadHostRules = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/hosts/'${this.props.host.hostname}'/rules`,
       data => this.setState({ hostRules: data, loading: false })
     );
   };
 
-  renderHostRules = () => {
-    let hostRulesNodes;
-    if (this.state.hostRules) {
-      hostRulesNodes = this.state.hostRules.map(function (hostRule) {
-        return (
-          <div key={hostRule.rule.id}>
-            <div className='card'>
-              <div className='card-content'>
-                {hostRule.rule.ruleName}
-              </div>
-            </div>
-          </div>
-        );
-      });
-    }
-    return hostRulesNodes;
-  };
-
   render = () => (
     <div>
       <h5>Rules</h5>
-      {this.renderHostRules()}
+      {this.state.hostRules && this.state.hostRules.map(hostRule => (
+        <div key={hostRule.rule.id}>
+          <div className='card'>
+            <div className='card-content'>
+              {hostRule.rule.ruleName}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

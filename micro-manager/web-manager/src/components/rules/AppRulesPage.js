@@ -24,8 +24,8 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
+import {deleteData, getData, postData} from "../../utils/data";
 
 export default class AppRulesPage extends React.Component {
   constructor (props) {
@@ -34,7 +34,7 @@ export default class AppRulesPage extends React.Component {
     if (props.match.params.appId) {
       thisAppId = props.match.params.appId;
     }
-    const thisBreadcrumbs = [{ link: '/ui/rules/apps', title: 'Apps rules' }];
+    const thisBreadcrumbs = [{ link: '/rules/apps', title: 'Apps rules' }];
     this.state = {
       breadcrumbs: thisBreadcrumbs,
       appId: thisAppId,
@@ -57,7 +57,7 @@ export default class AppRulesPage extends React.Component {
   };
 
   loadApp = () => {
-    Utils.ajaxGet(
+    getData(
       `localhost/apps/${this.state.appId}`,
       data => this.setState({ app: data, loading: false })
     );
@@ -65,7 +65,7 @@ export default class AppRulesPage extends React.Component {
 
   loadAppRules = () => {
     this.setState({ loadedRules: false, loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/apps/${this.state.appId}/rules`,
       data => this.setState({ rules: data, loadedRules: true, loading: false })
     );
@@ -73,18 +73,15 @@ export default class AppRulesPage extends React.Component {
 
   loadAllRules = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules/containers',
       data => this.setState({ allRules: data, loading: false })
     );
   };
 
   onRemoveRule = (ruleId, event) => {
-    const data = {
-      appId: Number(this.state.appId),
-      ruleId: Number(ruleId)
-    };
-    Utils.formSubmit( `localhost/apps/${this.state.appId}/rules`, 'DELETE', JSON.stringify(data),
+    deleteData(
+      `localhost/apps/${this.state.appId}/rules/${ruleId}`,
       data => {
         M.toast({ html: '<div>Rule successfully deleted from app rules!</div>' });
         this.loadAppRules();
@@ -92,12 +89,12 @@ export default class AppRulesPage extends React.Component {
   };
 
   addRule = (ruleId, event) => {
-    const formAction = '/apps/' + this.state.appId + '/rules';
-    const data = {
-      appId: Number(this.state.appId),
-      ruleId: Number(ruleId)
-    };
-    Utils.formSubmit(formAction, 'POST', JSON.stringify(data),
+    postData(
+      `localhost/apps/${this.state.appId}/rules`,
+      {
+        appId: Number(this.state.appId), //TODO remove appId from server too
+        ruleId: Number(ruleId)
+      },
       data => {
         M.toast({ html: '<div>Rule successfully added to app rules!</div>' });
         this.loadAppRules();

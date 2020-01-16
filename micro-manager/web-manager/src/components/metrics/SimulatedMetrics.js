@@ -25,8 +25,8 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
+import {getData, postData} from "../../utils/data";
 
 export default class ServiceSimulatedMetricsDetail extends React.Component {
   constructor (props) {
@@ -64,7 +64,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
 
   loadServices = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/services',
       data => this.setState({ services: data, loading: false })
     );
@@ -72,7 +72,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
 
   loadFields = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules/fields',
       data => this.setState({ fields: data, loading: false })
     );
@@ -81,7 +81,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
   loadServiceSimulatedMetrics = () => {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
-      Utils.ajaxGet(
+      getData(
         `localhost/metrics/simulated/services/${this.state.id}`,
         data => this.setState({ values: data, loading: false })
       );
@@ -91,11 +91,9 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
   renderServicesSelect = () => {
     let servicesNodes;
     if (this.state.services) {
-      servicesNodes = this.state.services.map(function (service) {
-        return (
-          <option key={service.id} value={service.serviceName}>{service.serviceName}</option>
-        );
-      });
+      servicesNodes = this.state.services.map(service => (
+        <option key={service.id} value={service.serviceName}>{service.serviceName}</option>
+      ));
       return servicesNodes;
     }
   };
@@ -103,21 +101,18 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
   renderFieldsSelect = () => {
     let fieldsNodes;
     if (this.state.fields) {
-      fieldsNodes = this.state.fields.map(function (field) {
-        return (
-          <option key={field.id} value={field.fieldName}>{field.fieldName}</option>
-        );
-      });
+      fieldsNodes = this.state.fields.map(field => (
+        <option key={field.id} value={field.fieldName}>{field.fieldName}</option>
+      ));
       return fieldsNodes;
     }
   };
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formId = 'form-service';
-    const formAction = '/simulatedMetrics/services/' + this.state.id;
-    const formData = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      `localhost/metrics/simulated/services/${this.state.id}`,
+      event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });
         M.toast({ html: '<div>Service simulated metric saved successfully!</div>' });
@@ -177,7 +172,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
 
   render = () => {
     if (this.state.formSubmit) {
-      return <Redirect to='/ui/simulatedMetrics/services' />;
+      return <Redirect to='/metrics/simulated/services' />;
     }
     return (
       <MainLayout title='Service simulated metric detail' breadcrumbs={this.state.breadcrumbs}>

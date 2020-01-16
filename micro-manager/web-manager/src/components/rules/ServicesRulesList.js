@@ -23,11 +23,11 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
 import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
 import ServiceRules from './ServiceRules';
 import MainLayout from '../shared/MainLayout';
+import {getData} from "../../utils/data";
 
 export default class ServicesRulesList extends React.Component {
   constructor (props) {
@@ -41,46 +41,37 @@ export default class ServicesRulesList extends React.Component {
 
   loadServices = () => {
     this.setState({ loading: true });
-    Utils.fetch('/services',
+    getData(
+      'localhost/services',
       data => {
         this.setState({ services: data, loading: false });
       });
   };
 
-  renderServices = () => {
-    let serviceNodes;
-    if (this.state.services) {
-      serviceNodes = this.state.services.map(function (service) {
-        return (
-          <div key={service.id} className='row'>
-            <div className='col s12'>
-              <div className='card'>
-                <div className='card-content'>
-                  <div className="right-align">
-                    <div className="row">
-                      <div className="col s12">
-                        <Link className="waves-effect waves-light btn-small"
-                          to={'/ui/rules/services/detail/' + service.id}>
-                          View details
-                        </Link>
-                      </div>
+  render = () => (
+    <MainLayout title='Services rules'>
+      {this.state.services && this.state.services.map(service => (
+        <div key={service.id} className='row'>
+          <div className='col s12'>
+            <div className='card'>
+              <div className='card-content'>
+                <div className="right-align">
+                  <div className="row">
+                    <div className="col s12">
+                      <Link className="waves-effect waves-light btn-small"
+                            to={'/rules/services/detail/' + service.id}>
+                        View details
+                      </Link>
                     </div>
                   </div>
-                  <CardItem label='Service' value={service.serviceName}/>
-                  <ServiceRules service={service}/>
                 </div>
+                <CardItem label='Service' value={service.serviceName}/>
+                <ServiceRules service={service}/>
               </div>
             </div>
           </div>
-        );
-      });
-    }
-    return serviceNodes;
-  };
-
-  render = () => (
-    <MainLayout title='Services rules'>
-      {this.renderServices()}
+        </div>
+      ))}
     </MainLayout>
   );
 }

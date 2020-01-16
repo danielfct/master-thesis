@@ -23,10 +23,10 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
 import ConditionCard from './ConditionCard';
 import MainLayout from '../shared/MainLayout';
 import { Link } from 'react-router-dom';
+import {getData} from "../../utils/data";
 
 export default class Conditions extends React.Component {
   constructor (props) {
@@ -40,33 +40,27 @@ export default class Conditions extends React.Component {
 
   loadConditions = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/conditions',
       data => this.setState({ data: data, loading: false })
     );
   };
 
   render = () => {
-    let conditionNodes;
-    if (this.state.data) {
-      conditionNodes = this.state.data.map(function (condition) {
-        return (
-          <ConditionCard viewDetails={true} key={condition.id} condition={condition}/>
-        );
-      });
-    }
     return (
       <MainLayout title='Conditions'>
         <div className="right-align">
           <div className="row">
             <div className="col s12">
-              <Link className="waves-effect waves-light btn-small" to='/ui/rules/conditions/detail/'>
+              <Link className="waves-effect waves-light btn-small" to='/rules/conditions/detail/'>
                 New condition
               </Link>
             </div>
           </div>
         </div>
-        {conditionNodes}
+        {this.state.data && this.state.data.map(condition => (
+          <ConditionCard viewDetails={true} key={condition.id} condition={condition}/>
+        ))}
       </MainLayout>
     );
   };

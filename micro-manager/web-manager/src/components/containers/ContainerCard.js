@@ -25,8 +25,7 @@
 import React from 'react';
 import M from 'materialize-css';
 import CardItem from '../shared/CardItem';
-import ContainerPort from './ContainerPort';
-import Utils from '../../utils';
+import {getData, deleteData, postData} from '../../utils/data';
 
 export default class ContainerCard extends React.Component {
   constructor (props) {
@@ -34,55 +33,50 @@ export default class ContainerCard extends React.Component {
     this.state = { nodes: [], isReplicate: false, isMigrate: false, hostnameSelected: '', seconds: 0, loading: false };
   }
 
-  // TODO
   componentDidUpdate = () => {
     if (this.state.isReplicate || this.state.isMigrate) {
-      const elems = this.hostname;
-      M.FormSelect.init(elems);
+      M.FormSelect.init(this.hostname);
     }
   };
 
-  componentDidMount = () => {
-    M.Collapsible.init(document.querySelectorAll('.collapsible'));
-  };
+  componentDidMount = () => M.Collapsible.init(document.querySelectorAll('.collapsible'));
 
-  renderNames = () => this.props.container.names.map((name, index) => {
-    const counter = index + 1;
-    return (
-      <CardItem key={name + index} label={'Name ' + counter} value={name}/>
-    );
-  });
+  renderNames = () => this.props.container.names.map((name, index) =>
+    <CardItem key={name + index + 1} label={`Name ${index + 1}`} value={name}/>
+  );
 
   renderPorts = () => this.props.container.ports.map((port, index) => (
-    <ContainerPort key={'port' + index} port={port}/>
+    <div key={'port' + index}>
+      <h6>Public port : Private port</h6>
+      <div>{port.publicPort + ' : ' + port.privatePort}</div>
+      <h6>IP / Type</h6>
+      <div>{port.ip + ' / ' + port.type}</div>
+    </div>
   ));
 
   renderLabels = () => {
     const propsLabels = this.props.container.labels;
-    return Object.keys(propsLabels).map((key, index) => (
+    return Object.keys(propsLabels).map(key => (
       <div key={key}>
         {key + ': ' + propsLabels[key]}
       </div>
     ));
   };
 
-  /* renderLogs() {
-      return (
-          <div>
-              {this.props.container.logs}
-          </div>
-      );
-  } */
+  renderLogs = () =>
+    <div>
+      {this.props.container.logs}
+    </div>;
 
-  onClickStop = () => {
-    const action = '/containers/' + this.props.container.id;
-    const dataObject = {
-      hostname: this.props.container.hostname,
-      containerId: this.props.container.id
-    };
-    const dataToSend = JSON.stringify(dataObject);
-    Utils.formSubmit(action, 'DELETE', dataToSend,
-      data => {
+  stopContainer = () => {
+    /* const action = `localhost/containers/${this.props.container.id}`;
+     const dataObject = {
+       hostname: this.props.container.hostname,
+       containerId: this.props.container.id
+     };
+     const dataToSend = JSON.stringify(dataObject);*/
+    deleteData(`localhost/containers/${this.props.container.id}`,
+      this.props.container, () => {
         M.toast({ html: '<div>Container stopped successfully!</div>' });
         this.props.containerStopped(this.props.container.id);
       });
@@ -90,9 +84,7 @@ export default class ContainerCard extends React.Component {
 
   loadAvailableNodes = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
-      'localhost/nodes',
-      data => this.setState({ nodes: data, loading: false })
+    getData('localhost/nodes', nodes => this.setState({ nodes: nodes, loading: false })
     );
   };
 
@@ -117,14 +109,12 @@ export default class ContainerCard extends React.Component {
   };
 
   onSubmitReplicate = () => {
-    const url = '/containers/' + this.props.container.id + '/replicate';
-    const dataToSend = JSON.stringify({
-      fromHostname: this.props.container.hostname,
-      containerId: this.props.container.id,
-      toHostname: this.state.hostnameSelected
-    });
-    Utils.formSubmit(url, 'POST', dataToSend,
-      data => {
+    postData(`localhost/containers/${this.props.container.id}/replicate`,
+      {
+        fromHostname: this.props.container.hostname,
+        toHostname: this.state.hostnameSelected
+      },
+      () => {
         this.onClickCancelReplicate();
         this.props.onReplicate();
         M.toast({ html: '<div>Container replicated successfully!</div>' });
@@ -132,31 +122,23 @@ export default class ContainerCard extends React.Component {
   };
 
   onSubmitMigrate = () => {
-    const url = '/containers/' + this.props.container.id + '/migrate';
-    const dataToSend = JSON.stringify({
-      fromHostname: this.props.container.hostname,
-      containerId: this.props.container.id,
-      toHostname: this.state.hostnameSelected,
-      secondsBeforeStop: this.state.seconds
-    });
-    Utils.formSubmit(url, 'POST', dataToSend, data => {
-      this.onClickCancelReplicate();
-      this.props.onReplicate();
-      M.toast({ html: '<div>Container migrated successfully!</div>' });
-    });
+    postData(`localhost/containers/${this.props.container.id}/migrate`,
+      {
+        fromHostname: this.props.container.hostname,
+        toHostname: this.state.hostnameSelected,
+        secondsBeforeStop: this.state.seconds
+      },
+      () => {
+        this.onClickCancelReplicate();
+        this.props.onReplicate();
+        M.toast({ html: '<div>Container migrated successfully!</div>' });
+      });
   };
 
-  renderHostnamesSelect = () => {
-    let hostnameNodes;
-    if (this.state.nodes) {
-      hostnameNodes = this.state.nodes.map(function (node) {
-        return (
-          <option key={node.id} value={node.hostname}>{node.hostname}</option>
-        );
-      });
-      return hostnameNodes;
-    }
-  };
+  renderHostnamesSelect = () =>
+    this.state.nodes && this.state.nodes.map(node =>
+      <option key={node.id} value={node.hostname}>{node.hostname}</option>
+    );
 
   renderSelectTotal = () => (
     <div className="input-field col s6">
@@ -171,38 +153,24 @@ export default class ContainerCard extends React.Component {
 
   renderReplicate = () => {
     const style = { marginLeft: '10px' };
-    const cancelButton =
-      <a title="Cancel" style={style} className="btn-floating waves-effect waves-light red darken-4"
-         onClick={this.onClickCancelReplicate}>
-        <i className="material-icons">clear</i>
-      </a>;
-    if (this.state.isReplicate) {
+    if (this.state.isReplicate || this.state.isMigrate) {
       return (
         <div className="row">
           {this.renderSelectTotal()}
           <div className="input-field col s6">
-            <a title="Replicate" style={style} className="btn-floating waves-effect waves-light"
-               onClick={this.onSubmitReplicate}>
+            <a title={this.state.isReplicate ? "Replicate" : "Migrate"} style={style}
+               className="btn-floating waves-effect waves-light"
+               onClick={this.state.isReplicate ? this.onSubmitReplicate : this.onSubmitMigrate}>
               <i className="material-icons">send</i>
             </a>
-            {cancelButton}
+            <a title="Cancel" style={style} className="btn-floating waves-effect waves-light red darken-4"
+               onClick={this.onClickCancelReplicate}>
+              <i className="material-icons">clear</i>
+            </a>
           </div>
         </div>
       );
-    } else if (this.state.isMigrate) {
-      return (
-        <div className="row">
-          {this.renderSelectTotal()}
-          <div className="input-field col s6">
-            <a title="Migrate" style={style} className="btn-floating waves-effect waves-light"
-               onClick={this.onSubmitMigrate}>
-              <i className="material-icons">send</i>
-            </a>
-            {cancelButton}
-          </div>
-        </div>
-      );
-    } else if (!this.state.isReplicate && !this.state.isMigrate) {
+    } else {
       return (
         <div className="row">
           <div className="col s12">
@@ -228,7 +196,7 @@ export default class ContainerCard extends React.Component {
                 <div className="row">
                   <div className="col s12">
                     <a style={style} className="waves-effect waves-light btn-small red darken-4"
-                       onClick={this.onClickStop}>Stop</a>
+                       onClick={this.stopContainer}>Stop</a>
                   </div>
                 </div>
               </div>
@@ -253,18 +221,18 @@ export default class ContainerCard extends React.Component {
                   </li>
                 </ul>
               </div>
-              {/* <div className="row">
-                                <ul className="collapsible">
-                                    <li>
-                                        <div style={labelStyle} className="collapsible-header">
-                                            <h5>Logs</h5>
-                                        </div>
-                                        <div className="collapsible-body">
-                                            {this.renderLogs()}
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div> */}
+              <div className="row">
+                <ul className="collapsible">
+                  <li>
+                    <div style={labelStyle} className="collapsible-header">
+                      <h5>Logs</h5>
+                    </div>
+                    <div className="collapsible-body">
+                      {this.renderLogs()}
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

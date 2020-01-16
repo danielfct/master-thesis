@@ -26,8 +26,8 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import M from 'materialize-css';
 import $ from 'jquery';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
+import {getData, postData} from "../../utils/data";
 
 export default class LoadBalancerPage extends React.Component {
   constructor (props) {
@@ -47,26 +47,21 @@ export default class LoadBalancerPage extends React.Component {
 
   loadServices = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/services',
-      data => {
-        const frontendServices = [];
-        for (let index = 0; index < data.length; index++) {
-          if (data[index].serviceType === 'frontend') {
-            frontendServices.push(data[index]);
-          }
-        }
-        this.setState({ services: frontendServices, loading: false });
-      });
+      // TODO get filtered data from server instead
+    data =>
+        this.setState({ services: data.filter(v => v.serviceType === 'frontend'), loading: false })
+    );
   };
 
   loadRegions = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/regions',
-      data => {
-        this.setState({ availableRegions: data, loading: false });
-      });
+      data =>
+        this.setState({ availableRegions: data, loading: false })
+    );
   };
 
   addRegion = (regionId, event) => {
@@ -82,7 +77,7 @@ export default class LoadBalancerPage extends React.Component {
     const index = getIndex(regionId, newAvailableRegions);
     newAvailableRegions.splice(index, 1);
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/regions/${regionId}`,
       data => {
         const newChosenRegions = this.state.chosenRegions;
@@ -104,7 +99,7 @@ export default class LoadBalancerPage extends React.Component {
     const index = getIndex(regionId, newChosenRegions);
     newChosenRegions.splice(index, 1);
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/regions/${regionId}`,
       data => {
         const newAvailableRegions = this.state.availableRegions;
@@ -127,14 +122,14 @@ export default class LoadBalancerPage extends React.Component {
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formAction = '/containers/loadBalancer';
     const service = $('#service').val();
-    const dataToSend = {
-      serviceName: service,
-      regions: this.state.chosenRegions
-    };
-    const formData = JSON.stringify(dataToSend);
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      'localhost/containers/loadBalancer',
+      //FIXME
+      {
+        serviceName: service,
+        regions: this.state.chosenRegions
+      },
       data => {
         this.setState({ formSubmit: true });
         const hosts = data.toString();
@@ -212,7 +207,7 @@ export default class LoadBalancerPage extends React.Component {
 
   render () {
     if (this.state.formSubmit) {
-      return <Redirect to='/ui/home' />;
+      return <Redirect to='/' />;
     }
     return (
       <MainLayout title='Launch load balancers' breadcrumbs={this.state.breadcrumbs}>

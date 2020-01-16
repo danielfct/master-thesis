@@ -24,8 +24,8 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
+import {deleteData, getData, postData} from "../../utils/data";
 
 export default class ServiceRulesPage extends React.Component {
   constructor (props) {
@@ -34,7 +34,7 @@ export default class ServiceRulesPage extends React.Component {
     if (props.match.params.serviceId) {
       thisServiceId = props.match.params.serviceId;
     }
-    const thisBreadcrumbs = [{ link: '/ui/rules/services', title: 'Services rules' }];
+    const thisBreadcrumbs = [{ link: '/rules/services', title: 'Services rules' }];
     this.state = {
       breadcrumbs: thisBreadcrumbs,
       serviceId: thisServiceId,
@@ -57,7 +57,7 @@ export default class ServiceRulesPage extends React.Component {
   };
 
   loadService = () => {
-    Utils.fetch(
+    getData(
       `localhost/services/${this.state.serviceId}`,
       data => this.setState({ service: data, loading: false })
     );
@@ -65,7 +65,7 @@ export default class ServiceRulesPage extends React.Component {
 
   loadServiceRules = () => {
     this.setState({ loadedRules: false, loading: true });
-    Utils.fetch(
+    getData(
       `localhost/services/${this.state.serviceId}/rules`,
       data => this.setState({ rules: data, loadedRules: true, loading: false })
     );
@@ -73,34 +73,30 @@ export default class ServiceRulesPage extends React.Component {
 
   loadAllRules = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules/containers',
       data => this.setState({ allRules: data, loading: false })
     );
   };
 
   onRemoveRule = (ruleId, event) => {
-    const formAction = '/services/' + this.state.serviceId + '/rules';
-    const data = {
-      serviceId: Number(this.state.serviceId),
-      ruleId: Number(ruleId)
-    };
-    Utils.formSubmit(formAction, 'DELETE', JSON.stringify(data), data => {
-      M.toast({ html: '<div>Rule successfully deleted from service rules!</div>' });
-      this.loadServiceRules();
-    });
+    deleteData(
+      `localhost/services/${this.state.serviceId}/rules/${ruleId}`,
+      () => {
+        M.toast({ html: '<div>Rule successfully deleted from service rules!</div>' });
+        this.loadServiceRules();
+      });
   };
 
   addRule = (ruleId, event) => {
-    const formAction = '/services/' + this.state.serviceId + '/rules';
-    const data = {
-      serviceId: Number(this.state.serviceId),
-      ruleId: Number(ruleId)
-    };
-    Utils.formSubmit(formAction, 'POST', JSON.stringify(data), data => {
-      M.toast({ html: '<div>Rule successfully added to service rules!</div>' });
-      this.loadServiceRules();
-    });
+    postData(`localhost/services/${this.state.serviceId}/rules`,
+      {
+        ruleId
+      },
+      data => {
+        M.toast({ html: '<div>Rule successfully added to service rules!</div>' });
+        this.loadServiceRules();
+      });
   };
 
   renderRules = () => {

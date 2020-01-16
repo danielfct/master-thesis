@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.host;
 
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsLaunchServiceReq;
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsService;
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsSimpleInstance;
@@ -107,7 +108,7 @@ public class HostsController {
   }
 
   @PostMapping("/cloud/service")
-  public String launchEC2Service(@RequestBody AwsLaunchServiceReq launchServiceReq) {
+  public SimpleContainer launchEC2Service(@RequestBody AwsLaunchServiceReq launchServiceReq) {
     //TODO fix ui
     String instanceId = launchServiceReq.getInstanceId();
     Instance instance = aws.startInstanceById(instanceId);

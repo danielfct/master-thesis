@@ -26,9 +26,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import M from 'materialize-css';
 import $ from 'jquery';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
 import ServiceCard from './ServiceCard';
+import {getData} from "../../utils/data";
 
 export default class Services extends React.Component {
   constructor (props) {
@@ -72,7 +72,7 @@ export default class Services extends React.Component {
 
   loadServices = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/services',
       services => this.setState({ data: services, filtServices: services, loading: false })
     );
@@ -85,7 +85,7 @@ export default class Services extends React.Component {
         <ServiceCard viewDetails={true} key={service.id} service={service} />);
     }
     return (
-      <MainLayout title='Services configs'>
+      <MainLayout title='Services'>
         <div className="input-field col s10">
           <input onChange={this.onChangeFilter} value={this.state.filter} type="text" name="filter" id="filter" autoComplete="off"/>
           <label htmlFor="filter">Filter by name</label>
@@ -97,7 +97,7 @@ export default class Services extends React.Component {
         </div>
         {serviceNodes}
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add service">
-          <Link className="waves-effect waves-light btn-floating btn-large grey darken-4" to='/ui/services/detail'>
+          <Link className="waves-effect waves-light btn-floating grey darken-3" to='/services/detail'>
             <i className="large material-icons">add</i>
           </Link>
         </div>

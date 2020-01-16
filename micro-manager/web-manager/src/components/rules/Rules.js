@@ -23,10 +23,10 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
 import RuleCard from './RuleCard';
 import MainLayout from '../shared/MainLayout';
 import { Link } from 'react-router-dom';
+import {getData} from "../../utils/data";
 
 export default class Rules extends React.Component {
   constructor (props) {
@@ -40,33 +40,23 @@ export default class Rules extends React.Component {
 
   loadRules = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules',
       data => this.setState({ data: data, loading: false })
     );
   };
 
   render = () => {
-    let ruleNodes;
-    if (this.state.data) {
-      ruleNodes = this.state.data.map(function (rule) {
-        return (
-          <RuleCard viewDetails={true} key={rule.id} rule={rule}/>
-        );
-      });
-    }
     return (
       <MainLayout title='Rules'>
-        <div className="right-align">
-          <div className="row">
-            <div className="col s12">
-              <Link className="waves-effect waves-light btn-small" to='/ui/rules/detail/'>
-                New rule
-              </Link>
-            </div>
-          </div>
+        {this.state.data && this.state.data.map(rule => (
+          <RuleCard viewDetails={true} key={rule.id} rule={rule}/>
+        ))}
+        <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="New rule">
+          <Link className="waves-effect waves-light btn-floating grey darken-3" to='/rules/detail'>
+            <i className="large material-icons">add</i>
+          </Link>
         </div>
-        {ruleNodes}
       </MainLayout>
     );
   };

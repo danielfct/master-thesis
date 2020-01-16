@@ -26,11 +26,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import M from 'materialize-css';
 import $ from 'jquery';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
 import ContainerCard from './ContainerCard';
+import {getData} from "../../utils/data";
 
 export default class Containers extends React.Component {
+
   constructor (props) {
     super(props);
     this.state = { data: [], filtContainers: [], filter: '', loading: false };
@@ -42,31 +43,17 @@ export default class Containers extends React.Component {
     this.setState({ tooltipInstances: instances });
   };
 
-  componentWillUnmount = () => {
+  componentWillUnmount = () =>
     this.state.tooltipInstances[0].destroy();
-  };
 
-  onReplicate = () => {
+  onReplicate = () =>
     this.loadContainers();
-  };
 
-  onChangeFilter = (event) => {
-    const filterVal = event.target.value;
-    this.setState({ filter: filterVal }, () => this.applyFilter());
-  };
+  onChangeFilter = ({target:{value}}) =>
+    this.setState({ filter: value }, () => this.applyFilter());
 
-  applyFilter = () => {
-    const filterVal = this.state.filter;
-    const data = this.state.data;
-    const filteredContainers = [];
-    for (let index = 0; index < data.length; index++) {
-      const container = data[index];
-      if (container.names[0].includes(filterVal)) {
-        filteredContainers.push(container);
-      }
-    }
-    this.setState({ filtContainers: filteredContainers });
-  };
+  applyFilter = () =>
+    this.setState({ filtContainers: this.state.data.filter(c => c.names[0].includes(this.state.filter)) });
 
   clearFilter = () => {
     this.setState({ filter: '' }, () => {
@@ -77,8 +64,8 @@ export default class Containers extends React.Component {
 
   loadContainers = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
-      '/containers',
+    getData(
+      'localhost/containers',
       containers => this.setState({ data: containers, filtContainers: containers, loading: false })
     );
   };
@@ -95,13 +82,6 @@ export default class Containers extends React.Component {
   };
 
   render = () => {
-    let containersNodes;
-    if (this.state.data) {
-      containersNodes = this.state.filtContainers.map(container => (
-        <ContainerCard onReplicate={this.onReplicate} key={container.id} container={container}
-                       containerStopped={this.containerStopped}/>
-      ));
-    }
     return (
       <MainLayout title='Containers'>
         <div className="input-field col s10">
@@ -113,9 +93,11 @@ export default class Containers extends React.Component {
             <i className="material-icons">clear</i>
           </a>
         </div>
-        {containersNodes}
+        {this.state.filtContainers && this.state.filtContainers.map(container => (
+          <ContainerCard key={container.id} container={container}
+                         onReplicate={this.onReplicate} containerStopped={this.containerStopped}/>))}
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Launch container">
-          <Link className="waves-effect waves-light btn-floating btn-large grey darken-4" to='/ui/containers/launch'>
+          <Link className="waves-effect waves-light btn-floating grey darken-3" to='/containers/launch'>
             <i className="large material-icons">add</i>
           </Link>
         </div>

@@ -23,15 +23,16 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
 import M from 'materialize-css';
 import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
+import {deleteData} from "../../utils/data";
 
 export default class DefaultHostSimulatedMetricsCard extends React.Component {
+
   onClickRemove = () => {
-    const action = '/simulatedMetrics/defaultHosts/' + this.props.simulatedMetric.id; // TODO confirm
-    Utils.formSubmit(action, 'DELETE', {},
+    deleteData(
+      `localhost/metrics/simulated/hosts/default/${this.props.simulatedMetric.id}`,
       data => {
         M.toast({ html: '<div>Default host simulated metric removed successfully!</div>' });
         this.props.reloadSimulatedMetrics();
@@ -50,7 +51,7 @@ export default class DefaultHostSimulatedMetricsCard extends React.Component {
                 <div className="row">
                   <div className="col s12">
                     <Link className="waves-effect waves-light btn-small"
-                          to={'/ui/simulatedmetrics/defaulthosts/detail/' + this.props.simulatedMetric.id}>Edit</Link>
+                          to={'/metrics/simulated/hosts/default/detail/' + this.props.simulatedMetric.id}>Edit</Link>
                     <button style={style} className="waves-effect waves-light btn-small red darken-4"
                             onClick={this.onClickRemove}>Remove
                     </button>

@@ -22,15 +22,13 @@
  * SOFTWARE.
  */
 
-import React from 'react';
+/*
+import { combineReducers } from 'redux'
+import { loadingBarReducer } from 'react-redux-loading-bar'
 
-export default function ContainerPort (props) {
-  return (
-    <div>
-      <h6>Public port : Private port</h6>
-      <div>{props.port.publicPort + ' : ' + props.port.privatePort}</div>
-      <h6>IP / Type</h6>
-      <div>{props.port.ip + ' / ' + props.port.type}</div>
-    </div>
-  );
-}
+const rootReducer = combineReducers({
+  // app reducers
+  loadingBar: loadingBarReducer,
+});
+
+export default rootReducer;*/

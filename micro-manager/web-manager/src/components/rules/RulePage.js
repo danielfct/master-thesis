@@ -24,9 +24,9 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
+import {deleteData, getData, postData} from "../../utils/data";
 
 export default class RulePage extends React.Component {
   constructor (props) {
@@ -38,7 +38,7 @@ export default class RulePage extends React.Component {
     const ruleInitialValues = {
       ruleName: '', componentTypeId: '', priority: 0, decisionId: ''
     };
-    const thisBreadcrumbs = [{ link: '/ui/rules', title: 'Rules' }];
+    const thisBreadcrumbs = [{ link: '/rules', title: 'Rules' }];
     this.state = {
       breadcrumbs: thisBreadcrumbs,
       ruleId: thisRuleId,
@@ -69,7 +69,7 @@ export default class RulePage extends React.Component {
 
   loadConditions = () => {
     this.setState({ loadedConditions: false, loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/rules/${this.state.ruleId}/conditions`,
       data => this.setState({ conditions: data, loadedConditions: true, loading: false })
     );
@@ -78,7 +78,7 @@ export default class RulePage extends React.Component {
   loadRule = () => {
     if (this.state.ruleId !== 0) {
       this.setState({ loading: true });
-      Utils.ajaxGet(
+      getData(
         `localhost/rules/${this.state.ruleId}`,
         (data) => {
           const currentRule = {
@@ -94,7 +94,7 @@ export default class RulePage extends React.Component {
 
   loadComponentTypes = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules/componentTypes/',
       data => this.setState({ componentTypes: data, loading: false })
     );
@@ -102,24 +102,20 @@ export default class RulePage extends React.Component {
 
   loadDecisions = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/decisions/',
       data => this.setState({ decisions: data, loading: false })
     );
   };
 
   handleChange = event => {
-    const name = event.target.name;
-    const newData = this.state.rule;
-    newData[name] = event.target.value;
-    this.setState({ rule: newData });
+    this.setState({ [event.target.name]: event.target.value });
   };
 
   addCondition = (conditionId, event) => {
     if (this.state.ruleId !== 0) {
-      const formAction = '/rules/' + this.state.ruleId + '/conditions/' + conditionId;
-      const formMethod = 'POST';
-      Utils.formSubmit(formAction, formMethod, {},
+      postData(`localhost/rules/${this.state.ruleId}/conditions`,
+        conditionId,
         data => {
           M.toast({ html: '<div>Condition successfully added to rule!</div>' });
           this.loadConditions();
@@ -165,18 +161,16 @@ export default class RulePage extends React.Component {
   };
 
   onDelete = () => {
-    const formAction = '/rules/' + this.state.ruleId;
-    Utils.formSubmit(formAction, 'DELETE', {},
-      data => {
+    deleteData(`localhost/rules/${this.state.ruleId}`,
+      () => {
         this.setState({ isDeleted: true });
         M.toast({ html: '<div>Rule successfully deleted!</div>' });
       });
   };
 
   onRemoveCondition = (conditionId, event) => {
-    const formAction = '/rules/' + this.state.ruleId + '/conditions/' + conditionId;
-    Utils.formSubmit(formAction, 'DELETE', {},
-      data => {
+    deleteData(`localhost/rules/${this.state.ruleId}/conditions/${conditionId}`,
+      () => {
         M.toast({ html: '<div>Condition successfully deleted from rule!</div>' });
         this.loadConditions();
       });
@@ -184,9 +178,8 @@ export default class RulePage extends React.Component {
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formAction = '/rules/' + this.state.ruleId;
-    const formData = Utils.convertFormToJson('ruleForm');
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(`localhost/rules/${this.state.ruleId}`,
+      event.target[0].value,
       data => {
         this.setState({ ruleId: data, isEdit: false });
         M.toast({ html: '<div>Rule successfully saved!</div>' });
@@ -214,7 +207,7 @@ export default class RulePage extends React.Component {
 
   loadAllConditions = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/conditions',
       data => this.setState({ allConditions: data, loading: false })
     );
@@ -259,7 +252,7 @@ export default class RulePage extends React.Component {
 
   renderRuleForm = () => {
     if (this.state.isDeleted) {
-      return <Redirect to='/ui/rules'/>;
+      return <Redirect to='/rules'/>;
     }
     const componentTypesSelect = this.renderComponentTypesSelect();
     const decisionsSelect = this.renderDecisionsSelect();

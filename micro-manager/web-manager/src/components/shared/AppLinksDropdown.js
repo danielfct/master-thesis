@@ -38,30 +38,21 @@ export default class AppLinksDropdown extends React.Component {
     M.Dropdown.init(elems, { coverTrigger: false });
   }
 
-  renderNavLinks () {
-    let links;
-    links = this.state.links.map(function (link, index) {
-      return (
-        <li key={index}>
-          <Link to={link.link}>
-            {link.name}
-          </Link>
-        </li>
-      );
-    });
-    return links;
-  };
-
   render () {
     return (
       <div className='col s12 hide-on-med-and-up'>
-        <button className='dropdown-trigger btn btn-small waves-effect waves-teal btn-flat col s12' href='#'
+        <button className='dropdown-trigger btn btn-small waves-effect waves-teal btn-flat col s12'
           data-target='linksDropdown'>
           <i className="material-icons right">menu</i>
-                    Menu
         </button>
         <ul id='linksDropdown' className='dropdown-content'>
-          {this.renderNavLinks()}
+          {this.state.links.map((link, index) => (
+            <li key={index}>
+              <Link to={link.link}>
+                {link.name}
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     );

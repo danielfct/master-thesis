@@ -24,9 +24,9 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
+import {getData, postData} from "../../utils/data";
 
 export default class LaunchContainer extends React.Component {
   constructor (props) {
@@ -61,7 +61,7 @@ export default class LaunchContainer extends React.Component {
 
   loadAvailableNodes = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/nodes',
       data => this.setState({ nodes: data, loading: false })
     );
@@ -69,7 +69,7 @@ export default class LaunchContainer extends React.Component {
 
   loadServices = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/services',
       data => this.setState({ services: data, loading: false })
     );
@@ -89,14 +89,12 @@ export default class LaunchContainer extends React.Component {
 
   onSubmitForm = (event) => {
     event.preventDefault();
-    const formId = 'form-service';
-    const formAction = '/containers';
-    const formData = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', formData,
-      data => {
+    postData(
+      'localhost/containers',
+      event.target[0].value,
+      container => {
         this.setState({ isEdit: false, formSubmit: true });
-        console.log(data);
-        M.toast({ html: '<div>Container launched successfully!</div>' });
+        M.toast({ html: `<div>Container launched successfully with id ${container.id}!</div>` });
       });
   };
 
@@ -132,7 +130,6 @@ export default class LaunchContainer extends React.Component {
           </select>
           <label htmlFor="hostname">Hostname</label>
         </div>
-
         <div className="input-field col s12">
           <select defaultValue="" name="service" id="service" onChange={this.onChangeServicesSelect}>
             <option value="" disabled="disabled">Choose service</option>
@@ -160,7 +157,7 @@ export default class LaunchContainer extends React.Component {
 
   render = () => {
     if (this.state.formSubmit) {
-      return <Redirect to='/ui/containers'/>;
+      return <Redirect to='/containers'/>;
     }
     return (
       <MainLayout title='Launch container' breadcrumbs={this.state.breadcrumbs}>

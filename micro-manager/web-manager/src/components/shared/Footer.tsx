@@ -26,17 +26,10 @@ import React from "react";
 
 const Footer: React.FC = () => {
     return (
-        <footer className="page-footer teal">
-            <div className="container">
-                <div className="row">
-                    <div className="col m122 s12">
-                        <h5 className="white-text">Microservices management</h5>
-                    </div>
-                </div>
-            </div>
-            <div className="footer-copyright">
-                <div className="container center">
-                    {(new Date().getFullYear())}
+        <footer className="page-footer">
+            <div className="row">
+                <div className="right">
+                    © {(new Date().getFullYear())} micro-manager
                 </div>
             </div>
         </footer>

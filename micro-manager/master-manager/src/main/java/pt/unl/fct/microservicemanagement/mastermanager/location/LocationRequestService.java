@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.location;
 
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.swarm.node.DockerNodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.swarm.node.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostDetails;
@@ -81,7 +82,7 @@ public class LocationRequestService {
     this.headers = new HttpHeaders();
   }
 
-  public String launchRequestLocationMonitor(String hostname) {
+  public SimpleContainer launchRequestLocationMonitor(String hostname) {
     return dockerContainersService.launchSingletonService(hostname, REQUEST_LOCATION_MONITOR);
   }
 

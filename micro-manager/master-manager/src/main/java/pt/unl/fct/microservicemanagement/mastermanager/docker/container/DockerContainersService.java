@@ -32,10 +32,10 @@ import pt.unl.fct.microservicemanagement.mastermanager.host.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.microservices.AppPackagesService;
+import pt.unl.fct.microservicemanagement.mastermanager.microservices.Service;
 import pt.unl.fct.microservicemanagement.mastermanager.microservices.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.microservices.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.microservices.discovery.eureka.EurekaService;
-import pt.unl.fct.microservicemanagement.mastermanager.microservices.Service;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
 
 import java.util.ArrayList;
@@ -107,22 +107,21 @@ public class DockerContainersService {
    * @param region
    * @param country
    * @param city
-   * @return a map of Service name -> List of container ids
+   * @return
    */
-  public Map<String, List<String>> launchMicroserviceApplication(long applicationId, String region, String country,
-                                                                 String city) {
+  public Map<String, List<SimpleContainer>> launchMicroserviceApplication(long applicationId, String region,
+                                                                          String country, String city) {
     // TODO : review launchMicroserviceApplication
-    var serviceContainerIds = new HashMap<String, List<String>>();
+    var serviceContainers = new HashMap<String, List<SimpleContainer>>();
     var dynamicLaunchParams = new HashMap<String, String>();
     log.info("\nLaunching app '{}' at {}, {}, {}", applicationId, region, country, city);
     appPackagesService.getServiceByAppId(applicationId).stream()
         .filter(serviceOrder -> !Objects.equals(serviceOrder.getService().getServiceType(), "database"))
         .map(ServiceOrder::getService)
         .forEach(service -> {
-          List<String> containerIds = launchMicroservice(service, region, country, city, dynamicLaunchParams);
-          serviceContainerIds.put(service.getServiceName(), containerIds);
-          containerIds.forEach(id -> {
-            SimpleContainer container = getContainer(id);
+          List<SimpleContainer> containers = launchMicroservice(service, region, country, city, dynamicLaunchParams);
+          serviceContainers.put(service.getServiceName(), containers);
+          containers.forEach(container -> {
             String hostname = container.getHostname();
             int privatePort = container.getPorts().get(0).getPrivatePort();
             dynamicLaunchParams.put(service.getOutputLabel(), String.format("%s:%d", hostname, privatePort));
@@ -131,7 +130,7 @@ public class DockerContainersService {
           //TODO rever tempo de espera entre cada container
           Timing.sleep(DELAY_BETWEEN_CONTAINER_LAUNCH, TimeUnit.MILLISECONDS);
         });
-    return serviceContainerIds;
+    return serviceContainers;
   }
 
   /**
@@ -143,34 +142,35 @@ public class DockerContainersService {
    * @param dynamicLaunchParams TODO
    * @return the list of all launched container ids
    */
-  private List<String> launchMicroservice(Service service, String region, String country, String city,
-                                          Map<String, String> dynamicLaunchParams) {
-    var containerIds = new LinkedList<String>();
+  private List<SimpleContainer> launchMicroservice(Service service, String region, String country,
+                                                   String city, Map<String, String> dynamicLaunchParams) {
     List<String> customEnvs = Collections.emptyList();
     Map<String, String> customLabels = Collections.emptyMap();
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
     int minReplics = serviceService.getMinReplicsByServiceName(service.getServiceName());
+    var containers = new ArrayList<SimpleContainer>(minReplics);
     for (int i = 0; i < minReplics; i++) {
       String hostname = hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region, country, city);
-      String containerId = launchContainer(hostname, service, customEnvs, customLabels, dynamicLaunchParams);
-      containerIds.add(containerId);
+      SimpleContainer container = launchContainer(hostname, service, customEnvs, customLabels, dynamicLaunchParams);
+      containers.add(container);
     }
-    return containerIds;
+    return containers;
   }
 
-  private String launchContainer(String hostname, String serviceName) {
+  private SimpleContainer launchContainer(String hostname, String serviceName) {
     List<String> customEnvs = Collections.emptyList();
     Map<String, String> customLabels = Collections.emptyMap();
     Map<String, String> dynamicLaunchParams = Collections.emptyMap();
     return launchContainer(hostname, serviceName, customEnvs, customLabels, dynamicLaunchParams);
   }
 
-  public String launchContainer(String hostname, String serviceName, String internalPort, String externalPort) {
+  public SimpleContainer launchContainer(String hostname, String serviceName,
+                                         String internalPort, String externalPort) {
     Map<String, String> dynamicLaunchParams = Collections.emptyMap();
     return launchContainer(hostname, serviceName, internalPort, externalPort, dynamicLaunchParams);
   }
 
-  public String launchContainer(String hostname, String serviceName, String internalPort, String externalPort,
+  public SimpleContainer launchContainer(String hostname, String serviceName, String internalPort, String externalPort,
                                 Map<String, String> dynamicLaunchParams) {
     Service service = serviceService.getServiceLaunchConfig(serviceName);
     service.setDefaultInternalPort(internalPort);
@@ -180,7 +180,7 @@ public class DockerContainersService {
     return launchContainer(hostname, service, customEnvs, customLabels, dynamicLaunchParams);
   }
 
-  public String launchContainer(String hostname, String serviceName, List<String> customEnvs,
+  public SimpleContainer launchContainer(String hostname, String serviceName, List<String> customEnvs,
                                 Map<String, String> customLabels, Map<String, String> dynamicLaunchParams) {
     Service service = serviceService.getServiceLaunchConfig(serviceName);
     return launchContainer(hostname, service, customEnvs, customLabels, dynamicLaunchParams);
@@ -193,9 +193,9 @@ public class DockerContainersService {
    * @param customEnvs environment values specific to the service
    * @param customLabels label values specific to the service
    * @param dynamicLaunchParams TODO
-   * @return the id of the new container
+   * @return the new container
    */
-  private String launchContainer(String hostname, Service service, List<String> customEnvs,
+  private SimpleContainer launchContainer(String hostname, Service service, List<String> customEnvs,
                                  Map<String, String> customLabels, Map<String, String> dynamicLaunchParams) {
     log.info("\nLaunching container...");
     String serviceName = service.getServiceName();
@@ -277,10 +277,10 @@ public class DockerContainersService {
       dockerClient.startContainer(containerId);
       log.info("\nsuccessfully launched container = '{}'", containerId);
       if (Objects.equals(serviceType, "frontend")) {
-        nginxLoadBalancerService.addToLoadBalancer(hostname, serviceName, serviceAddr, continent, region, country,
-            city);
+        nginxLoadBalancerService.addToLoadBalancer(hostname, serviceName, serviceAddr, continent,
+            region, country, city);
       }
-      return containerId;
+      return getContainer(containerId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new LaunchContainerException(e.getMessage());
@@ -293,18 +293,19 @@ public class DockerContainersService {
    * @param serviceName
    * @return
    */
-  public String launchSingletonService(String hostname, String serviceName) {
+  public SimpleContainer launchSingletonService(String hostname, String serviceName) {
     log.info("\nLaunching singleton service '{}' at hostname '{}' ...", serviceName, hostname);
     List<SimpleContainer> containers = getContainers(hostname,
         DockerClient.ListContainersParam.withLabel(DockerContainer.Label.SERVICE_NAME, serviceName));
-    String containerId;
+    SimpleContainer container;
     if (containers.isEmpty()) {
-      containerId = launchContainer(hostname, serviceName);
+      container = launchContainer(hostname, serviceName);
     } else {
-      containerId = containers.get(0).getId();
-      log.info("\ncontainer '{}' is already running service '{}' at hostname '{}'", containerId, serviceName, hostname);
+      container = containers.get(0);
+      log.info("\ncontainer '{}' is already running service '{}' at hostname '{}'",
+          container.getId(), serviceName, hostname);
     }
-    return containerId;
+    return container;
   }
 
   /**
@@ -338,11 +339,12 @@ public class DockerContainersService {
         DockerClient.ListContainersParam.withLabel(DockerContainer.Label.SERVICE_NAME, databaseServiceName));
     if (databaseContainer.isEmpty()) {
       log.info("\nNo database '{}' found on host '{}'", databaseServiceName, hostname);
-      String containerId = launchContainer(hostname, databaseServiceName);
+      SimpleContainer container = launchContainer(hostname, databaseServiceName);
+      //TODO review
       do {
         Timing.sleep(CPU_SLEEP, TimeUnit.MILLISECONDS);
-        log.info("\nLooking for database '{}' on container '{}'", databaseServiceName, containerId);
-        databaseContainer = findContainer(containerId);
+        log.info("\nLooking for database '{}' on container '{}'", databaseServiceName, container.getId());
+        databaseContainer = findContainer(container.getId());
         //TODO add timeout?
       } while (databaseContainer.isEmpty());
     }
@@ -379,7 +381,7 @@ public class DockerContainersService {
    * @param toHostname
    * @return the id of the container replica
    */
-  public String replicateContainer(String containerId, String fromHostname, String toHostname) {
+  public SimpleContainer replicateContainer(String containerId, String fromHostname, String toHostname) {
     ContainerInfo fromContainer = inspectContainer(containerId, fromHostname);
     List<String> args = fromContainer.args();
     String serviceName = fromContainer.name().replace("/", "").split("_")[0];
@@ -413,16 +415,16 @@ public class DockerContainersService {
    * @param toHostname
    * @return
    */
-  public List<String> migrateContainers(String fromHostname, String toHostname) {
+  public List<SimpleContainer> migrateContainers(String fromHostname, String toHostname) {
     List<SimpleContainer> containers = getContainers(fromHostname).stream()
         .filter(c -> List.of("backend", "frontend").contains(c.getLabels().get(DockerContainer.Label.SERVICE_TYPE)))
         .collect(Collectors.toList());
-    var containerIds = new ArrayList<String>(containers.size());
-    containers.forEach(c -> containerIds.add(migrateContainer(c.getId(), fromHostname, toHostname)));
-    return containerIds;
+    var migratedContainers = new ArrayList<SimpleContainer>(containers.size());
+    containers.forEach(c -> migratedContainers.add(migrateContainer(c.getId(), fromHostname, toHostname)));
+    return migratedContainers;
   }
 
-  public String migrateContainer(String containerId, String fromHostname, String toHostname) {
+  public SimpleContainer migrateContainer(String containerId, String fromHostname, String toHostname) {
     //TODO change delay from seconds to milliseconds
     return migrateContainer(containerId, fromHostname, toHostname, dockerDelayBeforeStopContainer);
   }
@@ -434,9 +436,10 @@ public class DockerContainersService {
    * @param toHostname
    * @return
    */
-  public String migrateContainer(String containerId, String fromHostname, String toHostname, int secondsBeforeStop) {
+  public SimpleContainer migrateContainer(String containerId, String fromHostname,
+                                          String toHostname, int secondsBeforeStop) {
     long delayBeforeStop = secondsBeforeStop < 1 ? dockerDelayBeforeStopContainer : secondsBeforeStop;
-    String replicaContainerId = replicateContainer(containerId, fromHostname, toHostname);
+    SimpleContainer replicaContainer = replicateContainer(containerId, fromHostname, toHostname);
     new Timer("stopContainerTimer").schedule(new TimerTask() {
       @Override
       public void run() {
@@ -444,7 +447,7 @@ public class DockerContainersService {
         log.info("\nStopped container '{}' on host '{}'", containerId, fromHostname);
       }
     }, TimeUnit.SECONDS.toMillis(delayBeforeStop));
-    return replicaContainerId;
+    return replicaContainer;
   }
 
   public List<SimpleContainer> getContainers(DockerClient.ListContainersParam... filter) {

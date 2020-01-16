@@ -23,19 +23,15 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
 import M from 'materialize-css';
 import CardItem from '../shared/CardItem';
+import {deleteData} from "../../utils/data";
 
 export default class NodeCard extends React.Component {
   onClickStop = () => {
-    const action = '/api/nodes';
-    const dataObject = {
-      hostname: this.props.node.hostname
-    };
-    const dataToSend = JSON.stringify(dataObject);
-    Utils.formSubmit(action, 'DELETE', dataToSend,
-      data => {
+    deleteData(
+      `localhost/nodes/${this.props.node.hostname}`, //TODO fix server
+      () => {
         M.toast({ html: '<div>Node removed successfully!</div>' });
         this.props.reloadNodes();
       });

@@ -33,6 +33,7 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import pt.unl.fct.microservicemanagement.mastermanager.docker.container.SimpleContainer;
 
 
 @Service
@@ -56,7 +57,7 @@ public class PrometheusService {
     this.restTemplate = new RestTemplate();
   }
 
-  public String launchPrometheus(String hostname) {
+  public SimpleContainer launchPrometheus(String hostname) {
     return dockerContainersService.launchSingletonService(hostname, PROMETHEUS);
   }
 

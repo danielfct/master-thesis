@@ -25,9 +25,9 @@
 import React from 'react';
 import M from 'materialize-css';
 import $ from 'jquery';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
 import EdgeHostCard from './EdgeHostCard';
+import {getData} from "../../utils/data";
 
 export default class EdgeHosts extends React.Component {
   constructor (props) {
@@ -36,7 +36,7 @@ export default class EdgeHosts extends React.Component {
   }
 
   componentDidUpdate = () => {
-    if (this.state.data.length > 0) {
+    if (this.state.data && this.state.data.length > 0) {
       const lastIndex = this.state.data.length - 1;
       if (this.state.data[lastIndex].id === 0) {
         const offset = $('#edgehost' + lastIndex).offset().top;
@@ -86,7 +86,7 @@ export default class EdgeHosts extends React.Component {
 
   loadHosts = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/hosts/edge',
       data =>
         this.setState({ data: data, loading: false })
@@ -105,7 +105,9 @@ export default class EdgeHosts extends React.Component {
       <MainLayout title='Edge hosts'>
         {edgeHostsNodes}
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add edge host">
-          <button disabled={!this.state.showAdd} className="waves-effect waves-light btn-floating btn-large grey darken-4" onClick={this.addEdgeHost}>
+          <button disabled={!this.state.showAdd}
+                  className="waves-effect waves-light btn-floating grey darken-3"
+                  onClick={this.addEdgeHost}>
             <i className="large material-icons">add</i>
           </button>
         </div>

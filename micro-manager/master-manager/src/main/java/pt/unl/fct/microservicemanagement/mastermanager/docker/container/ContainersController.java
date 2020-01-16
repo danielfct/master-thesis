@@ -24,6 +24,10 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.docker.container;
 
+import pt.unl.fct.microservicemanagement.mastermanager.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
+import pt.unl.fct.microservicemanagement.mastermanager.microservices.discovery.eureka.EurekaService;
+
 import java.util.List;
 import java.util.Map;
 
@@ -35,13 +39,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import pt.unl.fct.microservicemanagement.mastermanager.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.microservicemanagement.mastermanager.microservices.discovery.eureka.EurekaService;
-import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
-
 @RestController
 @RequestMapping("/containers")
 public class ContainersController {
+
+  //TODO substituir os reqs por objetos, ou @JsonValue annotation
 
   private final DockerContainersService dockerContainersService;
   private final EurekaService eurekaService;
@@ -61,9 +63,12 @@ public class ContainersController {
   }
 
   @PostMapping
-  public String launchContainer(@RequestBody LaunchServiceReq launchServiceReq) {
-    return dockerContainersService.launchContainer(launchServiceReq.getHostname(), launchServiceReq.getService(),
-      launchServiceReq.getInternalPort(), launchServiceReq.getExternalPort());
+  public SimpleContainer launchContainer(@RequestBody LaunchServiceReq launchServiceReq) {
+    String hostname = launchServiceReq.getHostname();
+    String serviceName = launchServiceReq.getService();
+    String internalPort = launchServiceReq.getInternalPort();
+    String externalPort = launchServiceReq.getExternalPort();
+    return dockerContainersService.launchContainer(hostname, serviceName, internalPort, externalPort);
   }
 
   @GetMapping("/{id}")
@@ -73,37 +78,34 @@ public class ContainersController {
 
   @DeleteMapping("/{id}")
   public void stopContainer(@PathVariable String id,
-                            @RequestBody StopServiceReq stopServiceReq) {
-    final var containerId = stopServiceReq.getContainerId();
-    final var hostname = stopServiceReq.getHostname();
+                            @RequestBody SimpleContainer container) {
+    //TODO validate ids => throw new BadRequest when not match
+    final var containerId = container.getId();
+    final var hostname = container.getHostname();
     dockerContainersService.stopContainer(containerId, hostname);
   }
 
   @PostMapping("/{id}/replicate")
-  public String replicateContainer(@PathVariable String id,
-                                   @RequestBody ReplicateContainerReq repContainerReq) {
-    //TODO fix ui
-    final var containerId = repContainerReq.getContainerId();
+  public SimpleContainer replicateContainer(@PathVariable String id,
+                                            @RequestBody ReplicateContainerReq repContainerReq) {
     final var fromHostname = repContainerReq.getFromHostname();
     final var toHostname = repContainerReq.getToHostname();
-    return dockerContainersService.replicateContainer(containerId, fromHostname, toHostname);
+    return dockerContainersService.replicateContainer(id, fromHostname, toHostname);
   }
 
   @PostMapping("/{id}/migrate")
-  public String migrateContainer(@PathVariable String id,
-                                 @RequestBody MigrateContainerReq migContainerReq) {
-    //FIXME fix ui
-    final var containerId = migContainerReq.getContainerId();
+  public SimpleContainer migrateContainer(@PathVariable String id,
+                                          @RequestBody MigrateContainerReq migContainerReq) {
     final var fromHostname = migContainerReq.getFromHostname();
     final var toHostname = migContainerReq.getToHostname();
     final var secondsBeforeStop = migContainerReq.getSecondsBeforeStop();
-    return dockerContainersService.migrateContainer(containerId, fromHostname, toHostname, secondsBeforeStop);
+    return dockerContainersService.migrateContainer(id, fromHostname, toHostname, secondsBeforeStop);
   }
 
   //FIXME add appId to launchAppReq
   @PostMapping("/app/{appId}")
-  public Map<String, List<String>> launchApp(@PathVariable long appId,
-                                             @RequestBody LaunchAppReq launchAppReq) {
+  public Map<String, List<SimpleContainer>> launchApp(@PathVariable long appId,
+                                                      @RequestBody LaunchAppReq launchAppReq) {
     final var region = launchAppReq.getRegion();
     final var country = launchAppReq.getCountry();
     final var city = launchAppReq.getCity();
@@ -111,7 +113,7 @@ public class ContainersController {
   }
 
   @PostMapping("/eureka")
-  public List<String> launchEureka(@RequestBody List<Region> regions) {
+  public List<SimpleContainer> launchEureka(@RequestBody List<Region> regions) {
     return eurekaService.launchEurekaServers(regions);
   }
 

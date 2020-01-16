@@ -24,9 +24,9 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
+import {getData, postData} from "../../utils/data";
 
 export default class DefaultHostSimulatedMetricsDetail extends React.Component {
   constructor (props) {
@@ -62,7 +62,7 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
 
   loadFields = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/fields',
       data => this.setState({ fields: data, loading: false })
     );
@@ -71,7 +71,7 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
   loadDefaultHostSimulatedMetrics = () => {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
-      Utils.ajaxGet(
+      getData(
         `localhost/metrics/simulated/hosts/default/'${this.state.id}`,
         data => this.setState({ values: data, loading: false })
       );
@@ -92,10 +92,9 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formId = 'form-service';
-    const formAction = '/simulatedMetrics/defaultHosts/' + this.state.id;
-    const formData = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      `localhost/metrics/simulated/hosts/default/${this.state.id}`,
+      event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });
         M.toast({ html: '<div>Default host simulated metric saved successfully!</div>' });
@@ -149,7 +148,7 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
 
   render = () => {
     if (this.state.formSubmit) {
-      return <Redirect to='/ui/simulatedMetrics/defaultHosts'/>;
+      return <Redirect to='/metrics/simulated/hosts/default'/>;
     }
     return (
       <MainLayout title='Default host simulated metric detail' breadcrumbs={this.state.breadcrumbs}>

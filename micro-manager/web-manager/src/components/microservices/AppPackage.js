@@ -25,11 +25,11 @@
 import React from 'react';
 import M from 'materialize-css';
 import $ from 'jquery';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
 import AppPackageCard from './AppPackageCard';
+import {getData} from "../../utils/data";
 
-export default class AppPackages extends React.Component {
+export default class AppPackage extends React.Component {
   constructor (props) {
     super(props);
     this.state = { data: [], loading: false, showAdd: true };
@@ -42,7 +42,7 @@ export default class AppPackages extends React.Component {
   };
 
   componentDidUpdate = () => {
-    if (this.state.data.length > 0) {
+    if (this.state.data && this.state.data.length > 0) {
       const lastIndex = this.state.data.length - 1;
       if (this.state.data[lastIndex].id === 0) {
         const offset = $('#app' + lastIndex).offset().top;
@@ -54,7 +54,7 @@ export default class AppPackages extends React.Component {
 
   loadApps = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/apps',
       data => this.setState({ data: data, loading: false })
     );
@@ -72,32 +72,21 @@ export default class AppPackages extends React.Component {
     this.setState({ tooltipInstances: instances });
   };
 
-  addApp = () => {
-    const newApp = {
-      id: 0, appName: ''
-    };
-    const newData = this.state.data;
-    newData.push(newApp);
-    this.setState({ data: newData, showAdd: false });
-  };
+  addApp = () =>
+    this.setState({ data: {id: 0, appname: '', ...this.state.data}, showAdd: false });
 
-  componentWillUnmount = () => {
+  componentWillUnmount = () =>
     this.state.tooltipInstances[0].destroy();
-  };
 
   render = () => {
-    let appPackagesNodes;
-    if (this.state.data) {
-      appPackagesNodes = this.state.data.map((appPackage, index) => (
-        <AppPackageCard key={appPackage.id} index={index} appPackage={appPackage} onRemove={this.loadApps}
-                        updateNewApp={this.updateNewApp}/>
-      ));
-    }
     return (
-      <MainLayout title='App packages'>
-        {appPackagesNodes}
+      <MainLayout title='Apps'>
+        {this.state.data && this.state.data.map((appPackage, index) => (
+          <AppPackageCard key={appPackage.id} index={index} appPackage={appPackage} onRemove={this.loadApps}
+                          updateNewApp={this.updateNewApp}/>
+        ))}
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add app package">
-          <button disabled={!this.state.showAdd} className="waves-effect waves-light btn-floating btn-large grey darken-4" onClick={this.addApp}>
+          <button disabled={!this.state.showAdd} className="waves-effect waves-light btn-floating grey darken-3" onClick={this.addApp}>
             <i className="large material-icons">add</i>
           </button>
         </div>

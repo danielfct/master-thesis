@@ -22,32 +22,16 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import {Link} from 'react-router-dom';
+/*
+import { createStore, applyMiddleware } from 'redux'
+import { loadingBarMiddleware } from 'react-redux-loading-bar'
+import rootReducer from './reducers'
 
-export default class PageTitle extends React.Component {
-  constructor (props) {
-    super(props);
-    let initialBreadcrumbs = [];
-    if (this.props.breadcrumbs) {
-      initialBreadcrumbs = this.props.breadcrumbs;
-    }
-    initialBreadcrumbs.push({ link: '', title: this.props.title });
-    this.state = { breadcrumbs: initialBreadcrumbs };
-  }
+const store = createStore(
+  rootReducer,
+  // promise middleware
+  applyMiddleware(loadingBarMiddleware())
+);
 
-  render () {
-    return (
-      <div className="row">
-        <div className="col s12">
-          {/*FIXME*/}
-          {this.state.breadcrumbs && this.state.breadcrumbs.map((breadcrumb, index) =>
-            breadcrumb.link === ''
-              ? <span key={index} className="breadcrumb white-text">{breadcrumb.title}</span>
-              : <Link key={index} className="breadcrumb white-text" to={breadcrumb.link}>{breadcrumb.title}</Link>
-          )}
-        </div>
-      </div>
-    );
-  }
-}
+export default store;
+*/

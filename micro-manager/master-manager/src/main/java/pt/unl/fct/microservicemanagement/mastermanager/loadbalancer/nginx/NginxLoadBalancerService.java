@@ -24,24 +24,29 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.loadbalancer.nginx;
 
-import java.util.*;
+import pt.unl.fct.microservicemanagement.mastermanager.docker.DockerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
+import pt.unl.fct.microservicemanagement.mastermanager.microservices.ServicesService;
+
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.spotify.docker.client.DockerClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainer;
-import pt.unl.fct.microservicemanagement.mastermanager.docker.container.SimpleContainer;
-import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
-import com.spotify.docker.client.DockerClient;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.microservicemanagement.mastermanager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.microservices.ServicesService;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
@@ -92,8 +97,8 @@ public class NginxLoadBalancerService {
     launchLoadBalancer(hostname, serviceName, "127.0.0.1:1906", "none", "none", "none", "none");
   }
 
-  private String launchLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,
-                                  String region, String country, String city) {
+  private SimpleContainer launchLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,
+                                             String region, String country, String city) {
     var customEnvs = List.of(
         "SERVER1=" + serverAddr,
         "SERVER1_CONTINENT=" + continent,
@@ -104,8 +109,8 @@ public class NginxLoadBalancerService {
         "BASIC_AUTH_PASSWORD=" + dockerApiProxyPassword);
     var customLabels = Map.of(DockerContainer.Label.FOR_SERVICE, serviceName);
     Map<String, String> dynamicLaunchParams = Collections.emptyMap();
-    return
-        dockerContainersService.launchContainer(hostname, LOAD_BALANCER, customEnvs, customLabels, dynamicLaunchParams);
+    return dockerContainersService
+        .launchContainer(hostname, LOAD_BALANCER, customEnvs, customLabels, dynamicLaunchParams);
   }
 
   private List<SimpleContainer> getLoadBalancersFromService(String serviceName) {
@@ -118,9 +123,8 @@ public class NginxLoadBalancerService {
                                 String region, String country, String city) {
     List<SimpleContainer> loadBalancers = getLoadBalancersFromService(serviceName);
     if (loadBalancers.isEmpty()) {
-      String containerId = launchLoadBalancer(hostname, serviceName, serverAddr, continent, region, country, city);
-      SimpleContainer container = dockerContainersService.getContainer(containerId);
-      assert container != null;
+      SimpleContainer container = launchLoadBalancer(hostname, serviceName, serverAddr, continent, region,
+          country, city);
       loadBalancers = List.of(container);
     }
     loadBalancers.forEach(loadBalancer -> {

@@ -24,10 +24,10 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import $ from 'jquery';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
+import {getData, postData} from "../../utils/data";
 
 export default class ServiceEventPredictionDetail extends React.Component {
   constructor (props) {
@@ -45,7 +45,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
       endTime: '',
       minReplics: ''
     };
-    const thisBreadcrumbs = [{ link: '/ui/rules/serviceEventPredictions', title: 'Service event predictions' }];
+    const thisBreadcrumbs = [{ link: '/rules/serviceEventPredictions', title: 'Service event predictions' }];
     this.state = {
       id: defaultId,
       values: defaultValues,
@@ -79,7 +79,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
 
   loadServices = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/services',
       data => this.setState({ services: data, loading: false })
     );
@@ -88,7 +88,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
   loadServiceEventPrediction = () => {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
-      Utils.ajaxGet(
+      getData(
         `localhost/services/eventPredictions/${this.state.id}`,
         data => {
           const loadValues = {
@@ -138,10 +138,9 @@ export default class ServiceEventPredictionDetail extends React.Component {
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formId = 'form-service';
-    const formAction = '/services/serviceEventPredictions/' + this.state.id;
-    const formData = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      `localhost/services/eventPredictions/${this.state.id}`,
+      event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });
         M.toast({ html: '<div>Service event prediction saved successfully!</div>' });
@@ -206,7 +205,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
 
   render = () => {
     if (this.state.formSubmit) {
-      return <Redirect to='/ui/rules/serviceEventPredictions'/>;
+      return <Redirect to='/rules/serviceEventPredictions'/>;
     }
     return (
       <MainLayout title='Service event prediction detail' breadcrumbs={this.state.breadcrumbs}>

@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.microservices.discovery.
 
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.microservices.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
@@ -67,8 +68,8 @@ public class EurekaService {
         .findFirst();
   }
 
-  // Returns the ids of all eureka containers started
-  public List<String> launchEurekaServers(List<Region> regions) {
+  // Return all eureka containers started
+  public List<SimpleContainer> launchEurekaServers(List<Region> regions) {
     pt.unl.fct.microservicemanagement.mastermanager.microservices.Service service =
         serviceService.getServiceLaunchConfig(EUREKA);
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();

@@ -24,9 +24,9 @@
 
 import React from "react";
 import M from "materialize-css";
-import Utils from '../../utils';
 import MainLayout from "../shared/MainLayout";
 import {Redirect} from "react-router";
+import {getData, postData} from "../../utils/data";
 
 export default class AddNode extends React.Component {
   constructor(props) {
@@ -34,7 +34,7 @@ export default class AddNode extends React.Component {
     const defaultValues = {
       region: '', country: '', city: '', quantity: 1
     };
-    const thisBreadcrumbs = [{link: '/ui/nodes', title: 'Nodes'}];
+    const thisBreadcrumbs = [{link: '/nodes', title: 'Nodes'}];
     this.state = {
       breadcrumbs: thisBreadcrumbs,
       loading: false,
@@ -54,10 +54,10 @@ export default class AddNode extends React.Component {
 
   loadRegions = () => {
     this.setState({loading: true});
-    Utils.fetch('localhost/regions',
-      data => {
-        this.setState({availableRegions: data, loading: false});
-      });
+    getData(
+      'localhost/regions',
+      data => this.setState({availableRegions: data, loading: false})
+    );
   };
 
   renderRegionsSelect = () => {
@@ -75,12 +75,11 @@ export default class AddNode extends React.Component {
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formAction = '/nodes';
-    const formData = Utils.convertFormToJson('form-node');
-    Utils.formSubmit(formAction, 'POST', formData,
-      data => {
+    postData(
+      'localhost/nodes',
+      event.target[0].value,
+      nodes => {
         this.setState({formSubmit: true});
-        const nodes = data.toString();
         M.toast({html: `<div>New nodes added successfully!</br>Nodes: ${nodes}</div>`});
       });
   };
@@ -119,7 +118,7 @@ export default class AddNode extends React.Component {
 
   render = () => {
     if (this.state.formSubmit) {
-      return <Redirect to='/ui/nodes'/>;
+      return <Redirect to='/nodes'/>;
     }
     return (
       <MainLayout title='Add node' breadcrumbs={this.state.breadcrumbs}>

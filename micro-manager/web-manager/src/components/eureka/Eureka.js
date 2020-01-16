@@ -25,8 +25,8 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
+import {getData, postData} from "../../utils/data";
 
 export default class EurekaPage extends React.Component {
   constructor (props) {
@@ -40,7 +40,7 @@ export default class EurekaPage extends React.Component {
 
   loadRegions () {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/regions',
       data => this.setState({ availableRegions: data, loading: false })
     );
@@ -59,7 +59,7 @@ export default class EurekaPage extends React.Component {
     const index = getIndex(regionId, newAvailableRegions);
     newAvailableRegions.splice(index, 1);
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/regions/${regionId}`,
       data => {
         const newChosenRegions = this.state.chosenRegions;
@@ -82,7 +82,7 @@ export default class EurekaPage extends React.Component {
     const index = getIndex(regionId, newChosenRegions);
     newChosenRegions.splice(index, 1);
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/regions/${regionId}`,
       data => {
         const newAvailableRegions = this.state.availableRegions;
@@ -93,10 +93,9 @@ export default class EurekaPage extends React.Component {
 
   onSubmitForm (event) {
     event.preventDefault();
-    const formAction = '/containers/eureka';
-    const formMethod = 'POST';
-    const formData = JSON.stringify(this.state.chosenRegions);
-    Utils.formSubmit(formAction, formMethod, formData,
+    postData(
+      'localhost/containers/eureka',
+      this.state.chosenRegion,
       data => {
         this.setState({ formSubmit: true });
         const hosts = data.toString();
@@ -168,7 +167,7 @@ export default class EurekaPage extends React.Component {
 
   render () {
     if (this.state.formSubmit) {
-      return <Redirect to='/ui/home' />;
+      return <Redirect to='/' />;
     }
     return (
       <MainLayout title='Launch Eureka servers' breadcrumbs={this.state.breadcrumbs}>

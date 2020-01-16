@@ -23,15 +23,15 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
 import M from 'materialize-css';
 import CardItem from '../shared/CardItem';
+import {deleteData} from "../../utils/data";
 
 export default class ServiceEventPredictionCard extends React.Component {
   onClickRemove = () => {
-    const action = '/services/serviceEventPredictions/' + this.props.serviceEvent.id;
-    Utils.formSubmit(action, 'DELETE', {},
-      data => {
+    deleteData(
+      `localhost/services/eventPredictions/${this.props.serviceEvent.id}`,
+      () => {
         M.toast({ html: '<div>Service event prediction removed successfully!</div>' });
         this.props.reloadServiceEvents();
       });

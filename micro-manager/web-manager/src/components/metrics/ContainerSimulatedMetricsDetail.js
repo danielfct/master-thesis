@@ -24,9 +24,9 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
+import {getData, postData} from "../../utils/data";
 
 export default class ContainerSimulatedMetricsDetail extends React.Component {
   constructor (props) {
@@ -64,16 +64,16 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
 
   loadContainers = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
-      '/containers',
+    getData(
+      'localhost/containers',
       data => this.setState({ containers: data, loading: false })
     );
   };
 
   loadFields = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
-      '/rules/fields',
+    getData(
+      'localhost/rules/fields',
       data => this.setState({ fields: data, loading: false })
     );
   };
@@ -81,7 +81,7 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
   loadContainerSimulatedMetrics = () => {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
-      Utils.ajaxGet(
+      getData(
         `localhost/metrics/simulated/containers/${this.state.id}`,
         data => this.setState({ values: data, loading: false })
       );
@@ -114,10 +114,9 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formId = 'form-service';
-    const formAction = '/simulatedMetrics/containers/' + this.state.id;
-    const formData = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      `localhost/metrics/simulated/containers/${this.state.id}`,
+      event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });
         M.toast({ html: '<div>Container simulated metric saved successfully!</div>' });
@@ -180,7 +179,7 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
 
   render = () => {
     if (this.state.formSubmit) {
-      return <Redirect to='/ui/simulatedMetrics/containers'/>;
+      return <Redirect to='/metrics/simulated/containers'/>;
     }
     return (
       <MainLayout title='Container simulated metric detail' breadcrumbs={this.state.breadcrumbs}>

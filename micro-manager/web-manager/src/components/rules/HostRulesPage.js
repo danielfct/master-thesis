@@ -24,8 +24,8 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
+import {deleteData, getData, postData} from "../../utils/data";
 
 export default class HostRulesPage extends React.Component {
   constructor (props) {
@@ -34,7 +34,7 @@ export default class HostRulesPage extends React.Component {
     if (props.match.params.hostname) {
       thisHostname = props.match.params.hostname;
     }
-    const thisBreadcrumbs = [{ link: '/ui/rules/hosts', title: 'Hosts rules' }];
+    const thisBreadcrumbs = [{ link: '/rules/hosts', title: 'Hosts rules' }];
     this.state = {
       breadcrumbs: thisBreadcrumbs,
       hostname: thisHostname,
@@ -56,7 +56,7 @@ export default class HostRulesPage extends React.Component {
 
   loadHostRules = () => {
     this.setState({ loadedRules: false, loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/hosts/${this.state.hostname}/rules`,
       data => this.setState({ rules: data, loadedRules: true, loading: false })
     );
@@ -64,19 +64,19 @@ export default class HostRulesPage extends React.Component {
 
   loadAllRules = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/rules/hosts',
       data => this.setState({ allRules: data, loading: false })
     );
   };
 
   onRemoveRule = (ruleId, event) => {
-    const formAction = '/hosts/' + this.state.hostname + '/rules';
     const data = {
       hostname: this.state.hostname,
       ruleId: Number(ruleId)
     };
-    Utils.formSubmit(formAction, 'DELETE', JSON.stringify(data),
+    deleteData(
+      `localhost/hosts/${this.state.hostname}/rules/`, JSON.stringify(data),
       data => {
         M.toast({ html: '<div>Rule successfully deleted from hosts rules!</div>' });
         this.loadHostRules();
@@ -84,11 +84,11 @@ export default class HostRulesPage extends React.Component {
   };
 
   addRule = (ruleId, event) => {
-    const data = {
-      hostname: this.state.hostname,
-      ruleId: Number(ruleId)
-    };
-    Utils.formSubmit(`/hosts/${this.state.hostname}/rules`, 'POST', JSON.stringify(data),
+    postData(
+      `/hosts/${this.state.hostname}/rules`,
+      {
+        ruleId
+      },
       data => {
         M.toast({ html: '<div>Rule successfully added to host rules!</div>' });
         this.loadHostRules();

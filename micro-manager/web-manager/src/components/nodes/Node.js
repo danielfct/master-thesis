@@ -25,9 +25,9 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
 import NodeCard from './NodeCard';
+import {getData} from "../../utils/data";
 
 export default class Nodes extends React.Component {
   constructor (props) {
@@ -47,7 +47,7 @@ export default class Nodes extends React.Component {
 
   loadNodes = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/nodes',
       data => this.setState({ data: data, loading: false })
     );
@@ -63,7 +63,7 @@ export default class Nodes extends React.Component {
     return (
       <MainLayout title='Nodes'>
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add node">
-          <Link className="waves-effect waves-light btn-floating btn-large grey darken-4" to='/ui/nodes/add'>
+          <Link className="waves-effect waves-light btn-floating grey darken-3" to='/nodes/add'>
             <i className="large material-icons">add</i>
           </Link>
         </div>

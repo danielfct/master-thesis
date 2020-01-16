@@ -24,8 +24,8 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import ServiceCard from './ServiceCard';
+import {deleteData, getData, postData} from "../../utils/data";
 
 export default class AppPackageCard extends React.Component {
   constructor (props) {
@@ -53,22 +53,21 @@ export default class AppPackageCard extends React.Component {
     M.updateTextFields();
     M.Collapsible.init(document.querySelectorAll('.collapsible'));
     if (this.state.isLaunchActive) {
-      const elems = this.region;
-      M.FormSelect.init(elems);
+      M.FormSelect.init(this.region);
     }
   };
 
   loadRegions = () => {
     this.setState({ loading: true });
-    const url = 'localhost/regions';
-    Utils.fetch(url, data => {
-      this.setState({ availableRegions: data, loading: false });
-    });
+    getData(
+      'localhost/regions',
+      data => this.setState({ availableRegions: data, loading: false })
+    );
   };
 
   loadAppServices = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/apps/${this.state.appPackage.id}/services`,
       data => this.setState({ data: data, loading: false })
     );
@@ -185,54 +184,49 @@ export default class AppPackageCard extends React.Component {
   };
 
   onClickRemove = () => {
-    const formAction = '/apps/' + this.state.appPackage.id;
-    Utils.formSubmit(formAction, 'DELETE', {},
-      data => {
+    deleteData(
+      `localhost/apps/${this.state.appPackage.id}`,
+      () => {
         M.toast({ html: '<div>App deleted successfully!</div>' });
         this.props.onRemove();
       });
   };
 
   onLaunchApp = () => {
-    const formAction = '/containers/app/' + this.state.appPackage.id;
-    const dataToSend = JSON.stringify({
-      region: this.state.regionSelected,
-      country: this.state.countrySelected,
-      city: this.state.citySelected
-    });
-    Utils.formSubmit(formAction, 'POST', dataToSend,
+    postData(
+      `localhost/containers/app/${this.state.appPackage.id}`, //TODO confirm link
+      {
+        region: this.state.regionSelected,
+        country: this.state.countrySelected,
+        city: this.state.citySelected
+      },
       data => {
         console.log(data);
-        M.toast({
-          html: '<div>App launched successfully!</div>',
-          options: { displayLength: 10000 }
-        });
+        M.toast({ html: '<div>App launched successfully!</div>' });
         this.onClickCancelLaunch();
       });
   };
 
   handleChange = event => {
-    const name = event.target.name;
-    const newData = this.state.appPackage;
-    newData[name] = event.target.value;
-    this.setState({ appPackage: newData });
+    this.setState({ [event.target.name]: event.target.value });
   };
 
-  onSubmitForm = e => {
-    e.preventDefault();
-    const formId = this.state.appPackage.id + 'appForm';
-    const formAction = '/apps/' + this.state.appPackage.id;
-    const dataToSend = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', dataToSend, data => {
-      const newData = this.state.appPackage;
-      const oldId = newData.id;
-      newData.id = data;
-      this.setState({ appPackage: newData, isEdit: false });
-      if (oldId === 0) {
-        this.props.updateNewApp(false);
-      }
-      M.toast({ html: '<div>App saved successfully!</div>' });
-    });
+  onSubmitForm = event => {
+    event.preventDefault();
+    postData(
+      `localhost/apps/${this.state.appPackage.id}`,
+      event.target[0].value,
+      data => {
+        //TODO wtf?
+        const newData = this.state.appPackage;
+        const oldId = newData.id;
+        newData.id = data;
+        this.setState({ appPackage: newData, isEdit: false });
+        if (oldId === 0) {
+          this.props.updateNewApp(false);
+        }
+        M.toast({ html: '<div>App saved successfully!</div>' });
+      });
   };
 
   renderForm = () => (

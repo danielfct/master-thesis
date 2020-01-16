@@ -23,7 +23,7 @@
  */
 
 import React from 'react';
-import Utils from '../../utils';
+import {getData} from "../../utils/data";
 
 export default class ServiceRules extends React.Component {
   constructor (props) {
@@ -37,34 +37,24 @@ export default class ServiceRules extends React.Component {
 
   loadServiceRules = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       `localhost/services/${this.props.service.id}/rules`,
       data => this.setState({ serviceRules: data, loading: false })
     );
   };
 
-  renderServiceRules = () => {
-    let serviceRulesNodes;
-    if (this.state.serviceRules) {
-      serviceRulesNodes = this.state.serviceRules.map(function (serviceRule) {
-        return (
-          <div key={serviceRule.rule.id}>
-            <div className='card'>
-              <div className='card-content'>
-                {serviceRule.rule.ruleName}
-              </div>
-            </div>
-          </div>
-        );
-      });
-    }
-    return serviceRulesNodes;
-  };
-
   render = () => (
     <div>
       <h5>Rules</h5>
-      {this.renderServiceRules()}
+      {this.state.serviceRules && this.state.serviceRules.map(serviceRule => (
+        <div key={serviceRule.rule.id}>
+          <div className='card'>
+            <div className='card-content'>
+              {serviceRule.rule.ruleName}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

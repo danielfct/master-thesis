@@ -24,7 +24,7 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
+import {deleteData, postData} from "../../utils/data";
 
 export default class EdgeHostCard extends React.Component {
   constructor (props) {
@@ -53,19 +53,16 @@ export default class EdgeHostCard extends React.Component {
   };
 
   handleChange = event => {
-    const name = event.target.name;
-    const newData = this.state.data;
-    newData[name] = event.target.value;
-    this.setState({ data: newData });
+    this.setState({ [event.target.name]: event.target.value });
   };
 
   onSubmitForm = event => {
     event.preventDefault();
-    const formId = this.state.data.id + 'edgeHostForm';
-    const formAction = '/hosts/edge/' + this.state.data.id;
-    const formData = Utils.convertFormToJson(formId);
-    Utils.formSubmit(formAction, 'POST', formData,
+    postData(
+      `localhost/hosts/edge/${this.state.data.id}`,
+      event.target[0].value,
       data => {
+        //TODO wtf?
         const newData = this.state.data;
         const oldId = newData.id;
         newData.id = data;
@@ -77,10 +74,10 @@ export default class EdgeHostCard extends React.Component {
       });
   };
 
-  onClickRemove = () => {
-    const formAction = '/hosts/edge/' + this.state.data.id;
-    Utils.formSubmit(formAction, 'DELETE', {},
-      data => {
+  onClickDelete = () => {
+    deleteData(
+      `localhost/hosts/edge/${this.state.data.id}`,
+      () => {
         M.toast({ html: '<div>Edge host deleted successfully!</div>' });
         this.props.onRemove();
       });
@@ -179,7 +176,7 @@ export default class EdgeHostCard extends React.Component {
                 <a className="waves-effect waves-light btn-small"
                    onClick={this.onClickEdit}>{this.state.isEdit ? 'Cancel' : 'Edit'}</a>
                 <a disabled={this.state.data.id === 0} style={style}
-                   className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>Remove</a>
+                   className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickDelete}>Delete</a>
               </div>
               {nodes}
             </div>

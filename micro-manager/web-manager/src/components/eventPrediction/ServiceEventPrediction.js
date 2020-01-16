@@ -25,9 +25,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import MainLayout from '../shared/MainLayout';
 import ServiceEventPredictionCard from './ServiceEventPredictionCard';
+import {getData} from "../../utils/data";
 
 export default class ServiceEventPredictions extends React.Component {
   constructor (props) {
@@ -47,29 +47,21 @@ export default class ServiceEventPredictions extends React.Component {
 
   loadServiceEventPredictions = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/services/eventPredictions',
       data => this.setState({ data: data, loading: false })
     );
   };
 
-  renderServiceEvents = () => {
-    let serviceEventsNodes;
-    if (this.state.data) {
-      serviceEventsNodes = this.state.data.map((serviceEvent, index) => (
-        <ServiceEventPredictionCard key={serviceEvent.id} serviceEvent={serviceEvent}
-                                    reloadServiceEvents={this.loadServiceEventPredictions}/>
-      ));
-    }
-    return serviceEventsNodes;
-  };
-
   render = () => (
     <MainLayout title='Service event predictions'>
-      {this.renderServiceEvents()}
+      {this.state.data && this.state.data.map((serviceEvent, index) => (
+        <ServiceEventPredictionCard key={serviceEvent.id} serviceEvent={serviceEvent}
+                                    reloadServiceEvents={this.loadServiceEventPredictions}/>
+      ))}
       <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add service event prediction">
-        <Link className="waves-effect waves-light btn-floating btn-large grey darken-4"
-              to='/ui/rules/serviceeventpredictions/detail'>
+        <Link className="waves-effect waves-light btn-floating grey darken-3"
+              to='/rules/serviceeventpredictions/detail'>
           <i className="large material-icons">add</i>
         </Link>
       </div>

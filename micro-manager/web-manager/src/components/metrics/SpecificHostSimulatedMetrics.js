@@ -24,10 +24,10 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import Utils from '../../utils';
 import SpecificHostSimulatedMetricsCard from './SpecificHostSimulatedMetricsCard';
 import MainLayout from '../shared/MainLayout';
 import { Link } from 'react-router-dom';
+import {getData} from "../../utils/data";
 
 export default class SpecificHostSimulatedMetrics extends React.Component {
   constructor (props) {
@@ -47,7 +47,7 @@ export default class SpecificHostSimulatedMetrics extends React.Component {
 
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
-    Utils.ajaxGet(
+    getData(
       'localhost/metrics/simulated/hosts/specific',
       data => this.setState({ data: data, loading: false })
     );
@@ -70,8 +70,8 @@ export default class SpecificHostSimulatedMetrics extends React.Component {
       {this.renderSimulatedMetrics()}
       <div className="fixed-action-btn tooltipped" data-position="left"
            data-tooltip="Add specific host simulated metric">
-        <Link className="waves-effect waves-light btn-floating btn-large grey darken-4"
-              to='/ui/simulatedmetrics/specifichosts/detail'>
+        <Link className="waves-effect waves-light btn-floating btn-large grey darken-3"
+              to='/metrics/simulated/hosts/specific/detail'>
           <i className="large material-icons">add</i>
         </Link>
       </div>
