@@ -1,0 +1,39 @@
+{
+  "id" : 11,
+  "title" : "Evento Vegan",
+  "description" : "Fazer um evento com comida vegan.",
+  "state" : "PENDING_APPROVAL",
+  "creationDate" : "2018-12-21T10:49:45.000+0000",
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/proposals/11"
+    },
+    "proposals" : {
+      "href" : "http://localhost:8080/proposals?search="
+    },
+    "staff" : {
+      "href" : "http://localhost:8080/proposals/11/staff?search="
+    },
+    "members" : {
+      "href" : "http://localhost:8080/proposals/11/members?search="
+    },
+    "sections" : {
+      "href" : "http://localhost:8080/proposals/11/sections?search="
+    },
+    "reviews" : {
+      "href" : "http://localhost:8080/proposals/11/reviews?search="
+    },
+    "comments" : {
+      "href" : "http://localhost:8080/proposals/11/comments?search="
+    },
+    "reviewBid" : {
+      "href" : "http://localhost:8080/proposals/11/bids?search="
+    },
+    "reviewers" : {
+      "href" : "http://localhost:8080/proposals/11/reviewers?search="
+    },
+    "proposer" : {
+      "href" : "http://localhost:8080/users/9"
+    }
+  }
+}

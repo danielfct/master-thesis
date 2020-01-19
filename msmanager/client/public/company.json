@@ -1,0 +1,21 @@
+{
+  "id" : 5,
+  "name" : "IST",
+  "city" : "Lisboa",
+  "zipCode" : "1023-240",
+  "address" : "Av. Rovisco Pais 1",
+  "phone" : "+351 214233200",
+  "email" : "ist@ist.pt",
+  "fax" : "+351 214233268",
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/companies/5"
+    },
+    "companies" : {
+      "href" : "http://localhost:8080/companies?search="
+    },
+    "employees" : {
+      "href" : "http://localhost:8080/companies/5/employees?search="
+    }
+  }
+}

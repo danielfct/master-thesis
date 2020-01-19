@@ -1,0 +1,289 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 micro-manager
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/* Custom Stylesheet */
+
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+
+.loading {
+    background-color: red;
+    height: 3px;
+    position: fixed;
+    z-index: 999;
+}
+
+.content {
+    padding-left: 200px;
+}
+
+@media only screen and (max-width : 992px) {
+    .content {
+        padding-left: 0;
+    }
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background: #1F1F1F;
+}
+
+nav {
+    background: #282828;
+    height: 56px;
+}
+
+nav .search-bar {
+    padding: 13px 0;
+}
+
+#search {
+    background-color: #1F1F1F;
+    color: white;
+    border: 1px solid black;
+}
+
+::-webkit-input-placeholder { /* Edge */
+    color: rgba(255,255,255,0.2);
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: rgba(255,255,255,0.2);
+}
+
+::placeholder {
+    color: rgba(255,255,255,0.2);
+}
+
+nav.nav-extended {
+    height: 56px;
+}
+
+nav .nav-wrapper {
+    margin: 0 13px;
+}
+
+nav .brand-logo {
+    white-space: nowrap;
+    max-width: 100%;
+    font-size: medium;
+}
+
+nav a.sidenav-trigger {
+    margin: 14px;
+}
+
+nav ul a,
+nav li {
+    color: white;
+}
+
+@media only screen and (min-width: 601px) {
+    nav.nav-extended .nav-wrapper {
+        min-height: 56px;
+    }
+    nav a.sidenav-trigger {
+        margin: 14px;
+    }
+    nav, nav .nav-wrapper i, nav a.sidenav-trigger, nav a.sidenav-trigger i {
+        height: 56px;
+        line-height: 56px;
+    }
+    .navbar-fixed {
+        height: 56px;
+    }
+}
+
+.right-nav-icons {
+    float: right !important;
+}
+
+.right-nav-icons a {
+    margin-left: 10px;
+}
+
+.left-nav-icons {
+    float: left !important;
+}
+
+.left-nav-icons a {
+    margin-right: 10px;
+}
+
+.brand-logo>img {
+    height: 30px;
+    vertical-align: middle;
+    padding-right: 5px;
+}
+
+.sidenav {
+    background: #282828;
+    width: 200px;
+    z-index: 998;
+    overflow: hidden;
+    height: 100vh;
+}
+
+.sidenav li .divider {
+    margin: 0;
+}
+
+.sidenav li:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.no-shadows {
+    box-shadow: none!important;
+}
+
+p {
+    line-height: 2rem;
+}
+
+.parallax-container {
+    min-height: 380px;
+    line-height: 0;
+    height: auto;
+    color: rgba(255, 255, 255, .9);
+}
+
+.parallax-container .section {
+    width: 100%;
+}
+
+@media only screen and (max-width: 992px) {
+    .parallax-container .section {
+        position: absolute;
+        top: 40%;
+    }
+    #index-banner .section {
+        top: 10%;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    #index-banner .section {
+        top: 0;
+    }
+}
+
+.icon-block {
+    padding: 0 15px;
+}
+
+.icon-block .material-icons {
+    font-size: inherit;
+}
+
+
+.route-img {
+    width: 100%;
+}
+
+/* Style sticky scroll*/
+
+.custom-loader {
+    height: 8px;
+    margin-bottom: -4px;
+    z-index: 999;
+}
+
+.page-content {
+    padding: 4px;
+}
+
+.sticky {
+    position: fixed;
+    top: 0;
+}
+
+.sticky+.page-content {
+    padding-top: 4px;
+}
+
+.breadcrumb {
+    font-size: 25px;
+    padding: 15px;
+}
+
+.breadcrumb:before {
+    font-size: 20px;
+    margin: 4px 25px 0 0;
+    color: #616161;
+}
+
+.breadcrumb {
+    opacity: 0.25;
+}
+
+.breadcrumb:last-child {
+    opacity: 1;
+}
+
+.page-footer {
+    background-color: #282828;
+    padding: 0;
+    margin: 0;
+}
+
+.page-footer .row {
+    padding: 10px 15px;
+    margin: 0;
+}
+
+.fixed-action-btn {
+    padding-bottom: 40px;
+}
+
+.sidenav-menu {
+    height: 56px;
+    position: relative;
+}
+
+.sidenav-menu .sidenav-icon {
+    margin: 14px 27px;
+    position: absolute;
+}
+
+.sidenav-menu .sidenav-icon .material-icons {
+    font-size: 24px;
+    height: 56px;
+}
+
+.ps:hover > .ps__rail-x:hover,
+.ps:hover > .ps__rail-y:hover,
+.ps--scrolling-x:active > .ps__rail-x:active,
+.ps--scrolling-y:active > .ps__rail-y:active{
+    background-color: transparent;
+}

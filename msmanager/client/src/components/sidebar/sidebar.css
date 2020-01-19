@@ -1,0 +1,158 @@
+.drawerPaper {
+    border: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.42), 0 4px 25px 0 rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+    width: 260px;
+    height: 100%;
+}
+
+.logo {
+    position: relative;
+    padding: 15px 15px;
+    z-index: 4;
+    width: 260px;
+}
+
+.logo:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    height: 1px;
+    right: 15px;
+    width: 100%;
+    background-color: rgba(180, 180, 180, 0.3)
+}
+
+.logoLink {
+    font-family: '"Roboto", "Helvetica", "Arial"', sans-serif;
+    padding: 5px 0;
+    display: block;
+    font-size: 20px;
+    text-align: left;
+    font-weight: 400;
+    line-height: 30px;
+    text-decoration: none;
+    background-color: transparent;
+    color: #FFFFFF
+}
+
+.logoImage {
+    width: 30px;
+    display: inline-block;
+    max-height: 30px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.img {
+    width: 35px;
+    top: 22px;
+    position: absolute;
+    vertical-align: middle;
+    border: 0;
+}
+
+.background {
+    position: absolute;
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+    display: block;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center center;
+}
+.background:after {
+    position: absolute;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    content: "";
+    display: block;
+    background: #000;
+    opacity: .8
+}
+
+.list {
+    margin-top: 20px;
+    padding-left: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    list-style: none;
+    position: unset;
+}
+
+.item {
+    position: relative;
+    display: block;
+    text-decoration: none;
+}
+.item:hover, .item:focus, .item:visited {
+    color: #FFFFFF
+}
+
+.itemLink {
+    transition: all 300ms linear;
+    border-radius: 3px;
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    background-Color: transparent;
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    line-height: 1.5em;
+    border: none;
+    margin: 10px 15px 0;
+}
+
+.itemLink:hover {
+    background-color: rgba(0,172,193, 0.2);
+}
+
+.itemIcon {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+    line-height: 30px;
+    float: left;
+    margin-right: 15px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.itemText {
+    font-family: '"Roboto", "Helvetica", "Arial"', sans-serif;
+    font-weight: 300;
+    margin: 0;
+    line-height: 30px;
+    font-size: 14px;
+    color: #FFFFFF;
+}
+
+.whiteFont {
+    color: #FFFFFF
+}
+
+.blue {
+    background-color: #00acc1;
+    box-shadow: 0 12px 20px -10px rgba(0,188,212,.28), 0 4px 20px 0 rgba(0,0,0,.12), 0 7px 8px -5px rgba(0,188,212,.2);
+}
+
+.blue:hover {
+    background-color: #00acc1;
+}
+
+.sidebarWrapper {
+    position: relative;
+    height: calc(100vh - 75px);
+    overflow: auto;
+    width: 260px;
+    z-index: 4;
+    margin-left: -15px;
+    overflow-scrolling: touch;
+}

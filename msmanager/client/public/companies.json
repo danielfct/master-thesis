@@ -1,0 +1,73 @@
+{
+  "_embedded" : {
+    "companies" : [ {
+      "id" : 4,
+      "name" : "FCT",
+      "city" : "Almada",
+      "zipCode" : "2825-149",
+      "address" : "Calçada de Alfazina 2",
+      "phone" : "+351 212948300",
+      "email" : "fct@email.pt",
+      "fax" : "+351 212954461",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/companies/4"
+        },
+        "companies" : {
+          "href" : "http://localhost:8080/companies?search="
+        },
+        "employees" : {
+          "href" : "http://localhost:8080/companies/4/employees?search="
+        }
+      }
+    }, {
+      "id" : 5,
+      "name" : "IST",
+      "city" : "Lisboa",
+      "zipCode" : "1023-240",
+      "address" : "Av. Rovisco Pais 1",
+      "phone" : "+351 214233200",
+      "email" : "ist@ist.pt",
+      "fax" : "+351 214233268",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/companies/5"
+        },
+        "companies" : {
+          "href" : "http://localhost:8080/companies?search="
+        },
+        "employees" : {
+          "href" : "http://localhost:8080/companies/5/employees?search="
+        }
+      }
+    }, {
+      "id" : 6,
+      "name" : "ISCTE",
+      "city" : "Lisboa",
+      "zipCode" : "1649-026",
+      "address" : "Av. das Forças Armadas",
+      "phone" : "+351 210464014",
+      "email" : "iscte@email.pt",
+      "fax" : "+351 217964710",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/companies/6"
+        },
+        "companies" : {
+          "href" : "http://localhost:8080/companies?search="
+        },
+        "employees" : {
+          "href" : "http://localhost:8080/companies/6/employees?search="
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/companies?search="
+    },
+    "root" : {
+      "href" : "http://localhost:8080/"
+    }
+  }
+}

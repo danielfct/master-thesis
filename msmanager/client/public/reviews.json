@@ -1,0 +1,55 @@
+{
+  "_embedded" : {
+    "reviews" : [ {
+      "id" : 16,
+      "title" : "Review1",
+      "text" : "A review",
+      "summary" : "Very good review",
+      "classification" : 5.0,
+      "creationDate" : "2018-12-22T17:59:08.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/proposals/10/reviews/16"
+        },
+        "reviews" : {
+          "href" : "http://localhost:8080/proposals/10/reviews?search="
+        },
+        "author" : {
+          "href" : "http://localhost:8080/users/9"
+        },
+        "proposal" : {
+          "href" : "http://localhost:8080/proposals/10"
+        }
+      }
+    }, {
+      "id" : 17,
+      "title" : "Review2",
+      "text" : "Meh... not so good review",
+      "summary" : "Not so good",
+      "classification" : 3.0,
+      "creationDate" : "2018-12-22T17:59:08.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/proposals/10/reviews/17"
+        },
+        "reviews" : {
+          "href" : "http://localhost:8080/proposals/10/reviews?search="
+        },
+        "author" : {
+          "href" : "http://localhost:8080/users/8"
+        },
+        "proposal" : {
+          "href" : "http://localhost:8080/proposals/10"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/proposals/10/reviews?search="
+    },
+    "root" : {
+      "href" : "http://localhost:8080/"
+    }
+  }
+}

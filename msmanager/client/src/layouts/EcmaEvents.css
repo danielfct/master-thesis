@@ -1,0 +1,26 @@
+.wrapper {
+    position: relative;
+    top: 0;
+    height: 100vh;
+}
+
+.mainPanel {
+    width: calc(100% - 260px); /* 260px é a largura do sidebar */
+    overflow: auto;
+    position: relative;
+    float: right;
+    max-height: 100%;
+    overflow-scrolling: touch;
+}
+
+.content {
+    margin-top: 30px;
+    padding: 30px 15px;
+}
+
+.container {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}

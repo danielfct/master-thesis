@@ -1,0 +1,127 @@
+{
+  "_embedded" : {
+    "proposals" : [ {
+      "id" : 10,
+      "title" : "Churrasco",
+      "description" : "Fazer um churrasco só com carne de porco.",
+      "state" : "PENDING_APPROVAL",
+      "creationDate" : "2018-12-19T12:00:14.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/proposals/10"
+        },
+        "proposals" : {
+          "href" : "http://localhost:8080/proposals?search="
+        },
+        "staff" : {
+          "href" : "http://localhost:8080/proposals/10/staff?search="
+        },
+        "members" : {
+          "href" : "http://localhost:8080/proposals/10/members?search="
+        },
+        "sections" : {
+          "href" : "http://localhost:8080/proposals/10/sections?search="
+        },
+        "reviews" : {
+          "href" : "http://localhost:8080/proposals/10/reviews?search="
+        },
+        "comments" : {
+          "href" : "http://localhost:8080/proposals/10/comments?search="
+        },
+        "reviewBid" : {
+          "href" : "http://localhost:8080/proposals/10/bids?search="
+        },
+        "reviewers" : {
+          "href" : "http://localhost:8080/proposals/10/reviewers?search="
+        },
+        "proposer" : {
+          "href" : "http://localhost:8080/users/8"
+        }
+      }
+    }, {
+      "id" : 11,
+      "title" : "Evento Vegan",
+      "description" : "Fazer um evento com comida vegan.",
+      "state" : "PENDING_APPROVAL",
+      "creationDate" : "2018-12-19T12:00:14.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/proposals/11"
+        },
+        "proposals" : {
+          "href" : "http://localhost:8080/proposals?search="
+        },
+        "staff" : {
+          "href" : "http://localhost:8080/proposals/11/staff?search="
+        },
+        "members" : {
+          "href" : "http://localhost:8080/proposals/11/members?search="
+        },
+        "sections" : {
+          "href" : "http://localhost:8080/proposals/11/sections?search="
+        },
+        "reviews" : {
+          "href" : "http://localhost:8080/proposals/11/reviews?search="
+        },
+        "comments" : {
+          "href" : "http://localhost:8080/proposals/11/comments?search="
+        },
+        "reviewBid" : {
+          "href" : "http://localhost:8080/proposals/11/bids?search="
+        },
+        "reviewers" : {
+          "href" : "http://localhost:8080/proposals/11/reviewers?search="
+        },
+        "proposer" : {
+          "href" : "http://localhost:8080/users/9"
+        }
+      }
+    }, {
+      "id" : 12,
+      "title" : "Evento de pesca",
+      "description" : "Evento de pesca no lago do departamental.",
+      "state" : "PENDING_APPROVAL",
+      "creationDate" : "2018-12-19T12:00:14.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/proposals/12"
+        },
+        "proposals" : {
+          "href" : "http://localhost:8080/proposals?search="
+        },
+        "staff" : {
+          "href" : "http://localhost:8080/proposals/12/staff?search="
+        },
+        "members" : {
+          "href" : "http://localhost:8080/proposals/12/members?search="
+        },
+        "sections" : {
+          "href" : "http://localhost:8080/proposals/12/sections?search="
+        },
+        "reviews" : {
+          "href" : "http://localhost:8080/proposals/12/reviews?search="
+        },
+        "comments" : {
+          "href" : "http://localhost:8080/proposals/12/comments?search="
+        },
+        "reviewBid" : {
+          "href" : "http://localhost:8080/proposals/12/bids?search="
+        },
+        "reviewers" : {
+          "href" : "http://localhost:8080/proposals/12/reviewers?search="
+        },
+        "proposer" : {
+          "href" : "http://localhost:8080/users/7"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/proposals?search="
+    },
+    "root" : {
+      "href" : "http://localhost:8080/"
+    }
+  }
+}
