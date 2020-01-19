@@ -79,36 +79,71 @@ formSubmit (formUrl, formMethod, formData, successFunction) {
 };
 }*/
 
-export function getData(url: string): Promise<any> {
-    return fetchData(url, 'GET', undefined);
-}
-
-export function postData(url: string, requestBody: any): Promise<any> {
-    return fetchData(url, 'POST', requestBody);
-}
-
-export function putData(url: string, requestBody: any): Promise<any> {
-    return fetchData(url, 'PUT', requestBody);
-}
-
-export function deleteData(url: string): Promise<any> {
-    return fetchData(url, 'DELETE', undefined);
-}
-
-function fetchData(url: string, method: string, requestBody: any): Promise<any> {
-    console.log(url);
-    console.log(method);
-    console.log(requestBody);
+export function getData(url: string): Promise<any[]> {
+    console.log(`GET ${url}`);
     return fetch(url, {
-        method,
-        body: requestBody && JSON.stringify(requestBody),
+        method: 'GET',
         headers: new Headers({'Content-type': 'application/json;charset=UTF-8'}),
     }).then(response => {
         if (response.ok) {
             return response.json();
         } else {
             M.toast({html: `<div>${response.status} ${response.statusText}</div>`});
-            throw new Error(response.statusText)
+            return [];
         }
-    }).catch((e: string) => M.toast({html: `<div>${e}</div>`}));
+    }).catch(e => {
+        M.toast({html: `<div>${e.message}</div>`});
+        return [];
+    });
+
+}
+
+export function postData(url: string, requestBody: any): void {
+    console.log(`POST ${url}`);
+    console.log(requestBody);
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+        headers: new Headers({'Content-type': 'application/json;charset=UTF-8'}),
+    }).then(response => {
+        if (!response.ok) {
+            M.toast({html: `<div>${response.status} ${response.statusText}</div>`});
+        }
+    }).catch(e => {
+        M.toast({html: `<div>${e.message}</div>`});
+    });
+}
+
+export function putData(url: string, requestBody: any): Promise<any> {
+    console.log(`PUT ${url}`);
+    console.log(requestBody);
+    return fetch(url, {
+        method: 'PUT',
+        body: JSON.stringify(requestBody),
+        headers: new Headers({'Content-type': 'application/json;charset=UTF-8'}),
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            M.toast({html: `<div>${response.status} ${response.statusText}</div>`});
+            return {};
+        }
+    }).catch(e => {
+        M.toast({html: `<div>${e.message}</div>`});
+        return {};
+    });
+}
+
+export function deleteData(url: string): void {
+    console.log(`DELETE ${url}`);
+    fetch(url, {
+        method: 'DELETE',
+        headers: new Headers({'Content-type': 'application/json;charset=UTF-8'}),
+    }).then(response => {
+        if (!response.ok) {
+            M.toast({html: `<div>${response.status} ${response.statusText}</div>`});
+        }
+    }).catch(e => {
+        M.toast({html: `<div>${e.message}</div>`});
+    });
 }

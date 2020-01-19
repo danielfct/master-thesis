@@ -1,5 +1,3 @@
-import fetch from 'isomorphic-fetch'
-import { shuffle, slice } from 'lodash'
 import {getData} from "../../utils/data";
 
 const FETCH = 'photos/FETCH';
@@ -12,7 +10,7 @@ export const fetchPhotos = () => ({
 
 export default function photosReducer(state = [], action = {}) {
   if (action.type === `${FETCH}_FULFILLED`) {
-    return slice(shuffle(action.payload), 0, 5)
+    return action.payload;
   } else {
     return state
   }

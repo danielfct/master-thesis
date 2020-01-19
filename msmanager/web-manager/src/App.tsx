@@ -75,7 +75,7 @@ export default class App extends React.Component<AppProps,any> {
     render() {
         return (
             <Provider store={store}>
-                <LoadingBar className="loading"/>
+                <LoadingBar className="loading-bar"/>
                 <div className="content" style={this.state.sidenavHidden ? {paddingLeft: 0} : undefined}>
                     <BrowserRouter>
                         <Navbar sidenavHidden={this.state.sidenavHidden} hideSidenav={this.hideSidenav}/>
