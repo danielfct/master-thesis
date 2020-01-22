@@ -74,7 +74,7 @@ export default class RuleCard extends React.Component {
     <div className="right-align">
       <div className="row">
         <div className="col s12">
-          <Link className="waves-effect waves-light btn-small" to={'/rules/detail/' + this.state.data.id}>
+          <Link className="waves-effect waves-light btn-small" to={'/rules/rule/' + this.state.data.id}>
             View details
           </Link>
         </div>

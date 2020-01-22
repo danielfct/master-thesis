@@ -22,35 +22,42 @@
  * SOFTWARE.
  */
 
-import * as React from "react";
-import {PagedList} from "./PagedList";
+import React from "react";
 import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {updateSearchFilter} from "../../redux/reducers/searchFilter";
 
-interface GenericFilteredListProps<T> {
-    list: T[];
-    show: (x: T) => JSX.Element;
-    page?: number;
-    pagesize?: number;
-    predicate: (x: T,s: string) => boolean;
+interface Props {
     search: string;
+    actions: { updateSearchFilter: (search: string) => void; }
 }
 
-class GenericFilteredList<T> extends React.Component<GenericFilteredListProps<T>, any> {
-    public render() {
-        const {list, predicate, search, ...otherprops} = this.props;
-        return (
-            <PagedList {...otherprops} list={list.filter((s:T) => predicate(s, search || ''))}/>
-        );
-    }
+class SearchBar extends React.Component<Props,{}> {
+
+    private setValue = ({target:{value}}:any) => this.props.actions.updateSearchFilter(value);
+
+    render = () =>
+        <form className="col s4 offset-s3 hide-on-small-and-down" noValidate autoComplete="off">
+            <div className="input-field search-bar">
+                <input id="search" type="search" placeholder="Filter" value={this.props.search} onChange={this.setValue}/>
+                <label className="label-icon" htmlFor="search">
+                    <i className="material-icons">search</i>
+                </label>
+            </div>
+        </form>
 }
 
-const mapStateToProps = (state: any) => (
+const mapStateToProps = (state:any) => (
     {
-        search: state.searchFilter.search
+        search: state.search
     }
 );
 
-export default function FilteredList<T>() {
-    return connect(mapStateToProps)(GenericFilteredList as new(props: GenericFilteredListProps<T>) => GenericFilteredList<T>);
-}
+const mapDispatchToProps = (dispatch: any) => (
+    {
+        actions: bindActionCreators({ updateSearchFilter }, dispatch),
+    }
+);
 
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);

@@ -24,21 +24,13 @@
 
 import React from "react";
 
-interface FooterProps {
-    sidenavHidden: boolean
-}
-
-export default class Footer extends React.Component<FooterProps> {
-    render = () => {
-        return (
-            <footer className="page-footer">
-                <div className="row">
-                    <div className="right">
-                        © {(new Date().getFullYear())} msmanager
-                    </div>
+export default class Footer extends React.Component<{}> {
+    render = () =>
+        <footer className="page-footer">
+            <div className="row">
+                <div className="right">
+                    © {(new Date().getFullYear())} μs-manager
                 </div>
-            </footer>
-        );
-    }
-
+            </div>
+        </footer>
 };

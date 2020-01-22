@@ -30,7 +30,7 @@ export default class MainLayout extends React.Component {
     return (
       <div className="section row">
         <PageTitle title={this.props.title} breadcrumbs={this.props.breadcrumbs}/>
-        <div className='col s8 m8'>
+        <div className='col s12 m12'>
           {this.props.children}
         </div>
       </div>

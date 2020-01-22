@@ -59,7 +59,7 @@ export default class ServicesRulesList extends React.Component {
                   <div className="row">
                     <div className="col s12">
                       <Link className="waves-effect waves-light btn-small"
-                            to={'/rules/services/detail/' + service.id}>
+                            to={'/rules/services/service/' + service.id}>
                         View details
                       </Link>
                     </div>

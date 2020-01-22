@@ -62,7 +62,7 @@ export default class HostsRulesList extends React.Component {
                     <div className="row">
                       <div className="col s12">
                         <Link className="waves-effect waves-light btn-small"
-                              to={'/ui/rules/hosts/detail/' + host.hostname}>
+                              to={'/ui/rules/hosts/host/' + host.hostname}>
                           View details
                         </Link>
                       </div>

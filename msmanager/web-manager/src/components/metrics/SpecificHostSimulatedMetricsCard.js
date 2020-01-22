@@ -50,7 +50,7 @@ export default class SpecificHostSimulatedMetricsCard extends React.Component {
                 <div className="row">
                   <div className="col s12">
                     <Link className="waves-effect waves-light btn-small"
-                          to={'/metrics/simulated/hosts/specific/detail/' + this.props.simulatedMetric.id}>Edit</Link>
+                          to={'/metrics/simulated/hosts/specific/metric/' + this.props.simulatedMetric.id}>Edit</Link>
                     <button style={style} className="waves-effect waves-light btn-small red darken-4"
                             onClick={this.onClickRemove}>Remove
                     </button>

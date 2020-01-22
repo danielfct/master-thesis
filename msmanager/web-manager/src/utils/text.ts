@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 micro-manager
+ * Copyright (c) 2020 msmanager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,40 +22,8 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import M from 'materialize-css';
-import { Link } from 'react-router-dom';
-
-export default class AppLinksDropdown extends React.Component {
-
-  constructor (props) {
-    super(props);
-    const navLinks = this.props.links;
-    this.state = { links: navLinks };
-  }
-
-  componentDidMount () {
-    const elems = document.querySelectorAll('.dropdown-trigger');
-    M.Dropdown.init(elems, { coverTrigger: false });
-  }
-
-  render () {
-    return (
-      <div className='col s12 hide-on-med-and-up'>
-        <button className='dropdown-trigger btn btn-small waves-effect waves-teal btn-flat col s12'
-          data-target='linksDropdown'>
-          <i className="material-icons right">menu</i>
-        </button>
-        <ul id='linksDropdown' className='dropdown-content'>
-          {this.state.links.map((link, index) => (
-            <li key={index}>
-              <Link to={link.link}>
-                {link.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-}
+export const camelCaseToSentenceCase = (text: string): string => {
+    let sentenceCase = text.replace( /([A-Z])/g, " $1" );
+    sentenceCase = sentenceCase.charAt(0).toUpperCase() + sentenceCase.slice(1);
+    return sentenceCase;
+};

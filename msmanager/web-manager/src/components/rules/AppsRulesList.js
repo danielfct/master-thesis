@@ -59,7 +59,7 @@ export default class AppsRulesList extends React.Component {
                   <div className="right-align">
                     <div className="row">
                       <div className="col s12">
-                        <Link className="waves-effect waves-light btn-small" to={'/rules/apps/detail/' + app.id}>
+                        <Link className="waves-effect waves-light btn-small" to={'/rules/apps/app/' + app.id}>
                           View details
                         </Link>
                       </div>

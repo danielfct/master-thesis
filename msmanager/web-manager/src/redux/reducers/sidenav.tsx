@@ -22,37 +22,26 @@
  * SOFTWARE.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
+export const hideSidenav = (hidden: boolean) => (
+    {
+        type: 'HIDE_SIDE_NAV',
+        hidden,
+    }
+);
 
-class Photos extends React.Component {
-  renderPhotos() {
-    return this.props.photos.map(photo => (
-      <div className="flex-auto" key={photo.id}>
-        <img src={photo.thumbnailUrl} alt={photo.title} />
-      </div>
-    ))
-  }
-
-  render() {
-    return (
-      <div>
-        <button
-          onClick={this.props.handleFetchPhotos}
-          className="btn btn-primary">
-          Fetch Photos
-        </button>
-        <div className="flex mxn2 p2">
-          {this.renderPhotos()}
-        </div>
-      </div>
-    )
-  }
+interface HideSidenavAction {
+    type: string;
+    hidden: boolean;
 }
 
-Photos.propTypes = {
-  photos: PropTypes.array.isRequired,
-  handleFetchPhotos: PropTypes.func.isRequired,
+export default function sidenavReducer(state = [], action: HideSidenavAction) {
+    switch (action.type) {
+        case 'HIDE_SIDE_NAV' :
+            return {
+                ...state,
+                hidden: action.hidden,
+            };
+        default:
+            return state
+    }
 }
-
-export default Photos

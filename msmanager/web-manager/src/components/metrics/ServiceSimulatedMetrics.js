@@ -69,7 +69,7 @@ export default class ServiceSimulatedMetrics extends React.Component {
       {this.renderSimulatedMetrics()}
       <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add service simulated metric">
         <Link className="waves-effect waves-light btn-floating grey darken-3"
-              to='/metrics/simulated/services/detail'>
+              to='/metrics/simulated/services/metric'>
           <i className="large material-icons">add</i>
         </Link>
       </div>

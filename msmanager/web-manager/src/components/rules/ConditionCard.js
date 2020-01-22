@@ -38,7 +38,7 @@ export default class ConditionCard extends React.Component {
       <div className="row">
         <div className="col s12">
           <Link className="waves-effect waves-light btn-small"
-                to={'/rules/conditions/detail/' + this.state.data.id}>
+                to={'/rules/conditions/condition/' + this.state.data.id}>
             View details
           </Link>
         </div>

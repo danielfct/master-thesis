@@ -32,7 +32,7 @@ export default class ServiceEventPredictionCard extends React.Component {
     deleteData(
       `http://localhostservices/eventPredictions/${this.props.serviceEvent.id}`,
       () => {
-        M.toast({ html: '<div>Service event prediction removed successfully!</div>' });
+        M.toast({ html: '<div>IService event prediction removed successfully!</div>' });
         this.props.reloadServiceEvents();
       });
   };

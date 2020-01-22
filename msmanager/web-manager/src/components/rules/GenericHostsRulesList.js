@@ -33,7 +33,7 @@ export default class GenericHostsRulesList extends React.Component {
       <div className="right-align">
         <div className="row">
           <div className="col s12">
-            <Link className="waves-effect waves-light btn-small" to={'/rules/generic/hosts/detail'}>
+            <Link className="waves-effect waves-light btn-small" to={'/rules/generic/hosts/host'}>
               View details
             </Link>
           </div>

@@ -48,6 +48,7 @@ body {
     min-height: 100vh;
     flex-direction: column;
     background: #1F1F1F;
+    overflow-x: hidden;
 }
 
 nav {
@@ -118,6 +119,7 @@ nav li {
 
 .right-nav-icons {
     float: right !important;
+    margin-right: 10px;
 }
 
 .right-nav-icons a {
@@ -251,10 +253,6 @@ p {
 .page-footer .row {
     padding: 10px 15px;
     margin: 0;
-}
-
-.fixed-action-btn {
-    padding-bottom: 40px;
 }
 
 .sidenav-menu {

@@ -22,35 +22,27 @@
  * SOFTWARE.
  */
 
-import * as React from "react";
-import {PagedList} from "./PagedList";
-import {connect} from "react-redux";
-
-interface GenericFilteredListProps<T> {
-    list: T[];
-    show: (x: T) => JSX.Element;
-    page?: number;
-    pagesize?: number;
-    predicate: (x: T,s: string) => boolean;
-    search: string;
-}
-
-class GenericFilteredList<T> extends React.Component<GenericFilteredListProps<T>, any> {
-    public render() {
-        const {list, predicate, search, ...otherprops} = this.props;
-        return (
-            <PagedList {...otherprops} list={list.filter((s:T) => predicate(s, search || ''))}/>
-        );
-    }
-}
-
-const mapStateToProps = (state: any) => (
+export const updateSearchFilter = (search: string) => (
     {
-        search: state.searchFilter.search
+        type: `UPDATE_SEARCH_FILTER`,
+        search
     }
 );
 
-export default function FilteredList<T>() {
-    return connect(mapStateToProps)(GenericFilteredList as new(props: GenericFilteredListProps<T>) => GenericFilteredList<T>);
+interface UpdateSearchFilterAction {
+    type: string;
+    search: string;
 }
 
+export default function searchFilterReducer(state = [], action: UpdateSearchFilterAction) {
+    switch (action.type) {
+        case 'UPDATE_SEARCH_FILTER' :
+            const search = action.search;
+            return {
+                ...state,
+                search
+            };
+        default:
+            return state
+    }
+}

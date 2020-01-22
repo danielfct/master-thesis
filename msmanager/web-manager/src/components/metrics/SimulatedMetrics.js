@@ -115,7 +115,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
       event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });
-        M.toast({ html: '<div>Service simulated metric saved successfully!</div>' });
+        M.toast({ html: '<div>IService simulated metric saved successfully!</div>' });
       });
   };
 

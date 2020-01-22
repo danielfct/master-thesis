@@ -27,7 +27,7 @@ import thunk from "redux-thunk";
 import {createLogger} from "redux-logger";
 import promise from "redux-promise-middleware";
 import {loadingBarMiddleware} from "react-redux-loading-bar";
-import rootReducer from "./reducer";
+import rootReducer from "./reducers";
 
 const createStoreWithMiddleware = compose(
   applyMiddleware(

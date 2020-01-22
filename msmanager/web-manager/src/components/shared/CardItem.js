@@ -25,18 +25,11 @@
 import React from 'react';
 
 export default class CardItem extends React.Component {
-  constructor (props) {
-    super(props);
-    const propLabel = this.props.label;
-    const propValue = this.props.value;
-    this.state = { label: propLabel, value: propValue };
-  }
-
   render () {
     return (
       <div>
-        <h5>{this.state.label}</h5>
-        <div>{this.state.value}</div>
+        <h6>{this.props.label}</h6>
+        <div>{this.props.value}</div>
       </div>
     );
   }

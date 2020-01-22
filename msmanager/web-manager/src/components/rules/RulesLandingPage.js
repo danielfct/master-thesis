@@ -36,7 +36,7 @@ export default class RulesLandingPage extends React.Component {
       { name: 'Hosts rules', link: '/rules/hosts' },
       { name: 'Apps rules', link: '/rules/apps' },
       { name: 'Services rules', link: '/rules/services' },
-      { name: 'Service event predictions', link: '/rules/serviceEventPredictions' }
+      { name: 'IService event predictions', link: '/rules/serviceEventPredictions' }
     ];
     this.state = { links: ruleLinks, loading: false };
   }

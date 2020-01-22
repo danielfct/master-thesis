@@ -45,7 +45,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
       endTime: '',
       minReplics: ''
     };
-    const thisBreadcrumbs = [{ link: '/rules/serviceEventPredictions', title: 'Service event predictions' }];
+    const thisBreadcrumbs = [{ link: '/rules/serviceEventPredictions', title: 'IService event predictions' }];
     this.state = {
       id: defaultId,
       values: defaultValues,
@@ -143,7 +143,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
       event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });
-        M.toast({ html: '<div>Service event prediction saved successfully!</div>' });
+        M.toast({ html: '<div>IService event prediction saved successfully!</div>' });
       });
   };
 

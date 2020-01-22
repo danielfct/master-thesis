@@ -61,7 +61,7 @@ export default class ServiceEventPredictions extends React.Component {
       ))}
       <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add service event prediction">
         <Link className="waves-effect waves-light btn-floating grey darken-3"
-              to='/rules/serviceeventpredictions/detail'>
+              to='/rules/serviceeventpredictions/serviceeventprediction'>
           <i className="large material-icons">add</i>
         </Link>
       </div>

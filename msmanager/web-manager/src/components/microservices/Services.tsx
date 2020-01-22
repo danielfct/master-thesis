@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 msmanager
+ * Copyright (c) 2020 micro-manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,34 @@
  * SOFTWARE.
  */
 
-import { combineReducers } from 'redux'
-import * as reducers from './reducers'
+import React, {Fragment} from 'react';
+import MainLayout from '../shared/MainLayout';
+import ServiceCard from './ServiceCard';
+import AddButton from "../shared/AddButton";
+import List from "../shared/List";
+import IService from "./IService";
 
-const rootReducer = combineReducers({...reducers});
+export default class Services extends React.Component<{}, {}> {
 
-export default rootReducer;
+  private show = (service: IService): JSX.Element =>
+      <ServiceCard key={service.id} service={service} />;
+
+  private predicate = (service: IService, filter: string): boolean =>
+      service.serviceName.includes(filter);
+
+  render = () => {
+    const ServicesList = List<IService>();
+    return (
+        <MainLayout title='Services'>
+          <Fragment>
+            <ServicesList
+                url="/services.json" //TODO change url
+                show={this.show}
+                predicate={this.predicate}
+            />
+          </Fragment>
+          <AddButton tooltip={'Add service'} link={'/services/service'}/>
+        </MainLayout>
+    )
+  }
+}

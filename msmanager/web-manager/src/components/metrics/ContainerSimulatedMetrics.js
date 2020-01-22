@@ -69,7 +69,7 @@ export default class ContainerSimulatedMetrics extends React.Component {
       {this.renderSimulatedMetrics()}
       <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add container simulated metric">
         <Link className="waves-effect waves-light btn-floating grey darken-3"
-              to='/metrics/simulated/containers/detail'>
+              to='/metrics/simulated/containers/metric'>
           <i className="large material-icons">add</i>
         </Link>
       </div>

@@ -70,7 +70,7 @@ export default class DefaultHostSimulatedMetrics extends React.Component {
       <div className="fixed-action-btn tooltipped" data-position="left"
            data-tooltip="Add default host simulated metric">
         <Link className="waves-effect waves-light btn-floating btn-large grey darken-3"
-              to='/metrics/simulated/hosts/default/detail'>
+              to='/metrics/simulated/hosts/default/metric'>
           <i className="large material-icons">add</i>
         </Link>
       </div>

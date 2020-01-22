@@ -23,6 +23,7 @@
  */
 
 import M from 'materialize-css';
+import {fetchError, fetchData} from "../redux/reducers/items";
 
 /*fetch (url, successFunction) {
   displayProgressBar();
@@ -79,62 +80,54 @@ formSubmit (formUrl, formMethod, formData, successFunction) {
 };
 }*/
 
-export function getData(url: string): Promise<any[]> {
+export function getData(url: string): any {
     console.log(`GET ${url}`);
-    return fetch(url, {
-        method: 'GET',
-        headers: new Headers({'Content-type': 'application/json;charset=UTF-8'}),
-    }).then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            M.toast({html: `<div>${response.status} ${response.statusText}</div>`});
-            return [];
-        }
-    }).catch(e => {
-        M.toast({html: `<div>${e.message}</div>`});
-        return [];
-    });
-
+    return (dispatch: any) => {
+        fetch(url, {
+            method: 'GET'
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error(`${response.status} ${response.statusText}`);
+        }).then(json => {
+            dispatch(fetchData(json));
+        }).catch(e => {
+            dispatch(fetchError(e))
+        });
+    }
 }
 
-export function postData(url: string, requestBody: any): void {
+export function postData(url: string, requestBody: any, callback: (data: any) => void): void {
     console.log(`POST ${url}`);
     console.log(requestBody);
-    fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        headers: new Headers({'Content-type': 'application/json;charset=UTF-8'}),
-    }).then(response => {
-        if (!response.ok) {
-            M.toast({html: `<div>${response.status} ${response.statusText}</div>`});
-        }
-    }).catch(e => {
-        M.toast({html: `<div>${e.message}</div>`});
-    });
+    sendData(url, 'POST', requestBody, callback);
 }
 
-export function putData(url: string, requestBody: any): Promise<any> {
+export function putData(url: string, requestBody: any, callback: (data: any) => void): void {
     console.log(`PUT ${url}`);
     console.log(requestBody);
-    return fetch(url, {
-        method: 'PUT',
-        body: JSON.stringify(requestBody),
+    sendData(url, 'PUT', requestBody, callback);
+}
+
+const sendData = (url: string, method: string, body: any, callback: (data: any) => void) => {
+    fetch(url, {
+        method: method,
+        body: JSON.stringify(body),
         headers: new Headers({'Content-type': 'application/json;charset=UTF-8'}),
     }).then(response => {
         if (response.ok) {
             return response.json();
-        } else {
-            M.toast({html: `<div>${response.status} ${response.statusText}</div>`});
-            return {};
         }
+        throw new Error(`${response.status} ${response.statusText}`);
+    }).then(json => {
+        callback(json);
     }).catch(e => {
         M.toast({html: `<div>${e.message}</div>`});
-        return {};
     });
-}
+};
 
-export function deleteData(url: string): void {
+export function deleteData(url: string, callback: () => void): void {
     console.log(`DELETE ${url}`);
     fetch(url, {
         method: 'DELETE',
@@ -143,6 +136,7 @@ export function deleteData(url: string): void {
         if (!response.ok) {
             M.toast({html: `<div>${response.status} ${response.statusText}</div>`});
         }
+        callback();
     }).catch(e => {
         M.toast({html: `<div>${e.message}</div>`});
     });

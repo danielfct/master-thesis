@@ -22,35 +22,18 @@
  * SOFTWARE.
  */
 
-import * as React from "react";
-import {PagedList} from "./PagedList";
-import {connect} from "react-redux";
+import IData from "../shared/IData";
 
-interface GenericFilteredListProps<T> {
-    list: T[];
-    show: (x: T) => JSX.Element;
-    page?: number;
-    pagesize?: number;
-    predicate: (x: T,s: string) => boolean;
-    search: string;
+export default interface IService extends IData {
+    serviceName: string;
+    dockerRepository: string;
+    defaultExternalPort: number;
+    defaultInternalPort: number;
+    defaultDb: string;
+    launchCommand: string;
+    minReplics: number;
+    maxReplics: number;
+    outputLabel: string;
+    serviceType: string;
+    expectedMemoryConsumption: number;
 }
-
-class GenericFilteredList<T> extends React.Component<GenericFilteredListProps<T>, any> {
-    public render() {
-        const {list, predicate, search, ...otherprops} = this.props;
-        return (
-            <PagedList {...otherprops} list={list.filter((s:T) => predicate(s, search || ''))}/>
-        );
-    }
-}
-
-const mapStateToProps = (state: any) => (
-    {
-        search: state.searchFilter.search
-    }
-);
-
-export default function FilteredList<T>() {
-    return connect(mapStateToProps)(GenericFilteredList as new(props: GenericFilteredListProps<T>) => GenericFilteredList<T>);
-}
-

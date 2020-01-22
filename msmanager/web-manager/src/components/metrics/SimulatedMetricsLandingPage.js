@@ -30,7 +30,7 @@ export default class SimulatedMetricsLandingPage extends React.Component {
   constructor (props) {
     super(props);
     const simulatedMetricsLinks = [
-      { name: 'Service simulated metrics', link: '/metrics/simulated/services' },
+      { name: 'IService simulated metrics', link: '/metrics/simulated/services' },
       { name: 'Container simulated metrics', link: '/metrics/simulated/containers' },
       { name: 'Default host simulated metrics', link: '/metrics/simulated/hosts/default' },
       { name: 'Specific host simulated metrics', link: '/metrics/simulated/hosts/specific' }

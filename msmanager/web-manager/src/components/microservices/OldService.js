@@ -29,7 +29,7 @@ import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
 import {deleteData, getData, postData} from "../../utils/data";
 
-export default class ServicePage extends React.Component {
+export default class OldService extends React.Component {
   constructor (props) {
     super(props);
     let paramId = 0;
@@ -57,7 +57,6 @@ export default class ServicePage extends React.Component {
       service: serviceInitialValues,
       dependencies: [],
       loadedDependencies: false,
-      loading: false,
       isEdit: isEdit,
       isDeleted: false
     };
@@ -79,18 +78,16 @@ export default class ServicePage extends React.Component {
   };
 
   loadService = () => {
-    this.setState({ loading: true });
     getData(
       `http://localhostservices/${this.state.service.id}`,
-      data => this.setState({ service: data, loading: false })
+      data => this.setState({ service: data })
     );
   };
 
   loadDependencies = () => {
-    this.setState({ loading: true });
     getData(
       `http://localhostservices/${this.state.service.id}/dependencies`,
-      data => this.setState({ dependencies: data, loadedDependencies: true, loading: false })
+      data => this.setState({ dependencies: data, loadedDependencies: true })
     );
   };
 
@@ -107,8 +104,7 @@ export default class ServicePage extends React.Component {
           </li>
         ));
       } else {
-        const style = { padding: '15px' }; //TODO css
-        dependencies = <div style={style}>No dependencies</div>;
+        dependencies = <div>No dependencies</div>;
       }
       return (
         <div>
@@ -128,10 +124,10 @@ export default class ServicePage extends React.Component {
 
   onClickRemove = () => {
     deleteData(
-      `http://localhostservices/${this.state.service.id}`,
+      `http://localhost/services/${this.state.service.id}`,
       () => {
         this.setState({ isDeleted: true });
-        M.toast({ html: '<div>Service config removed successfully!</div>' });
+        M.toast({ html: '<div>IService config removed successfully!</div>' });
       });
   };
 
@@ -148,11 +144,11 @@ export default class ServicePage extends React.Component {
         const newService = this.state.service;
         if (newService.id === 0) {
           const title = document.title;
-          window.history.replaceState({}, title, '/services/detail/' + data);
+          window.history.replaceState({}, title, '/services/' + data);
         }
         newService.id = data;
         this.setState({ service: newService });
-        M.toast({ html: '<div>Service saved successfully!</div>' });
+        M.toast({ html: '<div>IService saved successfully!</div>' });
       });
   };
 
@@ -168,7 +164,6 @@ export default class ServicePage extends React.Component {
   };
 
   renderServiceForm = () => {
-    const style = { marginLeft: '5px' }; //TODO move to css file
     return (
       <div className='row'>
         <div className="right-align">
@@ -177,7 +172,7 @@ export default class ServicePage extends React.Component {
               <a className="waves-effect waves-light btn-small" onClick={this.onClickEdit}>
                 {this.state.isEdit ? 'Cancel' : 'Edit'}
               </a>
-              <button disabled={this.state.service.id === 0} style={style}
+              <button disabled={this.state.service.id === 0}
                       className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>
                 Remove
               </button>
@@ -249,7 +244,11 @@ export default class ServicePage extends React.Component {
                    name="avgMem" id="avgMem" type="number" autoComplete="off"/>
             <label htmlFor="avgMem">Average Memory (bytes)</label>
           </div>
-          {this.renderButton()}
+          {this.state.isEdit &&
+          <button className="btn waves-effect waves-light" type="submit" name="action">
+            Save
+            <i className="material-icons right">send</i>
+          </button>}
         </form>
       </div>
     );
@@ -261,7 +260,92 @@ export default class ServicePage extends React.Component {
     }
     return (
       <MainLayout title={this.state.service.serviceName} breadcrumbs={this.state.breadcrumbs}>
-        {this.renderServiceForm()}
+        <div className='row'>
+          <div className="right-align">
+            <div className="row">
+              <div className="col s12">
+                <a className="waves-effect waves-light btn-small" onClick={this.onClickEdit}>
+                  {this.state.isEdit ? 'Cancel' : 'Edit'}
+                </a>
+                <button disabled={this.state.service.id === 0}
+                        className="waves-effect waves-light btn-small red darken-4" onClick={this.onClickRemove}>
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+          <form id="form-service" onSubmit={this.onSubmitForm}>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.serviceName} onChange={this.handleChange}
+                     name="serviceName" id="serviceName" type="text" autoComplete="off"/>
+              <label htmlFor="serviceName">Service name</label>
+            </div>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.dockerRepo} onChange={this.handleChange}
+                     name="dockerRepo" id="dockerRepo" type="text" autoComplete="off"/>
+              <label htmlFor="dockerRepo">Docker Repository</label>
+            </div>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.defaultExternalPort}
+                     onChange={this.handleChange} name="defaultExternalPort" id="defaultExternalPort" type="text"
+                     autoComplete="off"/>
+              <label htmlFor="defaultExternalPort">Default external port</label>
+            </div>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.defaultInternalPort}
+                     onChange={this.handleChange} name="defaultInternalPort" id="defaultInternalPort" type="text"
+                     autoComplete="off"/>
+              <label htmlFor="defaultInternalPort">Default internal port</label>
+            </div>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.defaultDb} onChange={this.handleChange}
+                     name="defaultDb" id="defaultDb" type="text" autoComplete="off"/>
+              <label htmlFor="defaultDb">Default database</label>
+            </div>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.launchCommand} onChange={this.handleChange}
+                     name="launchCommand" id="launchCommand" type="text" autoComplete="off"/>
+              <label htmlFor="launchCommand">Launch command</label>
+            </div>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.minReplics} onChange={this.handleChange}
+                     name="minReplics" id="minReplics" type="number" autoComplete="off"/>
+              <label htmlFor="minReplics">Minimum Replics</label>
+            </div>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.maxReplics} onChange={this.handleChange}
+                     name="maxReplics" id="maxReplics" type="number" autoComplete="off"/>
+              <label htmlFor="maxReplics">Maximum Replics</label>
+            </div>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.outputLabel} onChange={this.handleChange}
+                     name="outputLabel" id="outputLabel" type="text" autoComplete="off"/>
+              <label htmlFor="outputLabel">Output label</label>
+            </div>
+
+            <div className="input-field col s12">
+              <select disabled={!this.state.isEdit} value={this.state.service.serviceType} onChange={this.handleChange}
+                      name="serviceType" id="serviceType">
+                <option value="" disabled="disabled">Choose service type</option>
+                <option value='frontend'>frontend</option>
+                <option value='backend'>backend</option>
+                <option value='database'>database</option>
+                <option value='system'>system</option>
+              </select>
+              <label htmlFor="serviceType">Service type</label>
+            </div>
+            <div className="input-field col s12">
+              <input disabled={!this.state.isEdit} value={this.state.service.avgMem} onChange={this.handleChange}
+                     name="avgMem" id="avgMem" type="number" autoComplete="off"/>
+              <label htmlFor="avgMem">Average Memory (bytes)</label>
+            </div>
+            {this.state.isEdit &&
+            <button className="btn waves-effect waves-light" type="submit" name="action">
+              Save
+              <i className="material-icons right">send</i>
+            </button>}
+          </form>
+        </div>
         {this.renderDependencies()}
       </MainLayout>
     );

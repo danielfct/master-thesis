@@ -22,42 +22,10 @@
  * SOFTWARE.
  */
 
-export function fetchError() {
-  return {
-    type: 'FETCH_ERROR',
-    fetchError: true
-  };
-}
-
-export function resourceFetchDataSuccess(data: any[]) {
-  return {
-    type: 'RESOURCE_FETCH_DATA_SUCCESS',
-    data
-  };
-}
-
-export function resourceFetchData(url: string) {
-  return (dispatch: any) => {
-    fetch(url, {
-      method: 'GET',
-      headers: new Headers({
-         'Authorization': 'Basic ' + btoa('admin:password'),
-       }),
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(response.statusText);
-    }).then(json => {
-      dispatch(resourceFetchDataSuccess(json));
-    }).catch(() => dispatch(fetchError()));
-  }
-}
-
-export function itemSelected(item: any) {
-  return {
-    type: 'ITEM_SELECTED',
-    cardSelected: item
-  };
+.grid-card {
+    width: auto !important;
+    background: #36393F;
+    color: white;
+    border: 1px solid black;
+    height: 250px;
 }

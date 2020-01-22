@@ -53,7 +53,7 @@ export default class Rules extends React.Component {
           <RuleCard viewDetails={true} key={rule.id} rule={rule}/>
         ))}
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="New rule">
-          <Link className="waves-effect waves-light btn-floating grey darken-3" to='/rules/detail'>
+          <Link className="waves-effect waves-light btn-floating grey darken-3" to='/rules/rule'>
             <i className="large material-icons">add</i>
           </Link>
         </div>
