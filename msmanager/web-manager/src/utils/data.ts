@@ -22,8 +22,7 @@
  * SOFTWARE.
  */
 
-import M from 'materialize-css';
-import {fetchError, fetchData} from "../redux/reducers/items";
+import M from 'materialize-css'
 
 /*fetch (url, successFunction) {
   displayProgressBar();
@@ -81,7 +80,7 @@ formSubmit (formUrl, formMethod, formData, successFunction) {
 }*/
 
 export function getData(url: string): any {
-    console.log(`GET ${url}`);
+   /* console.log(`GET ${url}`);
     return (dispatch: any) => {
         fetch(url, {
             method: 'GET'
@@ -95,7 +94,7 @@ export function getData(url: string): any {
         }).catch(e => {
             dispatch(fetchError(e))
         });
-    }
+    }*/
 }
 
 export function postData(url: string, requestBody: any, callback: (data: any) => void): void {

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 micro-manager
+ * Copyright (c) 2020 msmanager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,15 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import MainLayout from '../shared/MainLayout';
+import {Store} from "redux";
+import {ReduxState} from "../reducers";
 
-export default function Landing() {
-  const style = { maxWidth: '100%' };
-  return (
-    <MainLayout title='Microservices dynamic system management'>
-      <img src={require('../../resources/images/architecture.png')} alt="System architecture" style={style}/>
-    </MainLayout>
-  );
-};
+let configureStore: Store<ReduxState>;
+
+if (process.env.NODE_ENV === "production") {
+    configureStore = require("./configureStore.prod").default;
+} else {
+    configureStore = require("./configureStore.dev").default;
+}
+
+export default configureStore;

@@ -46,7 +46,7 @@ class GenericFilteredList<T> extends React.Component<GenericFilteredListProps<T>
 
 const mapStateToProps = (state: any) => (
     {
-        search: state.searchFilter.search
+        search: state.search.value
     }
 );
 

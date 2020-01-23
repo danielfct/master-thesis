@@ -22,27 +22,13 @@
  * SOFTWARE.
  */
 
-export const updateSearchFilter = (search: string) => (
-    {
-        type: `UPDATE_SEARCH_FILTER`,
-        search
-    }
-);
+import merge from 'lodash/merge'
 
-interface UpdateSearchFilterAction {
-    type: string;
-    search: string;
-}
-
-export default function searchFilterReducer(state = [], action: UpdateSearchFilterAction) {
-    switch (action.type) {
-        case 'UPDATE_SEARCH_FILTER' :
-            const search = action.search;
-            return {
-                ...state,
-                search
-            };
-        default:
-            return state
+const entities = (state = { services: {} }, action: any) => {
+    if (action.response && action.response.entities) {
+        return merge({}, state, action.response.entities);
     }
-}
+    return state
+};
+
+export default entities;

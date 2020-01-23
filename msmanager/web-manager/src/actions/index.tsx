@@ -1,0 +1,145 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 msmanager
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+import IService from "../components/services/IService";
+import {CALL_API, Schemas} from "../middleware/api";
+
+export const SERVICE_REQUEST = 'SERVICE_REQUEST';
+export const SERVICE_SUCCESS = 'SERVICE_SUCCESS';
+export const SERVICE_FAILURE = 'SERVICE_FAILURE';
+
+export const loadServices = (id?: string | number) => (dispatch: any, getState: any) => {
+    const cached = !id ? getState().entities.services : getState().entities.services[id];
+    return cached ? null : dispatch(fetchServices());
+};
+
+const fetchServices = (id?: number | string) => ({
+    [CALL_API]: {
+        types: [ SERVICE_REQUEST, SERVICE_SUCCESS, SERVICE_FAILURE ],
+        endpoint: !id ? `services` : `services/${id}`,
+        schema: !id ? Schemas.SERVICE_ARRAY : Schemas.SERVICE,
+    }
+});
+
+/*export const RECEIVE_SERVICES = 'RECEIVE_SERVICES';
+function receiveServices(servicesJson: string) {
+    return {
+        type: RECEIVE_SERVICES,
+        services: servicesJson,
+        receivedAt: Date.now()
+    }
+}
+
+export const INVALIDATE_SERVICES = 'INVALIDATE_SERVICES';
+export function invalidateServices() {
+    return {
+        type: INVALIDATE_SERVICES
+    }
+}
+
+export const SELECT_SERVICE = 'SELECT_SERVICE';
+export function selectService(service: IService) {
+    return {
+        type: SELECT_SERVICE,
+        service
+    }
+}
+
+export const DELETE_SERVICE = 'DELETE_SERVICE';
+export function deleteService(service: IService) {
+    return {
+        type: DELETE_SERVICE,
+        service
+    }
+}
+
+export const UPDATE_SERVICE = 'UPDATE_SERVICE';
+export function updateService(service: IService) {
+    return {
+        type: UPDATE_SERVICE,
+        service
+    }
+}
+
+function shouldFetchServices(state: any) {
+    return true;
+   /!* const services = state.services.items;
+    if (!services) {
+        return true;
+    } else if (services.isFetching) {
+        return false;
+    } else {
+        return services.didInvalidate;
+    }*!/
+}
+
+export function fetchPostsIfNeeded() {
+    return (dispatch: any, getState: any) => {
+        if (shouldFetchServices(getState())) {
+            return dispatch(fetchServices())
+        } else {
+            return Promise.resolve()
+        }
+    }
+}
+
+export function fetchDeleteService(service: IService) {
+    //TODO
+}
+
+export function fetchUpdateService(service: IService) {
+    //TODO
+}
+
+export const HIDE_SIDE_NAV = 'HIDE_SIDE_NAV';
+export const hideSidenav = (hidden: boolean) => (
+    {
+        type: HIDE_SIDE_NAV,
+        hidden,
+    }
+);*/
+
+export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE';
+
+export const resetErrorMessage = () => ({
+    type: RESET_ERROR_MESSAGE
+});
+
+export const SIDENAV_HIDE = 'SIDENAV_HIDE';
+
+export const hideSidenav = (hidden: boolean) => (
+    {
+        type: SIDENAV_HIDE,
+        hidden
+    }
+);
+
+export const SEARCH_UPDATE = 'SEARCH_UPDATE';
+
+export const updateSearch = (search: string) => (
+    {
+        type: SEARCH_UPDATE,
+        search
+    }
+);

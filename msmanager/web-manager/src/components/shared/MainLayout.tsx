@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 msmanager
+ * Copyright (c) 2020 micro-manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,28 @@
  * SOFTWARE.
  */
 
-export default interface Data {
-    id: number | string
+import React from 'react';
+import {Link} from "react-router-dom";
+
+interface Props {
+    breadcrumbs: [ { title: string, link?: string } ];
+    children: React.ReactNode;
+}
+
+export default class MainLayout extends React.Component<Props, {}> {
+    public render = () =>
+        <div className="section row">
+            <div className="row">
+                <div className="col s12">
+                    {this.props.breadcrumbs.map(({title, link}, index) =>
+                        link
+                            ? <Link key={index} className="breadcrumb white-text" to={link}>{title}</Link>
+                            : <span key={index} className="breadcrumb white-text">{title}</span>
+                    )}
+                </div>
+            </div>
+            <div className='col s12 m12'>
+                {this.props.children}
+            </div>
+        </div>;
 }

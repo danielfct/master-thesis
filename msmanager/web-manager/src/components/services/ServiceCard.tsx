@@ -31,22 +31,22 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import IService from "./IService";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {itemSelection} from "../../redux/reducers/items";
+/*import {itemSelection} from "../../redux/reducers";*/
 
-interface DispatchToProps {
+/*interface DispatchToProps {
     actions: { itemSelection: (item: IService) => void },
-}
+}*/
 
 interface ServiceCardProps {
     service: IService;
 }
 
-type Props = DispatchToProps & ServiceCardProps;
+type Props = /*DispatchToProps & */ServiceCardProps;
 
-class ServiceCard extends React.Component<Props, {}> {
+export default class ServiceCard extends React.Component<Props, {}> {
 
-    private handleOnClick = () =>
-        this.props.actions.itemSelection(this.props.service);
+    private handleOnClick = () => {}
+      /*  this.props.actions.itemSelection(this.props.service);*/
 
     public render = () =>
         <div className='col s4'>
@@ -56,7 +56,7 @@ class ServiceCard extends React.Component<Props, {}> {
                         <div className='card-content'>
                             {Object.entries(this.props.service)
                                 .filter(([key, _]) => key !== 'id')
-                                .map(([key, value]) => <CardItem label={camelCaseToSentenceCase(key)} value={value}/>)
+                                .map(([key, value]) => <CardItem key={key} label={camelCaseToSentenceCase(key)} value={value}/>)
                             }
                         </div>
                     </Link>
@@ -65,10 +65,11 @@ class ServiceCard extends React.Component<Props, {}> {
         </div>;
 }
 
-const mapDispatchToProps = (dispatch: any): DispatchToProps => (
+/*const mapDispatchToProps = (dispatch: any): DispatchToProps => (
     {
         actions: bindActionCreators({ itemSelection }, dispatch),
     }
-);
+);*/
 
-export default connect(null, mapDispatchToProps)(ServiceCard);
+/*
+export default connect(null, mapDispatchToProps)(ServiceCard);*/

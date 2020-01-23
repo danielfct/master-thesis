@@ -22,20 +22,43 @@
  * SOFTWARE.
  */
 
-import {getData} from "../../utils/data";
+import {RESET_ERROR_MESSAGE, SEARCH_UPDATE, SIDENAV_HIDE} from "../actions";
+import {loadingBarReducer} from "react-redux-loading-bar";
 
-const FETCH = 'services/FETCH';
-const SERVICES_URL = 'http://localhost/services';
+export const loadingBar = loadingBarReducer;
 
-export const fetchServices = () => ({
-  type: FETCH,
-  payload: getData(SERVICES_URL)
-});
+export const errorMessage = (state = null, action: {type: string, error: string}) => {
+    const { type, error } = action;
+    switch (type) {
+        case RESET_ERROR_MESSAGE:
+            return Object.assign({}, state, null);
+        default:
+            return state;
+    }
+};
 
-export default function servicesReducer(state = [], action = {}) {
-  if (action.type === `${FETCH}_FULFILLED`) {
-    return action.payload;
-  } else {
-    return state
-  }
-}
+export const sidenav = (state = { hidden: window.innerWidth < 992 }, action: { type: string, hidden: boolean }) => {
+    const { type, hidden } = action;
+    switch (type) {
+        case SIDENAV_HIDE:
+            return {
+                ...state,
+                hidden
+            };
+        default:
+            return state;
+    }
+};
+
+export const search = (state = { value: "" }, action: { type: string, value: string}) => {
+    const { type, value } = action;
+    switch (type) {
+        case SEARCH_UPDATE:
+            return {
+                ...state,
+                value
+            };
+        default:
+            return state;
+    }
+};

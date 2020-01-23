@@ -28,60 +28,24 @@ import {connect} from 'react-redux';
 import FilteredList from './FilteredList';
 
 import "./List.css"
-import {bindActionCreators} from "redux";
-import {getData} from "../../utils/data";
 
-interface ListProps<T> {
-    url: string;
+interface Props<T> {
+    list: T[];
     show: (element: T) => JSX.Element;
     predicate: (element: T, filter: string) => boolean;
 }
 
-interface StateToProps<T> {
-    list: T[],
-    fetchError: TypeError,
-}
-
-interface DispatchToProps {
-    actions: { getData: (url: string) => void },
-}
-
-type Props<T> = ListProps<T> & StateToProps<T> & DispatchToProps;
-
-class GenericList<T> extends React.Component<Props<T>, {}> {
-
-    public componentDidMount = () =>
-        this.props.actions.getData(this.props.url);
+export default class List<T> extends React.Component<Props<T>, {}> {
 
     public render() {
         const FilteredCardsList = FilteredList<T>();
         return (
-            this.props.fetchError ?
-                <p>{this.props.fetchError.message}</p> : /*TODO improve error message/display*/
-                <Fragment>
-                    <FilteredCardsList
-                        list={this.props.list || []}
-                        show={this.props.show}
-                        predicate={this.props.predicate}/>
-                </Fragment>
+            <Fragment>
+                <FilteredCardsList
+                    list={this.props.list || []}
+                    show={this.props.show}
+                    predicate={this.props.predicate}/>
+            </Fragment>
         );
     }
-}
-
-const mapStateToProps = (state: any): StateToProps<any> => ( //TODO change from any to specific type
-    {
-        list: state.items.data,
-        fetchError: state.items.fetchError,
-    }
-);
-
-const mapDispatchToProps = (dispatch: any): DispatchToProps => (
-    {
-        actions: bindActionCreators({ getData }, dispatch),
-    }
-);
-
-export default function List<T>() {
-    return connect<StateToProps<T>, DispatchToProps>(mapStateToProps, mapDispatchToProps)(GenericList as
-        new(props: Props<T>) => GenericList<T>)
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 micro-manager
+ * Copyright (c) 2020 msmanager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,34 +22,29 @@
  * SOFTWARE.
  */
 
-import React, {Fragment} from 'react';
-import MainLayout from '../shared/MainLayout';
-import ServiceCard from './ServiceCard';
-import AddButton from "../shared/AddButton";
-import List from "../shared/List";
-import IService from "./IService";
+import {applyMiddleware, compose, createStore} from 'redux'
+import thunk from 'redux-thunk'
+import {createLogger} from "redux-logger";
+import DevTools from '../containers/DevTools'
+import promise from "redux-promise-middleware";
+import {loadingBarMiddleware} from "react-redux-loading-bar";
+import api from "../middleware/api";
+import rootReducer from "../reducers";
 
-export default class Services extends React.Component<{}, {}> {
+const configureStore = (preloadedState: any) =>  //TODO preloadedState type
+    createStore(
+        rootReducer,
+        preloadedState,
+        compose(
+            applyMiddleware(
+                thunk,
+                api,
+                createLogger(),
+                promise(),
+                loadingBarMiddleware()
+            ),
+            DevTools.instrument()
+        )
+    );
 
-  private show = (service: IService): JSX.Element =>
-      <ServiceCard key={service.id} service={service} />;
-
-  private predicate = (service: IService, filter: string): boolean =>
-      service.serviceName.includes(filter);
-
-  render = () => {
-    const ServicesList = List<IService>();
-    return (
-        <MainLayout title='Services'>
-          <Fragment>
-            <ServicesList
-                url="/services.json" //TODO change url
-                show={this.show}
-                predicate={this.predicate}
-            />
-          </Fragment>
-          <AddButton tooltip={'Add service'} link={'/services/service'}/>
-        </MainLayout>
-    )
-  }
-}
+export default configureStore

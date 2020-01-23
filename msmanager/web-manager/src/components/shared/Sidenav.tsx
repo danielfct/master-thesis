@@ -27,8 +27,9 @@ import {Link} from "react-router-dom";
 import React, {createRef} from "react";
 import M from "materialize-css";
 import {bindActionCreators} from "redux";
-import {hideSidenav} from "../../redux/reducers/sidenav";
 import {connect} from "react-redux";
+import {hideSidenav} from "../../actions";
+import {ReduxState} from "../../reducers";
 
 const sidenavLinks = [
     { link: '/containers', name: 'Containers' },
@@ -57,7 +58,6 @@ class Sidenav extends React.Component<SidenavProps, any> {
     componentDidMount = () => {
         M.Sidenav.init(this.sidenav.current as Element);
         window.addEventListener('resize', this.handleResize);
-        this.props.actions.hideSidenav(this.shouldHideSidenav());
     };
 
     componentWillUnmount = () =>
@@ -116,9 +116,9 @@ class Sidenav extends React.Component<SidenavProps, any> {
         </ul>
 }
 
-const mapStateToProps = (state: any) => (
+const mapStateToProps = (state: ReduxState) => (
     {
-        sidenavHidden: state.sidenav.hidden,
+        sidenavHidden: state.ui.sidenav,
     }
 );
 

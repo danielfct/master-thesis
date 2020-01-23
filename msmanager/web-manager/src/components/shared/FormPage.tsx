@@ -28,36 +28,35 @@ import {deleteData, postData} from "../../utils/data";
 import M from "materialize-css";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {editItem} from "../../redux/reducers/items";
 
 interface StateToProps {
     edit: boolean;
 }
 
-interface DispatchToProps {
+/*interface DispatchToProps {
     actions: { editItem: (value: boolean) => void; }
-}
+}*/
 
 interface FormPageProps {
     title: string;
-    breadcrumbs: [{title: string, link: string}];
-    content: JSX.Element;
+    breadcrumbs: [ { title: string, link: string } ];
+    children: JSX.Element;
     postUrl: string;
     deleteUrl: string;
 }
 
-type Props = StateToProps & DispatchToProps & FormPageProps;
+type Props = StateToProps & /*DispatchToProps &*/ FormPageProps;
 
 class FormPage extends React.Component<Props, {}> {
 
     onClickEdit = () => {
         this.setState({ isEditing: true });
-        this.props.actions.editItem(true);
+        /*this.props.actions.editItem(true);*/
     };
 
     onClickCancel = () => {
         this.setState({ isEditing: false });
-        this.props.actions.editItem(false);
+       /* this.props.actions.editItem(false);*/
     };
 
     onClickDelete = () => {
@@ -128,7 +127,7 @@ class FormPage extends React.Component<Props, {}> {
                 }
             </div>
             <form onSubmit={this.onSubmitForm}>
-                {this.props.content}
+                {this.props.children}
             </form>
         </MainLayout>
 }
@@ -139,11 +138,11 @@ const mapStateToProps = (state: any): StateToProps => (
     }
 );
 
-const mapDispatchToProps = (dispatch: any): DispatchToProps => (
+/*const mapDispatchToProps = (dispatch: any): DispatchToProps => (
     {
         actions: bindActionCreators({ editItem }, dispatch),
     }
-);
+);*/
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(FormPage);
+export default connect(mapStateToProps)(FormPage);

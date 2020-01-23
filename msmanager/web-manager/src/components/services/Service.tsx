@@ -24,7 +24,7 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import {RouteComponentProps} from 'react-router';
+import {Redirect, RouteComponentProps} from 'react-router';
 import {getData} from "../../utils/data";
 import IService from "./IService";
 import {bindActionCreators} from "redux";
@@ -120,6 +120,9 @@ class Service extends React.Component<Props, {}> {
     };*/
 
     public render = () => {
+        if (!this.props.service) {
+            return <Redirect to='/services'/>
+        }
         /*if (this.state.isDeleted) {
             return <Redirect to='/services'/>; TODO
         }*/

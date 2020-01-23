@@ -1,7 +1,8 @@
+
 /*
  * MIT License
  *
- * Copyright (c) 2020 micro-manager
+ * Copyright (c) 2020 msmanager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,32 +23,13 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import {Link} from 'react-router-dom';
+let root: JSX.Element;
 
-export default class PageTitle extends React.Component {
-  constructor (props) {
-    super(props);
-    let initialBreadcrumbs = [];
-    if (this.props.breadcrumbs) {
-      initialBreadcrumbs = this.props.breadcrumbs;
-    }
-    initialBreadcrumbs.push({ link: '', title: this.props.title });
-    this.state = { breadcrumbs: initialBreadcrumbs };
-  }
-
-  render () {
-    return (
-      <div className="row">
-        <div className="col s12">
-          {/*FIXME*/}
-          {this.state.breadcrumbs && this.state.breadcrumbs.map((breadcrumb, index) =>
-            breadcrumb.link === ''
-              ? <span key={index} className="breadcrumb white-text">{breadcrumb.title}</span>
-              : <Link key={index} className="breadcrumb white-text" to={breadcrumb.link}>{breadcrumb.title}</Link>
-          )}
-        </div>
-      </div>
-    );
-  }
+if (process.env.NODE_ENV === 'production') {
+    root = require('./Root.prod').default;
+} else {
+    root = require('./Root.dev').default;
 }
+
+export default root;
+

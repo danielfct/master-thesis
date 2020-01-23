@@ -22,26 +22,23 @@
  * SOFTWARE.
  */
 
-export const hideSidenav = (hidden: boolean) => (
-    {
-        type: 'HIDE_SIDE_NAV',
-        hidden,
-    }
-);
+import { createStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
+import promise from "redux-promise-middleware";
+import {loadingBarMiddleware} from "react-redux-loading-bar";
+import api from "../middleware/api";
+import rootReducer from "../reducers";
 
-interface HideSidenavAction {
-    type: string;
-    hidden: boolean;
-}
+const configureStore = (preloadedState: any) => //TODO preloadedState type ReduxState
+    createStore(
+        rootReducer,
+        preloadedState,
+        applyMiddleware(
+            thunk,
+            api,
+            promise(),
+            loadingBarMiddleware()
+        )
+    );
 
-export default function sidenavReducer(state = [], action: HideSidenavAction) {
-    switch (action.type) {
-        case 'HIDE_SIDE_NAV' :
-            return {
-                ...state,
-                hidden: action.hidden,
-            };
-        default:
-            return state
-    }
-}
+export default configureStore;

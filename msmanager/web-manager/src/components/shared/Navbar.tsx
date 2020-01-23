@@ -28,8 +28,7 @@ import {FaDocker, GoMarkGithub} from "react-icons/all";
 import SearchBar from "./SearchBar";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {updateSearchFilter} from "../../redux/reducers/searchFilter";
-import {hideSidenav} from "../../redux/reducers/sidenav";
+import {hideSidenav} from "../../actions";
 const logo = require("../../resources/images/favicon.png");
 
 interface NavbarProps extends RouteComponentProps {

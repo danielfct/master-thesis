@@ -23,17 +23,11 @@
  */
 
 import React from 'react';
-import PageTitle from './PageTitle';
+import MainLayout from '../shared/MainLayout';
 
-export default class MainLayout extends React.Component {
-  render = () => {
-    return (
-      <div className="section row">
-        <PageTitle title={this.props.title} breadcrumbs={this.props.breadcrumbs}/>
-        <div className='col s12 m12'>
-          {this.props.children}
-        </div>
-      </div>
-    );
-  }
-}
+const Landing = () =>
+    <MainLayout title='Microservices dynamic system management'>
+        <img src={require('../../resources/images/architecture.png')} alt="System architecture"/>
+    </MainLayout>;
+
+export default Landing;
