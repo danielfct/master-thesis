@@ -26,37 +26,34 @@ import MainLayout from "./MainLayout";
 import React, {FormEvent} from "react";
 import {deleteData, postData} from "../../utils/data";
 import M from "materialize-css";
-import {bindActionCreators} from "redux";
-import {connect} from "react-redux";
+import './FormPage.css';
 
-interface StateToProps {
-    edit: boolean;
-}
-
-/*interface DispatchToProps {
-    actions: { editItem: (value: boolean) => void; }
-}*/
-
-interface FormPageProps {
+interface Props {
     title: string;
     breadcrumbs: [ { title: string, link: string } ];
-    children: JSX.Element;
     postUrl: string;
     deleteUrl: string;
 }
 
-type Props = StateToProps & /*DispatchToProps &*/ FormPageProps;
+interface State {
+    isEditing: boolean;
+}
 
-class FormPage extends React.Component<Props, {}> {
+export default class FormPage extends React.Component<Props, State> {
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            isEditing: false
+        };
+    }
 
     onClickEdit = () => {
         this.setState({ isEditing: true });
-        /*this.props.actions.editItem(true);*/
     };
 
     onClickCancel = () => {
         this.setState({ isEditing: false });
-       /* this.props.actions.editItem(false);*/
     };
 
     onClickDelete = () => {
@@ -89,7 +86,7 @@ class FormPage extends React.Component<Props, {}> {
         <MainLayout title={this.props.title} breadcrumbs={this.props.breadcrumbs}>
             <div>
                 {
-                    this.props.edit
+                    this.state.isEditing
                         ? <div>
                             <div className="fixed-action-send-btn tooltipped" data-position="left" data-tooltip={'Send'}
                                  onClick={this.onSubmitForm}>
@@ -126,23 +123,8 @@ class FormPage extends React.Component<Props, {}> {
                     </div>*/
                 }
             </div>
-            <form onSubmit={this.onSubmitForm}>
+            <form className="form" onSubmit={this.onSubmitForm}>
                 {this.props.children}
             </form>
         </MainLayout>
 }
-
-const mapStateToProps = (state: any): StateToProps => (
-    {
-        edit: state.items.edit,
-    }
-);
-
-/*const mapDispatchToProps = (dispatch: any): DispatchToProps => (
-    {
-        actions: bindActionCreators({ editItem }, dispatch),
-    }
-);*/
-
-
-export default connect(mapStateToProps)(FormPage);

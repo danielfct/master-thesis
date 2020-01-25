@@ -31,11 +31,12 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import FormPage from "../shared/FormPage";
+import {ReduxState} from "../../reducers";
 
 interface StateToProps {
     service: IService;
-    fetchError: TypeError;
-    isEditing: boolean;
+    /*fetchError: TypeError;
+    isEditing: boolean;*/
 }
 
 interface DispatchToProps {
@@ -51,12 +52,11 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 class Service extends React.Component<Props, {}> {
 
     public componentDidMount = () => {
-        console.log(this.props.service)
-        if (!this.props.service) {
-            /*this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}`); TODO*/
+        /*if (!this.props.service) {
+            /!*this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}`); TODO*!/
             this.props.actions.getData(`/service.json`);
         }
-        this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}/dependencies`);
+        this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}/dependencies`);*/
         M.updateTextFields();
         M.FormSelect.init(document.querySelectorAll('select'));
     };
@@ -105,7 +105,7 @@ class Service extends React.Component<Props, {}> {
     onSubmitForm = event => {
         event.preventDefault();
         postData(
-            'http://localhostservices',
+            'http://localhost/services',
             event.target[0].value,
             data => {
                 const newService = this.state.service;
@@ -120,63 +120,74 @@ class Service extends React.Component<Props, {}> {
     };*/
 
     public render = () => {
-        if (!this.props.service) {
-            return <Redirect to='/services'/>
-        }
         /*if (this.state.isDeleted) {
             return <Redirect to='/services'/>; TODO
         }*/
-        if (this.props.service) {
-            let content = (
-                <div className='row'>
-                    <div className="col s12">
-                        <ul className="tabs">
-                            <li className="tab col s6"><a href="#test1">Test 1</a></li>
-                            <li className="tab col s6"><a className="active" href="#test2">Test 2</a></li>
-                        </ul>
+        return (
+            <div>
+                <FormPage title={this.props.service.serviceName}
+                          breadcrumbs={[{ title: 'Services', link: '/services' }]}
+                          postUrl={'http://localhost/services'}
+                          deleteUrl={`http://localhost/services/${this.props.service.id}`}>
+                    <div className="row">
+                        <div className="col s12">
+                            <ul className="tabs">
+                                <li className="tab col s6"><a href="#details">Details</a></li>
+                                <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
+                            </ul>
+                        </div>
+                        <div id="details">
+                            {this.props.service &&
+                            Object.entries(this.props.service)
+                                .filter(([key, _]) => key !== 'id')
+                                .map(([key, value], index) =>
+                                    <div key={index} className="input-field col s12">
+                                        {key !== 'serviceType'
+                                            ? <input /*disabled={!this.props.isEditing}*/ value={value} name={key} id={key}
+                                                                                          type={isNaN(value) ? "text" : "number"} autoComplete="off"/>
+                                            : <select /*disabled={!this.props.isEditing}*/ value={value} name={key} id={key}>
+                                                {/*//TODO get from database?*/}
+                                                <option>Choose service type</option>
+                                                <option value='frontend'>Frontend</option>
+                                                <option value='backend'>Backend</option>
+                                                <option value='database'>Database</option>
+                                                <option value='system'>System</option>
+                                            </select>
+                                        }
+                                        <label htmlFor={key}>{camelCaseToSentenceCase(key)}</label>
+                                    </div>
+                                )
+                            }
+                        </div>
                     </div>
-                    {this.props.service &&
-                    Object.entries(this.props.service)
-                        .filter(([key, _]) => key !== 'id')
-                        .map(([key, value]) =>
-                            <div className="input-field col s12">
-                                {key !== 'serviceType'
-                                    ? <input disabled={!this.props.isEditing} value={value} name={key} id={key}
-                                             type={isNaN(value) ? "text" : "number"} autoComplete="off"/>
-                                    : <select disabled={!this.props.isEditing} value={value} name={key} id={key}>
-                                        {/*//TODO get from database?*/}
-                                        <option>Choose service type</option>
-                                        <option value='frontend'>Frontend</option>
-                                        <option value='backend'>Backend</option>
-                                        <option value='database'>Database</option>
-                                        <option value='system'>System</option>
-                                    </select>
-                                }
-                                <label htmlFor={key}>{camelCaseToSentenceCase(key)}</label>
-                            </div>)}
-                    }
-                </div>
-            );
-            return <FormPage title={this.props.service.serviceName}
-                             breadcrumbs={[{ title: 'Services', link: '/services' }]}
-                             postUrl={'http://localhost/services'}
-                             deleteUrl={`http://localhost/services/${this.props.service.id}`}
-                             content={content}/>
-        }
-        if (this.props.fetchError) {
-            return <p>{this.props.fetchError.message}</p>
-        }
-        return null;
+                </FormPage>
+            </div>
+
+
+        )
     }
     /*{this.renderDependencies()}*/
 }
+/*service: state.ui.entity, /!*|| (state.items.data && state.items.data[0]),*!/
+    fetchError: state.items.fetchError,
+    isEditing: state.items.edit,*/
 
-
-const mapStateToProps = (state: any): StateToProps => (
+const mapStateToProps = (state: ReduxState): StateToProps => (
     {
-        service: state.items.itemSelected || (state.items.data && state.items.data[0]),
-        fetchError: state.items.fetchError,
-        isEditing: state.items.edit,
+        //TODO remove default service
+        service: state.ui.select.service ||
+            {id: 1,
+                serviceName: "front-end",
+                dockerRepository: "front-end",
+                defaultExternalPort: 8079,
+                defaultInternalPort: 80,
+                defaultDb: "NOT_APPLICABLE",
+                launchCommand: "${eurekaHost} ${externalPort} ${internalPort} ${hostname}",
+                minReplics: 1,
+                maxReplics: 0,
+                outputLabel: "${front-endHost}",
+                serviceType: "frontend",
+                expectedMemoryConsumption: 209715200}
     }
 );
 
@@ -187,3 +198,35 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps => (
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Service);
+
+
+
+
+/*
+<ul className="tabs">
+    <li className="tab col s6"><a className="active" href="">Details</a>
+        <div className='row'>
+            {this.props.service &&
+            Object.entries(this.props.service)
+                .filter(([key, _]) => key !== 'id')
+                .map(([key, value], index) =>
+                    <div key={index} className="input-field col s12">
+                        {key !== 'serviceType'
+                            ? <input disabled={!this.props.isEditing} value={value} name={key} id={key}
+                                                                          type={isNaN(value) ? "text" : "number"} autoComplete="off"/>
+                            : <select disabled={!this.props.isEditing} value={value} name={key} id={key}>
+                                //TODO get from database?
+                                <option>Choose service type</option>
+                                <option value='frontend'>Frontend</option>
+                                <option value='backend'>Backend</option>
+                                <option value='database'>Database</option>
+                                <option value='system'>System</option>
+                            </select>
+                        }
+                        <label htmlFor={key}>{camelCaseToSentenceCase(key)}</label>
+                    </div>
+                )
+            }
+        </div>
+    </li>
+</ul>*/

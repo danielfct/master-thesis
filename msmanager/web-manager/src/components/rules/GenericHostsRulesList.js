@@ -29,7 +29,7 @@ import GenericHostRules from './GenericHostRules';
 
 export default class GenericHostsRulesList extends React.Component {
   render = () => (
-    <MainLayout title='Generic hosts rules'>
+    <MainLayout title={'Generic hosts rules'}>
       <div className="right-align">
         <div className="row">
           <div className="col s12">

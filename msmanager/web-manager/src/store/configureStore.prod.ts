@@ -37,7 +37,9 @@ const configureStore = (preloadedState: any) => //TODO preloadedState type Redux
             thunk,
             api,
             promise(),
-            loadingBarMiddleware()
+            loadingBarMiddleware({
+                promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
+            })
         )
     );
 

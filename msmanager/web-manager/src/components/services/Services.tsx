@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 import MainLayout from '../shared/MainLayout';
 import ServiceCard from './ServiceCard';
 import AddButton from "../shared/AddButton";
-import List from "../shared/List";
 import IService from "./IService";
 import {connect} from "react-redux";
 import {loadServices} from "../../actions";
 import {ReduxState} from "../../reducers";
+import CardList from "../shared/CardList";
 
 interface StateToProps {
     services: IService[];
@@ -38,7 +38,7 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-    loadServices: () => void
+    loadServices: (name?: string, requiredField?: string) => any;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -48,38 +48,31 @@ class Services extends React.Component<Props, {}> {
     public componentDidMount = () =>
         this.props.loadServices();
 
-    private show = (service: IService): JSX.Element =>
+    private card = (service: IService): JSX.Element =>
         <ServiceCard key={service.id} service={service} />;
 
-    private predicate = (service: IService, filter: string): boolean =>
-        service.serviceName.includes(filter);
+    private predicate = (service: IService, search: string): boolean =>
+        service.serviceName.includes(search);
 
     render = () =>
-        <MainLayout breadcrumbs={[{title: 'Services'}]}>
-            {this.props.error
-                ? <div>{`${this.props.error}`}</div>
-                : <div>
-                    <List<IService>
-                        list={this.props.services}
-                        show={this.show}
-                        predicate={this.predicate}
-                    />
-                </div>}
+        <MainLayout title={'Services'}>
             <AddButton tooltip={'Add service'} link={'/services/service'}/>
+            <CardList<IService>
+                list={this.props.services}
+                card={this.card}
+                predicate={this.predicate}/>
         </MainLayout>
 }
 
-const mapStateToProps = (state: ReduxState): StateToProps => ( //TODO change from any to specific type
+const mapStateToProps = (state: ReduxState): StateToProps => (
     {
-        services: state.entities.services,
+        services: Object.values(state.entities.services),
         error: state.ui.errorMessage,
     }
 );
 
-const mapDispatchToProps = (): DispatchToProps => (
-    {
-        loadServices,
-    }
-);
+const mapDispatchToProps: DispatchToProps = {
+    loadServices,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Services);

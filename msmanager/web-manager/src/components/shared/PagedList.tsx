@@ -24,59 +24,91 @@
 
 import * as React from "react";
 import SimpleList from './SimpleList';
+import './PagedList.css';
 
 export interface IPagedList<T> {
+/*    isFetching: boolean;
+    loadingLabel: string;*/
     list: T[];
-   // select: (x: T) => void;
+/*    select: (x: T) => void;*/
     show: (x: T) => JSX.Element;
     page?: number;
     pagesize?: number;
 }
 
 export class PagedList<T> extends React.Component<IPagedList<T>, { page?: number, pagesize?: number }> {
+
     private max: number = 0;
 
     constructor(props: IPagedList<T>) {
         super(props);
-
         this.state = {
-            page: props.page,
+            page: props.page || 0,
             pagesize: props.pagesize,
         };
-
         this.max = Math.ceil(props.list.length / (props.pagesize || 1)) - 1;
     }
 
     public render() {
-        const {list: l, /*select,*/ show} = this.props;
+        const {list: l, show} = this.props;
         const {page = 0, pagesize = l.length} = this.state;
         const list = l.slice(page * pagesize, page * pagesize + pagesize);
-
         return (
             <div>
-              {/*  {<SimpleList {...{list, show, select}} />}*/}
-                {<SimpleList {...{list, show}} />}
-                {/*<Pager>
-                    <Pager.Item previous={true} href="#" onClick={this.prevPage}>
-                        &larr; Página anterior
-                    </Pager.Item>
-
-                    <span>{page + 1}</span>
-
-                    <Pager.Item next={true} href="#" onClick={this.nextPage}>
-                        Página seguinte &rarr;
-                    </Pager.Item>
-                </Pager>*/}
+                <ul className="pagination center-align" style={{userSelect: "none"}}>
+                    <li className={page === 0 ? "disabled prev" : "prev"}>
+                        <a onClick={this.prevPage}>
+                            <i className="material-icons">chevron_left</i>
+                        </a>
+                    </li>
+                    {Array.from({length: this.max+1}, (x, i) => i+1).map((pageNumber, index) =>
+                        <PageNumber key={index} page={pageNumber} active={index === page} setPage={this.setPage}/>
+                    )}
+                    <li className={page === this.max ? "disabled next" : "next"}>
+                        <a onClick={this.nextPage}>
+                            <i className="material-icons">chevron_right</i>
+                        </a>
+                    </li>
+                </ul>
+                {<SimpleList {...{list, show}}/>}
             </div>
-       );
+        );
     }
 
-    private prevPage = () => {
+    private setPage = (pageIndex: number): void => {
         this.max = Math.max(0, Math.ceil(this.props.list.length / (this.state.pagesize || 1)) - 1);
-        this.setState((st) => ({page: ((st.page === undefined) ? 0 : Math.max(0, st.page - 1))}));
+        this.setState(state => ({page: state.page === undefined ? 0 : Math.max(0, pageIndex)}));
     };
-    private nextPage = () => {
-        this.max = Math.max(0, Math.ceil(this.props.list.length / (this.state.pagesize || 1)) - 1);
-        this.setState((st) => ({page: ((st.page === undefined) ? 0 : Math.min(this.max, st.page + 1))}));
+
+    private prevPage = (): void => {
+        const {page} = this.state;
+        this.setPage(page === undefined ? 0 : Math.max(0, page - 1));
+    };
+
+    private nextPage = (): void => {
+        const {page} = this.state;
+        this.setPage(page === undefined ? 0 : Math.min(this.max, page + 1));
+    };
+
+}
+
+interface PageNumberProps {
+    page: number;
+    active: boolean;
+    setPage: (pageIndex: number) => void;
+}
+
+class PageNumber extends React.Component<PageNumberProps, {}> {
+
+    private changePage = () => {
+        this.props.setPage(this.props.page - 1);
+    };
+
+    public render = () => {
+        const {page, active} = this.props;
+        return <li key={page} className={active ? "active" : "waves-effect"}>
+            <a onClick={this.changePage}>{page}</a>
+        </li>
+
     };
 }

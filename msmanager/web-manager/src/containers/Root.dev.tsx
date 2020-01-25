@@ -24,7 +24,7 @@
 
 import React from "react";
 import M from "materialize-css";
-import {BrowserRouter, Route} from "react-router-dom";
+import {Route} from "react-router-dom";
 import LoadingBar from "react-redux-loading-bar";
 import Navbar from "../components/shared/Navbar";
 import Sidenav from "../components/shared/Sidenav";
@@ -66,27 +66,34 @@ import SpecificHostSimulatedMetricsDetail from "../components/metrics/SpecificHo
 import Regions from "../components/region/Region";
 import DevTools from "./DevTools";
 import Footer from "../components/shared/Footer";
-import {connect} from "react-redux";
+import {connect, Provider} from "react-redux";
+import {ReduxState} from "../reducers";
 
-interface RootContainerProps {
-    sidenavHidden: boolean
+interface StateToProps {
+    sidenavVisible: boolean;
 }
 
-class Root extends React.Component<RootContainerProps,{}> {
+interface RootContainerProps {
+    store: any;
+}
 
-    componentDidMount = () =>
+type Props = StateToProps & RootContainerProps;
+
+class Root extends React.Component<Props, {}> {
+
+    public componentDidMount = () =>
         M.AutoInit();
 
-    render = () =>
-        <BrowserRouter>
+    public render = () =>
+        <Provider store={this.props.store}>
             <LoadingBar showFastActions className="loading-bar"/>
-            <div className="content" style={this.props.sidenavHidden ? {paddingLeft: 0} : undefined}>
+            <div className="content" style={this.props.sidenavVisible ? undefined : {paddingLeft: 0}}>
                 <Navbar/>
                 <Sidenav/>
                 <main>
                     <Route exact path="/" component={Landing}/>
                     <Route exact path="/services" component={Services}/>
-                    <Route exact path="/services/service/:id?" component={Service}/>
+                    <Route exact path="/services/service/:name?" component={Service}/>
                     <Route exact path="/apps" component={AppPackage}/>
                     <Route exact path="/hosts/edge" component={EdgeHosts}/>
                     <Route exact path="/containers" component={Containers}/>
@@ -120,16 +127,16 @@ class Root extends React.Component<RootContainerProps,{}> {
                     <Route exact path="/metrics/simulated/hosts/specific" component={SpecificHostSimulatedMetrics}/>
                     <Route exact path="/metrics/simulated/hosts/specific/metric/:id?" component={SpecificHostSimulatedMetricsDetail}/>
                     <Route exact path="/regions" component={Regions}/>
-                    <DevTools/>
+                    {/*<DevTools/>*/}
                 </main>
                 <Footer/>
             </div>
-        </BrowserRouter>
+        </Provider>
 }
 
-const mapStateToProps = (state: any) => (
+const mapStateToProps = (state: ReduxState): StateToProps => (
     {
-        sidenavHidden: state.sidenav.hidden,
+        sidenavVisible: state.ui.sidenav.user,
     }
 );
 

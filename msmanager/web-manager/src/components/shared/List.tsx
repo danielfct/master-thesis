@@ -28,24 +28,36 @@ import {connect} from 'react-redux';
 import FilteredList from './FilteredList';
 
 import "./List.css"
+import {PagedList} from "./PagedList";
+import SimpleList from "./SimpleList";
 
 interface Props<T> {
+/*    isFetching: boolean;
+    loadingLabel: string;*/
     list: T[];
     show: (element: T) => JSX.Element;
-    predicate: (element: T, filter: string) => boolean;
+    predicate?: (element: T, filter: string) => boolean;
+    pagesize?: number;
+    page?: number;
 }
 
 export default class List<T> extends React.Component<Props<T>, {}> {
 
+/*    static defaultProps = {
+        isFetching: true,
+        loadingLabel: 'Loading...'
+    };*/
+
     public render() {
-        const FilteredCardsList = FilteredList<T>();
-        return (
-            <Fragment>
-                <FilteredCardsList
-                    list={this.props.list || []}
-                    show={this.props.show}
-                    predicate={this.props.predicate}/>
-            </Fragment>
-        );
+        const {predicate, pagesize, page} = this.props;
+        if (predicate) {
+            const Filtered = FilteredList<T>();
+            return <Filtered {...this.props}
+                             predicate={predicate}/>;
+        } else if (pagesize || page) {
+            return <PagedList {...this.props}/>
+        } else {
+            return <SimpleList {...this.props}/>
+        }
     }
 }

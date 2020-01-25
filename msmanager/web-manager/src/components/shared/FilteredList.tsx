@@ -22,35 +22,41 @@
  * SOFTWARE.
  */
 
-import * as React from "react";
-import {PagedList} from "./PagedList";
+import React from "react";
 import {connect} from "react-redux";
+import {PagedList} from "./PagedList";
+import SimpleList from "./SimpleList";
 
-interface GenericFilteredListProps<T> {
+interface Props<T> {
+    /*    isFetching: boolean;
+        loadingLabel: string;*/
     list: T[];
     show: (x: T) => JSX.Element;
-    page?: number;
-    pagesize?: number;
     predicate: (x: T,s: string) => boolean;
     search: string;
+    page?: number;
+    pagesize?: number;
 }
 
-class GenericFilteredList<T> extends React.Component<GenericFilteredListProps<T>, any> {
+class GenericFilteredList<T> extends React.Component<Props<T>, any> {
     public render() {
-        const {list, predicate, search, ...otherprops} = this.props;
-        return (
-            <PagedList {...otherprops} list={list.filter((s:T) => predicate(s, search || ''))}/>
-        );
+        const {predicate, search, page, pagesize, ...otherprops} = this.props;
+        let {list} = this.props;
+        list = list.filter((s:T) => predicate(s, search));
+        return page || pagesize
+            ? <PagedList {...otherprops}
+                         {...{list, page, pagesize}}/>
+            : <SimpleList {...otherprops}
+                          {...{list}}/>
     }
 }
 
 const mapStateToProps = (state: any) => (
     {
-        search: state.search.value
+        search: state.ui.search
     }
 );
 
 export default function FilteredList<T>() {
-    return connect(mapStateToProps)(GenericFilteredList as new(props: GenericFilteredListProps<T>) => GenericFilteredList<T>);
+    return connect(mapStateToProps)(GenericFilteredList as new(props: Props<T>) => GenericFilteredList<T>);
 }
-

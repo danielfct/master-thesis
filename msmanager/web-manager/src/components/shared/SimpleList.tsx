@@ -24,21 +24,28 @@
 
 import * as React from "react";
 
-interface ListProps<T> {
+interface Props<T> {
+/*    isFetching: boolean;
+    loadingLabel: string;*/
     list: T[];
     show: (element: T) => JSX.Element;
 }
 
-const SimpleList = function <T>({list, show}: ListProps<T>) {
+const SimpleList = function <T>({/*isFetching, loadingLabel,*/ list, show}: Props<T>) {
+    const isEmpty = list.length === 0;
+   /* if (isEmpty && isFetching) {
+        return <h2><i>{loadingLabel}</i></h2>
+    }*/
+    if (isEmpty) {
+        return <h1><i>Nothing to show...</i></h1>
+    }
     return (
         <div>
-            <div className='row'>
-                {list.map((c, i) => (
-                    <div key={i}>
-                        {show(c)}
-                    </div>
-                ))}
-            </div>
+            {list.map((c, i) => (
+                <div key={i}>
+                    {show(c)}
+                </div>
+            ))}
         </div>);
 };
 

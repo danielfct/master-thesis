@@ -22,10 +22,7 @@
  * SOFTWARE.
  */
 
-import {Store} from "redux";
-import {ReduxState} from "../reducers";
-
-let configureStore: Store<ReduxState>;
+let configureStore: any;
 
 if (process.env.NODE_ENV === "production") {
     configureStore = require("./configureStore.prod").default;

@@ -28,7 +28,7 @@ const entities = (state = { services: {} }, action: any) => {
     if (action.response && action.response.entities) {
         return merge({}, state, action.response.entities);
     }
-    return state
+    return state;
 };
 
 export default entities;

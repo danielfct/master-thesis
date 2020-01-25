@@ -1,0 +1,17 @@
+.pagination > li > a {
+    cursor: pointer;
+    color: white;
+}
+
+.pagination li.active {
+    background-color: #1F1F1F;
+    border: 1px solid black;
+}
+
+.pagination li.disabled {
+    opacity: 0.25;
+}
+
+.pagination {
+    margin-top: -50px;
+}

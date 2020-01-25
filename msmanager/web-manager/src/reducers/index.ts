@@ -26,23 +26,22 @@
 import { combineReducers } from 'redux'
 import IService from "../components/services/IService";
 import entities from "./entities";
-import {errorMessage, loadingBar, search, sidenav} from "./ui";
+import {breadcrumbs, errorMessage, loadingBar, search, select, sidenav} from "./ui";
+import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
 
 export interface ReduxState {
     ui: {
-        errorMessage: string;
-        sidenav: boolean;
+        sidenav: { user: boolean, width: boolean };
         search: string;
+        breadcrumbs: IBreadcrumbs;
+        errorMessage: string;
+        select: {service?: IService};
     }
     entities: {
-        services: [IService]
+        services: IService[],
     };
     pagination: any;
 }
-
-
-
-
 
 
 /*interface ISelectServiceAction {
@@ -171,15 +170,16 @@ export interface IState {
 
 
 const ui = combineReducers({
-    loadingBar,
     sidenav,
     search,
+    breadcrumbs,
     errorMessage,
+    select
 });
 
 // Updates the pagination data for different actions.
-const pagination = combineReducers({
-    /*starredByUser: paginate({
+/*const pagination = combineReducers({
+    starredByUser: paginate({
         mapActionToKey: action => action.login,
         types: [
             ActionTypes.STARRED_REQUEST,
@@ -194,13 +194,14 @@ const pagination = combineReducers({
             ActionTypes.STARGAZERS_SUCCESS,
             ActionTypes.STARGAZERS_FAILURE
         ]
-    })*/
-});
+    })
+});*/
 
 const rootReducer = combineReducers({
+    loadingBar,
     ui,
     entities,
-    pagination,
+    /*pagination,*/
 });
 
 export default rootReducer;

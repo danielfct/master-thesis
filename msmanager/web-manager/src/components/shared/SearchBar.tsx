@@ -25,18 +25,22 @@
 import React from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {IState} from "../../reducers/reducers";
 import {updateSearch} from "../../actions";
 import {ReduxState} from "../../reducers";
 
-interface Props {
+interface StateToProps {
     search: string;
-    actions: { updateSearch: (search: string) => void; }
 }
+
+interface DispatchToProps {
+    updateSearch: (search: string) => void;
+}
+
+type Props = DispatchToProps & StateToProps;
 
 class SearchBar extends React.Component<Props,{}> {
 
-    private setValue = ({target:{value}}:any) => this.props.actions.updateSearch(value.toLowerCase());
+    private setValue = ({target:{value}}:any) => this.props.updateSearch(value.toLowerCase());
 
     render = () =>
         <form className="col s4 offset-s3 hide-on-small-and-down" noValidate autoComplete="off">
@@ -49,17 +53,14 @@ class SearchBar extends React.Component<Props,{}> {
         </form>
 }
 
-const mapStateToProps = (state: ReduxState) => (
+const mapStateToProps = (state: ReduxState): StateToProps => (
     {
         search: state.ui.search
     }
 );
 
-const mapDispatchToProps = (dispatch: any) => (
-    {
-        actions: bindActionCreators({ updateSearch }, dispatch),
-    }
-);
+const mapDispatchToProps = (dispatch: any): DispatchToProps =>
+    bindActionCreators({ updateSearch }, dispatch);
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);

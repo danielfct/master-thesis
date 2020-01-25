@@ -117,23 +117,6 @@ nav li {
     }
 }
 
-.right-nav-icons {
-    float: right !important;
-    margin-right: 10px;
-}
-
-.right-nav-icons a {
-    margin-left: 10px;
-}
-
-.left-nav-icons {
-    float: left !important;
-}
-
-.left-nav-icons a {
-    margin-right: 10px;
-}
-
 .brand-logo>img {
     height: 30px;
     vertical-align: middle;
@@ -223,25 +206,6 @@ p {
 
 .sticky+.page-content {
     padding-top: 4px;
-}
-
-.breadcrumb {
-    font-size: 25px;
-    padding: 15px;
-}
-
-.breadcrumb:before {
-    font-size: 20px;
-    margin: 4px 25px 0 0;
-    color: #616161;
-}
-
-.breadcrumb {
-    opacity: 0.25;
-}
-
-.breadcrumb:last-child {
-    opacity: 1;
 }
 
 .page-footer {

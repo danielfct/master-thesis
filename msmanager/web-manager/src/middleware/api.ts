@@ -26,7 +26,8 @@ import {normalize, schema} from 'normalizr';
 import { camelizeKeys } from 'humps';
 import IService from "../components/services/IService";
 
-const API_ROOT = 'http://localhost/';
+/*const API_ROOT = 'http://localhost/';*/
+const API_ROOT = '';
 
 const callApi = (endpoint: string, schema: schema.Entity<IService>) => {
     const url = endpoint.includes(API_ROOT) ? endpoint : API_ROOT + endpoint;
@@ -42,27 +43,25 @@ const callApi = (endpoint: string, schema: schema.Entity<IService>) => {
         )
 };
 
+interface ISchemas {
+    SERVICE: schema.Entity<IService>;
+    SERVICE_ARRAY: schema.Entity<IService>[];
+}
+
 const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {}, {
-    idAttribute: (service: IService) => service.id.toString()
+    idAttribute: (service: IService) => service.serviceName.toString()
 });
+
+export const Schemas: ISchemas = {
+    SERVICE: serviceSchema,
+    SERVICE_ARRAY: [serviceSchema],
+};
 
 /*const repoSchema = new schema.Entity('repos', {
     owner: userSchema
 }, {
     idAttribute: repo => repo.fullName.toLowerCase()
 })*/
-
-interface ISchemas {
-    SERVICE: schema.Entity<IService>;
-    SERVICE_ARRAY: [schema.Entity<IService>];
-}
-
-export const Schemas: ISchemas = {
-    SERVICE: serviceSchema,
-    SERVICE_ARRAY: [serviceSchema],
-    /*REPO: repoSchema,
-    REPO_ARRAY: [repoSchema]*/
-};
 
 export const CALL_API = 'Call API';
 
@@ -71,15 +70,11 @@ export default (store: any) => (next: (action: any) => void) => (action: any) =>
     if (typeof callAPI === 'undefined') {
         return next(action)
     }
-    let { endpoint } = callAPI;
-    const { schema, types } = callAPI;
-    if (typeof endpoint === 'function') {
-        endpoint = endpoint(store.getState())
-    }
+    const { endpoint, schema, types } = callAPI;
     const actionWith = (data: any) => {
         const finalAction = Object.assign({}, action, data);
         delete finalAction[CALL_API];
-        return finalAction
+        return finalAction;
     };
     const [ requestType, successType, failureType ] = types;
     next(actionWith({ type: requestType }));
@@ -89,7 +84,7 @@ export default (store: any) => (next: (action: any) => void) => (action: any) =>
             type: successType,
         })),
         error => next(actionWith({
-            error: error.message || 'Something bad happened',
+            error: error.message || 'Error fetching data',
             type: failureType,
         }))
     )

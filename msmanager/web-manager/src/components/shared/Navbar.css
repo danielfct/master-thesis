@@ -1,0 +1,22 @@
+.navbar-fixed {
+    z-index: 998;
+    box-sizing: border-box;
+}
+
+.left-nav-icons {
+    float: left !important;
+}
+
+.left-nav-icons a {
+    margin-right: 10px;
+}
+
+.right-nav-icons {
+    float: right !important;
+    margin-right: 10px;
+    padding-right: 200px;
+}
+
+.right-nav-icons a {
+    margin-left: 10px;
+}

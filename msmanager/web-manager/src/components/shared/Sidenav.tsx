@@ -28,7 +28,7 @@ import React, {createRef} from "react";
 import M from "materialize-css";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {hideSidenav} from "../../actions";
+import {showSidenavByUser, showSidenavByWidth} from "../../actions";
 import {ReduxState} from "../../reducers";
 
 const sidenavLinks = [
@@ -44,16 +44,22 @@ const sidenavLinks = [
     { link: '/regions', name: 'Regions' },
 ];
 
-interface SidenavProps {
-    sidenavHidden: boolean,
-    actions: {hideSidenav: (state: boolean) => void},
+interface StateToProps {
+    sidenav: {user: boolean, width: boolean}
 }
 
-class Sidenav extends React.Component<SidenavProps, any> {
+interface DispatchToProps {
+    showSidenavByUser: (value: boolean) => void;
+    showSidenavByWidth: (value: boolean) => void;
+}
+
+type Props = StateToProps & DispatchToProps;
+
+class Sidenav extends React.Component<Props, {}> {
 
     private sidenav = createRef<HTMLUListElement>();
 
-    private shouldHideSidenav = () => window.innerWidth <= 992;
+    private shouldShowSidenav = () => window.innerWidth > 992;
 
     componentDidMount = () => {
         M.Sidenav.init(this.sidenav.current as Element);
@@ -64,16 +70,14 @@ class Sidenav extends React.Component<SidenavProps, any> {
         window.removeEventListener('resize', this.handleResize);
 
     handleResize = (_: any) => {
-        const hide = this.shouldHideSidenav();
-        if (hide !== this.props.sidenavHidden) {
-            this.props.actions.hideSidenav(hide);
-        }
         const sidenav = M.Sidenav.getInstance(this.sidenav.current as Element);
-        if (hide || (!hide && !this.props.sidenavHidden)) {
+        const {user, width} = this.props.sidenav;
+        let show = this.shouldShowSidenav();
+        if (show && sidenav.isOpen) {
             sidenav.close();
         }
-        if (!hide) {
-            sidenav.open();
+        if (show != width) {
+            this.props.showSidenavByWidth(show);
         }
     };
 
@@ -85,12 +89,12 @@ class Sidenav extends React.Component<SidenavProps, any> {
         } else {
             sidenav.open();
         }
-        this.props.actions.hideSidenav(isOpen);
+        this.props.showSidenavByUser(!isOpen);
     };
 
     render = () =>
         <ul id="slide-out" className="sidenav sidenav-fixed no-shadows"
-            style={this.props.sidenavHidden ? {display: 'none'} : undefined} ref={this.sidenav}>
+            style={this.props.sidenav.user ? undefined : {display: 'none'}} ref={this.sidenav}>
             <div className="sidenav-menu">
                 <a className="sidenav-icon sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light"
                    data-target="slide-out"
@@ -108,7 +112,7 @@ class Sidenav extends React.Component<SidenavProps, any> {
                             </Link>
                         </li>
                         {index < sidenavLinks.length - 1 && <li>
-                          <div className="divider grey darken-3"/>
+                            <div className="divider grey darken-3"/>
                         </li>}
                     </div>
                 )}
@@ -116,16 +120,13 @@ class Sidenav extends React.Component<SidenavProps, any> {
         </ul>
 }
 
-const mapStateToProps = (state: ReduxState) => (
+const mapStateToProps = (state: ReduxState): StateToProps => (
     {
-        sidenavHidden: state.ui.sidenav,
+        sidenav: state.ui.sidenav,
     }
 );
 
-const mapDispatchToProps = (dispatch: any) => (
-    {
-        actions: bindActionCreators({ hideSidenav }, dispatch),
-    }
-);
+const mapDispatchToProps = (dispatch: any): DispatchToProps =>
+    bindActionCreators({ showSidenavByUser, showSidenavByWidth }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sidenav);

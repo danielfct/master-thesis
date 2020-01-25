@@ -39,12 +39,14 @@ const configureStore = (preloadedState: any) =>  //TODO preloadedState type
             applyMiddleware(
                 thunk,
                 api,
-                createLogger(),
                 promise(),
-                loadingBarMiddleware()
+                loadingBarMiddleware({
+                    promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
+                }),
+                createLogger(),
             ),
-            DevTools.instrument()
+            DevTools.instrument(),
         )
     );
 
-export default configureStore
+export default configureStore;

@@ -23,13 +23,13 @@
  * SOFTWARE.
  */
 
-let root: JSX.Element;
+let Root: any;
 
 if (process.env.NODE_ENV === 'production') {
-    root = require('./Root.prod').default;
+    Root = require('./Root.prod').default as JSX.Element;
 } else {
-    root = require('./Root.dev').default;
+    Root = require('./Root.dev').default as JSX.Element;
 }
 
-export default root;
+export default Root;
 

@@ -24,23 +24,42 @@
 
 import IService from "../components/services/IService";
 import {CALL_API, Schemas} from "../middleware/api";
+import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
 
 export const SERVICE_REQUEST = 'SERVICE_REQUEST';
 export const SERVICE_SUCCESS = 'SERVICE_SUCCESS';
 export const SERVICE_FAILURE = 'SERVICE_FAILURE';
 
-export const loadServices = (id?: string | number) => (dispatch: any, getState: any) => {
-    const cached = !id ? getState().entities.services : getState().entities.services[id];
-    return cached ? null : dispatch(fetchServices());
+export const loadServices = (name?: string, requiredField = 'id') => (dispatch: any, getState: any) => {
+    let cached;
+    if (name) {
+        let entity = getState().entities.services[name];
+        cached = entity && entity.hasOwnProperty(requiredField);
+    }
+    else {
+        let entities = getState().entities.services;
+        cached = entities && entities.length && entities.every((service: IService) => service.hasOwnProperty(requiredField));
+    }
+    return cached ? null : dispatch(fetchServices(name));
 };
 
 const fetchServices = (id?: number | string) => ({
     [CALL_API]: {
         types: [ SERVICE_REQUEST, SERVICE_SUCCESS, SERVICE_FAILURE ],
-        endpoint: !id ? `services` : `services/${id}`,
+        /*  endpoint: !id ? `services` : `services/${id}`,TODO*/
+        endpoint: !id ? `services.json` : `service.json`,
         schema: !id ? Schemas.SERVICE_ARRAY : Schemas.SERVICE,
     }
 });
+
+export const SELECT_ENTITY = 'SELECT_ENTITY';
+
+export function selectEntity<T>(entity: T) {
+    return {
+        type: SELECT_ENTITY,
+        entity
+    }
+}
 
 /*export const RECEIVE_SERVICES = 'RECEIVE_SERVICES';
 function receiveServices(servicesJson: string) {
@@ -58,13 +77,7 @@ export function invalidateServices() {
     }
 }
 
-export const SELECT_SERVICE = 'SELECT_SERVICE';
-export function selectService(service: IService) {
-    return {
-        type: SELECT_SERVICE,
-        service
-    }
-}
+
 
 export const DELETE_SERVICE = 'DELETE_SERVICE';
 export function deleteService(service: IService) {
@@ -126,12 +139,21 @@ export const resetErrorMessage = () => ({
     type: RESET_ERROR_MESSAGE
 });
 
-export const SIDENAV_HIDE = 'SIDENAV_HIDE';
+export const SIDENAV_SHOW_USER = 'SIDENAV_SHOW_USER';
 
-export const hideSidenav = (hidden: boolean) => (
+export const showSidenavByUser = (value: boolean) => (
     {
-        type: SIDENAV_HIDE,
-        hidden
+        type: SIDENAV_SHOW_USER,
+        value
+    }
+);
+
+export const SIDENAV_SHOW_WIDTH = 'SIDENAV_SHOW_WIDTH';
+
+export const showSidenavByWidth = (value: boolean) => (
+    {
+        type: SIDENAV_SHOW_WIDTH,
+        value
     }
 );
 
@@ -141,5 +163,14 @@ export const updateSearch = (search: string) => (
     {
         type: SEARCH_UPDATE,
         search
+    }
+);
+
+export const BREADCRUMBS_UPDATE = 'BREADCRUMBS_UPDATE';
+
+export const updateBreadcrumbs = (breadcrumbs: IBreadcrumbs) => (
+    {
+        type: BREADCRUMBS_UPDATE,
+        breadcrumbs
     }
 );

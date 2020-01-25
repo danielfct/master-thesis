@@ -22,21 +22,24 @@
  * SOFTWARE.
  */
 
-import {applyMiddleware, compose, createStore} from "redux";
-import thunk from "redux-thunk";
-import {createLogger} from "redux-logger";
-import promise from "redux-promise-middleware";
-import {loadingBarMiddleware} from "react-redux-loading-bar";
-import rootReducer from "./reducers";
+import React from "react";
+import {Link} from "react-router-dom";
+import './Breadcrumbs.css';
 
-const createStoreWithMiddleware = compose(
-  applyMiddleware(
-    thunk,
-    createLogger(),
-    promise(),
-    loadingBarMiddleware())
-)(createStore);
+export type IBreadcrumbs = [ { title: string, link?: string } ];
 
-const store = createStoreWithMiddleware(rootReducer);
+interface Props {
+    breadcrumbs: IBreadcrumbs;
+}
 
-export default store;
+export default class Breadcrumbs extends React.Component<Props, {}> {
+    public render = () => {
+        return (<div>
+            {this.props.breadcrumbs.map(({title, link}, index) =>
+                link
+                    ? <Link key={index} className="breadcrumb white-text" to={link}>{title}</Link>
+                    : <span key={index} className="breadcrumb white-text">{title}</span>
+            )}
+        </div>)
+    }
+}

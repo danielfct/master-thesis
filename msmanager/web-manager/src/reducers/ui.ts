@@ -22,43 +22,76 @@
  * SOFTWARE.
  */
 
-import {RESET_ERROR_MESSAGE, SEARCH_UPDATE, SIDENAV_HIDE} from "../actions";
+import {
+    BREADCRUMBS_UPDATE,
+    RESET_ERROR_MESSAGE,
+    SEARCH_UPDATE, SELECT_ENTITY,
+    SIDENAV_SHOW_USER,
+    SIDENAV_SHOW_WIDTH
+} from "../actions";
 import {loadingBarReducer} from "react-redux-loading-bar";
+import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
+import { merge } from "lodash";
 
 export const loadingBar = loadingBarReducer;
 
-export const errorMessage = (state = null, action: {type: string, error: string}) => {
-    const { type, error } = action;
-    switch (type) {
-        case RESET_ERROR_MESSAGE:
-            return Object.assign({}, state, null);
-        default:
-            return state;
-    }
-};
-
-export const sidenav = (state = { hidden: window.innerWidth < 992 }, action: { type: string, hidden: boolean }) => {
-    const { type, hidden } = action;
-    switch (type) {
-        case SIDENAV_HIDE:
-            return {
-                ...state,
-                hidden
-            };
-        default:
-            return state;
-    }
-};
-
-export const search = (state = { value: "" }, action: { type: string, value: string}) => {
+export const sidenav = (
+    state = { user: true, width: window.innerWidth > 992 },
+    action: { type: string, value: boolean },
+) => {
     const { type, value } = action;
     switch (type) {
-        case SEARCH_UPDATE:
+        case SIDENAV_SHOW_USER:
             return {
                 ...state,
-                value
+                user: value
+            };
+        case SIDENAV_SHOW_WIDTH:
+            return {
+                ...state,
+                width: value
             };
         default:
             return state;
     }
 };
+
+export const search = (state = "", action: { type: string, search: string}) => {
+    const { type, search } = action;
+    switch (type) {
+        case SEARCH_UPDATE:
+            return search;
+        default:
+            return state;
+    }
+};
+
+export const breadcrumbs = (state = {}, action: { type: string, breadcrumbs: IBreadcrumbs}) => {
+    const { type, breadcrumbs } = action;
+    switch (type) {
+        case BREADCRUMBS_UPDATE:
+            return breadcrumbs;
+        default:
+            return state;
+    }
+};
+
+export const errorMessage = (state = null, action: {type: string, error: string}) => {
+    const { type, error } = action;
+    if (type === RESET_ERROR_MESSAGE) {
+        return null
+    } else if (error) {
+        return error
+    }
+    return state
+};
+
+export function select<T>(state = {}, action: {type: string, entity: T}) {
+    const { type, entity } = action;
+    switch (type) {
+        case SELECT_ENTITY:
+            return merge({}, state, entity);
+        default:
+            return state;
+    }
+}

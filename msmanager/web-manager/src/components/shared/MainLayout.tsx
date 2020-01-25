@@ -23,27 +23,35 @@
  */
 
 import React from 'react';
+import Breadcrumbs, {IBreadcrumbs} from "./Breadcrumbs";
 import {Link} from "react-router-dom";
 
 interface Props {
-    breadcrumbs: [ { title: string, link?: string } ];
+    title: string;
+    breadcrumbs?: IBreadcrumbs;
     children: React.ReactNode;
 }
 
 export default class MainLayout extends React.Component<Props, {}> {
-    public render = () =>
-        <div className="section row">
-            <div className="row">
-                <div className="col s12">
-                    {this.props.breadcrumbs.map(({title, link}, index) =>
-                        link
-                            ? <Link key={index} className="breadcrumb white-text" to={link}>{title}</Link>
-                            : <span key={index} className="breadcrumb white-text">{title}</span>
-                    )}
+    public render() {
+        const {title, children} = this.props;
+        let {breadcrumbs} = this.props;
+        if (breadcrumbs) {
+            breadcrumbs.push({title});
+        } else {
+            breadcrumbs = [{title}];
+        }
+        return (
+            <div className="section row">
+                <div className="row">
+                    <div className="col s12">
+                        <Breadcrumbs breadcrumbs={breadcrumbs}/>
+                    </div>
+                </div>
+                <div className='col s12 m12'>
+                    {children}
                 </div>
             </div>
-            <div className='col s12 m12'>
-                {this.props.children}
-            </div>
-        </div>;
+        )
+    }
 }

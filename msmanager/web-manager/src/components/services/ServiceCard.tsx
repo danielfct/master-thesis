@@ -31,32 +31,34 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import IService from "./IService";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import {selectEntity} from "../../actions";
 /*import {itemSelection} from "../../redux/reducers";*/
 
-/*interface DispatchToProps {
-    actions: { itemSelection: (item: IService) => void },
-}*/
+interface DispatchToProps {
+    selectEntity: (entity: {service: IService}) => void;
+}
 
 interface ServiceCardProps {
     service: IService;
 }
 
-type Props = /*DispatchToProps & */ServiceCardProps;
+type Props = DispatchToProps & ServiceCardProps;
 
-export default class ServiceCard extends React.Component<Props, {}> {
+class ServiceCard extends React.Component<Props, {}> {
 
-    private handleOnClick = () => {}
-      /*  this.props.actions.itemSelection(this.props.service);*/
+    private handleOnClick = () =>
+        this.props.selectEntity({service: this.props.service});
 
     public render = () =>
-        <div className='col s4'>
-            <div className='card grid-card'>
+        <div className='col s6 m4 l3'>
+            <div className='card grid-card hoverable'>
                 <PerfectScrollbar>
-                    <Link to={`/services/service/${this.props.service.id}`} onClick={this.handleOnClick}>
+                    <Link to={`/services/service/${this.props.service.serviceName}`} onClick={this.handleOnClick}>
                         <div className='card-content'>
                             {Object.entries(this.props.service)
                                 .filter(([key, _]) => key !== 'id')
-                                .map(([key, value]) => <CardItem key={key} label={camelCaseToSentenceCase(key)} value={value}/>)
+                                .map(([key, value]) =>
+                                    <CardItem key={key} label={camelCaseToSentenceCase(key)} value={value}/>)
                             }
                         </div>
                     </Link>
@@ -65,11 +67,7 @@ export default class ServiceCard extends React.Component<Props, {}> {
         </div>;
 }
 
-/*const mapDispatchToProps = (dispatch: any): DispatchToProps => (
-    {
-        actions: bindActionCreators({ itemSelection }, dispatch),
-    }
-);*/
+const mapDispatchToProps = (dispatch: any): DispatchToProps =>
+    bindActionCreators({ selectEntity }, dispatch);
 
-/*
-export default connect(null, mapDispatchToProps)(ServiceCard);*/
+export default connect(null, mapDispatchToProps)(ServiceCard);
