@@ -7,8 +7,12 @@ import Root from "./containers/Root";
 import {BrowserRouter} from "react-router-dom";
 import configureStore from "./store/configureStore";
 
-const store = configureStore();
+// TODO close sidenav on click link
+// TODO implement labelToIcon function
+// TODO fix tab when coming from services page
+// TODO fix breadcrumbs
 
+const store = configureStore();
 
 ReactDOM.render(
     <BrowserRouter>

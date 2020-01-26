@@ -32,6 +32,7 @@ import {connect} from "react-redux";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import FormPage from "../shared/FormPage";
 import {ReduxState} from "../../reducers";
+import {mapLabelToIcon} from "../../utils/image";
 
 interface StateToProps {
     service: IService;
@@ -56,9 +57,9 @@ class Service extends React.Component<Props, {}> {
             /!*this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}`); TODO*!/
             this.props.actions.getData(`/service.json`);
         }
-        this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}/dependencies`);*/
+        this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}/dependencies`);
         M.updateTextFields();
-        M.FormSelect.init(document.querySelectorAll('select'));
+        M.FormSelect.init(document.querySelectorAll('select'));*/
     };
 
     public componentDidUpdate = () => {
@@ -130,31 +131,32 @@ class Service extends React.Component<Props, {}> {
                           postUrl={'http://localhost/services'}
                           deleteUrl={`http://localhost/services/${this.props.service.id}`}>
                     <div className="row">
-                        <div className="col s12">
-                            <ul className="tabs">
-                                <li className="tab col s6"><a href="#details">Details</a></li>
-                                <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
-                            </ul>
-                        </div>
-                        <div id="details">
+                        <ul className="tabs">
+                            <li className="tab col s6"><a href="#details">Details</a></li>
+                            <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
+                        </ul>
+                        <div className="col s12" id="details">
                             {this.props.service &&
                             Object.entries(this.props.service)
                                 .filter(([key, _]) => key !== 'id')
                                 .map(([key, value], index) =>
                                     <div key={index} className="input-field col s12">
+                                        <i className="material-icons prefix">{mapLabelToIcon(key)}</i>
+                                        <label className="active" htmlFor={key}>{camelCaseToSentenceCase(key)}</label>
                                         {key !== 'serviceType'
-                                            ? <input /*disabled={!this.props.isEditing}*/ value={value} name={key} id={key}
-                                                                                          type={isNaN(value) ? "text" : "number"} autoComplete="off"/>
-                                            : <select /*disabled={!this.props.isEditing}*/ value={value} name={key} id={key}>
+                                            ? <input /*disabled={!this.props.isEditing}*/
+                                                value={value} name={key} id={key}
+                                                type={isNaN(value) ? "text" : "number"} autoComplete="off"/>
+                                            : <select /*disabled={!this.props.isEditing}*/
+                                                value={value} name={key} id={key}>
                                                 {/*//TODO get from database?*/}
-                                                <option>Choose service type</option>
+                                                <option disabled selected>Choose service type</option>
                                                 <option value='frontend'>Frontend</option>
                                                 <option value='backend'>Backend</option>
                                                 <option value='database'>Database</option>
                                                 <option value='system'>System</option>
                                             </select>
                                         }
-                                        <label htmlFor={key}>{camelCaseToSentenceCase(key)}</label>
                                     </div>
                                 )
                             }

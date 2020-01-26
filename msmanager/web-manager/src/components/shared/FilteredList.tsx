@@ -26,6 +26,7 @@ import React from "react";
 import {connect} from "react-redux";
 import {PagedList} from "./PagedList";
 import SimpleList from "./SimpleList";
+import {ReduxState} from "../../reducers";
 
 interface Props<T> {
     /*    isFetching: boolean;
@@ -38,7 +39,8 @@ interface Props<T> {
     pagesize?: number;
 }
 
-class GenericFilteredList<T> extends React.Component<Props<T>, any> {
+class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
+
     public render() {
         const {predicate, search, page, pagesize, ...otherprops} = this.props;
         let {list} = this.props;
@@ -51,9 +53,9 @@ class GenericFilteredList<T> extends React.Component<Props<T>, any> {
     }
 }
 
-const mapStateToProps = (state: any) => (
+const mapStateToProps = (state: ReduxState) => (
     {
-        search: state.ui.search
+        search: state.ui.search.toLowerCase()
     }
 );
 

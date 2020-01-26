@@ -88,20 +88,20 @@ export default class FormPage extends React.Component<Props, State> {
                 {
                     this.state.isEditing
                         ? <div>
-                            <div className="fixed-action-send-btn tooltipped" data-position="left" data-tooltip={'Send'}
-                                 onClick={this.onSubmitForm}>
-                                <a className="waves-effect waves-light btn-floating grey darken-3" type="submit">
-                                    <i className="material-icons right">send</i>
+                            <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip={'Cancel'}
+                                 onClick={this.onClickCancel}>
+                                <a className="waves-effect waves-light btn-floating red darken-4">
+                                    <i className="material-icons">cancel</i>
                                 </a>
                             </div>
-                            <div className="fixed-action-cancel-btn tooltipped" data-position="left" data-tooltip={'Cancel'}
-                                 onClick={this.onClickCancel}>
-                                <a className="waves-effect waves-light btn-floating grey darken-3">
-                                    <i className="large material-icons">cancel</i>
+                            <div className="fixed-action-btn tooltipped two" data-position="left" data-tooltip={'Send'}
+                                 onClick={this.onSubmitForm}>
+                                <a className="waves-effect waves-light btn-floating green darken-4" type="submit">
+                                    <i className="material-icons">send</i>
                                 </a>
                             </div>
                         </div>
-                        : <div className="fixed-action-edit-btn tooltipped"
+                        : <div className="fixed-action-btn tooltipped"
                                data-position="left" data-tooltip={`Edit ${this.props.title}`}
                                onClick={this.onClickEdit}>
                             <a className="waves-effect waves-light btn-floating grey darken-3">
@@ -123,7 +123,7 @@ export default class FormPage extends React.Component<Props, State> {
                     </div>*/
                 }
             </div>
-            <form className="form" onSubmit={this.onSubmitForm}>
+            <form className="form container" onSubmit={this.onSubmitForm}>
                 {this.props.children}
             </form>
         </MainLayout>

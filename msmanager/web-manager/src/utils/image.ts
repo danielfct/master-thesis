@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 msmanager
+ * Copyright (c) 2020 micro-manager
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,41 +22,4 @@
  * SOFTWARE.
  */
 
-.fixed-action-send-btn {
-    position: absolute;
-    top: 60px;
-    right: 70px;
-    padding-top: 15px;
-    margin-bottom: 0;
-    z-index: 997;
-}
-
-.fixed-action-edit-btn {
-    position: absolute;
-    top: 60px;
-    right: 23px;
-    padding-top: 15px;
-    margin-bottom: 0;
-    z-index: 997;
-}
-
-.fixed-action-cancel-btn {
-    position: absolute;
-    top: 60px;
-    right: 50px;
-    padding-top: 15px;
-    margin-bottom: 0;
-    z-index: 997;
-}
-
-.fixed-action-delete-btn {
-    position: absolute;
-    top: 60px;
-    right: 23px;
-    padding-top: 15px;
-    margin-bottom: 0;
-    z-index: 997;
-}
-
-
-
+export const mapLabelToIcon = (label: string): string => "account_circle"; //TODO
