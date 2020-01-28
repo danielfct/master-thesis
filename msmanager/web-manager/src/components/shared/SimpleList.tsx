@@ -23,30 +23,64 @@
  */
 
 import * as React from "react";
+import {ReduxState} from "../../reducers";
+import {connect} from "react-redux";
 
-interface Props<T> {
-/*    isFetching: boolean;
-    loadingLabel: string;*/
+interface StateToProps {
+    isLoading: boolean;
+}
+
+interface GenericSimpleListProps<T> {
+    empty: string | (() => JSX.Element);
     list: T[];
     show: (element: T) => JSX.Element;
 }
 
-const SimpleList = function <T>({/*isFetching, loadingLabel,*/ list, show}: Props<T>) {
-    const isEmpty = list.length === 0;
-   /* if (isEmpty && isFetching) {
-        return <h2><i>{loadingLabel}</i></h2>
-    }*/
-    if (isEmpty) {
-        return <h1><i>Nothing to show...</i></h1>
-    }
-    return (
-        <div>
-            {list.map((c, i) => (
-                <div key={i}>
-                    {show(c)}
-                </div>
-            ))}
-        </div>);
-};
+type Props<T> = StateToProps & GenericSimpleListProps<T>;
 
-export default SimpleList;
+class GenericSimpleList<T> extends React.Component<Props<T>, {}> {
+    public render = () => {
+        const {empty, isLoading, list, show} = this.props;
+        const isEmpty = list.length === 0;
+        if (isEmpty && isLoading) {
+            return <div className="center-horizontal">
+                <div className="center-vertical">
+                <div className="preloader-wrapper active">
+                    <div className="spinner-layer spinner-red-only">
+                        <div className="circle-clipper left">
+                            <div className="circle"/>
+                        </div>
+                        <div className="gap-patch">
+                            <div className="circle"/>
+                        </div>
+                        <div className="circle-clipper right">
+                            <div className="circle"/>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>;
+        }
+        if (isEmpty) {
+            return typeof empty === 'string' ? <h1><i>{empty}</i></h1> : <div>{empty()}</div>;
+        }
+        return (
+            <div>
+                {list.map((c, i) => (
+                    <div key={i}>
+                        {show(c)}
+                    </div>
+                ))}
+            </div>);
+    }
+}
+
+const mapStateToProps = (state: ReduxState): StateToProps => (
+    {
+        isLoading: state.ui.loading
+    }
+);
+
+export default function SimpleList<T>() {
+    return connect(mapStateToProps)(GenericSimpleList as new(props: Props<T>) => GenericSimpleList<T>);
+}

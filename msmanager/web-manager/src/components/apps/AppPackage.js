@@ -55,8 +55,8 @@ export default class AppPackage extends React.Component {
   loadApps = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostapps',
-      data => this.setState({ data: data, loading: false })
+        'http://localhostapps',
+        data => this.setState({ data: data, loading: false })
     );
   };
 
@@ -73,17 +73,17 @@ export default class AppPackage extends React.Component {
   };
 
   addApp = () =>
-    this.setState({ data: {id: 0, appname: '', ...this.state.data}, showAdd: false });
+      this.setState({ data: {id: 0, appname: '', ...this.state.data}, showAdd: false });
 
   componentWillUnmount = () =>
-    this.state.tooltipInstances[0].destroy();
+      this.state.tooltipInstances[0].destroy();
 
-  render = () => {
-    return (
-      <MainLayout title='Apps'>
+  /*<MainLayout title={{title:'Apps'}}>*/
+  render = () =>
+      <MainLayout>
         {this.state.data && this.state.data.map((appPackage, index) => (
-          <AppPackageCard key={appPackage.id} index={index} appPackage={appPackage} onRemove={this.loadApps}
-                          updateNewApp={this.updateNewApp}/>
+            <AppPackageCard key={appPackage.id} index={index} appPackage={appPackage} onRemove={this.loadApps}
+                            updateNewApp={this.updateNewApp}/>
         ))}
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add app package">
           <button disabled={!this.state.showAdd} className="waves-effect waves-light btn-floating grey darken-3" onClick={this.addApp}>
@@ -91,6 +91,4 @@ export default class AppPackage extends React.Component {
           </button>
         </div>
       </MainLayout>
-    );
-  };
 }

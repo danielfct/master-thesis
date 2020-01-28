@@ -174,3 +174,14 @@ export const updateBreadcrumbs = (breadcrumbs: IBreadcrumbs) => (
         breadcrumbs
     }
 );
+
+/*
+export const BREADCRUMBS_ADD = 'BREADCRUMBS_ADD';
+
+export const addBreadcrumb = (title: string, link?: string) => (
+    {
+        type: BREADCRUMBS_ADD,
+        title,
+        link
+    }
+);*/

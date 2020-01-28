@@ -101,8 +101,9 @@ export default class EdgeHosts extends React.Component {
                       onRemove={this.loadHosts}/>
       ));
     }
+ {/*   <MainLayout title={{title:'Edge hosts'}}>*/}
     return (
-      <MainLayout title='Edge hosts'>
+      <MainLayout>
         {edgeHostsNodes}
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add edge host">
           <button disabled={!this.state.showAdd}

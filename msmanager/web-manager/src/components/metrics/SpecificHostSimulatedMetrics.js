@@ -48,8 +48,8 @@ export default class SpecificHostSimulatedMetrics extends React.Component {
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostmetrics/simulated/hosts/specific',
-      data => this.setState({ data: data, loading: false })
+        'http://localhostmetrics/simulated/hosts/specific',
+        data => this.setState({ data: data, loading: false })
     );
   };
 
@@ -57,24 +57,25 @@ export default class SpecificHostSimulatedMetrics extends React.Component {
     let simulatedMetricsNodes;
     if (this.state.data) {
       simulatedMetricsNodes = this.state.data.map((simulatedMetric, index) => (
-        <SpecificHostSimulatedMetricsCard key={simulatedMetric.id}
-                                          simulatedMetric={simulatedMetric}
-                                          reloadSimulatedMetrics={this.loadSimulatedMetrics}/>
+          <SpecificHostSimulatedMetricsCard key={simulatedMetric.id}
+                                            simulatedMetric={simulatedMetric}
+                                            reloadSimulatedMetrics={this.loadSimulatedMetrics}/>
       ));
     }
     return simulatedMetricsNodes;
   };
 
+  /*<MainLayout title={{title:'Specific host simulated metrics'}}>*/
   render = () => (
-    <MainLayout title='Specific host simulated metrics'>
-      {this.renderSimulatedMetrics()}
-      <div className="fixed-action-btn tooltipped" data-position="left"
-           data-tooltip="Add specific host simulated metric">
-        <Link className="waves-effect waves-light btn-floating btn-large grey darken-3"
-              to='/metrics/simulated/hosts/specific/metric'>
-          <i className="large material-icons">add</i>
-        </Link>
-      </div>
-    </MainLayout>
+      <MainLayout>
+        {this.renderSimulatedMetrics()}
+        <div className="fixed-action-btn tooltipped" data-position="left"
+             data-tooltip="Add specific host simulated metric">
+          <Link className="waves-effect waves-light btn-floating btn-large grey darken-3"
+                to='/metrics/simulated/hosts/specific/metric'>
+            <i className="large material-icons">add</i>
+          </Link>
+        </div>
+      </MainLayout>
   );
 }

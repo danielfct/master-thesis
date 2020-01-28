@@ -41,23 +41,24 @@ export default class Rules extends React.Component {
   loadRules = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhost/rules',
-      data => this.setState({ data: data, loading: false })
+        'http://localhost/rules',
+        data => this.setState({ data: data, loading: false })
     );
   };
 
+  /*<MainLayout title={{title:'Rules'}}>*/
   render = () => {
     return (
-      <MainLayout title='Rules'>
-        {this.state.data && this.state.data.map(rule => (
-          <RuleCard viewDetails={true} key={rule.id} rule={rule}/>
-        ))}
-        <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="New rule">
-          <Link className="waves-effect waves-light btn-floating grey darken-3" to='/rules/rule'>
-            <i className="large material-icons">add</i>
-          </Link>
-        </div>
-      </MainLayout>
+        <MainLayout>
+          {this.state.data && this.state.data.map(rule => (
+              <RuleCard viewDetails={true} key={rule.id} rule={rule}/>
+          ))}
+          <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="New rule">
+            <Link className="waves-effect waves-light btn-floating grey darken-3" to='/rules/rule'>
+              <i className="large material-icons">add</i>
+            </Link>
+          </div>
+        </MainLayout>
     );
   };
 }

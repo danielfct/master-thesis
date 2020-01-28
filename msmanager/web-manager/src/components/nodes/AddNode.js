@@ -121,8 +121,9 @@ export default class AddNode extends React.Component {
     if (this.state.formSubmit) {
       return <Redirect to='/nodes'/>;
     }
+    {/*<MainLayout title={{title:'Add node'}}>*/}
     return (
-      <MainLayout title='Add node' breadcrumbs={this.state.breadcrumbs}>
+      <MainLayout>
         <div className='row'>
           <div className='col s12'>
             <div className='card'>

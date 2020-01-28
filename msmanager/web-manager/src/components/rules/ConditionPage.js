@@ -228,9 +228,9 @@ export default class ConditionPage extends React.Component {
       </div>
     );
   };
-
+/*<MainLayout title={{title:'Condition detail'}}>*/
   render = () => (
-    <MainLayout title='Condition detail' breadcrumbs={this.state.breadcrumbs}>
+    <MainLayout>
       {this.renderConditionForm()}
     </MainLayout>
   );

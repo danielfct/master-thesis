@@ -47,8 +47,9 @@ export default class Conditions extends React.Component {
   };
 
   render = () => {
+   {/* <MainLayout title={{title:'Conditions'}}>*/}
     return (
-      <MainLayout title='Conditions'>
+     <MainLayout>
         <div className="right-align">
           <div className="row">
             <div className="col s12">

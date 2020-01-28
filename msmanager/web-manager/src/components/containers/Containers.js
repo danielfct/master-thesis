@@ -81,9 +81,10 @@ export default class Containers extends React.Component {
     this.setState({ data: newData }, () => this.applyFilter());
   };
 
+/*<MainLayout title={{title:'Containers'}}>*/
   render = () => {
     return (
-      <MainLayout title='Containers'>
+        <MainLayout>
         <div className="input-field col s10">
           <input onChange={this.onChangeFilter} value={this.state.filter} type="text" name="filter" id="filter" autoComplete="off"/>
           <label htmlFor="filter">Filter by name</label>

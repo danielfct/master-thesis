@@ -65,16 +65,16 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
   loadNodes = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostnodes',
-      data => this.setState({ nodes: data, loading: false })
+        'http://localhostnodes',
+        data => this.setState({ nodes: data, loading: false })
     );
   };
 
   loadFields = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostrules/fields',
-      data => this.setState({ fields: data, loading: false })
+        'http://localhostrules/fields',
+        data => this.setState({ fields: data, loading: false })
     );
   };
 
@@ -82,8 +82,8 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     if (this.state.id !== 0) {
       this.setState({ loading: true });
       getData(
-        `http://localhostmetrics/simulated/hosts/specific/${this.state.id}`,
-        data => this.setState({ values: data, loading: false })
+          `http://localhostmetrics/simulated/hosts/specific/${this.state.id}`,
+          data => this.setState({ values: data, loading: false })
       );
     }
   };
@@ -93,7 +93,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     if (this.state.nodes) {
       nodes = this.state.nodes.map(function (node) {
         return (
-          <option key={node.hostname} value={node.hostname}>{node.hostname}</option>
+            <option key={node.hostname} value={node.hostname}>{node.hostname}</option>
         );
       });
       return nodes;
@@ -105,7 +105,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     if (this.state.fields) {
       fieldsNodes = this.state.fields.map(function (field) {
         return (
-          <option key={field.id} value={field.fieldName}>{field.fieldName}</option>
+            <option key={field.id} value={field.fieldName}>{field.fieldName}</option>
         );
       });
       return fieldsNodes;
@@ -115,12 +115,12 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
   onSubmitForm = event => {
     event.preventDefault();
     postData(
-      `http://localhostmetrics/simulated/hosts/specific/${this.state.id}`,
-      event.target[0].value,
-      data => {
-        this.setState({ isEdit: false, formSubmit: true });
-        M.toast({ html: '<div>Specific host simulated metric saved successfully!</div>' });
-      });
+        `http://localhostmetrics/simulated/hosts/specific/${this.state.id}`,
+        event.target[0].value,
+        data => {
+          this.setState({ isEdit: false, formSubmit: true });
+          M.toast({ html: '<div>Specific host simulated metric saved successfully!</div>' });
+        });
   };
 
   onInputChange = event => {
@@ -134,45 +134,45 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     const nodesSelect = this.renderNodesSelect();
     const fieldsSelect = this.renderFieldsSelect();
     return (
-      <form id="form-service" onSubmit={this.onSubmitForm}>
-        <div className="input-field col s12">
-          <select value={this.state.values.hostname} onChange={this.onInputChange} name="hostname" id="hostname">
-            <option value="" disabled="disabled">Choose host</option>
-            {nodesSelect}
-          </select>
-          <label htmlFor="hostname">Hostname</label>
-        </div>
-        <div className="input-field col s12">
-          <select value={this.state.values.field} onChange={this.onInputChange} name="field" id="field">
-            <option value="" disabled="disabled">Choose field</option>
-            {fieldsSelect}
-          </select>
-          <label htmlFor="field">Field</label>
-        </div>
-        <div className="input-field col s12">
-          <input value={this.state.values.minValue} onChange={this.onInputChange} type="number" name="minValue"
-                 id="minValue" autoComplete="off"/>
-          <label htmlFor="minValue">Minimum value</label>
-        </div>
-        <div className="input-field col s12">
-          <input value={this.state.values.maxValue} onChange={this.onInputChange} type="number" name="maxValue"
-                 id="maxValue" autoComplete="off"/>
-          <label htmlFor="maxValue">Maximum value</label>
-        </div>
-        <div className="input-field col s12">
-          <select value={this.state.values.override} onChange={this.onInputChange} name="override" id="override">
-            <option value="" disabled="disabled">Choose override</option>
-            <option value='true'>True</option>
-            <option value='false'>False</option>
-          </select>
-          <label htmlFor="override">Override</label>
-        </div>
+        <form id="form-service" onSubmit={this.onSubmitForm}>
+          <div className="input-field col s12">
+            <select value={this.state.values.hostname} onChange={this.onInputChange} name="hostname" id="hostname">
+              <option value="" disabled="disabled">Choose host</option>
+              {nodesSelect}
+            </select>
+            <label htmlFor="hostname">Hostname</label>
+          </div>
+          <div className="input-field col s12">
+            <select value={this.state.values.field} onChange={this.onInputChange} name="field" id="field">
+              <option value="" disabled="disabled">Choose field</option>
+              {fieldsSelect}
+            </select>
+            <label htmlFor="field">Field</label>
+          </div>
+          <div className="input-field col s12">
+            <input value={this.state.values.minValue} onChange={this.onInputChange} type="number" name="minValue"
+                   id="minValue" autoComplete="off"/>
+            <label htmlFor="minValue">Minimum value</label>
+          </div>
+          <div className="input-field col s12">
+            <input value={this.state.values.maxValue} onChange={this.onInputChange} type="number" name="maxValue"
+                   id="maxValue" autoComplete="off"/>
+            <label htmlFor="maxValue">Maximum value</label>
+          </div>
+          <div className="input-field col s12">
+            <select value={this.state.values.override} onChange={this.onInputChange} name="override" id="override">
+              <option value="" disabled="disabled">Choose override</option>
+              <option value='true'>True</option>
+              <option value='false'>False</option>
+            </select>
+            <label htmlFor="override">Override</label>
+          </div>
 
-        <button className="btn waves-effect waves-light" type="submit" name="action">
-          Save
-          <i className="material-icons right">send</i>
-        </button>
-      </form>
+          <button className="btn waves-effect waves-light" type="submit" name="action">
+            Save
+            <i className="material-icons right">send</i>
+          </button>
+        </form>
     );
   };
 
@@ -180,8 +180,9 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     if (this.state.formSubmit) {
       return <Redirect to='/metrics/simulated/hosts/specific'/>;
     }
-    return (
-      <MainLayout title='Specific host simulated metric detail' breadcrumbs={this.state.breadcrumbs}>
+   {/* <MainLayout title={{title:'Specific host simulated metric detail'}}>*/}
+      return (
+      <MainLayout>
         <div className='row'>
           <div className='col s12'>
             <div className='card'>
@@ -192,6 +193,6 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
           </div>
         </div>
       </MainLayout>
-    );
-  };
-}
+      );
+      };
+      }

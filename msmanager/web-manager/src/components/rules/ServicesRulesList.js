@@ -42,36 +42,37 @@ export default class ServicesRulesList extends React.Component {
   loadServices = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhost/services',
-      data => {
-        this.setState({ services: data, loading: false });
-      });
+        'http://localhost/services',
+        data => {
+          this.setState({ services: data, loading: false });
+        });
   };
 
+  /* <MainLayout title={{title: 'Services rules'}}>*/
   render = () => (
-    <MainLayout title='Services rules'>
-      {this.state.services && this.state.services.map(service => (
-        <div key={service.id} className='row'>
-          <div className='col s12'>
-            <div className='card'>
-              <div className='card-content'>
-                <div className="right-align">
-                  <div className="row">
-                    <div className="col s12">
-                      <Link className="waves-effect waves-light btn-small"
-                            to={'/rules/services/service/' + service.id}>
-                        View details
-                      </Link>
+      <MainLayout>
+        {this.state.services && this.state.services.map(service => (
+            <div key={service.id} className='row'>
+              <div className='col s12'>
+                <div className='card'>
+                  <div className='card-content'>
+                    <div className="right-align">
+                      <div className="row">
+                        <div className="col s12">
+                          <Link className="waves-effect waves-light btn-small"
+                                to={'/rules/services/' + service.id}>
+                            View details
+                          </Link>
+                        </div>
+                      </div>
                     </div>
+                    <CardItem label='Service' value={service.serviceName}/>
+                    <ServiceRules service={service}/>
                   </div>
                 </div>
-                <CardItem label='Service' value={service.serviceName}/>
-                <ServiceRules service={service}/>
               </div>
             </div>
-          </div>
-        </div>
-      ))}
-    </MainLayout>
+        ))}
+      </MainLayout>
   );
 }

@@ -92,7 +92,7 @@ class Root extends React.Component<Props, {}> {
                 <main>
                     <Route exact path="/" component={Landing}/>
                     <Route exact path="/services" component={Services}/>
-                    <Route exact path="/services/service/:name?" component={Service}/>
+                    <Route exact path="/services/:name?" component={Service}/>
                     <Route exact path="/apps" component={AppPackage}/>
                     <Route exact path="/hosts/edge" component={EdgeHosts}/>
                     <Route exact path="/containers" component={Containers}/>

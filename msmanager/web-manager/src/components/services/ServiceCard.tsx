@@ -53,7 +53,7 @@ class ServiceCard extends React.Component<Props, {}> {
         <div className='col s6 m4 l3'>
             <div className='card grid-card hoverable'>
                 <PerfectScrollbar>
-                    <Link to={`/services/service/${this.props.service.serviceName}`} onClick={this.handleOnClick}>
+                    <Link to={`/services/${this.props.service.serviceName}`} onClick={this.handleOnClick}>
                         <div className='card-content'>
                             {Object.entries(this.props.service)
                                 .filter(([key, _]) => key !== 'id')

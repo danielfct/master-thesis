@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-import React from 'react';
+import React, {createRef} from 'react';
 import M from 'materialize-css';
-import {Redirect, RouteComponentProps} from 'react-router';
+import {Redirect, RouteComponentProps, withRouter} from 'react-router';
 import {getData} from "../../utils/data";
 import IService from "./IService";
 import {bindActionCreators} from "redux";
@@ -33,6 +33,7 @@ import {camelCaseToSentenceCase} from "../../utils/text";
 import FormPage from "../shared/FormPage";
 import {ReduxState} from "../../reducers";
 import {mapLabelToIcon} from "../../utils/image";
+import {IBreadcrumbs} from "../shared/Breadcrumbs";
 
 interface StateToProps {
     service: IService;
@@ -41,32 +42,44 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-    actions: { getData: (url: string) => void },
+    getData: (url: string) => void;
 }
 
-interface MatchParams {
-    id: string;
+/*interface RouteProps extends RouteComponentProps<{}> {
+    title: [string | {title: string}];
+}*/
+
+type Props = StateToProps & DispatchToProps;/* & RouteProps;*/
+
+interface State {
+    service: IService;
 }
 
-type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
+class Service extends React.Component<Props, State> {
 
-class Service extends React.Component<Props, {}> {
+    constructor(props: Props) {
+        super(props);
+        this.state = { service: props.service };
+    }
 
-    public componentDidMount = () => {
-        /*if (!this.props.service) {
-            /!*this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}`); TODO*!/
-            this.props.actions.getData(`/service.json`);
-        }
-        this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}/dependencies`);
+    private tabs = createRef<HTMLUListElement>();
+    private dropdown = createRef<HTMLSelectElement>();
+
+    /*  public componentDidMount = () => {
+          if (!this.props.service) {
+              /!*this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}`); TODO*!/
+              this.props.actions.getData(`/service.json`);
+          }
+          this.props.actions.getData(`http://localhost/services/${this.props.match.params.id}/dependencies`);
+          M.updateTextFields();
+          M.FormSelect.init(document.querySelectorAll('select'));
+    };*/
+
+    /* public componentDidUpdate = () => {
         M.updateTextFields();
-        M.FormSelect.init(document.querySelectorAll('select'));*/
-    };
-
-    public componentDidUpdate = () => {
-        /* M.updateTextFields();
          M.Collapsible.init(document.querySelectorAll('.collapsible'));
-         M.FormSelect.init(document.querySelectorAll('select'));*/
-    };
+         M.FormSelect.init(document.querySelectorAll('select'));
+    };*/
 
     /*renderDependencies = () => {
         if (this.state.loadedDependencies) {
@@ -120,24 +133,41 @@ class Service extends React.Component<Props, {}> {
             });
     };*/
 
+    public componentDidMount(): void {
+        M.Tabs.init(this.tabs.current as Element);
+        M.FormSelect.init(this.dropdown.current as Element);
+    }
+
+    private onChange = ({target:{id, value}}:any) => {
+        console.log(id + " " + value);
+        this.setState(prevState => ({
+            service: {
+                ...prevState.service,
+                [id]: value
+            }
+        }), () => console.log(this.state));
+    };
+
     public render = () => {
         /*if (this.state.isDeleted) {
             return <Redirect to='/services'/>; TODO
         }*/
+        const {service} = this.props;
+        const isNew = !service;
         return (
             <div>
-                <FormPage title={this.props.service.serviceName}
-                          breadcrumbs={[{ title: 'Services', link: '/services' }]}
+                <FormPage isNew={isNew}
                           postUrl={'http://localhost/services'}
-                          deleteUrl={`http://localhost/services/${this.props.service.id}`}>
+                          deleteUrl={isNew ? undefined : `http://localhost/services/${service.id}`}
+                >
                     <div className="row">
-                        <ul className="tabs">
-                            <li className="tab col s6"><a href="#details">Details</a></li>
+                        <ul className="tabs" ref={this.tabs}>
+                            <li className="tab col s6 active"><a href="#details">Details</a></li>
                             <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
                         </ul>
                         <div className="col s12" id="details">
-                            {this.props.service &&
-                            Object.entries(this.props.service)
+                            {service &&
+                            Object.entries(this.state.service)
                                 .filter(([key, _]) => key !== 'id')
                                 .map(([key, value], index) =>
                                     <div key={index} className="input-field col s12">
@@ -146,11 +176,13 @@ class Service extends React.Component<Props, {}> {
                                         {key !== 'serviceType'
                                             ? <input /*disabled={!this.props.isEditing}*/
                                                 value={value} name={key} id={key}
-                                                type={isNaN(value) ? "text" : "number"} autoComplete="off"/>
+                                                type={!value || isNaN(value) ? "text" : "number"} autoComplete="off"
+                                                onChange={this.onChange}/>
                                             : <select /*disabled={!this.props.isEditing}*/
-                                                value={value} name={key} id={key}>
+                                                defaultValue={value || "Choose service type"} name={key} id={key}
+                                                ref={this.dropdown}
+                                                onChange={this.onChange}>
                                                 {/*//TODO get from database?*/}
-                                                <option disabled selected>Choose service type</option>
                                                 <option value='frontend'>Frontend</option>
                                                 <option value='backend'>Backend</option>
                                                 <option value='database'>Database</option>
@@ -161,6 +193,7 @@ class Service extends React.Component<Props, {}> {
                                 )
                             }
                         </div>
+                        <div id="dependencies">TODO</div>
                     </div>
                 </FormPage>
             </div>
@@ -193,15 +226,11 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
     }
 );
 
-const mapDispatchToProps = (dispatch: any): DispatchToProps => (
-    {
-        actions: bindActionCreators({ getData }, dispatch),
-    }
-);
-
-export default connect(mapStateToProps, mapDispatchToProps)(Service);
+const mapDispatchToProps = (dispatch: any): DispatchToProps =>
+    bindActionCreators({ getData }, dispatch);
 
 
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Service));
 
 
 /*

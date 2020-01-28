@@ -28,8 +28,9 @@ import { Link } from 'react-router-dom';
 import GenericHostRules from './GenericHostRules';
 
 export default class GenericHostsRulesList extends React.Component {
+/*<MainLayout title={{title:'Generic hosts rules'}}>*/
   render = () => (
-    <MainLayout title={'Generic hosts rules'}>
+   <MainLayout>
       <div className="right-align">
         <div className="row">
           <div className="col s12">

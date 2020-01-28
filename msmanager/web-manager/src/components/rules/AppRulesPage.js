@@ -156,8 +156,9 @@ export default class AppRulesPage extends React.Component {
     );
   };
 
+/*<MainLayout title={{title:'App rules detail'}}>*/
   render = () => (
-    <MainLayout title='App rules detail' breadcrumbs={this.state.breadcrumbs}>
+  <MainLayout>
       <div className='row'>
         <div className="input-field col s12">
           <input disabled={true} value={this.state.app.appName} name="appName" id="appName" type="text"/>

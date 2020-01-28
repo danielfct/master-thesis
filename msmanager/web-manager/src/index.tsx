@@ -7,10 +7,9 @@ import Root from "./containers/Root";
 import {BrowserRouter} from "react-router-dom";
 import configureStore from "./store/configureStore";
 
-// TODO close sidenav on click link
 // TODO implement labelToIcon function
-// TODO fix tab when coming from services page
-// TODO fix breadcrumbs
+// TODO hide search bar when not needed
+// TODO push footer to end of page
 
 const store = configureStore();
 

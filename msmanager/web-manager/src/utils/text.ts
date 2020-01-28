@@ -27,3 +27,6 @@ export const camelCaseToSentenceCase = (text: string): string => {
     sentenceCase = sentenceCase.charAt(0).toUpperCase() + sentenceCase.slice(1);
     return sentenceCase;
 };
+
+export const capitalize = (text: string): string =>
+    text.charAt(0).toUpperCase() + text.substring(1);

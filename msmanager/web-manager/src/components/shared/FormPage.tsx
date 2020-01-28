@@ -23,108 +23,114 @@
  */
 
 import MainLayout from "./MainLayout";
-import React, {FormEvent} from "react";
-import {deleteData, postData} from "../../utils/data";
+import React, {createRef, FormEvent} from "react";
+import {deleteData} from "../../utils/data";
 import M from "materialize-css";
 import './FormPage.css';
+import {RouteComponentProps, withRouter} from "react-router";
 
-interface Props {
-    title: string;
-    breadcrumbs: [ { title: string, link: string } ];
+interface FormPageProps {
     postUrl: string;
-    deleteUrl: string;
+    deleteUrl?: string;
+    isNew?: boolean;
 }
+
+type Props = FormPageProps & RouteComponentProps;
 
 interface State {
     isEditing: boolean;
 }
 
-export default class FormPage extends React.Component<Props, State> {
+class FormPage extends React.Component<Props, State> {
+
+    private fab = createRef<HTMLDivElement>();
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            isEditing: false
+            isEditing: this.props.isNew || false,
         };
     }
 
-    onClickEdit = () => {
-        this.setState({ isEditing: true });
-    };
+    public componentDidMount(): void {
+        M.FloatingActionButton.init(this.fab.current as Element, {
+            direction: 'left',
+            hoverEnabled: false
+        });
+    }
 
-    onClickCancel = () => {
-        this.setState({ isEditing: false });
-    };
+    private onClickEdit = (): void =>
+        this.setState({ isEditing: !this.state.isEditing });
 
-    onClickDelete = () => {
+    private onClickDelete = (): void => {
         deleteData(
-            this.props.deleteUrl,
+            this.props.deleteUrl || '',
             () => {
                 /*this.setState({ isDeleted: true });*/
-                M.toast({ html: `<div>${this.props.title} removed successfully!</div>` });
+                M.toast({ html: `<div>${"TODO"} removed successfully!</div>` });
             });
     };
 
-    onSubmitForm = (event: FormEvent) => {
+    private onSubmitForm = (event: FormEvent): void => {
         event.preventDefault();
-        // @ts-ignore TODO
+        /*// @ts-ignore TODO
         let values = event.target[0].value;
         postData(
             this.props.postUrl,
             values,
             data => {
-                /* if (newService.id === 0) {
+                /!* if (newService.id === 0) {
                      const title = document.title;
                      window.history.replaceState({}, title, '/services/service/' + data);
-                 }*/
+                 }*!/
                 console.log(data);
                 M.toast({ html: `<div>${this.props.title} saved successfully!</div>` });
-            });
+            });*/
     };
 
-    render = () =>
-        <MainLayout title={this.props.title} breadcrumbs={this.props.breadcrumbs}>
-            <div>
-                {
-                    this.state.isEditing
-                        ? <div>
-                            <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip={'Cancel'}
-                                 onClick={this.onClickCancel}>
-                                <a className="waves-effect waves-light btn-floating red darken-4">
-                                    <i className="material-icons">cancel</i>
-                                </a>
-                            </div>
-                            <div className="fixed-action-btn tooltipped two" data-position="left" data-tooltip={'Send'}
-                                 onClick={this.onSubmitForm}>
-                                <a className="waves-effect waves-light btn-floating green darken-4" type="submit">
-                                    <i className="material-icons">send</i>
-                                </a>
-                            </div>
-                        </div>
-                        : <div className="fixed-action-btn tooltipped"
-                               data-position="left" data-tooltip={`Edit ${this.props.title}`}
-                               onClick={this.onClickEdit}>
-                            <a className="waves-effect waves-light btn-floating grey darken-3">
-                                {/*TODO use grid instead of fixed position*/}
-                                <i className="large material-icons">edit</i>
-                            </a>
-                        </div>
-                }
-                {
-                    /*this.props.item.id !== 0 &&
-                    <div>
-                      <div className="fixed-action-delete-btn tooltipped" data-position="left"
-                           data-tooltip={`Delete ${this.props.title}`}
-                           onClick={this.onClickDelete}>
-                        <a className="waves-effect waves-light btn-floating grey darken-3">
-                          <i className="large material-icons">delete</i>
+    public render = () => {
+        const {isEditing} = this.state;
+        const {isNew, children} = this.props;
+        return <MainLayout>
+            {isNew
+                ? <div className="fixed-action-btn tooltipped"
+                       data-position="left" data-tooltip="Save"
+                       onClick={this.onSubmitForm}>
+                    <a className="waves-effect waves-light btn-floating green darken-4" type="submit">
+                        <i className="material-icons">save</i>
+                    </a>
+                </div>
+                : <div>
+                    <div className="fixed-action-small-btn tooltipped slide"
+                         data-position="bottom" data-tooltip="Save"
+                         onClick={this.onSubmitForm}
+                         style={isEditing ? {transform: "translate(-85px, 0)"} : {transform: ""}}>
+                        <a className="waves-effect waves-light btn-floating btn-small green darken-4" type="submit">
+                            <i className="material-icons">save</i>
                         </a>
-                      </div>
-                    </div>*/
-                }
-            </div>
+                    </div>
+                    <div className="fixed-action-small-btn tooltipped slide"
+                         data-position="bottom" data-tooltip="Delete"
+                         onClick={this.onClickDelete}
+                         style={isEditing ? {transform: "translate(-44px, 0)"} : {transform: ""}}>
+                        <a className="waves-effect waves-light btn-floating btn-small red darken-4">
+                            <i className="material-icons">delete</i>
+                        </a>
+                    </div>
+                    <div className="fixed-action-btn tooltipped"
+                         data-position="bottom" data-tooltip="Edit"
+                         onClick={this.onClickEdit}>
+                        <a className="waves-effect waves-light btn-floating grey darken-3">
+                            <i className="large material-icons">edit</i>
+                        </a>
+                    </div>
+                </div>
+            }
             <form className="form container" onSubmit={this.onSubmitForm}>
-                {this.props.children}
+                {children}
             </form>
         </MainLayout>
+    }
 }
+
+export default withRouter(FormPage);

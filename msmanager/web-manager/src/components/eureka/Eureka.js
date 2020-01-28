@@ -169,8 +169,9 @@ export default class EurekaPage extends React.Component {
     if (this.state.formSubmit) {
       return <Redirect to='/' />;
     }
+{/*    <MainLayout title={{title:'Launch Eureka servers'}}>*/}
     return (
-      <MainLayout title='Launch Eureka servers' breadcrumbs={this.state.breadcrumbs}>
+      <MainLayout>
         {this.renderEurekaPageComponents()}
       </MainLayout>
     );

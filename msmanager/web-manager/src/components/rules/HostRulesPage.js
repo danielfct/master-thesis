@@ -148,9 +148,9 @@ export default class HostRulesPage extends React.Component {
       </ul>
     );
   };
-
+/*<MainLayout title={{title:'Host detail'}}>*/
   render = () => (
-    <MainLayout title='Host detail' breadcrumbs={this.state.breadcrumbs}>
+<MainLayout>
       <div className='row'>
         <div className="input-field col s12">
           <input disabled={true} value={this.state.hostname} name="hostname" id="hostname" type="text"/>

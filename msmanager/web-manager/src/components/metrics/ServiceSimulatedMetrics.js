@@ -63,9 +63,9 @@ export default class ServiceSimulatedMetrics extends React.Component {
     }
     return simulatedMetricsNodes;
   };
-
+/*<MainLayout title={{title:'Service simulated metrics'}}>*/
   render = () => (
-    <MainLayout title='Service simulated metrics'>
+    <MainLayout>
       {this.renderSimulatedMetrics()}
       <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add service simulated metric">
         <Link className="waves-effect waves-light btn-floating grey darken-3"

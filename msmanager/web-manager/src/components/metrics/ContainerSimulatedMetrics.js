@@ -64,8 +64,9 @@ export default class ContainerSimulatedMetrics extends React.Component {
     return simulatedMetricsNodes;
   };
 
+/*<MainLayout title={{title:'Container simulated metrics'}}>*/
   render = () => (
-    <MainLayout title='Container simulated metrics'>
+  <MainLayout>
       {this.renderSimulatedMetrics()}
       <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add container simulated metric">
         <Link className="waves-effect waves-light btn-floating grey darken-3"

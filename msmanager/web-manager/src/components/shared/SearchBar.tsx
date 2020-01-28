@@ -40,9 +40,10 @@ type Props = DispatchToProps & StateToProps;
 
 class SearchBar extends React.Component<Props,{}> {
 
-    private setValue = ({target:{value}}:any) => this.props.updateSearch(value);
+    private setValue = ({target:{value}}:any) =>
+        this.props.updateSearch(value);
 
-    render = () =>
+    public render = () =>
         <form className="col s4 offset-s3 hide-on-small-and-down" noValidate autoComplete="off">
             <div className="input-field search-bar">
                 <input id="search" type="search" placeholder="Filter" value={this.props.search} onChange={this.setValue}/>

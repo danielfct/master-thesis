@@ -181,8 +181,9 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
     if (this.state.formSubmit) {
       return <Redirect to='/metrics/simulated/containers'/>;
     }
+{/*    <MainLayout title={{title:'Container simulated metric detail'}}>*/}
     return (
-      <MainLayout title='Container simulated metric detail' breadcrumbs={this.state.breadcrumbs}>
+      <MainLayout>
         <div className='row'>
           <div className='col s12'>
             <div className='card'>

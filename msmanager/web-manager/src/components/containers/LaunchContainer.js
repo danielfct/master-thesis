@@ -159,8 +159,9 @@ export default class LaunchContainer extends React.Component {
     if (this.state.formSubmit) {
       return <Redirect to='/containers'/>;
     }
+{/*    <MainLayout title={{title: 'Launch container'}}>*/}
     return (
-      <MainLayout title='Launch container' breadcrumbs={this.state.breadcrumbs}>
+      <MainLayout>
         <div className='row'>
           <div className='col s12'>
             <div className='card'>

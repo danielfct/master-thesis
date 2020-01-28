@@ -27,10 +27,8 @@ import SimpleList from './SimpleList';
 import './PagedList.css';
 
 export interface IPagedList<T> {
-/*    isFetching: boolean;
-    loadingLabel: string;*/
+    empty: string | (() => JSX.Element);
     list: T[];
-/*    select: (x: T) => void;*/
     show: (x: T) => JSX.Element;
     page?: number;
     pagesize?: number;
@@ -46,13 +44,14 @@ export class PagedList<T> extends React.Component<IPagedList<T>, { page?: number
             page: props.page || 0,
             pagesize: props.pagesize,
         };
-        this.max = Math.ceil(props.list.length / (props.pagesize || 1)) - 1;
+        this.max = Math.max(0, Math.ceil(props.list.length / (props.pagesize || 1)) - 1);
     }
 
     public render() {
-        const {list: l, show} = this.props;
+        const {empty, list: l, show} = this.props;
         const {page = 0, pagesize = l.length} = this.state;
         const list = l.slice(page * pagesize, page * pagesize + pagesize);
+        const Simple = SimpleList<T>();
         return (
             <div>
                 <ul className="pagination center-align" style={{userSelect: "none"}}>
@@ -61,7 +60,7 @@ export class PagedList<T> extends React.Component<IPagedList<T>, { page?: number
                             <i className="material-icons">chevron_left</i>
                         </a>
                     </li>
-                    {Array.from({length: this.max+1}, (x, i) => i+1).map((pageNumber, index) =>
+                    {Array.from({length: this.max + 1}, (x, i) => i+1).map((pageNumber, index) =>
                         <PageNumber key={index} page={pageNumber} active={index === page} setPage={this.setPage}/>
                     )}
                     <li className={page === this.max ? "disabled next" : "next"}>
@@ -70,7 +69,7 @@ export class PagedList<T> extends React.Component<IPagedList<T>, { page?: number
                         </a>
                     </li>
                 </ul>
-                {<SimpleList {...{list, show}}/>}
+                <Simple {...{empty, list, show}}/>
             </div>
         );
     }
@@ -109,6 +108,5 @@ class PageNumber extends React.Component<PageNumberProps, {}> {
         return <li key={page} className={active ? "active" : "waves-effect"}>
             <a onClick={this.changePage}>{page}</a>
         </li>
-
     };
 }

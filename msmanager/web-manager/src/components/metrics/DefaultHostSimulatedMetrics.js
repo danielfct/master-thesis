@@ -64,8 +64,9 @@ export default class DefaultHostSimulatedMetrics extends React.Component {
     return simulatedMetricsNodes;
   };
 
+/*<MainLayout title={{title:'Default host simulated metrics'}}>*/
   render = () => (
-    <MainLayout title='Default host simulated metrics'>
+  <MainLayout>
       {this.renderSimulatedMetrics()}
       <div className="fixed-action-btn tooltipped" data-position="left"
            data-tooltip="Add default host simulated metric">

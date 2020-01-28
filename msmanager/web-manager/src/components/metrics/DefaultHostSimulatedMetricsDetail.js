@@ -150,8 +150,9 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
     if (this.state.formSubmit) {
       return <Redirect to='/metrics/simulated/hosts/default'/>;
     }
+    {/*<MainLayout title={{title:'Default host simulated metric detail'}}>*/}
     return (
-      <MainLayout title='Default host simulated metric detail' breadcrumbs={this.state.breadcrumbs}>
+      <MainLayout>
         <div className='row'>
           <div className='col s12'>
             <div className='card'>

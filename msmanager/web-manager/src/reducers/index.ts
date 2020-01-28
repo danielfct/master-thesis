@@ -26,7 +26,7 @@
 import { combineReducers } from 'redux'
 import IService from "../components/services/IService";
 import entities from "./entities";
-import {breadcrumbs, errorMessage, loadingBar, search, select, sidenav} from "./ui";
+import {breadcrumbs, errorMessage, loading, loadingBar, search, select, sidenav} from "./ui";
 import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
 
 export interface ReduxState {
@@ -35,6 +35,7 @@ export interface ReduxState {
         search: string;
         breadcrumbs: IBreadcrumbs;
         errorMessage: string;
+        loading: boolean;
         select: {service?: IService};
     }
     entities: {
@@ -174,6 +175,7 @@ const ui = combineReducers({
     search,
     breadcrumbs,
     errorMessage,
+    loading,
     select
 });
 

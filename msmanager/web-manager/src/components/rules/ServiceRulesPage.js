@@ -154,9 +154,10 @@ export default class ServiceRulesPage extends React.Component {
       </ul>
     );
   };
-
+/*<MainLayout title={{title:'Service rules detail'}}>*/
   render = () => (
-    <MainLayout title='Service rules detail' breadcrumbs={this.state.breadcrumbs}>
+
+      <MainLayout>
       <div className='row'>
         <div className="input-field col s12">
           <input disabled={true} value={this.state.service.serviceName} name="serviceName" id="serviceName"

@@ -26,7 +26,7 @@ import React from "react";
 
 export default class Footer extends React.Component<{}> {
     render = () =>
-        <footer className="page-footer">
+        <footer className="footer page-footer">
             <div className="row">
                 <div className="right">
                     © {(new Date().getFullYear())} μs-manager

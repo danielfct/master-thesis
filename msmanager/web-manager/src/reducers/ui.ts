@@ -23,6 +23,7 @@
  */
 
 import {
+   /* BREADCRUMBS_ADD,*/
     BREADCRUMBS_UPDATE,
     RESET_ERROR_MESSAGE,
     SEARCH_UPDATE, SELECT_ENTITY,
@@ -32,6 +33,7 @@ import {
 import {loadingBarReducer} from "react-redux-loading-bar";
 import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
 import { merge } from "lodash";
+import {act} from "react-dom/test-utils";
 
 export const loadingBar = loadingBarReducer;
 
@@ -66,7 +68,7 @@ export const search = (state = "", action: { type: string, search: string}) => {
     }
 };
 
-export const breadcrumbs = (state = {}, action: { type: string, breadcrumbs: IBreadcrumbs}) => {
+/*export const breadcrumbs = (state = {}, action: { type: string, breadcrumbs: IBreadcrumbs}) => {
     const { type, breadcrumbs } = action;
     switch (type) {
         case BREADCRUMBS_UPDATE:
@@ -74,7 +76,18 @@ export const breadcrumbs = (state = {}, action: { type: string, breadcrumbs: IBr
         default:
             return state;
     }
-};
+};*/
+
+export function breadcrumbs(state: IBreadcrumbs = [], action: { type: string, title: string, link?: string, breadcrumbs: IBreadcrumbs }) {
+    const { type, title, link, breadcrumbs } = action;
+    /*if (type === BREADCRUMBS_ADD) {
+        state.push({title, link});
+    }
+    else*/ if (type === BREADCRUMBS_UPDATE) {
+        state = breadcrumbs;
+    }
+    return state;
+}
 
 export const errorMessage = (state = null, action: {type: string, error: string}) => {
     const { type, error } = action;
@@ -84,6 +97,13 @@ export const errorMessage = (state = null, action: {type: string, error: string}
         return error
     }
     return state
+};
+
+export const loading = (state = true, action: any) => {
+    if (action.response && action.response.entities) {
+        return false;
+    }
+    return state;
 };
 
 export function select<T>(state = {}, action: {type: string, entity: T}) {

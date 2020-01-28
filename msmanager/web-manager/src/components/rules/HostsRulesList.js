@@ -79,9 +79,9 @@ export default class HostsRulesList extends React.Component {
     }
     return hostNodes;
   };
-
+/*<MainLayout title={{title:'Host rules management'}}>*/
   render = () => (
-    <MainLayout title='Hosts rules'>
+<MainLayout>
       {this.renderHosts()}
     </MainLayout>
   );

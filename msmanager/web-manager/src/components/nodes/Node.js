@@ -60,8 +60,9 @@ export default class Nodes extends React.Component {
         <NodeCard key={node.id} node={node} reloadNodes={this.loadNodes}/>
       ));
     }
+{/*    <MainLayout title={{title:'Nodes'}}>*/}
     return (
-      <MainLayout title='Nodes'>
+      <MainLayout>
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add node">
           <Link className="waves-effect waves-light btn-floating grey darken-3" to='/nodes/add'>
             <i className="large material-icons">add</i>

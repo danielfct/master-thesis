@@ -23,23 +23,108 @@
  */
 
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, RouteComponentProps, RouteProps, withRouter} from "react-router-dom";
 import './Breadcrumbs.css';
+import {ReduxState} from "../../reducers";
+import {bindActionCreators} from "redux";
+import {updateBreadcrumbs} from "../../actions";
+import {connect} from "react-redux";
+import {RouterProps} from "react-router";
+import {routes} from "../../containers/Root.dev";
+import {camelCaseToSentenceCase, capitalize} from "../../utils/text";
 
-export type IBreadcrumbs = [ { title: string, link?: string } ];
+export type IBreadcrumb = { title: string, link?: string };
 
-interface Props {
+export type IBreadcrumbs = IBreadcrumb[];
+
+interface StateToProps {
     breadcrumbs: IBreadcrumbs;
 }
 
-export default class Breadcrumbs extends React.Component<Props, {}> {
+interface DispatchToProps {
+    updateBreadcrumbs: (breadcrumbs: IBreadcrumbs) => void;
+}
+
+interface BreadcrumbsProps {
+    /*breadcrumb: {title: string, link?: string, build?: boolean};*/
+}
+
+interface State {
+    breadcrumbs: IBreadcrumbs;
+}
+
+type Props = StateToProps & DispatchToProps & BreadcrumbsProps & RouteProps & RouteComponentProps;
+
+
+const breadcrumbs = (props: Props): IBreadcrumbs => {
+    let path = props.location && props.location.pathname || '';
+    let links = [];
+    while (path.length) {
+        links.push(path);
+        path = path.replace(path.substring(path.lastIndexOf('/'), path.length), '');
+    }
+    links = links.reverse();
+    const breadcrumbs = links.map(link => {
+        let path = link;
+        if (path === props.match.url) {
+            path = path.replace(path, props.match.path);
+        }
+        return {
+            title: routes[path].title || capitalize(link.substring(link.lastIndexOf('/') + 1)),
+            link,
+        }
+    });
+/*    console.log(breadcrumbs)*/
+    return breadcrumbs;
+};
+
+class Breadcrumbs extends React.Component<Props, State> {
+
+    constructor(props:Props) {
+        super(props);
+        /*const {title, link, build} = this.props.breadcrumb;
+        let breadcrumbs = this.props.breadcrumbs;
+        if (build) {
+            breadcrumbs.push({title, link});
+            //this.props.addBreadcrumb(title, link);
+        }
+        else {
+            breadcrumbs = [{title, link}];
+        }
+        this.props.updateBreadcrumbs(breadcrumbs);
+        console.log(breadcrumbs)*/
+        this.state = { breadcrumbs: breadcrumbs(props) };
+    }
+
+    /*public componentDidMount(): void {
+        const {title, link, build} = this.props.breadcrumb;
+        if (build) {
+            this.props.addBreadcrumb(title, link);
+        }
+        else {
+            this.props.updateBreadcrumbs([{title, link}]);
+        }
+    }*/
+
     public render = () => {
-        return (<div>
-            {this.props.breadcrumbs.map(({title, link}, index) =>
-                link
+        return <div>
+            {this.state.breadcrumbs.map(({title, link}, index) =>
+                link && index !== this.state.breadcrumbs.length - 1
                     ? <Link key={index} className="breadcrumb white-text" to={link}>{title}</Link>
                     : <span key={index} className="breadcrumb white-text">{title}</span>
             )}
-        </div>)
+        </div>
     }
+
 }
+
+const mapStateToProps = (state: ReduxState): StateToProps => (
+    {
+        breadcrumbs: state.ui.breadcrumbs,
+    }
+);
+
+const mapDispatchToProps = (dispatch: any): DispatchToProps =>
+    bindActionCreators({ updateBreadcrumbs }, dispatch);
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Breadcrumbs));

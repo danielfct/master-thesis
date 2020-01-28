@@ -65,16 +65,16 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
   loadServices = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostservices',
-      data => this.setState({ services: data, loading: false })
+        'http://localhostservices',
+        data => this.setState({ services: data, loading: false })
     );
   };
 
   loadFields = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostrules/fields',
-      data => this.setState({ fields: data, loading: false })
+        'http://localhostrules/fields',
+        data => this.setState({ fields: data, loading: false })
     );
   };
 
@@ -82,8 +82,8 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
       getData(
-        `http://localhostmetrics/simulated/services/${this.state.id}`,
-        data => this.setState({ values: data, loading: false })
+          `http://localhostmetrics/simulated/services/${this.state.id}`,
+          data => this.setState({ values: data, loading: false })
       );
     }
   };
@@ -92,7 +92,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
     let servicesNodes;
     if (this.state.services) {
       servicesNodes = this.state.services.map(service => (
-        <option key={service.id} value={service.serviceName}>{service.serviceName}</option>
+          <option key={service.id} value={service.serviceName}>{service.serviceName}</option>
       ));
       return servicesNodes;
     }
@@ -102,7 +102,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
     let fieldsNodes;
     if (this.state.fields) {
       fieldsNodes = this.state.fields.map(field => (
-        <option key={field.id} value={field.fieldName}>{field.fieldName}</option>
+          <option key={field.id} value={field.fieldName}>{field.fieldName}</option>
       ));
       return fieldsNodes;
     }
@@ -111,12 +111,12 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
   onSubmitForm = event => {
     event.preventDefault();
     postData(
-      `http://localhostmetrics/simulated/services/${this.state.id}`,
-      event.target[0].value,
-      data => {
-        this.setState({ isEdit: false, formSubmit: true });
-        M.toast({ html: '<div>IService simulated metric saved successfully!</div>' });
-      });
+        `http://localhostmetrics/simulated/services/${this.state.id}`,
+        event.target[0].value,
+        data => {
+          this.setState({ isEdit: false, formSubmit: true });
+          M.toast({ html: '<div>IService simulated metric saved successfully!</div>' });
+        });
   };
 
   onInputChange = event => {
@@ -130,43 +130,43 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
     const servicesSelect = this.renderServicesSelect();
     const fieldsSelect = this.renderFieldsSelect();
     return (
-      <form id="form-service" onSubmit={this.onSubmitForm}>
-        <div className="input-field col s12">
-          <select value={this.state.values.serviceName} onChange={this.onInputChange} name="serviceName" id="serviceName">
-            <option value="" disabled="disabled">Choose service</option>
-            {servicesSelect}
-          </select>
-          <label htmlFor="serviceName">Service</label>
-        </div>
-        <div className="input-field col s12">
-          <select value={this.state.values.field} onChange={this.onInputChange} name="field" id="field">
-            <option value="" disabled="disabled">Choose field</option>
-            {fieldsSelect}
-          </select>
-          <label htmlFor="field">Field</label>
-        </div>
-        <div className="input-field col s12">
-          <input value={this.state.values.minValue} onChange={this.onInputChange} type="number" name="minValue" id="minValue" autoComplete="off"/>
-          <label htmlFor="minValue">Minimum value</label>
-        </div>
-        <div className="input-field col s12">
-          <input value={this.state.values.maxValue} onChange={this.onInputChange} type="number" name="maxValue" id="maxValue" autoComplete="off"/>
-          <label htmlFor="maxValue">Maximum value</label>
-        </div>
-        <div className="input-field col s12">
-          <select value={this.state.values.override} onChange={this.onInputChange} name="override" id="override">
-            <option value="" disabled="disabled">Choose override</option>
-            <option value='true'>True</option>
-            <option value='false'>False</option>
-          </select>
-          <label htmlFor="override">Override</label>
-        </div>
+        <form id="form-service" onSubmit={this.onSubmitForm}>
+          <div className="input-field col s12">
+            <select value={this.state.values.serviceName} onChange={this.onInputChange} name="serviceName" id="serviceName">
+              <option value="" disabled="disabled">Choose service</option>
+              {servicesSelect}
+            </select>
+            <label htmlFor="serviceName">Service</label>
+          </div>
+          <div className="input-field col s12">
+            <select value={this.state.values.field} onChange={this.onInputChange} name="field" id="field">
+              <option value="" disabled="disabled">Choose field</option>
+              {fieldsSelect}
+            </select>
+            <label htmlFor="field">Field</label>
+          </div>
+          <div className="input-field col s12">
+            <input value={this.state.values.minValue} onChange={this.onInputChange} type="number" name="minValue" id="minValue" autoComplete="off"/>
+            <label htmlFor="minValue">Minimum value</label>
+          </div>
+          <div className="input-field col s12">
+            <input value={this.state.values.maxValue} onChange={this.onInputChange} type="number" name="maxValue" id="maxValue" autoComplete="off"/>
+            <label htmlFor="maxValue">Maximum value</label>
+          </div>
+          <div className="input-field col s12">
+            <select value={this.state.values.override} onChange={this.onInputChange} name="override" id="override">
+              <option value="" disabled="disabled">Choose override</option>
+              <option value='true'>True</option>
+              <option value='false'>False</option>
+            </select>
+            <label htmlFor="override">Override</label>
+          </div>
 
-        <button className="btn waves-effect waves-light" type="submit" name="action">
-          Save
-          <i className="material-icons right">send</i>
-        </button>
-      </form>
+          <button className="btn waves-effect waves-light" type="submit" name="action">
+            Save
+            <i className="material-icons right">send</i>
+          </button>
+        </form>
     );
   };
 
@@ -174,18 +174,19 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
     if (this.state.formSubmit) {
       return <Redirect to='/metrics/simulated/services' />;
     }
+    {/*    <MainLayout title={{title:'Service simulated metric detail'}}>*/}
     return (
-      <MainLayout title='Service simulated metric detail' breadcrumbs={this.state.breadcrumbs}>
-        <div className='row'>
-          <div className='col s12'>
-            <div className='card'>
-              <div className='card-content'>
-                {this.renderForm()}
+        <MainLayout>
+          <div className='row'>
+            <div className='col s12'>
+              <div className='card'>
+                <div className='card-content'>
+                  {this.renderForm()}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </MainLayout>
+        </MainLayout>
     );
   };
 }

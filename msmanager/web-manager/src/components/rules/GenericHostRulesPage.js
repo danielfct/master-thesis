@@ -45,36 +45,36 @@ export default class GenericHostRulesPage extends React.Component {
   loadHostRules = () => {
     this.setState({ loadedRules: false, loading: true });
     getData(
-      'http://localhostrules/hosts/generic',
-      data => this.setState({ rules: data, loadedRules: true, loading: false })
+        'http://localhostrules/hosts/generic',
+        data => this.setState({ rules: data, loadedRules: true, loading: false })
     );
   };
 
   loadAllRules = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostrules/hosts',
-      data => this.setState({ allRules: data, loading: false })
+        'http://localhostrules/hosts',
+        data => this.setState({ allRules: data, loading: false })
     );
   };
 
   onRemoveRule = (ruleId, event) => {
     deleteData(
-      `http://localhosthosts/generic/${ruleId}`,
-      () => {
-        M.toast({ html: '<div>Rule successfully deleted from generic hosts rules!</div>' });
-        this.loadHostRules();
-      });
+        `http://localhosthosts/generic/${ruleId}`,
+        () => {
+          M.toast({ html: '<div>Rule successfully deleted from generic hosts rules!</div>' });
+          this.loadHostRules();
+        });
   };
 
   addRule = (ruleId, event) => {
     postData(
-      `http://localhosthosts/rules/generic/${ruleId}`,
-      event.target[0].value,
-      data => {
-        M.toast({ html: '<div>Rule successfully added to generic host rules!</div>' });
-        this.loadHostRules();
-      });
+        `http://localhosthosts/rules/generic/${ruleId}`,
+        event.target[0].value,
+        data => {
+          M.toast({ html: '<div>Rule successfully added to generic host rules!</div>' });
+          this.loadHostRules();
+        });
   };
 
   renderRules = () => {
@@ -82,15 +82,15 @@ export default class GenericHostRulesPage extends React.Component {
     const style = { marginTop: '-4px' };
     if (this.state.rules) {
       rulesNodes = this.state.rules.map(hostRule => (
-        <li key={hostRule.rule.id} className="collection-item">
-          <div>
-            {hostRule.rule.ruleName}
-            <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-               onClick={(e) => this.onRemoveRule(hostRule.rule.id, e)}>
-              <i className="material-icons">clear</i>
-            </a>
-          </div>
-        </li>
+          <li key={hostRule.rule.id} className="collection-item">
+            <div>
+              {hostRule.rule.ruleName}
+              <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+                 onClick={(e) => this.onRemoveRule(hostRule.rule.id, e)}>
+                <i className="material-icons">clear</i>
+              </a>
+            </div>
+          </li>
       ));
     }
     return rulesNodes;
@@ -113,39 +113,39 @@ export default class GenericHostRulesPage extends React.Component {
       ruleNodes = this.state.allRules.map(rule => {
         if (canAddRule(rule.id)) {
           return (
-            <li key={rule.id} className="collection-item">
-              <div>
-                {rule.ruleName}
-                <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-                   onClick={(e) => this.addRule(rule.id, e)}>
-                  <i className="material-icons">add</i>
-                </a>
-              </div>
-            </li>
+              <li key={rule.id} className="collection-item">
+                <div>
+                  {rule.ruleName}
+                  <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
+                     onClick={(e) => this.addRule(rule.id, e)}>
+                    <i className="material-icons">add</i>
+                  </a>
+                </div>
+              </li>
           );
         }
       });
     }
     return (
-      <ul className="collection">
-        {ruleNodes}
-      </ul>
+        <ul className="collection">
+          {ruleNodes}
+        </ul>
     );
   };
-
+  /*<MainLayout title={{title:'Generic hosts rules detail'}}>*/
   render = () => (
-    <MainLayout title='Generic hosts rules detail'>
-      <div className='row'>
-        <div>
-          <h5>Rules</h5>
-          <ul className="collection">
-            {this.renderRules()}
-          </ul>
-          <br/>
-          <h5>Add rules</h5>
-          {this.renderAddRules()}
+      <MainLayout>
+        <div className='row'>
+          <div>
+            <h5>Rules</h5>
+            <ul className="collection">
+              {this.renderRules()}
+            </ul>
+            <br/>
+            <h5>Add rules</h5>
+            {this.renderAddRules()}
+          </div>
         </div>
-      </div>
-    </MainLayout>
+      </MainLayout>
   );
 }

@@ -3,6 +3,7 @@ import List from "./List";
 import React from "react";
 
 interface Props<T> {
+    empty: string | (() => JSX.Element);
     list: T[];
     card: (element: T) => JSX.Element;
     predicate: (element: T, filter: string) => boolean;
@@ -44,6 +45,7 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
 
     public render = () =>
         <List<T>
+            empty={this.props.empty}
             list={this.props.list}
             show={this.props.card}
             predicate={this.props.predicate}

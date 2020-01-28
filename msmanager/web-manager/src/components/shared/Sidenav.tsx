@@ -59,19 +59,18 @@ class Sidenav extends React.Component<Props, {}> {
 
     private sidenav = createRef<HTMLUListElement>();
 
-    private shouldShowSidenav = () => window.innerWidth > 992;
-
-    componentDidMount = () => {
-        M.Sidenav.init(this.sidenav.current as Element);
+    public componentDidMount = () =>
         window.addEventListener('resize', this.handleResize);
-    };
 
-    componentWillUnmount = () =>
+    public componentWillUnmount = () =>
         window.removeEventListener('resize', this.handleResize);
 
-    handleResize = (_: any) => {
+    private shouldShowSidenav = () =>
+        window.innerWidth > 992;
+
+    private handleResize = (_: any) => {
         const sidenav = M.Sidenav.getInstance(this.sidenav.current as Element);
-        const {user, width} = this.props.sidenav;
+        const {width} = this.props.sidenav;
         let show = this.shouldShowSidenav();
         if (show && sidenav.isOpen) {
             sidenav.close();
@@ -81,7 +80,7 @@ class Sidenav extends React.Component<Props, {}> {
         }
     };
 
-    handleSidenav = () => {
+    private handleSidenav = () => {
         let sidenav = M.Sidenav.getInstance(this.sidenav.current as Element);
         let {isOpen} = sidenav;
         if (isOpen) {
@@ -92,7 +91,15 @@ class Sidenav extends React.Component<Props, {}> {
         this.props.showSidenavByUser(!isOpen);
     };
 
-    render = () =>
+    private closeSlideSidenav = () => {
+        let sidenav = M.Sidenav.getInstance(this.sidenav.current as Element);
+        const {width} = this.props.sidenav;
+        if (!width) {
+            sidenav.close();
+        }
+    };
+
+    public render = () =>
         <ul id="slide-out" className="sidenav sidenav-fixed no-shadows"
             style={this.props.sidenav.user ? undefined : {display: 'none'}} ref={this.sidenav}>
             <div className="sidenav-menu">
@@ -107,7 +114,7 @@ class Sidenav extends React.Component<Props, {}> {
                 {sidenavLinks.map((link, index) =>
                     <div key={index}>
                         <li>
-                            <Link className="white-text" to={link.link}>
+                            <Link className="white-text" to={link.link} onClick={this.closeSlideSidenav}>
                                 {link.name}
                             </Link>
                         </li>

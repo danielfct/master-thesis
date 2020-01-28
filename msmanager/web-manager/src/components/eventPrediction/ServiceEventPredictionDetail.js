@@ -207,8 +207,9 @@ export default class ServiceEventPredictionDetail extends React.Component {
     if (this.state.formSubmit) {
       return <Redirect to='/rules/serviceEventPredictions'/>;
     }
+{/*    <MainLayout title={{title:'Service event prediction detail'}}>*/}
     return (
-      <MainLayout title='Service event prediction detail' breadcrumbs={this.state.breadcrumbs}>
+      <MainLayout>
         <div className='row'>
           <div className='col s12'>
             <div className='card'>

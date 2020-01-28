@@ -26,7 +26,7 @@ import React from 'react';
 import MainLayout from '../shared/MainLayout';
 
 const Landing = () =>
-    <MainLayout title='Microservices dynamic system management'>
+    <MainLayout>
         <img src={require('../../resources/images/architecture.png')} alt="System architecture"/>
     </MainLayout>;
 

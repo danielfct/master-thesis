@@ -50,8 +50,9 @@ export default class SimulatedMetricsLandingPage extends React.Component {
     );
   });
 
+/*<MainLayout title={{title:'Simulated metrics Management management'}}>*/
   render = () => (
-    <MainLayout title='Simulated metrics Management'>
+  <MainLayout>
       <div className="row">
         <div className="col s12">
           <ul className="collection">

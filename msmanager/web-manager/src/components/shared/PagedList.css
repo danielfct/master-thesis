@@ -1,3 +1,7 @@
+.pagination {
+    margin-top: -50px;
+}
+
 .pagination > li > a {
     cursor: pointer;
     color: white;
@@ -10,8 +14,4 @@
 
 .pagination li.disabled {
     opacity: 0.25;
-}
-
-.pagination {
-    margin-top: -50px;
 }

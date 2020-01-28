@@ -209,8 +209,9 @@ export default class LoadBalancerPage extends React.Component {
     if (this.state.formSubmit) {
       return <Redirect to='/' />;
     }
+    {/*<MainLayout title={{title:'Launch load balancers'}}>*/}
     return (
-      <MainLayout title='Launch load balancers' breadcrumbs={this.state.breadcrumbs}>
+        <MainLayout>
         {this.renderLoadBalancerPageComponents()}
       </MainLayout>
     );

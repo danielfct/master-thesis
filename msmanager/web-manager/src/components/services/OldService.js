@@ -258,8 +258,9 @@ export default class OldService extends React.Component {
     if (this.state.isDeleted) {
       return <Redirect to='/services'/>;
     }
+{/*    <MainLayout title={{title:this.state.service.serviceName}}>*/}
     return (
-      <MainLayout title={this.state.service.serviceName} breadcrumbs={this.state.breadcrumbs}>
+      <MainLayout>
         <div className='row'>
           <div className="right-align">
             <div className="row">

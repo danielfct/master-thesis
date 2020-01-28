@@ -48,16 +48,19 @@ class Services extends React.Component<Props, {}> {
     public componentDidMount = () =>
         this.props.loadServices();
 
+    private empty = (): JSX.Element =>
+        <h1><i>empty</i></h1>; //TODO
+
     private card = (service: IService): JSX.Element =>
         <ServiceCard key={service.id} service={service} />;
 
     private predicate = (service: IService, search: string): boolean =>
         service.serviceName.includes(search);
-
     render = () =>
-        <MainLayout title={'Services'}>
-            <AddButton tooltip={'Add service'} link={'/services/service'}/>
+        <MainLayout>
+            <AddButton tooltip={'Add service'} link={'/services/new'}/>
             <CardList<IService>
+                empty={this.empty}
                 list={this.props.services}
                 card={this.card}
                 predicate={this.predicate}/>

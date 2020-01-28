@@ -93,8 +93,9 @@ export default class Regions extends React.Component {
                     onRemove={this.loadRegions}/>
       ));
     }
+    {/*<MainLayout title={{title:'Regions'}}>*/}
     return (
-      <MainLayout title='Regions'>
+      <MainLayout>
         {regionNodes}
         <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add region">
           <button disabled={!this.state.showAdd} className="waves-effect waves-light btn-floating grey darken-3" onClick={this.addRegion}>

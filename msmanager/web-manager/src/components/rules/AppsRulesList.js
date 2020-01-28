@@ -76,9 +76,9 @@ export default class AppsRulesList extends React.Component {
     }
     return appNodes;
   };
-
+/*<MainLayout title={{title:'Apps rules'}}>*/
   render = () => (
-    <MainLayout title='Apps rules'>
+<MainLayout>
       {this.renderApps()}
     </MainLayout>
   );

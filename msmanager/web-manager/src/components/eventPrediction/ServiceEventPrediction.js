@@ -53,8 +53,9 @@ export default class ServiceEventPredictions extends React.Component {
     );
   };
 
+/*<MainLayout title={{title:'Service event predictions'}}>*/
   render = () => (
-    <MainLayout title='Service event predictions'>
+  <MainLayout>
       {this.state.data && this.state.data.map((serviceEvent, index) => (
         <ServiceEventPredictionCard key={serviceEvent.id} serviceEvent={serviceEvent}
                                     reloadServiceEvents={this.loadServiceEventPredictions}/>

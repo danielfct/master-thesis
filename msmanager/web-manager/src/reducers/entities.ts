@@ -24,7 +24,7 @@
 
 import merge from 'lodash/merge'
 
-const entities = (state = { services: {} }, action: any) => {
+const entities = (state = { services: {} }, action: { response: { entities: {}, result: [] }}) => {
     if (action.response && action.response.entities) {
         return merge({}, state, action.response.entities);
     }

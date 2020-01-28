@@ -29,8 +29,7 @@ import SimpleList from "./SimpleList";
 import {ReduxState} from "../../reducers";
 
 interface Props<T> {
-    /*    isFetching: boolean;
-        loadingLabel: string;*/
+    empty: string | (() => JSX.Element);
     list: T[];
     show: (x: T) => JSX.Element;
     predicate: (x: T,s: string) => boolean;
@@ -43,13 +42,19 @@ class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
 
     public render() {
         const {predicate, search, page, pagesize, ...otherprops} = this.props;
-        let {list} = this.props;
-        list = list.filter((s:T) => predicate(s, search));
-        return page || pagesize
-            ? <PagedList {...otherprops}
-                         {...{list, page, pagesize}}/>
-            : <SimpleList {...otherprops}
-                          {...{list}}/>
+        let {empty, list} = this.props;
+        const filteredList = list.filter((s:T) => predicate(s, search));
+        if (list.length !== filteredList.length && filteredList.length === 0) {
+            empty = `no matches for the search '${search}'`; //TODO jsx element with no_found icon plus the text
+        }
+        if (page || pagesize) {
+            return <PagedList {...otherprops}
+                              {...{empty, list: filteredList, page, pagesize}}/>
+        } else {
+            const Simple = SimpleList<T>();
+            return <Simple {...otherprops}
+                           {...{empty, list: filteredList}}/>
+        }
     }
 }
 

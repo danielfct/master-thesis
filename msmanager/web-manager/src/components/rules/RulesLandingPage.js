@@ -53,8 +53,9 @@ export default class RulesLandingPage extends React.Component {
     );
   });
 
+/*<MainLayout title={{title:'Rules management'}}>*/
   render = () => (
-    <MainLayout title='Rules management'>
+<MainLayout>
       <div className="row">
         <div className="col s12">
           <ul className="collection">
