@@ -1,6 +1,7 @@
 .form {
     background: #36393F;
     padding: 0 10px;
+    margin-top: 10px;
 }
 
 .fixed-action-btn {
@@ -18,4 +19,5 @@
     top: 60px;
     right: 27px;
     margin-top: 20px;
+    z-index: 997;
 }

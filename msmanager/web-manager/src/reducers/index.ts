@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
-
 import { combineReducers } from 'redux'
-import IService from "../components/services/IService";
 import entities from "./entities";
 import {breadcrumbs, errorMessage, loading, loadingBar, search, select, sidenav} from "./ui";
 import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
+import {IService} from "../components/services/Service";
 
 export interface ReduxState {
     ui: {
@@ -36,10 +35,10 @@ export interface ReduxState {
         breadcrumbs: IBreadcrumbs;
         errorMessage: string;
         loading: boolean;
-        select: {service?: IService};
+        /*select: { service?: string };*/
     }
     entities: {
-        services: IService[],
+        services: { [key: string]: IService; },
     };
     pagination: any;
 }

@@ -28,11 +28,12 @@ import promise from "redux-promise-middleware";
 import {loadingBarMiddleware} from "react-redux-loading-bar";
 import api from "../middleware/api";
 import rootReducer from "../reducers";
+import {loadState} from "./localStorage";
 
-const configureStore = (preloadedState: any) => //TODO preloadedState type ReduxState
+const configureStore = (persistedState = loadState()) =>
     createStore(
         rootReducer,
-        preloadedState,
+        persistedState,
         applyMiddleware(
             thunk,
             api,

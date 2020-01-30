@@ -23,15 +23,10 @@
  */
 
 import React from 'react';
-import Breadcrumbs, {IBreadcrumb} from "./Breadcrumbs";
+import Breadcrumbs from "./Breadcrumbs";
+import './MainLayout.css';
 
-interface MainLayoutProps {
-  /*  title: {title: string, link?: string, build?: boolean};*/
-}
-
-type Props = MainLayoutProps;
-
-export default class MainLayout extends React.Component<Props, {}> {
+export default class MainLayout extends React.Component<{}, {}> {
 
     public render = () =>
         <div className="section row">

@@ -28,32 +28,24 @@ import CardItem from '../shared/CardItem';
 import {camelCaseToSentenceCase} from "../../utils/text";
 import './ServiceCard.css';
 import PerfectScrollbar from "react-perfect-scrollbar";
-import IService from "./IService";
-import {bindActionCreators} from "redux";
-import {connect} from "react-redux";
-import {selectEntity} from "../../actions";
-/*import {itemSelection} from "../../redux/reducers";*/
+import {IService} from "./Service";
 
-interface DispatchToProps {
-    selectEntity: (entity: {service: IService}) => void;
-}
 
 interface ServiceCardProps {
     service: IService;
 }
 
-type Props = DispatchToProps & ServiceCardProps;
+type Props = ServiceCardProps;
 
-class ServiceCard extends React.Component<Props, {}> {
-
-    private handleOnClick = () =>
-        this.props.selectEntity({service: this.props.service});
+export default class ServiceCard extends React.Component<Props, {}> {
 
     public render = () =>
         <div className='col s6 m4 l3'>
             <div className='card grid-card hoverable'>
                 <PerfectScrollbar>
-                    <Link to={`/services/${this.props.service.serviceName}`} onClick={this.handleOnClick}>
+                    <Link to={{
+                        pathname: `/services/${this.props.service.serviceName}#details`,
+                        state: this.props}}>
                         <div className='card-content'>
                             {Object.entries(this.props.service)
                                 .filter(([key, _]) => key !== 'id')
@@ -66,8 +58,3 @@ class ServiceCard extends React.Component<Props, {}> {
             </div>
         </div>;
 }
-
-const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-    bindActionCreators({ selectEntity }, dispatch);
-
-export default connect(null, mapDispatchToProps)(ServiceCard);

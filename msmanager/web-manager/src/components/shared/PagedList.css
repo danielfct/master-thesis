@@ -1,5 +1,6 @@
 .pagination {
-    margin-top: -50px;
+    margin-top: -30px;
+    margin-bottom: 20px;
 }
 
 .pagination > li > a {

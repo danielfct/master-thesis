@@ -23,10 +23,23 @@
  */
 
 import merge from 'lodash/merge'
+import {SERVICE_DEPENDENCIES_SUCCESS, SERVICE_SUCCESS} from "../actions";
+import {normalize} from "normalizr";
+import {Schemas} from "../middleware/api";
 
-const entities = (state = { services: {} }, action: { response: { entities: {}, result: [] }}) => {
+const entities = (state = { services: {} },
+                  action: { type: string, args?: any, response: { entities: {}, result: [] }}) => {
     if (action.response && action.response.entities) {
-        return merge({}, state, action.response.entities);
+        const {type, args, response} = action;
+        switch (type) {
+            case SERVICE_SUCCESS:
+                return merge({}, state, response.entities);
+            case SERVICE_DEPENDENCIES_SUCCESS:
+                // @ts-ignore
+                Object.assign(state.services[args], response.entities);
+                const normalized = normalize(state.services, Schemas.SERVICE_ARRAY);
+                return merge({}, state, normalized.entities);
+        }
     }
     return state;
 };

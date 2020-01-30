@@ -30,36 +30,42 @@ export interface IPagedList<T> {
     empty: string | (() => JSX.Element);
     list: T[];
     show: (x: T) => JSX.Element;
-    page?: number;
-    pagesize?: number;
+    pagination: { pagesize: number, page?: number, bottom?: boolean };
+    separator?: boolean | { color: string };
 }
 
-export class PagedList<T> extends React.Component<IPagedList<T>, { page?: number, pagesize?: number }> {
+interface State {
+    pagesize?: number;
+    page?: number;
+}
+
+export class PagedList<T> extends React.Component<IPagedList<T>, State> {
 
     private max: number = 0;
 
     constructor(props: IPagedList<T>) {
         super(props);
         this.state = {
-            page: props.page || 0,
-            pagesize: props.pagesize,
+            page: props.pagination.page || 0,
+            pagesize: props.pagination.pagesize,
         };
-        this.max = Math.max(0, Math.ceil(props.list.length / (props.pagesize || 1)) - 1);
+        this.max = Math.max(0, Math.ceil(props.list.length / (this.state.pagesize || 1)) - 1);
     }
 
     public render() {
-        const {empty, list: l, show} = this.props;
+        const {empty, list: l, show, pagination, separator} = this.props;
         const {page = 0, pagesize = l.length} = this.state;
         const list = l.slice(page * pagesize, page * pagesize + pagesize);
         const Simple = SimpleList<T>();
         return (
             <div>
                 <ul className="pagination center-align" style={{userSelect: "none"}}>
+                    {!pagination.bottom &&
                     <li className={page === 0 ? "disabled prev" : "prev"}>
                         <a onClick={this.prevPage}>
                             <i className="material-icons">chevron_left</i>
                         </a>
-                    </li>
+                    </li>}
                     {Array.from({length: this.max + 1}, (x, i) => i+1).map((pageNumber, index) =>
                         <PageNumber key={index} page={pageNumber} active={index === page} setPage={this.setPage}/>
                     )}
@@ -68,8 +74,14 @@ export class PagedList<T> extends React.Component<IPagedList<T>, { page?: number
                             <i className="material-icons">chevron_right</i>
                         </a>
                     </li>
+                    {pagination.bottom &&
+                    <li className={page === 0 ? "disabled prev" : "prev"}>
+                        <a onClick={this.prevPage}>
+                            <i className="material-icons">chevron_left</i>
+                        </a>
+                    </li>}
                 </ul>
-                <Simple {...{empty, list, show}}/>
+                <Simple {...{empty, list, show, separator}}/>
             </div>
         );
     }

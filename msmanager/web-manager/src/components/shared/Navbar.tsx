@@ -31,6 +31,7 @@ import {bindActionCreators} from "redux";
 import {showSidenavByUser} from "../../actions";
 import './Navbar.css';
 import {ReduxState} from "../../reducers";
+import {routes} from "../../containers/Root.dev";
 const logo = require("../../resources/images/favicon.png");
 
 const navIcons = [
@@ -46,10 +47,7 @@ interface DispatchToProps {
     showSidenavByUser: (value: boolean) => void;
 }
 
-interface NavbarProps extends RouteComponentProps {
-}
-
-type Props = StateToProps & DispatchToProps & NavbarProps;
+type Props = StateToProps & DispatchToProps & RouteComponentProps;
 
 class Navbar extends React.Component<Props, {}> {
 
@@ -77,7 +75,7 @@ class Navbar extends React.Component<Props, {}> {
                             <img src={logo} alt=""/>
                             Web Manager
                         </Link>
-                        {this.props.location.pathname !== '/' && <SearchBar/>}
+                        {routes[this.props.location.pathname] && routes[this.props.location.pathname].search && <SearchBar/>}
                         <div className="right-nav-icons"
                              style={this.props.sidenav.user && this.props.sidenav.width ? undefined : {paddingRight: '0px'}}>
                             {navIcons.map((navIcon, index) =>
@@ -104,4 +102,4 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
     bindActionCreators({ showSidenavByUser }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Navbar));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Navbar));

@@ -25,12 +25,13 @@
 import React from 'react';
 import MainLayout from '../shared/MainLayout';
 import ServiceCard from './ServiceCard';
+
 import AddButton from "../shared/AddButton";
-import IService from "./IService";
 import {connect} from "react-redux";
 import {loadServices} from "../../actions";
 import {ReduxState} from "../../reducers";
 import CardList from "../shared/CardList";
+import {IService} from "./Service";
 
 interface StateToProps {
     services: IService[];
@@ -51,18 +52,19 @@ class Services extends React.Component<Props, {}> {
     private empty = (): JSX.Element =>
         <h1><i>empty</i></h1>; //TODO
 
-    private card = (service: IService): JSX.Element =>
+    private service = (service: IService): JSX.Element =>
         <ServiceCard key={service.id} service={service} />;
 
     private predicate = (service: IService, search: string): boolean =>
         service.serviceName.includes(search);
+
     render = () =>
         <MainLayout>
-            <AddButton tooltip={'Add service'} link={'/services/new'}/>
+            <AddButton tooltip={'Add service'} pathname={'/services/new'}/>
             <CardList<IService>
                 empty={this.empty}
                 list={this.props.services}
-                card={this.card}
+                card={this.service}
                 predicate={this.predicate}/>
         </MainLayout>
 }

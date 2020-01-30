@@ -1,0 +1,7 @@
+.item-separator {
+    border-bottom: 1px solid black;
+}
+
+.item-separator:last-child {
+    border-bottom: unset;
+}

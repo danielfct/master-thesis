@@ -30,9 +30,9 @@ import './FormPage.css';
 import {RouteComponentProps, withRouter} from "react-router";
 
 interface FormPageProps {
-    postUrl: string;
-    deleteUrl?: string;
-    isNew?: boolean;
+    onEdit: () => void;
+    post: { url: string, callback: () => void };
+    delete?: { url: string, callback: () => void }
 }
 
 type Props = FormPageProps & RouteComponentProps;
@@ -47,9 +47,7 @@ class FormPage extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {
-            isEditing: this.props.isNew || false,
-        };
+        this.state = { isEditing: !this.props.delete };
     }
 
     public componentDidMount(): void {
@@ -59,16 +57,15 @@ class FormPage extends React.Component<Props, State> {
         });
     }
 
-    private onClickEdit = (): void =>
+    private onClickEdit = (): void => {
+        this.props.onEdit();
         this.setState({ isEditing: !this.state.isEditing });
+    }
 
     private onClickDelete = (): void => {
-        deleteData(
-            this.props.deleteUrl || '',
-            () => {
-                /*this.setState({ isDeleted: true });*/
-                M.toast({ html: `<div>${"TODO"} removed successfully!</div>` });
-            });
+        if (this.props.delete) {
+            deleteData(this.props.delete.url, () => this.props.delete && this.props.delete.callback());
+        }
     };
 
     private onSubmitForm = (event: FormEvent): void => {
@@ -88,11 +85,14 @@ class FormPage extends React.Component<Props, State> {
             });*/
     };
 
+    private isNew = (): boolean =>
+        !this.props.delete;
+
     public render = () => {
         const {isEditing} = this.state;
-        const {isNew, children} = this.props;
+        const {children} = this.props;
         return <MainLayout>
-            {isNew
+            {this.isNew()
                 ? <div className="fixed-action-btn tooltipped"
                        data-position="left" data-tooltip="Save"
                        onClick={this.onSubmitForm}>

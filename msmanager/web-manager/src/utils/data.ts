@@ -24,6 +24,10 @@
 
 import M from 'materialize-css'
 
+export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+    return key in obj
+}
+
 /*fetch (url, successFunction) {
   displayProgressBar();
   fetch(`http://${url}`, {

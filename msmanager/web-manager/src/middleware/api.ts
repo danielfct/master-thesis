@@ -24,12 +24,14 @@
 
 import {normalize, schema} from 'normalizr';
 import { camelizeKeys } from 'humps';
-import IService from "../components/services/IService";
+import merge from 'lodash/merge'
+import {IService} from "../components/services/Service";
+import {IServiceDependency} from "../components/services/ServiceDependencyList";
 
 /*const API_ROOT = 'http://localhost/';*/
-const API_ROOT = '';
+const API_ROOT = '/';
 
-const callApi = (endpoint: string, schema: schema.Entity<IService>) => {
+const callApi = (endpoint: string, schema: schema.Entity<IService | IServiceDependency>) => {
     const url = endpoint.includes(API_ROOT) ? endpoint : API_ROOT + endpoint;
     return fetch(url)
         .then(response =>
@@ -46,15 +48,25 @@ const callApi = (endpoint: string, schema: schema.Entity<IService>) => {
 interface ISchemas {
     SERVICE: schema.Entity<IService>;
     SERVICE_ARRAY: schema.Entity<IService>[];
+    SERVICE_DEPENDENCY: schema.Entity<IServiceDependency>;
+    SERVICE_DEPENDENCY_ARRAY: schema.Entity<IServiceDependency>[];
 }
 
-const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {}, {
-    idAttribute: (service: IService) => service.serviceName.toString()
+const dependencySchema: schema.Entity<IService> = new schema.Entity('dependencies', {}, {
+    idAttribute: (service: IService) => service.serviceName
 });
+
+const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {}, {
+    idAttribute: (service: IService) => service.serviceName
+});
+const dependencies = new schema.Array(serviceSchema);
+serviceSchema.define({dependencies});
 
 export const Schemas: ISchemas = {
     SERVICE: serviceSchema,
     SERVICE_ARRAY: [serviceSchema],
+    SERVICE_DEPENDENCY : dependencySchema,
+    SERVICE_DEPENDENCY_ARRAY: [dependencySchema],
 };
 
 /*const repoSchema = new schema.Entity('repos', {
@@ -70,7 +82,7 @@ export default (store: any) => (next: (action: any) => void) => (action: any) =>
     if (typeof callAPI === 'undefined') {
         return next(action)
     }
-    const { endpoint, schema, types } = callAPI;
+    const { endpoint, schema, types, args } = callAPI;
     const actionWith = (data: any) => {
         const finalAction = Object.assign({}, action, data);
         delete finalAction[CALL_API];
@@ -80,6 +92,7 @@ export default (store: any) => (next: (action: any) => void) => (action: any) =>
     next(actionWith({ type: requestType }));
     return callApi(endpoint, schema).then(
         response => next(actionWith({
+            args,
             response,
             type: successType,
         })),

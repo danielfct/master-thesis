@@ -87,7 +87,7 @@ public class Service {
   private String outputLabel;
 
   //TODO use enum https://vladmihalcea.com/the-best-way-to-map-an-enum-type-with-jpa-and-hibernate/
-  // VALUES: frontend, backend, database
+  // VALUES: frontend, backend, database, system
   @Column(name = "service_type")
   private String serviceType;
 

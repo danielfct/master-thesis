@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-import IService from "../components/services/IService";
 import {CALL_API, Schemas} from "../middleware/api";
 import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
+import {IService} from "../components/services/Service";
+import {IServiceDependency} from "../components/services/ServiceDependencyList";
 
 export const SERVICE_REQUEST = 'SERVICE_REQUEST';
 export const SERVICE_SUCCESS = 'SERVICE_SUCCESS';
@@ -38,19 +39,47 @@ export const loadServices = (name?: string, requiredField = 'id') => (dispatch: 
     }
     else {
         let entities = getState().entities.services;
-        cached = entities && entities.length && entities.every((service: IService) => service.hasOwnProperty(requiredField));
+        cached = entities && entities.length
+            && entities.every((entity: IService) => entity.hasOwnProperty(requiredField));
     }
     return cached ? null : dispatch(fetchServices(name));
 };
 
-const fetchServices = (id?: number | string) => ({
+const fetchServices = (name?: string) => ({
     [CALL_API]: {
         types: [ SERVICE_REQUEST, SERVICE_SUCCESS, SERVICE_FAILURE ],
         /*  endpoint: !id ? `services` : `services/${id}`,TODO*/
-        endpoint: !id ? `services.json` : `service.json`,
-        schema: !id ? Schemas.SERVICE_ARRAY : Schemas.SERVICE,
+        endpoint: !name ? `services.json` : `service.json`,
+        schema: !name ? Schemas.SERVICE_ARRAY : Schemas.SERVICE,
     }
 });
+
+export const SERVICE_DEPENDENCIES_REQUEST = 'SERVICE_DEPENDENCIES_REQUEST';
+export const SERVICE_DEPENDENCIES_SUCCESS = 'SERVICE_DEPENDENCIES_SUCCESS';
+export const SERVICE_DEPENDENCIES_FAILURE = 'SERVICE_DEPENDENCIES_FAILURE';
+
+export const loadServiceDependencies = (service: IService, id?: string | number) => (dispatch: any, getState: any) => {
+    const cachedService = getState().entities.services[service.serviceName];
+    let cached = cachedService && cachedService.dependencies;
+    if (id) {
+        cached = cached[id];
+    }
+    console.log('cached')
+    console.log(cached)
+    return cached ? null : dispatch(fetchServiceDependencies(service, id));
+};
+
+const fetchServiceDependencies = (service: IService, id?: string | number) => ({
+    [CALL_API]: {
+        types: [ SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_SUCCESS, SERVICE_DEPENDENCIES_FAILURE ],
+        /*endpoint: !id ? `services/${service.id}/dependencies` : `services/${service.id}/dependencies/${id}`,TODO*/
+        endpoint: !id ? `serviceDependencies.json` : `serviceDependency.json`,
+        schema: !id ? Schemas.SERVICE_DEPENDENCY_ARRAY : Schemas.SERVICE_DEPENDENCY,
+        args: service
+    }
+});
+
+
 
 export const SELECT_ENTITY = 'SELECT_ENTITY';
 

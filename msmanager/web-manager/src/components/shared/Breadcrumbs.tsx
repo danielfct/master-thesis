@@ -58,6 +58,9 @@ type Props = StateToProps & DispatchToProps & BreadcrumbsProps & RouteProps & Ro
 
 const breadcrumbs = (props: Props): IBreadcrumbs => {
     let path = props.location && props.location.pathname || '';
+    if (path !== '/' && path.endsWith('/')) {
+        path = path.substr(0, path.length-1); // remove the extra '/' at the end
+    }
     let links = [];
     while (path.length) {
         links.push(path);
@@ -66,15 +69,29 @@ const breadcrumbs = (props: Props): IBreadcrumbs => {
     links = links.reverse();
     const breadcrumbs = links.map(link => {
         let path = link;
-        if (path === props.match.url) {
+        let url = props.match.url;
+        if (url.endsWith('/')) {
+            url = url.substr(0, url.length-1);
+        }
+        if (path === url) {
             path = path.replace(path, props.match.path);
         }
+        if (path.indexOf('#') !== -1) {
+            path = path.substring(0, path.indexOf('#'));
+        }
+        let title = routes[path].title;
+        if (!title) {
+            title = capitalize(link.substring(link.lastIndexOf('/') + 1));
+            if (title.indexOf('#') !== -1) {
+                title = title.substring(0, title.indexOf('#'));
+            }
+        }
         return {
-            title: routes[path].title || capitalize(link.substring(link.lastIndexOf('/') + 1)),
+            title,
             link,
         }
     });
-/*    console.log(breadcrumbs)*/
+   // console.log(breadcrumbs)
     return breadcrumbs;
 };
 
@@ -82,29 +99,8 @@ class Breadcrumbs extends React.Component<Props, State> {
 
     constructor(props:Props) {
         super(props);
-        /*const {title, link, build} = this.props.breadcrumb;
-        let breadcrumbs = this.props.breadcrumbs;
-        if (build) {
-            breadcrumbs.push({title, link});
-            //this.props.addBreadcrumb(title, link);
-        }
-        else {
-            breadcrumbs = [{title, link}];
-        }
-        this.props.updateBreadcrumbs(breadcrumbs);
-        console.log(breadcrumbs)*/
         this.state = { breadcrumbs: breadcrumbs(props) };
     }
-
-    /*public componentDidMount(): void {
-        const {title, link, build} = this.props.breadcrumb;
-        if (build) {
-            this.props.addBreadcrumb(title, link);
-        }
-        else {
-            this.props.updateBreadcrumbs([{title, link}]);
-        }
-    }*/
 
     public render = () => {
         return <div>

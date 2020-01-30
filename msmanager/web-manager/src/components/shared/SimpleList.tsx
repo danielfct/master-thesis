@@ -25,6 +25,7 @@
 import * as React from "react";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
+import "./SimpleList.css";
 
 interface StateToProps {
     isLoading: boolean;
@@ -34,11 +35,23 @@ interface GenericSimpleListProps<T> {
     empty: string | (() => JSX.Element);
     list: T[];
     show: (element: T) => JSX.Element;
+    separator?: boolean | { color: string };
 }
 
 type Props<T> = StateToProps & GenericSimpleListProps<T>;
 
 class GenericSimpleList<T> extends React.Component<Props<T>, {}> {
+
+    private getSeparatorColor = (): string | undefined => {
+        if (typeof this.props.separator === 'boolean' && this.props.separator) {
+            return "black";
+        }
+        else if (typeof this.props.separator === 'object') {
+            return this.props.separator.color ? this.props.separator.color : "black";
+        }
+    };
+
+
     public render = () => {
         const {empty, isLoading, list, show} = this.props;
         const isEmpty = list.length === 0;
@@ -64,10 +77,12 @@ class GenericSimpleList<T> extends React.Component<Props<T>, {}> {
         if (isEmpty) {
             return typeof empty === 'string' ? <h1><i>{empty}</i></h1> : <div>{empty()}</div>;
         }
+        const separatorColor = this.getSeparatorColor();
         return (
             <div>
                 {list.map((c, i) => (
-                    <div key={i}>
+                    <div key={i}
+                         style={separatorColor && i != list.length - 1 ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
                         {show(c)}
                     </div>
                 ))}

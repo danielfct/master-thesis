@@ -32,24 +32,24 @@ interface Props<T> {
     empty: string | (() => JSX.Element);
     list: T[];
     show: (x: T) => JSX.Element;
-    predicate: (x: T,s: string) => boolean;
+    predicate: (x: T, s: string) => boolean;
     search: string;
-    page?: number;
-    pagesize?: number;
+    pagination?: { pagesize: number, page?: number, bottom?: boolean };
+    separator?: boolean | { color: string };
 }
 
 class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
 
     public render() {
-        const {predicate, search, page, pagesize, ...otherprops} = this.props;
+        const {predicate, search, pagination, ...otherprops} = this.props;
         let {empty, list} = this.props;
         const filteredList = list.filter((s:T) => predicate(s, search));
         if (list.length !== filteredList.length && filteredList.length === 0) {
             empty = `no matches for the search '${search}'`; //TODO jsx element with no_found icon plus the text
         }
-        if (page || pagesize) {
+        if (pagination) {
             return <PagedList {...otherprops}
-                              {...{empty, list: filteredList, page, pagesize}}/>
+                              {...{empty, list: filteredList, pagination}}/>
         } else {
             const Simple = SimpleList<T>();
             return <Simple {...otherprops}

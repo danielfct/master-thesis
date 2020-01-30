@@ -33,20 +33,20 @@ interface Props<T> {
     list: T[];
     show: (element: T) => JSX.Element;
     predicate?: (element: T, filter: string) => boolean;
-    pagesize?: number;
-    page?: number;
+    pagination?: { pagesize: number, page?: number, bottom?: boolean };
 }
 
 export default class List<T> extends React.Component<Props<T>, {}> {
 
     public render() {
-        const {predicate, pagesize, page} = this.props;
+        const {predicate, pagination} = this.props;
         if (predicate) {
             const Filtered = FilteredList<T>();
             return <Filtered {...this.props}
                              predicate={predicate}/>;
-        } else if (pagesize || page) {
-            return <PagedList {...this.props}/>
+        } else if (pagination) {
+            return <PagedList {...this.props}
+                              pagination={pagination}/>
         } else {
             const Simple = SimpleList<T>();
             return <Simple {...this.props}/>

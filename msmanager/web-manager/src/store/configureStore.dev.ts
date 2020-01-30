@@ -30,11 +30,12 @@ import promise from "redux-promise-middleware";
 import {loadingBarMiddleware} from "react-redux-loading-bar";
 import api from "../middleware/api";
 import rootReducer from "../reducers";
+import {loadState} from './localStorage'
 
-const configureStore = (preloadedState: any) =>  //TODO preloadedState type
+const configureStore = (persistedState = loadState()) =>
     createStore(
         rootReducer,
-        preloadedState,
+        persistedState,
         compose(
             applyMiddleware(
                 thunk,
@@ -46,7 +47,7 @@ const configureStore = (preloadedState: any) =>  //TODO preloadedState type
                 createLogger(),
             ),
             DevTools.instrument(),
-        )
+        ),
     );
 
 export default configureStore;

@@ -6,18 +6,27 @@ import * as serviceWorker from './serviceWorker';
 import Root from "./containers/Root";
 import {BrowserRouter} from "react-router-dom";
 import configureStore from "./store/configureStore";
+import Footer from "./components/shared/Footer";
+import {saveState} from "./store/localStorage";
 
 // TODO implement labelToIcon function
-// TODO hide search bar when not needed
-// TODO push footer to end of page
 
 const store = configureStore();
 
-ReactDOM.render(
+store.subscribe(() => {
+    saveState(store.getState());
+});
+
+const body = [
     <BrowserRouter>
         <Root store={store}/>
     </BrowserRouter>,
-    document.getElementById('root'));
+    <Footer/>
+];
+
+ReactDOM.render(
+    body,
+    document.getElementById('body'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

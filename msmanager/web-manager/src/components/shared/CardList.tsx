@@ -1,4 +1,3 @@
-import IService from "../services/IService";
 import List from "./List";
 import React from "react";
 
@@ -6,7 +5,7 @@ interface Props<T> {
     empty: string | (() => JSX.Element);
     list: T[];
     card: (element: T) => JSX.Element;
-    predicate: (element: T, filter: string) => boolean;
+    predicate?: (element: T, filter: string) => boolean;
 }
 
 interface State {
@@ -49,5 +48,5 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
             list={this.props.list}
             show={this.props.card}
             predicate={this.props.predicate}
-            pagesize={this.state.pagesize}/>
+            pagination={{pagesize: this.state.pagesize}}/>
 }
