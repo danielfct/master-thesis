@@ -1,0 +1,96 @@
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright (c) 2020 usmanager
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="header :: head"></head>
+
+<body lang="en">	
+  <header>
+      <nav class="white" role="navigation" th:include="navbar :: nav"></nav>
+  </header>	
+  
+  <main>
+    <div class="container">
+      <div class="section">
+        <div class="row">          
+          <h4>Execute ssh command</h4>
+          <form id="form-command" action="/api/exec" method="POST">
+            <div class="input-fieldEntity col s12">
+              <input type="text" name="hostname" id="hostname" autocomplete="off"></input>
+              <label for="last_name">Hostname</label>
+            </div>
+
+            <div class="input-fieldEntity col s12">
+              <input type="text" name="username" id="username" autocomplete="off"></input>
+              <label for="username">Username</label>
+            </div>
+
+            <div class="input-fieldEntity col s12">
+              <input type="password" name="password" id="password" autocomplete="off"></input>
+              <label for="password">Password</label>
+            </div>
+            
+            <div class="input-fieldEntity col s12">
+              <textarea id="command" name="command" class="materialize-textarea"></textarea>
+              <label for="command">Command</label>
+            </div>
+
+            <div id ="loader-placeholder"></div>
+
+            <button class="btn waves-effect waves-light" type="submit" name="action">Execute
+                <i class="material-icons right">send</i>
+            </button>
+          </form>
+        </div>
+      </div>	  
+    </div>
+    <script type="text/javascript">
+      $("#form-command").on('submit',function(event){
+          formSubmitCommand(event, "form-command", onSuccessSubmitCommand);
+      });
+    </script>
+
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal">
+      <div class="modal-content">
+        <h4>Command result</h4>
+        <div id="command-result">
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-light btn-flat">Close</a>
+      </div>
+    </div>
+    <script type="text/javascript">    
+      $('.modal').modal();    
+    </script>
+  </main>
+
+  <footer class="page-footer teal" th:include="footer :: footer"></footer>
+	
+</body>
+</html>

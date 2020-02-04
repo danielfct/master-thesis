@@ -1,0 +1,51 @@
+{
+  "_embedded" : {
+    "comments" : [ {
+      "id" : 21,
+      "title" : "Comment 3",
+      "text" : "I came here like a wrecking ball",
+      "creationDate" : "2018-12-21T12:33:55.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/proposals/12/comments/21"
+        },
+        "comments" : {
+          "href" : "http://localhost:8080/proposals/12/comments?search="
+        },
+        "author" : {
+          "href" : "http://localhost:8080/users/8"
+        },
+        "proposal" : {
+          "href" : "http://localhost:8080/proposals/12"
+        }
+      }
+    }, {
+      "id" : 22,
+      "title" : "Comment 4",
+      "text" : "I ",
+      "creationDate" : "2018-12-21T12:33:55.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/proposals/12/comments/22"
+        },
+        "comments" : {
+          "href" : "http://localhost:8080/proposals/12/comments?search="
+        },
+        "author" : {
+          "href" : "http://localhost:8080/users/7"
+        },
+        "proposal" : {
+          "href" : "http://localhost:8080/proposals/12"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/proposals/12/comments?search="
+    },
+    "root" : {
+      "href" : "http://localhost:8080/"
+    }
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "_embedded" : {
+    "employees" : [ {
+      "id" : 7,
+      "firstName" : "Daniel",
+      "lastName" : "Pimenta",
+      "username" : "dpimenta",
+      "email" : "dpimenta@email.com",
+      "role" : "ROLE_COMPANY_ADMIN",
+      "city" : "Almada",
+      "address" : "Caparica",
+      "zipCode" : "1234-999",
+      "cellPhone" : "+351 919999999",
+      "homePhone" : "+351 221000000",
+      "gender" : "MALE",
+      "salary" : 750.0,
+      "birthday" : "2018-12-21T19:43:03.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/users/7"
+        },
+        "users" : {
+          "href" : "http://localhost:8080/users?search="
+        },
+        "proposals" : {
+          "href" : "http://localhost:8080/users/7/proposals?search="
+        },
+        "bids" : {
+          "href" : "http://localhost:8080/users/7/bids?search="
+        }
+      }
+    }, {
+      "id" : 8,
+      "firstName" : "João",
+      "lastName" : "Reis",
+      "username" : "jreis",
+      "email" : "jreis@email.com",
+      "role" : null,
+      "city" : "Almada",
+      "address" : "Caparica",
+      "zipCode" : "1234-992",
+      "cellPhone" : "+351 918888888",
+      "homePhone" : "+351 221212121",
+      "gender" : "MALE",
+      "salary" : 1000.0,
+      "birthday" : "2018-12-21T19:43:03.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/users/8"
+        },
+        "users" : {
+          "href" : "http://localhost:8080/users?search="
+        },
+        "proposals" : {
+          "href" : "http://localhost:8080/users/8/proposals?search="
+        },
+        "bids" : {
+          "href" : "http://localhost:8080/users/8/bids?search="
+        }
+      }
+    }, {
+      "id" : 9,
+      "firstName" : "Luis",
+      "lastName" : "Martins",
+      "username" : "lmartins",
+      "email" : "lmartins@email.com",
+      "role" : "ROLE_COMPANY_ADMIN",
+      "city" : "Almada",
+      "address" : "Caparica",
+      "zipCode" : "1234-1111",
+      "cellPhone" : "+351 912222222",
+      "homePhone" : "+351 221111111",
+      "gender" : "MALE",
+      "salary" : 1500.0,
+      "birthday" : "2018-12-21T19:43:03.000+0000",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/users/9"
+        },
+        "users" : {
+          "href" : "http://localhost:8080/users?search="
+        },
+        "proposals" : {
+          "href" : "http://localhost:8080/users/9/proposals?search="
+        },
+        "bids" : {
+          "href" : "http://localhost:8080/users/9/bids?search="
+        }
+      }
+    } ],
+    "users" : [ {
+      "id" : 1,
+      "firstName" : "admin",
+      "lastName" : "admin",
+      "username" : "admin",
+      "email" : "admin@admin.pt",
+      "role" : "ROLE_SYS_ADMIN",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/users/1"
+        },
+        "users" : {
+          "href" : "http://localhost:8080/users?search="
+        },
+        "proposals" : {
+          "href" : "http://localhost:8080/users/1/proposals?search="
+        },
+        "bids" : {
+          "href" : "http://localhost:8080/users/1/bids?search="
+        }
+      }
+    }, {
+      "id" : 2,
+      "firstName" : "Manuel",
+      "lastName" : "Coelho",
+      "username" : "mcoelho",
+      "email" : "mcoelho@email.com",
+      "role" : "ROLE_PROPOSAL_APPROVER",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/users/2"
+        },
+        "users" : {
+          "href" : "http://localhost:8080/users?search="
+        },
+        "proposals" : {
+          "href" : "http://localhost:8080/users/2/proposals?search="
+        },
+        "bids" : {
+          "href" : "http://localhost:8080/users/2/bids?search="
+        }
+      }
+    }, {
+      "id" : 3,
+      "firstName" : "Andre",
+      "lastName" : "Oliveira",
+      "username" : "aoliveira",
+      "email" : "aoliveira@email.com",
+      "role" : "ROLE_PROPOSAL_APPROVER",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/users/3"
+        },
+        "users" : {
+          "href" : "http://localhost:8080/users?search="
+        },
+        "proposals" : {
+          "href" : "http://localhost:8080/users/3/proposals?search="
+        },
+        "bids" : {
+          "href" : "http://localhost:8080/users/3/bids?search="
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/users?search="
+    },
+    "root" : {
+      "href" : "http://localhost:8080/"
+    }
+  }
+}
