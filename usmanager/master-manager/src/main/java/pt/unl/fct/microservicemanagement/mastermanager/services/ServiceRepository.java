@@ -87,7 +87,7 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
   int getMinReplicsByServiceName(@Param("serviceName") String serviceName);
 
   @Query("select p "
-      + "from ServiceEntity s join s.serviceEventPredictions p "
+      + "from ServiceEntity s join s.eventPredictions p "
       + "where s.id = :serviceId and p.id = :serviceEventPredictions")
   Optional<ServiceEventPrediction> getServiceEventPrediction(@Param("serviceId") long serviceId,
                                                              @Param("serviceEventPredictions")

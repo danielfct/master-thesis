@@ -44,7 +44,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "generic_host_rule")
+@Table(name = "generic_host_rules")
 public class GenericHostRuleEntity {
 
   @Id

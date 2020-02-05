@@ -51,7 +51,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "value_mode")
+@Table(name = "value_modes")
 public class ValueModeEntity {
 
   @Id

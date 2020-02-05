@@ -34,7 +34,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.docker.swarm.node.SimpleN
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsInstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsService;
-import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHost;
+import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.location.LocationRequestService;
 import pt.unl.fct.microservicemanagement.mastermanager.monitoring.HostMetricsService;
@@ -191,7 +191,7 @@ public class HostsService {
     String region;
     String continent;
     if (edgeHostsService.hasEdgeHost(hostname)) {
-      EdgeHost edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
       city = edgeHost.getCity();
       country = edgeHost.getCountry();
       region = edgeHost.getRegion();
@@ -261,7 +261,7 @@ public class HostsService {
       log.info("\nSwarm manager '{}' is on cloud", managerHostname);
       hostnames.addAll(getWorkerAwsNodes());
     } else {
-      EdgeHost dockerMasterHost = edgeHostsService.getEdgeHostByHostname(managerHostname);
+      EdgeHostEntity dockerMasterHost = edgeHostsService.getEdgeHostByHostname(managerHostname);
       if (!dockerMasterHost.isLocal()) {
         log.info("\nSwarm manager '{}' is an edge node, and accessible through internet", managerHostname);
         hostnames.addAll(getWorkerAwsNodes());
@@ -307,7 +307,7 @@ public class HostsService {
   private List<String> getWorkerEdgeNodes() {
     String partialHostname = managerHostname.substring(0, managerHostname.lastIndexOf('.'));
     return edgeHostsService.getHostsByPartialHostname(partialHostname).stream()
-        .map(EdgeHost::getHostname)
+        .map(EdgeHostEntity::getHostname)
         .filter(hostname -> !Objects.equals(hostname, managerHostname))
         .filter(this::isHostRunning)
         .limit(maxWorkers)
@@ -328,12 +328,12 @@ public class HostsService {
 
 
   private Optional<String> chooseEdgeHost(String region, String city, String country) {
-    List<EdgeHost> edgeHosts = country.isEmpty()
+    List<EdgeHostEntity> edgeHosts = country.isEmpty()
         ? edgeHostsService.getHostsByRegion(region)
         : edgeHostsService.getHostsByCountry(country);
     return edgeHosts.stream()
         .filter(edgeHost -> Text.isNullOrEmpty(city) || Objects.equals(edgeHost.getCity(), city))
-        .map(EdgeHost::getHostname)
+        .map(EdgeHostEntity::getHostname)
         .filter(Predicate.not(dockerNodesService::isNode))
         .filter(this::isHostRunning)
         .findFirst();

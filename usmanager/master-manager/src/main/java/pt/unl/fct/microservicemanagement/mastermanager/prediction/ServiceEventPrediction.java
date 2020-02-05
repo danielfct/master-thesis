@@ -51,7 +51,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "service_event_prediction")
+@Table(name = "service_event_predictions")
 public class ServiceEventPrediction {
 
   @Id

@@ -56,7 +56,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "component_decision_log")
+@Table(name = "component_decision_logs")
 public class ComponentDecisionLog {
 
   //TODO rename

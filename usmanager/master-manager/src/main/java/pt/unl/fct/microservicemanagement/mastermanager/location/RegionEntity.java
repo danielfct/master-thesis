@@ -22,18 +22,12 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.rulesystem.event;
-
-import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionEntity;
-
-
+package pt.unl.fct.microservicemanagement.mastermanager.location;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AccessLevel;
@@ -42,42 +36,38 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-@Setter
+@Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "service_event_logs")
-public class ServiceEvent {
+@Table(name = "regions")
+public class RegionEntity {
 
   @Id
   @GeneratedValue
   private Long id;
 
-  @Column(name = "container_id")
-  private String containerId;
+  @NaturalId
+  private String regionName;
 
-  @Column(name = "service_name")
-  private String serviceName;
+  private String regionDescription;
 
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
-
-  @Column(name = "count")
-  private int count;
+  @Column(columnDefinition = "boolean default true")
+  private boolean active;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ServiceEvent)) {
+    if (!(o instanceof RegionEntity)) {
       return false;
     }
-    ServiceEvent other = (ServiceEvent) o;
+    RegionEntity other = (RegionEntity) o;
     return id != null && id.equals(other.getId());
   }
 

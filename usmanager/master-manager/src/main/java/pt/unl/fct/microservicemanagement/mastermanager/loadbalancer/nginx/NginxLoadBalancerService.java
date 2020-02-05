@@ -29,7 +29,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerCo
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
+import pt.unl.fct.microservicemanagement.mastermanager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.services.ServicesService;
 
@@ -82,7 +82,7 @@ public class NginxLoadBalancerService {
     this.restTemplate = new RestTemplate();
   }
 
-  public List<String> launchLoadBalancers(String serviceName, List<Region> regions) {
+  public List<String> launchLoadBalancers(String serviceName, List<RegionEntity> regions) {
     ServiceEntity serviceConfig =
         serviceService.getService(LOAD_BALANCER);
     double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();

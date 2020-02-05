@@ -26,11 +26,9 @@ package pt.unl.fct.microservicemanagement.mastermanager.apps;
 
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.AppRule;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -44,6 +42,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
@@ -51,25 +51,25 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "app_package")
+@Table(name = "app_packages")
 public class AppPackage {
 
   @Id
   @GeneratedValue
   private Long id;
 
-  @Column(name = "app_name")
+  @NaturalId
   private String appName;
 
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "appPackage", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<AppService> appServices = new HashSet<>();
+  private Set<AppService> appServices;
 
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "appPackage", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<AppRule> appRules = new HashSet<>();
+  private Set<AppRule> appRules;
 
   @Override
   public boolean equals(Object o) {

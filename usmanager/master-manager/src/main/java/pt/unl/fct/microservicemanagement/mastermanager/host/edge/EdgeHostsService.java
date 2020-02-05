@@ -37,7 +37,7 @@ public class EdgeHostsService {
     this.edgeHosts = edgeHosts;
   }
 
-  public Iterable<EdgeHost> getEdgeHosts() {
+  public Iterable<EdgeHostEntity> getEdgeHosts() {
     return edgeHosts.findAll();
   }
 
@@ -51,7 +51,7 @@ public class EdgeHostsService {
         return edgeHosts.save(edgeHost).getId();
    }*/
 
-  public long saveEdgeHost(long edgeHostId, EdgeHost edgeHost) {
+  public long saveEdgeHost(long edgeHostId, EdgeHostEntity edgeHost) {
     if (edgeHostId > 0) {
       edgeHost.setId(edgeHostId);
     }
@@ -62,19 +62,19 @@ public class EdgeHostsService {
     edgeHosts.deleteById(edgeHostId);
   }
 
-  public EdgeHost getEdgeHostByHostname(String hostname) {
+  public EdgeHostEntity getEdgeHostByHostname(String hostname) {
     return edgeHosts.findByHostname(hostname);
   }
 
-  public List<EdgeHost> getHostsByPartialHostname(String partialHostname) {
+  public List<EdgeHostEntity> getHostsByPartialHostname(String partialHostname) {
     return edgeHosts.findByHostnameContaining(partialHostname);
   }
 
-  public List<EdgeHost> getHostsByRegion(String region) {
+  public List<EdgeHostEntity> getHostsByRegion(String region) {
     return edgeHosts.findByRegion(region);
   }
 
-  public List<EdgeHost> getHostsByCountry(String country) {
+  public List<EdgeHostEntity> getHostsByCountry(String country) {
     return edgeHosts.findByCountry(country);
   }
 

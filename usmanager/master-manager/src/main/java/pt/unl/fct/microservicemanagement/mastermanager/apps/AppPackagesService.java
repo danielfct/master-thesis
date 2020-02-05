@@ -25,11 +25,11 @@
 package pt.unl.fct.microservicemanagement.mastermanager.apps;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.services.ServiceOrder;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import pt.unl.fct.microservicemanagement.mastermanager.services.ServiceOrder;
 
 @Service
 public class AppPackagesService {

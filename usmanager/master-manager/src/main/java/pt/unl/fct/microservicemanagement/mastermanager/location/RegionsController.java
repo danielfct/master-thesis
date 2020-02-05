@@ -43,12 +43,12 @@ public class RegionsController {
   }
 
   @GetMapping
-  public Iterable<Region> getRegions() {
+  public Iterable<RegionEntity> getRegions() {
     return regionsService.getRegions();
   }
 
   @GetMapping("/{id}")
-  public Region getRegion(@PathVariable long id) {
+  public RegionEntity getRegion(@PathVariable long id) {
     return regionsService.getRegion(id);
   }
 
@@ -65,7 +65,7 @@ public class RegionsController {
   }*/
 
   @PostMapping("/{id}")
-  public long saveRegion(@PathVariable long id, @RequestBody Region region) {
+  public long saveRegion(@PathVariable long id, @RequestBody RegionEntity region) {
     return regionsService.saveRegion(id, region);
   }
 

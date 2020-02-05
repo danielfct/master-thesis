@@ -28,13 +28,13 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
+import pt.unl.fct.microservicemanagement.mastermanager.location.RegionEntity;
 
 @AllArgsConstructor
 @Getter
 final class LaunchLoadBalacerReq {
 
   private final String serviceName;
-  private final List<Region> regions;
+  private final List<RegionEntity> regions;
 
 }

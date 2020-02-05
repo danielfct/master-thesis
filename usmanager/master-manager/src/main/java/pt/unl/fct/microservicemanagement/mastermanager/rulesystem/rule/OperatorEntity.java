@@ -51,7 +51,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "operator")
+@Table(name = "operators")
 public class OperatorEntity {
 
   @Id

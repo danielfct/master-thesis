@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule;
 
-import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.ComponentTypeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.ComponentDecisionLog;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionEntity;
@@ -56,7 +55,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "rule")
+@Table(name = "rules")
 public class RuleEntity {
 
   @Id

@@ -32,18 +32,18 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EdgeHostRepository extends CrudRepository<EdgeHost, Long> {
+public interface EdgeHostRepository extends CrudRepository<EdgeHostEntity, Long> {
 
-  EdgeHost findByHostname(@Param("hostname") String hostname);
+  EdgeHostEntity findByHostname(@Param("hostname") String hostname);
 
-  List<EdgeHost> findByHostnameContaining(@Param("partialHostname") String partialHostname);
+  List<EdgeHostEntity> findByHostnameContaining(@Param("partialHostname") String partialHostname);
 
-  List<EdgeHost> findByRegion(@Param("region") String region);
+  List<EdgeHostEntity> findByRegion(@Param("region") String region);
 
-  List<EdgeHost> findByCountry(@Param("country") String country);
+  List<EdgeHostEntity> findByCountry(@Param("country") String country);
 
   @Query("select case when count(*) > 0 then true else false end "
-      + "from EdgeHost h "
+      + "from EdgeHostEntity h "
       + "where h.hostname = :hostname")
   boolean hasEdgeHost(@Param("hostname") String hostname);
 

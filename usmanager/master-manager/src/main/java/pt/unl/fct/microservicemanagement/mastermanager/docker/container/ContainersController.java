@@ -25,7 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.docker.container;
 
 import pt.unl.fct.microservicemanagement.mastermanager.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
+import pt.unl.fct.microservicemanagement.mastermanager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.services.discovery.eureka.EurekaService;
 
 import java.util.List;
@@ -113,7 +113,7 @@ public class ContainersController {
   }
 
   @PostMapping("/eureka")
-  public List<SimpleContainer> launchEureka(@RequestBody List<Region> regions) {
+  public List<SimpleContainer> launchEureka(@RequestBody List<RegionEntity> regions) {
     return eurekaService.launchEurekaServers(regions);
   }
 

@@ -25,8 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.location;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
-import pt.unl.fct.microservicemanagement.mastermanager.location.RegionRepository;
 
 import org.springframework.stereotype.Service;
 
@@ -39,11 +37,11 @@ public class RegionsService {
     this.regions = regions;
   }
 
-  public Iterable<Region> getRegions() {
+  public Iterable<RegionEntity> getRegions() {
     return regions.findAll();
   }
 
-  public Region getRegion(long id) {
+  public RegionEntity getRegion(long id) {
     return regions.findById(id).orElseThrow(() -> new NotFoundException("Region not found"));
   }
 
@@ -57,7 +55,7 @@ public class RegionsService {
     return regions.save(region).getId();
   }*/
 
-  public long saveRegion(long id, Region region) {
+  public long saveRegion(long id, RegionEntity region) {
     if (id > 0) {
       region.setId(id);
     }

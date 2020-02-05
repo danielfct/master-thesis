@@ -52,7 +52,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "field")
+@Table(name = "fields")
 public class FieldEntity {
 
   @Id

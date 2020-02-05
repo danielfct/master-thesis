@@ -26,13 +26,12 @@ package pt.unl.fct.microservicemanagement.mastermanager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.apps.AppService;
 import pt.unl.fct.microservicemanagement.mastermanager.prediction.ServiceEventPrediction;
-import pt.unl.fct.microservicemanagement.mastermanager.services.dependency.ServiceDependency;
 import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.rule.ServiceRule;
+import pt.unl.fct.microservicemanagement.mastermanager.services.dependency.ServiceDependency;
 
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -47,6 +46,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
 
 @Entity
@@ -55,7 +55,7 @@ import org.hibernate.annotations.NaturalId;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "service")
+@Table(name = "services")
 public class ServiceEntity {
 
   @Id
@@ -63,63 +63,57 @@ public class ServiceEntity {
   private Long id;
 
   @NaturalId
-  @Column(name = "service_name")
   private String serviceName;
 
-  @Column(name = "docker_repository")
   private String dockerRepository;
 
-  @Column(name = "default_external_port")
   private String defaultExternalPort;
 
-  @Column(name = "default_internal_port")
   private String defaultInternalPort;
 
-  @Column(name = "default_db")
   private String defaultDb;
 
-  @Column(name = "launch_command")
   private String launchCommand;
 
-  @Column(name = "min_replics")
   @Min(0)
   private int minReplics;
 
-  @Column(name = "max_replics")
   @Min(0)
   private int maxReplics;
 
-  @Column(name = "output_label")
   private String outputLabel;
 
   //TODO use enum https://vladmihalcea.com/the-best-way-to-map-an-enum-type-with-jpa-and-hibernate/
   // VALUES: frontend, backend, database, system
-  @Column(name = "service_type")
   private String serviceType;
 
   // Average memory consumption in bytes
-  @Column(name = "expected_memory_consumption")
   private double expectedMemoryConsumption;
 
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<AppService> appServices;
 
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ServiceDependency> dependencies;
 
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "serviceDependency", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceDependency> dependsOn;
+  private Set<ServiceDependency> depends;
 
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceEventPrediction> serviceEventPredictions;
+  private Set<ServiceEventPrediction> eventPredictions;
 
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceRule> serviceRules;
+  private Set<ServiceRule> rules;
 
   public boolean hasLaunchCommand() {
     return launchCommand != null && !launchCommand.isBlank();

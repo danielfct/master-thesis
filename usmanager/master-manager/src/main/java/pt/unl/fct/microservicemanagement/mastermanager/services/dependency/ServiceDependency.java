@@ -24,9 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.services.dependency;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import pt.unl.fct.microservicemanagement.mastermanager.services.ServiceEntity;
 
 import javax.persistence.Entity;
@@ -36,6 +33,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,7 +46,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "service_dependency")
+@Table(name = "service_dependencies")
 public class ServiceDependency {
 
   @Id

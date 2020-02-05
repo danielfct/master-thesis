@@ -280,7 +280,7 @@ public class LocationRequestService {
         return "us-east-1";
       default:
     }
-    Iterable<Region> regions = regionsService.getRegions();
+    Iterable<RegionEntity> regions = regionsService.getRegions();
     List<String> foundRegion = new ArrayList<>();
     String regionNameBegin = "";
     switch (continent) {
@@ -300,7 +300,7 @@ public class LocationRequestService {
         break;
       default:
     }
-    for (Region region : regions) {
+    for (RegionEntity region : regions) {
       String regionName = region.getRegionName();
       if (regionName.contains(regionNameBegin)) {
         foundRegion.add(regionName);

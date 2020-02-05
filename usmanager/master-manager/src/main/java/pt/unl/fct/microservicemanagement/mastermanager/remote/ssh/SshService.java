@@ -27,7 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.remote.ssh;
 import pt.unl.fct.microservicemanagement.mastermanager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHost;
+import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHostsService;
 
 import java.io.File;
@@ -78,7 +78,7 @@ public class SshService {
     sshClient.addHostKeyVerifier(new PromiscuousVerifier());
     sshClient.connect(hostname);
     if (edgeHostsService.hasEdgeHost(hostname)) {
-      EdgeHost edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
       String username = edgeHost.getSshUsername();
       //TODO improve security password
       String password = new String(Base64.getDecoder().decode(edgeHost.getSshPassword()));

@@ -30,7 +30,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.docker.container.SimpleCo
 import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.services.ServicesService;
-import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
+import pt.unl.fct.microservicemanagement.mastermanager.location.RegionEntity;
 
 import java.util.Collections;
 import java.util.List;
@@ -70,7 +70,7 @@ public class EurekaService {
   }
 
   // Return all eureka containers started
-  public List<SimpleContainer> launchEurekaServers(List<Region> regions) {
+  public List<SimpleContainer> launchEurekaServers(List<RegionEntity> regions) {
     ServiceEntity service =
         serviceService.getService(EUREKA);
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();

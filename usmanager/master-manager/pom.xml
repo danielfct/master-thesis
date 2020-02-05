@@ -39,7 +39,7 @@
 		<repository>
 			<id>master-manager</id>
 			<name>Master Manager</name>
-			<url>https://github.com/msmanager/msmanager/master-manager</url>
+			<url>https://github.com/usmanager/usmanager/master-manager</url>
 		</repository>
 	</repositories>
 	<licenses>

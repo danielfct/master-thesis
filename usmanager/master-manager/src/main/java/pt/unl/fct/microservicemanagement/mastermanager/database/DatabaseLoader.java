@@ -28,9 +28,9 @@ import pt.unl.fct.microservicemanagement.mastermanager.apps.AppPackage;
 import pt.unl.fct.microservicemanagement.mastermanager.apps.AppPackageRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.apps.AppService;
 import pt.unl.fct.microservicemanagement.mastermanager.apps.AppServiceRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHost;
+import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHostRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.location.Region;
+import pt.unl.fct.microservicemanagement.mastermanager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.location.RegionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.monitoring.metric.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.monitoring.metric.FieldRepository;
@@ -54,7 +54,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.services.ServiceRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.services.dependency.ServiceDependency;
 import pt.unl.fct.microservicemanagement.mastermanager.services.dependency.ServiceDependencyRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.users.User;
+import pt.unl.fct.microservicemanagement.mastermanager.users.UserEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.users.UsersRepository;
 
 import java.util.Set;
@@ -80,13 +80,13 @@ public class DatabaseLoader {
       System.out.println("running db population");
 
       // sytem users
-      User sysAdmin = User.builder()
+      UserEntity sysAdmin = UserEntity.builder()
           .firstName("admin")
           .lastName("admin")
           .username("admin")
           .password(encoder.encode("password"))
           .email("admin@admin.pt")
-          .role(User.Role.ROLE_SYS_ADMIN)
+          .role(UserEntity.Role.ROLE_SYS_ADMIN)
           .build();
       sysAdmin = users.save(sysAdmin);
       System.out.println(sysAdmin);
@@ -628,19 +628,19 @@ public class DatabaseLoader {
       servicesDependencies.save(rabbitmqEurekaServerDependency);
 
       // regions
-      var usEast1 = Region.builder()
+      var usEast1 = RegionEntity.builder()
           .regionName("us-east-1")
           .regionDescription("US East (N. Virginia)")
           .active(true)
           .build();
       regions.save(usEast1);
-      var euCentral1 = Region.builder()
+      var euCentral1 = RegionEntity.builder()
           .regionName("eu-central-1")
           .regionDescription("EU (Frankfurt)")
           .active(true)
           .build();
       regions.save(euCentral1);
-      var euWest2 = Region.builder()
+      var euWest2 = RegionEntity.builder()
           .regionName("eu-west-2")
           .regionDescription("EU (London)")
           .active(true)
@@ -648,7 +648,7 @@ public class DatabaseLoader {
       regions.save(euWest2);
 
       // edge hosts
-      var daniel127001 = EdgeHost.builder()
+      var daniel127001 = EdgeHostEntity.builder()
           .hostname("127.0.0.1")
           .sshUsername("daniel")
           .sshPassword("enhj")
@@ -658,7 +658,7 @@ public class DatabaseLoader {
           .isLocal(true)
           .build();
       edgeHosts.save(daniel127001);
-      var daniel192168176 = EdgeHost.builder()
+      var daniel192168176 = EdgeHostEntity.builder()
           .hostname("192.168.1.76")
           .sshUsername("daniel")
           .sshPassword("enhj")
@@ -668,7 +668,7 @@ public class DatabaseLoader {
           .isLocal(true)
           .build();
       edgeHosts.save(daniel192168176);
-      var daniel192168168 = EdgeHost.builder()
+      var daniel192168168 = EdgeHostEntity.builder()
           .hostname("192.168.1.68")
           .sshUsername("daniel")
           .sshPassword("enhj")
@@ -678,7 +678,7 @@ public class DatabaseLoader {
           .isLocal(true)
           .build();
       edgeHosts.save(daniel192168168);
-      var daniel192168172 = EdgeHost.builder()
+      var daniel192168172 = EdgeHostEntity.builder()
           .hostname("192.168.1.72")
           .sshUsername("daniel")
           .sshPassword("enhj")
@@ -688,7 +688,7 @@ public class DatabaseLoader {
           .isLocal(true)
           .build();
       edgeHosts.save(daniel192168172);
-      var daniel1022245206 = EdgeHost.builder()
+      var daniel1022245206 = EdgeHostEntity.builder()
           .hostname("10.22.245.206")
           .sshUsername("daniel")
           .sshPassword("enhj")

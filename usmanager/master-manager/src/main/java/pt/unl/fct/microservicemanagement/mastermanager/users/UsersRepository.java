@@ -28,13 +28,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface UsersRepository extends CrudRepository<User, Long> {
+public interface UsersRepository extends CrudRepository<UserEntity, Long> {
 
-  User findByUsername(String username);
+  UserEntity findByUsername(String username);
 
   @Query("SELECT u "
-      + "FROM User u "
+      + "FROM UserEntity u "
       + "WHERE u.username LIKE CONCAT('%',:search,'%')")
-  Iterable<User> searchUsers(@Param(value = "search") String search);
+  Iterable<UserEntity> searchUsers(@Param(value = "search") String search);
 
 }

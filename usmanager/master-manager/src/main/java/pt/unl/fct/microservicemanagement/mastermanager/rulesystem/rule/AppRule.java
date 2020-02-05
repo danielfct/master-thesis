@@ -46,7 +46,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "app_rule")
+@Table(name = "app_rules")
 public class AppRule {
 
   @Id

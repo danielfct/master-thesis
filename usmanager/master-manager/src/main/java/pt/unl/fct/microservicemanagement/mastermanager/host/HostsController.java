@@ -29,7 +29,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.docker.container.SimpleCo
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsLaunchServiceReq;
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsService;
 import pt.unl.fct.microservicemanagement.mastermanager.host.cloud.aws.AwsSimpleInstance;
-import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHost;
+import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.host.edge.EdgeHostsService;
 
 import java.util.List;
@@ -60,7 +60,7 @@ public class HostsController {
   }
 
   @GetMapping("/edge")
-  public Iterable<EdgeHost> getEdgeHosts() {
+  public Iterable<EdgeHostEntity> getEdgeHosts() {
     return edgeHostsService.getEdgeHosts();
   }
 
@@ -78,7 +78,7 @@ public class HostsController {
     }*/
 
   @PostMapping("/edge/{id}")
-  public long saveEdgeHost(@PathVariable long id, @RequestBody EdgeHost edgeHost) {
+  public long saveEdgeHost(@PathVariable long id, @RequestBody EdgeHostEntity edgeHost) {
     return edgeHostsService.saveEdgeHost(id, edgeHost);
   }
 

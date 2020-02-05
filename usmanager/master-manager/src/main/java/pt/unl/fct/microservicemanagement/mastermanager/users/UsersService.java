@@ -48,7 +48,7 @@ public class UsersService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    pt.unl.fct.microservicemanagement.mastermanager.users.User user = users.findByUsername(username);
+    UserEntity user = users.findByUsername(username);
     if (user == null) {
       throw new UsernameNotFoundException(username);
     }

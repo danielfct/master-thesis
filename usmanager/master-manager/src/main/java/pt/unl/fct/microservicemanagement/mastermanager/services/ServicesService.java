@@ -116,7 +116,7 @@ public class ServicesService {
 
   public Iterable<ServiceEventPrediction> getServiceEventPredictions(long serviceId) {
     var service = services.findById(serviceId).orElseThrow(NotFoundException::new);
-    return service.getServiceEventPredictions();
+    return service.getEventPredictions();
   }
 
   public ServiceEventPrediction getServiceEventPrediction(long serviceId, long serviceEventPredictionId) {

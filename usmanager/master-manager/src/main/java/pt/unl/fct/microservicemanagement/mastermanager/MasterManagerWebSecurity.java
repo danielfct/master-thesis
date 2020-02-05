@@ -58,6 +58,12 @@ public class MasterManagerWebSecurity extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
         .csrf().disable()
+        .headers().frameOptions().sameOrigin()
+        .and()
+        .authorizeRequests()
+        .antMatchers("/console/**")
+        .permitAll()
+        .and()
         .authorizeRequests()
         .anyRequest().authenticated()
         .and()

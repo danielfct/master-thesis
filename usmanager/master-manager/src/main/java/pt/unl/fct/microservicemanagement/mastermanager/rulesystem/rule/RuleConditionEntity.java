@@ -46,7 +46,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "rule_condition")
+@Table(name = "rule_conditions")
 public class RuleConditionEntity {
 
   @Id

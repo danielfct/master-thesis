@@ -22,68 +22,59 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.rulesystem.event;
+package pt.unl.fct.microservicemanagement.mastermanager.users;
 
-import pt.unl.fct.microservicemanagement.mastermanager.rulesystem.decision.DecisionEntity;
-
-
-
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-@Setter
+@Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "service_event_logs")
-public class ServiceEvent {
+@Table(name = "users")
+public class UserEntity {
+
+  public enum Role {
+    ROLE_SYS_ADMIN
+  }
 
   @Id
   @GeneratedValue
-  private Long id;
+  private long id;
 
-  @Column(name = "container_id")
-  private String containerId;
+  @NotEmpty
+  private String firstName;
 
-  @Column(name = "service_name")
-  private String serviceName;
+  @NotEmpty
+  private String lastName;
 
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
+  @NaturalId
+  private String username;
 
-  @Column(name = "count")
-  private int count;
+  @NotEmpty
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+  private String password;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ServiceEvent)) {
-      return false;
-    }
-    ServiceEvent other = (ServiceEvent) o;
-    return id != null && id.equals(other.getId());
-  }
+  @NaturalId
+  private String email;
 
-  @Override
-  public int hashCode() {
-    return 31;
-  }
+  @Enumerated(EnumType.STRING)
+  private Role role;
 
 }

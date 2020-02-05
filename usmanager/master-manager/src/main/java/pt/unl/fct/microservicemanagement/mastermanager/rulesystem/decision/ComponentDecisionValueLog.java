@@ -47,7 +47,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "component_decision_value_log")
+@Table(name = "component_decision_value_logs")
 public class ComponentDecisionValueLog {
 
   @Id

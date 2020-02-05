@@ -53,7 +53,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-@Table(name = "component_type")
+@Table(name = "component_types")
 public class ComponentTypeEntity {
 
   @Id
