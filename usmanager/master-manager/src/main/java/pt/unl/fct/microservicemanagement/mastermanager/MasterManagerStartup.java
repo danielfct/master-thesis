@@ -24,10 +24,10 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager;
 
-import pt.unl.fct.microservicemanagement.mastermanager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.monitoring.ContainersMonitoringService;
-import pt.unl.fct.microservicemanagement.mastermanager.monitoring.HostsMonitoringService;
-import pt.unl.fct.microservicemanagement.mastermanager.monitoring.MasterManagerMonitoringService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.ContainersMonitoringService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.HostsMonitoringService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.MasterManagerMonitoringService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
