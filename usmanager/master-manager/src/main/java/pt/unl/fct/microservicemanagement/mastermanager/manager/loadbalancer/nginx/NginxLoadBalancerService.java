@@ -139,13 +139,13 @@ public class NginxLoadBalancerService {
       Message responseBody = response.getBody();
       String responseMessage = responseBody.getMessage();
       if (!Objects.equals(responseMessage, "success")) {
-        log.info("\nFailed to add server {} to loadBalancer {}: {}", nginxServer, loadBalancerUrl, responseMessage);
+        log.info("Failed to add server {} to loadBalancer {}: {}", nginxServer, loadBalancerUrl, responseMessage);
       }
     });
   }
 
   public void removeFromLoadBalancer(String hostname, String containerId) {
-    log.info("\nRemoving container '{}' from load balancer", containerId);
+    log.info("Removing container '{}' from load balancer", containerId);
     Map<String, String> labels = dockerContainersService.inspectContainer(containerId, hostname).config().labels();
     String serviceType = labels.get(DockerContainer.Label.SERVICE_TYPE);
     String serviceName = labels.get(DockerContainer.Label.SERVICE_NAME);
@@ -170,7 +170,7 @@ public class NginxLoadBalancerService {
       Message responseBody = response.getBody();
       String responseMessage = responseBody.getMessage();
       if (!Objects.equals(responseMessage, "success")) {
-        log.info("\nFailed to delete server '{}' from load balancer '{}': {}", serverAddress, url, responseMessage);
+        log.info("Failed to delete server '{}' from load balancer '{}': {}", serverAddress, url, responseMessage);
       }
     });
   }

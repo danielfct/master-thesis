@@ -44,7 +44,7 @@ import lombok.Setter;
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
 @Table(name = "component_decision_value_logs")

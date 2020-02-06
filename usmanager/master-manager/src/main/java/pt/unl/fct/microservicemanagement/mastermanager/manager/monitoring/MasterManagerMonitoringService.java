@@ -66,7 +66,7 @@ public class MasterManagerMonitoringService {
 
   public void initMasterManagerMonitorTimer() {
     if (isTestLogsEnable) {
-      new Timer("masterManagerMonitorTimer", true).schedule(new TimerTask() {
+      new Timer("MasterManagerMonitorTimer", true).schedule(new TimerTask() {
         private long lastRun = System.currentTimeMillis();
         @Override
         public void run() {

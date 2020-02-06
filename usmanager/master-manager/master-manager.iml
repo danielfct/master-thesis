@@ -18,7 +18,6 @@
         <setting name="validation-enabled" value="true" />
         <datasource-mapping>
           <factory-entry name="entityManagerFactory" />
-          <factory-entry name="loggingPersistenceUnit" />
         </datasource-mapping>
         <naming-strategy-map />
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/src/main/resources/persistence.xml" />

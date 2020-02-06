@@ -77,8 +77,6 @@ public class DatabaseLoader {
                                  RuleConditionRepository ruleConditions, GenericHostRuleRepository genericHostRules) {
     return args -> {
 
-      System.out.println("running db population");
-
       // sytem users
       UserEntity sysAdmin = UserEntity.builder()
           .firstName("admin")
@@ -88,8 +86,7 @@ public class DatabaseLoader {
           .email("admin@admin.pt")
           .role(UserEntity.Role.ROLE_SYS_ADMIN)
           .build();
-      sysAdmin = users.save(sysAdmin);
-      System.out.println(sysAdmin);
+      users.save(sysAdmin);
 
       // services
       var frontend = ServiceEntity.builder()
@@ -106,7 +103,6 @@ public class DatabaseLoader {
           .expectedMemoryConsumption(209715200)
           .build();
       frontend = services.save(frontend);
-      System.out.println(frontend);
       var user = ServiceEntity.builder()
           .serviceName("user")
           .dockerRepository("user")
@@ -121,7 +117,6 @@ public class DatabaseLoader {
           .expectedMemoryConsumption(62914560)
           .build();
       user = services.save(user);
-      System.out.println(user);
       var userDb = ServiceEntity.builder()
           .serviceName("user-db")
           .dockerRepository("user-db")

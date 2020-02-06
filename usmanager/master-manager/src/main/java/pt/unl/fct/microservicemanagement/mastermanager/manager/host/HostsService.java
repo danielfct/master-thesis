@@ -119,7 +119,7 @@ public class HostsService {
 
   public String getAvailableNodeHostname(double avgContainerMem, String region, String country, String city) {
     //TODO try to improve method
-    log.info("\nLooking for available nodes to host container with at least '{}' memory...", avgContainerMem);
+    log.info("Looking for available nodes to host container with at least '{}' memory...", avgContainerMem);
     var otherRegionsHosts = new LinkedList<String>();
     var sameRegionHosts = new LinkedList<String>();
     var sameCountryHosts = new LinkedList<String>();
@@ -151,10 +151,10 @@ public class HostsService {
             otherRegionsHosts.add(hostname);
           }
         });
-    log.info("\nFound hosts {} on same city", sameCityHosts.toString());
-    log.info("\nFound hosts {} on same country", sameCountryHosts.toString());
-    log.info("\nFound hosts {} on same region", sameRegionHosts.toString());
-    log.info("\nFound hosts {} on other regions", otherRegionsHosts.toString());
+    log.info("Found hosts {} on same city", sameCityHosts.toString());
+    log.info("Found hosts {} on same country", sameCountryHosts.toString());
+    log.info("Found hosts {} on same region", sameRegionHosts.toString());
+    log.info("Found hosts {} on other regions", otherRegionsHosts.toString());
     final var random = new Random();
     if (!sameCityHosts.isEmpty()) {
       return sameCityHosts.get(random.nextInt(sameCityHosts.size()));
@@ -167,7 +167,7 @@ public class HostsService {
       // TODO: review otherHostRegion and region us-east-1
       return otherRegionsHosts.get(random.nextInt(otherRegionsHosts.size()));
     } else {
-      log.info("\nDidn't find any available node");
+      log.info("Didn't find any available node");
       return addHost(region, country, city);
     }
   }
@@ -258,31 +258,31 @@ public class HostsService {
     var hostnames = new LinkedList<String>();
     hostnames.add(managerHostname);
     if (!edgeHostsService.hasEdgeHost(managerHostname)) {
-      log.info("\nSwarm manager '{}' is on cloud", managerHostname);
+      log.info("Swarm manager '{}' is on cloud", managerHostname);
       hostnames.addAll(getWorkerAwsNodes());
     } else {
       EdgeHostEntity dockerMasterHost = edgeHostsService.getEdgeHostByHostname(managerHostname);
       if (!dockerMasterHost.isLocal()) {
-        log.info("\nSwarm manager '{}' is an edge node, and accessible through internet", managerHostname);
+        log.info("Swarm manager '{}' is an edge node, and accessible through internet", managerHostname);
         hostnames.addAll(getWorkerAwsNodes());
       } else {
-        log.info("\nSwarm manager '{}' is local", managerHostname);
+        log.info("Swarm manager '{}' is local", managerHostname);
         hostnames.addAll(getWorkerEdgeNodes());
       }
     }
-    log.info("\nClustering hosts into the swarm...");
+    log.info("Clustering hosts into the swarm...");
     hostnames.forEach(this::setupHost);
   }
 
   private void setupHost(String hostname) {
-    log.info("\nSetting up host '{}'", hostname);
+    log.info("Setting up host '{}'", hostname);
     dockerApiProxyService.launchDockerApiProxy(hostname);
     if (Objects.equals(hostname, managerHostname)) {
       if (!dockerNodesService.hasNode(n ->
           Objects.equals(n.status().addr(), hostname) && Objects.equals(n.spec().role(), "manager"))) {
         dockerSwarmService.initSwarm();
       } else {
-        log.info("\nManager {} is already a swarm manager", hostname);
+        log.info("Manager {} is already a swarm manager", hostname);
       }
       // TODO why now?
       dockerNodesService.deleteUnresponsiveNodes();

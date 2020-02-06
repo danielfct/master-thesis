@@ -114,7 +114,7 @@ public class DockerContainersService {
     // TODO : review launchMicroserviceApplication
     var serviceContainers = new HashMap<String, List<SimpleContainer>>();
     var dynamicLaunchParams = new HashMap<String, String>();
-    log.info("\nLaunching app '{}' at {}, {}, {}", applicationId, region, country, city);
+    log.info("Launching app '{}' at {}, {}, {}", applicationId, region, country, city);
     appPackagesService.getServiceByAppId(applicationId).stream()
         .filter(serviceOrder -> !Objects.equals(serviceOrder.getService().getServiceType(), "database"))
         .map(ServiceOrder::getService)
@@ -198,7 +198,7 @@ public class DockerContainersService {
    */
   private SimpleContainer launchContainer(String hostname, ServiceEntity service, List<String> customEnvs,
                                           Map<String, String> customLabels, Map<String, String> dynamicLaunchParams) {
-    log.info("\nLaunching container...");
+    log.info("Launching container...");
     String serviceName = service.getServiceName();
     long serviceId = service.getId();
     String serviceType = service.getServiceType();
@@ -255,7 +255,7 @@ public class DockerContainersService {
         DockerContainer.Label.SERVICE_CITY, city));
     labels.putAll(customLabels);
     //TODO porquê repetir informação nos envs e labels?
-    log.info("\nhostname = '{}', internalPort = '{}', externalPort = '{}', containerName = '{}', "
+    log.info("hostname = '{}', internalPort = '{}', externalPort = '{}', containerName = '{}', "
             + "dockerRepository = '{}', launchCommand = '{}', envs = '{}', labels = '{}'",
         hostname, internalPort, externalPort, containerName, dockerRepository, launchCommand, envs, labels);
     HostConfig hostConfig = HostConfig.builder()
@@ -276,7 +276,7 @@ public class DockerContainersService {
       ContainerCreation container = dockerClient.createContainer(containerConfig, containerName);
       String containerId = container.id();
       dockerClient.startContainer(containerId);
-      log.info("\nsuccessfully launched container = '{}'", containerId);
+      log.info("successfully launched container = '{}'", containerId);
       if (Objects.equals(serviceType, "frontend")) {
         nginxLoadBalancerService.addToLoadBalancer(hostname, serviceName, serviceAddr, continent,
             region, country, city);
@@ -295,7 +295,7 @@ public class DockerContainersService {
    * @return
    */
   public SimpleContainer launchSingletonService(String hostname, String serviceName) {
-    log.info("\nLaunching singleton service '{}' at hostname '{}' ...", serviceName, hostname);
+    log.info("Launching singleton service '{}' at hostname '{}' ...", serviceName, hostname);
     List<SimpleContainer> containers = getContainers(hostname,
         DockerClient.ListContainersParam.withLabel(DockerContainer.Label.SERVICE_NAME, serviceName));
     SimpleContainer container;
@@ -303,7 +303,7 @@ public class DockerContainersService {
       container = launchContainer(hostname, serviceName);
     } else {
       container = containers.get(0);
-      log.info("\ncontainer '{}' is already running service '{}' at hostname '{}'",
+      log.info("container '{}' is already running service '{}' at hostname '{}'",
           container.getId(), serviceName, hostname);
     }
     return container;
@@ -339,18 +339,18 @@ public class DockerContainersService {
     Optional<SimpleContainer> databaseContainer = findContainer(hostname,
         DockerClient.ListContainersParam.withLabel(DockerContainer.Label.SERVICE_NAME, databaseServiceName));
     if (databaseContainer.isEmpty()) {
-      log.info("\nNo database '{}' found on host '{}'", databaseServiceName, hostname);
+      log.info("No database '{}' found on host '{}'", databaseServiceName, hostname);
       SimpleContainer container = launchContainer(hostname, databaseServiceName);
       //TODO review
       do {
         Timing.sleep(CPU_SLEEP, TimeUnit.MILLISECONDS);
-        log.info("\nLooking for database '{}' on container '{}'", databaseServiceName, container.getId());
+        log.info("Looking for database '{}' on container '{}'", databaseServiceName, container.getId());
         databaseContainer = findContainer(container.getId());
         //TODO add timeout?
       } while (databaseContainer.isEmpty());
     }
     final var serviceAddress = databaseContainer.get().getLabels().get(DockerContainer.Label.SERVICE_ADDRESS);
-    log.info("\nFound database '{}' with state '{}'", serviceAddress, databaseContainer.get().getState());
+    log.info("Found database '{}' with state '{}'", serviceAddress, databaseContainer.get().getState());
     //TODO make sure container is on state ready?
     return serviceAddress;
   }
@@ -441,11 +441,11 @@ public class DockerContainersService {
                                           String toHostname, int secondsBeforeStop) {
     long delayBeforeStop = secondsBeforeStop < 1 ? dockerDelayBeforeStopContainer : secondsBeforeStop;
     SimpleContainer replicaContainer = replicateContainer(containerId, fromHostname, toHostname);
-    new Timer("stopContainerTimer").schedule(new TimerTask() {
+    new Timer("StopContainerTimer").schedule(new TimerTask() {
       @Override
       public void run() {
         stopContainer(containerId, fromHostname);
-        log.info("\nStopped container '{}' on host '{}'", containerId, fromHostname);
+        log.info("Stopped container '{}' on host '{}'", containerId, fromHostname);
       }
     }, TimeUnit.SECONDS.toMillis(delayBeforeStop));
     return replicaContainer;

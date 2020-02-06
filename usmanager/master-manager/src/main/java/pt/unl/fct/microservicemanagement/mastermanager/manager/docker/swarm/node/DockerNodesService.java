@@ -86,10 +86,10 @@ public final class DockerNodesService {
   }
 
   public void deleteUnresponsiveNodes() {
-    log.info("\nDeleting unresponsive nodes...");
-    log.info("\nbefore: {}", getNodes());
+    log.info("Deleting unresponsive nodes...");
+    log.info("before: {}", getNodes());
     deleteNodes(n -> !n.status().state().equals("ready"));
-    log.info("\nafter: {}", getNodes());
+    log.info("after: {}", getNodes());
   }
 
   public void deleteHostNodes(String nodeHostname) {
@@ -103,7 +103,7 @@ public final class DockerNodesService {
   private void deleteNode(String nodeId) {
     try (var swarmManager = dockerSwarmService.getSwarmManager()) {
       swarmManager.deleteNode(nodeId, true);
-      log.info("\nDeleted node '{}'", nodeId);
+      log.info("Deleted node '{}'", nodeId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new DeleteNodeException(e.getMessage());

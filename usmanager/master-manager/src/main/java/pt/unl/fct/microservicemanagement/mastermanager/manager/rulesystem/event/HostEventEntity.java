@@ -44,7 +44,7 @@ import lombok.Setter;
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
 @Setter
 @Getter
 @Table(name = "host_events")

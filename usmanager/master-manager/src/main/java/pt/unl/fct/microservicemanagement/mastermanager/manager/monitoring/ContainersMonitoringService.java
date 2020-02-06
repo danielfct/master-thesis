@@ -159,7 +159,7 @@ public class ContainersMonitoringService {
   }
 
   public void initContainerMonitorTimer() {
-    new Timer("monitorContainersTimer", true).schedule(new TimerTask() {
+    new Timer("MonitorContainersTimer", true).schedule(new TimerTask() {
       private long lastRun = System.currentTimeMillis();
       @Override
       public void run() {
@@ -173,11 +173,11 @@ public class ContainersMonitoringService {
   }
 
   private void monitorContainersTask(int secondsFromLastRun) {
-    log.info("\nStarting container monitoring task...");
+    log.info("Starting container monitoring task...");
     var servicesDecisions = new HashMap<String, List<ContainerDecisionResult>>();
     List<SimpleContainer> containers = dockerContainersService.getAppContainers();
     for (SimpleContainer container : containers) {
-      log.info("\nOn {}", container);
+      log.info("On {}", container);
       String containerId = container.getId();
       String serviceName = container.getLabels().get(DockerContainer.Label.SERVICE_NAME);
       String serviceHostname = container.getHostname();
@@ -233,14 +233,14 @@ public class ContainersMonitoringService {
 
   private void processContainerDecisions(Map<String, List<ContainerDecisionResult>> servicesDecisions,
                                          int secondsFromLastRun) {
-    log.info("\nProcessing container decisions...");
+    log.info("Processing container decisions...");
     var relevantServicesDecisions = new HashMap<String, List<ContainerDecisionResult>>();
     for (List<ContainerDecisionResult> serviceDecisions : servicesDecisions.values()) {
       for (ContainerDecisionResult containerDecision : serviceDecisions) {
         String serviceName = containerDecision.getServiceName();
         String containerId = containerDecision.getContainerId();
         RuleDecision decision = containerDecision.getDecision();
-        log.info("\nServiceName '{}' on containerId '{}' had decision '{}'", serviceName, containerId, decision);
+        log.info("ServiceName '{}' on containerId '{}' had decision '{}'", serviceName, containerId, decision);
         ServiceEvent serviceEvent =
             servicesEventsService.saveServiceEvent(containerId, serviceName, decision.toString());
         int serviceEventCount = serviceEvent.getCount();
@@ -328,30 +328,30 @@ public class ContainersMonitoringService {
     final HostDetails startLocation;
     if (servicesLocationsRegions.containsKey(serviceName)) {
       startLocation = servicesLocationsRegions.get(serviceName);
-      log.info("\nStarting service '{}'. Location from request-location-monitor: '{}' ({})",
+      log.info("Starting service '{}'. Location from request-location-monitor: '{}' ({})",
           serviceName, hostname, startLocation.getRegion());
     } else {
       startLocation = hostsService.getHostDetails(hostname);
-      log.info("\nStarting service '{}'. Location: '{}' ({})",
+      log.info("Starting service '{}'. Location: '{}' ({})",
           serviceName, hostname, startLocation.getRegion());
     }
     final var serviceAvgMem = servicesConfigService.getService(serviceName).getExpectedMemoryConsumption();
     final var toHostname = hostsService.getAvailableNodeHostname(serviceAvgMem, startLocation);
     final var replicatedContainerId = dockerContainersService.replicateContainer(containerId, hostname, toHostname);
     final var selectedHostDetails = hostsService.getHostDetails(toHostname);
-    log.info("\nRuleDecision executed: Replicated container '{}' of service '{}' to container '{}' "
+    log.info("RuleDecision executed: Replicated container '{}' of service '{}' to container '{}' "
             + "on host '{} ({}_{}_{})'",
         containerId, serviceName, replicatedContainerId, toHostname, selectedHostDetails.getRegion(),
         selectedHostDetails.getCountry(), selectedHostDetails.getCity());
     /*if (selectedHostDetails instanceof EdgeHostDetails) {
       final var edgeHostDetails = (EdgeHostDetails) selectedHostDetails;
-      log.info("\nRuleDecision executed: Replicated container '{}' of service '{}' to container '{}' " +
+      log.info("RuleDecision executed: Replicated container '{}' of service '{}' to container '{}' " +
               "on edge host '{} ({}_{}_{})'",
           containerId, serviceName, replicatedContainerId, toHostname, edgeHostDetails.getRegion(),
           edgeHostDetails.getCountry(), edgeHostDetails.getCity());
     } else if (selectedHostDetails instanceof AwsHostDetails) {
       final var awsHostDetails = (AwsHostDetails) selectedHostDetails;
-      log.info("\nRuleDecision executed: Replicated container '{}' of service '{}' to  container '{}' " +
+      log.info("RuleDecision executed: Replicated container '{}' of service '{}' to  container '{}' " +
               "on aws host '{} ({})'",
           containerId, serviceName, replicatedContainerId, toHostname, awsHostDetails.getRegion());
     }*/
@@ -364,17 +364,17 @@ public class ContainersMonitoringService {
     final var serviceName = leastPriorityContainerDecision.getServiceName();
     dockerContainersService.stopContainer(containerId, hostname);
     final var selectedHostDetails = hostsService.getHostDetails(hostname);
-    log.info("\nRuleDecision executed: Stopped container '{}' of service '{}' on edge host '{} ({}_{}_{})'",
+    log.info("RuleDecision executed: Stopped container '{}' of service '{}' on edge host '{} ({}_{}_{})'",
         containerId, serviceName, hostname, selectedHostDetails.getRegion(), selectedHostDetails.getCountry(),
         selectedHostDetails.getCity());
     /*if (selectedHostDetails instanceof EdgeHostDetails) {
       final var edgeHostDetails = (EdgeHostDetails) selectedHostDetails;
-      log.info("\nRuleDecision executed: Stopped container '{}' of service '{}' on edge host '{} ({}_{}_{})'",
+      log.info("RuleDecision executed: Stopped container '{}' of service '{}' on edge host '{} ({}_{}_{})'",
           containerId, serviceName, hostname, edgeHostDetails.getRegion(), edgeHostDetails.getCountry(),
           edgeHostDetails.getCity());
     } else if (selectedHostDetails instanceof AwsHostDetails) {
       final var awsHostDetails = (AwsHostDetails) selectedHostDetails;
-      log.info("\nRuleDecision executed: Stopped container '{}' of service '{}' on aws host '{} ({})'",
+      log.info("RuleDecision executed: Stopped container '{}' of service '{}' on aws host '{} ({})'",
           containerId, serviceName, hostname, awsHostDetails.getRegion());
     }*/
     saveComponentDecisionService(hostname, selectedHostDetails, leastPriorityContainerDecision);

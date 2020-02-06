@@ -138,7 +138,7 @@ public class HostsMonitoringService {
   }
 
   public void initHostMonitorTimer() {
-    new Timer("monitorHostTimer", true).schedule(new TimerTask() {
+    new Timer("MonitorHostTimer", true).schedule(new TimerTask() {
       @Override
       public void run() {
         monitorHostsTask();
@@ -147,11 +147,11 @@ public class HostsMonitoringService {
   }
 
   private void monitorHostsTask() {
-    log.info("\nStarting host monitoring task...");
+    log.info("Starting host monitoring task...");
     var hostDecisions = new LinkedList<HostDecisionResult>();
     var nodes = dockerNodesService.getAvailableNodes();
     for (SimpleNode node : nodes) {
-      log.info("\nOn {}", node);
+      log.info("On {}", node);
       String hostname = node.getHostname();
       Map<String, Double> newFields = hostMetricsService.getHostStats(hostname);
       newFields.forEach((field, value) -> saveMonitoringHostLog(hostname, field, value));
@@ -192,11 +192,11 @@ public class HostsMonitoringService {
 
   private void processHostDecisions(List<HostDecisionResult> hostDecisions, List<SimpleNode> nodes) {
     final var relevantHostDecisions = new LinkedList<HostDecisionResult>();
-    log.info("\nProcessing host decisions...");
+    log.info("Processing host decisions...");
     for (HostDecisionResult hostDecision : hostDecisions) {
       final var hostname = hostDecision.getHostname();
       final var decision = hostDecision.getDecision();
-      log.info("\nHostname '{}' had decision '{}'", hostname, decision);
+      log.info("Hostname '{}' had decision '{}'", hostname, decision);
       final var hostEvent = hostsEventsService.saveHostEvent(hostname, decision.toString());
       final var hostEventCount = hostEvent.getCount();
       if ((decision == RuleDecision.START && hostEventCount >= startHostOnEventsCount)
@@ -238,7 +238,7 @@ public class HostsMonitoringService {
       final String toHostname = hostsService.getAvailableNodeHostname(serviceAvgMem, hostDetails);
       // TODO porquê migrar logo um container?
       dockerContainersService.migrateContainer(containerId, hostname, toHostname);
-      log.info("\nRuleDecision executed: Started host '{}' and migrated container '{}' to it", toHostname, containerId);
+      log.info("RuleDecision executed: Started host '{}' and migrated container '{}' to it", toHostname, containerId);
     }
   }
 
@@ -258,14 +258,14 @@ public class HostsMonitoringService {
     final var containerIds = dockerContainersService.migrateContainers(stopHostname, migrateToHostname);
     final var hostnameToRemove = stopHostname;
     //TODO os containers não migram em paralelo?
-    new Timer("removeHostFromSwarmTimer").schedule(new TimerTask() {
+    new Timer("RemoveHostFromSwarmTimer").schedule(new TimerTask() {
       @Override
       public void run() {
         hostsService.removeHost(hostnameToRemove);
       }
     }, containerIds.size() * DELAY_STOP_HOST);
     //TODO garantir que o host é removido dinamicamente só depois de serem migrados todos os containers
-    log.info("\nRuleDecision executed: Stopped host '{}' and migrated containers to host '{}'",
+    log.info("RuleDecision executed: Stopped host '{}' and migrated containers to host '{}'",
         stopHostname, migrateToHostname);
   }
 

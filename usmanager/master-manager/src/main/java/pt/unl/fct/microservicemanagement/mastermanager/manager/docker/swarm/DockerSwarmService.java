@@ -59,13 +59,13 @@ public class DockerSwarmService {
 
   public void initSwarm() {
     try (DockerClient swarmManager = getSwarmManager()) {
-      log.info("\nStarting docker swarm '{}' on host '{}'...", swarmManager.inspectSwarm().id(), dockerSwarmManager);
+      log.info("Starting docker swarm '{}' on host '{}'...", swarmManager.inspectSwarm().id(), dockerSwarmManager);
       var command = String.format("docker swarm init --advertise-addr %s", dockerSwarmManager);
       CommandResult result = sshService.execCommand(dockerSwarmManager, command);
       if (result.isSuccessful()) {
-        log.info("\ndone");
+        log.info("done");
       } else {
-        log.info("\nfailed with exit status '{}' due to '{}'", result.getExitStatus(), result.getResult());
+        log.info("failed with exit status '{}' due to '{}'", result.getExitStatus(), result.getResult());
       }
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();

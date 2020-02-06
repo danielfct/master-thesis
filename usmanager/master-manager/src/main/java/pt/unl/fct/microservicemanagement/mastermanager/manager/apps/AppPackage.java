@@ -48,7 +48,7 @@ import org.hibernate.annotations.NaturalId;
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
 @Table(name = "app_packages")

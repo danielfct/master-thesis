@@ -221,7 +221,7 @@ public class LocationRequestService {
     Collections.sort(locationsWithMinReqPerc);
 
     if (!locationsWithMinReqPerc.isEmpty()) {
-      log.info("\n>>> Best location for '" + serviceName + "' : " + locationsWithMinReqPerc.get(0).toString());
+      log.info(">>> Best location for '" + serviceName + "' : " + locationsWithMinReqPerc.get(0).toString());
       return getHostDetailsByLocationKey(locationsWithMinReqPerc.get(0).getLocationKey());
     }
 

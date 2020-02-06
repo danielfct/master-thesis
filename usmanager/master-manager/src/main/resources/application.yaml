@@ -79,4 +79,4 @@ server:
 #debug: true
 #trace: true
 logging:
-  config: file:src/main/resources/logback-spring.xml
+  config: file:src/main/resources/logging/logback-spring.xml

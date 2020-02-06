@@ -585,7 +585,7 @@ public class RulesService {
     final var rulesList = new ArrayList<Rule>(hostRulesList.size() + genericRules.size());
     rulesList.addAll(genericRules);
     hostRulesList.forEach(rule -> rulesList.add(generateRule(rule.getRule())));
-    log.info("\nGenerating host rules... (count: " + rulesList.size() + ")");
+    log.info("Generating host rules... (count: " + rulesList.size() + ")");
     return rulesList;
   }
 
@@ -593,7 +593,7 @@ public class RulesService {
     final List<AppRule> appRulesList = getAppRulesByAppId(appId);
     final List<Rule> rulesList = new ArrayList<>(appRulesList.size());
     appRulesList.forEach(appRule -> rulesList.add(generateRule(appRule.getRule())));
-    log.info("\nGenerating app rules... (count: " + rulesList.size() + ")");
+    log.info("Generating app rules... (count: " + rulesList.size() + ")");
     return rulesList;
   }
 
@@ -601,7 +601,7 @@ public class RulesService {
     List<ServiceRule> serviceRulesList = getServiceRulesByServiceName(serviceName);
     List<Rule> rulesList = generateRulesByApp(appId);
     serviceRulesList.forEach(rule -> rulesList.add(generateRule(rule.getRule())));
-    log.info("\nGenerating service rules... (count: " + rulesList.size() + ")");
+    log.info("Generating service rules... (count: " + rulesList.size() + ")");
     return rulesList;
   }
 
@@ -625,7 +625,7 @@ public class RulesService {
 
   @Cacheable(cacheNames = "ruleTemplateCache", key = "#templateFile")
   public String getRuleTemplate(String templateFile) {
-    log.info("\nGetting rule template...");
+    log.info("Getting rule template...");
     InputStream ruleTemplate = Thread.currentThread().getContextClassLoader().getResourceAsStream(templateFile);
     var result = new ByteArrayOutputStream();
     var buffer = new byte[1024];

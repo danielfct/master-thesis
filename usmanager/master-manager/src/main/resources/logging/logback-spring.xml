@@ -69,11 +69,13 @@
     <root level="info">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
+        <appender-ref ref="DB" />
     </root>
 
     <logger name="pt.unl.fct.microservicemanagement.mastermanager" level="trace" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
+        <appender-ref ref="DB" />
     </logger>
 
 </configuration>

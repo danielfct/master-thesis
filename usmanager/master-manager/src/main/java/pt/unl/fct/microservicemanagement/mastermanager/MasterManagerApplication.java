@@ -33,8 +33,6 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 public class MasterManagerApplication {
 
-  // TODO: instead of logging, send feed to a console on the website
-
   public static void main(String[] args) {
     SpringApplication.run(MasterManagerApplication.class, args);
   }

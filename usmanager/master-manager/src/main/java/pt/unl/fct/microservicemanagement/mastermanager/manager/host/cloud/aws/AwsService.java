@@ -149,7 +149,7 @@ public class AwsService {
     DryRunResult<StartInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
     if (!dryResponse.isSuccessful()) {
       String errorMessage = dryResponse.getDryRunResponse().getErrorMessage();
-      log.info("\nFailed to start instance {}: {}", instanceId, errorMessage);
+      log.info("Failed to start instance {}: {}", instanceId, errorMessage);
       throw new StartInstanceException(errorMessage);
     }
     StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instanceId);
@@ -160,7 +160,7 @@ public class AwsService {
     } catch (TimeoutException e) {
       throw new StartInstanceException(e.getMessage());
     }
-    log.info("\nSuccessfully started instance {}", instanceId);
+    log.info("Successfully started instance {}", instanceId);
   }
 
   public void stopInstance(String publicIpAddr) {
@@ -171,7 +171,7 @@ public class AwsService {
     DryRunResult<StopInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
     if (!dryResponse.isSuccessful()) {
       String errorMessage = dryResponse.getDryRunResponse().getErrorMessage();
-      log.info("\nFailed to stop instance {}: {}", instanceId, errorMessage);
+      log.info("Failed to stop instance {}: {}", instanceId, errorMessage);
       throw new StopInstanceException(errorMessage);
     }
     var request = new StopInstancesRequest().withInstanceIds(instanceId);
@@ -182,7 +182,7 @@ public class AwsService {
     } catch (TimeoutException e) {
       throw new StopInstanceException(e.getMessage());
     }
-    log.info("\nStopped instance {} successfully", instanceId);
+    log.info("Stopped instance {} successfully", instanceId);
   }
 
   public String createEC2() {
@@ -200,7 +200,7 @@ public class AwsService {
   }
 
   public String createNewAwsInstance() {
-    log.info("\nCreating new AWS instance...");
+    log.info("Creating new AWS instance...");
     String instanceId = createEC2();
     try {
       Timing.wait(() -> getInstance(instanceId).getState().getCode() == AwsInstanceState.RUNNING.getCode(),
@@ -211,7 +211,7 @@ public class AwsService {
     }
     //TODO try to avoid extra getInstance
     String hostname = getInstance(instanceId).getPublicIpAddress();
-    log.info("\nNew AWS instance created: {}", hostname);
+    log.info("New AWS instance created: {}", hostname);
     return hostname;
   }
 
