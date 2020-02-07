@@ -25,7 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPrediction;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
   @Query("select d.serviceDependency "
       + "from ServiceEntity s inner join s.dependencies d "
       + "where s.id = :serviceId")
-  List<ServiceEntity> getServiceDependencies(@Param("serviceId") long serviceId);
+  List<ServiceEntity> getDependencies(@Param("serviceId") long serviceId);
 
   @Modifying
   @Query("select d.serviceDependency "
@@ -88,8 +88,13 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
 
   @Query("select p "
       + "from ServiceEntity s join s.eventPredictions p "
+      + "where s.id = :serviceId")
+  List<EventPredictionEntity> getServiceEventPredictions(@Param("serviceId") long id);
+
+  @Query("select p "
+      + "from ServiceEntity s join s.eventPredictions p "
       + "where s.id = :serviceId and p.id = :serviceEventPredictions")
-  Optional<ServiceEventPrediction> getServiceEventPrediction(@Param("serviceId") long serviceId,
-                                                             @Param("serviceEventPredictions")
+  Optional<EventPredictionEntity> getServiceEventPrediction(@Param("serviceId") long serviceId,
+                                                            @Param("serviceEventPredictions")
                                                                  long serviceEventPredictions);
 }

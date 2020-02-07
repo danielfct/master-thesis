@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/decisions")
@@ -59,14 +60,14 @@ public class DecisionsController {
   //TODO move logs to other controller
 
   @GetMapping("/logs/services/{serviceName}")
-  public List<ComponentDecisionServiceLog> getComponentDecisionServiceLogByServiceName(
-      @PathVariable String serviceName) {
+  public List<ComponentDecisionServiceLog> getComponentDecisionServiceLogByServiceName(@PathVariable String serviceName)
+      throws EntityNotFoundException {
     return decisionsService.getComponentDecisionServiceLogByServiceName(serviceName);
   }
 
   @GetMapping("/logs/containers/{containerId}")
-  public List<ComponentDecisionServiceLog> getComponentDecisionServiceLogByContainerId(
-      @PathVariable String containerId) {
+  public List<ComponentDecisionServiceLog> getComponentDecisionServiceLogByContainerId(@PathVariable String containerId)
+      throws EntityNotFoundException {
     return decisionsService.getComponentDecisionServiceLogByContainerId(containerId);
   }
 

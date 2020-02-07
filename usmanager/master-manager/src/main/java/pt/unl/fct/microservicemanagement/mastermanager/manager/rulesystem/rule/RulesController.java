@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.ComponentTypeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.ValueModeEntity;
@@ -54,7 +55,7 @@ public class RulesController {
   }
 
   @GetMapping("/{ruleId}")
-  public RuleEntity getRule(@PathVariable long ruleId) {
+  public RuleEntity getRule(@PathVariable long ruleId) throws EntityNotFoundException {
     return rulesService.getRule(ruleId);
   }
 
@@ -64,12 +65,12 @@ public class RulesController {
   }
 
   @DeleteMapping("/{ruleId}")
-  public void deleteRule(@PathVariable long ruleId) {
+  public void deleteRule(@PathVariable long ruleId) throws EntityNotFoundException {
     rulesService.deleteRule(ruleId);
   }
 
   @GetMapping("/{ruleId}/conditions")
-  public List<ConditionEntity> getRuleConditions(@PathVariable long ruleId) {
+  public List<ConditionEntity> getRuleConditions(@PathVariable long ruleId) throws EntityNotFoundException {
     return rulesService.getRuleConditions(ruleId);
   }
 
@@ -79,7 +80,8 @@ public class RulesController {
   }
 
   @DeleteMapping("/{ruleId}/conditions/{conditionId}")
-  public long deleteConditionFromRule(@PathVariable long ruleId, @PathVariable long conditionId) {
+  public long deleteConditionFromRule(@PathVariable long ruleId, @PathVariable long conditionId)
+      throws EntityNotFoundException {
     return rulesService.deleteConditionFromRule(ruleId, conditionId);
   }
 
@@ -91,7 +93,7 @@ public class RulesController {
   }
 
   @GetMapping("/hosts/{hostname}")
-  public List<HostRule> getHostRulesByHostname(@PathVariable String hostname) {
+  public List<HostRule> getHostRulesByHostname(@PathVariable String hostname) throws EntityNotFoundException {
     return rulesService.getHostRulesByHostname(hostname);
   }
 
@@ -101,7 +103,8 @@ public class RulesController {
   }
 
   @DeleteMapping("/hosts/{hostname}")
-  public boolean deleteHostRule(@PathVariable String hostname, @RequestBody HostRuleReq hostRule) {
+  public boolean deleteHostRule(@PathVariable String hostname, @RequestBody HostRuleReq hostRule)
+      throws EntityNotFoundException {
     return rulesService.deleteHostRule(hostname, hostRule.getRuleId());
   }
 
@@ -116,7 +119,7 @@ public class RulesController {
   }
 
   @DeleteMapping("/hosts/genericRules/{ruleId}")
-  public boolean deleteGenericHostRule(@PathVariable long ruleId) {
+  public boolean deleteGenericHostRule(@PathVariable long ruleId) throws EntityNotFoundException {
     return rulesService.deleteGenericHostRule(ruleId);
   }
 
@@ -149,19 +152,18 @@ public class RulesController {
 
 
   @GetMapping("/services/{serviceId}")
-  public List<ServiceRule> getAppRulesByServiceId(@PathVariable long serviceId) {
+  public List<ServiceRule> getAppRulesByServiceId(@PathVariable long serviceId) throws EntityNotFoundException {
     return rulesService.getServiceRulesByServiceId(serviceId);
   }
 
   @PostMapping("/services/{serviceId}")
-  public long saveServiceRule(@PathVariable long serviceId,
-                              @RequestBody ServiceRuleReq serviceRule) {
+  public long saveServiceRule(@PathVariable long serviceId, @RequestBody ServiceRuleReq serviceRule) {
     return rulesService.saveServiceRule(serviceId, serviceRule.getRuleId());
   }
 
   @DeleteMapping("/services/{serviceId}")
-  public boolean deleteServiceRule(@PathVariable long serviceId,
-                                   @RequestBody ServiceRuleReq serviceRule) {
+  public boolean deleteServiceRule(@PathVariable long serviceId, @RequestBody ServiceRuleReq serviceRule)
+      throws EntityNotFoundException {
     return rulesService.deleteServiceRule(serviceId, serviceRule.getRuleId());
   }
 

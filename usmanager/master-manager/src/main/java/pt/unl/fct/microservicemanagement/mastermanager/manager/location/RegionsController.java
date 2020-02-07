@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/regions")
@@ -48,7 +49,7 @@ public class RegionsController {
   }
 
   @GetMapping("/{id}")
-  public RegionEntity getRegion(@PathVariable long id) {
+  public RegionEntity getRegion(@PathVariable long id) throws EntityNotFoundException {
     return regionsService.getRegion(id);
   }
 
@@ -59,7 +60,7 @@ public class RegionsController {
   }
 
   @PutMapping(value = "/{id}")
-  public long updateRegion(@PathVariable long id, @RequestBody Region region) {
+  public long updateRegion(@PathVariable long id, @RequestBody Region region) throws EntityNotFoundException {
     Validation.validatePutRequest(id, region.getId());
     return regionsService.updateRegion(id, region);
   }*/
@@ -70,7 +71,7 @@ public class RegionsController {
   }
 
   @DeleteMapping("/{id}")
-  public void deleteRegion(@PathVariable long id) {
+  public void deleteRegion(@PathVariable long id) throws EntityNotFoundException {
     regionsService.deleteRegion(id);
   }
 

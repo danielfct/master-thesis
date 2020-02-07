@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
@@ -72,13 +73,13 @@ public class ContainersController {
   }
 
   @GetMapping("/{id}")
-  public SimpleContainer getContainer(@PathVariable String id) {
+  public SimpleContainer getContainer(@PathVariable String id) throws EntityNotFoundException {
     return dockerContainersService.getContainer(id);
   }
 
   @DeleteMapping("/{id}")
-  public void stopContainer(@PathVariable String id,
-                            @RequestBody SimpleContainer container) {
+  public void stopContainer(@PathVariable String id, @RequestBody SimpleContainer container)
+      throws EntityNotFoundException {
     //TODO validate ids => throw new BadRequest when not match
     final var containerId = container.getId();
     final var hostname = container.getHostname();

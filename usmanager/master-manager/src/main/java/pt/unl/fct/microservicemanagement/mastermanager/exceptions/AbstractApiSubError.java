@@ -22,22 +22,10 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
+// Adapted from https://github.com/brunocleite/spring-boot-exception-handling
 
-import java.util.Date;
+package pt.unl.fct.microservicemanagement.mastermanager.exceptions;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface ServiceEventPredictionRepository extends CrudRepository<EventPredictionEntity, Long> {
-
-  @Query("select sp.minReplics "
-      + "from EventPredictionEntity sp inner join sp.service s "
-      + "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
-      + "order by sp.lastUpdate desc")
-  Integer getMinReplicsByServiceName(@Param("serviceName") String serviceName, @Param("date") Date date);
+abstract class AbstractApiSubError {
 
 }

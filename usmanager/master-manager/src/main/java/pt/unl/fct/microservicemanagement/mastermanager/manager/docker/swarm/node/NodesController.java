@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.util.GenericResponse;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
 
@@ -69,7 +70,7 @@ public class NodesController {
   }
 
   @DeleteMapping
-  public List<GenericResponse> removeNode(@RequestBody StopNodeReq stopNodeReq) {
+  public List<GenericResponse> removeNode(@RequestBody StopNodeReq stopNodeReq) throws EntityNotFoundException {
     hostsService.removeHost(stopNodeReq.getHostname());
     //TODO change return value
     return List.of(new GenericResponse("success", String.valueOf(true)));

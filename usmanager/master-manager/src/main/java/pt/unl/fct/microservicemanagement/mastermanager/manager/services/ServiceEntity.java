@@ -25,7 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPrediction;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.ServiceRule;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependency.ServiceDependency;
 
@@ -108,7 +108,7 @@ public class ServiceEntity {
   @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceEventPrediction> eventPredictions;
+  private Set<EventPredictionEntity> eventPredictions;
 
   @Singular
   @JsonIgnore

@@ -24,8 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPrediction;
 import pt.unl.fct.microservicemanagement.mastermanager.util.BatchRequest;
 
 import java.util.Arrays;
@@ -58,39 +59,39 @@ public class ServicesController {
   }
 
   @GetMapping("/{serviceId}")
-  public ServiceEntity getService(@PathVariable long serviceId) {
+  public ServiceEntity getService(@PathVariable Long serviceId) throws EntityNotFoundException {
     return servicesService.getService(serviceId);
   }
 
   /*@PostMapping
-  public long addService(@RequestBody Service service) {
+  public Long addService(@RequestBody Service service) {
     Validation.validatePostRequest(service.getId());
     return servicesService.addService(service);
   }
 
   @PutMapping("/{id}")
-  public long updateService(@PathVariable long id, @RequestBody Service service) {
+  public Long updateService(@PathVariable Long id, @RequestBody Service service) throws EntityNotFoundException {
     Validation.validatePutRequest(id, service.getId());
     return servicesService.updateService(id, service);
   }*/
 
   @PostMapping("/{id}")
-  public long saveService(@PathVariable long id, @RequestBody SaveServiceReq saveServiceConfigReq) {
+  public Long saveService(@PathVariable Long id, @RequestBody SaveServiceReq saveServiceConfigReq) {
     return servicesService.saveService(id, saveServiceConfigReq);
   }
 
   @DeleteMapping("/{id}")
-  public void deleteService(@PathVariable long id) {
+  public void deleteService(@PathVariable Long id) throws EntityNotFoundException {
     servicesService.deleteService(id);
   }
 
   @GetMapping("/{id}/dependencies")
-  public List<ServiceEntity> getServicesDependencies(@PathVariable long id) {
-    return servicesService.getServiceDependencies(id);
+  public List<ServiceEntity> getServicesDependencies(@PathVariable Long id) throws EntityNotFoundException {
+    return servicesService.getDependencies(id);
   }
 
   @PatchMapping("/{serviceId}/dependencies")
-  public void removeDependencies(@PathVariable long serviceId, @RequestBody BatchRequest<Long> batchRequest) {
+  public void removeDependencies(@PathVariable Long serviceId, @RequestBody BatchRequest<Long> batchRequest) {
     System.out.println(batchRequest);
     BatchRequest.Request request = batchRequest.getRequest();
     Long[] body = batchRequest.getBody();
@@ -101,23 +102,25 @@ public class ServicesController {
   }
 
   @DeleteMapping("/{id}/dependencies/{dependencyId}")
-  public void removeDependency(@PathVariable long id, @PathVariable long dependencyId) {
+  public void removeDependency(@PathVariable Long id, @PathVariable Long dependencyId) throws EntityNotFoundException {
     servicesService.removeDependency(id, dependencyId);
   }
 
   @GetMapping("/{id}/eventPredictions")
-  public Iterable<ServiceEventPrediction> getServiceEventPredictions(@PathVariable long id) {
+  public Iterable<EventPredictionEntity> getServiceEventPredictions(@PathVariable Long id)
+      throws EntityNotFoundException {
     return servicesService.getServiceEventPredictions(id);
   }
 
   @GetMapping("/{serviceId}/eventPredictions/{eventPredictionId}")
-  public ServiceEventPrediction getServiceEventPrediction(@PathVariable long serviceId,
-                                                          @PathVariable long eventPredictionId) {
-    return servicesService.getServiceEventPrediction(serviceId, eventPredictionId);
+  public EventPredictionEntity getServiceEventPrediction(@PathVariable Long serviceId,
+                                                         @PathVariable Long eventPredictionId)
+      throws EntityNotFoundException {
+    return servicesService.getEventPrediction(serviceId, eventPredictionId);
   }
 
   /*@PostMapping("/{id}/serviceEventPredictions")
-  public long addServiceEventPrediction(@PathVariable long id,
+  public Long addServiceEventPrediction(@PathVariable Long id,
                                         @RequestBody
                                         final ServiceEventPrediction serviceEventPrediction) {
     Validation.validatePostRequest(id);
@@ -125,26 +128,26 @@ public class ServicesController {
   }
 
   @PostMapping("/{serviceId}/serviceEventPredictions/{serviceEventPredictionId}")
-  public void updateServiceEventPrediction(@PathVariable long serviceId,
-                                           @PathVariable long serviceEventPredictionId,
+  public void updateServiceEventPrediction(@PathVariable Long serviceId,
+                                           @PathVariable Long serviceEventPredictionId,
                                            @RequestBody
                                            final ServiceEventPrediction serviceEventPrediction) {
     Validation.validatePutRequest(serviceEventPredictionId, serviceEventPrediction.getId());
     servicesService.updateServiceEventPrediction(serviceId, serviceEventPredictionId, serviceEventPrediction);
   }*/
 
-  //TODO move to an eventpredictioncontroller
 
   @RequestMapping(value = "/{serviceId}/eventPrediction/", method = RequestMethod.POST)
-  public @ResponseBody long saveServiceEventPrediction(@PathVariable long serviceId,
+  public @ResponseBody Long saveServiceEventPrediction(@PathVariable Long serviceId,
                                                        @RequestBody SaveServiceEventPredictionReq
                                                            serviceEventPredictionReq) {
     return servicesService.saveServiceEventPrediction(serviceId, serviceEventPredictionReq);
   }
 
   @DeleteMapping("/{serviceId}/serviceEventPredictions/{serviceEventPredictionId}")
-  public void deleteServiceEventPrediction(@PathVariable long serviceId,
-                                           @PathVariable long serviceEventPredictionId) {
+  public void deleteServiceEventPrediction(@PathVariable Long serviceId,
+                                           @PathVariable Long serviceEventPredictionId)
+      throws EntityNotFoundException {
     servicesService.deleteServiceEventPrediction(serviceId, serviceEventPredictionId);
   }
 
@@ -156,7 +159,7 @@ public class ServicesController {
 
   //TODO change to ?search=
   @GetMapping("/search/name/{serviceName}")
-  public ServiceEntity getServiceByDockerRepo(@PathVariable String serviceName) {
+  public ServiceEntity getServiceByDockerRepo(@PathVariable String serviceName) throws EntityNotFoundException {
     return servicesService.getService(serviceName);
   }
 

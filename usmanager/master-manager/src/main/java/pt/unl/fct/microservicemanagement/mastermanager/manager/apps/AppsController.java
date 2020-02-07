@@ -24,9 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.AppRule;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.AppRuleReq;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 
 import java.util.List;
 
@@ -37,7 +39,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 
 @RestController
 @RequestMapping("/apps")
@@ -57,7 +58,7 @@ public final class AppsController {
   }
 
   @GetMapping("/{appId}")
-  public AppPackage getApp(@PathVariable long appId) {
+  public AppPackage getApp(@PathVariable long appId) throws EntityNotFoundException {
     return appPackagesService.getApp(appId);
   }
 
@@ -73,17 +74,17 @@ public final class AppsController {
 
   @PutMapping("/{appId}")
   public void updateApp(@PathVariable long appId,
-                        @JsonValue String appName) {
+                        @JsonValue String appName) throws EntityNotFoundException {
     appPackageService.updateApp(appId, appName);
   }*/
 
   @DeleteMapping("/{appId}")
-  public void deleteApp(@PathVariable long appId) {
+  public void deleteApp(@PathVariable long appId) throws EntityNotFoundException {
     appPackagesService.deleteApp(appId);
   }
 
   @GetMapping("/{appId}/services")
-  public List<ServiceOrder> getServicesByAppId(@PathVariable long appId) {
+  public List<ServiceOrder> getServicesByAppId(@PathVariable long appId) throws EntityNotFoundException {
     return appPackagesService.getServiceByAppId(appId);
   }
 
@@ -91,7 +92,7 @@ public final class AppsController {
   //TODO move to rules service
 
   @GetMapping("/{appId}/rules")
-  public List<AppRule> getAppRulesByAppId(@PathVariable long appId) {
+  public List<AppRule> getAppRulesByAppId(@PathVariable long appId) throws EntityNotFoundException {
     return ruleService.getAppRulesByAppId(appId);
   }
 
@@ -101,7 +102,8 @@ public final class AppsController {
   }
 
   @DeleteMapping("/{appId}/rules")
-  public boolean deleteAppRule(@PathVariable long appId, @RequestBody AppRuleReq appRule) {
+  public boolean deleteAppRule(@PathVariable long appId, @RequestBody AppRuleReq appRule)
+      throws EntityNotFoundException {
     return ruleService.deleteAppRule(appId, appRule.getRuleId());
   }
 

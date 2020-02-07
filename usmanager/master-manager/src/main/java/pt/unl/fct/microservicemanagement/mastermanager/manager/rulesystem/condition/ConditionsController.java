@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RulesService;
 
 @RestController
@@ -49,7 +50,7 @@ public class ConditionsController {
   }
 
   @GetMapping("/{conditionId}")
-  public ConditionEntity getCondition(@PathVariable long conditionId) {
+  public ConditionEntity getCondition(@PathVariable long conditionId) throws EntityNotFoundException {
     return ruleService.getCondition(conditionId);
   }
 
@@ -59,7 +60,7 @@ public class ConditionsController {
   }
 
   @DeleteMapping("/{conditionId}")
-  public void deleteCondition(@PathVariable long conditionId) {
+  public void deleteCondition(@PathVariable long conditionId) throws EntityNotFoundException {
     ruleService.deleteCondition(conditionId);
   }
 

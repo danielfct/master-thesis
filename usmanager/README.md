@@ -1,9 +1,12 @@
-# Manager on a Dynamic Microservice Management System #
+# μsManager 
 
-dmanager is a system to dynamically manage microservices, both at the cloud and the edge. Takes into account multiple metrics, such as device cpu and ram usage, user requests, microservice dependencies and location to decide where to place microservices.
-This is a project developed in the context of MIEI master thesis at [FCT-UNL](https://www.fct.unl.pt/).
+Manager on a Dynamic Microservice Management System
 
-# Project Layout #
+μsManager is a system to dynamically manage microservices, both at the cloud and the edge. Takes into account multiple metrics, such as device cpu and ram usage, user requests, microservice dependencies and location to decide where to place microservices.
+This is a project developed in the context of several MIEI master thesis at [FCT-UNL](https://www.fct.unl.pt/).
+
+
+### Organização do projeto
 
 - docker-images
   - [docker-alpine](docker-images/docker-alpine)
@@ -38,10 +41,23 @@ This is a project developed in the context of MIEI master thesis at [FCT-UNL](ht
 
 - [registration-server](registration-server)
 
-# Usage
+### Ferramentas usadas
 
+[<img src="https://i.imgur.com/c6X4nsq.png" alt="" width="48" height="48"> IntelliJ IDEA](https://docs.npmjs.com/) - IntelliJ IDEA is an integrated development environment written in Java for developing computer software
+
+As ferramentas especificas usadas em cada um dos módulos podem ser vistas nos respetivos ficheiros README.md:
+
+> [Master manager](master-manager/README.md#ferramentas-usadas)  
+> [Local manager](local-manager/README.md#ferramentas-usadas)  
+> [Web manager](web-manager/README.md#ferramentas-usadas)  
+> TODO adicionar os outros módulos
+
+### Utilização
+
+TODO  
 Open the project in your IDE as a Maven project, build the root module and then run the Main class in [launcher](launcher).
 
-# License
+### Licença
 
-msmanager is licensed under the MIT license. See the license header in the respective file to be sure.
+μsManager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para ter a certeza.
+

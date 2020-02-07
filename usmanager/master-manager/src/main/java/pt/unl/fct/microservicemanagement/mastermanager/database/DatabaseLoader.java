@@ -82,7 +82,7 @@ public class DatabaseLoader {
           .firstName("admin")
           .lastName("admin")
           .username("admin")
-          .password(encoder.encode("password"))
+          .password(encoder.encode("admin"))
           .email("admin@admin.pt")
           .role(UserEntity.Role.ROLE_SYS_ADMIN)
           .build();

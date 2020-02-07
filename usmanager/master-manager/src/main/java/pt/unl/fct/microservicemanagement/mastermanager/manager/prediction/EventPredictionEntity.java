@@ -52,7 +52,7 @@ import lombok.Setter;
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
 @Table(name = "service_event_predictions")
-public class ServiceEventPrediction {
+public class EventPredictionEntity {
 
   @Id
   @GeneratedValue
@@ -94,10 +94,10 @@ public class ServiceEventPrediction {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ServiceEventPrediction)) {
+    if (!(o instanceof EventPredictionEntity)) {
       return false;
     }
-    ServiceEventPrediction other = (ServiceEventPrediction) o;
+    EventPredictionEntity other = (EventPredictionEntity) o;
     return id != null && id.equals(other.getId());
   }
 

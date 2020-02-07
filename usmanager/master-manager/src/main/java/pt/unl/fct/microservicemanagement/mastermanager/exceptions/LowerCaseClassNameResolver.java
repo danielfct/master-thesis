@@ -22,22 +22,29 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
+// Adapted from https://github.com/brunocleite/spring-boot-exception-handling
 
-import java.util.Date;
+package pt.unl.fct.microservicemanagement.mastermanager.exceptions;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
 
-@Repository
-public interface ServiceEventPredictionRepository extends CrudRepository<EventPredictionEntity, Long> {
+public class LowerCaseClassNameResolver extends TypeIdResolverBase {
 
-  @Query("select sp.minReplics "
-      + "from EventPredictionEntity sp inner join sp.service s "
-      + "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
-      + "order by sp.lastUpdate desc")
-  Integer getMinReplicsByServiceName(@Param("serviceName") String serviceName, @Param("date") Date date);
+  @Override
+  public String idFromValue(Object value) {
+    return value.getClass().getSimpleName().toLowerCase();
+  }
+
+  @Override
+  public String idFromValueAndType(Object value, Class<?> suggestedType) {
+    return idFromValue(value);
+  }
+
+  @Override
+  public JsonTypeInfo.Id getMechanism() {
+    return JsonTypeInfo.Id.CUSTOM;
+  }
 
 }
+

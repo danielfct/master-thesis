@@ -24,16 +24,19 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPrediction;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependency.ServiceDependency;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -52,32 +55,33 @@ public class ServicesService {
     return services.findAll();
   }
 
-  public ServiceEntity getService(long id) {
-    return services.findById(id).orElseThrow(() -> new NotFoundException("Service not found"));
+  public ServiceEntity getService(Long id) {
+    return services.findById(id).orElseThrow(() ->
+        new EntityNotFoundException(ServiceEntity.class, "id", id.toString()));
   }
 
   public ServiceEntity getService(String serviceName) {
-    return services.findByServiceNameIgnoreCase(serviceName)
-        .orElseThrow(() -> new NotFoundException("Service %s not found", serviceName));
+    return services.findByServiceNameIgnoreCase(serviceName).orElseThrow(() ->
+        new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName));
   }
 
-  public List<ServiceEntity> getServiceDependencies(long serviceId) {
-    return services.getServiceDependencies(serviceId);
+  public List<ServiceEntity> getDependencies(Long id) {
+    return getService(id).getDependencies().stream()
+        .map(ServiceDependency::getServiceDependency).collect(Collectors.toList());
   }
 
   @Transactional
-  public void removeDependency(long serviceId, long dependencyId) {
+  public void removeDependency(Long serviceId, Long dependencyId) {
+    removeDependencies(serviceId, List.of(dependencyId));
+  }
+
+  @Transactional
+  public void removeDependencies(Long serviceId, List<Long> dependenciesId) {
     var service = getService(serviceId);
     System.out.println(service.getDependencies());
-    service.getDependencies().removeIf(dependency -> dependency.getId() == dependencyId);
+    service.getDependencies().removeIf(dependency -> dependenciesId.contains(dependency.getId()));
     service = services.save(service);
     System.out.println(service.getDependencies());
-  }
-
-  @Transactional
-  public void removeDependencies(long serviceId, List<Long> dependenciesId) {
-    final var service = getService(serviceId);
-    service.getDependencies().removeIf(dependency -> dependenciesId.contains(dependency.getId()));
   }
 
 
@@ -85,17 +89,17 @@ public class ServicesService {
     return services.findByDockerRepository(dockerRepository);
   }
 
-  /*public long addService(Service service) {
+  /*public Long addService(Service service) {
         return services.save(service).getId();
     }
 
-    public long updateService(long id, Service newService) {
+    public Long updateService(Long id, Service newService) {
         final var service = getService(id);
         Utils.copyValidProperties(newService, service);
         return services.save(service).getId();
     }*/
 
-  public long saveService(long id, SaveServiceReq saveServiceConfigReq) {
+  public Long saveService(Long id, SaveServiceReq saveServiceConfigReq) {
     var service = id > 0 ? getService(id) : new ServiceEntity();
     service.setServiceName(saveServiceConfigReq.getServiceName());
     service.setDockerRepository(saveServiceConfigReq.getDockerRepo());
@@ -110,27 +114,31 @@ public class ServicesService {
     return services.save(service).getId();
   }
 
-  public void deleteService(long id) {
-    services.deleteById(id);
+  public void deleteService(Long id) {
+    var service = getService(id);
+    services.delete(service);
   }
 
-  public Iterable<ServiceEventPrediction> getServiceEventPredictions(long serviceId) {
-    var service = services.findById(serviceId).orElseThrow(NotFoundException::new);
-    return service.getEventPredictions();
+  public Iterable<EventPredictionEntity> getServiceEventPredictions(Long id) {
+    return getService(id).getEventPredictions();
   }
 
-  public ServiceEventPrediction getServiceEventPrediction(long serviceId, long serviceEventPredictionId) {
-    return services.getServiceEventPrediction(serviceId, serviceEventPredictionId)
-        .orElseThrow(() -> new NotFoundException("Service event prediction not found"));
+  public EventPredictionEntity getEventPrediction(Long serviceId, Long eventPredictionId) {
+    return getService(serviceId).getEventPredictions().stream().filter(
+        prediction -> Objects.equals(prediction.getId(), eventPredictionId)
+    ).findFirst().orElseThrow(() ->
+        new EntityNotFoundException(EventPredictionEntity.class, "eventPredictionId", eventPredictionId.toString())
+    );
   }
 
-  /*public long addServiceEventPrediction(long serviceId, ServiceEventPrediction serviceEventPrediction) {
+  /*public Long addServiceEventPrediction(Long serviceId, ServiceEventPrediction serviceEventPrediction) {
         services.findById(serviceId).orElseThrow(NotFoundException::new);
+        //TODO add serviceEventPrediction to service and then save it
         return serviceEventPredictions.save(serviceEventPrediction).getId();
     }
 
-    public void updateServiceEventPrediction(long serviceId,
-                                             final long serviceEventPredictionId,
+    public void updateServiceEventPrediction(Long serviceId,
+                                             final Long serviceEventPredictionId,
                                              final ServiceEventPrediction newServiceEventPrediction) {
         final var service = services.findById(serviceId)
                 .orElseThrow(NotFoundException::new);
@@ -142,32 +150,32 @@ public class ServicesService {
         serviceEventPredictions.save(serviceEventPrediction);
     }*/
 
-  public long saveServiceEventPrediction(long id, SaveServiceEventPredictionReq serviceEventPredictionReq) {
+  public Long saveServiceEventPrediction(Long id, SaveServiceEventPredictionReq serviceEventPredictionReq) {
     var service = services.findById(serviceEventPredictionReq.getServiceId()).get();
     var description = serviceEventPredictionReq.getDescription();
     var startDate = serviceEventPredictionReq.getStartDateTimeStamp();
     var endDate = serviceEventPredictionReq.getEndDateTimeStamp();
     var minReplicas = serviceEventPredictionReq.getMinReplics();
     var updateTime = Timestamp.from(Instant.now());
-    ServiceEventPrediction serviceEventPredition =
-        (id > 0 ? serviceEventPredictions.findById(id).get().toBuilder() : ServiceEventPrediction.builder())
+    EventPredictionEntity serviceEventPredition =
+        (id > 0 ? serviceEventPredictions.findById(id).get().toBuilder() : EventPredictionEntity.builder())
         .service(service).description(description).startDate(startDate).endDate(endDate).minReplics(minReplicas)
         .lastUpdate(updateTime).build();
     return serviceEventPredictions.save(serviceEventPredition).getId();
   }
 
-  public void deleteServiceEventPrediction(long serviceId, long serviceEventPredictionId) {
+  public void deleteServiceEventPrediction(Long serviceId, Long serviceEventPredictionId) {
     // just to trigger the possible 404 not found
     getService(serviceId);
-    var serviceEventPrediction = getServiceEventPrediction(serviceId, serviceEventPredictionId);
+    var serviceEventPrediction = getEventPrediction(serviceId, serviceEventPredictionId);
     serviceEventPredictions.delete(serviceEventPrediction);
   }
 
-  public boolean serviceDependsOnOtherService(long serviceId, String otherServiceName) {
+  public boolean serviceDependsOnOtherService(Long serviceId, String otherServiceName) {
     return services.serviceDependsOnOtherService(serviceId, otherServiceName) > 0;
   }
 
-  public List<ServiceEntity> getDependenciesByType(long serviceId, String serviceType) {
+  public List<ServiceEntity> getDependenciesByType(Long serviceId, String serviceType) {
     return services.getDependenciesByType(serviceId, serviceType);
   }
 

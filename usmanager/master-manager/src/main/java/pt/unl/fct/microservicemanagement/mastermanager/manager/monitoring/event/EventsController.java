@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.HostsEventsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.ServicesEventsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
@@ -52,17 +53,20 @@ public class EventsController {
   }
 
   @GetMapping("/hosts/{hostname}")
-  public List<HostEventEntity> getHostEventLogsByHostname(@PathVariable String hostname) {
+  public List<HostEventEntity> getHostEventLogsByHostname(@PathVariable String hostname)
+      throws EntityNotFoundException {
     return hostsEventsService.getHostEventsByHostname(hostname);
   }
 
   @GetMapping("/services/{serviceName}")
-  public List<ServiceEvent> getServiceEventLogsByServiceName(@PathVariable String serviceName) {
+  public List<ServiceEvent> getServiceEventLogsByServiceName(@PathVariable String serviceName)
+      throws EntityNotFoundException {
     return servicesEventsService.getServiceEventsByServiceName(serviceName);
   }
 
   @GetMapping("/containers/{containerId}")
-  public List<ServiceEvent> getServiceEventLogsByContainerId(@PathVariable String containerId) {
+  public List<ServiceEvent> getServiceEventLogsByContainerId(@PathVariable String containerId)
+      throws EntityNotFoundException {
     return servicesEventsService.getServiceEventsByContainerId(containerId);
   }
 

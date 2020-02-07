@@ -137,7 +137,6 @@
 		<module name="HideUtilityClassConstructor"/>
 		<module name="InnerTypeLast"/>
 		<module name="InterfaceIsType"/>
-		<module name="MutableException"/>
 		<module name="OneTopLevelClass"/>
 
 		<module name="VisibilityModifier">
@@ -155,11 +154,6 @@
 		<module name="EqualsHashCode"/>
 		<module name="ExplicitInitialization"/>
 		<module name="FallThrough"/>
-		<module name="HiddenField">
-			<property name="ignoreConstructorParameter" value="true"/>
-			<property name="ignoreSetter" value="true"/>
-			<property name="setterCanReturnItsClass" value="true"/>
-		</module>
 		<module name="IllegalCatch">
 			<property name="illegalClassNames"
 					  value="java.lang.Exception,

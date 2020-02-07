@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsLaunchServiceReq;
@@ -72,7 +73,7 @@ public class HostsController {
 
     @PutMapping("/edge/{id}")
     public long updateEdgeHost(@PathVariable long id,
-                                             @RequestBody EdgeHost edgeHost) {
+                                             @RequestBody EdgeHost edgeHost) throws EntityNotFoundException {
         Validation.validatePutRequest(id, edgeHost.getId());
         return edgeHostsService.updateEdgeHost(id, edgeHost);
     }*/
@@ -83,7 +84,7 @@ public class HostsController {
   }
 
   @DeleteMapping("/edge/{id}")
-  public void deleteEdgeHost(@PathVariable long id) {
+  public void deleteEdgeHost(@PathVariable long id) throws EntityNotFoundException {
     edgeHostsService.deleteEdgeHost(id);
   }
 
@@ -98,12 +99,12 @@ public class HostsController {
   }
 
   @GetMapping("/cloud/{id}")
-  public Instance getEC2Instance(@PathVariable String id) {
+  public Instance getEC2Instance(@PathVariable String id) throws EntityNotFoundException {
     return aws.getInstance(id);
   }
 
   @GetMapping("/cloud/{id}/simple")
-  public AwsSimpleInstance getEC2SimpleInstance(@PathVariable String id) {
+  public AwsSimpleInstance getEC2SimpleInstance(@PathVariable String id) throws EntityNotFoundException {
     return aws.getSimpleInstance(id);
   }
 
