@@ -30,7 +30,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventP
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -48,21 +47,30 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.id = :serviceId")
   List<ServiceEntity> getDependencies(@Param("serviceId") long serviceId);
 
-  @Modifying
+  @Query("select case when count(s) > 0 then true else false end "
+      + "from ServiceEntity s "
+      + "where s.id = :serviceId")
+  boolean hasService(@Param("serviceId") long serviceId);
+
+  @Query("select case when count(s) > 0 then true else false end "
+      + "from ServiceEntity s "
+      + "where s.serviceName = :serviceName")
+  boolean hasService(@Param("serviceName") String serviceName);
+
   @Query("select d.serviceDependency "
-          + "from ServiceEntity s inner join s.dependencies d "
-          + "where s.id = :serviceId and d.id = :dependencyId")
+      + "from ServiceEntity s inner join s.dependencies d "
+      + "where s.id = :serviceId and d.id = :dependencyId")
   Optional<ServiceEntity> getDependency(@Param("serviceId") long serviceId, @Param("dependencyId") long dependencyId);
 
   /*@Query("delete from Service s inner join s.dependencies d "
           + "where s.id = :serviceId and d.id = :dependencyId")
   void removeDependency(@Param("serviceId") long serviceId, @Param("dependencyId") long dependencyId);*/
 
-  @Query("select count (*) "
+  @Query("select case when count(d) > 0 then true else false end "
       + "from ServiceEntity s inner join s.dependencies d "
       + "where s.id = :serviceId and d.serviceDependency.serviceName = :otherServiceName")
-  int serviceDependsOnOtherService(@Param("serviceId") long serviceId,
-                                   @Param("otherServiceName") String otherServiceName);
+  boolean serviceDependsOnOtherService(@Param("serviceId") long serviceId,
+                                       @Param("otherServiceName") String otherServiceName);
 
   @Query("select d.serviceDependency "
       + "from ServiceEntity s inner join s.dependencies d "
@@ -96,5 +104,5 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.id = :serviceId and p.id = :serviceEventPredictions")
   Optional<EventPredictionEntity> getServiceEventPrediction(@Param("serviceId") long serviceId,
                                                             @Param("serviceEventPredictions")
-                                                                 long serviceEventPredictions);
+                                                                long serviceEventPredictions);
 }

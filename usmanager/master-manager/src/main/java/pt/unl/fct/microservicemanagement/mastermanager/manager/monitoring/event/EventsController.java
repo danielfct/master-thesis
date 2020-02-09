@@ -54,19 +54,19 @@ public class EventsController {
 
   @GetMapping("/hosts/{hostname}")
   public List<HostEventEntity> getHostEventLogsByHostname(@PathVariable String hostname)
-      throws EntityNotFoundException {
+      {
     return hostsEventsService.getHostEventsByHostname(hostname);
   }
 
   @GetMapping("/services/{serviceName}")
   public List<ServiceEvent> getServiceEventLogsByServiceName(@PathVariable String serviceName)
-      throws EntityNotFoundException {
+      {
     return servicesEventsService.getServiceEventsByServiceName(serviceName);
   }
 
   @GetMapping("/containers/{containerId}")
   public List<ServiceEvent> getServiceEventLogsByContainerId(@PathVariable String containerId)
-      throws EntityNotFoundException {
+      {
     return servicesEventsService.getServiceEventsByContainerId(containerId);
   }
 

@@ -42,7 +42,7 @@ public interface EdgeHostRepository extends CrudRepository<EdgeHostEntity, Long>
 
   List<EdgeHostEntity> findByCountry(@Param("country") String country);
 
-  @Query("select case when count(*) > 0 then true else false end "
+  @Query("select case when count(h) > 0 then true else false end "
       + "from EdgeHostEntity h "
       + "where h.hostname = :hostname")
   boolean hasEdgeHost(@Param("hostname") String hostname);

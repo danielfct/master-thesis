@@ -27,7 +27,7 @@ import M from 'materialize-css';
 import ContainerSimulatedMetricsCard from './ContainerSimulatedMetricsCard';
 import MainLayout from '../shared/MainLayout';
 import {Link} from 'react-router-dom';
-import {getData} from "../../utils/data";
+import {getData} from "../../utils/rest";
 
 export default class ContainerSimulatedMetrics extends React.Component {
   constructor (props) {

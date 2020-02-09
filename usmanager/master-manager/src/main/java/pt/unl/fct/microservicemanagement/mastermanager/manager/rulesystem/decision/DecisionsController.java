@@ -61,13 +61,13 @@ public class DecisionsController {
 
   @GetMapping("/logs/services/{serviceName}")
   public List<ComponentDecisionServiceLog> getComponentDecisionServiceLogByServiceName(@PathVariable String serviceName)
-      throws EntityNotFoundException {
+      {
     return decisionsService.getComponentDecisionServiceLogByServiceName(serviceName);
   }
 
   @GetMapping("/logs/containers/{containerId}")
   public List<ComponentDecisionServiceLog> getComponentDecisionServiceLogByContainerId(@PathVariable String containerId)
-      throws EntityNotFoundException {
+      {
     return decisionsService.getComponentDecisionServiceLogByContainerId(containerId);
   }
 

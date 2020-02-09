@@ -70,7 +70,7 @@ public class NodesController {
   }
 
   @DeleteMapping
-  public List<GenericResponse> removeNode(@RequestBody StopNodeReq stopNodeReq) throws EntityNotFoundException {
+  public List<GenericResponse> removeNode(@RequestBody StopNodeReq stopNodeReq) {
     hostsService.removeHost(stopNodeReq.getHostname());
     //TODO change return value
     return List.of(new GenericResponse("success", String.valueOf(true)));

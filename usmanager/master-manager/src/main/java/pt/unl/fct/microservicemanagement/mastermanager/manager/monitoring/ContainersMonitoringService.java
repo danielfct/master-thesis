@@ -187,7 +187,7 @@ public class ContainersMonitoringService {
         //TODO utilidade?
         testLogsService.saveMonitoringServiceLogTests(containerId, serviceName, field, value);
       });
-      long appId = servicesConfigService.getAppByServiceName(serviceName).getId();
+      long appId = servicesConfigService.getApp(serviceName).getId();
       final var containerDecisionResult = runAppRules(appId, serviceHostname, containerId, serviceName, newFields);
       var serviceDecisions = servicesDecisions.get(serviceName);
       if (serviceDecisions != null) {

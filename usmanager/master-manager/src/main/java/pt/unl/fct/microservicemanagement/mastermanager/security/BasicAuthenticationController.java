@@ -22,39 +22,17 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import {getData} from "../../utils/rest";
+package pt.unl.fct.microservicemanagement.mastermanager.security;
 
-export default class ServiceRules extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { serviceRules: [], loading: false };
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class BasicAuthenticationController {
+
+  @GetMapping(path = "/basicauth")
+  public AuthenticationBean authenticate() {
+    return new AuthenticationBean("You are authenticated");
   }
 
-  componentDidMount = () => {
-    this.loadServiceRules();
-  };
-
-  loadServiceRules = () => {
-    this.setState({ loading: true });
-    getData(
-      `http://localhost/services/${this.props.service.id}/rules`,
-      data => this.setState({ serviceRules: data, loading: false })
-    );
-  };
-
-  render = () => (
-    <div>
-      <h5>Rules</h5>
-      {this.state.serviceRules && this.state.serviceRules.map(serviceRule => (
-        <div key={serviceRule.rule.id}>
-          <div className='card'>
-            <div className='card-content'>
-              {serviceRule.rule.ruleName}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
 }

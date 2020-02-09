@@ -26,7 +26,7 @@ import React from 'react';
 import M from 'materialize-css';
 import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
-import {deleteData} from "../../utils/data";
+import {deleteData} from "../../utils/rest";
 
 export default class SpecificHostSimulatedMetricsCard extends React.Component {
   onClickRemove = () => {

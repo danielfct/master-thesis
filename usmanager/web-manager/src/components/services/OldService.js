@@ -27,7 +27,7 @@ import M from 'materialize-css';
 import ServiceCard from './ServiceCard';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
-import {deleteData, getData, postData} from "../../utils/data";
+import {deleteData, getData, postData} from "../../utils/rest";
 
 export default class OldService extends React.Component {
   constructor (props) {

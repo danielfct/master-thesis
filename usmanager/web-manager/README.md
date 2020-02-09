@@ -37,7 +37,7 @@ seeing the progress and behaviour of the system as a whole.
 
 [<img src="https://i.imgur.com/lwAbTpS.png" alt="" width="48" height="48"> Typescript](https://www.typescriptlang.org/docs/home.html) - TypeScript is a typed superset of JavaScript that compiles to plain JavaScript
 
-#### Bug fixes
+#### Resolução de erros
 
 Se após a execução de `npm start`, por acaso aparecer o erro:
 

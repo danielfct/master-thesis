@@ -55,7 +55,7 @@ public class RulesController {
   }
 
   @GetMapping("/{ruleId}")
-  public RuleEntity getRule(@PathVariable long ruleId) throws EntityNotFoundException {
+  public RuleEntity getRule(@PathVariable long ruleId) {
     return rulesService.getRule(ruleId);
   }
 
@@ -65,12 +65,12 @@ public class RulesController {
   }
 
   @DeleteMapping("/{ruleId}")
-  public void deleteRule(@PathVariable long ruleId) throws EntityNotFoundException {
+  public void deleteRule(@PathVariable long ruleId) {
     rulesService.deleteRule(ruleId);
   }
 
   @GetMapping("/{ruleId}/conditions")
-  public List<ConditionEntity> getRuleConditions(@PathVariable long ruleId) throws EntityNotFoundException {
+  public List<ConditionEntity> getRuleConditions(@PathVariable long ruleId) {
     return rulesService.getRuleConditions(ruleId);
   }
 
@@ -81,7 +81,7 @@ public class RulesController {
 
   @DeleteMapping("/{ruleId}/conditions/{conditionId}")
   public long deleteConditionFromRule(@PathVariable long ruleId, @PathVariable long conditionId)
-      throws EntityNotFoundException {
+      {
     return rulesService.deleteConditionFromRule(ruleId, conditionId);
   }
 
@@ -93,7 +93,7 @@ public class RulesController {
   }
 
   @GetMapping("/hosts/{hostname}")
-  public List<HostRule> getHostRulesByHostname(@PathVariable String hostname) throws EntityNotFoundException {
+  public List<HostRule> getHostRulesByHostname(@PathVariable String hostname) {
     return rulesService.getHostRulesByHostname(hostname);
   }
 
@@ -104,7 +104,7 @@ public class RulesController {
 
   @DeleteMapping("/hosts/{hostname}")
   public boolean deleteHostRule(@PathVariable String hostname, @RequestBody HostRuleReq hostRule)
-      throws EntityNotFoundException {
+      {
     return rulesService.deleteHostRule(hostname, hostRule.getRuleId());
   }
 
@@ -119,7 +119,7 @@ public class RulesController {
   }
 
   @DeleteMapping("/hosts/genericRules/{ruleId}")
-  public boolean deleteGenericHostRule(@PathVariable long ruleId) throws EntityNotFoundException {
+  public boolean deleteGenericHostRule(@PathVariable long ruleId) {
     return rulesService.deleteGenericHostRule(ruleId);
   }
 
@@ -152,7 +152,7 @@ public class RulesController {
 
 
   @GetMapping("/services/{serviceId}")
-  public List<ServiceRule> getAppRulesByServiceId(@PathVariable long serviceId) throws EntityNotFoundException {
+  public List<ServiceRule> getAppRulesByServiceId(@PathVariable long serviceId) {
     return rulesService.getServiceRulesByServiceId(serviceId);
   }
 
@@ -163,7 +163,7 @@ public class RulesController {
 
   @DeleteMapping("/services/{serviceId}")
   public boolean deleteServiceRule(@PathVariable long serviceId, @RequestBody ServiceRuleReq serviceRule)
-      throws EntityNotFoundException {
+      {
     return rulesService.deleteServiceRule(serviceId, serviceRule.getRuleId());
   }
 

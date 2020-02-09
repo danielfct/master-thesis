@@ -75,7 +75,7 @@ rules:
   container-rule-template-file: container-rule-template.drl
   host-rule-template-file: host-rule-template.drl
 server:
-  port: ${port:80}
+  port: ${port:8080}
 #debug: true
 #trace: true
 logging:

@@ -24,9 +24,7 @@
 
 import M from 'materialize-css'
 
-export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
-    return key in obj
-}
+//TODO dispatch invalidate local data? on post put delete and patch
 
 /*fetch (url, successFunction) {
   displayProgressBar();
@@ -141,7 +139,6 @@ const sendData = (url: string, method: string, body: any, callback: (data: any) 
 };
 
 export function deleteData(url: string, callback: () => void): void {
-    //TODO dispatch invalidate local data? on post put delete and patch
     console.log(`DELETE ${url}`);
     fetch(url, {
         method: 'DELETE',
@@ -149,15 +146,18 @@ export function deleteData(url: string, callback: () => void): void {
         headers: new Headers({
             'Content-type': 'application/json;charset=UTF-8',
             'Accept': 'application/json;charset=UTF-8',
-            'Origin': 'http://localhost:3000'
+            'Origin': 'http://localhost:3000',
+            'Authorization': 'Basic ' + btoa('admin:admin'), //TODO
         })
     }).then(response => {
-        if (!response.ok) {
-            M.toast({html: `<div>${response.status} ${response.statusText}</div>`});
-        } else {
+        if (response.ok) {
             callback();
+        } else {
+            response.json().then(({apierror}) => {
+                M.toast({html: `${response.status} ${apierror.status} - ${apierror.message}`, displayLength: 6000});
+            });
         }
-    }).catch(e => {
+    }).catch(_ => {
         M.toast({html: `<div>Connection refused</div>`});
     });
 }

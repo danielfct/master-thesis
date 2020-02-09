@@ -25,7 +25,7 @@
 import React from 'react';
 import M from 'materialize-css';
 import CardItem from '../shared/CardItem';
-import {deleteData} from "../../utils/data";
+import {deleteData} from "../../utils/rest";
 
 export default class ServiceEventPredictionCard extends React.Component {
   onClickRemove = () => {

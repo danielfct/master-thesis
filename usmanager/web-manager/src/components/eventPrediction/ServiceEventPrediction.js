@@ -27,7 +27,7 @@ import { Link } from 'react-router-dom';
 import M from 'materialize-css';
 import MainLayout from '../shared/MainLayout';
 import ServiceEventPredictionCard from './ServiceEventPredictionCard';
-import {getData} from "../../utils/data";
+import {getData} from "../../utils/rest";
 
 export default class ServiceEventPredictions extends React.Component {
   constructor (props) {

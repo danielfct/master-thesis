@@ -22,39 +22,15 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import {getData} from "../../utils/rest";
+package pt.unl.fct.microservicemanagement.mastermanager.security;
 
-export default class ServiceRules extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { serviceRules: [], loading: false };
-  }
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-  componentDidMount = () => {
-    this.loadServiceRules();
-  };
+@AllArgsConstructor
+@Data
+public class AuthenticationBean {
 
-  loadServiceRules = () => {
-    this.setState({ loading: true });
-    getData(
-      `http://localhost/services/${this.props.service.id}/rules`,
-      data => this.setState({ serviceRules: data, loading: false })
-    );
-  };
+  private String message;
 
-  render = () => (
-    <div>
-      <h5>Rules</h5>
-      {this.state.serviceRules && this.state.serviceRules.map(serviceRule => (
-        <div key={serviceRule.rule.id}>
-          <div className='card'>
-            <div className='card-content'>
-              {serviceRule.rule.ruleName}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
 }

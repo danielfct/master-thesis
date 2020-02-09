@@ -40,7 +40,7 @@ export function fetchUrl(url: string, method: string, reqbody: any,
         method,
         body: JSON.stringify(reqbody),
         headers: new Headers({
-            'Authorization': 'Basic '+btoa('admin:password'),
+            'Authorization': 'Basic ' + btoa('admin:password'),
             'Content-type': 'application/json;charset=UTF-8'
         }),
     })

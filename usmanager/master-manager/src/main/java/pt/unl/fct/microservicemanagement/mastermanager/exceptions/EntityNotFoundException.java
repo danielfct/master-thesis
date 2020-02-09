@@ -40,7 +40,7 @@ public class EntityNotFoundException extends RuntimeException {
   }
 
   private static String generateMessage(String entity, Map<String, String> searchParams) {
-    return StringUtils.capitalize(entity) + " was not found for parameters " + searchParams;
+    return String.format("%s with %s was not found", StringUtils.capitalize(entity), searchParams);
   }
 
   private static <K, V> Map<K, V> toMap(Class<K> keyType, Class<V> valueType, String... entries) {

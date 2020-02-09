@@ -73,7 +73,7 @@ public class HostsController {
 
     @PutMapping("/edge/{id}")
     public long updateEdgeHost(@PathVariable long id,
-                                             @RequestBody EdgeHost edgeHost) throws EntityNotFoundException {
+                                             @RequestBody EdgeHost edgeHost) {
         Validation.validatePutRequest(id, edgeHost.getId());
         return edgeHostsService.updateEdgeHost(id, edgeHost);
     }*/
@@ -84,7 +84,7 @@ public class HostsController {
   }
 
   @DeleteMapping("/edge/{id}")
-  public void deleteEdgeHost(@PathVariable long id) throws EntityNotFoundException {
+  public void deleteEdgeHost(@PathVariable long id) {
     edgeHostsService.deleteEdgeHost(id);
   }
 
@@ -99,12 +99,12 @@ public class HostsController {
   }
 
   @GetMapping("/cloud/{id}")
-  public Instance getEC2Instance(@PathVariable String id) throws EntityNotFoundException {
+  public Instance getEC2Instance(@PathVariable String id) {
     return aws.getInstance(id);
   }
 
   @GetMapping("/cloud/{id}/simple")
-  public AwsSimpleInstance getEC2SimpleInstance(@PathVariable String id) throws EntityNotFoundException {
+  public AwsSimpleInstance getEC2SimpleInstance(@PathVariable String id) {
     return aws.getSimpleInstance(id);
   }
 

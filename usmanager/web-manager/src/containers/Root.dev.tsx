@@ -69,6 +69,8 @@ import Footer from "../components/shared/Footer";
 import {connect, Provider} from "react-redux";
 import {ReduxState} from "../reducers";
 import PageNotFound from "../components/shared/PageNotFound";
+import LoginComponent from "../components/shared/LoginComponent";
+import AuthenticatedRoute from "../components/shared/AuthenticatedRoute";
 
 interface StateToProps {
     sidenavVisible: boolean;
@@ -81,7 +83,7 @@ interface RootContainerProps {
 type Props = StateToProps & RootContainerProps;
 
 export const routes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
-    ["/"]: { title: 'Microservices dynamic system management', component: Landing },
+    ["/home"]: { title: 'Microservices dynamic system management', component: Landing },
     ["/services"]: { title: "Services", component: Services, search: true },
     ["/services/:name"]: { title: "", component: Service },
     ["/apps"]: { title: "", component: AppPackage, search: true },
@@ -133,14 +135,12 @@ class Root extends React.Component<Props, {}> {
                 <Sidenav/>
                 <main>
                     <Switch>
-                    {Object.entries(routes).map(([path, {title, component: Component}], index) =>
-                        <Route key={index}
-                               exact path={path}
-                               render={props => <Component {...props} title={title}/>}
-                        />
-                    )}
+                        <Route path="/" exact component={LoginComponent} />
+                        <Route path="/login" exact component={LoginComponent} />
+                    {Object.entries(routes).map(([path, {title, component}], index) =>
+                        <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
                     </Switch>
-                   {/* <DevTools/>*/}
+                    <DevTools/>
                 </main>
             </div>
         </Provider>

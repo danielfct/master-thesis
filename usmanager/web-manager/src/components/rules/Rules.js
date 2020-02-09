@@ -26,7 +26,7 @@ import React from 'react';
 import RuleCard from './RuleCard';
 import MainLayout from '../shared/MainLayout';
 import { Link } from 'react-router-dom';
-import {getData} from "../../utils/data";
+import {getData} from "../../utils/rest";
 
 export default class Rules extends React.Component {
   constructor (props) {

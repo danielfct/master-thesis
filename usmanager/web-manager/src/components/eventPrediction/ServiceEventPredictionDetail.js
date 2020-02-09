@@ -27,7 +27,7 @@ import M from 'materialize-css';
 import $ from 'jquery';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
-import {getData, postData} from "../../utils/data";
+import {getData, postData} from "../../utils/rest";
 
 export default class ServiceEventPredictionDetail extends React.Component {
   constructor (props) {

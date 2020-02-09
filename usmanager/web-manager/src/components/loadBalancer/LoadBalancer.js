@@ -27,7 +27,7 @@ import { Redirect } from 'react-router-dom';
 import M from 'materialize-css';
 import $ from 'jquery';
 import MainLayout from '../shared/MainLayout';
-import {getData, postData} from "../../utils/data";
+import {getData, postData} from "../../utils/rest";
 
 export default class LoadBalancerPage extends React.Component {
   constructor (props) {

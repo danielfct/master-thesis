@@ -73,13 +73,13 @@ public class ContainersController {
   }
 
   @GetMapping("/{id}")
-  public SimpleContainer getContainer(@PathVariable String id) throws EntityNotFoundException {
+  public SimpleContainer getContainer(@PathVariable String id) {
     return dockerContainersService.getContainer(id);
   }
 
   @DeleteMapping("/{id}")
   public void stopContainer(@PathVariable String id, @RequestBody SimpleContainer container)
-      throws EntityNotFoundException {
+      {
     //TODO validate ids => throw new BadRequest when not match
     final var containerId = container.getId();
     final var hostname = container.getHostname();

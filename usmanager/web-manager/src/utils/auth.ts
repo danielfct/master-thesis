@@ -22,39 +22,34 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import {getData} from "../../utils/rest";
+import axios from "axios";
 
-export default class ServiceRules extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { serviceRules: [], loading: false };
-  }
+const API_URL = 'http://localhost:8080';
+const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser';
 
-  componentDidMount = () => {
-    this.loadServiceRules();
-  };
+export const basicAuthenticate = (username: string, password: string) =>
+    axios.get(`${API_URL}/basicauth`, { headers: { authorization: createBasicAuthToken(username, password) } });
 
-  loadServiceRules = () => {
-    this.setState({ loading: true });
-    getData(
-      `http://localhost/services/${this.props.service.id}/rules`,
-      data => this.setState({ serviceRules: data, loading: false })
-    );
-  };
+const createBasicAuthToken = (username: string, password: string) =>
+    `Basic ${window.btoa(`${username} : ${password}`)}`;
 
-  render = () => (
-    <div>
-      <h5>Rules</h5>
-      {this.state.serviceRules && this.state.serviceRules.map(serviceRule => (
-        <div key={serviceRule.rule.id}>
-          <div className='card'>
-            <div className='card-content'>
-              {serviceRule.rule.ruleName}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+export const isAuthenticated = () => !!sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+
+export const registerSuccessfulLogin = (username: string, password: string) => {
+    sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username);
+    setupAxiosInterceptors(createBasicAuthToken(username, password))
+};
+
+export const logout = () =>
+    sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+
+const setupAxiosInterceptors = (token: string ) => {
+    axios.interceptors.request.use(
+        (config) => {
+            if (isAuthenticated()) {
+                config.headers.authorization = token;
+            }
+            return config
+        }
+    )
+};

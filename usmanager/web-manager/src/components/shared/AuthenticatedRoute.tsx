@@ -22,39 +22,20 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import {getData} from "../../utils/rest";
+import {Redirect, Route} from "react-router";
+import React from "react";
+import {isAuthenticated} from "../../utils/auth";
 
-export default class ServiceRules extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { serviceRules: [], loading: false };
-  }
-
-  componentDidMount = () => {
-    this.loadServiceRules();
-  };
-
-  loadServiceRules = () => {
-    this.setState({ loading: true });
-    getData(
-      `http://localhost/services/${this.props.service.id}/rules`,
-      data => this.setState({ serviceRules: data, loading: false })
-    );
-  };
-
-  render = () => (
-    <div>
-      <h5>Rules</h5>
-      {this.state.serviceRules && this.state.serviceRules.map(serviceRule => (
-        <div key={serviceRule.rule.id}>
-          <div className='card'>
-            <div className='card-content'>
-              {serviceRule.rule.ruleName}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+interface Props {
+    exact: boolean;
+    path: string;
+    component: any;
+    title?: string;
 }
+
+const AuthenticatedRoute = ({exact, path, component:Component, title}: Props) =>
+    isAuthenticated()
+        ? <Route exact={exact} path={path} render={props => <Component {...props} title={title}/>}/>
+        : <Redirect to="/login" />;
+
+export default AuthenticatedRoute;

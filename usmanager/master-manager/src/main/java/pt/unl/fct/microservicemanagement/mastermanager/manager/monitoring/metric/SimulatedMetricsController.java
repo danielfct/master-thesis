@@ -53,7 +53,7 @@ public class SimulatedMetricsController {
   }
 
   @GetMapping("/services/{id}")
-  public ServiceSimulatedMetricsEntity getServiceSimulatedMetric(@PathVariable long id) throws EntityNotFoundException {
+  public ServiceSimulatedMetricsEntity getServiceSimulatedMetric(@PathVariable long id) {
     return simulatedMetricsService.getServiceSimulatedMetric(id);
   }
 
@@ -73,13 +73,13 @@ public class SimulatedMetricsController {
   @PutMapping("/services/{id}")
   public void updateServiceSimulatedMetric(@PathVariable long id,
                                            @RequestBody ServiceSimulatedMetrics serviceSimulatedMetric)
-                                           throws EntityNotFoundException {
+                                           {
     Validation.validatePutRequest(id, serviceSimulatedMetric.getId());
     simulatedMetricsService.updateServiceSimulatedMetric(id, serviceSimulatedMetric);
   }*/
 
   @DeleteMapping("/services/{id}")
-  public void deleteServiceSimulatedMetric(@PathVariable long id) throws EntityNotFoundException {
+  public void deleteServiceSimulatedMetric(@PathVariable long id) {
     simulatedMetricsService.deleteServiceSimulatedMetrics(id);
   }
 
@@ -90,7 +90,7 @@ public class SimulatedMetricsController {
 
   @GetMapping("/containers/{id}")
   public ContainerSimulatedMetricsEntity getContainerSimulatedMetricsById(@PathVariable long id)
-      throws EntityNotFoundException {
+      {
     return simulatedMetricsService.getContainerSimulatedMetric(id);
   }
 
@@ -112,13 +112,13 @@ public class SimulatedMetricsController {
   public void updateContainerSimulatedMetric(@PathVariable long id,
                                              @RequestBody
                                              final ContainerSimulatedMetrics containerSimulatedMetric)
-                                             throws EntityNotFoundException {
+                                             {
     Validation.validatePutRequest(id, containerSimulatedMetric.getId());
     simulatedMetricsService.updateContainerSimulatedMetric(id, containerSimulatedMetric);
   }*/
 
   @DeleteMapping("/containers/{id}")
-  public void deleteContainerSimulatedMetrics(@PathVariable long id) throws EntityNotFoundException {
+  public void deleteContainerSimulatedMetrics(@PathVariable long id) {
     simulatedMetricsService.deleteContainerSimulatedMetric(id);
   }
 
@@ -129,7 +129,7 @@ public class SimulatedMetricsController {
 
   @GetMapping("/hosts/default/{id}")
   public DefaultHostSimulatedMetricsEntity getDefaultHostSimulatedMetric(@PathVariable long id)
-      throws EntityNotFoundException {
+      {
     return simulatedMetricsService.getDefaultHostSimulatedMetric(id);
   }
 
@@ -149,13 +149,13 @@ public class SimulatedMetricsController {
   @PutMapping("/hosts/default/{id}")
   public void updateContainerSimulatedMetric(@PathVariable long id,
                                              @RequestBody DefaultHostSimulatedMetrics defaultHostSimulatedMetric)
-                                             throws EntityNotFoundException {
+                                             {
     Validation.validatePutRequest(id, defaultHostSimulatedMetric.getId());
     simulatedMetricsService.updateDefaultHostSimulatedMetric(id, defaultHostSimulatedMetric);
   }*/
 
   @DeleteMapping("/hosts/default/{id}")
-  public void deleteDefaultHostSimulatedMetrics(@PathVariable long id) throws EntityNotFoundException {
+  public void deleteDefaultHostSimulatedMetrics(@PathVariable long id) {
     simulatedMetricsService.deleteDefaultHostSimulatedMetric(id);
   }
 
@@ -167,7 +167,7 @@ public class SimulatedMetricsController {
 
   @GetMapping("/hosts/specific/{id}")
   public SpecificHostSimulatedMetricsEntity getSpecificHostSimulatedMetric(@PathVariable long id)
-      throws EntityNotFoundException {
+      {
     return simulatedMetricsService.getSpecificHostSimulatedMetric(id);
   }
 
@@ -188,13 +188,13 @@ public class SimulatedMetricsController {
   public void updateSpecificHostSimulatedMetric(@PathVariable long id,
                                                 @RequestBody
                                                 SpecificHostSimulatedMetrics specificHostSimulatedMetrics)
-                                                throws EntityNotFoundException {
+                                                {
     Validation.validatePutRequest(id, specificHostSimulatedMetrics.getId());
     simulatedMetricsService.updateSpecificHostSimulatedMetric(id, specificHostSimulatedMetrics);
   }*/
 
   @DeleteMapping("/hosts/specific/{id}")
-  public void deleteSpecificHostSimulatedMetric(@PathVariable long id) throws EntityNotFoundException {
+  public void deleteSpecificHostSimulatedMetric(@PathVariable long id) {
     simulatedMetricsService.deleteSpecificHostSimulatedMetric(id);
   }
 

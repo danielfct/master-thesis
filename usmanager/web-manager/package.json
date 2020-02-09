@@ -26,6 +26,7 @@
     "@types/react": "^16.9.17",
     "@types/react-dom": "^16.9.4",
     "@types/react-redux": "^7.1.6",
+    "axios": "^0.19.2",
     "isomorphic-fetch": "^2.2.1",
     "jquery": "^3.4.1",
     "lodash": "^4.17.4",
@@ -48,11 +49,13 @@
     "redux-devtools-log-monitor": "latest",
     "redux-devtools-dock-monitor": "latest",
     "normalizr": "latest",
-    "humps": "latest"
+    "humps": "latest",
+    "js-cookie": "latest"
   },
   "devDependencies": {
     "@types/humps": "^1.1.3",
     "@types/isomorphic-fetch": "0.0.35",
+    "@types/js-cookie": "^2.2.4",
     "@types/lodash": "^4.14.149",
     "@types/materialize-css": "^1.0.7",
     "@types/react-router-dom": "^5.1.3",

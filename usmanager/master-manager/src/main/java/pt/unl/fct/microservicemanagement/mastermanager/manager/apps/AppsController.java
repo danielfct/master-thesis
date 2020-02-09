@@ -58,7 +58,7 @@ public final class AppsController {
   }
 
   @GetMapping("/{appId}")
-  public AppPackage getApp(@PathVariable long appId) throws EntityNotFoundException {
+  public AppPackage getApp(@PathVariable long appId) {
     return appPackagesService.getApp(appId);
   }
 
@@ -74,17 +74,17 @@ public final class AppsController {
 
   @PutMapping("/{appId}")
   public void updateApp(@PathVariable long appId,
-                        @JsonValue String appName) throws EntityNotFoundException {
+                        @JsonValue String appName) {
     appPackageService.updateApp(appId, appName);
   }*/
 
   @DeleteMapping("/{appId}")
-  public void deleteApp(@PathVariable long appId) throws EntityNotFoundException {
+  public void deleteApp(@PathVariable long appId) {
     appPackagesService.deleteApp(appId);
   }
 
   @GetMapping("/{appId}/services")
-  public List<ServiceOrder> getServicesByAppId(@PathVariable long appId) throws EntityNotFoundException {
+  public List<ServiceOrder> getServicesByAppId(@PathVariable long appId) {
     return appPackagesService.getServiceByAppId(appId);
   }
 
@@ -92,7 +92,7 @@ public final class AppsController {
   //TODO move to rules service
 
   @GetMapping("/{appId}/rules")
-  public List<AppRule> getAppRulesByAppId(@PathVariable long appId) throws EntityNotFoundException {
+  public List<AppRule> getAppRulesByAppId(@PathVariable long appId) {
     return ruleService.getAppRulesByAppId(appId);
   }
 
@@ -103,7 +103,7 @@ public final class AppsController {
 
   @DeleteMapping("/{appId}/rules")
   public boolean deleteAppRule(@PathVariable long appId, @RequestBody AppRuleReq appRule)
-      throws EntityNotFoundException {
+      {
     return ruleService.deleteAppRule(appId, appRule.getRuleId());
   }
 

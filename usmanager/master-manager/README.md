@@ -1,11 +1,15 @@
-# Master manager 
-
-Master manager é o módulo principal do sistema de gestão de micro-serviços.  
-É um projeto Spring Boot, gerido com maven, que disponibiliza um servidor restful.
+# Master manager   
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-checkstyle-brightgreen.svg)](https://checkstyle.org/)
 
+Master manager é o módulo principal do sistema de gestão de micro-serviços.
+Faz uso de conhecimento prévio (serviços e sua dependencias, regras, tipo de decisões, etc) e de conhecimento que adquire ao longo da sua execução (métricas obtidas dos containers e hosts, migração/replicação de serviços, etc).  
+Usa o sistema de gestão de regras de negócios Drools para gerir as regras aplicadas. 
+É também um projeto Spring Boot, gerido com maven, que disponibiliza um servidor restful.
+
 ### Ferramentas usadas
+
+[<img src="https://i.imgur.com/71OViyN.png" alt="" width="48" height="62"> Drools](https://www.drools.org/) - Drools is a Business Rules Management System (BRMS) solution
 
 [<img src="https://i.imgur.com/DBrGTaL.png" alt="" width="48" height="48"> Postman](https://www.postman.com/) - The Collaboration Platform for API Development
 
@@ -18,16 +22,20 @@ Master manager é o módulo principal do sistema de gestão de micro-serviços.
 ### Guias úteis
 [<img src="https://i.imgur.com/WDbhA08.png" alt="" width="48" height="42"> Spring Boot](https://spring.io/projects/spring-boot) - Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run" 
 
-[<img src="https://i.imgur.com/ei7nKF5.png" alt="" width="48" height="42"> Spring HATEOAS](https://spring.io/projects/spring-hateoas) - Spring HATEOAS provides some APIs to ease creating REST representations that follow the HATEOAS principle when working with Spring and especially Spring MVC
+<!--[<img src="https://i.imgur.com/ei7nKF5.png" alt="" width="48" height="42"> Spring HATEOAS](https://spring.io/projects/spring-hateoas) - Spring HATEOAS provides some APIs to ease creating REST representations that follow the HATEOAS principle when working with Spring and especially Spring MVC-->
 
 [<img src="https://i.imgur.com/qFZtEoa.png" alt="" width="48" height="24"> Maven](http://maven.apache.org/guides/getting-started/) - Maven is essentially a project management and comprehension tool and as such provides a way to help with managing: Builds, Documentation, Reporting, Dependencies, SCMs, Release, Distribution and Documentation
 
-### Iniciar
+### Executar
 
-> `mvn package`
->
-> `sudo java -jar ./target/master-manager-0.0.1.jar`
+Com o maven instalado:
 
-### License
+> `mvn spring-boot:run`
+
+Sem o maven instalado:
+
+> `./mvnw package`
+
+### Licença
 
 Master manager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para ter a certeza.

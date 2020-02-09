@@ -33,7 +33,7 @@ import ListItem from "../shared/ListItem";
 import './ServiceDependencyList.css'
 import M from "materialize-css";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {deleteData, patchData} from "../../utils/data";
+import {deleteData, patchData} from "../../utils/rest";
 
 export interface IServiceDependency extends IService {
 }

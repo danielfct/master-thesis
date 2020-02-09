@@ -26,7 +26,7 @@ import React from 'react';
 import M from 'materialize-css';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
-import {getData, postData} from "../../utils/data";
+import {getData, postData} from "../../utils/rest";
 
 export default class ContainerSimulatedMetricsDetail extends React.Component {
   constructor (props) {

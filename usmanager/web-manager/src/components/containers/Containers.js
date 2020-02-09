@@ -28,7 +28,7 @@ import M from 'materialize-css';
 import $ from 'jquery';
 import MainLayout from '../shared/MainLayout';
 import ContainerCard from './ContainerCard';
-import {getData} from "../../utils/data";
+import {getData} from "../../utils/rest";
 
 export default class Containers extends React.Component {
 

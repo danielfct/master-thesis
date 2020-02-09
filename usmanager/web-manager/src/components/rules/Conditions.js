@@ -26,7 +26,7 @@ import React from 'react';
 import ConditionCard from './ConditionCard';
 import MainLayout from '../shared/MainLayout';
 import { Link } from 'react-router-dom';
-import {getData} from "../../utils/data";
+import {getData} from "../../utils/rest";
 
 export default class Conditions extends React.Component {
   constructor (props) {

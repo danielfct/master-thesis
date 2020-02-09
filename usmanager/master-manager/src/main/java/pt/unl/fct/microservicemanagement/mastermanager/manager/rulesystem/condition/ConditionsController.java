@@ -50,7 +50,7 @@ public class ConditionsController {
   }
 
   @GetMapping("/{conditionId}")
-  public ConditionEntity getCondition(@PathVariable long conditionId) throws EntityNotFoundException {
+  public ConditionEntity getCondition(@PathVariable long conditionId) {
     return ruleService.getCondition(conditionId);
   }
 
@@ -60,7 +60,7 @@ public class ConditionsController {
   }
 
   @DeleteMapping("/{conditionId}")
-  public void deleteCondition(@PathVariable long conditionId) throws EntityNotFoundException {
+  public void deleteCondition(@PathVariable long conditionId) {
     ruleService.deleteCondition(conditionId);
   }
 

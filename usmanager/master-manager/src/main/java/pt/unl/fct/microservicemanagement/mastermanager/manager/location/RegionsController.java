@@ -49,7 +49,7 @@ public class RegionsController {
   }
 
   @GetMapping("/{id}")
-  public RegionEntity getRegion(@PathVariable long id) throws EntityNotFoundException {
+  public RegionEntity getRegion(@PathVariable long id) {
     return regionsService.getRegion(id);
   }
 
@@ -60,7 +60,7 @@ public class RegionsController {
   }
 
   @PutMapping(value = "/{id}")
-  public long updateRegion(@PathVariable long id, @RequestBody Region region) throws EntityNotFoundException {
+  public long updateRegion(@PathVariable long id, @RequestBody Region region) {
     Validation.validatePutRequest(id, region.getId());
     return regionsService.updateRegion(id, region);
   }*/
@@ -71,7 +71,7 @@ public class RegionsController {
   }
 
   @DeleteMapping("/{id}")
-  public void deleteRegion(@PathVariable long id) throws EntityNotFoundException {
+  public void deleteRegion(@PathVariable long id) {
     regionsService.deleteRegion(id);
   }
 

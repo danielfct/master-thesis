@@ -59,14 +59,14 @@ public class MonitoringController {
 
   @GetMapping("/services/{serviceName}/avg")
   public List<ServiceFieldAvg> getMonitoringServiceLogsByService(@PathVariable String serviceName)
-      throws EntityNotFoundException {
+      {
     return containersMonitoringService.getAvgServiceFields(serviceName);
   }
 
   @GetMapping("/services/{serviceName}/fields/{field}/avg")
   public ServiceFieldAvg getMonitoringServiceLogsByServiceAndField(@PathVariable String serviceName,
                                                                    @PathVariable String field)
-      throws EntityNotFoundException {
+      {
     return containersMonitoringService.getAvgServiceField(serviceName, field);
   }
 
@@ -76,13 +76,13 @@ public class MonitoringController {
   }
 
   @GetMapping("/hosts/{hostname}/avg")
-  public List<HostFieldAvg> getMonitoringHostLogsByHost(@PathVariable String hostname) throws EntityNotFoundException {
+  public List<HostFieldAvg> getMonitoringHostLogsByHost(@PathVariable String hostname) {
     return hostsMonitoringService.getAvgHostFields(hostname);
   }
 
   @GetMapping("/hosts/{hostname}/fields/{field}/avg")
   public HostFieldAvg getMonitoringHostLogsByHostAndField(@PathVariable String hostname, @PathVariable String field)
-      throws EntityNotFoundException {
+      {
     return hostsMonitoringService.getAvgHostField(hostname, field);
   }
 
@@ -93,13 +93,13 @@ public class MonitoringController {
 
   @GetMapping("/logs/services/{serviceName}")
   public List<MonitoringServiceLogTests> getMonitoringServiceLogTestsByServiceName(@PathVariable String serviceName)
-      throws EntityNotFoundException {
+      {
     return testLogsService.getMonitoringServiceLogTestsByServiceName(serviceName);
   }
 
   @GetMapping("/logs/containers/{containerId}")
   public List<MonitoringServiceLogTests> getMonitoringServiceLogTestsByContainerId(@PathVariable String containerId)
-      throws EntityNotFoundException {
+      {
     return testLogsService.getMonitoringServiceLogTestsByContainerId(containerId);
   }
 
