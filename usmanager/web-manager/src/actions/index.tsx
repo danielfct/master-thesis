@@ -32,7 +32,7 @@ export const SERVICE_SUCCESS = 'SERVICE_SUCCESS';
 export const SERVICE_FAILURE = 'SERVICE_FAILURE';
 
 export const loadServices = (name?: string, requiredField = 'id') => (dispatch: any, getState: any) => {
-    let cached;
+    /*let cached;
     if (name) {
         let entity = getState().entities.services[name];
         cached = entity && entity.hasOwnProperty(requiredField);
@@ -42,7 +42,8 @@ export const loadServices = (name?: string, requiredField = 'id') => (dispatch: 
         cached = entities && entities.length
             && entities.every((entity: IService) => entity.hasOwnProperty(requiredField));
     }
-    return cached ? null : dispatch(fetchServices(name));
+    return cached ? null : dispatch(fetchServices(name));*/
+    return dispatch(fetchServices(name));
 };
 
 const fetchServices = (name?: string) => ({
@@ -59,13 +60,14 @@ export const SERVICE_DEPENDENCIES_SUCCESS = 'SERVICE_DEPENDENCIES_SUCCESS';
 export const SERVICE_DEPENDENCIES_FAILURE = 'SERVICE_DEPENDENCIES_FAILURE';
 
 export const loadServiceDependencies = (service: IService, id?: string | number) => (dispatch: any, getState: any) => {
-    const cachedService = getState().entities.services[service.serviceName];
+    /*const cachedService = getState().entities.services[service.serviceName];
     let cached = cachedService && cachedService.dependencies;
     if (id) {
         cached = cached[id];
     }
     console.log('service dependencies of ' + service.serviceName + ' cached? ' + cached);
-    return cached ? null : dispatch(fetchServiceDependencies(service, id));
+    return cached ? null : dispatch(fetchServiceDependencies(service, id));*/
+    return dispatch(fetchServiceDependencies(service, id));
 };
 
 const fetchServiceDependencies = (service: IService, id?: string | number) => ({
