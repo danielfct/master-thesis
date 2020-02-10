@@ -22,39 +22,18 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import {getData} from "../../utils/api";
+.login-container {
+    margin-top: 50px;
+}
 
-export default class ServiceRules extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { serviceRules: [], loading: false };
-  }
+.login-tab {
+    cursor: default;
+}
 
-  componentDidMount = () => {
-    this.loadServiceRules();
-  };
+.login-tab-content {
+    padding: 25px !important;
+}
 
-  loadServiceRules = () => {
-    this.setState({ loading: true });
-    getData(
-      `/services/${this.props.service.id}/rules`,
-      data => this.setState({ serviceRules: data, loading: false })
-    );
-  };
-
-  render = () => (
-    <div>
-      <h5>Rules</h5>
-      {this.state.serviceRules && this.state.serviceRules.map(serviceRule => (
-        <div key={serviceRule.rule.id}>
-          <div className='card'>
-            <div className='card-content'>
-              {serviceRule.rule.ruleName}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+.login-container .tabs  {
+    padding: 0 !important;
 }

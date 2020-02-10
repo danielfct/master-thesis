@@ -25,7 +25,7 @@
 import React from 'react';
 import M from 'materialize-css';
 import ServiceCard from '../services/ServiceCard';
-import {deleteData, getData, postData} from "../../utils/rest";
+import {deleteData, getData, postData} from "../../utils/api";
 
 export default class AppPackageCard extends React.Component {
   constructor (props) {

@@ -24,7 +24,7 @@
 
 import MainLayout from "./MainLayout";
 import React, {createRef, FormEvent} from "react";
-import {deleteData} from "../../utils/rest";
+import {deleteData} from "../../utils/api";
 import M from "materialize-css";
 import './FormPage.css';
 import {RouteComponentProps, withRouter} from "react-router";

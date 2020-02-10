@@ -64,100 +64,75 @@ import DefaultHostSimulatedMetricsDetail from "../components/metrics/DefaultHost
 import SpecificHostSimulatedMetrics from "../components/metrics/SpecificHostSimulatedMetrics";
 import SpecificHostSimulatedMetricsDetail from "../components/metrics/SpecificHostSimulatedMetricsDetail";
 import Regions from "../components/region/Region";
-import DevTools from "./DevTools";
-import Footer from "../components/shared/Footer";
-import {connect, Provider} from "react-redux";
-import {ReduxState} from "../reducers";
+import {Provider} from "react-redux";
 import PageNotFound from "../components/shared/PageNotFound";
-import LoginComponent from "../components/shared/LoginComponent";
+import Login from "../components/shared/Login";
 import AuthenticatedRoute from "../components/shared/AuthenticatedRoute";
-
-interface StateToProps {
-    sidenavVisible: boolean;
-}
 
 interface RootContainerProps {
     store: any;
 }
 
-type Props = StateToProps & RootContainerProps;
+type Props = RootContainerProps;
 
-export const routes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
-    ["/home"]: { title: 'Microservices dynamic system management', component: Landing },
-    ["/services"]: { title: "Services", component: Services, search: true },
-    ["/services/:name"]: { title: "", component: Service },
-    ["/apps"]: { title: "", component: AppPackage, search: true },
-    ["/hosts/edge"]: { title: "", component: EdgeHosts, search: true },
-    ["/containers"]: { title: "", component: Containers, search: true },
-    ["/containers/launch/:containerId?"]: { title: "", component: LaunchContainer },
-    ["/rules"]: { title: "", component: Rules, search: true },
-    ["/rules/management"]: { title: "", component: RulesLandingPage, search: true },
-    ["/rules/rules/:ruleId?"]: { title: "",component: RulePage },
-    ["/rules/conditions"]: { title: "",  component: Conditions, search: true },
-    ["/rules/conditions/condition/:conditionId?"]: { title: "",  component: ConditionPage },
-    ["/rules/apps"]: { title: "",  component: AppsRulesList, search: true },
-    ["/rules/apps/app/:appId"]: { title: "", component: AppRulesPage },
-    ["/rules/services"]: { title: "", component: ServicesRulesList, search: true },
-    ["/rules/services/service/:serviceId"]: { title: "", component: ServiceRulesPage },
-    ["/rules/hosts"]: { title: "", component: HostsRulesList, search: true },
-    ["/rules/hosts/host/:hostname"]: { title: "", component: HostRulesPage },
-    ["/rules/generic/hosts"]: { title: "", component: GenericHostsRulesList, search: true },
-    ["/rules/generic/hosts/rule"]: { title: "", component: GenericHostRulesPage },
-    ["/rules/serviceEventPredictions"]: { title: "", component: ServiceEventPredictions, search: true },
-    ["/rules/serviceEventPredictions/serviceEventPrediction/:id?"]: { title: "", component: ServiceEventPredictionDetail },
-    ["/nodes"]: { title: "", component: Nodes, search: true },
-    ["/nodes/add"]: { title: "", component: AddNode },
-    ["/eureka"]: { title: "", component: EurekaPage, search: true },
-    ["/loadbalancer"]: { title: "", component: LoadBalancerPage, search: true },
-    ["/metrics/simulated"]: { title: "", component: SimulatedMetricsLandingPage, search: true },
-    ["/metrics/simulated/services"]: { title: "", component: ServiceSimulatedMetrics, search: true },
-    ["/metrics/simulated/services/service/:id?"]: { title: "", component: ServiceSimulatedMetricsDetail },
-    ["/metrics/simulated/containers"]: { title: "", component: ContainerSimulatedMetrics, search: true },
-    ["/metrics/simulated/containers/metric/:id?"]: { title: "", component: ContainerSimulatedMetricsDetail },
-    ["/metrics/simulated/hosts/default"]: { title: "", component: DefaultHostSimulatedMetrics, search: true },
-    ["/metrics/simulated/hosts/metric/:id?"]: { title: "", component: DefaultHostSimulatedMetricsDetail },
-    ["/metrics/simulated/hosts/specific"]: { title: "", component: SpecificHostSimulatedMetrics, search: true },
-    ["/metrics/simulated/hosts/specific/metric/:id?"]: { title: "", component: SpecificHostSimulatedMetricsDetail },
-    ["/regions"]: { title: "", component: Regions, search: true },
-    ["/*"]: { title: "404 - Not found", component: PageNotFound },
+export const authenticatedRoutes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
+    "/home": { title: 'Microservices dynamic system management', component: Landing },
+    "/services": { title: "Services", component: Services, search: true },
+    "/services/:name": { title: "", component: Service },
+    "/apps": { title: "", component: AppPackage, search: true },
+    "/hosts/edge": { title: "", component: EdgeHosts, search: true },
+    "/containers": { title: "", component: Containers, search: true },
+    "/containers/launch/:containerId?": { title: "", component: LaunchContainer },
+    "/rules": { title: "", component: Rules, search: true },
+    "/rules/management": { title: "", component: RulesLandingPage, search: true },
+    "/rules/rules/:ruleId?": { title: "",component: RulePage },
+    "/rules/conditions": { title: "",  component: Conditions, search: true },
+    "/rules/conditions/condition/:conditionId?": { title: "",  component: ConditionPage },
+    "/rules/apps": { title: "",  component: AppsRulesList, search: true },
+    "/rules/apps/app/:appId": { title: "", component: AppRulesPage },
+    "/rules/services": { title: "", component: ServicesRulesList, search: true },
+    "/rules/services/service/:serviceId": { title: "", component: ServiceRulesPage },
+    "/rules/hosts": { title: "", component: HostsRulesList, search: true },
+    "/rules/hosts/host/:hostname": { title: "", component: HostRulesPage },
+    "/rules/generic/hosts": { title: "", component: GenericHostsRulesList, search: true },
+    "/rules/generic/hosts/rule": { title: "", component: GenericHostRulesPage },
+    "/rules/serviceEventPredictions": { title: "", component: ServiceEventPredictions, search: true },
+    "/rules/serviceEventPredictions/serviceEventPrediction/:id?": { title: "", component: ServiceEventPredictionDetail },
+    "/nodes": { title: "", component: Nodes, search: true },
+    "/nodes/add": { title: "", component: AddNode },
+    "/eureka": { title: "", component: EurekaPage, search: true },
+    "/loadbalancer": { title: "", component: LoadBalancerPage, search: true },
+    "/metrics/simulated": { title: "", component: SimulatedMetricsLandingPage, search: true },
+    "/metrics/simulated/services": { title: "", component: ServiceSimulatedMetrics, search: true },
+    "/metrics/simulated/services/service/:id?": { title: "", component: ServiceSimulatedMetricsDetail },
+    "/metrics/simulated/containers": { title: "", component: ContainerSimulatedMetrics, search: true },
+    "/metrics/simulated/containers/metric/:id?": { title: "", component: ContainerSimulatedMetricsDetail },
+    "/metrics/simulated/hosts/default": { title: "", component: DefaultHostSimulatedMetrics, search: true },
+    "/metrics/simulated/hosts/metric/:id?": { title: "", component: DefaultHostSimulatedMetricsDetail },
+    "/metrics/simulated/hosts/specific": { title: "", component: SpecificHostSimulatedMetrics, search: true },
+    "/metrics/simulated/hosts/specific/metric/:id?": { title: "", component: SpecificHostSimulatedMetricsDetail },
+    "/regions": { title: "", component: Regions, search: true },
+    "/*": { title: "404 - Not found", component: PageNotFound },
 };
 
-class Root extends React.Component<Props, {}> {
+export default class Root extends React.Component<Props, {}> {
 
     public componentDidMount = () =>
         M.AutoInit();
 
     public render = () =>
-        <Provider store={this.props.store}>
-            <LoadingBar showFastActions className="loading-bar"/>
-            <div className="content" style={this.props.sidenavVisible ? undefined : {paddingLeft: 0}}>
+        <main>
+            <Provider store={this.props.store}>
+                <LoadingBar showFastActions className="loading-bar"/>
                 <Navbar/>
-                <Sidenav/>
-                <main>
-                    <Switch>
-                        <Route path="/" exact component={LoginComponent} />
-                        <Route path="/login" exact component={LoginComponent} />
-                    {Object.entries(routes).map(([path, {title, component}], index) =>
+                <Switch>
+                    <Route path="/" exact component={Login} />
+                    <Route path="/login" exact component={Login} />
+                    {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
                         <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
-                    </Switch>
-                    <DevTools/>
-                </main>
-            </div>
-        </Provider>
+                </Switch>
+                {/*<DevTools/>*/}
+            </Provider>
+        </main>
 
 }
-
-const mapStateToProps = (state: ReduxState): StateToProps => (
-{
-    sidenavVisible: state.ui.sidenav.user,
-}
-);
-
-export default connect(mapStateToProps)(Root);
-
-{/*<div className="content">
-            <h1>Sticky Footer with Flexbox</h1>
-            <p>
-                <button>Add Content</button>
-            </p>
-        </div>*/}

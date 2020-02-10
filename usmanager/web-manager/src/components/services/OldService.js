@@ -27,7 +27,7 @@ import M from 'materialize-css';
 import ServiceCard from './ServiceCard';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
-import {deleteData, getData, postData} from "../../utils/rest";
+import {deleteData, getData, postData} from "../../utils/api";
 
 export default class OldService extends React.Component {
   constructor (props) {
@@ -124,7 +124,7 @@ export default class OldService extends React.Component {
 
   onClickRemove = () => {
     deleteData(
-      `http://localhost/services/${this.state.service.id}`,
+      `/services/${this.state.service.id}`,
       () => {
         this.setState({ isDeleted: true });
         M.toast({ html: '<div>IService config removed successfully!</div>' });

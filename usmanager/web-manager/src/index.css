@@ -128,10 +128,15 @@ nav li {
     }
 }
 
-.brand-logo>img {
+.brand-logo {
+    position: relative !important;
+
+}
+
+.brand-logo > img {
     height: 30px;
     vertical-align: middle;
-    padding-right: 5px;
+    padding-right: 10px;
 }
 
 .sidenav {
@@ -318,7 +323,7 @@ ul.dropdown-content.select-dropdown li:first-child span:hover {
     border-left: 1px solid black;
     border-right: 1px solid black;
     border-bottom: 1px solid black;
-    background: #36393F
+    background: #36393F;
 }
 
 .control-btn {
@@ -327,6 +332,41 @@ ul.dropdown-content.select-dropdown li:first-child span:hover {
 
 .control-btn:hover {
     background-color: #1F1F1F;
+}
+
+button:hover {
+    background-color: #1F1F1F !important;
+}
+
+.input-field {
+    padding: 0 !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 30px #36393F inset !important;
+}
+
+input:-webkit-autofill {
+    -webkit-text-fill-color: white !important;
+    caret-color: white;
+}
+
+.input-field .suffix {
+    position: absolute;
+    right: 0;
+    top: 1rem;
+    font-size: 1.5rem;
+    -webkit-transition: color .2s;
+    transition: color .2s;
+    color: grey;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /*.control-btn i.material-icons.delete {

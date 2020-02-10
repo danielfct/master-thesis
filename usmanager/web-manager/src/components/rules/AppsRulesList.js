@@ -27,7 +27,7 @@ import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
 import AppRules from './AppRules';
 import MainLayout from '../shared/MainLayout';
-import {getData} from "../../utils/rest";
+import {getData} from "../../utils/api";
 
 export default class AppsRulesList extends React.Component {
   constructor (props) {

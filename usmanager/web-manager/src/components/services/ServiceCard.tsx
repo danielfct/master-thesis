@@ -50,8 +50,7 @@ export default class ServiceCard extends React.Component<Props, {}> {
                             {Object.entries(this.props.service)
                                 .filter(([key, _]) => key !== 'id')
                                 .map(([key, value]) =>
-                                    <CardItem key={key} label={camelCaseToSentenceCase(key)} value={value}/>)
-                            }
+                                    <CardItem key={key} label={camelCaseToSentenceCase(key)} value={value}/>)}
                         </div>
                     </Link>
                 </PerfectScrollbar>

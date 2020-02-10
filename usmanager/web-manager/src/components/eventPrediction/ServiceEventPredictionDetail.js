@@ -27,7 +27,7 @@ import M from 'materialize-css';
 import $ from 'jquery';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
-import {getData, postData} from "../../utils/rest";
+import {getData, postData} from "../../utils/api";
 
 export default class ServiceEventPredictionDetail extends React.Component {
   constructor (props) {
@@ -80,7 +80,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
   loadServices = () => {
     this.setState({ loading: true });
     getData(
-      'localhost/services',
+      'services',
       data => this.setState({ services: data, loading: false })
     );
   };
@@ -89,7 +89,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
       getData(
-        `localhost/services/eventPredictions/${this.state.id}`,
+        `services/eventPredictions/${this.state.id}`,
         data => {
           const loadValues = {
             serviceId: data.service.id,
@@ -139,7 +139,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
   onSubmitForm = event => {
     event.preventDefault();
     postData(
-      `localhost/services/eventPredictions/${this.state.id}`,
+      `services/eventPredictions/${this.state.id}`,
       event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });

@@ -117,7 +117,7 @@ class Service extends React.Component<Props, State> {
         }
     }
 
-    private onChange = ({target:{id, value}}:any) => {
+    private onChange = ( { target: { id, value } }: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         this.setState(prevState => ({
             service: {
                 ...prevState.service,
@@ -151,8 +151,8 @@ class Service extends React.Component<Props, State> {
                 <div className="tab-content col s12" id="details">
                     <FormPage new={!service}
                               onEdit={this.onEdit}
-                              post={{url: 'http://localhost/services', callback: this.onPostSuccessful}}
-                              delete={service && {url: `http://localhost/services/${service.id}`, callback: this.onDeleteSuccessful}}
+                              post={{url: '/services', callback: this.onPostSuccessful}}
+                              delete={service && {url: `/services/${service.id}`, callback: this.onDeleteSuccessful}}
                     >
                         <div className="form-content">
                             {Object.entries(this.state.service)
@@ -201,10 +201,10 @@ export default connect(null, mapDispatchToProps)(Service);
 
 {/*
 <FormPage onEdit={this.onEdit}
-          post={{url: 'http://localhost/services', callback: this.onPostSuccessful}}
+          post={{url: '/services', callback: this.onPostSuccessful}}
           delete={!service
               ? undefined
-              : {url: `http://localhost/services/${service.id}`, callback: this.onDeleteSuccessful}}
+              : {url: `/services/${service.id}`, callback: this.onDeleteSuccessful}}
 >
     <div className="row">
         <ul className="tabs" ref={this.tabs}>

@@ -25,7 +25,7 @@
 import React from 'react';
 import M from 'materialize-css';
 import CardItem from '../shared/CardItem';
-import {getData, deleteData, postData} from '../../utils/rest';
+import {getData, deleteData, postData} from '../../utils/api';
 
 export default class ContainerCard extends React.Component {
   constructor (props) {
@@ -69,13 +69,13 @@ export default class ContainerCard extends React.Component {
     </div>;
 
   stopContainer = () => {
-    /* const action = `localhost/containers/${this.props.container.id}`;
+    /* const action = `containers/${this.props.container.id}`;
      const dataObject = {
        hostname: this.props.container.hostname,
        containerId: this.props.container.id
      };
      const dataToSend = JSON.stringify(dataObject);*/
-    deleteData(`localhost/containers/${this.props.container.id}`,
+    deleteData(`containers/${this.props.container.id}`,
       this.props.container, () => {
         M.toast({ html: '<div>Container stopped successfully!</div>' });
         this.props.containerStopped(this.props.container.id);
@@ -84,7 +84,7 @@ export default class ContainerCard extends React.Component {
 
   loadAvailableNodes = () => {
     this.setState({ loading: true });
-    getData('localhost/nodes', nodes => this.setState({ nodes: nodes, loading: false })
+    getData('nodes', nodes => this.setState({ nodes: nodes, loading: false })
     );
   };
 
@@ -109,7 +109,7 @@ export default class ContainerCard extends React.Component {
   };
 
   onSubmitReplicate = () => {
-    postData(`localhost/containers/${this.props.container.id}/replicate`,
+    postData(`containers/${this.props.container.id}/replicate`,
       {
         fromHostname: this.props.container.hostname,
         toHostname: this.state.hostnameSelected
@@ -122,7 +122,7 @@ export default class ContainerCard extends React.Component {
   };
 
   onSubmitMigrate = () => {
-    postData(`localhost/containers/${this.props.container.id}/migrate`,
+    postData(`containers/${this.props.container.id}/migrate`,
       {
         fromHostname: this.props.container.hostname,
         toHostname: this.state.hostnameSelected,

@@ -58,7 +58,7 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
         const list = l.slice(page * pagesize, page * pagesize + pagesize);
         return (
             <div>
-                <ul className="pagination center-align" style={{userSelect: "none"}}>
+                <ul className="pagination center-align no-select">
                     {!pagination.bottom &&
                     <li className={page === 0 ? "disabled prev" : "prev"}>
                         <a onClick={this.prevPage}>

@@ -28,7 +28,7 @@ import merge from 'lodash/merge'
 import {IService} from "../components/services/Service";
 import {IServiceDependency} from "../components/services/ServiceDependencyList";
 
-/*const API_ROOT = 'http://localhost/';*/
+/*const API_ROOT = 'http://localhost:8080';*/
 const API_ROOT = '/';
 
 const callApi = (endpoint: string, schema: schema.Entity<IService | IServiceDependency>) => {

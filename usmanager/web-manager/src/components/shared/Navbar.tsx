@@ -31,13 +31,10 @@ import {bindActionCreators} from "redux";
 import {showSidenavByUser} from "../../actions";
 import './Navbar.css';
 import {ReduxState} from "../../reducers";
-import {routes} from "../../containers/Root.dev";
+import {authenticatedRoutes} from "../../containers/Root.dev";
+import {getLoggedInUser, logout} from "../../utils/auth";
+import {capitalize} from "../../utils/text";
 const logo = require("../../resources/images/favicon.png");
-
-const navIcons = [
-    { icon: <GoMarkGithub/>, href: "https://github.com/usmanager/us-manager", tooltip: { tip: "GitHub", position: "bottom" } },
-    { icon: <FaDocker/>, href: "https://hub.docker.com/orgs/usmanager", tooltip: { tip: "DockerHub", position: "left" } },
-];
 
 interface StateToProps {
     sidenav: {user: boolean, width: boolean}
@@ -53,44 +50,73 @@ class Navbar extends React.Component<Props, {}> {
 
     private handleSidenav = () => {
         let {user, width} = this.props.sidenav;
-        user = !width  || !user;
+        user = !width || !user;
         this.props.showSidenavByUser(user);
     };
 
-    render = () =>
-        <header role="navigation">
-            <div className="navbar-fixed">
-                <nav className="no-shadows">
-                    <div className="nav-wrapper row">
-                        <div className="left-nav-icons">
+    private handleLogout = () => {
+        logout();
+        this.props.history.push("/");
+    };
+
+    public render = () => {
+        const {pathname} = this.props.location;
+        const route = authenticatedRoutes[pathname];
+        const {user: sidenavUser, width: sidenavWidth} = this.props.sidenav;
+        const loggingIn = pathname === '/' || pathname === '/login';
+        const showSidenav = sidenavUser && sidenavWidth;
+        const showSearchbar = route  && authenticatedRoutes[pathname].search;
+        let loggedInUser = getLoggedInUser();
+        loggedInUser = loggedInUser && capitalize(loggedInUser);
+        return (
+            <header role="navigation">
+                <div className="navbar-fixed">
+                    <nav className="no-shadows">
+                        <div className="nav-wrapper row">
+                            {!loggingIn &&
                             <a className="sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light"
                                data-target="slide-out"
-                               style={this.props.sidenav.user && this.props.sidenav.width ? undefined : {display: 'inherit'}}
-                               onClick={this.handleSidenav}
-                            >
-                                <i className="material-icons">menu</i>
-                            </a>
+                               style={showSidenav ? undefined : { display: 'inherit' }}
+                               onClick={this.handleSidenav}>
+                              <i className="material-icons">menu</i>
+                            </a>}
+                            <ul className="left">
+                                <li style={showSidenav && !loggingIn ? { paddingLeft: '200px', marginRight: "24px" } : { margin: "0 24px" } }>
+                                    <a className="transparent brand-logo" href="/home">
+                                        <img src={logo} alt=""/>
+                                        Web Manager
+                                    </a>
+                                </li>
+                            </ul>
+                            {showSearchbar && <SearchBar/>}
+                            <ul className="right hide-on-small-and-down">
+                                <li className="username">
+                                    {loggedInUser}
+                                </li>
+                                <li>
+                                    <a className="tooltipped" data-tooltip="GitHub" data-position="bottom"
+                                       href="https://github.com/usmanager/us-manager">
+                                        <i className="material-icons"><GoMarkGithub/></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="tooltipped" data-tooltip="DockerHub" data-position="bottom"
+                                       href="https://hub.docker.com/orgs/usmanager">
+                                        <i className="material-icons"><FaDocker/></i>
+                                    </a>
+                                </li>
+                                {!loggingIn && <li>
+                                  <a className="red-text text-darken-4" onClick={this.handleLogout}>
+                                    <i className="material-icons right">logout</i> Logout
+                                  </a>
+                                </li>}
+                            </ul>
                         </div>
-                        <Link className="col s6 m2 l2 offset-s3 offset-m1 brand-logo" to={"/"}>
-                            <img src={logo} alt=""/>
-                            Web Manager
-                        </Link>
-                        {routes[this.props.location.pathname] && routes[this.props.location.pathname].search && <SearchBar/>}
-                        <div className="right-nav-icons"
-                             style={this.props.sidenav.user && this.props.sidenav.width ? undefined : {paddingRight: '0px'}}>
-                            {navIcons.map((navIcon, index) =>
-                                <a key={index}
-                                   className="transparent btn-floating btn-flat btn-small waves-effect waves-light tooltipped"
-                                   data-position={navIcon.tooltip.position} data-tooltip={navIcon.tooltip.tip}
-                                   href={navIcon.href}>
-                                    <i className="material-icons">{navIcon.icon}</i>
-                                </a>
-                            )}
-                        </div>
-                    </div>
-                </nav>
-            </div>
-        </header>
+                    </nav>
+                </div>
+            </header>
+        )
+    }
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (

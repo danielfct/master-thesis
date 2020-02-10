@@ -27,7 +27,7 @@ import M from 'materialize-css';
 import ConditionCard from './ConditionCard';
 import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
-import {getData} from "../../utils/rest";
+import {getData} from "../../utils/api";
 
 export default class RuleCard extends React.Component {
   constructor (props) {

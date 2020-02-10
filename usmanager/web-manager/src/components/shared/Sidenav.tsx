@@ -59,8 +59,10 @@ class Sidenav extends React.Component<Props, {}> {
 
     private sidenav = createRef<HTMLUListElement>();
 
-    public componentDidMount = () =>
+    public componentDidMount = () => {
         window.addEventListener('resize', this.handleResize);
+        M.Sidenav.init(this.sidenav.current as Element);
+    };
 
     public componentWillUnmount = () =>
         window.removeEventListener('resize', this.handleResize);
@@ -70,13 +72,10 @@ class Sidenav extends React.Component<Props, {}> {
 
     private handleResize = (_: any) => {
         const sidenav = M.Sidenav.getInstance(this.sidenav.current as Element);
-        const {width} = this.props.sidenav;
+        sidenav.close();
         let show = this.shouldShowSidenav();
-        console.log(show)
-        if (show && !sidenav.isOpen) {
-            sidenav.open();
-        }
-        if (show != width) {
+        const {width} = this.props.sidenav;
+        if (show !== width) {
             this.props.showSidenavByWidth(show);
         }
     };
@@ -100,32 +99,34 @@ class Sidenav extends React.Component<Props, {}> {
         }
     };
 
-    public render = () =>
-        <ul id="slide-out" className="sidenav sidenav-fixed no-shadows"
-            style={this.props.sidenav.user ? undefined : {display: 'none'}} ref={this.sidenav}>
-            <div className="sidenav-menu">
-                <a className="sidenav-icon sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light"
-                   data-target="slide-out"
-                   onClick={this.handleSidenav}
-                >
-                    <i className="material-icons">menu</i>
-                </a>
-            </div>
-            <PerfectScrollbar>
-                {sidenavLinks.map((link, index) =>
-                    <div key={index}>
-                        <li>
-                            <Link className="white-text" to={link.link} onClick={this.closeSlideSidenav}>
-                                {link.name}
-                            </Link>
-                        </li>
-                        {index < sidenavLinks.length - 1 && <li>
-                            <div className="divider grey darken-3"/>
-                        </li>}
-                    </div>
-                )}
-            </PerfectScrollbar>
-        </ul>
+    public render = () => {
+        return (
+            <ul id="slide-out" className="sidenav sidenav-fixed no-shadows"
+                style={this.props.sidenav.user ? undefined : {display: 'none'}} ref={this.sidenav}>
+                <div className="sidenav-menu">
+                    <a className="sidenav-icon sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light"
+                       data-target="slide-out"
+                       onClick={this.handleSidenav}>
+                        <i className="material-icons">menu</i>
+                    </a>
+                </div>
+                <PerfectScrollbar>
+                    {sidenavLinks.map((link, index) =>
+                        <div key={index}>
+                            <li>
+                                <Link className="white-text" to={link.link} onClick={this.closeSlideSidenav}>
+                                    {link.name}
+                                </Link>
+                            </li>
+                            {index < sidenavLinks.length - 1 && <li>
+                              <div className="divider grey darken-3"/>
+                            </li>}
+                        </div>
+                    )}
+                </PerfectScrollbar>
+            </ul>
+        )
+    }
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (

@@ -26,7 +26,7 @@ import React from 'react';
 import M from 'materialize-css';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
-import {deleteData, getData, postData} from "../../utils/rest";
+import {deleteData, getData, postData} from "../../utils/api";
 
 export default class ConditionPage extends React.Component {
   constructor (props) {

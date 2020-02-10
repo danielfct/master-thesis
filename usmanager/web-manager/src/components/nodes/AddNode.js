@@ -26,7 +26,7 @@ import React from "react";
 import M from "materialize-css";
 import MainLayout from "../shared/MainLayout";
 import {Redirect} from "react-router";
-import {getData, postData} from "../../utils/rest";
+import {getData, postData} from "../../utils/api";
 
 export default class AddNode extends React.Component {
 

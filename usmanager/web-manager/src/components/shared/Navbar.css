@@ -31,16 +31,14 @@
     float: left !important;
 }
 
-.left-nav-icons a {
+.left-nav-icons * {
     margin-right: 10px;
 }
 
-.right-nav-icons {
-    float: right !important;
-    margin-right: 10px;
-    padding-right: 200px;
+nav .nav-wrapper {
+    margin-right: 0 !important;
 }
 
-.right-nav-icons a {
-    margin-left: 10px;
+li.username {
+    margin-right: 10px;
 }

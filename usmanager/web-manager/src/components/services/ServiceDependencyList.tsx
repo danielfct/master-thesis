@@ -33,7 +33,7 @@ import ListItem from "../shared/ListItem";
 import './ServiceDependencyList.css'
 import M from "materialize-css";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {deleteData, patchData} from "../../utils/rest";
+import {deleteData, patchData} from "../../utils/api";
 
 export interface IServiceDependency extends IService {
 }
@@ -130,13 +130,13 @@ class ServiceDependencyList extends React.Component<Props, State> {
         const dependencies = this.props.dependencies.filter(dependency => toDelete.includes(dependency.serviceName));
         if (toDelete.length > 1) {
             const request = dependencies.join(" ");
-            patchData(`http://localhost/services/${this.props.service.id}/dependencies`, request,() => {
+            patchData(`/services/${this.props.service.id}/dependencies`, request,() => {
                     M.toast({ html: '<div>Dependencies removed</div>' });
                 },
                 "delete");
         } else {
             const dependencyId = dependencies[0].id;
-            deleteData(`http://localhost/services/100/dependencies/${dependencyId}`, () => {
+            deleteData(`/services/100/dependencies/${dependencyId}`, () => {
                 M.toast({ html: '<div>Dependency removed</div>' });
             });
         }

@@ -27,7 +27,7 @@ import {Link} from 'react-router-dom';
 import M from 'materialize-css';
 import MainLayout from '../shared/MainLayout';
 import NodeCard from './NodeCard';
-import {getData} from "../../utils/rest";
+import {getData} from "../../utils/api";
 
 export default class Nodes extends React.Component {
   constructor (props) {

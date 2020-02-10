@@ -27,7 +27,7 @@ import M from 'materialize-css';
 import DefaultHostSimulatedMetricsCard from './DefaultHostSimulatedMetricsCard';
 import MainLayout from '../shared/MainLayout';
 import { Link } from 'react-router-dom';
-import {getData} from "../../utils/rest";
+import {getData} from "../../utils/api";
 
 export default class DefaultHostSimulatedMetrics extends React.Component {
   constructor (props) {

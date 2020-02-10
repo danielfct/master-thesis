@@ -27,7 +27,7 @@ import M from 'materialize-css';
 import $ from 'jquery';
 import MainLayout from '../shared/MainLayout';
 import AppPackageCard from './AppPackageCard';
-import {getData} from "../../utils/rest";
+import {getData} from "../../utils/api";
 
 export default class AppPackage extends React.Component {
   constructor (props) {

@@ -30,7 +30,7 @@ import {bindActionCreators} from "redux";
 import {updateBreadcrumbs} from "../../actions";
 import {connect} from "react-redux";
 import {RouterProps} from "react-router";
-import {routes} from "../../containers/Root.dev";
+import {authenticatedRoutes} from "../../containers/Root.dev";
 import {camelCaseToSentenceCase, capitalize} from "../../utils/text";
 
 export type IBreadcrumb = { title: string, link?: string };
@@ -79,7 +79,10 @@ const breadcrumbs = (props: Props): IBreadcrumbs => {
         if (path.indexOf('#') !== -1) {
             path = path.substring(0, path.indexOf('#'));
         }
-        let title = routes[path].title;
+        if (path.startsWith('//')) {
+            path = path.substring(1);
+        }
+        let title = authenticatedRoutes[path].title;
         if (!title) {
             title = capitalize(link.substring(link.lastIndexOf('/') + 1));
             if (title.indexOf('#') !== -1) {

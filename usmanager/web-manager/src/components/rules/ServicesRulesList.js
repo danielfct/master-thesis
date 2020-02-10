@@ -27,7 +27,7 @@ import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
 import ServiceRules from './ServiceRules';
 import MainLayout from '../shared/MainLayout';
-import {getData} from "../../utils/rest";
+import {getData} from "../../utils/api";
 
 export default class ServicesRulesList extends React.Component {
   constructor (props) {
@@ -42,7 +42,7 @@ export default class ServicesRulesList extends React.Component {
   loadServices = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhost/services',
+        '/services',
         data => {
           this.setState({ services: data, loading: false });
         });

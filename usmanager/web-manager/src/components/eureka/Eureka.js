@@ -26,7 +26,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import M from 'materialize-css';
 import MainLayout from '../shared/MainLayout';
-import {getData, postData} from "../../utils/rest";
+import {getData, postData} from "../../utils/api";
 
 export default class EurekaPage extends React.Component {
   constructor (props) {

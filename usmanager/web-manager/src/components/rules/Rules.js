@@ -26,7 +26,7 @@ import React from 'react';
 import RuleCard from './RuleCard';
 import MainLayout from '../shared/MainLayout';
 import { Link } from 'react-router-dom';
-import {getData} from "../../utils/rest";
+import {getData} from "../../utils/api";
 
 export default class Rules extends React.Component {
   constructor (props) {
@@ -41,7 +41,7 @@ export default class Rules extends React.Component {
   loadRules = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhost/rules',
+        '/rules',
         data => this.setState({ data: data, loading: false })
     );
   };

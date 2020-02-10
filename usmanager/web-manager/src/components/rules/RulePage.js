@@ -26,7 +26,7 @@ import React from 'react';
 import M from 'materialize-css';
 import { Redirect } from 'react-router';
 import MainLayout from '../shared/MainLayout';
-import {deleteData, getData, postData} from "../../utils/rest";
+import {deleteData, getData, postData} from "../../utils/api";
 
 export default class RulePage extends React.Component {
   constructor (props) {
@@ -70,7 +70,7 @@ export default class RulePage extends React.Component {
   loadConditions = () => {
     this.setState({ loadedConditions: false, loading: true });
     getData(
-        `http://localhost/rules/${this.state.ruleId}/conditions`,
+        `/rules/${this.state.ruleId}/conditions`,
         data => this.setState({ conditions: data, loadedConditions: true, loading: false })
     );
   };
@@ -79,7 +79,7 @@ export default class RulePage extends React.Component {
     if (this.state.ruleId !== 0) {
       this.setState({ loading: true });
       getData(
-          `http://localhost/rules/${this.state.ruleId}`,
+          `/rules/${this.state.ruleId}`,
           (data) => {
             const currentRule = {
               ruleName: data.ruleName,
@@ -95,7 +95,7 @@ export default class RulePage extends React.Component {
   loadComponentTypes = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhost/rules/componentTypes/',
+        '/rules/componentTypes/',
         data => this.setState({ componentTypes: data, loading: false })
     );
   };
@@ -103,7 +103,7 @@ export default class RulePage extends React.Component {
   loadDecisions = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhost/decisions/',
+        '/decisions/',
         data => this.setState({ decisions: data, loading: false })
     );
   };

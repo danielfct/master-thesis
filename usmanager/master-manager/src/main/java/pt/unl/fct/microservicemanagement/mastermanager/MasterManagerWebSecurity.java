@@ -66,10 +66,10 @@ public class MasterManagerWebSecurity extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .anyRequest().authenticated()
         .and()
-        /*.formLogin().permitAll()
+        .formLogin().permitAll()
         .and()
         .logout().permitAll()
-        .and()*/
+        .and()
         .httpBasic()
         .and()
         .cors();

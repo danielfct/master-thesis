@@ -23,7 +23,7 @@
  */
 
 import React from 'react';
-import {getData} from "../../utils/rest";
+import {getData} from "../../utils/api";
 
 export default class HostRules extends React.Component {
   constructor (props) {

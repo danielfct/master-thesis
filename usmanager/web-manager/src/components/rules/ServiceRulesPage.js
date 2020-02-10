@@ -25,7 +25,7 @@
 import React from 'react';
 import M from 'materialize-css';
 import MainLayout from '../shared/MainLayout';
-import {deleteData, getData, postData} from "../../utils/rest";
+import {deleteData, getData, postData} from "../../utils/api";
 
 export default class ServiceRulesPage extends React.Component {
   constructor (props) {
@@ -74,7 +74,7 @@ export default class ServiceRulesPage extends React.Component {
   loadAllRules = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhost/rules/containers',
+      '/rules/containers',
       data => this.setState({ allRules: data, loading: false })
     );
   };

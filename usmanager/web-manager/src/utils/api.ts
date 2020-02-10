@@ -23,63 +23,13 @@
  */
 
 import M from 'materialize-css'
+import axios, {AxiosResponse, Method} from "axios";
+import {isAuthenticated} from "./auth";
 
 //TODO dispatch invalidate local data? on post put delete and patch
 
-/*fetch (url, successFunction) {
-  displayProgressBar();
-  fetch(`http://${url}`, {
-    method: 'GET'
-  }).then(response => {
-    if (response.ok) {
-      return response.json();
-    }
-    // throw new Error(response.statusText);
-    M.toast({ html: '<div>Error: ' + response.statusText + '; Code: ' + response.status + '</div>' });
-  }).then(json => {
-    successFunction(json);
-    hideProgressBar(200);
-  });
-};
-
-convertFormToJson (formId) {
-  const form = $('#' + formId).serializeArray();
-  const formObject = {};
-  $.each(form, (i, v) => {
-        const valueTest = v.value.replace(',', '.');
-        const number = Number(valueTest);
-        if (isNaN(number) || v.value === '') {
-          formObject[v.name] = v.value;
-        } else {
-          formObject[v.name] = number;
-        }
-      }
-  );
-  return JSON.stringify(formObject);
-};
-
-formSubmit (formUrl, formMethod, formData, successFunction) {
-  $.ajax({
-    url: formUrl,
-    type: formMethod,
-    data: formData,
-    dataType: 'json',
-    contentType: 'application/json',
-    cache: false,
-    beforeSend: () =>
-        displayProgressBar(),
-    success: (data) => {
-      hideProgressBar(200);
-      successFunction(data);
-    },
-    error: (xhr, status, err) => {
-      hideProgressBar(200);
-      M.toast({ html: '<div>Error: ' + xhr.statusText + '; Code: ' + xhr.status + '</div>' });
-    }
-  });
-  return false;
-};
-}*/
+export const API_URL = 'http://localhost:8080';
+const TIMEOUT = 5000;
 
 export function getData(url: string): any {
     /* console.log(`GET ${url}`);
@@ -114,10 +64,22 @@ export function patchData(url: string, requestBody: any, callback: (data?: any) 
     sendData(url, 'PATCH', requestBody, callback);
 }
 
-const sendData = (url: string, method: string, body: any, callback: (data: any) => void) => {
-    body = JSON.stringify(body);
-    console.log(`${method} ${url} ${body}`);
-    fetch(url, {
+const sendData = (url: string, method: Method, data: any, callback: (data: any) => void) => {
+    console.log(`${method} ${url} ${JSON.stringify(data)}`);
+    axios(API_URL + url, {
+        method,
+        headers: {
+            'Content-type': 'application/json;charset=UTF-8',
+            'Accept': 'application/json;charset=UTF-8',
+            'Origin': 'http://localhost:3000'
+        },
+        data,
+    }).then(response => {
+        console.log(response)
+    }).catch(error => console.error('timeout exceeded'))
+
+
+    /*fetch(url, {
         method,
         body,
         mode: 'cors',
@@ -135,29 +97,60 @@ const sendData = (url: string, method: string, body: any, callback: (data: any) 
         callback(json);
     }).catch(e => {
         M.toast({html: `<div>${e.message}</div>`});
-    });
+    });*/
 };
 
 export function deleteData(url: string, callback: () => void): void {
     console.log(`DELETE ${url}`);
-    fetch(url, {
+
+    axios(API_URL + url, {
         method: 'DELETE',
-        mode: 'cors',
-        headers: new Headers({
+        // TODO set options from setupAxiosInterceptors instead, after login
+        headers: {
             'Content-type': 'application/json;charset=UTF-8',
             'Accept': 'application/json;charset=UTF-8',
-            'Origin': 'http://localhost:3000',
-            'Authorization': 'Basic ' + btoa('admin:admin'), //TODO
-        })
+            'Authorization': `Basic ` + window.btoa('admin:admin')
+        },
+        timeout: TIMEOUT,
     }).then(response => {
-        if (response.ok) {
-            callback();
-        } else {
-            response.json().then(({apierror}) => {
-                M.toast({html: `${response.status} ${apierror.status} - ${apierror.message}`, displayLength: 6000});
-            });
-        }
-    }).catch(_ => {
-        M.toast({html: `<div>Connection refused</div>`});
-    });
+        console.log(response)
+    }).catch(error => {
+        console.log(error);
+        //console.error('timeout exceeded')
+    })
+
+    /*  fetch(url, {
+        method: 'DELETE',
+         mode: 'cors',
+         headers: new Headers({
+             'Content-type': 'application/json;charset=UTF-8',
+             'Accept': 'application/json;charset=UTF-8',
+             'Origin': 'http://localhost:3000',
+             'Authorization': 'Basic ' + btoa('admin:admin'), //TODO
+         })
+     }).then(response => {
+         if (response.ok) {
+             callback();
+         } else {
+             response.json().then(({apierror}) => {
+                 M.toast({html: `${response.status} ${apierror.status} - ${apierror.message}`, displayLength: 6000});
+             });
+         }
+     }).catch(_ => {
+         M.toast({html: `<div>Connection refused</div>`});
+     });*/
 }
+
+export const setupAxiosInterceptors = (token: string): void => {
+    axios.interceptors.request.use(
+        (config) => {
+            if (isAuthenticated()) {
+                config.headers.authorization = token;
+            }
+            config.headers.contentType = 'application/json;charset=UTF-8';
+            config.headers.accept = 'application/json;charset=UTF-8';
+            config.timeout = TIMEOUT;
+            return config
+        }
+    )
+};

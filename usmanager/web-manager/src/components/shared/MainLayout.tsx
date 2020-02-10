@@ -25,16 +25,38 @@
 import React from 'react';
 import Breadcrumbs from "./Breadcrumbs";
 import './MainLayout.css';
+import Navbar from "./Navbar";
+import Sidenav from "./Sidenav";
+import {ReduxState} from "../../reducers";
+import {connect} from "react-redux";
 
-export default class MainLayout extends React.Component<{}, {}> {
+interface StateToProps {
+    sidenavVisible: boolean;
+}
+
+type Props = StateToProps;
+
+class MainLayout extends React.Component<Props, {}> {
 
     public render = () =>
-        <div className="section">
-            <div className="row col s12">
-                <Breadcrumbs/>
-            </div>
-            <div className='row col s12 m12'>
-                {this.props.children}
+        <div>
+            <Sidenav/>
+            <div className="section content" style={this.props.sidenavVisible ? undefined : {paddingLeft: 0}}>
+                <div className="row col s12">
+                    <Breadcrumbs/>
+                </div>
+                <div className='row col s12 m12'>
+                    {this.props.children}
+                </div>
             </div>
         </div>
+
 }
+
+const mapStateToProps = (state: ReduxState): StateToProps => (
+    {
+        sidenavVisible: state.ui.sidenav.user,
+    }
+);
+
+export default connect(mapStateToProps)(MainLayout);
