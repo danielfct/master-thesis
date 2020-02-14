@@ -44,12 +44,11 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-    loadServiceDependencies: (service: IService) => void;
-    loadServices: () => void;
+    loadServiceDependencies: (serviceName: string) => void;
 }
 
 interface ServiceDependencyProps {
-    service: IService;
+    service: IService | Partial<IService>;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceDependencyProps;
@@ -74,17 +73,11 @@ class ServiceDependencyList extends React.Component<Props, State> {
     }
 
     public componentDidMount(): void {
-        this.props.loadServices();
-        if (this.props.service) {
-            this.props.loadServiceDependencies(this.props.service);
+        const {serviceName} = this.props.service;
+        if (serviceName) {
+            this.props.loadServiceDependencies(serviceName);
         }
         M.Dropdown.init(this.dropdown.current as Element);
-    }
-
-    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-        if (prevProps.service && prevProps.service.serviceName != this.props.service.serviceName) {
-            this.props.loadServiceDependencies(this.props.service);
-        }
     }
 
     private handleCheckbox = ({target:{id, checked}}:any) => {
@@ -94,7 +87,8 @@ class ServiceDependencyList extends React.Component<Props, State> {
                     this.globalCheckbox.current.checked = Object.values(this.state).every((checked: boolean) => checked);
                 }
             });
-        } else {
+        }
+        else {
             this.setState(this.props.dependencies.reduce((newState: any, dependency: IService) => {
                 const dependencyName = dependency.serviceName;
                 newState[dependencyName] = checked;
@@ -108,11 +102,11 @@ class ServiceDependencyList extends React.Component<Props, State> {
             <div className="row">
                 <div className="col s12">
                     <p>
-                        <label >
+                        <label>
                             <input id={dependency.serviceName}
                                    type="checkbox"
                                    onChange={this.handleCheckbox}
-                                   defaultChecked={this.state[dependency.serviceName]}/>
+                                   checked={this.state[dependency.serviceName]}/>
                             <span>{dependency.serviceName}</span>
                         </label>
                     </p>
@@ -200,7 +194,7 @@ class ServiceDependencyList extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceDependencyProps): StateToProps {
-    const service = ownProps.service && state.entities.services[ownProps.service.serviceName];
+    const service = ownProps.service.serviceName && state.entities.services[ownProps.service.serviceName];
     const dependencies = service && service.dependencies;
     return {
         dependencies: dependencies && dependencies.map(dependency => state.entities.services[dependency]) || [],
@@ -209,6 +203,6 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceDependencyProps): S
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-    bindActionCreators({ loadServiceDependencies, loadServices }, dispatch);
+    bindActionCreators({ loadServiceDependencies }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceDependencyList);

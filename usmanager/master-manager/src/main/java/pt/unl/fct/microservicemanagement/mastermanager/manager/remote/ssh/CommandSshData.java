@@ -38,6 +38,7 @@ class CommandSshData {
   private final String hostname;
   private final String username;
   private final String password;
+  private final String name;
   private final String command;
 
 }

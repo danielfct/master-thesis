@@ -278,19 +278,26 @@ public class HostsService {
     log.info("Setting up host '{}'", hostname);
     dockerApiProxyService.launchDockerApiProxy(hostname);
     if (Objects.equals(hostname, managerHostname)) {
-      if (!dockerNodesService.hasNode(n ->
-          Objects.equals(n.status().addr(), hostname) && Objects.equals(n.spec().role(), "manager"))) {
-        dockerSwarmService.initSwarm();
-      } else {
-        log.info("Manager {} is already a swarm manager", hostname);
-      }
-      // TODO why now?
-      dockerNodesService.deleteUnresponsiveNodes();
+      setupManager(hostname);
     } else {
-      dockerSwarmService.joinSwarm(hostname);
+      setupWorker(hostname);
     }
     prometheusService.launchPrometheus(hostname);
     locationRequestService.launchRequestLocationMonitor(hostname);
+  }
+
+  private void setupManager(String managerHostname) {
+    if (!dockerSwarmService.isASwarmManager(managerHostname)) {
+      dockerSwarmService.initSwarm();
+    } else {
+      log.info("Manager {} is already a swarm manager", managerHostname);
+    }
+    // TODO why now?
+    dockerNodesService.deleteUnresponsiveNodes();
+  }
+
+  private void setupWorker(String workerHostname) {
+    dockerSwarmService.joinSwarm(workerHostname);
   }
 
   private List<String> getWorkerAwsNodes() {

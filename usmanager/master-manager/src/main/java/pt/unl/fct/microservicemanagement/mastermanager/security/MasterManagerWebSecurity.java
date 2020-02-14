@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager;
+package pt.unl.fct.microservicemanagement.mastermanager.security;
 
 import pt.unl.fct.microservicemanagement.mastermanager.users.UsersService;
 

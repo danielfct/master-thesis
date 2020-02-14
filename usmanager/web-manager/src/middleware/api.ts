@@ -27,22 +27,32 @@ import { camelizeKeys } from 'humps';
 import merge from 'lodash/merge'
 import {IService} from "../components/services/Service";
 import {IServiceDependency} from "../components/services/ServiceDependencyList";
+import axios from "axios";
+import {API_URL} from "../utils/api";
+import Axios from "axios";
 
-/*const API_ROOT = 'http://localhost:8080';*/
-const API_ROOT = '/';
+
 
 const callApi = (endpoint: string, schema: schema.Entity<IService | IServiceDependency>) => {
-    const url = endpoint.includes(API_ROOT) ? endpoint : API_ROOT + endpoint;
-    return fetch(url)
-        .then(response =>
-            response.json().then(json => {
-                if (!response.ok) {
-                    return Promise.reject(json)
-                }
-                const camelizedJson = camelizeKeys(json);
-                return normalize(camelizedJson, schema);
-            })
-        )
+    const url = endpoint.includes(API_URL) ? endpoint : API_URL + endpoint;
+    return axios.get(url, {
+        //TODO remove headers
+        headers: {
+            'Authorization': 'Basic YWRtaW46YWRtaW4=',
+            'Content-type': 'application/json;charset=UTF-8',
+            'Accept': 'application/json;charset=UTF-8',
+            'Origin': 'http://localhost:3000'
+        },
+    }).then(response => {
+        console.log(response);
+        if (response.status === 200) {
+            const camelizedJson = camelizeKeys(response.data);
+            return normalize(camelizedJson, schema);
+        }
+        else {
+            return Promise.reject(response);
+        }
+    }).catch(error => console.error(error));
 };
 
 interface ISchemas {

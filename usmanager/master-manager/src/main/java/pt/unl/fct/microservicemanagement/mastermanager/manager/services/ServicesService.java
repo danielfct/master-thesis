@@ -36,6 +36,7 @@ import java.time.Instant;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 @Service
 public class ServicesService {
@@ -66,17 +67,17 @@ public class ServicesService {
     return services.findByDockerRepository(dockerRepository);
   }
 
-  /*public Long addService(Service service) {
+  public Long addService(ServiceEntity service) {
     return services.save(service).getId();
   }
 
-  public Long updateService(Long id, Service newService) {
-    final var service = getService(id);
-    Utils.copyValidProperties(newService, service);
+  public Long updateService(String serviceName, ServiceEntity newService) {
+    final var service = getService(serviceName);
+    ObjectUtils.copyValidProperties(newService, service);
     return services.save(service).getId();
-  }*/
+  }
 
-  public Long saveService(Long id, SaveServiceReq saveServiceConfigReq) {
+  /*  public Long saveService(String serviceName, SaveServiceReq saveServiceConfigReq) {
     var service = id > 0 ? getService(id) : new ServiceEntity();
     service.setServiceName(saveServiceConfigReq.getServiceName());
     service.setDockerRepository(saveServiceConfigReq.getDockerRepo());
@@ -89,7 +90,7 @@ public class ServicesService {
     service.setOutputLabel(saveServiceConfigReq.getOutputLabel());
     service.setServiceType(saveServiceConfigReq.getServiceType());
     return services.save(service).getId();
-  }
+  }*/
 
   public void deleteService(Long id) {
     var service = getService(id);

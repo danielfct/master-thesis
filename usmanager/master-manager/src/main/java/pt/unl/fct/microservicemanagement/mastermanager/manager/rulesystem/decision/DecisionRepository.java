@@ -41,7 +41,7 @@ public interface DecisionRepository extends CrudRepository<DecisionEntity, Long>
 
   @Query("select d "
       + "from DecisionEntity d inner join d.componentType r "
-      + "where d.decisionName = :decisionName and r.componentTypeName = :componentType")
+      + "where r.componentTypeName = :componentType and d.decisionName = :decisionName")
   DecisionEntity getDecisionByComponentTypeAndByDecisionName(@Param("componentType") String componentType,
                                                              @Param("decisionName") String decisionName);
 

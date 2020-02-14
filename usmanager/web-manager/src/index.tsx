@@ -41,15 +41,10 @@ store.subscribe(() => {
     saveState(store.getState());
 });
 
-const body = [
+ReactDOM.render(
     <BrowserRouter>
         <Root store={store}/>
     </BrowserRouter>,
-    <Footer/>
-];
-
-ReactDOM.render(
-    body,
     document.getElementById('body'));
 
 // If you want your app to work offline and load faster, you can change

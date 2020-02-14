@@ -24,8 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostsService;
@@ -109,25 +109,26 @@ public class SshService {
     }
   }
 
-  public CommandResult execCommand(String hostname, String command) {
+  public CommandResult execCommand(String hostname, String name, String command) {
     try (var sshClient = initClient(hostname);
          var session = sshClient.startSession()) {
       log.info("Executing '{}' \non hostname '{}'", command, hostname);
       Session.Command cmd = session.exec(command);
       cmd.join(EXEC_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
-      String result = Arrays.stream(IOUtils.readFully(cmd.getInputStream()).toString().split("\\n"))
+      int exitStatus = cmd.getExitStatus();
+      String output = Arrays.stream(IOUtils.readFully(cmd.getInputStream()).toString().split("\\n"))
           .filter(Predicate.not(String::isEmpty))
+          .distinct()
           .collect(Collectors.joining());
       String error = Arrays.stream(IOUtils.readFully(cmd.getErrorStream()).toString().split("\\n"))
           .filter(Predicate.not(String::isEmpty))
+          .distinct()
           .collect(Collectors.joining());
-      error = error.isEmpty() ? "None" : error;
-      int exitStatus = cmd.getExitStatus();
-      log.info("result = '{}' with exit status '{}' and error '{}'", result, exitStatus, error);
-      return new CommandResult(command, result, exitStatus);
+      log.info("Command {} exited with status: {}', output: '{}', error: {}", name, exitStatus, output, error);
+      return new CommandResult(exitStatus, command, output, error);
     } catch (IOException e) {
       e.printStackTrace();
-      return new CommandResult(command, e.getMessage(), -1);
+      return new CommandResult(-1, command, "", e.getMessage());
     }
   }
 

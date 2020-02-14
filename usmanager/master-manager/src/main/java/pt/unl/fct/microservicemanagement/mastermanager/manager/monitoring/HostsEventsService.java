@@ -30,6 +30,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decisi
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
@@ -49,17 +50,18 @@ public class HostsEventsService {
   }
 
   HostEventEntity saveHostEvent(String hostname, String decisionName) {
-    DecisionEntity decision =
-        decisionsService.getDecisionByComponentTypeAndByDecisionName("HOST", decisionName);
-    HostEventEntity hostEventEntity = this.hostEvents.findByHostname(hostname).stream().findFirst()
+    DecisionEntity decision = decisionsService
+        .getDecisionByComponentTypeAndByDecisionName("Host", decisionName);
+    HostEventEntity hostEvent = hostEvents
+        .findByHostname(hostname).stream().findFirst()
         .orElse(HostEventEntity.builder().hostname(hostname).decision(decision).count(0).build());
-    if (hostEventEntity.getDecision().getId() != decision.getId()) {
-      hostEventEntity.setDecision(decision);
-      hostEventEntity.setCount(1);
+    if (!Objects.equals(hostEvent.getDecision().getId(), decision.getId())) {
+      hostEvent.setDecision(decision);
+      hostEvent.setCount(1);
     } else {
-      hostEventEntity.setCount(hostEventEntity.getCount() + 1);
+      hostEvent.setCount(hostEvent.getCount() + 1);
     }
-    return this.hostEvents.save(hostEventEntity);
+    return this.hostEvents.save(hostEvent);
   }
 
 }

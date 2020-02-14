@@ -59,5 +59,5 @@ Open the project in your IDE as a Maven project, build the root module and then 
 
 ### Licença
 
-μsManager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para ter a certeza.
+μsManager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
 

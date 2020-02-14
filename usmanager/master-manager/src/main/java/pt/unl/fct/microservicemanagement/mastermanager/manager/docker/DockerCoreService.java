@@ -34,9 +34,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class DockerCoreService {
 
-  //TODO check if this time can be lower 10/10?
   private static final long CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
-  private static final long READ_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
+  private static final long READ_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
 
   private final String dockerAuthorization;
   private final int dockerApiPort;
@@ -50,9 +49,13 @@ public class DockerCoreService {
   }
 
   public DockerClient getDockerClient(String hostname) {
-    final String uri = String.format("http://%s:%d", hostname, dockerApiPort);
-    return DefaultDockerClient.builder().uri(uri).header("Authorization", dockerAuthorization)
-        .connectTimeoutMillis(CONNECTION_TIMEOUT).readTimeoutMillis(READ_TIMEOUT).build();
+    String uri = String.format("http://%s:%d", hostname, dockerApiPort);
+    return DefaultDockerClient.builder()
+        .uri(uri)
+        .header("Authorization", dockerAuthorization)
+        .connectTimeoutMillis(CONNECTION_TIMEOUT)
+        .readTimeoutMillis(READ_TIMEOUT)
+        .build();
   }
 
 }

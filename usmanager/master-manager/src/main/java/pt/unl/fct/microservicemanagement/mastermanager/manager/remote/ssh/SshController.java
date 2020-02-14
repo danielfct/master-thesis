@@ -42,7 +42,7 @@ public class SshController {
 
   @PostMapping("/execute")
   public CommandResult execute(@RequestBody CommandSshData commandData) {
-    return sshService.execCommand(commandData.getHostname(), commandData.getCommand());
+    return sshService.execCommand(commandData.getHostname(), commandData.getName(), commandData.getCommand());
   }
 
   @PostMapping("/upload/{filename}")

@@ -31,7 +31,7 @@ export const SERVICE_REQUEST = 'SERVICE_REQUEST';
 export const SERVICE_SUCCESS = 'SERVICE_SUCCESS';
 export const SERVICE_FAILURE = 'SERVICE_FAILURE';
 
-export const loadServices = (name?: string, requiredField = 'id') => (dispatch: any, getState: any) => {
+export const loadServices = (name?: string) => (dispatch: any) => {
     /*let cached;
     if (name) {
         let entity = getState().entities.services[name];
@@ -49,8 +49,8 @@ export const loadServices = (name?: string, requiredField = 'id') => (dispatch: 
 const fetchServices = (name?: string) => ({
     [CALL_API]: {
         types: [ SERVICE_REQUEST, SERVICE_SUCCESS, SERVICE_FAILURE ],
-        /*  endpoint: !id ? `services` : `services/${id}`,TODO*/
-        endpoint: !name ? `services.json` : `service.json`,
+          endpoint: !name ? `services` : `services/${name}`,
+        /*endpoint: !name ? `services.json` : `service.json`,*/
         schema: !name ? Schemas.SERVICE_ARRAY : Schemas.SERVICE,
     }
 });
@@ -59,7 +59,7 @@ export const SERVICE_DEPENDENCIES_REQUEST = 'SERVICE_DEPENDENCIES_REQUEST';
 export const SERVICE_DEPENDENCIES_SUCCESS = 'SERVICE_DEPENDENCIES_SUCCESS';
 export const SERVICE_DEPENDENCIES_FAILURE = 'SERVICE_DEPENDENCIES_FAILURE';
 
-export const loadServiceDependencies = (service: IService, id?: string | number) => (dispatch: any, getState: any) => {
+export const loadServiceDependencies = (serviceName: string, id?: string | number) => (dispatch: any, getState: any) => {
     /*const cachedService = getState().entities.services[service.serviceName];
     let cached = cachedService && cachedService.dependencies;
     if (id) {
@@ -67,16 +67,16 @@ export const loadServiceDependencies = (service: IService, id?: string | number)
     }
     console.log('service dependencies of ' + service.serviceName + ' cached? ' + cached);
     return cached ? null : dispatch(fetchServiceDependencies(service, id));*/
-    return dispatch(fetchServiceDependencies(service, id));
+    return dispatch(fetchServiceDependencies(serviceName, id));
 };
 
-const fetchServiceDependencies = (service: IService, id?: string | number) => ({
+const fetchServiceDependencies = (serviceName: string, id?: string | number) => ({
     [CALL_API]: {
         types: [ SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_SUCCESS, SERVICE_DEPENDENCIES_FAILURE ],
-        /*endpoint: !id ? `services/${service.id}/dependencies` : `services/${service.id}/dependencies/${id}`,TODO*/
-        endpoint: !id ? `serviceDependencies.json` : `serviceDependency.json`,
+        endpoint: !id ? `services/${serviceName}/dependencies` : `services/${serviceName}/dependencies/${id}`,
+        /*endpoint: !id ? `serviceDependencies.json` : `serviceDependency.json`,*/
         schema: !id ? Schemas.SERVICE_DEPENDENCY_ARRAY : Schemas.SERVICE_DEPENDENCY,
-        args: service.serviceName
+        args: serviceName
     }
 });
 

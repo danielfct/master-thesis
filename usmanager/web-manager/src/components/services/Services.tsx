@@ -61,7 +61,7 @@ class Services extends React.Component<Props, {}> {
 
     render = () =>
         <MainLayout>
-            <AddButton tooltip={'Add service'} pathname={'/services/new'}/>
+            <AddButton tooltip={'Add service'} pathname={'/services/service?new=true'}/>
             <div className="services-container">
                 <CardList<IService>
                     empty={this.empty}

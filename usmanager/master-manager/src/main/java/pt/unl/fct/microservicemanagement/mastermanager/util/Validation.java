@@ -26,18 +26,26 @@ package pt.unl.fct.microservicemanagement.mastermanager.util;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
 
+import java.util.Objects;
+
 public class Validation {
 
-    public static void validatePostRequest(long requestBodyId) {
-        if (requestBodyId > 0) {
-            throw new BadRequestException("Expected non positive request body id, instead got %d", requestBodyId);
-        }
+  public static void validatePostRequest(long requestBodyId) {
+    if (requestBodyId > 0) {
+      throw new BadRequestException("Expected non positive request body id, instead got %d", requestBodyId);
     }
+  }
 
-    public static void validatePutRequest(long pathId, long requestBodyId) {
-        if (pathId != requestBodyId) {
-            throw new BadRequestException("Path id = %d and request body id = %d don't match", pathId, requestBodyId);
-        }
+  public static void validatePutRequest(long pathId, long requestBodyId) {
+    if (pathId != requestBodyId) {
+      throw new BadRequestException("Path id = %d and request body id = %d don't match", pathId, requestBodyId);
     }
+  }
+
+  public static void validatePutRequest(String pathId, String requestBodyId) {
+    if (!Objects.equals(pathId, requestBodyId)) {
+      throw new BadRequestException("Path id = %d and request body id = %d don't match", pathId, requestBodyId);
+    }
+  }
 
 }

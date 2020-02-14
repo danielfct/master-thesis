@@ -24,20 +24,17 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Builder;
+import lombok.Data;
 
-@AllArgsConstructor
-@Getter
-@ToString
-@EqualsAndHashCode
+@Builder
+@Data
 public class CommandResult {
 
-  private final String command;
-  private final String result;
   private final int exitStatus;
+  private final String command;
+  private final String output;
+  private String error;
 
   public boolean isSuccessful() {
     return exitStatus == 0;

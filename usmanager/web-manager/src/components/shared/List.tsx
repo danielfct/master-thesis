@@ -51,24 +51,25 @@ class GenericList<T> extends React.Component<Props<T>, {}> {
     public render() {
         const {isLoading, predicate, pagination} = this.props;
         if (isLoading) {
-            return <LoadingSpinner/>
+            return <LoadingSpinner/>;
         }
         if (predicate) {
             const Filtered = FilteredList<T>();
             return <Filtered {...this.props} predicate={predicate}/>;
         }
         if (pagination) {
-            return <PagedList {...this.props} pagination={pagination}/>
+            return <PagedList {...this.props} pagination={pagination}/>;
         }
-        return <SimpleList<T> {...this.props}/>
+        return <SimpleList<T> {...this.props}/>;
     }
 
 }
 
-function mapStateToProps(state: ReduxState): StateToProps {
-    console.log(state);
-    return {isLoading: state.ui.loading}
-}
+const mapStateToProps = (state: ReduxState): StateToProps => (
+  {
+      isLoading: state.ui.loading
+  }
+);
 
 export default function List<T>() {
     return connect(mapStateToProps)(GenericList as new(props: Props<T>) => GenericList<T>);

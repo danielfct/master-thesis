@@ -33,9 +33,9 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostFieldAvg;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.RuleDecision;

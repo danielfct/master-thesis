@@ -32,34 +32,33 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.springframework.beans.BeanUtils;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.experimental.UtilityClass;
+import org.springframework.beans.BeanUtils;
 
 @UtilityClass
 public final class ObjectUtils {
 
-    public void copyValidProperties(Object source, Object target) {
-        final var ignoreProperties = new LinkedList<String>();
-        // loop to include super classes except Object
-        for (Class<?> current = target.getClass(); current.getSuperclass() != null; current = current.getSuperclass()) {
-            Arrays.stream(current.getDeclaredFields()).forEach(field -> {
-                field.setAccessible(true);
-                if (hasInvalidAnnotation(field)) {
-                    ignoreProperties.add(field.getName());
-                }
-            });
-
+  public void copyValidProperties(Object source, Object target) {
+    final var ignoreProperties = new LinkedList<String>();
+    // loop to include super classes except Object
+    for (Class<?> current = target.getClass(); current.getSuperclass() != null; current = current.getSuperclass()) {
+      Arrays.stream(current.getDeclaredFields()).forEach(field -> {
+        field.setAccessible(true);
+        if (hasInvalidAnnotation(field)) {
+          ignoreProperties.add(field.getName());
         }
-        BeanUtils.copyProperties(source, target, ignoreProperties.toArray(new String[0]));
-    }
+      });
 
-    private boolean hasInvalidAnnotation(Field field) {
-        return field.getAnnotation(OneToMany.class) != null
-                || field.getAnnotation(ManyToMany.class) != null
-                || field.getAnnotation(ManyToOne.class) != null
-                || field.getAnnotation(JsonIgnore.class) != null;
     }
+    BeanUtils.copyProperties(source, target, ignoreProperties.toArray(new String[0]));
+  }
+
+  private boolean hasInvalidAnnotation(Field field) {
+    return field.getAnnotation(OneToMany.class) != null
+        || field.getAnnotation(ManyToMany.class) != null
+        || field.getAnnotation(ManyToOne.class) != null
+        || field.getAnnotation(JsonIgnore.class) != null;
+  }
 
 }

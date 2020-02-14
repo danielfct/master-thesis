@@ -68,6 +68,7 @@ import {Provider} from "react-redux";
 import PageNotFound from "../components/shared/PageNotFound";
 import Login from "../components/shared/Login";
 import AuthenticatedRoute from "../components/shared/AuthenticatedRoute";
+import Footer from "../components/shared/Footer";
 
 
 interface RootContainerProps {
@@ -122,17 +123,20 @@ export default class Root extends React.Component<Props, {}> {
         M.AutoInit();
 
     public render = () =>
-        <main>
-            <Provider store={this.props.store}>
-                <LoadingBar showFastActions className="loading-bar"/>
-                <Navbar/>
-                <Switch>
-                    <Route path="/" exact component={Login} />
-                    <Route path="/login" exact component={Login} />
-                    {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
-                        <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
-                </Switch>
-            </Provider>
-        </main>
+        <>
+            <main>
+                <Provider store={this.props.store}>
+                    <LoadingBar showFastActions className="loading-bar"/>
+                    <Navbar/>
+                    <Switch>
+                        <Route path="/" exact component={Login} />
+                        <Route path="/login" exact component={Login} />
+                        {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
+                            <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
+                    </Switch>
+                </Provider>
+            </main>
+            <Footer/>
+        </>
 
 }

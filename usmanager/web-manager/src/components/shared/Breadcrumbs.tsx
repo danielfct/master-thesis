@@ -56,15 +56,25 @@ interface State {
 type Props = StateToProps & DispatchToProps & BreadcrumbsProps & RouteProps & RouteComponentProps;
 
 
+function nthIndex(str: string, pat:string, n:number){
+    var L= str.length, i= -1;
+    while(n-- && i++<L){
+        i= str.indexOf(pat, i);
+        if (i < 0) break;
+    }
+    return i;
+}
+
 const breadcrumbs = (props: Props): IBreadcrumbs => {
     let path = props.location && props.location.pathname || '';
+    // remove the extra '/' at the end
     if (path !== '/' && path.endsWith('/')) {
-        path = path.substr(0, path.length-1); // remove the extra '/' at the end
+        path = path.substr(0, path.length - 1);
     }
     let links = [];
-    while (path.length) {
+    while (path) {
         links.push(path);
-        path = path.replace(path.substring(path.lastIndexOf('/'), path.length), '');
+        path = path.substring(0, path.lastIndexOf('/'))
     }
     links = links.reverse();
     const breadcrumbs = links.map(link => {
@@ -82,7 +92,7 @@ const breadcrumbs = (props: Props): IBreadcrumbs => {
         if (path.startsWith('//')) {
             path = path.substring(1);
         }
-        let title = authenticatedRoutes[path].title;
+        let title = authenticatedRoutes[path] && authenticatedRoutes[path].title;
         if (!title) {
             title = capitalize(link.substring(link.lastIndexOf('/') + 1));
             if (title.indexOf('#') !== -1) {
@@ -94,7 +104,7 @@ const breadcrumbs = (props: Props): IBreadcrumbs => {
             link,
         }
     });
-   // console.log(breadcrumbs)
+    // console.log(breadcrumbs)
     return breadcrumbs;
 };
 

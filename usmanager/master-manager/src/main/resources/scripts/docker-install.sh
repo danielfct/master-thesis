@@ -118,21 +118,21 @@ echo_docker_as_nonroot() {
 			$sh_c 'docker version'
 		) || true
 	fi
-	your_user=your-user
-	[ "$user" != 'root' ] && your_user="$user"
-	# intentionally mixed spaces and tabs here -- tabs are stripped by "<<-EOF", spaces are kept in the output
-	echo "If you would like to use Docker as a non-root user, you should now consider"
-	echo "adding your user to the \"docker\" group with something like:"
-	echo
-	echo "  sudo usermod -aG docker $your_user"
-	echo
-	echo "Remember that you will have to log out and back in for this to take effect!"
-	echo
-	echo "WARNING: Adding a user to the \"docker\" group will grant the ability to run"
-	echo "         containers which can be used to obtain root privileges on the"
-	echo "         docker host."
-	echo "         Refer to https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface"
-	echo "         for more information."
+	#your_user=your-user
+	#[ "$user" != 'root' ] && your_user="$user"
+	## intentionally mixed spaces and tabs here -- tabs are stripped by "<<-EOF", spaces are kept in the output
+	#echo "If you would like to use Docker as a non-root user, you should now consider"
+	#echo "adding your user to the \"docker\" group with something like:"
+	#echo
+	#echo "  sudo usermod -aG docker $your_user"
+	#echo
+	#echo "Remember that you will have to log out and back in for this to take effect!"
+	#echo
+	#echo "WARNING: Adding a user to the \"docker\" group will grant the ability to run"
+	#echo "         containers which can be used to obtain root privileges on the"
+	#echo "         docker host."
+	#echo "         Refer to https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface"
+	#echo "         for more information."
 
 }
 
@@ -200,6 +200,13 @@ ee_notice() {
 	echo "           Check https://store.docker.com for information on Docker EE"
 	echo
 	echo
+}
+
+docker_without_sudo() {
+  sudo usermod -aG docker "$USER"
+  RED='\033[0;31m'
+  NC='\033[0m' # No Color
+  echo "Docker without sudo configured. ${RED}Log out and log back in${NC} so that your group membership is re-evaluated."
 }
 
 do_install() {
@@ -383,7 +390,8 @@ do_install() {
 				$sh_c "apt-get install -y -qq --no-install-recommends docker-ce$pkg_version >/dev/null"
 			)
 			echo_docker_as_nonroot
-			exit 0
+			docker_without_sudo
+      return
 			;;
 		centos|fedora)
 			yum_repo="$DOWNLOAD_URL/linux/$lsb_dist/$REPO_FILE"
@@ -453,7 +461,8 @@ do_install() {
 				$sh_c "$pkg_manager install -y -q docker-ce$pkg_version"
 			)
 			echo_docker_as_nonroot
-			exit 0
+			docker_without_sudo
+			return
 			;;
 		*)
 			echo
@@ -471,23 +480,24 @@ do_install() {
 if ! command_exists docker
 then
 	do_install
-	usermod -a -G docker $USER
 else
-	echo "Docker already installed."
+	printf "Docker already installed: "
+  docker --version
 fi
 
-DIRECTORY_DOCKER_SERVICE_API=/etc/systemd/system/docker.service.d
-FILE_DOCKER_SERVICE_API=/etc/systemd/system/docker.service.d/startup_options.conf
+setup_docker_api() {
+  DIRECTORY_DOCKER_SERVICE_API=/etc/systemd/system/docker.service.d
+  FILE_DOCKER_SERVICE_API=/etc/systemd/system/docker.service.d/startup_options.conf
+  if [ ! -d "$DIRECTORY_DOCKER_SERVICE_API" ]
+  then
+	  mkdir $DIRECTORY_DOCKER_SERVICE_API
+  fi
+  echo "" > "$FILE_DOCKER_SERVICE_API"
+  sudo chmod 777 "$FILE_DOCKER_SERVICE_API"
+  printf "# /etc/systemd/system/docker.service.d/override.conf\n[Service]\nExecStart=\nExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2376" > "$FILE_DOCKER_SERVICE_API"
+  sudo systemctl daemon-reload
+  sudo systemctl restart docker.service
+  echo "Docker API configured."
+}
 
-
-if [ ! -d "$DIRECTORY_DOCKER_SERVICE_API" ]
-then	
-	mkdir $DIRECTORY_DOCKER_SERVICE_API
-fi
-
-echo "" > "$FILE_DOCKER_SERVICE_API"
-sudo chmod 777 "$FILE_DOCKER_SERVICE_API"
-printf "# /etc/systemd/system/docker.service.d/override.conf\n[Service]\nExecStart=\nExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2376" > "$FILE_DOCKER_SERVICE_API"
-sudo systemctl daemon-reload
-sudo systemctl restart docker.service
-echo "Docker API configured."
+setup_docker_api

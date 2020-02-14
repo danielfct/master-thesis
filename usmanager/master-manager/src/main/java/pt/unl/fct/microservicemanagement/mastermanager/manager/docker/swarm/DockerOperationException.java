@@ -22,15 +22,12 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.security;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+final class DockerOperationException extends RuntimeException {
 
-@AllArgsConstructor
-@Data
-public class AuthenticationBean {
-
-  private String message;
+  DockerOperationException(String s, Object... args) {
+    super(String.format(s, args));
+  }
 
 }

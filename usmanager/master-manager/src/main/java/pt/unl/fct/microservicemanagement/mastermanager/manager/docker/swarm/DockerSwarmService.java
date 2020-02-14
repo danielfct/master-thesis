@@ -26,13 +26,14 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
+import com.spotify.docker.client.messages.swarm.SwarmInit;
 import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,14 +43,12 @@ import org.springframework.stereotype.Service;
 public class DockerSwarmService {
 
   private final DockerCoreService dockerCoreService;
-  private final SshService sshService;
   private final String dockerSwarmManager;
 
   public DockerSwarmService(DockerCoreService dockerCoreService,
                             SshService sshService,
                             DockerProperties dockerProperties) {
     this.dockerCoreService = dockerCoreService;
-    this.sshService = sshService;
     this.dockerSwarmManager = dockerProperties.getSwarm().getManager();
   }
 
@@ -57,19 +56,37 @@ public class DockerSwarmService {
     return dockerCoreService.getDockerClient(dockerSwarmManager);
   }
 
-  public void initSwarm() {
-    try (DockerClient swarmManager = getSwarmManager()) {
-      log.info("Starting docker swarm '{}' on host '{}'...", swarmManager.inspectSwarm().id(), dockerSwarmManager);
-      var command = String.format("docker swarm init --advertise-addr %s", dockerSwarmManager);
-      CommandResult result = sshService.execCommand(dockerSwarmManager, command);
-      if (result.isSuccessful()) {
-        log.info("done");
-      } else {
-        log.info("failed with exit status '{}' due to '{}'", result.getExitStatus(), result.getResult());
-      }
+  public boolean isASwarmManager(String hostname) {
+    try (var docker = dockerCoreService.getDockerClient(hostname)) {
+      return docker.info().swarm().controlAvailable();
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new InitSwarmException(e.getMessage());
+      throw new DockerOperationException("Failed to execute 'isASwarmManager': %s", e.getMessage());
+    }
+  }
+
+  public boolean isASwarmWorker(String hostname) {
+    try (var docker = dockerCoreService.getDockerClient(hostname)) {
+      return Objects.equals(docker.info().swarm().localNodeState(), "active")
+          && !docker.info().swarm().controlAvailable();
+    } catch (DockerException | InterruptedException e) {
+      e.printStackTrace();
+      throw new DockerOperationException("Failed to execute 'isASwarmWorker': %s", e.getMessage());
+    }
+  }
+
+  public void initSwarm() {
+    try (var docker = getSwarmManager()) {
+      log.info("Initializing docker swarm at {}...", dockerSwarmManager);
+      var swarmInit = SwarmInit.builder()
+          .advertiseAddr(dockerSwarmManager)
+          .listenAddr("0.0.0.0:2377")
+          .build();
+      String swarmId = docker.initSwarm(swarmInit);
+      log.info("Started docker swarm with id {}...", swarmId);
+    } catch (DockerException | InterruptedException e) {
+      e.printStackTrace();
+      throw new DockerOperationException("Failed to execute 'initSwarm': %s", e.getMessage());
     }
   }
 

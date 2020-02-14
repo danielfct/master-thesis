@@ -7,6 +7,33 @@ Faz uso de conhecimento prévio (serviços e sua dependencias, regras, tipo de d
 Usa o sistema de gestão de regras de negócios Drools para gerir as regras aplicadas. 
 É também um projeto Spring Boot, gerido com maven, que disponibiliza um servidor restful.
 
+### Requisitos
+
+- #####Maven com java 11  
+>`sudo apt install maven`  
+>`maven --version` verificar que está associado ao java 11 ([solução](https://stackoverflow.com/a/49988988))
+ 
+- #####SSH
+>`sudo apt-get install ssh`
+
+- #####Docker
+>`sh src/main/resources/scripts/docker-install.sh`
+
+- #####Node Exporter
+>`sh src/main/resources/scripts/node-exporter-install.sh` 
+
+### Ambiente
+
+>`Ubuntu 18.04.4 LTS`
+
+>`Apache Maven 3.6.0`  
+ `Maven home: /usr/share/maven`  
+ `Java version: 11.0.6, vendor: Ubuntu, runtime: /usr/lib/jvm/java-11-openjdk-amd64`  
+ `Default locale: pt_PT, platform encoding: UTF-8`  
+ `OS name: "linux", version: "5.3.0-28-generic", arch: "amd64", family: "unix"`
+
+>`Docker version 19.03.5, build 633a0ea838`
+
 ### Ferramentas usadas
 
 [<img src="https://i.imgur.com/71OViyN.png" alt="" width="48" height="62"> Drools](https://www.drools.org/) - Drools is a Business Rules Management System (BRMS) solution
@@ -36,6 +63,12 @@ Sem o maven instalado:
 
 > `./mvnw package`
 
+### Troubleshooting
+
+>Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
+
+`sudo setfacl --modify user:<user name or ID>:rw /var/run/docker.sock` ([solução](https://stackoverflow.com/a/54504083))
+
 ### Licença
 
-Master manager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para ter a certeza.
+Master manager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

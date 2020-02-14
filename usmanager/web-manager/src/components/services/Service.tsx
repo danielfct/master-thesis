@@ -26,221 +26,148 @@ import React, {createRef} from 'react';
 import M from 'materialize-css';
 import {Redirect, RouteComponentProps} from 'react-router';
 import {camelCaseToSentenceCase} from "../../utils/text";
-import FormPage from "../shared/FormPage";
+import Form, {IValues} from "../shared/Form";
 import {mapLabelToIcon} from "../../utils/image";
 import IData from "../shared/IData";
 import ServiceDependencyList from "./ServiceDependencyList";
 import {loadServices} from "../../actions";
-import {connect} from "react-redux";
+import {connect, MapStateToProps} from "react-redux";
 import MainLayout from "../shared/MainLayout";
+import LoadingSpinner from "../shared/LoadingSpinner";
+import * as queryString from "querystring";
+import {ReduxState} from "../../reducers";
+import Field from "../shared/Field";
 
 export interface IService extends IData {
-    serviceName: string;
-    dockerRepository: string;
-    defaultExternalPort: number;
-    defaultInternalPort: number;
-    defaultDb: string;
-    launchCommand: string;
-    minReplics: number;
-    maxReplics: number;
-    outputLabel: string;
-    serviceType: string;
-    expectedMemoryConsumption: number;
-    dependencies?: string[];
+  serviceName: string;
+  dockerRepository: string;
+  defaultExternalPort: number;
+  defaultInternalPort: number;
+  defaultDb: string;
+  launchCommand: string;
+  minReplics: number;
+  maxReplics: number;
+  outputLabel: string;
+  serviceType: string;
+  expectedMemoryConsumption: number;
+  dependencies?: string[];
 }
 
-const defaultService: Partial<IService> = {
-    serviceName: undefined,
-    dockerRepository: undefined,
-    defaultExternalPort: undefined,
-    defaultInternalPort: undefined,
-    defaultDb: undefined,
-    launchCommand: undefined,
-    minReplics: undefined,
-    maxReplics: undefined,
-    outputLabel: undefined,
-    serviceType: undefined,
-    expectedMemoryConsumption: undefined,
-    dependencies: []
-};
+const emptyService = (): Partial<IService> => ({
+  serviceName: '',
+  dockerRepository: '',
+  defaultExternalPort: 0,
+  defaultInternalPort: 0,
+  defaultDb: '',
+  launchCommand: '',
+  minReplics: 0,
+  maxReplics: 0,
+  outputLabel: '',
+  serviceType: '',
+  expectedMemoryConsumption: 0,
+});
+
+interface StateToProps {
+  service: Partial<IService>;
+}
 
 interface DispatchToProps {
-    loadServices: (name?: string, requiredField?: string) => any;
+  loadServices: (name: string) => any;
 }
 
-type Props = DispatchToProps & RouteComponentProps;
-
-interface State {
-    service: IService;
-    isEditing: boolean;
-    redirect?: boolean;
+interface MatchParams {
+  name: string;
 }
 
-class Service extends React.Component<Props, State> {
+type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-    private tabs = createRef<HTMLUListElement>();
-    private dropdown = createRef<HTMLSelectElement>();
+const getServiceNameFromPathname = (props: Props) =>
+  props.match.params.name.split('#')[0];
 
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            service: this.propsService() || defaultService,
-            isEditing: !this.props.location.state || !this.props.location.state.service
-        }
+class Service extends React.Component<Props> {
+
+  private tabs = createRef<HTMLUListElement>();
+
+  private isServiceNew = (): boolean => {
+    const values = queryString.parse(this.props.location.search);
+    return !!values['?new'];
+  };
+
+  public componentDidMount(): void {
+    const serviceName = getServiceNameFromPathname(this.props);
+    if (serviceName && serviceName !== 'service') {
+      this.props.loadServices(serviceName);
     }
+    M.Tabs.init(this.tabs.current as Element);
+  }
 
-    private propsService = () =>
-        this.props.location.state && this.props.location.state.service;
+  public componentWillUnmount(): void {
+    //TODO cancel axios loadServices
+  }
 
-    public componentDidMount(): void {
-        const service = this.propsService();
-        if (service) {
-            this.props.loadServices(service.serviceName);
-        }
-        M.Tabs.init(this.tabs.current as Element);
-        M.FormSelect.init(this.dropdown.current as Element);
-        M.updateTextFields();
+  private onPostSuccessful = () =>
+      M.toast({html: `<div>Service ${getServiceNameFromPathname(this.props)} successfully created!</div>`});
+
+  private onPutSuccessful = () =>
+      M.toast({html: `<div>Changes to ${getServiceNameFromPathname(this.props)} services successfully saved!</div>`});
+
+  private onDeleteSuccessful = () => {
+    M.toast({html: `<div>Service ${getServiceNameFromPathname(this.props)} successfully removed!</div>`});
+    this.props.history.push(`/services`)
+  };
+
+  public render = () => {
+    const service = this.props.service && { ...this.props.service };
+    if (service) {
+      delete service["id"];
+      delete service["dependencies"];
     }
-
-    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-        const previousService = prevProps.location.state && prevProps.location.state.service;
-        const newService = this.props.location.state && this.props.location.state.service;
-        if (previousService !== newService) {
-            this.setState({ service: newService, isEditing: false });
-            M.Tabs.init(this.tabs.current as Element);
-            M.updateTextFields();
-            M.FormSelect.init(this.dropdown.current as Element);
-        }
-        if (prevState.isEditing !== this.state.isEditing) {
-            M.updateTextFields();
-            M.FormSelect.init(this.dropdown.current as Element);
-        }
-    }
-
-    private onChange = ( { target: { id, value } }: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-        this.setState(prevState => ({
-            service: {
-                ...prevState.service,
-                [id]: value
-            }
-        }));
-    };
-
-    private onEdit = () =>
-        this.setState(prevState => ({ isEditing: !prevState.isEditing }));
-
-    private onPostSuccessful = () =>
-        M.toast({html: `<div>Service ${this.state.service.serviceName} successfully saved!</div>`});
-
-    private onDeleteSuccessful = () => {
-        M.toast({html: `<div>Service ${this.state.service.serviceName} successfully removed!</div>`});
-        this.setState({ redirect: true });
-    };
-
-    public render = () => {
-        const service = this.props.location.state && this.props.location.state.service;
-        if (this.state.redirect || (window.location.pathname !== "/services/new" && !service)) {
-            return <Redirect to='/services'/>;
-        }
-        return <MainLayout>
-            <div className="container">
-                <ul className="tabs" ref={this.tabs}>
-                    <li className="tab col s6"><a href="#details">Details</a></li>
-                    <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
-                </ul>
-                <div className="tab-content col s12" id="details">
-                    <FormPage new={!service}
-                              onEdit={this.onEdit}
-                              post={{url: '/services', callback: this.onPostSuccessful}}
-                              delete={service && {url: `/services/${service.id}`, callback: this.onDeleteSuccessful}}
-                    >
-                        <div className="form-content">
-                            {Object.entries(this.state.service)
-                                .filter(([key, _]) => key !== 'id' && key !== 'dependencies')
-                                .map(([key, value], index) =>
-                                    <div key={index} className="input-field col s12">
-                                        <i className="material-icons prefix">{mapLabelToIcon(key)}</i>
-                                        <label className="active" htmlFor={key}>{camelCaseToSentenceCase(key)}</label>
-                                        {key === 'serviceType'
-                                            ? <select value={value} defaultValue="Choose service type" name={key} id={key}
-                                                      onChange={this.onChange}
-                                                      ref={this.dropdown}
-                                                      disabled={!this.state.isEditing}>
-                                                <option disabled>Choose service type</option>
-                                                {/* TODO get from database?*/}
-                                                <option value='frontend'>Frontend</option>
-                                                <option value='backend'>Backend</option>
-                                                <option value='database'>Database</option>
-                                                <option value='system'>System</option>
-                                            </select>
-                                            : <input value={value} name={key} id={key}
-                                                     type={!value || isNaN(value) ? "text" : "number"} autoComplete="off"
-                                                     onChange={this.onChange}
-                                                     disabled={!this.state.isEditing}/>
-                                        }
-                                    </div>
-                                )
-                            }
-                        </div>
-                    </FormPage>
-                </div>
-                <div className="tab-content" id="dependencies">
-                    {<ServiceDependencyList service={service}/>}
-                </div>
+    return (
+        <MainLayout>
+          <div className="container">
+            <ul className="tabs" ref={this.tabs}>
+              <li className="tab col s6"><a href="#details">Details</a></li>
+              <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
+            </ul>
+            <div className="tab-content col s12" id="details">
+              {!service
+                  ? <LoadingSpinner/>
+                  : <Form values={this.props.service}
+                          new={this.isServiceNew()}
+                          post={{url: 'services', callback: this.onPostSuccessful}}
+                          put={{url: `services/${this.props.service['serviceName']}`, callback: this.onPutSuccessful}}
+                          delete={{url: `services/${this.props.service['serviceName']}`, callback: this.onDeleteSuccessful}}>
+                    {Object.keys(service).map(key =>
+                               key === 'serviceType'
+                                   ? <Field id={key}
+                                            type="dropdown"
+                                            label={key}
+                                            options={{defaultValue: "Choose service type", values: ["Frontend", "Backend", "Database", "System"]}}/>
+                                   : <Field id={key}
+                                            label={key}/>
+                           )
+                    }
+                  </Form>}
             </div>
-        </MainLayout>
-    }
+            <div className="tab-content" id="dependencies">
+              {!this.props.service
+                  ? <LoadingSpinner/>
+                  : <ServiceDependencyList service={this.props.service}/>}
+            </div>
+          </div>
+        </MainLayout>)
+  }
+}
+
+function mapStateToProps(state: ReduxState, props: Props): StateToProps {
+  const name = getServiceNameFromPathname(props);
+  return  {
+    service: name === 'service' ? emptyService() : state.entities.services[name]
+  }
 }
 
 const mapDispatchToProps: DispatchToProps = {
-    loadServices,
+  loadServices,
 };
 
-export default connect(null, mapDispatchToProps)(Service);
-
-
-{/*
-<FormPage onEdit={this.onEdit}
-          post={{url: '/services', callback: this.onPostSuccessful}}
-          delete={!service
-              ? undefined
-              : {url: `/services/${service.id}`, callback: this.onDeleteSuccessful}}
->
-    <div className="row">
-        <ul className="tabs" ref={this.tabs}>
-            <li className="tab col s6"><a href="#details">Details</a></li>
-            <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
-        </ul>
-        <div className="col s12" id="details">
-            {Object.entries(this.state.service)
-                .filter(([key, _]) => key !== 'id' && key !== 'dependencies')
-                .map(([key, value], index) =>
-                    <div key={index} className="input-field col s12">
-                        <i className="material-icons prefix">{mapLabelToIcon(key)}</i>
-                        <label className="active" htmlFor={key}>{camelCaseToSentenceCase(key)}</label>
-                        {key === 'serviceType'
-                            ? <select value={value} defaultValue="Choose service type" name={key} id={key}
-                                      onChange={this.onChange}
-                                      ref={this.dropdown}
-                                      disabled={!this.state.isEditing}>
-                                <option disabled>Choose service type</option>
-                                TODO get from database?
-                                <option value='frontend'>Frontend</option>
-                                <option value='backend'>Backend</option>
-                                <option value='database'>Database</option>
-                                <option value='system'>System</option>
-                            </select>
-                            : <input value={value} name={key} id={key}
-                                     type={!value || isNaN(value) ? "text" : "number"} autoComplete="off"
-                                     onChange={this.onChange}
-                                     disabled={!this.state.isEditing}/>
-                        }
-                    </div>
-                )
-            }
-        </div>
-        <div id="dependencies">
-            {<ServiceDependencyList service={service}/>}
-        </div>
-    </div>
-</FormPage>*/}
+export default connect(mapStateToProps, mapDispatchToProps)(Service);

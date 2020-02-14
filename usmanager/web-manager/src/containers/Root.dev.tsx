@@ -68,6 +68,7 @@ import {Provider} from "react-redux";
 import PageNotFound from "../components/shared/PageNotFound";
 import Login from "../components/shared/Login";
 import AuthenticatedRoute from "../components/shared/AuthenticatedRoute";
+import Footer from "../components/shared/Footer";
 
 interface RootContainerProps {
     store: any;
@@ -79,6 +80,7 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/home": { title: 'Microservices dynamic system management', component: Landing },
     "/services": { title: "Services", component: Services, search: true },
     "/services/:name": { title: "", component: Service },
+    "/services/service": { title: "", component: Service },
     "/apps": { title: "", component: AppPackage, search: true },
     "/hosts/edge": { title: "", component: EdgeHosts, search: true },
     "/containers": { title: "", component: Containers, search: true },
@@ -121,18 +123,21 @@ export default class Root extends React.Component<Props, {}> {
         M.AutoInit();
 
     public render = () =>
-        <main>
-            <Provider store={this.props.store}>
-                <LoadingBar showFastActions className="loading-bar"/>
-                <Navbar/>
-                <Switch>
-                    <Route path="/" exact component={Login} />
-                    <Route path="/login" exact component={Login} />
-                    {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
-                        <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
-                </Switch>
-                {/*<DevTools/>*/}
-            </Provider>
-        </main>
+        <>
+            <main>
+                <Provider store={this.props.store}>
+                    <LoadingBar showFastActions className="loading-bar"/>
+                    <Navbar/>
+                    <Switch>
+                        <Route path="/" exact component={Login} />
+                        <Route path="/login" exact component={Login} />
+                        {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
+                            <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
+                    </Switch>
+                    {/*<DevTools/>*/}
+                </Provider>
+            </main>
+            <Footer/>
+        </>
 
 }

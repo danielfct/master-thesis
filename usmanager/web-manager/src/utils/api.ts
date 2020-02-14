@@ -22,14 +22,13 @@
  * SOFTWARE.
  */
 
-import M from 'materialize-css'
-import axios, {AxiosResponse, Method} from "axios";
+import axios, {Method} from "axios";
 import {isAuthenticated} from "./auth";
 
-//TODO dispatch invalidate local data? on post put delete and patch
-
-export const API_URL = 'http://localhost:8080';
+export const API_URL = 'http://localhost:8080/';
+/*const API_URL = '/';*/
 const TIMEOUT = 5000;
+
 
 export function getData(url: string): any {
     /* console.log(`GET ${url}`);
@@ -64,11 +63,14 @@ export function patchData(url: string, requestBody: any, callback: (data?: any) 
     sendData(url, 'PATCH', requestBody, callback);
 }
 
-const sendData = (url: string, method: Method, data: any, callback: (data: any) => void) => {
+const sendData = (endpoint: string, method: Method, data: any, callback: (data: any) => void) => {
+    const url = endpoint.includes(API_URL) ? endpoint : API_URL + endpoint;
     console.log(`${method} ${url} ${JSON.stringify(data)}`);
-    axios(API_URL + url, {
+    axios(url, {
         method,
         headers: {
+            //TODO remove headers
+            'Authorization': 'Basic YWRtaW46YWRtaW4=',
             'Content-type': 'application/json;charset=UTF-8',
             'Accept': 'application/json;charset=UTF-8',
             'Origin': 'http://localhost:3000'
@@ -76,7 +78,7 @@ const sendData = (url: string, method: Method, data: any, callback: (data: any) 
         data,
     }).then(response => {
         console.log(response)
-    }).catch(error => console.error('timeout exceeded'))
+    }).catch(error => console.error(error))
 
 
     /*fetch(url, {
@@ -107,9 +109,9 @@ export function deleteData(url: string, callback: () => void): void {
         method: 'DELETE',
         // TODO set options from setupAxiosInterceptors instead, after login
         headers: {
+            'Authorization': 'Basic YWRtaW46YWRtaW4=', //TODO remove
             'Content-type': 'application/json;charset=UTF-8',
             'Accept': 'application/json;charset=UTF-8',
-            'Authorization': `Basic ` + window.btoa('admin:admin')
         },
         timeout: TIMEOUT,
     }).then(response => {
@@ -147,9 +149,9 @@ export const setupAxiosInterceptors = (token: string): void => {
             if (isAuthenticated()) {
                 config.headers.authorization = token;
             }
-            config.headers.contentType = 'application/json;charset=UTF-8';
+            /*config.headers.contentType = 'application/json;charset=UTF-8';
             config.headers.accept = 'application/json;charset=UTF-8';
-            config.timeout = TIMEOUT;
+            config.timeout = TIMEOUT;*/
             return config
         }
     )

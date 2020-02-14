@@ -51,4 +51,4 @@ Executar os comandos seguintes deve resolvê-lo:
 
 ### Licença
 
-Web manager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para ter a certeza.
+Web manager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

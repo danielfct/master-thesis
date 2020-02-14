@@ -25,10 +25,10 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
 import org.springframework.stereotype.Service;
 
@@ -54,14 +54,13 @@ public class DockerApiProxyService {
   }
 
   public void launchDockerApiProxy(String hostname) {
-    ServiceEntity dockerApiProxy =
-        serviceService.getService(DOCKER_API_PROXY);
+    ServiceEntity dockerApiProxy = serviceService.getService(DOCKER_API_PROXY);
     String serviceName = dockerApiProxy.getServiceName();
     String serviceType = dockerApiProxy.getServiceType();
     String externalPort = dockerApiProxy.getDefaultExternalPort();
     String internalPort = dockerApiProxy.getDefaultInternalPort();
     var dockerRepository = String.format("%s/%s", dockerHubUsername, dockerApiProxy.getDockerRepository());
-    String command = String.format("COUNT_API_PROXY=$(docker ps --filter 'name=%s' | grep '%s' | wc -l) && "
+    var command = String.format("COUNT_API_PROXY=$(docker ps --filter 'name=%s' | grep '%s' | wc -l) && "
             + "if [ $COUNT_API_PROXY = 1 ]; then echo 'Proxy is running'; "
             + "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
             + "docker pull %s && "
@@ -72,10 +71,10 @@ public class DockerApiProxyService {
         serviceName, dockerRepository, dockerRepository, externalPort, internalPort,
         dockerApiProxyUsername, dockerApiProxyPassword, serviceName, serviceType, hostname, externalPort,
         hostname, dockerRepository);
-    CommandResult commandResult = sshService.execCommand(hostname, command);
+    CommandResult commandResult = sshService.execCommand(hostname, "launchDockerApiProxy", command);
     if (!commandResult.isSuccessful()) {
       throw new LaunchDockerApiProxyException("Unsuccessful launch of docker api proxy on host %s: %s", hostname,
-          commandResult.getResult());
+          commandResult.getError());
     }
   }
 

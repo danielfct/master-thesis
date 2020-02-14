@@ -204,11 +204,11 @@ public class RulesService {
   }
 
   public List<RuleEntity> getHostRules() {
-    return rules.getRulesByComponentType("HOST");
+    return rules.getRulesByComponentType("Host");
   }
 
   public List<RuleEntity> getContainerRules() {
-    return rules.getRulesByComponentType("CONTAINER");
+    return rules.getRulesByComponentType("Container");
   }
 
 

@@ -78,11 +78,11 @@ public class DecisionsService {
   }
 
   public List<DecisionEntity> getHostDecisions() {
-    return decisions.getDecisionsByComponentType("HOST");
+    return decisions.getDecisionsByComponentType("Host");
   }
 
   public List<DecisionEntity> getContainerDecisions() {
-    return decisions.getDecisionsByComponentType("CONTAINER");
+    return decisions.getDecisionsByComponentType("Container");
   }
 
   public DecisionEntity getDecisionByComponentTypeAndByDecisionName(String componentTypeName, String decisionName) {
@@ -91,7 +91,7 @@ public class DecisionsService {
 
   public ComponentDecisionServiceLog saveComponentDecisionServiceLog(String containerId, String serviceName,
                                                                      String decision, long ruleId, String otherInfo) {
-    var componentDecisionLog = saveComponentDecisionLog("CONTAINER", decision, ruleId);
+    var componentDecisionLog = saveComponentDecisionLog("Container", decision, ruleId);
     var componentDecisionServiceLog = ComponentDecisionServiceLog.builder()
         .componentDecisionLog(componentDecisionLog).containerId(containerId).serviceName(serviceName)
         .otherInfo(otherInfo).build();
@@ -99,7 +99,7 @@ public class DecisionsService {
   }
 
   public ComponentDecisionHostLog saveComponentDecisionHostLog(String hostname, String decision, long ruleId) {
-    final var componentDecisionLog = saveComponentDecisionLog("HOST", decision, ruleId);
+    final var componentDecisionLog = saveComponentDecisionLog("Host", decision, ruleId);
     final var componentDecisionHostLog = ComponentDecisionHostLog.builder().componentDecisionLog(componentDecisionLog)
         .hostname(hostname).build();
     return componentDecisionHostLogs.save(componentDecisionHostLog);

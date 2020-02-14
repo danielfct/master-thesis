@@ -54,7 +54,7 @@ public class ServicesEventsService {
 
   ServiceEvent saveServiceEvent(String containerId, String serviceName, String decisionName) {
     DecisionEntity decision =
-        decisionsService.getDecisionByComponentTypeAndByDecisionName("CONTAINER", decisionName);
+        decisionsService.getDecisionByComponentTypeAndByDecisionName("Container", decisionName);
     ServiceEvent event = getServiceEventsByContainerId(containerId).stream().findFirst().orElse(ServiceEvent.builder()
             .containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
     if (event.getDecision().getId() != decision.getId()) {
@@ -69,7 +69,7 @@ public class ServicesEventsService {
 
   void resetServiceEvent(String serviceName) {
     DecisionEntity decision =
-        decisionsService.getDecisionByComponentTypeAndByDecisionName("CONTAINER", "NONE");
+        decisionsService.getDecisionByComponentTypeAndByDecisionName("Container", "NONE");
     serviceEvents.findByServiceName(serviceName).forEach(serviceEvent -> {
       serviceEvent.setDecision(decision);
       serviceEvent.setCount(1);
