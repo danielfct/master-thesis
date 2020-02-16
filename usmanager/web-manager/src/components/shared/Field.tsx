@@ -3,47 +3,112 @@ import React, {createRef, useContext} from "react";
 import {mapLabelToIcon} from "../../utils/image";
 import {camelCaseToSentenceCase, capitalize} from "../../utils/text";
 import M from "materialize-css";
-import { IErrors, IFormContext, FormContext } from "./Form";
+import {IErrors, IFormContext, FormContext, IValues} from "./Form";
 
-type FieldType = "textbox" | "multilinetextbox" | "dropdown";
-
-export interface IFieldProps {
+interface TextBoxProps {
+  className: string;
   id: string;
-  type?: FieldType;
-  label?: string;
-  options?: {defaultValue: string, values: string[]};
-  required?: boolean;
+  name: string;
+  value?: string;
+  disabled?: boolean;
+  onChange: (e: React.FormEvent<HTMLInputElement>) => void;
+  onBlur: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
-interface DropdownProps {
+export const getTypeFromValue = (value: any): string =>
+  value === undefined || value === '' || isNaN(value) ? 'text' : 'number';
+
+class TextBox extends React.Component<TextBoxProps, any> {
+
+  public render(): any {
+    const {className, id, name, value, disabled, onChange, onBlur} = this.props;
+    return (
+      <>
+        <input
+          className={className}
+          style={className.includes('invalid') ? {borderBottom: "1px solid #F44336", boxShadow: "0 1px 0 0 #F44336"} : undefined}
+          id={id}
+          name={name}
+          type={getTypeFromValue(value)}
+          value={value}
+          disabled={disabled}
+          autoComplete="off"
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+      </>
+    )
+  }
+
+}
+
+interface MultilinetextboxProps {
+  className: string;
   id: string;
   name: string;
   value: string;
   disabled?: boolean;
-  onChange: (e: React.FormEvent<HTMLSelectElement>) => void
+  onChange: (e: React.FormEvent<HTMLTextAreaElement>) => void;
+  onBlur: (e: React.FormEvent<HTMLTextAreaElement>) => void;
+}
+
+class MultilineTextBox extends React.Component<MultilinetextboxProps, {}> {
+
+  public render(): any {
+    const {className, id, name, value, disabled, onChange, onBlur} = this.props;
+    return (
+      <textarea
+        className={className}
+        id={id}
+        name={name}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+    )
+  }
+
+}
+
+interface DropdownProps {
+  className: string;
+  id: string;
+  name: string;
+  value: string;
+  disabled?: boolean;
   options?: {defaultValue: string, values: string[]};
+  onChange: (e: React.FormEvent<HTMLSelectElement>) => void;
+  onBlur: (e: React.FormEvent<HTMLSelectElement>) => void;
 }
 
 class Dropdown extends React.Component<DropdownProps,{}> {
 
   private dropdown = createRef<HTMLSelectElement>();
 
-  public componentDidUpdate(prevProps: Readonly<DropdownProps>, prevState: Readonly<{}>, snapshot?: any): void {
+  private initDropdown = (): void => {
     M.FormSelect.init(this.dropdown.current as Element);
+  };
+
+  componentDidMount(): void {
+    this.initDropdown();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<DropdownProps>, prevState: Readonly<{}>, snapshot?: any): void {
+    this.initDropdown();
   }
 
   public render = () => {
-    const {id, value, disabled, onChange, options} = this.props;
+    const {className, id, name, value, disabled, onChange, onBlur, options} = this.props;
     return (
       <select
+        className={className}
         id={id}
-        name={id}
+        name={name}
         value={value}
         disabled={disabled}
         onChange={onChange}
-        onBlur={(e: React.FormEvent<HTMLSelectElement>) =>
-          console.log(e) /* TODO: validate field value */
-        }
+        onBlur={onBlur}
         defaultValue={options && options.defaultValue}
         ref={this.dropdown}
       >
@@ -62,78 +127,46 @@ class Dropdown extends React.Component<DropdownProps,{}> {
       </select>
     )
   }
+
 }
 
-interface TextBoxProps {
+type FieldType = "textbox" | "multilinetextbox" | "dropdown";
+
+export interface IValidation {
+  rule: (values: IValues, fieldName: string, args: any) => string;
+  args?: any;
+}
+
+export interface IFieldProps {
   id: string;
-  value?: string;
-  disabled?: boolean;
-  onChange: (e: React.FormEvent<HTMLInputElement>) => void;
-  required?: boolean
-}
-
-class TextBox extends React.Component<TextBoxProps, any> {
-
-  public componentDidUpdate(prevProps: Readonly<IFieldProps>, prevState: Readonly<{}>, snapshot?: any): void {
-    M.updateTextFields();
-  }
-
-  private getTypeFromValue = (value: any): string =>
-    value === undefined || value === '' || isNaN(value) ? "text" : "number";
-
-  public render(): any {
-    const {id, value, disabled, onChange, required} = this.props;
-    return (
-      <input
-        id={id}
-        type={this.getTypeFromValue(value)}
-        autoComplete="off"
-        value={value}
-        disabled={disabled}
-        onChange={onChange}
-        onBlur={(e: React.FormEvent<HTMLInputElement>) =>
-          console.log(e) /* TODO: validate field value */
-        }
-        required={required}
-      />
-    )
-  }
-
-}
-
-interface MultilinetextboxProps {
-  id: string;
-  value: string;
-  disabled?: boolean;
-  onChange: (e: React.FormEvent<HTMLTextAreaElement>) => void
-}
-
-class MultilineTextBox extends React.Component<MultilinetextboxProps, {}> {
-
-  public componentDidUpdate(prevProps: Readonly<IFieldProps>, prevState: Readonly<{}>, snapshot?: any): void {
-    M.updateTextFields();
-  }
-
-  public render(): any {
-    const {id, value, disabled, onChange} = this.props;
-    return (
-      <textarea
-        id={id}
-        value={value}
-        disabled={disabled}
-        onChange={onChange}
-        onBlur={(e: React.FormEvent<HTMLTextAreaElement>) =>
-          console.log(e) /* TODO: validate field value */
-        }
-      />
-    )
-  }
-
+  type?: FieldType;
+  label?: string;
+  options?: {defaultValue: string, values: string[]};
+  validation?: IValidation;
 }
 
 export default class Field extends React.Component<IFieldProps> {
+
+  public componentDidMount(): void {
+    M.updateTextFields();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<MultilinetextboxProps>, prevState: Readonly<{}>, snapshot?: any): void {
+    M.updateTextFields();
+  }
+
+  private onChange = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+                      formContext: IFormContext, id: string): void =>
+    formContext.setValues({ [id]: e.currentTarget.value });
+
+  private onBlur = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+                    formContext: IFormContext, id: string): void =>
+    formContext.validate(id);
+
   render = () => {
-    const {id, type, label, options, required} = this.props;
+    const {id, type, label, options} = this.props;
+    const getError = (errors: IErrors): string => (errors ? errors[id] : "");
+    const getEditorClassname = (errors: IErrors): string => getError(errors) ? "validate invalid" : "validate";
     return (
       <FormContext.Consumer>
         {(formContext: IFormContext | null) => (
@@ -145,35 +178,43 @@ export default class Field extends React.Component<IFieldProps> {
                   <label className="active" htmlFor={id}>{camelCaseToSentenceCase(label)}</label>
                 </>
               )}
-              {(!type || type!.toLowerCase() === "textbox") && (
-                <TextBox id={id}
+              {(!type || type.toLowerCase() === "textbox") && (
+                <TextBox className={getEditorClassname(formContext.errors)}
+                         id={id}
+                         name={id}
                          value={formContext?.values[id]}
                          disabled={!formContext?.isEditing}
-                         onChange={(e: React.FormEvent<HTMLInputElement>) =>
-                           formContext.setValues({ [id]: e.currentTarget.value })
-                         }
-                         required={required}
+                         onChange={e => this.onChange(e, formContext, id)}
+                         onBlur={e => this.onBlur(e, formContext, id)}
                 />
               )}
-              {type && type!.toLowerCase() === "multilinetextbox" && (
-                <MultilineTextBox id={id}
+              {type && type.toLowerCase() === "multilinetextbox" && (
+                <MultilineTextBox className={getEditorClassname(formContext.errors)}
+                                  id={id}
+                                  name={id}
                                   value={formContext?.values[id]}
                                   disabled={!formContext?.isEditing}
-                                  onChange={(e: React.FormEvent<HTMLTextAreaElement>) =>
-                                    formContext.setValues({ [id]: e.currentTarget.value })
-                                  }
+                                  onChange={e => this.onChange(e, formContext, id)}
+                                  onBlur={e => this.onBlur(e, formContext, id)}
+
                 />
               )}
-              {type && type!.toLowerCase() === "dropdown" && (
-                <Dropdown id={id} name={id} value={formContext?.values[id]}
+              {type && type.toLowerCase() === "dropdown" && (
+                <Dropdown className={getEditorClassname(formContext.errors)}
+                          id={id}
+                          name={id}
+                          value={formContext?.values[id]}
                           disabled={!formContext?.isEditing}
-                          onChange={(e: React.FormEvent<HTMLSelectElement>) =>
-                            formContext.setValues({ [id]: e.currentTarget.value })
-                          }
+                          onChange={e => this.onChange(e, formContext, id)}
+                          onBlur={e => this.onBlur(e, formContext, id)}
                           options={options}
                 />
               )}
-              {/* TODO - display validation error */}
+              {getError(formContext.errors) && (
+                <span className={"helper-text red-text darken-3"}>
+                    {getError(formContext.errors)}
+                  </span>
+              )}
             </div>
           )
         )}

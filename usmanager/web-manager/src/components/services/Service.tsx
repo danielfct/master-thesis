@@ -26,7 +26,7 @@ import React, {createRef} from 'react';
 import M from 'materialize-css';
 import {Redirect, RouteComponentProps} from 'react-router';
 import {camelCaseToSentenceCase} from "../../utils/text";
-import Form, {IValues} from "../shared/Form";
+import Form, {IFields, IValues, min, required, requiredAndNumberAndMin} from "../shared/Form";
 import {mapLabelToIcon} from "../../utils/image";
 import IData from "../shared/IData";
 import ServiceDependencyList from "./ServiceDependencyList";
@@ -36,7 +36,7 @@ import MainLayout from "../shared/MainLayout";
 import LoadingSpinner from "../shared/LoadingSpinner";
 import * as queryString from "querystring";
 import {ReduxState} from "../../reducers";
-import Field from "../shared/Field";
+import Field, {getTypeFromValue} from "../shared/Field";
 
 export interface IService extends IData {
   serviceName: string;
@@ -69,6 +69,7 @@ const emptyService = (): Partial<IService> => ({
 
 interface StateToProps {
   service: Partial<IService>;
+  formService: Partial<IService>,
 }
 
 interface DispatchToProps {
@@ -88,10 +89,8 @@ class Service extends React.Component<Props> {
 
   private tabs = createRef<HTMLUListElement>();
 
-  private isServiceNew = (): boolean => {
-    const values = queryString.parse(this.props.location.search);
-    return !!values['?new'];
-  };
+  private isServiceNew = (): boolean =>
+    !!queryString.parse(this.props.location.search)['?new'];
 
   public componentDidMount(): void {
     const serviceName = getServiceNameFromPathname(this.props);
@@ -101,68 +100,89 @@ class Service extends React.Component<Props> {
     M.Tabs.init(this.tabs.current as Element);
   }
 
+
   public componentWillUnmount(): void {
     //TODO cancel axios loadServices
   }
 
   private onPostSuccessful = () =>
-      M.toast({html: `<div>Service ${getServiceNameFromPathname(this.props)} successfully created!</div>`});
+    M.toast({html: `<div>Service ${getServiceNameFromPathname(this.props)} successfully created!</div>`});
 
   private onPutSuccessful = () =>
-      M.toast({html: `<div>Changes to ${getServiceNameFromPathname(this.props)} services successfully saved!</div>`});
+    M.toast({html: `<div>Changes to ${getServiceNameFromPathname(this.props)} services successfully saved!</div>`});
 
   private onDeleteSuccessful = () => {
     M.toast({html: `<div>Service ${getServiceNameFromPathname(this.props)} successfully removed!</div>`});
     this.props.history.push(`/services`)
   };
 
+  private getFields = (): IFields =>
+    Object.entries(this.props.formService).map(([key, value]) => {
+      return {
+        [key]: {
+          id: key,
+          label: key,
+          validation: getTypeFromValue(value) === 'number'
+            ? { rule: requiredAndNumberAndMin, args: 0 }
+            : { rule: required }
+        }
+      };
+    }).reduce((fields, field) => {
+      for (let key in field) {
+        fields[key] = field[key];
+      }
+      return fields;
+    }, {});
+
   public render = () => {
-    const service = this.props.service && { ...this.props.service };
-    if (service) {
-      delete service["id"];
-      delete service["dependencies"];
-    }
     return (
-        <MainLayout>
-          <div className="container">
-            <ul className="tabs" ref={this.tabs}>
-              <li className="tab col s6"><a href="#details">Details</a></li>
-              <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
-            </ul>
-            <div className="tab-content col s12" id="details">
-              {!service
-                  ? <LoadingSpinner/>
-                  : <Form values={this.props.service}
-                          new={this.isServiceNew()}
-                          post={{url: 'services', callback: this.onPostSuccessful}}
-                          put={{url: `services/${this.props.service['serviceName']}`, callback: this.onPutSuccessful}}
-                          delete={{url: `services/${this.props.service['serviceName']}`, callback: this.onDeleteSuccessful}}>
-                    {Object.keys(service).map(key =>
-                               key === 'serviceType'
-                                   ? <Field id={key}
-                                            type="dropdown"
-                                            label={key}
-                                            options={{defaultValue: "Choose service type", values: ["Frontend", "Backend", "Database", "System"]}}/>
-                                   : <Field id={key}
-                                            label={key}/>
-                           )
-                    }
-                  </Form>}
-            </div>
-            <div className="tab-content" id="dependencies">
-              {!this.props.service
-                  ? <LoadingSpinner/>
-                  : <ServiceDependencyList service={this.props.service}/>}
-            </div>
+      <MainLayout>
+        <div className="container">
+          <ul className="tabs" ref={this.tabs}>
+            <li className="tab col s6"><a href="#details">Details</a></li>
+            <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
+          </ul>
+          <div className="tab-content col s12" id="details">
+            {!this.props.formService
+              ? <LoadingSpinner/>
+              : <Form fields={this.getFields()}
+                      values={this.props.service}
+                      new={this.isServiceNew()}
+                      post={{url: 'services', callback: this.onPostSuccessful}}
+                      put={{url: `services/${this.props.service['serviceName']}`, callback: this.onPutSuccessful}}
+                      delete={{url: `services/${this.props.service['serviceName']}`, callback: this.onDeleteSuccessful}}>
+                {Object.keys(this.props.formService).map(key =>
+                  key === 'serviceType'
+                    ? <Field id={key}
+                             type="dropdown"
+                             label={key}
+                             options={{defaultValue: "Choose service type", values: ["Frontend", "Backend", "Database", "System"]}}
+                    />
+                    : <Field id={key}
+                             label={key}
+                    />
+                )}
+              </Form>}
           </div>
-        </MainLayout>)
+          <div className="tab-content" id="dependencies">
+            {!this.props.service
+              ? <LoadingSpinner/>
+              : <ServiceDependencyList service={this.props.service}/>}
+          </div>
+        </div>
+      </MainLayout>)
   }
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const name = getServiceNameFromPathname(props);
+  const service = name === 'service' ? emptyService() : state.entities.services[name];
+  const formService = service;
+  delete formService["id"];
+  delete formService["dependencies"];
   return  {
-    service: name === 'service' ? emptyService() : state.entities.services[name]
+    service,
+    formService
   }
 }
 

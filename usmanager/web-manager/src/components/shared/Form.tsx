@@ -22,13 +22,17 @@
  * SOFTWARE.
  */
 
-import MainLayout from "./MainLayout";
 import React, {createRef, FormEvent} from "react";
 import {deleteData, postData, putData} from "../../utils/api";
 import M from "materialize-css";
 import './Form.css';
 import {RouteComponentProps, withRouter} from "react-router";
-import PerfectScrollbar from "react-perfect-scrollbar";
+import {getTypeFromValue, IFieldProps} from "./Field";
+import {camelCaseToSentenceCase} from "../../utils/text";
+
+export interface IFields {
+    [key: string]: IFieldProps;
+}
 
 export interface IValues {
     [key: string]: any;
@@ -38,12 +42,15 @@ export interface IErrors {
     [key: string]: string;
 }
 
+type restOperation = { url: string, callback: () => void }
+
 interface FormPageProps {
+    fields: IFields;
     values: IValues;
     new: boolean;
-    post: { url: string, callback: () => void };
-    put: { url: string, callback: () => void };
-    delete?: { url: string, callback: () => void } | null;
+    post: restOperation;
+    put: restOperation;
+    delete?: restOperation;
 }
 
 type Props = FormPageProps & RouteComponentProps;
@@ -56,11 +63,29 @@ interface State {
 
 export interface IFormContext extends State {
     setValues: (values: IValues) => void;
+    validate: (fieldName: string) => void;
 }
 
 export const FormContext =
   React.createContext<IFormContext | null>(null);
 
+export const required = (values: IValues, fieldName: string): string =>
+  values[fieldName] === undefined || values[fieldName] === null || values[fieldName] === ""
+    ? `${camelCaseToSentenceCase(fieldName)} is required`
+    : "";
+
+export const min = (values: IValues, fieldName: string, args: any): string =>
+  values[fieldName] < args
+    ? `Required minimum value of ${args}`
+    : "";
+
+export const number = (values: IValues, fieldName: string): string =>
+  getTypeFromValue(values[fieldName]) !== 'number'
+    ? `${camelCaseToSentenceCase(fieldName)} is a number`
+    : "";
+
+export const requiredAndNumberAndMin = (values: IValues, fieldName: string, args: any) =>
+  required(values, fieldName) || number(values, fieldName) || min(values, fieldName, args);
 
 class Form extends React.Component<Props, State> {
 
@@ -76,9 +101,28 @@ class Form extends React.Component<Props, State> {
         M.FloatingActionButton.init(this.fab.current as Element);
     }
 
+    private validate = (fieldName: string): string => {
+        let newError: string = "";
+        if (this.props.fields[fieldName] && this.props.fields[fieldName].validation) {
+            newError = this.props.fields[fieldName].validation!.rule(
+              this.state.values,
+              fieldName,
+              this.props.fields[fieldName].validation!.args
+            );
+        }
+        this.setState({
+            errors: { ...this.state.errors, [fieldName]: newError }
+        });
+        return newError;
+    };
+
     private validateForm(): boolean {
-        // TODO - validate form
-        return true;
+        const errors: IErrors = {};
+        Object.keys(this.props.fields).map((fieldName: string) => {
+            errors[fieldName] = this.validate(fieldName);
+        });
+        this.setState({ errors });
+        return this.isValid(errors);
     }
 
     private isValid = (errors: IErrors) =>
@@ -96,7 +140,6 @@ class Form extends React.Component<Props, State> {
 
     private handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
-        console.log(this.state.values);
         if (!this.validateForm()) {
             return;
         }
@@ -111,7 +154,8 @@ class Form extends React.Component<Props, State> {
                   console.log(data);
                   this.props.post.callback();
               });
-        } else {
+        }
+        else {
             putData(
               this.props.put.url,
               requestBody,
@@ -132,20 +176,19 @@ class Form extends React.Component<Props, State> {
     public render = () => {
         const context: IFormContext = {
             ...this.state,
-            setValues: this.setValues
+            setValues: this.setValues,
+            validate: this.validate
         };
         const {isEditing, errors} = this.state;
         const {children} = this.props;
         return (
-
           <form onSubmit={this.handleSubmit} noValidate>
               <div className="form-controls-container">
                   {this.props.new
                     ? <div className="row">
                         <button className="control-btn btn-flat btn-small waves-effect waves-light green-text right slide"
                                 type="submit"
-                                tabIndex={0}
-                          /*disabled={this.isValid(errors)}*/>
+                                tabIndex={0}>
                             Save
                         </button>
                     </div>

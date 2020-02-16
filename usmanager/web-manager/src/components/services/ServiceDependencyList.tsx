@@ -28,7 +28,7 @@ import {IService} from "./Service";
 import {connect} from "react-redux";
 import List from "../shared/List";
 import {bindActionCreators} from "redux";
-import {loadServiceDependencies, loadServices} from "../../actions";
+import {loadServiceDependencies} from "../../actions";
 import ListItem from "../shared/ListItem";
 import './ServiceDependencyList.css'
 import M from "materialize-css";
