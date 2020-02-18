@@ -24,21 +24,16 @@
 
 import { combineReducers } from 'redux'
 import entities from "./entities";
-import {breadcrumbs, errorMessage, loading, loadingBar, search, select, sidenav} from "./ui";
-import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
+import {loadingBar, search, sidenav} from "./ui";
 import {IService} from "../components/services/Service";
 
 export interface ReduxState {
     ui: {
         sidenav: { user: boolean, width: boolean };
         search: string;
-        breadcrumbs: IBreadcrumbs;
-        errorMessage: string;
-        loading: boolean;
-        /*select: { service?: string };*/
     }
     entities: {
-        services: { [key: string]: IService; },
+        services: { data: { [key: string]: IService }, isLoading: boolean, error: string }
     };
     pagination: any;
 }
@@ -172,10 +167,6 @@ export interface IState {
 const ui = combineReducers({
     sidenav,
     search,
-    breadcrumbs,
-    errorMessage,
-    loading,
-    select
 });
 
 // Updates the pagination data for different actions.

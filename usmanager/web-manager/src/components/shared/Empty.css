@@ -1,0 +1,17 @@
+.empty-container {
+    padding: 5% 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.empty-icon {
+    color: white;
+    font-size: 2rem;
+}
+
+.empty-message {
+    color: white;
+    margin: 0 !important;
+    padding: 25px;
+}

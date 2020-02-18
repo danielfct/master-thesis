@@ -73,7 +73,6 @@ const sendData = (endpoint: string, method: Method, data: any, callback: (data: 
             'Authorization': 'Basic YWRtaW46YWRtaW4=',
             'Content-type': 'application/json;charset=UTF-8',
             'Accept': 'application/json;charset=UTF-8',
-            'Origin': 'http://localhost:3000'
         },
         data,
     }).then(response => {
@@ -88,7 +87,6 @@ const sendData = (endpoint: string, method: Method, data: any, callback: (data: 
         headers: new Headers({
             'Content-type': 'application/json;charset=UTF-8',
             'Accept': 'application/json;charset=UTF-8',
-            'Origin': 'http://localhost:3000'
         })
     }).then(response => {
         if (response.ok) {
@@ -127,7 +125,6 @@ export function deleteData(url: string, callback: () => void): void {
          headers: new Headers({
              'Content-type': 'application/json;charset=UTF-8',
              'Accept': 'application/json;charset=UTF-8',
-             'Origin': 'http://localhost:3000',
              'Authorization': 'Basic ' + btoa('admin:admin'), //TODO
          })
      }).then(response => {

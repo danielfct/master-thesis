@@ -49,7 +49,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor
-@Setter(value = AccessLevel.PACKAGE)
+@Setter
 @Getter
 @Table(name = "value_modes")
 public class ValueModeEntity {

@@ -42,7 +42,7 @@ import org.hibernate.annotations.NaturalId;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor
-@Setter(value = AccessLevel.PACKAGE)
+@Setter
 @Getter
 @Table(name = "regions")
 public class RegionEntity {

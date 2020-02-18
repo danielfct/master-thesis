@@ -24,10 +24,11 @@
 
 import * as React from "react";
 import "./SimpleList.css";
+import Empty from "./Empty";
 
 
 interface GenericSimpleListProps<T> {
-    empty: string | (() => JSX.Element);
+    emptyMessage: string;
     list: T[];
     show: (element: T) => JSX.Element;
     separator?: boolean | { color: string };
@@ -47,9 +48,9 @@ export default class SimpleList<T> extends React.Component<Props<T>, {}> {
     };
 
     public render = () => {
-        const {empty, list, show} = this.props;
+        const {emptyMessage, list, show} = this.props;
         if (list.length === 0) {
-            return typeof empty === 'string' ? <h1><i>{empty}</i></h1> : <div>{empty()}</div>;
+            return <Empty message={emptyMessage}/>
         }
         const separatorColor = this.getSeparatorColor();
         return (

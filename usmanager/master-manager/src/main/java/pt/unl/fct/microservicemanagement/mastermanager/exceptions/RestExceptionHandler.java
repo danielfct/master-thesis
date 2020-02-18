@@ -126,13 +126,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     return buildResponseEntity(apiError);
   }
 
-  /**
-   * Handles EntityNotFoundException. Created to encapsulate errors with more detail than
-   * javax.persistence.EntityNotFoundException.
-   *
-   * @param ex the EntityNotFoundException
-   * @return the ApiError object
-   */
   @ExceptionHandler(EntityNotFoundException.class)
   protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
     ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);

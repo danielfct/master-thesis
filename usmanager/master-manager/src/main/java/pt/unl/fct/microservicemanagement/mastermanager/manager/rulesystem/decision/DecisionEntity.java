@@ -55,7 +55,7 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor
-@Setter(value = AccessLevel.PACKAGE)
+@Setter
 @Getter
 @Table(name = "decisions")
 public class DecisionEntity {

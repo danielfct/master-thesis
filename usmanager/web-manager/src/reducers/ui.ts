@@ -23,10 +23,8 @@
  */
 
 import {
-   /* BREADCRUMBS_ADD,*/
     BREADCRUMBS_UPDATE,
-    RESET_ERROR_MESSAGE,
-    SEARCH_UPDATE, SELECT_ENTITY,
+    SEARCH_UPDATE,
     SIDENAV_SHOW_USER,
     SIDENAV_SHOW_WIDTH
 } from "../actions";
@@ -38,8 +36,8 @@ import {act} from "react-dom/test-utils";
 export const loadingBar = loadingBarReducer;
 
 export const sidenav = (
-    state = { user: true, width: window.innerWidth > 992 },
-    action: { type: string, value: boolean },
+  state = { user: true, width: window.innerWidth > 992 },
+  action: { type: string, value: boolean },
 ) => {
     const { type, value } = action;
     switch (type) {
@@ -58,7 +56,10 @@ export const sidenav = (
     }
 };
 
-export const search = (state = "", action: { type: string, search: string}) => {
+export const search = (
+  state = "",
+  action: { type: string, search: string}
+) => {
     const { type, search } = action;
     switch (type) {
         case SEARCH_UPDATE:
@@ -67,54 +68,3 @@ export const search = (state = "", action: { type: string, search: string}) => {
             return state;
     }
 };
-
-/*export const breadcrumbs = (state = {}, action: { type: string, breadcrumbs: IBreadcrumbs}) => {
-    const { type, breadcrumbs } = action;
-    switch (type) {
-        case BREADCRUMBS_UPDATE:
-            return breadcrumbs;
-        default:
-            return state;
-    }
-};*/
-
-export function breadcrumbs(state: IBreadcrumbs = [], action: { type: string, title: string, link?: string, breadcrumbs: IBreadcrumbs }) {
-    const { type, title, link, breadcrumbs } = action;
-    /*if (type === BREADCRUMBS_ADD) {
-        state.push({title, link});
-    }
-    else*/ if (type === BREADCRUMBS_UPDATE) {
-        state = breadcrumbs;
-    }
-    return state;
-}
-
-export const errorMessage = (state = null, action: {type: string, error: string}) => {
-    const { type, error } = action;
-    if (type === RESET_ERROR_MESSAGE) {
-        return null
-    } else if (error) {
-        return error
-    }
-    return state
-};
-
-export const loading = (state = true, action: any) => {
-    if (action.type.includes("REQUEST")) {
-        return true;
-    }
-    if (action.response && action.response.entities) {
-        return false;
-    }
-    return state;
-};
-
-export function select<T>(state = {}, action: {type: string, entity: T}) {
-    const { type, entity } = action;
-    switch (type) {
-        case SELECT_ENTITY:
-            return merge({}, state, entity);
-        default:
-            return state;
-    }
-}

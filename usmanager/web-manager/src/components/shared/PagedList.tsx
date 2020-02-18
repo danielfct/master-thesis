@@ -27,7 +27,7 @@ import SimpleList from './SimpleList';
 import './PagedList.css';
 
 export interface IPagedList<T> {
-    empty: string | (() => JSX.Element);
+    emptyMessage: string;
     list: T[];
     show: (x: T) => JSX.Element;
     pagination: { pagesize: number, page?: number, bottom?: boolean };
@@ -53,35 +53,45 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
     }
 
     public render() {
-        const {empty, list: l, show, pagination, separator} = this.props;
+        const {emptyMessage, list: l, show, pagination, separator} = this.props;
         const {page = 0, pagesize = l.length} = this.state;
         const list = l.slice(page * pagesize, page * pagesize + pagesize);
         return (
-            <div>
-                <ul className="pagination center-align no-select">
-                    {!pagination.bottom &&
+          <div>
+              <ul className="pagination center-align no-select" style={this.max < 1 ? { visibility: "hidden" } : undefined}>
+                  {!pagination.bottom && (
                     <li className={page === 0 ? "disabled prev" : "prev"}>
                         <a onClick={this.prevPage}>
                             <i className="material-icons">chevron_left</i>
-                        </a>
-                    </li>}
-                    {Array.from({length: this.max + 1}, (x, i) => i+1).map((pageNumber, index) =>
-                        <PageNumber key={index} page={pageNumber} active={index === page} setPage={this.setPage}/>
-                    )}
-                    <li className={page === this.max ? "disabled next" : "next"}>
-                        <a onClick={this.nextPage}>
-                            <i className="material-icons">chevron_right</i>
                         </a>
                     </li>
-                    {pagination.bottom &&
+                  )}
+                  {/*TODO:
+                  if too many pages, add 3 dots to intermediate pages. e.g. 1, 2, 3 ... 50.
+                  add first_page and last_page icons (https://materializecss.com/icons.html),
+                  and implement firstPage and lastPage functions
+                  */}
+                  {Array.from({ length: this.max + 1 }, (x, i) => i + 1)
+                        .map((pageNumber, index) => (
+                            <PageNumber key={index} page={pageNumber} active={index === page} setPage={this.setPage}/>
+                          )
+                        )
+                  }
+                  <li className={page === this.max ? "disabled next" : "next"}>
+                      <a onClick={this.nextPage}>
+                          <i className="material-icons">chevron_right</i>
+                      </a>
+                  </li>
+                  {pagination.bottom && (
                     <li className={page === 0 ? "disabled prev" : "prev"}>
                         <a onClick={this.prevPage}>
                             <i className="material-icons">chevron_left</i>
                         </a>
-                    </li>}
-                </ul>
-                <SimpleList<T> {...{empty, list, show, separator}}/>
-            </div>
+                    </li>
+                  )}
+              </ul>
+              <SimpleList<T> {...{emptyMessage, list, show, separator}}/>
+          </div>
         );
     }
 

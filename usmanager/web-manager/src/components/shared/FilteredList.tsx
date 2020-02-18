@@ -29,7 +29,7 @@ import SimpleList from "./SimpleList";
 import {ReduxState} from "../../reducers";
 
 interface Props<T> {
-    empty: string | (() => JSX.Element);
+    emptyMessage: string;
     list: T[];
     show: (x: T) => JSX.Element;
     predicate: (x: T, s: string) => boolean;
@@ -42,17 +42,17 @@ class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
 
     public render() {
         const {predicate, search, pagination, ...otherprops} = this.props;
-        let {empty, list} = this.props;
+        let {emptyMessage, list} = this.props;
         const filteredList = list.filter((s:T) => predicate(s, search));
         if (list.length !== filteredList.length && filteredList.length === 0) {
-            empty = `no matches for the search '${search}'`; //TODO jsx element with no_found icon plus the text
+            emptyMessage = `No matches for the search "${search}"`; //TODO jsx element with no_found icon plus the text
         }
         if (pagination) {
             return <PagedList {...otherprops}
-                              {...{empty, list: filteredList, pagination}}/>
+                              {...{emptyMessage, list: filteredList, pagination}}/>
         } else {
             return <SimpleList<T> {...otherprops}
-                           {...{empty, list: filteredList}}/>
+                           {...{emptyMessage, list: filteredList}}/>
         }
     }
 }

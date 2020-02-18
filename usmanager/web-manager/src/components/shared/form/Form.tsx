@@ -23,15 +23,15 @@
  */
 
 import React, {createRef, FormEvent} from "react";
-import {deleteData, postData, putData} from "../../utils/api";
+import {deleteData, postData, putData} from "../../../utils/api";
 import M from "materialize-css";
 import './Form.css';
 import {RouteComponentProps, withRouter} from "react-router";
-import {getTypeFromValue, IFieldProps} from "./Field";
-import {camelCaseToSentenceCase} from "../../utils/text";
+import {getTypeFromValue, FieldProps, IValidation} from "./Field";
+import {camelCaseToSentenceCase} from "../../../utils/text";
 
 export interface IFields {
-    [key: string]: IFieldProps;
+    [key: string]: FieldProps;
 }
 
 export interface IValues {
@@ -102,17 +102,11 @@ class Form extends React.Component<Props, State> {
     }
 
     private validate = (fieldName: string): string => {
-        let newError: string = "";
-        if (this.props.fields[fieldName] && this.props.fields[fieldName].validation) {
-            newError = this.props.fields[fieldName].validation!.rule(
-              this.state.values,
-              fieldName,
-              this.props.fields[fieldName].validation!.args
-            );
-        }
-        this.setState({
-            errors: { ...this.state.errors, [fieldName]: newError }
-        });
+        const {fields} = this.props;
+        const field: FieldProps | undefined = fields[fieldName];
+        const validation: IValidation | undefined = field!.validation;
+        const newError: string = validation ? validation.rule(this.state.values, fieldName, validation.args) : "";
+        this.setState({ errors: { ...this.state.errors, [fieldName]: newError } });
         return newError;
     };
 
@@ -143,12 +137,10 @@ class Form extends React.Component<Props, State> {
         if (!this.validateForm()) {
             return;
         }
-        const requestBody = new FormData(event.target as HTMLFormElement);
-        console.log(requestBody)
         if (this.props.new) {
             postData(
               this.props.post.url,
-              requestBody,
+              this.state.values,
               data => {
                   //TODO delete console log
                   console.log(data);
@@ -158,7 +150,7 @@ class Form extends React.Component<Props, State> {
         else {
             putData(
               this.props.put.url,
-              requestBody,
+              this.state.values,
               data => {
                   //TODO delete console log
                   console.log(data);
@@ -168,10 +160,8 @@ class Form extends React.Component<Props, State> {
 
     };
 
-    private setValues = (values: IValues) => {
-        console.log(values)
-        this.setState({ values: { ...this.state.values, ...values } });
-    };
+    private setValues = (values: IValues) =>
+      this.setState({ values: { ...this.state.values, ...values } });
 
     public render = () => {
         const context: IFormContext = {

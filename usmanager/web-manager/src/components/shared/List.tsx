@@ -30,28 +30,28 @@ import "./List.css"
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
 import LoadingSpinner from "./LoadingSpinner";
+import Error from "./Error";
 
-interface StateToProps {
+interface Props<T> {
     isLoading: boolean;
-}
-
-interface ListProps<T> {
-    empty: string | (() => JSX.Element);
+    error: string;
+    emptyMessage: string;
     list: T[];
     show: (element: T) => JSX.Element;
     predicate?: (element: T, filter: string) => boolean;
     pagination?: { pagesize: number, page?: number, bottom?: boolean };
-    separator?: boolean | { color: string };
+    useSeparator?: boolean | { color: string };
 }
-
-type Props<T> = StateToProps & ListProps<T>;
 
 class GenericList<T> extends React.Component<Props<T>, {}> {
 
     public render() {
-        const {isLoading, predicate, pagination} = this.props;
+        const {isLoading, error, predicate, pagination} = this.props;
         if (isLoading) {
             return <LoadingSpinner/>;
+        }
+        if (error) {
+            return <Error message={error}/>;
         }
         if (predicate) {
             const Filtered = FilteredList<T>();
@@ -65,12 +65,6 @@ class GenericList<T> extends React.Component<Props<T>, {}> {
 
 }
 
-const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-      isLoading: state.ui.loading
-  }
-);
-
 export default function List<T>() {
-    return connect(mapStateToProps)(GenericList as new(props: Props<T>) => GenericList<T>);
+    return (GenericList as new(props: Props<T>) => GenericList<T>);
 }

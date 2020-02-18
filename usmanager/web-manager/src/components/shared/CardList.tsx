@@ -26,53 +26,58 @@ import List from "./List";
 import React from "react";
 
 interface Props<T> {
-    empty: string | (() => JSX.Element);
-    list: T[];
-    card: (element: T) => JSX.Element;
-    predicate?: (element: T, filter: string) => boolean;
+  isLoading: boolean;
+  error: string;
+  emptyMessage: string;
+  list: T[];
+  card: (element: T) => JSX.Element;
+  predicate?: (element: T, filter: string) => boolean;
 }
 
 interface State {
-    pagesize: number;
+  pagesize: number;
 }
 
 export default class CardList<T> extends React.Component<Props<T>, State> {
 
-    constructor(props: Props<T>) {
-        super(props);
-        this.state = {
-            pagesize: this.calcPagesize()
-        }
+  constructor(props: Props<T>) {
+    super(props);
+    this.state = {
+      pagesize: this.calcPagesize()
     }
+  }
 
-    public componentDidMount = () =>
-        window.addEventListener('resize', this.handleResize);
+  public componentDidMount = () =>
+    window.addEventListener('resize', this.handleResize);
 
-    public componentWillUnmount = () =>
-        window.removeEventListener('resize', this.handleResize);
+  public componentWillUnmount = () =>
+    window.removeEventListener('resize', this.handleResize);
 
-    private handleResize = (_: Event) => {
-        this.setState({pagesize: this.calcPagesize()})
-    };
+  private handleResize = (_: Event) => {
+    this.setState({pagesize: this.calcPagesize()})
+  };
 
-    private calcPagesize = () => {
-        const width = window.innerWidth;
-        if (width <= 600) {
-            return 4;
-        } else if (width <= 992) {
-            return 6;
-        } else {
-            return 8;
-        }
-    };
-
-    public render = () => {
-        const GenericList = List<T>();
-        return <GenericList
-            empty={this.props.empty}
-            list={this.props.list}
-            show={this.props.card}
-            predicate={this.props.predicate}
-            pagination={{pagesize: this.state.pagesize}}/>
+  private calcPagesize = () => {
+    const width = window.innerWidth;
+    if (width <= 600) {
+      return 4;
+    } else if (width <= 992) {
+      return 6;
+    } else {
+      return 8;
     }
+  };
+
+  public render = () => {
+    const GenericList = List<T>();
+    return <GenericList
+      isLoading={this.props.isLoading}
+      error={this.props.error}
+      emptyMessage={this.props.emptyMessage}
+      list={this.props.list}
+      show={this.props.card}
+      predicate={this.props.predicate}
+      pagination={{pagesize: this.state.pagesize}}/>
+  }
+
 }

@@ -24,6 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
@@ -38,6 +40,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
+@Slf4j
 @Service
 public class ServicesService {
 
@@ -67,14 +70,21 @@ public class ServicesService {
     return services.findByDockerRepository(dockerRepository);
   }
 
-  public Long addService(ServiceEntity service) {
-    return services.save(service).getId();
+  public ServiceEntity addService(ServiceEntity service) {
+    log.debug("Saving service {}", ToStringBuilder.reflectionToString(service));
+    return services.save(service);
   }
 
-  public Long updateService(String serviceName, ServiceEntity newService) {
-    final var service = getService(serviceName);
+  public ServiceEntity updateService(String serviceName, ServiceEntity newService) {
+    var service = getService(serviceName);
+    log.debug("Updating service {} with {}",
+        ToStringBuilder.reflectionToString(service), ToStringBuilder.reflectionToString(newService));
+    log.debug("Service before copying properties: {}",
+        ToStringBuilder.reflectionToString(service));
     ObjectUtils.copyValidProperties(newService, service);
-    return services.save(service).getId();
+    log.debug("Service after copying properties: {}",
+        ToStringBuilder.reflectionToString(service));
+    return services.save(service);
   }
 
   /*  public Long saveService(String serviceName, SaveServiceReq saveServiceConfigReq) {

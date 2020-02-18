@@ -32,27 +32,27 @@ export const SERVICE_SUCCESS = 'SERVICE_SUCCESS';
 export const SERVICE_FAILURE = 'SERVICE_FAILURE';
 
 export const loadServices = (name?: string) => (dispatch: any) => {
-    /*let cached;
-    if (name) {
-        let entity = getState().entities.services[name];
-        cached = entity && entity.hasOwnProperty(requiredField);
-    }
-    else {
-        let entities = getState().entities.services;
-        cached = entities && entities.length
-            && entities.every((entity: IService) => entity.hasOwnProperty(requiredField));
-    }
-    return cached ? null : dispatch(fetchServices(name));*/
-    return dispatch(fetchServices(name));
+  /*let cached;
+  if (name) {
+      let entity = getState().entities.services[name];
+      cached = entity && entity.hasOwnProperty(requiredField);
+  }
+  else {
+      let entities = getState().entities.services;
+      cached = entities && entities.length
+          && entities.every((entity: IService) => entity.hasOwnProperty(requiredField));
+  }
+  return cached ? null : dispatch(fetchServices(name));*/
+  return dispatch(fetchServices(name));
 };
 
 const fetchServices = (name?: string) => ({
-    [CALL_API]: {
-        types: [ SERVICE_REQUEST, SERVICE_SUCCESS, SERVICE_FAILURE ],
-          endpoint: !name ? `services` : `services/${name}`,
-        /*endpoint: !name ? `services.json` : `service.json`,*/
-        schema: !name ? Schemas.SERVICE_ARRAY : Schemas.SERVICE,
-    }
+  [CALL_API]: {
+    types: [ SERVICE_REQUEST, SERVICE_SUCCESS, SERVICE_FAILURE ],
+    endpoint: !name ? `services` : `services/${name}`,
+    schema: !name ? Schemas.SERVICE_ARRAY : Schemas.SERVICE,
+    args: 'services'
+  }
 });
 
 export const SERVICE_DEPENDENCIES_REQUEST = 'SERVICE_DEPENDENCIES_REQUEST';
@@ -60,36 +60,36 @@ export const SERVICE_DEPENDENCIES_SUCCESS = 'SERVICE_DEPENDENCIES_SUCCESS';
 export const SERVICE_DEPENDENCIES_FAILURE = 'SERVICE_DEPENDENCIES_FAILURE';
 
 export const loadServiceDependencies = (serviceName: string, id?: string | number) => (dispatch: any, getState: any) => {
-    /*const cachedService = getState().entities.services[service.serviceName];
-    let cached = cachedService && cachedService.dependencies;
-    if (id) {
-        cached = cached[id];
-    }
-    console.log('service dependencies of ' + service.serviceName + ' cached? ' + cached);
-    return cached ? null : dispatch(fetchServiceDependencies(service, id));*/
-    return dispatch(fetchServiceDependencies(serviceName, id));
+  /*const cachedService = getState().entities.services[service.serviceName];
+  let cached = cachedService && cachedService.dependencies;
+  if (id) {
+      cached = cached[id];
+  }
+  console.log('service dependencies of ' + service.serviceName + ' cached? ' + cached);
+  return cached ? null : dispatch(fetchServiceDependencies(service, id));*/
+  return dispatch(fetchServiceDependencies(serviceName, id));
 };
 
 const fetchServiceDependencies = (serviceName: string, id?: string | number) => ({
-    [CALL_API]: {
-        types: [ SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_SUCCESS, SERVICE_DEPENDENCIES_FAILURE ],
-        endpoint: !id ? `services/${serviceName}/dependencies` : `services/${serviceName}/dependencies/${id}`,
-        /*endpoint: !id ? `serviceDependencies.json` : `serviceDependency.json`,*/
-        schema: !id ? Schemas.SERVICE_DEPENDENCY_ARRAY : Schemas.SERVICE_DEPENDENCY,
-        args: serviceName
-    }
+  [CALL_API]: {
+    types: [ SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_SUCCESS, SERVICE_DEPENDENCIES_FAILURE ],
+    endpoint: !id ? `services/${serviceName}/dependencies` : `services/${serviceName}/dependencies/${id}`,
+    /*endpoint: !id ? `serviceDependencies.json` : `serviceDependency.json`,*/
+    schema: !id ? Schemas.SERVICE_DEPENDENCY_ARRAY : Schemas.SERVICE_DEPENDENCY,
+    args: serviceName
+  }
 });
 
 
-
+/*
 export const SELECT_ENTITY = 'SELECT_ENTITY';
 
 export function selectEntity<T>(entity: T) {
-    return {
-        type: SELECT_ENTITY,
-        entity
-    }
-}
+  return {
+    type: SELECT_ENTITY,
+    entity
+  }
+}*/
 
 /*export const RECEIVE_SERVICES = 'RECEIVE_SERVICES';
 function receiveServices(servicesJson: string) {
@@ -166,43 +166,43 @@ export const hideSidenav = (hidden: boolean) => (
 export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE';
 
 export const resetErrorMessage = () => ({
-    type: RESET_ERROR_MESSAGE
+  type: RESET_ERROR_MESSAGE
 });
 
 export const SIDENAV_SHOW_USER = 'SIDENAV_SHOW_USER';
 
 export const showSidenavByUser = (value: boolean) => (
-    {
-        type: SIDENAV_SHOW_USER,
-        value
-    }
+  {
+    type: SIDENAV_SHOW_USER,
+    value
+  }
 );
 
 export const SIDENAV_SHOW_WIDTH = 'SIDENAV_SHOW_WIDTH';
 
 export const showSidenavByWidth = (value: boolean) => (
-    {
-        type: SIDENAV_SHOW_WIDTH,
-        value
-    }
+  {
+    type: SIDENAV_SHOW_WIDTH,
+    value
+  }
 );
 
 export const SEARCH_UPDATE = 'SEARCH_UPDATE';
 
 export const updateSearch = (search: string) => (
-    {
-        type: SEARCH_UPDATE,
-        search
-    }
+  {
+    type: SEARCH_UPDATE,
+    search
+  }
 );
 
 export const BREADCRUMBS_UPDATE = 'BREADCRUMBS_UPDATE';
 
 export const updateBreadcrumbs = (breadcrumbs: IBreadcrumbs) => (
-    {
-        type: BREADCRUMBS_UPDATE,
-        breadcrumbs
-    }
+  {
+    type: BREADCRUMBS_UPDATE,
+    breadcrumbs
+  }
 );
 
 /*

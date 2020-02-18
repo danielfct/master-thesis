@@ -37,33 +37,11 @@ export type IBreadcrumb = { title: string, link?: string };
 
 export type IBreadcrumbs = IBreadcrumb[];
 
-interface StateToProps {
-    breadcrumbs: IBreadcrumbs;
-}
-
-interface DispatchToProps {
-    updateBreadcrumbs: (breadcrumbs: IBreadcrumbs) => void;
-}
-
-interface BreadcrumbsProps {
-    /*breadcrumb: {title: string, link?: string, build?: boolean};*/
-}
-
 interface State {
     breadcrumbs: IBreadcrumbs;
 }
 
-type Props = StateToProps & DispatchToProps & BreadcrumbsProps & RouteProps & RouteComponentProps;
-
-
-function nthIndex(str: string, pat:string, n:number){
-    var L= str.length, i= -1;
-    while(n-- && i++<L){
-        i= str.indexOf(pat, i);
-        if (i < 0) break;
-    }
-    return i;
-}
+type Props = RouteProps & RouteComponentProps;
 
 const breadcrumbs = (props: Props): IBreadcrumbs => {
     let path = props.location && props.location.pathname || '';
@@ -127,13 +105,4 @@ class Breadcrumbs extends React.Component<Props, State> {
 
 }
 
-const mapStateToProps = (state: ReduxState): StateToProps => (
-    {
-        breadcrumbs: state.ui.breadcrumbs,
-    }
-);
-
-const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-    bindActionCreators({ updateBreadcrumbs }, dispatch);
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Breadcrumbs));
+export default withRouter(Breadcrumbs);

@@ -23,12 +23,11 @@
  */
 
 import React from 'react';
-import Breadcrumbs from "./Breadcrumbs";
 import './MainLayout.css';
-import Navbar from "./Navbar";
 import Sidenav from "./Sidenav";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
+import Breadcrumbs from "./Breadcrumbs";
 
 interface StateToProps {
     sidenavVisible: boolean;

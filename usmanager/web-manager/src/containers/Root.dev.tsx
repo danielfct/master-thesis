@@ -69,6 +69,7 @@ import PageNotFound from "../components/shared/PageNotFound";
 import Login from "../components/shared/Login";
 import AuthenticatedRoute from "../components/shared/AuthenticatedRoute";
 import Footer from "../components/shared/Footer";
+import DevTools from "./DevTools";
 
 interface RootContainerProps {
     store: any;
@@ -134,7 +135,7 @@ export default class Root extends React.Component<Props, {}> {
                         {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
                             <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
                     </Switch>
-                    {/*<DevTools/>*/}
+                    <DevTools/>
                 </Provider>
             </main>
             <Footer/>

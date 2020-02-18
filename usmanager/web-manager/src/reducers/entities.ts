@@ -23,28 +23,52 @@
  */
 
 import merge from 'lodash/merge'
-import {SERVICE_DEPENDENCIES_SUCCESS, SERVICE_SUCCESS} from "../actions";
+import {SERVICE_DEPENDENCIES_SUCCESS, SERVICE_FAILURE, SERVICE_REQUEST, SERVICE_SUCCESS} from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
+import {IService} from "../components/services/Service";
 
-const entities = (state = { services: {} },
-                  action: { type: string, args?: number | string, response: { entities: {}, result: [] }}) => {
-    if (action.response && action.response.entities) {
-        const {type, args, response} = action;
-        switch (type) {
-            case SERVICE_SUCCESS:
-                return merge({}, state, response.entities);
-            case SERVICE_DEPENDENCIES_SUCCESS:
-                // @ts-ignore
-                const service = state.services[args];
+const entities = (state: { services: { data: { [key: string]: IService }, isLoading: boolean, error: string | null } } =
+                    { services: { data: {}, isLoading: false, error: null } },
+                  action: { type: string, args?: number | string, isLoading?: {}, error?: {}, response?: { entities: { services: { data: {}}}, result: [] } }
+) => {
+    const { type, response, error, args } = action;
+    switch (type) {
+        case SERVICE_REQUEST:
+            return merge({}, state, { services: { data: {}, isLoading: true, error: null } });
+        case SERVICE_FAILURE:
+            return merge({}, state, { services: { data: {}, isLoading: false, error: error } });
+        case SERVICE_SUCCESS:
+            return merge({}, state, { services: { data: response?.entities.services.data, isLoading: false, error: null } });
+        case SERVICE_DEPENDENCIES_SUCCESS:
+            if (args) {
+                const service = state.services.data[args];
                 if (!service) {
                     return state;
                 }
-                Object.assign(service, response.entities);
+                Object.assign(service, response?.entities);
                 const normalized = normalize(state.services, Schemas.SERVICE_ARRAY);
                 return merge({}, state, normalized.entities);
-        }
+            }
     }
+    /*if (response) {
+        const { args } = action;
+        switch (type) {
+            case SERVICE_SUCCESS:
+                state = merge({}, state, response.entities);
+                return merge({}, state, { services: { isLoading: false, error: null } });
+            case SERVICE_DEPENDENCIES_SUCCESS:
+                if (args) {
+                    const service = state.services.data[args];
+                    if (!service) {
+                        return state;
+                    }
+                    Object.assign(service, response.entities);
+                    const normalized = normalize(state.services, Schemas.SERVICE_ARRAY);
+                    return merge({}, state, normalized.entities);
+                }
+        }
+    }*/
     return state;
 };
 

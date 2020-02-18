@@ -23,17 +23,14 @@
  */
 
 import {normalize, schema} from 'normalizr';
-import { camelizeKeys } from 'humps';
-import merge from 'lodash/merge'
+import {camelizeKeys} from 'humps';
 import {IService} from "../components/services/Service";
 import {IServiceDependency} from "../components/services/ServiceDependencyList";
 import axios from "axios";
 import {API_URL} from "../utils/api";
-import Axios from "axios";
+import {RESET_ERROR_MESSAGE} from "../actions";
 
-
-
-const callApi = (endpoint: string, schema: schema.Entity<IService | IServiceDependency>) => {
+const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : API_URL + endpoint;
     return axios.get(url, {
         //TODO remove headers
@@ -41,18 +38,20 @@ const callApi = (endpoint: string, schema: schema.Entity<IService | IServiceDepe
             'Authorization': 'Basic YWRtaW46YWRtaW4=',
             'Content-type': 'application/json;charset=UTF-8',
             'Accept': 'application/json;charset=UTF-8',
-            'Origin': 'http://localhost:3000'
         },
     }).then(response => {
         console.log(response);
         if (response.status === 200) {
             const camelizedJson = camelizeKeys(response.data);
-            return normalize(camelizedJson, schema);
+            const normalized = normalize(camelizedJson, schema).entities;
+            const normalizedKey = Object.keys(normalized)[0];
+            const normalizedValues = normalized[normalizedKey];
+            return { entities: { [normalizedKey]: { data: normalizedValues } } };
         }
         else {
             return Promise.reject(response);
         }
-    }).catch(error => console.error(error));
+    }).catch(e => Promise.reject(e))
 };
 
 interface ISchemas {
@@ -62,15 +61,13 @@ interface ISchemas {
     SERVICE_DEPENDENCY_ARRAY: schema.Entity<IServiceDependency>[];
 }
 
-const dependencySchema: schema.Entity<IService> = new schema.Entity('dependencies', {}, {
-    idAttribute: (service: IService) => service.serviceName
+const dependencySchema: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', {}, {
+    idAttribute: (dependency: IServiceDependency) => dependency.serviceName
 });
 
 const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {}, {
     idAttribute: (service: IService) => service.serviceName
 });
-const dependencies = new schema.Array(serviceSchema);
-serviceSchema.define({dependencies});
 
 export const Schemas: ISchemas = {
     SERVICE: serviceSchema,
@@ -101,14 +98,11 @@ export default (store: any) => (next: (action: any) => void) => (action: any) =>
     const [ requestType, successType, failureType ] = types;
     next(actionWith({ type: requestType }));
     return callApi(endpoint, schema).then(
-        response => next(actionWith({
-            args,
-            response,
-            type: successType,
-        })),
-        error => next(actionWith({
-            error: error.message || 'Error fetching data',
-            type: failureType,
-        }))
-    )
+      response => {
+          next(actionWith({ type: successType, args, response }));
+      },
+      error => {
+          next(actionWith({ type: failureType, error: error.message || 'Error fetching data' } ));
+      })
+
 }

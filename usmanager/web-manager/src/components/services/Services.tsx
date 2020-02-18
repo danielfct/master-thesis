@@ -33,54 +33,59 @@ import {ReduxState} from "../../reducers";
 import CardList from "../shared/CardList";
 import {IService} from "./Service";
 import './Services.css'
+import Empty from "../shared/Empty";
 
 interface StateToProps {
-    services: IService[];
-    error: string;
+  isLoading: boolean
+  error: string;
+  services: IService[];
 }
 
 interface DispatchToProps {
-    loadServices: (name?: string, requiredField?: string) => any;
+  loadServices: (name?: string) => any;
 }
 
 type Props = StateToProps & DispatchToProps;
 
 class Services extends React.Component<Props, {}> {
 
-    public componentDidMount = () =>
-        this.props.loadServices();
+  public componentDidMount = () =>
+    this.props.loadServices();
 
-    private empty = (): JSX.Element =>
-        <h1><i>empty</i></h1>; //TODO
+  private service = (service: IService): JSX.Element =>
+    <ServiceCard key={service.id} service={service} />;
 
-    private service = (service: IService): JSX.Element =>
-        <ServiceCard key={service.id} service={service} />;
+  private predicate = (service: IService, search: string): boolean =>
+    service.serviceName.includes(search);
 
-    private predicate = (service: IService, search: string): boolean =>
-        service.serviceName.includes(search);
+  render = () =>
+    <MainLayout>
+      <AddButton tooltip={'Add service'} pathname={'/services/service?new=true'}/>
+      <div className="services-container">
+        {console.log(this.props.services)}
+        <CardList<IService>
+          isLoading={this.props.isLoading}
+          error={this.props.error}
+          emptyMessage={"No services to display"}
+          list={this.props.services}
+          card={this.service}
+          predicate={this.predicate}/>
+      </div>
+    </MainLayout>
 
-    render = () =>
-        <MainLayout>
-            <AddButton tooltip={'Add service'} pathname={'/services/service?new=true'}/>
-            <div className="services-container">
-                <CardList<IService>
-                    empty={this.empty}
-                    list={this.props.services}
-                    card={this.service}
-                    predicate={this.predicate}/>
-            </div>
-        </MainLayout>
 }
 
-const mapStateToProps = (state: ReduxState): StateToProps => (
-    {
-        services: Object.values(state.entities.services),
-        error: state.ui.errorMessage,
-    }
-);
+const mapStateToProps = (state: ReduxState): StateToProps => {
+  console.log(state.entities.services.data)
+  return {
+    isLoading: state.entities.services.isLoading,
+    error: state.entities.services.error,
+    services: Object.values(state.entities.services.data),
+  }
+};
 
 const mapDispatchToProps: DispatchToProps = {
-    loadServices,
+  loadServices,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Services);

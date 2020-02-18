@@ -44,7 +44,7 @@ public class Validation {
 
   public static void validatePutRequest(String pathId, String requestBodyId) {
     if (!Objects.equals(pathId, requestBodyId)) {
-      throw new BadRequestException("Path id = %d and request body id = %d don't match", pathId, requestBodyId);
+      throw new BadRequestException("Path id = %s and request body id = %s don't match", pathId, requestBodyId);
     }
   }
 

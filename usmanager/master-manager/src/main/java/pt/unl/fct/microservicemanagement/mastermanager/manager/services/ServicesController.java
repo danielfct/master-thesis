@@ -24,10 +24,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.web.bind.annotation.PutMapping;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
 import pt.unl.fct.microservicemanagement.mastermanager.util.BatchRequest;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,13 +45,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 @RestController
 @RequestMapping("/services")
 public class ServicesController {
-
-  //TODO change from id to serviceName
 
   private final ServicesService servicesService;
 
@@ -72,16 +72,13 @@ public class ServicesController {
   }
 
   @PostMapping
-  public Long addService(@RequestBody ServiceEntity service) {
-    System.out.println("Adding service " + service.getServiceName());
+  public ServiceEntity addService(@RequestBody ServiceEntity service) {
     Validation.validatePostRequest(service.getId());
     return servicesService.addService(service);
   }
 
   @PutMapping("/{serviceName}")
-  public Long updateService(@PathVariable String serviceName, @RequestBody ServiceEntity service) {
-    System.out.println("Saving service " + service.getServiceName());
-    Validation.validatePutRequest(serviceName, service.getServiceName());
+  public ServiceEntity updateService(@PathVariable String serviceName, @RequestBody ServiceEntity service) {
     return servicesService.updateService(serviceName, service);
   }
 

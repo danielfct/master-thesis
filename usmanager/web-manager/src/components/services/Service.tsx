@@ -26,7 +26,7 @@ import React, {createRef} from 'react';
 import M from 'materialize-css';
 import {Redirect, RouteComponentProps} from 'react-router';
 import {camelCaseToSentenceCase} from "../../utils/text";
-import Form, {IFields, IValues, min, required, requiredAndNumberAndMin} from "../shared/Form";
+import Form, {IFields, IValues, min, required, requiredAndNumberAndMin} from "../shared/form/Form";
 import {mapLabelToIcon} from "../../utils/image";
 import IData from "../shared/IData";
 import ServiceDependencyList from "./ServiceDependencyList";
@@ -36,7 +36,7 @@ import MainLayout from "../shared/MainLayout";
 import LoadingSpinner from "../shared/LoadingSpinner";
 import * as queryString from "querystring";
 import {ReduxState} from "../../reducers";
-import Field, {getTypeFromValue} from "../shared/Field";
+import Field, {getTypeFromValue} from "../shared/form/Field";
 
 export interface IService extends IData {
   serviceName: string;
@@ -176,7 +176,7 @@ class Service extends React.Component<Props> {
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const name = getServiceNameFromPathname(props);
-  const service = name === 'service' ? emptyService() : state.entities.services[name];
+  const service = name === 'service' ? emptyService() : state.entities.services.data[name];
   const formService = service;
   delete formService["id"];
   delete formService["dependencies"];
