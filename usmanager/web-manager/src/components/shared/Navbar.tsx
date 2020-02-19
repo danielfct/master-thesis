@@ -82,10 +82,10 @@ class Navbar extends React.Component<Props, {}> {
                             </a>}
                             <ul className="left">
                                 <li style={showSidenav && !loggingIn ? { paddingLeft: '200px', marginRight: "24px" } : { margin: "0 24px" } }>
-                                    <a className="transparent brand-logo" href="/home">
+                                    <Link className="transparent brand-logo" to={"/home"}>
                                         <img src={logo} alt=""/>
                                         Web Manager
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                             {showSearchbar && <SearchBar/>}

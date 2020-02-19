@@ -23,15 +23,11 @@
  */
 
 import {
-    BREADCRUMBS_UPDATE,
     SEARCH_UPDATE,
     SIDENAV_SHOW_USER,
     SIDENAV_SHOW_WIDTH
 } from "../actions";
 import {loadingBarReducer} from "react-redux-loading-bar";
-import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
-import { merge } from "lodash";
-import {act} from "react-dom/test-utils";
 
 export const loadingBar = loadingBarReducer;
 
@@ -39,6 +35,8 @@ export const sidenav = (
   state = { user: true, width: window.innerWidth > 992 },
   action: { type: string, value: boolean },
 ) => {
+    console.log(window.innerWidth)
+    console.log(window.innerWidth > 992)
     const { type, value } = action;
     switch (type) {
         case SIDENAV_SHOW_USER:

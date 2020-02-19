@@ -44,8 +44,8 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
 
   @Query("select d.serviceDependency "
       + "from ServiceEntity s inner join s.dependencies d "
-      + "where s.id = :serviceId")
-  List<ServiceEntity> getDependencies(@Param("serviceId") long serviceId);
+      + "where s.serviceName = :serviceName")
+  List<ServiceEntity> getDependencies(@Param("serviceName") String serviceName);
 
   @Query("select case when count(s) > 0 then true else false end "
       + "from ServiceEntity s "

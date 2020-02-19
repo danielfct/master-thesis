@@ -107,9 +107,9 @@ public class ServicesService {
     services.delete(service);
   }
 
-  public List<ServiceEntity> getDependencies(Long id) {
-    assertServiceExists(id);
-    return services.getDependencies(id);
+  public List<ServiceEntity> getDependencies(String serviceName) {
+    assertServiceExists(serviceName);
+    return services.getDependencies(serviceName);
   }
 
   public List<ServiceEntity> getDependenciesByType(Long serviceId, String serviceType) {

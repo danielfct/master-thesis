@@ -40,7 +40,8 @@ import org.springframework.beans.BeanUtils;
 public final class ObjectUtils {
 
   public void copyValidProperties(Object source, Object target) {
-    final var ignoreProperties = new LinkedList<String>();
+    var ignoreProperties = new LinkedList<String>();
+    ignoreProperties.add("id");
     // loop to include super classes except Object
     for (Class<?> current = target.getClass(); current.getSuperclass() != null; current = current.getSuperclass()) {
       Arrays.stream(current.getDeclaredFields()).forEach(field -> {
@@ -49,7 +50,6 @@ public final class ObjectUtils {
           ignoreProperties.add(field.getName());
         }
       });
-
     }
     BeanUtils.copyProperties(source, target, ignoreProperties.toArray(new String[0]));
   }

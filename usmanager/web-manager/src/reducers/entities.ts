@@ -23,52 +23,54 @@
  */
 
 import merge from 'lodash/merge'
-import {SERVICE_DEPENDENCIES_SUCCESS, SERVICE_FAILURE, SERVICE_REQUEST, SERVICE_SUCCESS} from "../actions";
+import {
+    SERVICES_FAILURE,
+    SERVICES_REQUEST,
+    SERVICES_SUCCESS,
+    SERVICE_DEPENDENCIES_SUCCESS,
+    SERVICE_REQUEST, SERVICE_FAILURE, SERVICE_SUCCESS, SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_FAILURE
+} from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
 import {IService} from "../components/services/Service";
 
-const entities = (state: { services: { data: { [key: string]: IService }, isLoading: boolean, error: string | null } } =
+const entities = (state: { services: { data: { [key: string]: IService }, isLoading: boolean, error?: string | null } } =
                     { services: { data: {}, isLoading: false, error: null } },
-                  action: { type: string, args?: number | string, isLoading?: {}, error?: {}, response?: { entities: { services: { data: {}}}, result: [] } }
+                  action: { type: string, args?: number | string, isLoading?: {}, error?: string, response?: { entities: { services: { data: {}}}, result: [] } }
 ) => {
     const { type, response, error, args } = action;
     switch (type) {
         case SERVICE_REQUEST:
-            return merge({}, state, { services: { data: {}, isLoading: true, error: null } });
+        case SERVICES_REQUEST:
+            state =  merge({}, state, { services: { isLoading: true } });
+            break;
         case SERVICE_FAILURE:
-            return merge({}, state, { services: { data: {}, isLoading: false, error: error } });
+        case SERVICES_FAILURE:
+            state.services = { data: {}, isLoading: false, error: error };
+            break;
         case SERVICE_SUCCESS:
-            return merge({}, state, { services: { data: response?.entities.services.data, isLoading: false, error: null } });
+            state = merge({}, state, { services: { data: response?.entities.services.data, isLoading: false, error: null } });
+            break;
+        case SERVICES_SUCCESS:
+            state.services.data = {};
+            state = merge({}, state, { services: { data: response?.entities.services.data, isLoading: false, error: null } });
+            break;
+        case SERVICE_DEPENDENCIES_REQUEST:
+            //TODO
+        case SERVICE_DEPENDENCIES_FAILURE:
+            //TODO
         case SERVICE_DEPENDENCIES_SUCCESS:
             if (args) {
                 const service = state.services.data[args];
-                if (!service) {
-                    return state;
-                }
-                Object.assign(service, response?.entities);
-                const normalized = normalize(state.services, Schemas.SERVICE_ARRAY);
-                return merge({}, state, normalized.entities);
-            }
-    }
-    /*if (response) {
-        const { args } = action;
-        switch (type) {
-            case SERVICE_SUCCESS:
-                state = merge({}, state, response.entities);
-                return merge({}, state, { services: { isLoading: false, error: null } });
-            case SERVICE_DEPENDENCIES_SUCCESS:
-                if (args) {
-                    const service = state.services.data[args];
-                    if (!service) {
-                        return state;
-                    }
-                    Object.assign(service, response.entities);
+                if (service) {
+                    Object.assign(service, response?.entities);
+                    console.log(service) //TODO
                     const normalized = normalize(state.services, Schemas.SERVICE_ARRAY);
-                    return merge({}, state, normalized.entities);
+                    state = merge({}, state, normalized.entities);
                 }
-        }
-    }*/
+            }
+            break;
+    }
     return state;
 };
 

@@ -28,21 +28,24 @@ import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestExce
 
 import java.util.Objects;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class Validation {
 
-  public static void validatePostRequest(long requestBodyId) {
-    if (requestBodyId > 0) {
+  public void validatePostRequest(Long requestBodyId) {
+    if (requestBodyId != null && requestBodyId > 0) {
       throw new BadRequestException("Expected non positive request body id, instead got %d", requestBodyId);
     }
   }
 
-  public static void validatePutRequest(long pathId, long requestBodyId) {
+  public void validatePutRequest(long pathId, Long requestBodyId) {
     if (pathId != requestBodyId) {
       throw new BadRequestException("Path id = %d and request body id = %d don't match", pathId, requestBodyId);
     }
   }
 
-  public static void validatePutRequest(String pathId, String requestBodyId) {
+  public void validatePutRequest(String pathId, String requestBodyId) {
     if (!Objects.equals(pathId, requestBodyId)) {
       throw new BadRequestException("Path id = %s and request body id = %s don't match", pathId, requestBodyId);
     }

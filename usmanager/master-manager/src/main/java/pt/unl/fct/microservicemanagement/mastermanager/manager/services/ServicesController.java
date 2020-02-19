@@ -90,9 +90,9 @@ public class ServicesController {
     servicesService.deleteService(serviceName);
   }
 
-  @GetMapping("/{id}/dependencies")
-  public List<ServiceEntity> getServicesDependencies(@PathVariable Long id) {
-    return servicesService.getDependencies(id);
+  @GetMapping("/{serviceName}/dependencies")
+  public List<ServiceEntity> getServicesDependencies(@PathVariable String serviceName) {
+    return servicesService.getDependencies(serviceName);
   }
 
   @PatchMapping("/{serviceId}/dependencies")

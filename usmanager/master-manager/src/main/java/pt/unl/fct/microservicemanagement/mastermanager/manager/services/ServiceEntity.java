@@ -38,6 +38,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -47,7 +48,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
@@ -62,9 +62,10 @@ public class ServiceEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
+  @NotNull
   private String serviceName;
 
+  @NotNull
   private String dockerRepository;
 
   private String defaultExternalPort;
@@ -76,19 +77,21 @@ public class ServiceEntity {
   private String launchCommand;
 
   @Min(0)
-  private int minReplics;
+  private Integer minReplics;
 
   @Min(0)
-  private int maxReplics;
+  private Integer maxReplics;
 
   private String outputLabel;
 
   //TODO use enum https://vladmihalcea.com/the-best-way-to-map-an-enum-type-with-jpa-and-hibernate/
   // VALUES: frontend, backend, database, system
+  @NotNull
   private String serviceType;
 
   // Average memory consumption in bytes
-  private double expectedMemoryConsumption;
+  @NotNull
+  private Double expectedMemoryConsumption;
 
   @Singular
   @JsonIgnore

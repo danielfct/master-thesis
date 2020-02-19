@@ -27,6 +27,9 @@ import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
 import {IService} from "../components/services/Service";
 import {IServiceDependency} from "../components/services/ServiceDependencyList";
 
+export const SERVICES_REQUEST = 'SERVICES_REQUEST';
+export const SERVICES_SUCCESS = 'SERVICES_SUCCESS';
+export const SERVICES_FAILURE = 'SERVICES_FAILURE';
 export const SERVICE_REQUEST = 'SERVICE_REQUEST';
 export const SERVICE_SUCCESS = 'SERVICE_SUCCESS';
 export const SERVICE_FAILURE = 'SERVICE_FAILURE';
@@ -47,19 +50,27 @@ export const loadServices = (name?: string) => (dispatch: any) => {
 };
 
 const fetchServices = (name?: string) => ({
-  [CALL_API]: {
-    types: [ SERVICE_REQUEST, SERVICE_SUCCESS, SERVICE_FAILURE ],
-    endpoint: !name ? `services` : `services/${name}`,
-    schema: !name ? Schemas.SERVICE_ARRAY : Schemas.SERVICE,
-    args: 'services'
-  }
+  [CALL_API]:
+    !name
+      ? {
+        types: [ SERVICES_REQUEST, SERVICES_SUCCESS, SERVICES_FAILURE ],
+        endpoint: `services`,
+        schema: Schemas.SERVICE_ARRAY,
+        args: 'services'
+      }
+      : {
+        types: [ SERVICE_REQUEST, SERVICE_SUCCESS, SERVICE_FAILURE ],
+        endpoint: `services/${name}`,
+        schema: Schemas.SERVICE,
+        args: 'services'
+      }
 });
 
 export const SERVICE_DEPENDENCIES_REQUEST = 'SERVICE_DEPENDENCIES_REQUEST';
 export const SERVICE_DEPENDENCIES_SUCCESS = 'SERVICE_DEPENDENCIES_SUCCESS';
 export const SERVICE_DEPENDENCIES_FAILURE = 'SERVICE_DEPENDENCIES_FAILURE';
 
-export const loadServiceDependencies = (serviceName: string, id?: string | number) => (dispatch: any, getState: any) => {
+export const loadServiceDependencies = (serviceName: string) => (dispatch: any, getState: any) => {
   /*const cachedService = getState().entities.services[service.serviceName];
   let cached = cachedService && cachedService.dependencies;
   if (id) {
@@ -67,47 +78,17 @@ export const loadServiceDependencies = (serviceName: string, id?: string | numbe
   }
   console.log('service dependencies of ' + service.serviceName + ' cached? ' + cached);
   return cached ? null : dispatch(fetchServiceDependencies(service, id));*/
-  return dispatch(fetchServiceDependencies(serviceName, id));
+  return dispatch(fetchServiceDependencies(serviceName));
 };
 
-const fetchServiceDependencies = (serviceName: string, id?: string | number) => ({
+const fetchServiceDependencies = (serviceName: string) => ({
   [CALL_API]: {
     types: [ SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_SUCCESS, SERVICE_DEPENDENCIES_FAILURE ],
-    endpoint: !id ? `services/${serviceName}/dependencies` : `services/${serviceName}/dependencies/${id}`,
-    /*endpoint: !id ? `serviceDependencies.json` : `serviceDependency.json`,*/
-    schema: !id ? Schemas.SERVICE_DEPENDENCY_ARRAY : Schemas.SERVICE_DEPENDENCY,
+    endpoint: `services/${serviceName}/dependencies`,
+    schema: Schemas.SERVICE_DEPENDENCY_ARRAY,
     args: serviceName
   }
 });
-
-
-/*
-export const SELECT_ENTITY = 'SELECT_ENTITY';
-
-export function selectEntity<T>(entity: T) {
-  return {
-    type: SELECT_ENTITY,
-    entity
-  }
-}*/
-
-/*export const RECEIVE_SERVICES = 'RECEIVE_SERVICES';
-function receiveServices(servicesJson: string) {
-    return {
-        type: RECEIVE_SERVICES,
-        services: servicesJson,
-        receivedAt: Date.now()
-    }
-}
-
-export const INVALIDATE_SERVICES = 'INVALIDATE_SERVICES';
-export function invalidateServices() {
-    return {
-        type: INVALIDATE_SERVICES
-    }
-}
-
-
 
 export const DELETE_SERVICE = 'DELETE_SERVICE';
 export function deleteService(service: IService) {
@@ -116,58 +97,6 @@ export function deleteService(service: IService) {
         service
     }
 }
-
-export const UPDATE_SERVICE = 'UPDATE_SERVICE';
-export function updateService(service: IService) {
-    return {
-        type: UPDATE_SERVICE,
-        service
-    }
-}
-
-function shouldFetchServices(state: any) {
-    return true;
-   /!* const services = state.services.items;
-    if (!services) {
-        return true;
-    } else if (services.isFetching) {
-        return false;
-    } else {
-        return services.didInvalidate;
-    }*!/
-}
-
-export function fetchPostsIfNeeded() {
-    return (dispatch: any, getState: any) => {
-        if (shouldFetchServices(getState())) {
-            return dispatch(fetchServices())
-        } else {
-            return Promise.resolve()
-        }
-    }
-}
-
-export function fetchDeleteService(service: IService) {
-    //TODO
-}
-
-export function fetchUpdateService(service: IService) {
-    //TODO
-}
-
-export const HIDE_SIDE_NAV = 'HIDE_SIDE_NAV';
-export const hideSidenav = (hidden: boolean) => (
-    {
-        type: HIDE_SIDE_NAV,
-        hidden,
-    }
-);*/
-
-export const RESET_ERROR_MESSAGE = 'RESET_ERROR_MESSAGE';
-
-export const resetErrorMessage = () => ({
-  type: RESET_ERROR_MESSAGE
-});
 
 export const SIDENAV_SHOW_USER = 'SIDENAV_SHOW_USER';
 
@@ -195,23 +124,3 @@ export const updateSearch = (search: string) => (
     search
   }
 );
-
-export const BREADCRUMBS_UPDATE = 'BREADCRUMBS_UPDATE';
-
-export const updateBreadcrumbs = (breadcrumbs: IBreadcrumbs) => (
-  {
-    type: BREADCRUMBS_UPDATE,
-    breadcrumbs
-  }
-);
-
-/*
-export const BREADCRUMBS_ADD = 'BREADCRUMBS_ADD';
-
-export const addBreadcrumb = (title: string, link?: string) => (
-    {
-        type: BREADCRUMBS_ADD,
-        title,
-        link
-    }
-);*/

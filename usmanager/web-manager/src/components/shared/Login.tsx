@@ -75,7 +75,6 @@ class Login extends PageComponent<Props, State> {
     basicAuthenticate(username, password)
       .then(() => {
         registerSuccessfulLogin(username, password);
-        this.props.showSidenavByUser(true);
         M.toast({ html: `<div>Welcome ${username}</div>` });
         this.props.history.push(`/home`);
       }).catch((e:AxiosError) => {

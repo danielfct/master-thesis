@@ -100,7 +100,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${front-endHost}")
           .serviceType("frontend")
-          .expectedMemoryConsumption(209715200)
+          .expectedMemoryConsumption(209715200d)
           .build();
       frontend = services.save(frontend);
       var user = ServiceEntity.builder()
@@ -114,7 +114,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${userHost}")
           .serviceType("backend")
-          .expectedMemoryConsumption(62914560)
+          .expectedMemoryConsumption(62914560d)
           .build();
       user = services.save(user);
       var userDb = ServiceEntity.builder()
@@ -128,7 +128,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${userDatabaseHost}")
           .serviceType("database")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(userDb);
       var catalogue = ServiceEntity.builder()
@@ -142,7 +142,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${catalogueHost}")
           .serviceType("backend")
-          .expectedMemoryConsumption(62914560)
+          .expectedMemoryConsumption(62914560d)
           .build();
       services.save(catalogue);
       var catalogueDb = ServiceEntity.builder()
@@ -156,7 +156,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${catalogueDatabaseHost}")
           .serviceType("database")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(catalogueDb);
       var payment = ServiceEntity.builder()
@@ -170,7 +170,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${paymentHost}")
           .serviceType("backend")
-          .expectedMemoryConsumption(62914560)
+          .expectedMemoryConsumption(62914560d)
           .build();
       services.save(payment);
       var carts = ServiceEntity.builder()
@@ -184,7 +184,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${cartsHost}")
           .serviceType("backend")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(carts);
       var cartsDb = ServiceEntity.builder()
@@ -198,7 +198,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${cartsDatabaseHost}")
           .serviceType("database")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(cartsDb);
       var orders = ServiceEntity.builder()
@@ -212,7 +212,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${ordersHost}")
           .serviceType("backend")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(orders);
       var ordersDb = ServiceEntity.builder()
@@ -227,7 +227,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${ordersDatabaseHost}")
           .serviceType("database")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(ordersDb);
       var shipping = ServiceEntity.builder()
@@ -241,7 +241,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${shippingHost}")
           .serviceType("backend")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(shipping);
       var queueMaster = ServiceEntity.builder()
@@ -255,7 +255,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${queue-masterHost}")
           .serviceType("backend")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(queueMaster);
       var rabbitmq = ServiceEntity.builder()
@@ -269,7 +269,7 @@ public class DatabaseLoader {
           .maxReplics(1)
           .outputLabel("${rabbitmqHost}")
           .serviceType("backend")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(rabbitmq);
       var eurekaServer = ServiceEntity.builder()
@@ -283,7 +283,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${eurekaHost}")
           .serviceType("system")
-          .expectedMemoryConsumption(262144000)
+          .expectedMemoryConsumption(262144000d)
           .build();
       services.save(eurekaServer);
       var loadBalancer = ServiceEntity.builder()
@@ -297,7 +297,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${loadBalancerHost}")
           .serviceType("system")
-          .expectedMemoryConsumption(10485760)
+          .expectedMemoryConsumption(10485760d)
           .build();
       services.save(loadBalancer);
       var dockerApiProxy = ServiceEntity.builder()
@@ -311,7 +311,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${dockerApiProxyHost}")
           .serviceType("system")
-          .expectedMemoryConsumption(10485760)
+          .expectedMemoryConsumption(10485760d)
           .build();
       services.save(dockerApiProxy);
       var prometheus = ServiceEntity.builder()
@@ -325,7 +325,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${prometheusHost}")
           .serviceType("system")
-          .expectedMemoryConsumption(52428800)
+          .expectedMemoryConsumption(52428800d)
           .build();
       services.save(prometheus);
       var requestLocationMonitor = ServiceEntity.builder()
@@ -339,7 +339,7 @@ public class DatabaseLoader {
           .maxReplics(0)
           .outputLabel("${requestLocationMonitorHost}")
           .serviceType("system")
-          .expectedMemoryConsumption(52428800)
+          .expectedMemoryConsumption(52428800d)
           .build();
       services.save(requestLocationMonitor);
       var masterManager = ServiceEntity.builder()
@@ -357,7 +357,7 @@ public class DatabaseLoader {
           .outputLabel("${masterManagerHost}")
           .serviceType("system")
           // TODO
-          .expectedMemoryConsumption(0)
+          .expectedMemoryConsumption(0d)
           .build();
       services.save(masterManager);
       var localManager = ServiceEntity.builder()
@@ -376,7 +376,7 @@ public class DatabaseLoader {
           .outputLabel("${localManagerHost}")
           .serviceType("system")
           // TODO
-          .expectedMemoryConsumption(0)
+          .expectedMemoryConsumption(0d)
           .build();
       services.save(localManager);
       var consulServer = ServiceEntity.builder()
@@ -394,7 +394,7 @@ public class DatabaseLoader {
           .outputLabel("${consulServerHost}")
           .serviceType("system")
           // TODO
-          .expectedMemoryConsumption(0)
+          .expectedMemoryConsumption(0d)
           .build();
       var consulAgent = ServiceEntity.builder()
           .serviceName("consul-client")
@@ -411,7 +411,7 @@ public class DatabaseLoader {
           .outputLabel("${consulClientHost}")
           .serviceType("system")
           // TODO
-          .expectedMemoryConsumption(0)
+          .expectedMemoryConsumption(0d)
           .build();
 
       var sockShop = AppPackage.builder()

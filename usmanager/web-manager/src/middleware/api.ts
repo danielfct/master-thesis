@@ -28,7 +28,6 @@ import {IService} from "../components/services/Service";
 import {IServiceDependency} from "../components/services/ServiceDependencyList";
 import axios from "axios";
 import {API_URL} from "../utils/api";
-import {RESET_ERROR_MESSAGE} from "../actions";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -58,7 +57,6 @@ const callApi = (endpoint: string, schema: any) => {
 interface ISchemas {
     SERVICE: schema.Entity<IService>;
     SERVICE_ARRAY: schema.Entity<IService>[];
-    SERVICE_DEPENDENCY: schema.Entity<IServiceDependency>;
     SERVICE_DEPENDENCY_ARRAY: schema.Entity<IServiceDependency>[];
 }
 
@@ -73,7 +71,6 @@ const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {},
 export const Schemas: ISchemas = {
     SERVICE: serviceSchema,
     SERVICE_ARRAY: [serviceSchema],
-    SERVICE_DEPENDENCY : dependencySchema,
     SERVICE_DEPENDENCY_ARRAY: [dependencySchema],
 };
 

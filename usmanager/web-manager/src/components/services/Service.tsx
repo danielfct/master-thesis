@@ -146,7 +146,7 @@ class Service extends PageComponent<Props, {}> {
 
   render() {
     // @ts-ignore
-    const serviceKey: (keyof IService) = Object.keys(this.props.formService)[0];
+    const serviceKey: (keyof IService) = this.props.formService && Object.keys(this.props.formService)[0];
     return (
       <MainLayout>
         <div className="container">
@@ -191,8 +191,10 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const name = getServiceNameFromPathname(props);
   const service = name === 'service' ? emptyService() : state.entities.services.data[name];
   const formService = service;
-  delete formService["id"];
-  delete formService["dependencies"];
+  if (formService) {
+    delete formService["id"];
+    delete formService["dependencies"];
+  }
   return  {
     service,
     formService

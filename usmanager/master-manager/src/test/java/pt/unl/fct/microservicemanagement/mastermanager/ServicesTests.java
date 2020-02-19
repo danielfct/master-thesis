@@ -40,7 +40,7 @@ public class ServicesTests {
         .minReplics(1).maxReplics(0)
         .outputLabel("${front-endHost}")
         .serviceType("frontend")
-        .expectedMemoryConsumption(209715200)
+        .expectedMemoryConsumption(209715200d)
         .build();
   }
 
