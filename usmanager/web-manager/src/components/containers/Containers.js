@@ -37,14 +37,15 @@ export default class Containers extends React.Component {
     this.state = { data: [], filtContainers: [], filter: '', loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadContainers();
     const instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
     this.setState({ tooltipInstances: instances });
   };
 
-  componentWillUnmount = () =>
+  componentWillUnmount() {
     this.state.tooltipInstances[0].destroy();
+  }
 
   onReplicate = () =>
     this.loadContainers();
@@ -82,7 +83,7 @@ export default class Containers extends React.Component {
   };
 
 /*<MainLayout title={{title:'Containers'}}>*/
-  render = () => {
+  render() {
     return (
         <MainLayout>
         <div className="input-field col s10">

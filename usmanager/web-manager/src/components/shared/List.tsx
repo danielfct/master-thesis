@@ -26,9 +26,6 @@ import * as React from 'react';
 import FilteredList from './FilteredList';
 import {PagedList} from "./PagedList";
 import SimpleList from "./SimpleList";
-import "./List.css"
-import {ReduxState} from "../../reducers";
-import {connect} from "react-redux";
 import LoadingSpinner from "./LoadingSpinner";
 import Error from "./Error";
 
@@ -45,7 +42,7 @@ interface Props<T> {
 
 class GenericList<T> extends React.Component<Props<T>, {}> {
 
-    public render() {
+    render() {
         const {isLoading, error, predicate, pagination} = this.props;
         if (isLoading) {
             return <LoadingSpinner/>;

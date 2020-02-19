@@ -56,7 +56,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadServices();
     this.loadServiceEventPrediction();
     const dateElems = document.querySelectorAll('.datepicker');
@@ -203,7 +203,7 @@ export default class ServiceEventPredictionDetail extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     if (this.state.formSubmit) {
       return <Redirect to='/rules/serviceEventPredictions'/>;
     }

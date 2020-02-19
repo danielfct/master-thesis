@@ -38,7 +38,7 @@ export default class ContainerSimulatedMetricsCard extends React.Component {
       });
   };
 
-  render = () => {
+  render() {
     const style = {marginLeft: '10px'};
     const override = '' + this.props.simulatedMetric.override;
     return (

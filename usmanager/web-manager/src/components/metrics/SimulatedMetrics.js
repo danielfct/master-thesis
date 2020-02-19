@@ -50,7 +50,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadServices();
     this.loadFields();
     this.loadServiceSimulatedMetrics();
@@ -170,7 +170,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     if (this.state.formSubmit) {
       return <Redirect to='/metrics/simulated/services' />;
     }

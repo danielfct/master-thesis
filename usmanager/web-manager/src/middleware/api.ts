@@ -31,7 +31,8 @@ import {API_URL} from "../utils/api";
 import {RESET_ERROR_MESSAGE} from "../actions";
 
 const callApi = (endpoint: string, schema: any) => {
-    const url = endpoint.includes(API_URL) ? endpoint : API_URL + endpoint;
+    const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
+    console.log(url);
     return axios.get(url, {
         //TODO remove headers
         headers: {

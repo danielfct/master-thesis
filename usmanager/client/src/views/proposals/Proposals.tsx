@@ -64,7 +64,7 @@ class ProposalList extends React.Component<IProposalProps,any> {
         }
     };
 
-    public render() {
+    render() {
         return (
             <Fragment>
                 <ListWithControllers

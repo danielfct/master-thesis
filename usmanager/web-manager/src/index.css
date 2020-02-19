@@ -326,17 +326,19 @@ ul.dropdown-content.select-dropdown li:first-child span:hover {
     background: #36393F;
 }
 
-.control-btn {
-    margin-left: 10px;
-}
-
-.control-btn:hover {
-    background-color: #1F1F1F;
-}
-
 button:hover {
     background-color: #1F1F1F !important;
 }
+
+.fixed-action-btn {
+    position: absolute;
+    top: 58px;
+    right: 23px;
+    bottom: unset;
+    padding-top: 0;
+    margin-top: 15px;
+}
+
 
 .input-field {
     padding: 0 !important;
@@ -455,3 +457,10 @@ textarea.materialize-textarea[readonly="readonly"] {
     color: white;
 }
 
+.spinner-white-only {
+    border-color: white;
+}
+
+.modal-overlay {
+    overflow: inherit;
+}

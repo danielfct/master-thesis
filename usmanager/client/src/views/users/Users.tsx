@@ -69,7 +69,7 @@ class UsersList extends React.Component<IUsersProps,any> {
     }
   };
 
-  public render() {
+  render() {
     return (
         <Fragment>
           <ListWithControllers

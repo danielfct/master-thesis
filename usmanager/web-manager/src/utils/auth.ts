@@ -28,7 +28,11 @@ import {API_URL, setupAxiosInterceptors} from "./api";
 const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser';
 
 export const basicAuthenticate = (username: string, password: string): Promise<AxiosResponse<any>> =>
-    axios.get(`${API_URL}/basicauth`, { headers: { authorization: createBasicAuthToken(username, password) } });
+    axios.get(`${API_URL}/basicauth`, {
+        headers: {
+            authorization: createBasicAuthToken(username, password)
+        }
+    });
 
 export const createBasicAuthToken = (username: string, password: string): string =>
     `Basic ` + window.btoa(username + ":" + password);

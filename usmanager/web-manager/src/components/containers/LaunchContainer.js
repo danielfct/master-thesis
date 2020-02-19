@@ -49,7 +49,7 @@ export default class LaunchContainer extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadServices();
     this.loadAvailableNodes();
   };
@@ -155,7 +155,7 @@ export default class LaunchContainer extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     if (this.state.formSubmit) {
       return <Redirect to='/containers'/>;
     }

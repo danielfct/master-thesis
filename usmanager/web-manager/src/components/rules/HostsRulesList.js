@@ -37,7 +37,7 @@ export default class HostsRulesList extends React.Component {
     this.renderHosts = this.renderHosts.bind(this);
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadHosts();
   };
 

@@ -22,4 +22,20 @@
  * SOFTWARE.
  */
 
+.container {
+    margin-top: 50px;
+}
+
+.tabs  {
+    padding: 0 !important;
+}
+
+.tab {
+    cursor: default;
+}
+
+.tabContent {
+    padding: 25px !important;
+}
+
 

@@ -34,7 +34,7 @@ class App extends React.Component<ReactCookieProps, any> {
         super(props);
     }
 
-    public render() {
+    render() {
         return (
             <BrowserRouter basename={"/ecmaEvents"}>
                 <Switch>

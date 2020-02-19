@@ -32,8 +32,8 @@ import {loadServices} from "../../actions";
 import {ReduxState} from "../../reducers";
 import CardList from "../shared/CardList";
 import {IService} from "./Service";
-import './Services.css'
-import Empty from "../shared/Empty";
+import styles from './Services.module.css'
+import PageComponent from "../shared/PageComponent";
 
 interface StateToProps {
   isLoading: boolean
@@ -47,10 +47,11 @@ interface DispatchToProps {
 
 type Props = StateToProps & DispatchToProps;
 
-class Services extends React.Component<Props, {}> {
+class Services extends PageComponent<Props, {}> {
 
-  public componentDidMount = () =>
+  componentDidMount(): void {
     this.props.loadServices();
+  }
 
   private service = (service: IService): JSX.Element =>
     <ServiceCard key={service.id} service={service} />;
@@ -61,8 +62,7 @@ class Services extends React.Component<Props, {}> {
   render = () =>
     <MainLayout>
       <AddButton tooltip={'Add service'} pathname={'/services/service?new=true'}/>
-      <div className="services-container">
-        {console.log(this.props.services)}
+      <div className={`${styles.container}`}>
         <CardList<IService>
           isLoading={this.props.isLoading}
           error={this.props.error}
@@ -75,14 +75,13 @@ class Services extends React.Component<Props, {}> {
 
 }
 
-const mapStateToProps = (state: ReduxState): StateToProps => {
-  console.log(state.entities.services.data)
-  return {
+const mapStateToProps = (state: ReduxState): StateToProps => (
+  {
     isLoading: state.entities.services.isLoading,
     error: state.entities.services.error,
     services: Object.values(state.entities.services.data),
   }
-};
+);
 
 const mapDispatchToProps: DispatchToProps = {
   loadServices,

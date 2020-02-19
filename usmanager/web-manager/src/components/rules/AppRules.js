@@ -31,7 +31,7 @@ export default class AppRules extends React.Component {
     this.state = { appRules: [], loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadAppRules();
   };
 

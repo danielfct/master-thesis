@@ -25,20 +25,22 @@
 import React, {Component, createRef} from 'react'
 import {basicAuthenticate, isAuthenticated, registerSuccessfulLogin} from "../../utils/auth";
 import {RouteComponentProps, withRouter} from "react-router";
-import './Login.css'
+import styles from './Login.module.css';
 import M from "materialize-css";
 import {bindActionCreators} from "redux";
 import {showSidenavByUser} from "../../actions";
 import {connect} from "react-redux";
+import {AxiosError} from "axios";
+import PageComponent from "./PageComponent";
 
 interface State {
-    username: string;
-    password: string;
-    showPassword: boolean;
+  username: string;
+  password: string;
+  showPassword: boolean;
 }
 
 interface DispatchToProps {
-    showSidenavByUser: (value: boolean) => void;
+  showSidenavByUser: (value: boolean) => void;
 }
 
 interface LoginProps {
@@ -46,87 +48,82 @@ interface LoginProps {
 
 type Props = LoginProps & DispatchToProps & RouteComponentProps;
 
-class Login extends Component<Props, State> {
+class Login extends PageComponent<Props, State> {
 
-    private tabs = createRef<HTMLUListElement>();
+  private tabs = createRef<HTMLUListElement>();
 
-    state = {
-        username: '',
-        password: '',
-        showPassword: false,
-    };
+  state = {
+    username: '',
+    password: '',
+    showPassword: false,
+  };
 
-    componentDidMount(): void {
-        M.Tabs.init(this.tabs.current as Element);
-        M.updateTextFields();
-    }
+  componentDidMount(): void {
+    M.Tabs.init(this.tabs.current as Element);
+    M.updateTextFields();
+  }
 
-    private handleChange = ({ target: { name, value } }: React.ChangeEvent<HTMLInputElement>) =>
-        this.setState({ [name]: value } as Pick<State, any>);
+  private handleChange = ({ target: { name, value } }: React.ChangeEvent<HTMLInputElement>) =>
+    this.setState({ [name]: value } as Pick<State, any>);
 
-    private handleShowPassword = () =>
-        this.setState({showPassword: !this.state.showPassword});
+  private handleShowPassword = () =>
+    this.setState({ showPassword: !this.state.showPassword });
 
-    private handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        const {username, password} = this.state;
-        //TODO delete next 3 line and remove comment
+  private handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const {username, password} = this.state;
+    basicAuthenticate(username, password)
+      .then(() => {
         registerSuccessfulLogin(username, password);
         this.props.showSidenavByUser(true);
+        M.toast({ html: `<div>Welcome ${username}</div>` });
         this.props.history.push(`/home`);
-        /*basicAuthenticate(username, password)
-            .then(() => {
-                registerSuccessfulLogin(username, password);
-                this.props.showSidenavByUser(true);
-                M.toast({ html: `<div>Welcome ${username}</div>` });
-                this.props.history.push(`/home`);
-            }).catch(() => {
-            M.toast({ html: `<div>Invalid username and/or password</div>` });
-        })*/
-    };
+      }).catch((e:AxiosError) => {
+        super.toast(`Failed to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true);
+    })
+  };
 
-    public render() {
-        if (isAuthenticated()) {
-            this.props.history.push(`/home`);
-        }
-        const {username, password, showPassword} = this.state;
-        return (
-            <div className="row container login-container ">
-                <ul className="tabs col s9 m6 l6 offset-s1 offset-m3 offset-l3" ref={this.tabs}>
-                    <li className="tab login-tab col s12"><a>Login</a></li>
-                </ul>
-                <div className="tab-content login-tab-content col s9 m6 l6 offset-s1 offset-m3 offset-l3"
-                     id="login">
-                    <form onSubmit={this.handleLogin}>
-                        <div className="input-field col s12">
-                            <i className="material-icons prefix">account_circle</i>
-                            <label className="active" htmlFor="username">Username</label>
-                            <input id="username" name="username" value={username}
-                                   type="text" required onChange={this.handleChange}/>
-                        </div>
-                        <div className="input-field col s12">
-                            <i className="material-icons prefix">vpn_key</i>
-                            <label className="active" htmlFor="password">Password</label>
-                            <input id="password" name="password" value={password}
-                                   autoComplete="off"
-                                   type={showPassword ? "text" : "password"} required
-                                   onChange={this.handleChange}/>
-                            <i className="material-icons suffix" onClick={this.handleShowPassword}>
-                                {showPassword ? "visibility_off" : "visibility"}
-                            </i>
-                        </div>
-                        <button className="btn btn-flat waves-effect waves-light white-text right slide"
-                                type="submit" tabIndex={0} onClick={this.handleLogin}>
-                            Login
-                        </button>
-                    </form>
-                </div>
-            </div>)
+  render() {
+    if (isAuthenticated()) {
+      this.props.history.push(`/home`);
     }
+    const {username, password, showPassword} = this.state;
+    return (
+      <div className={`row container ${styles.container}`}>
+        <ul className={`tabs ${styles.tabs} col s9 m6 l6 offset-s1 offset-m3 offset-l3`} ref={this.tabs}>
+          <li className={`tab ${styles.tab} col s12`}><a>Login</a></li>
+        </ul>
+        <div className={`tab-content ${styles.tabContent} col s9 m6 l6 offset-s1 offset-m3 offset-l3`}>
+          <form onSubmit={this.handleLogin}>
+            <div className="input-field col s12">
+              <i className="material-icons prefix">account_circle</i>
+              <label className="active" htmlFor="username">Username</label>
+              <input id="username" name="username" value={username}
+                     type="text" required onChange={this.handleChange}/>
+            </div>
+            <div className="input-field col s12">
+              <i className="material-icons prefix">vpn_key</i>
+              <label className="active" htmlFor="password">Password</label>
+              <input id="password" name="password" value={password}
+                     autoComplete="off"
+                     type={showPassword ? "text" : "password"} required
+                     onChange={this.handleChange}/>
+              <i className="material-icons suffix" onClick={this.handleShowPassword}>
+                {showPassword ? "visibility_off" : "visibility"}
+              </i>
+            </div>
+            <button className="btn btn-flat waves-effect waves-light white-text right slide"
+                    type="submit" tabIndex={0} onClick={this.handleLogin}>
+              Login
+            </button>
+          </form>
+        </div>
+      </div>)
+  }
 
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-    bindActionCreators({ showSidenavByUser }, dispatch);
+  bindActionCreators({ showSidenavByUser }, dispatch);
 
 export default connect(null, mapDispatchToProps)(Login);

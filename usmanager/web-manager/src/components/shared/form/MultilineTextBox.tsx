@@ -12,7 +12,7 @@ interface Props {
 
 export class MultilineTextBox extends React.Component<Props, {}> {
 
-  public render(): any {
+  render(): any {
     const {className, id, name, value, disabled, onChange, onBlur} = this.props;
     return (
       <textarea

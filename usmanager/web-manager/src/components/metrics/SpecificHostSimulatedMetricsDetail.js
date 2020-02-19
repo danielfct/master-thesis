@@ -50,7 +50,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadNodes();
     this.loadFields();
     this.loadSpecificHostSimulatedMetrics();
@@ -176,7 +176,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     );
   };
 
-  render = () => {
+  render() {
     if (this.state.formSubmit) {
       return <Redirect to='/metrics/simulated/hosts/specific'/>;
     }

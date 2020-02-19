@@ -22,18 +22,6 @@
  * SOFTWARE.
  */
 
-.login-container {
-    margin-top: 50px;
-}
-
-.login-tab {
-    cursor: default;
-}
-
-.login-tab-content {
-    padding: 25px !important;
-}
-
-.login-container .tabs  {
-    padding: 0 !important;
+.container {
+    margin: 10px;
 }

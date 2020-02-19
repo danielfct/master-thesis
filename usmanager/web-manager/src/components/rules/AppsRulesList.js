@@ -35,7 +35,7 @@ export default class AppsRulesList extends React.Component {
     this.state = { apps: [], loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadApps();
   };
 

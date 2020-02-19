@@ -50,7 +50,7 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadContainers();
     this.loadFields();
     this.loadContainerSimulatedMetrics();
@@ -177,7 +177,7 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     if (this.state.formSubmit) {
       return <Redirect to='/metrics/simulated/containers'/>;
     }

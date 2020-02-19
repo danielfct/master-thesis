@@ -27,7 +27,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {updateSearch} from "../../actions";
 import {ReduxState} from "../../reducers";
-import './SearchBar.css';
+import styles from './SearchBar.module.css';
 
 interface StateToProps {
     search: string;
@@ -44,9 +44,9 @@ class SearchBar extends React.Component<Props,{}> {
     private setValue = ({target:{value}}:any) =>
         this.props.updateSearch(value);
 
-    public render = () =>
+    render = () =>
         <form className="col s4 hide-on-med-and-down" noValidate autoComplete="off">
-            <div className="input-field search-bar">
+            <div className={`input-field ${styles.searchBar}`}>
                 <input id="search" type="search" placeholder="Filter" value={this.props.search} onChange={this.setValue}/>
                 <label className="label-icon" htmlFor="search">
                     <i className="material-icons">search</i>

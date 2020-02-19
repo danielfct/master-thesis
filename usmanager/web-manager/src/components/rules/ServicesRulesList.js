@@ -35,7 +35,7 @@ export default class ServicesRulesList extends React.Component {
     this.state = { services: [], loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadServices();
   };
 

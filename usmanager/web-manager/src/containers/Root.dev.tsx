@@ -70,6 +70,7 @@ import Login from "../components/shared/Login";
 import AuthenticatedRoute from "../components/shared/AuthenticatedRoute";
 import Footer from "../components/shared/Footer";
 import DevTools from "./DevTools";
+import Logs from "../components/shared/Logs";
 
 interface RootContainerProps {
     store: any;
@@ -115,15 +116,17 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/metrics/simulated/hosts/specific": { title: "", component: SpecificHostSimulatedMetrics, search: true },
     "/metrics/simulated/hosts/specific/metric/:id?": { title: "", component: SpecificHostSimulatedMetricsDetail },
     "/regions": { title: "", component: Regions, search: true },
+    "/logs": { title: "Logs", component: Logs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };
 
 export default class Root extends React.Component<Props, {}> {
 
-    public componentDidMount = () =>
+    componentDidMount(): void {
         M.AutoInit();
+    }
 
-    public render = () =>
+    render = () =>
         <>
             <main>
                 <Provider store={this.props.store}>
@@ -135,7 +138,7 @@ export default class Root extends React.Component<Props, {}> {
                         {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
                             <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
                     </Switch>
-                    <DevTools/>
+                    {/*<DevTools/>*/}
                 </Provider>
             </main>
             <Footer/>

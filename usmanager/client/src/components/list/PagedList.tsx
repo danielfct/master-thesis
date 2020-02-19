@@ -48,7 +48,7 @@ export class PagedList<T> extends React.Component<IPagedList<T>, { page?: number
         this.max = Math.ceil(props.list.length / (props.pagesize || 1)) - 1;
     }
 
-    public render() {
+    render() {
         const {list: l, select, show} = this.props;
         const {page = 0, pagesize = l.length} = this.state;
         const list = l.slice(page * pagesize, page * pagesize + pagesize);

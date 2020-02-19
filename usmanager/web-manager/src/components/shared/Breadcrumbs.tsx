@@ -24,14 +24,9 @@
 
 import React from "react";
 import {Link, RouteComponentProps, RouteProps, withRouter} from "react-router-dom";
-import './Breadcrumbs.css';
-import {ReduxState} from "../../reducers";
-import {bindActionCreators} from "redux";
-import {updateBreadcrumbs} from "../../actions";
-import {connect} from "react-redux";
-import {RouterProps} from "react-router";
+import styles from './Breadcrumbs.module.css';
 import {authenticatedRoutes} from "../../containers/Root.dev";
-import {camelCaseToSentenceCase, capitalize} from "../../utils/text";
+import {capitalize} from "../../utils/text";
 
 export type IBreadcrumb = { title: string, link?: string };
 
@@ -93,14 +88,16 @@ class Breadcrumbs extends React.Component<Props, State> {
         this.state = { breadcrumbs: breadcrumbs(props) };
     }
 
-    public render = () => {
-        return <div>
+    render() {
+        return (
+          <div className={`${styles.container}`}>
             {this.state.breadcrumbs.map(({title, link}, index) =>
                 link && index !== this.state.breadcrumbs.length - 1
-                    ? <Link key={index} className="breadcrumb white-text" to={link}>{title}</Link>
-                    : <span key={index} className="breadcrumb white-text">{title}</span>
+                    ? <Link key={index} className={`breadcrumb ${styles.breadcrumb} white-text`} to={link}>{title}</Link>
+                    : <span key={index} className={`breadcrumb ${styles.breadcrumb} white-text`}>{title}</span>
             )}
         </div>
+        )
     }
 
 }

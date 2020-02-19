@@ -25,7 +25,7 @@ export const getTypeFromValue = (value: any): string =>
 
 export default class Field extends React.Component<FieldProps> {
 
-  public componentDidMount(): void {
+  componentDidMount(): void {
     M.updateTextFields();
   }
 
@@ -41,7 +41,7 @@ export default class Field extends React.Component<FieldProps> {
                     formContext: IFormContext, id: string): void =>
     formContext.validate(id);
 
-  render = () => {
+  render() {
     const {id, type, label, options} = this.props;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
     const getEditorClassname = (errors: IErrors): string => getError(errors) ? "validate invalid" : "validate";

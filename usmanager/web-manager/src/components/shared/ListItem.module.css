@@ -22,16 +22,6 @@
  * SOFTWARE.
  */
 
-.slide {
-    transition: transform 0.275s ease-in-out;
-}
-
-.form-content {
-    padding: 10px 10px;
-}
-
-.form-controls-container {
-    margin: 0 -0.75rem;
+.item {
     padding: 15px 40px;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.8);
 }

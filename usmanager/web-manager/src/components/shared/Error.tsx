@@ -1,5 +1,5 @@
 import React from "react";
-import './Error.css';
+import styles from './Error.module.css';
 
 interface Props {
   message: String;
@@ -7,10 +7,10 @@ interface Props {
 
 export default class Error extends React.Component<Props, {}> {
 
-  public render = () =>
-    <div className="error-container row">
-      <i className="material-icons error-icon">error_outline</i>
-        <h5 className="error-message">{this.props.message}</h5>
+  render = () =>
+    <div className={`${styles.container} row`}>
+      <i className={`${styles.icon} material-icons`}>error_outline</i>
+        <h5 className={`${styles.message}`}>{this.props.message}</h5>
     </div>
 
 }

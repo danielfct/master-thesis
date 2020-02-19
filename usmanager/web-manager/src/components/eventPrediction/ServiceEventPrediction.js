@@ -35,13 +35,13 @@ export default class ServiceEventPredictions extends React.Component {
     this.state = { data: [], loading: false, showAdd: true };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadServiceEventPredictions();
     const instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
     this.setState({ tooltipInstances: instances });
   };
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     this.state.tooltipInstances[0].destroy();
   };
 

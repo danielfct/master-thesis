@@ -46,13 +46,13 @@ export default class EdgeHosts extends React.Component {
     }
   };
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadHosts();
     const instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
     this.setState({ tooltipInstances: instances });
   };
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     this.state.tooltipInstances[0].destroy();
   };
 
@@ -93,7 +93,7 @@ export default class EdgeHosts extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     let edgeHostsNodes;
     if (this.state.data) {
       edgeHostsNodes = this.state.data.map((edgeHost, index) => (

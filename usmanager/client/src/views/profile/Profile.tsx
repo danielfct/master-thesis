@@ -50,7 +50,7 @@ class Profile extends React.Component<IProfileProps,any> {
         };
     }
 
-    public componentDidMount() {
+    componentDidMount(): void {
         this.props.fetchData("7"); // TODO
     }
 
@@ -61,7 +61,7 @@ class Profile extends React.Component<IProfileProps,any> {
         }
     }
 
-    public render() {
+    render() {
         if (this.props.hasErrored) {
             return <p>Oops! Houve um erro ao carregar os dados.</p>;
         }

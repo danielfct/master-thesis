@@ -23,9 +23,7 @@
  */
 
 import * as React from "react";
-import "./SimpleList.css";
 import Empty from "./Empty";
-
 
 interface GenericSimpleListProps<T> {
     emptyMessage: string;
@@ -47,7 +45,7 @@ export default class SimpleList<T> extends React.Component<Props<T>, {}> {
         }
     };
 
-    public render = () => {
+    render() {
         const {emptyMessage, list, show} = this.props;
         if (list.length === 0) {
             return <Empty message={emptyMessage}/>

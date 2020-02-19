@@ -1,16 +1,16 @@
-.error-container {
+.container {
     padding: 5% 0;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.error-icon {
-    color: red;
-    font-size: 4rem;
+.icon {
+    color: white;
+    font-size: 2rem;
 }
 
-.error-message {
+.message {
     color: white;
     margin: 0 !important;
     padding: 25px;

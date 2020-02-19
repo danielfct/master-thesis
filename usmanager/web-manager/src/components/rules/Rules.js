@@ -34,7 +34,7 @@ export default class Rules extends React.Component {
     this.state = { data: [], loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadRules();
   };
 
@@ -47,7 +47,7 @@ export default class Rules extends React.Component {
   };
 
   /*<MainLayout title={{title:'Rules'}}>*/
-  render = () => {
+  render() {
     return (
         <MainLayout>
           {this.state.data && this.state.data.map(rule => (

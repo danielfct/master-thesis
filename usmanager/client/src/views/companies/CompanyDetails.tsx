@@ -45,11 +45,11 @@ class CompanyDetails extends React.Component<ICompanyDetailsProps,any> {
       super(props);
   }
 
-  public componentDidMount() {
+  componentDidMount(): void {
     this.props.fetchData(this.props.match.params.id);
   }
 
-  public render() {
+  render() {
     if (this.props.hasErrored) {
       return <p>Oops! Houve um erro ao carregar os dados.</p>;
     }

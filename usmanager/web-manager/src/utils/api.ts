@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-import axios, {Method} from "axios";
+import axios, {AxiosError, AxiosResponse, Method} from "axios";
 import {isAuthenticated} from "./auth";
 
-export const API_URL = 'http://localhost:8080/';
+export const API_URL = 'http://localhost:8080';
 /*const API_URL = '/';*/
 const TIMEOUT = 5000;
 
@@ -64,7 +64,8 @@ export function patchData(url: string, requestBody: any, callback: (data?: any) 
 }
 
 const sendData = (endpoint: string, method: Method, data: any, callback: (data: any) => void) => {
-    const url = endpoint.includes(API_URL) ? endpoint : API_URL + endpoint;
+    const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
+    console.trace();
     console.log(`${method} ${url} ${JSON.stringify(data)}`);
     axios(url, {
         method,
@@ -100,10 +101,9 @@ const sendData = (endpoint: string, method: Method, data: any, callback: (data: 
     });*/
 };
 
-export function deleteData(url: string, callback: () => void): void {
+export function deleteData(url: string, successCallback: () => void, failureCallback: (reason: string) => void): void {
     console.log(`DELETE ${url}`);
-
-    axios(API_URL + url, {
+    axios(`${API_URL}/${url}`, {
         method: 'DELETE',
         // TODO set options from setupAxiosInterceptors instead, after login
         headers: {
@@ -112,32 +112,13 @@ export function deleteData(url: string, callback: () => void): void {
             'Accept': 'application/json;charset=UTF-8',
         },
         timeout: TIMEOUT,
-    }).then(response => {
-        console.log(response)
-    }).catch(error => {
+    }).then((response: AxiosResponse) => {
+        console.log(response);
+        successCallback();
+    }).catch((error: AxiosError) => {
         console.log(error);
-        //console.error('timeout exceeded')
+        failureCallback(error.message);
     })
-
-    /*  fetch(url, {
-        method: 'DELETE',
-         mode: 'cors',
-         headers: new Headers({
-             'Content-type': 'application/json;charset=UTF-8',
-             'Accept': 'application/json;charset=UTF-8',
-             'Authorization': 'Basic ' + btoa('admin:admin'), //TODO
-         })
-     }).then(response => {
-         if (response.ok) {
-             callback();
-         } else {
-             response.json().then(({apierror}) => {
-                 M.toast({html: `${response.status} ${apierror.status} - ${apierror.message}`, displayLength: 6000});
-             });
-         }
-     }).catch(_ => {
-         M.toast({html: `<div>Connection refused</div>`});
-     });*/
 }
 
 export const setupAxiosInterceptors = (token: string): void => {
@@ -146,9 +127,9 @@ export const setupAxiosInterceptors = (token: string): void => {
             if (isAuthenticated()) {
                 config.headers.authorization = token;
             }
-            /*config.headers.contentType = 'application/json;charset=UTF-8';
+            config.headers.contentType = 'application/json;charset=UTF-8';
             config.headers.accept = 'application/json;charset=UTF-8';
-            config.timeout = TIMEOUT;*/
+            config.timeout = TIMEOUT;
             return config
         }
     )

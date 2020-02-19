@@ -39,7 +39,9 @@ export default class ContainerCard extends React.Component {
     }
   };
 
-  componentDidMount = () => M.Collapsible.init(document.querySelectorAll('.collapsible'));
+  componentDidMount() {
+    M.Collapsible.init(document.querySelectorAll('.collapsible'));
+  };
 
   renderNames = () => this.props.container.names.map((name, index) =>
     <CardItem key={name + index + 1} label={`Name ${index + 1}`} value={name}/>
@@ -183,7 +185,7 @@ export default class ContainerCard extends React.Component {
     }
   };
 
-  render = () => {
+  render() {
     const style = { marginLeft: '5px' };
     const labelStyle = { paddingTop: '0px', paddingBottom: '0px' };
     return (

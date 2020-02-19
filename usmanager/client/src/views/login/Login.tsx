@@ -43,7 +43,7 @@ class Login extends React.Component<ILogin, any> {
     };
   }
 
-  public render() {
+  render() {
     return (
         <div className="Login">
           <Jumbotron className="loginHeader">

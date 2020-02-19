@@ -53,7 +53,7 @@ export default class RulePage extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     M.updateTextFields();
     this.loadComponentTypes();
     this.loadDecisions();

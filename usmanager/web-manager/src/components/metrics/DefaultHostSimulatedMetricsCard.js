@@ -39,7 +39,7 @@ export default class DefaultHostSimulatedMetricsCard extends React.Component {
       });
   };
 
-  render = () => {
+  render() {
     const style = { marginLeft: '10px' };
     const override = '' + this.props.simulatedMetric.override;
     return (

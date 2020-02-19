@@ -34,7 +34,7 @@ export default class EurekaPage extends React.Component {
     this.state = { chosenRegions: [], availableRegions: [], formSubmit: false, loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadRegions();
   };
 

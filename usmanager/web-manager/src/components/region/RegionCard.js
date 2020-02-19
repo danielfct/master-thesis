@@ -36,7 +36,7 @@ export default class RegionCard extends React.Component {
     this.state = {data: region, loading: false, isEdit: defaultIsEdit};
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     M.FormSelect.init(document.querySelectorAll('select'));
   };
 
@@ -120,7 +120,7 @@ export default class RegionCard extends React.Component {
     </form>
   );
 
-  render = () => {
+  render() {
     const nodes = this.state.isEdit ? this.renderForm() : this.renderNormal();
     const style = {marginLeft: '5px'};
     return (

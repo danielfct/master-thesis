@@ -22,21 +22,10 @@
  * SOFTWARE.
  */
 
-.breadcrumb {
-    font-size: 25px;
-    padding: 15px;
-}
-
-.breadcrumb:before {
-    font-size: 20px;
-    margin: 4px 25px 0 0;
-    color: #616161;
-}
-
-.breadcrumb {
-    opacity: 0.25;
-}
-
-.breadcrumb:last-child {
-    opacity: 1;
+.gridCard {
+    width: auto !important;
+    background: #36393F;
+    color: white;
+    border: 1px solid black;
+    height: 250px;
 }

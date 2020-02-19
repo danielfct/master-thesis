@@ -49,11 +49,11 @@ class ProposalDetails extends React.Component<IProposalDetailsProps,any> {
       this.state = { renderTab: "reviews" }
   }
 
-  public componentDidMount() {
+  componentDidMount(): void {
     this.props.fetchData();
   }
 
-  public render() {
+  render() {
     if (this.props.hasErrored) {
       return <p>Oops! Houve um erro ao carregar os dados.</p>;
     }

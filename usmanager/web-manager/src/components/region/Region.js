@@ -46,13 +46,13 @@ export default class Regions extends React.Component {
     }
   };
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadRegions();
     const instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
     this.setState({ tooltipInstances: instances });
   };
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     this.state.tooltipInstances[0].destroy();
   };
 
@@ -85,7 +85,7 @@ export default class Regions extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     let regionNodes;
     if (this.state.data) {
       regionNodes = this.state.data.map((region, index) => (

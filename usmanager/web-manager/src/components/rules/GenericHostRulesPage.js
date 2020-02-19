@@ -33,7 +33,7 @@ export default class GenericHostRulesPage extends React.Component {
     this.state = { rules: [], allRules: [], loadedRules: false, loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadHostRules();
     this.loadAllRules();
   };

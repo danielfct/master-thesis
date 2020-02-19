@@ -62,7 +62,7 @@ export default class OldService extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     if (this.state.service.id !== 0) {
       this.loadDependencies();
       this.loadService();
@@ -254,7 +254,7 @@ export default class OldService extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     if (this.state.isDeleted) {
       return <Redirect to='/services'/>;
     }

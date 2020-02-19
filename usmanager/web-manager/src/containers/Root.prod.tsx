@@ -119,10 +119,11 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
 
 export default class Root extends React.Component<Props, {}> {
 
-    public componentDidMount = () =>
+    componentDidMount(): void {
         M.AutoInit();
+    }
 
-    public render = () =>
+    render = () =>
         <>
             <main>
                 <Provider store={this.props.store}>

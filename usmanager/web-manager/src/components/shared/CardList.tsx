@@ -47,11 +47,13 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
     }
   }
 
-  public componentDidMount = () =>
+  componentDidMount(): void {
     window.addEventListener('resize', this.handleResize);
+  }
 
-  public componentWillUnmount = () =>
+  componentWillUnmount(): void {
     window.removeEventListener('resize', this.handleResize);
+  }
 
   private handleResize = (_: Event) => {
     this.setState({pagesize: this.calcPagesize()})
@@ -68,7 +70,7 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
     }
   };
 
-  public render = () => {
+  render() {
     const GenericList = List<T>();
     return <GenericList
       isLoading={this.props.isLoading}

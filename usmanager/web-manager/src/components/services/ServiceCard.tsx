@@ -26,10 +26,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import CardItem from '../shared/CardItem';
 import {camelCaseToSentenceCase} from "../../utils/text";
-import './ServiceCard.css';
+import styles from './ServiceCard.module.css';
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {IService} from "./Service";
-
 
 interface ServiceCardProps {
     service: IService;
@@ -39,9 +38,9 @@ type Props = ServiceCardProps;
 
 export default class ServiceCard extends React.Component<Props, {}> {
 
-    public render = () =>
+    render = () =>
         <div className='col s6 m4 l3'>
-            <div className='card grid-card hoverable'>
+            <div className={`card ${styles.gridCard} hoverable`}>
                 <PerfectScrollbar>
                     <Link to={{
                         pathname: `/services/${this.props.service.serviceName}#details`,

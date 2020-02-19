@@ -40,12 +40,12 @@ interface Props<T> {
 
 class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
 
-    public render() {
+    render() {
         const {predicate, search, pagination, ...otherprops} = this.props;
         let {emptyMessage, list} = this.props;
         const filteredList = list.filter((s:T) => predicate(s, search));
         if (list.length !== filteredList.length && filteredList.length === 0) {
-            emptyMessage = `No matches for the search "${search}"`; //TODO jsx element with no_found icon plus the text
+            emptyMessage = `No matches for the search "${search}"`;
         }
         if (pagination) {
             return <PagedList {...otherprops}

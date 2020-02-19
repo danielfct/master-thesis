@@ -34,7 +34,7 @@ import {ReduxState} from "../../reducers";
 import {authenticatedRoutes} from "../../containers/Root.dev";
 import {getLoggedInUser, logout} from "../../utils/auth";
 import {capitalize} from "../../utils/text";
-const logo = require("../../resources/images/favicon.png");
+const logo = require("../../resources/images/logo.png");
 
 interface StateToProps {
     sidenav: {user: boolean, width: boolean}
@@ -59,7 +59,7 @@ class Navbar extends React.Component<Props, {}> {
         this.props.history.push("/");
     };
 
-    public render = () => {
+    render() {
         const {pathname} = this.props.location;
         const route = authenticatedRoutes[pathname];
         const {user: sidenavUser, width: sidenavWidth} = this.props.sidenav;

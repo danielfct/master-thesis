@@ -29,7 +29,7 @@ export class Dropdown extends React.Component<Props, {}> {
     this.initDropdown();
   }
 
-  public render = () => {
+  render() {
     const {className, id, name, value, disabled, onChange, onBlur, options} = this.props;
     return (
       <select

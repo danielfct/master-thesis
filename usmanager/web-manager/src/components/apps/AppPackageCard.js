@@ -45,7 +45,7 @@ export default class AppPackageCard extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadAppServices();
   };
 
@@ -243,7 +243,7 @@ export default class AppPackageCard extends React.Component {
     </form>
   );
 
-  render = () => {
+  render() {
     let appServices;
     if (this.state.data) {
       appServices = this.state.data.map(function (appService) {

@@ -35,7 +35,7 @@ export default class LoadBalancerPage extends React.Component {
     this.state = { services: [], chosenRegions: [], availableRegions: [], formSubmit: false, loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadRegions();
     this.loadServices();
   };

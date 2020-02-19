@@ -45,7 +45,7 @@ export default class HostRulesPage extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadHostRules();
     this.loadAllRules();
   };

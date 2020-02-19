@@ -23,39 +23,39 @@
  */
 
 import React from 'react';
-import './MainLayout.css';
 import Sidenav from "./Sidenav";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
 import Breadcrumbs from "./Breadcrumbs";
+import M from "materialize-css";
 
 interface StateToProps {
-    sidenavVisible: boolean;
+  sidenavVisible: boolean;
 }
 
 type Props = StateToProps;
 
 class MainLayout extends React.Component<Props, {}> {
 
-    public render = () =>
-        <div>
-            <Sidenav/>
-            <div className="section content" style={this.props.sidenavVisible ? undefined : {paddingLeft: 0}}>
-                <div className="row col s12">
-                    <Breadcrumbs/>
-                </div>
-                <div className='row col s12 m12'>
-                    {this.props.children}
-                </div>
-            </div>
+  render = () =>
+    <div>
+      <Sidenav/>
+      <div className="section content" style={this.props.sidenavVisible ? undefined : {paddingLeft: 0}}>
+        <div className="row col s12">
+          <Breadcrumbs/>
         </div>
+        <div className='row col s12 m12'>
+          {this.props.children}
+        </div>
+      </div>
+    </div>
 
 }
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
-    {
-        sidenavVisible: state.ui.sidenav.user,
-    }
+  {
+    sidenavVisible: state.ui.sidenav.user,
+  }
 );
 
 export default connect(mapStateToProps)(MainLayout);

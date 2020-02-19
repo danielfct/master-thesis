@@ -49,7 +49,7 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadFields();
     this.loadDefaultHostSimulatedMetrics();
   };
@@ -146,7 +146,7 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     if (this.state.formSubmit) {
       return <Redirect to='/metrics/simulated/hosts/default'/>;
     }

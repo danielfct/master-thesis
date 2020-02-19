@@ -61,7 +61,7 @@ class ReviewsList extends React.Component<IReviewProps,any> {
     }
   }
 
-  public render() {
+  render() {
     return (
         <Fragment>
           <ListWithControllers

@@ -51,11 +51,11 @@ export interface IItemProps {
 
 class ListWithControllers extends React.Component<IItemProps,any> {
 
-    public componentDidMount() {
+    componentDidMount(): void {
         this.props.fetchData(this.props.fetchFrom, this.props.embeddedArray);
     }
 
-    public render() {
+    render() {
         if (this.props.hasErrored) {
             return <p>Oops! Houve um erro ao carregar os dados.</p>;
         }

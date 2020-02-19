@@ -61,7 +61,7 @@ class CommentsList extends React.Component<ICommentProps,any> {
     }
   }
 
-  public render() {
+  render() {
     return (
         <Fragment>
           <ListWithControllers

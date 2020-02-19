@@ -45,7 +45,7 @@ export default class AddNode extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadRegions();
   };
 
@@ -117,7 +117,7 @@ export default class AddNode extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     if (this.state.formSubmit) {
       return <Redirect to='/nodes'/>;
     }

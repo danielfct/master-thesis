@@ -51,7 +51,7 @@ export default class ConditionPage extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadValueModes();
     this.loadFields();
     this.loadOperators();

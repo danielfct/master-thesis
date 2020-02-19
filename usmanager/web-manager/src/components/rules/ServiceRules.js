@@ -31,7 +31,7 @@ export default class ServiceRules extends React.Component {
     this.state = { serviceRules: [], loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadServiceRules();
   };
 

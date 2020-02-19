@@ -1,0 +1,19 @@
+.confirmDialog {
+    background: #282828;
+    outline: transparent;
+}
+
+
+.message {
+    display: inline;
+    color: #F44336;
+}
+
+.footer {
+    background: #282828 !important;
+}
+
+h5 {
+    color: white;
+    font-size: 1.4rem;
+}

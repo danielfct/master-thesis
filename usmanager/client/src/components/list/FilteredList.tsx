@@ -41,7 +41,7 @@ export class FilteredList<T> extends React.Component<ISearchableList<T>,{search:
         this.state = {search:''};
     }
 
-    public render() {
+    render() {
         const {list, predicate, ...otherprops} = this.props;
 
         return (

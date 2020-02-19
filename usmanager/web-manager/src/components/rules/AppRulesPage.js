@@ -46,7 +46,7 @@ export default class AppRulesPage extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadApp();
     this.loadAppRules();
     this.loadAllRules();

@@ -24,7 +24,8 @@
 
 import React from "react";
 import MainLayout from "./MainLayout";
+import PageComponent from "./PageComponent";
 
-export default class extends React.Component<{}, {}> {
+export default class extends PageComponent<{}, {}> {
     render = () => <MainLayout/>
 }

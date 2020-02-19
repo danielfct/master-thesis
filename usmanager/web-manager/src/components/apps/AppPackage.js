@@ -35,7 +35,7 @@ export default class AppPackage extends React.Component {
     this.state = { data: [], loading: false, showAdd: true };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadApps();
     const instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
     this.setState({ tooltipInstances: instances });
@@ -75,8 +75,9 @@ export default class AppPackage extends React.Component {
   addApp = () =>
       this.setState({ data: {id: 0, appname: '', ...this.state.data}, showAdd: false });
 
-  componentWillUnmount = () =>
-      this.state.tooltipInstances[0].destroy();
+  componentWillUnmount() {
+    this.state.tooltipInstances[0].destroy();
+  }
 
   /*<MainLayout title={{title:'Apps'}}>*/
   render = () =>

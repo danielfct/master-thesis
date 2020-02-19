@@ -24,21 +24,21 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 @Slf4j
 @Service
@@ -102,8 +102,8 @@ public class ServicesService {
     return services.save(service).getId();
   }*/
 
-  public void deleteService(Long id) {
-    var service = getService(id);
+  public void deleteService(String serviceName) {
+    var service = getService(serviceName);
     services.delete(service);
   }
 

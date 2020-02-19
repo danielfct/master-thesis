@@ -52,7 +52,7 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
         this.max = Math.max(0, Math.ceil(props.list.length / (this.state.pagesize || 1)) - 1);
     }
 
-    public render() {
+    render() {
         const {emptyMessage, list: l, show, pagination, separator} = this.props;
         const {page = 0, pagesize = l.length} = this.state;
         const list = l.slice(page * pagesize, page * pagesize + pagesize);
@@ -124,7 +124,7 @@ class PageNumber extends React.Component<PageNumberProps, {}> {
         this.props.setPage(this.props.page - 1);
     };
 
-    public render = () => {
+    render() {
         const {page, active} = this.props;
         return <li key={page} className={active ? "active" : "waves-effect"}>
             <a onClick={this.changePage}>{page}</a>

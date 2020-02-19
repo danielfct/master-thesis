@@ -24,9 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.springframework.web.bind.annotation.PutMapping;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
 import pt.unl.fct.microservicemanagement.mastermanager.util.BatchRequest;
@@ -40,6 +37,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -87,9 +85,9 @@ public class ServicesController {
     return servicesService.saveService(serviceName, saveServiceConfigReq);
   }*/
 
-  @DeleteMapping("/{id}")
-  public void deleteService(@PathVariable Long id) {
-    servicesService.deleteService(id);
+  @DeleteMapping("/{serviceName}")
+  public void deleteService(@PathVariable String serviceName) {
+    servicesService.deleteService(serviceName);
   }
 
   @GetMapping("/{id}/dependencies")

@@ -37,6 +37,7 @@ import LoadingSpinner from "../shared/LoadingSpinner";
 import * as queryString from "querystring";
 import {ReduxState} from "../../reducers";
 import Field, {getTypeFromValue} from "../shared/form/Field";
+import PageComponent from "../shared/PageComponent";
 
 export interface IService extends IData {
   serviceName: string;
@@ -85,36 +86,45 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 const getServiceNameFromPathname = (props: Props) =>
   props.match.params.name.split('#')[0];
 
-class Service extends React.Component<Props> {
+class Service extends PageComponent<Props, {}> {
 
   private tabs = createRef<HTMLUListElement>();
 
-  private isServiceNew = (): boolean =>
-    !!queryString.parse(this.props.location.search)['?new'];
-
-  public componentDidMount(): void {
+  componentDidMount(): void {
     const serviceName = getServiceNameFromPathname(this.props);
     if (serviceName && serviceName !== 'service') {
       this.props.loadServices(serviceName);
     }
     M.Tabs.init(this.tabs.current as Element);
-  }
+  };
 
-
-  public componentWillUnmount(): void {
+  componentWillUnmount(): void {
+    super.componentWillUnmount();
     //TODO cancel axios loadServices
   }
 
-  private onPostSuccessful = () =>
-    M.toast({html: `<div>Service ${getServiceNameFromPathname(this.props)} successfully created!</div>`});
+  private isServiceNew = (): boolean =>
+    !!queryString.parse(this.props.location.search)['?new'];
 
-  private onPutSuccessful = () =>
-    M.toast({html: `<div>Changes to ${getServiceNameFromPathname(this.props)} services successfully saved!</div>`});
+  private onPostSuccess = () =>
+    super.toast(`Service ${getServiceNameFromPathname(this.props)} successfully created`);
 
-  private onDeleteSuccessful = () => {
-    M.toast({html: `<div>Service ${getServiceNameFromPathname(this.props)} successfully removed!</div>`});
+  private onPostFailure = (reason: string) =>
+    super.toast(`Unable to save ${getServiceNameFromPathname(this.props)}`, 10000, reason, true);
+
+  private onPutSuccess = () =>
+    super.toast(`Changes to ${getServiceNameFromPathname(this.props)} successfully saved`);
+
+  private onPutFailure = (reason: string) =>
+    super.toast(`Unable to update ${getServiceNameFromPathname(this.props)}`, 10000, reason, true);
+
+  private onDeleteSuccess = () => {
+    super.toast(`Service ${getServiceNameFromPathname(this.props)} successfully removed`);
     this.props.history.push(`/services`)
   };
+
+  private onDeleteFailure = (reason: string) =>
+    super.toast(`Unable to delete ${getServiceNameFromPathname(this.props)}`, 10000, reason, true);
 
   private getFields = (): IFields =>
     Object.entries(this.props.formService).map(([key, value]) => {
@@ -134,7 +144,9 @@ class Service extends React.Component<Props> {
       return fields;
     }, {});
 
-  public render = () => {
+  render() {
+    // @ts-ignore
+    const serviceKey: (keyof IService) = Object.keys(this.props.formService)[0];
     return (
       <MainLayout>
         <div className="container">
@@ -148,9 +160,10 @@ class Service extends React.Component<Props> {
               : <Form fields={this.getFields()}
                       values={this.props.service}
                       new={this.isServiceNew()}
-                      post={{url: 'services', callback: this.onPostSuccessful}}
-                      put={{url: `services/${this.props.service['serviceName']}`, callback: this.onPutSuccessful}}
-                      delete={{url: `services/${this.props.service['serviceName']}`, callback: this.onDeleteSuccessful}}>
+                      post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
+                      put={{url: `services/${this.props.service[serviceKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
+                      delete={{url: `services/${this.props.service[serviceKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                      id={serviceKey}>
                 {Object.keys(this.props.formService).map(key =>
                   key === 'serviceType'
                     ? <Field id={key}

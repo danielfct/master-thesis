@@ -34,7 +34,7 @@ export default class Conditions extends React.Component {
     this.state = { data: [], loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadConditions();
   };
 
@@ -46,7 +46,7 @@ export default class Conditions extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
    {/* <MainLayout title={{title:'Conditions'}}>*/}
     return (
      <MainLayout>

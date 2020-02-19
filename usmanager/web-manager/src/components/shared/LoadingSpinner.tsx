@@ -23,25 +23,24 @@
  */
 
 import React from "react";
-import './LoadingSpinner.css';
 
-export default class extends React.Component<{},{}> {
-    render = () =>
-        <div className="center-horizontal">
-            <div className="center-vertical">
-                <div className="preloader-wrapper active">
-                    <div className="spinner-layer spinner-red-only">
-                        <div className="circle-clipper left">
-                            <div className="circle"/>
-                        </div>
-                        <div className="gap-patch">
-                            <div className="circle"/>
-                        </div>
-                        <div className="circle-clipper right">
-                            <div className="circle"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>;
-}
+const LoadingSpinner: React.FC = () =>
+  <div className="center-horizontal">
+      <div className="center-vertical">
+          <div className="preloader-wrapper active">
+              <div className="spinner-layer spinner-white-only">
+                  <div className="circle-clipper left">
+                      <div className="circle"/>
+                  </div>
+                  <div className="gap-patch">
+                      <div className="circle"/>
+                  </div>
+                  <div className="circle-clipper right">
+                      <div className="circle"/>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>;
+
+export default  LoadingSpinner;

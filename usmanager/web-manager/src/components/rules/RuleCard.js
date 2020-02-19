@@ -36,7 +36,7 @@ export default class RuleCard extends React.Component {
     this.state = { data: rule, conditions: [], loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadConditions();
   };
 

@@ -31,7 +31,7 @@ export default class HostRules extends React.Component {
     this.state = { hostRules: [], loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadHostRules();
   };
 

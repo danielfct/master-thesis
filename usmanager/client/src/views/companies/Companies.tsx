@@ -64,7 +64,7 @@ class CompaniesList extends React.Component<ICompanyProps,any> {
     }
   }
 
-  public render() {
+  render() {
     return (
         <Fragment>
           <ListWithControllers

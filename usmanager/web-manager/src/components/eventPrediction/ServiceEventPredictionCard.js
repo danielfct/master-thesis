@@ -37,7 +37,7 @@ export default class ServiceEventPredictionCard extends React.Component {
       });
   };
 
-  render = () => {
+  render() {
     const startDate = new Date(this.props.serviceEvent.startDate).toLocaleString();
     const endDate = new Date(this.props.serviceEvent.endDate).toLocaleString();
     return (

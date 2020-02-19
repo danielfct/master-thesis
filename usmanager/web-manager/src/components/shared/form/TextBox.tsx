@@ -13,7 +13,7 @@ interface TextBoxProps {
 
 export class TextBox extends React.Component<TextBoxProps, any> {
 
-  public render(): any {
+  render(): any {
     const {className, id, name, value, disabled, onChange, onBlur} = this.props;
     return (
       <>

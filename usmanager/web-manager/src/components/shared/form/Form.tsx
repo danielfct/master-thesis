@@ -25,45 +25,47 @@
 import React, {createRef, FormEvent} from "react";
 import {deleteData, postData, putData} from "../../../utils/api";
 import M from "materialize-css";
-import './Form.css';
+import styles from './Form.module.css';
 import {RouteComponentProps, withRouter} from "react-router";
 import {getTypeFromValue, FieldProps, IValidation} from "./Field";
 import {camelCaseToSentenceCase} from "../../../utils/text";
+import ConfirmDialog from "../ConfirmDialog";
 
 export interface IFields {
-    [key: string]: FieldProps;
+  [key: string]: FieldProps;
 }
 
 export interface IValues {
-    [key: string]: any;
+  [key: string]: any;
 }
 
 export interface IErrors {
-    [key: string]: string;
+  [key: string]: string;
 }
 
-type restOperation = { url: string, callback: () => void }
+type restOperation = { url: string, successCallback: () => void, failureCallback: (reason: string) => void }
 
 interface FormPageProps {
-    fields: IFields;
-    values: IValues;
-    new: boolean;
-    post: restOperation;
-    put: restOperation;
-    delete?: restOperation;
+  fields: IFields;
+  values: IValues;
+  new: boolean;
+  post: restOperation;
+  put: restOperation;
+  delete?: restOperation;
+  id: string;
 }
 
 type Props = FormPageProps & RouteComponentProps;
 
 interface State {
-    values: IValues;
-    errors: IErrors;
-    isEditing: boolean;
+  values: IValues;
+  errors: IErrors;
+  isEditing: boolean;
 }
 
 export interface IFormContext extends State {
-    setValues: (values: IValues) => void;
-    validate: (fieldName: string) => void;
+  setValues: (values: IValues) => void;
+  validate: (fieldName: string) => void;
 }
 
 export const FormContext =
@@ -89,128 +91,128 @@ export const requiredAndNumberAndMin = (values: IValues, fieldName: string, args
 
 class Form extends React.Component<Props, State> {
 
-    private fab = createRef<HTMLDivElement>();
+  private fab = createRef<HTMLDivElement>();
 
-    state = {
-        values: this.props.values,
-        errors: {},
-        isEditing: this.props.new,
-    };
+  state = {
+    values: this.props.values,
+    errors: {},
+    isEditing: this.props.new,
+  };
 
-    public componentDidMount(): void {
-        M.FloatingActionButton.init(this.fab.current as Element);
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    M.FloatingActionButton.init(this.fab.current as Element);
+  }
+
+  private validate = (fieldName: string): string => {
+    const {fields} = this.props;
+    const field: FieldProps | undefined = fields[fieldName];
+    const validation: IValidation | undefined = field!.validation;
+    const newError: string = validation ? validation.rule(this.state.values, fieldName, validation.args) : "";
+    this.setState({ errors: { ...this.state.errors, [fieldName]: newError } });
+    return newError;
+  };
+
+  private validateForm(): boolean {
+    const errors: IErrors = {};
+    Object.keys(this.props.fields).map((fieldName: string) => {
+      errors[fieldName] = this.validate(fieldName);
+    });
+    this.setState({ errors });
+    return this.isValid(errors);
+  }
+
+  private isValid = (errors: IErrors) =>
+    Object.values(errors).every(error => !error);
+
+  private onClickEdit = (): void => {
+    this.setState(prevState => ({ isEditing: !prevState.isEditing }));
+  };
+
+  private onClickDelete = (): void => {
+    if (this.props.delete) {
+      deleteData(this.props.delete.url, this.props.delete.successCallback, this.props.delete.failureCallback);
     }
+  };
 
-    private validate = (fieldName: string): string => {
-        const {fields} = this.props;
-        const field: FieldProps | undefined = fields[fieldName];
-        const validation: IValidation | undefined = field!.validation;
-        const newError: string = validation ? validation.rule(this.state.values, fieldName, validation.args) : "";
-        this.setState({ errors: { ...this.state.errors, [fieldName]: newError } });
-        return newError;
-    };
-
-    private validateForm(): boolean {
-        const errors: IErrors = {};
-        Object.keys(this.props.fields).map((fieldName: string) => {
-            errors[fieldName] = this.validate(fieldName);
+  private handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+    if (!this.validateForm()) {
+      return;
+    }
+    if (this.props.new) {
+      postData(
+        this.props.post.url,
+        this.state.values,
+        data => {
+          console.log(data);
+          this.props.post.successCallback();
         });
-        this.setState({ errors });
-        return this.isValid(errors);
+    }
+    else {
+      putData(
+        this.props.put.url,
+        this.state.values,
+        data => {
+          console.log(data);
+          this.props.put.successCallback();
+        });
     }
 
-    private isValid = (errors: IErrors) =>
-      Object.values(errors).every(error => !error);
+  };
 
-    private onClickEdit = (): void => {
-        this.setState(prevState => ({ isEditing: !prevState.isEditing }));
+  private setValues = (values: IValues) =>
+    this.setState({ values: { ...this.state.values, ...values } });
+
+  render() {
+    const context: IFormContext = {
+      ...this.state,
+      setValues: this.setValues,
+      validate: this.validate
     };
-
-    private onClickDelete = (): void => {
-        if (this.props.delete) {
-            deleteData(this.props.delete.url, this.props.delete.callback);
-        }
-    };
-
-    private handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-        event.preventDefault();
-        if (!this.validateForm()) {
-            return;
-        }
-        if (this.props.new) {
-            postData(
-              this.props.post.url,
-              this.state.values,
-              data => {
-                  //TODO delete console log
-                  console.log(data);
-                  this.props.post.callback();
-              });
-        }
-        else {
-            putData(
-              this.props.put.url,
-              this.state.values,
-              data => {
-                  //TODO delete console log
-                  console.log(data);
-                  this.props.put.callback();
-              });
-        }
-
-    };
-
-    private setValues = (values: IValues) =>
-      this.setState({ values: { ...this.state.values, ...values } });
-
-    public render = () => {
-        const context: IFormContext = {
-            ...this.state,
-            setValues: this.setValues,
-            validate: this.validate
-        };
-        const {isEditing, errors} = this.state;
-        const {children} = this.props;
-        return (
-          <form onSubmit={this.handleSubmit} noValidate>
-              <div className="form-controls-container">
-                  {this.props.new
-                    ? <div className="row">
-                        <button className="control-btn btn-flat btn-small waves-effect waves-light green-text right slide"
-                                type="submit"
-                                tabIndex={0}>
-                            Save
-                        </button>
-                    </div>
-                    : <div className="row">
-                        <a className="control-btn btn-floating btn-flat btn-small waves-effect waves-light right tooltipped"
-                           data-position="bottom" data-tooltip="Edit"
-                           onClick={this.onClickEdit}>
-                            <i className="large material-icons">edit</i>
-                        </a>
-                        <a className="control-btn btn-flat btn-small waves-effect waves-light red-text right slide"
-                           tabIndex={0}
-                           style={isEditing ? {transform: "scale(1)"} : {transform: "scale(0)"}}
-                           onClick={this.onClickDelete}>
-                            Delete
-                        </a>
-                        <button className="control-btn btn-flat btn-small waves-effect waves-light green-text right slide"
-                                type="submit"
-                                tabIndex={0}
-                                style={isEditing ? {transform: "scale(1)"} : {transform: "scale(0)"}}>
-                            Save
-                        </button>
-                    </div>
-                  }
+    const {isEditing} = this.state;
+    const {children} = this.props;
+    return (
+      <>
+        <ConfirmDialog message={`delete ${this.props.values[this.props.id]}`} confirmCallback={this.onClickDelete}/>
+        <form onSubmit={this.handleSubmit} noValidate>
+          <div className={`${styles.controlsContainer}`}>
+            {this.props.new
+              ?
+              <button className={`btn-flat btn-small waves-effect waves-light green-text right slide`}
+                      type="submit">
+                Save
+              </button>
+              :
+              <div>
+                <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                        data-position="bottom" data-tooltip="Edit"
+                        type="button"
+                        onClick={this.onClickEdit}>
+                  <i className="large material-icons">edit</i>
+                </button>
+                <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text right slide`}
+                        style={isEditing ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                        type="button"
+                        data-target="confirm-dialog">
+                  Delete
+                </button>
+                <button className={`btn-flat btn-small waves-effect waves-light green-text right slide`}
+                        style={isEditing ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                        type="submit">
+                  Save
+                </button>
               </div>
-              <div className="form-content">
-                  <FormContext.Provider value={context}>
-                      {children}
-                  </FormContext.Provider>
-              </div>
-          </form>
-        )
-    }
+            }
+          </div>
+          <div className={`${styles.content}`}>
+            <FormContext.Provider value={context}>
+              {children}
+            </FormContext.Provider>
+          </div>
+        </form>
+      </>
+    )
+  }
 }
 
 export default withRouter(Form);

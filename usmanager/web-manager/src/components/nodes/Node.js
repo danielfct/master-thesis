@@ -35,13 +35,13 @@ export default class Nodes extends React.Component {
     this.state = { data: [], loading: false };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadNodes();
     const instances = M.Tooltip.init(document.querySelectorAll('.tooltipped'));
     this.setState({ tooltipInstances: instances });
   };
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     this.state.tooltipInstances[0].destroy();
   };
 
@@ -53,7 +53,7 @@ export default class Nodes extends React.Component {
     );
   };
 
-  render = () => {
+  render() {
     let nodes;
     if (this.state.data) {
       nodes = this.state.data.map(node => (

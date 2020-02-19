@@ -46,7 +46,7 @@ export default class ServiceRulesPage extends React.Component {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.loadService();
     this.loadServiceRules();
     this.loadAllRules();

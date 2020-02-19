@@ -22,6 +22,45 @@
  * SOFTWARE.
  */
 
-.services-container {
-    margin: 10px;
+.controlsContainer {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.8);
+    padding: 15px 40px;
+    overflow: auto;
 }
+
+.dropdown {
+    width: auto !important;
+    overflow-y: hidden;
+}
+
+ul.dropdown li a {
+    background-color: #282828;
+    font-size: 14px;
+}
+
+ul.dropdown li a:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+ul.dropdown li.disabled a {
+    border-bottom: solid 1px #666;
+    color: grey;
+}
+
+ul.dropdown li.disabled a:hover {
+    background-color: #282828;
+    cursor: default;
+    border-bottom: solid 1px #666;
+}
+
+.nolabelCheckbox {
+    display: inline-block;
+    text-align: center;
+}
+
+.nolabelCheckbox label span {
+    margin-bottom: -7.5px;
+}
+
+
+
