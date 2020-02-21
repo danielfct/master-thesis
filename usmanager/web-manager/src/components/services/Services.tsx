@@ -37,7 +37,7 @@ import PageComponent from "../shared/PageComponent";
 
 interface StateToProps {
   isLoading: boolean
-  error: string;
+  error?: string | null;
   services: IService[];
 }
 

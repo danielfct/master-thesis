@@ -1,0 +1,1 @@
+{"id":2,"serviceName":"front-end","dockerRepository":"front-end","defaultExternalPort":"8079","defaultInternalPort":"80","defaultDb":"NOT_APPLICABLE","launchCommand":"${eurekaHost} ${externalPort} ${internalPort} ${hostname}","minReplics":1,"maxReplics":0,"outputLabel":"${front-endHost}","serviceType":"frontend","expectedMemoryConsumption":2.097152E8}

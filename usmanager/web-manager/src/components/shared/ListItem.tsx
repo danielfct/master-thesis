@@ -27,23 +27,23 @@ import styles from './ListItem.module.css';
 import {Link} from "react-router-dom";
 
 interface ListItemProps<T> {
-    link?: { pathname: string, state: any };
+  link?: { pathname: string, state: any };
 }
 
 export default class ListItem<T> extends React.Component<ListItemProps<T>,{}> {
 
-    render() {
-        const {link} = this.props;
-        return (
-          link
-            ? <Link to={ {pathname: link.pathname, state: link.state} }>
-                <div className={`${styles.item}`}>
-                    {this.props.children}
-                </div>
-            </Link>
-            : <div className={`${styles.item} white-text`}>
-                {this.props.children}
-            </div>
-        );
-    }
+  render() {
+    const {link} = this.props;
+    return (
+      link
+        ? <Link to={ {pathname: link.pathname, state: link.state} }>
+          <div className={`${styles.item}`}>
+            {this.props.children}
+          </div>
+        </Link>
+        : <div className={`${styles.item} white-text`}>
+              {this.props.children}
+        </div>
+    );
+  }
 }

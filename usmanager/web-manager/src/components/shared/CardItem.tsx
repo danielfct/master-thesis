@@ -24,13 +24,15 @@
 
 import React from 'react';
 
-export default class CardItem extends React.Component {
-  render () {
-    return (
-      <div>
-        <h6>{this.props.label}</h6>
-        <div>{this.props.value}</div>
-      </div>
-    );
-  }
+interface CardItemProps {
+  label: string;
+  value: string;
 }
+
+const CardItem: React.FC<CardItemProps> = ({label, value}) =>
+  <div>
+    <h6>{label}</h6>
+    <div>{value}</div>
+  </div>;
+
+export default CardItem;

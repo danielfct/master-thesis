@@ -70,7 +70,7 @@ const emptyService = (): Partial<IService> => ({
 
 interface StateToProps {
   service: Partial<IService>;
-  formService: Partial<IService>,
+  formService?: Partial<IService>,
 }
 
 interface DispatchToProps {
@@ -126,8 +126,8 @@ class Service extends PageComponent<Props, {}> {
   private onDeleteFailure = (reason: string) =>
     super.toast(`Unable to delete ${getServiceNameFromPathname(this.props)}`, 10000, reason, true);
 
-  private getFields = (): IFields =>
-    Object.entries(this.props.formService).map(([key, value]) => {
+  private getFields = (service: Partial<IService>): IFields =>
+    Object.entries(service).map(([key, value]) => {
       return {
         [key]: {
           id: key,
@@ -157,7 +157,7 @@ class Service extends PageComponent<Props, {}> {
           <div className="tab-content col s12" id="details">
             {!this.props.formService
               ? <LoadingSpinner/>
-              : <Form fields={this.getFields()}
+              : <Form fields={this.getFields(this.props.formService)}
                       values={this.props.service}
                       new={this.isServiceNew()}
                       post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
@@ -190,8 +190,9 @@ class Service extends PageComponent<Props, {}> {
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const name = getServiceNameFromPathname(props);
   const service = name === 'service' ? emptyService() : state.entities.services.data[name];
-  const formService = service;
-  if (formService) {
+  let formService;
+  if (service) {
+    formService = { ...service };
     delete formService["id"];
     delete formService["dependencies"];
   }

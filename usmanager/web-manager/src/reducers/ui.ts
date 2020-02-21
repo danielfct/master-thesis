@@ -29,15 +29,18 @@ import {
 } from "../actions";
 import {loadingBarReducer} from "react-redux-loading-bar";
 
+export interface UIState {
+    sidenav: { user: boolean, width: boolean };
+    search: string;
+}
+
 export const loadingBar = loadingBarReducer;
 
 export const sidenav = (
   state = { user: true, width: window.innerWidth > 992 },
   action: { type: string, value: boolean },
 ) => {
-    console.log(window.innerWidth)
-    console.log(window.innerWidth > 992)
-    const { type, value } = action;
+    const {type, value} = action;
     switch (type) {
         case SIDENAV_SHOW_USER:
             return {

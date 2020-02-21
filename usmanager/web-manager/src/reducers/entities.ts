@@ -24,54 +24,75 @@
 
 import merge from 'lodash/merge'
 import {
-    SERVICES_FAILURE,
-    SERVICES_REQUEST,
-    SERVICES_SUCCESS,
-    SERVICE_DEPENDENCIES_SUCCESS,
-    SERVICE_REQUEST, SERVICE_FAILURE, SERVICE_SUCCESS, SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_FAILURE
+  SERVICES_FAILURE,
+  SERVICES_REQUEST,
+  SERVICES_SUCCESS,
+  SERVICE_DEPENDENCIES_SUCCESS,
+  SERVICE_REQUEST, SERVICE_FAILURE, SERVICE_SUCCESS, SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_FAILURE
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
 import {IService} from "../components/services/Service";
+import { assign } from 'lodash';
 
-const entities = (state: { services: { data: { [key: string]: IService }, isLoading: boolean, error?: string | null } } =
-                    { services: { data: {}, isLoading: false, error: null } },
-                  action: { type: string, args?: number | string, isLoading?: {}, error?: string, response?: { entities: { services: { data: {}}}, result: [] } }
+export type EntitiesState = {
+  services: {
+    data: { [key: string]: IService },
+    isLoading: boolean,
+    error?: string | null
+  },
+  //TODO other entities
+}
+
+type Action = {
+  type: string,
+  entity?: number | string,
+  isLoading?: {},
+  error?: string,
+  response?: {
+    services?: IService[],
+    dependencies?: IService[],
+    //TODO other entities
+    result: any[],
+  }
+};
+
+const entities = (state: EntitiesState = { services: { data: {}, isLoading: false, error: null } },
+                  action: Action
 ) => {
-    const { type, response, error, args } = action;
-    switch (type) {
-        case SERVICE_REQUEST:
-        case SERVICES_REQUEST:
-            state =  merge({}, state, { services: { isLoading: true } });
-            break;
-        case SERVICE_FAILURE:
-        case SERVICES_FAILURE:
-            state.services = { data: {}, isLoading: false, error: error };
-            break;
-        case SERVICE_SUCCESS:
-            state = merge({}, state, { services: { data: response?.entities.services.data, isLoading: false, error: null } });
-            break;
-        case SERVICES_SUCCESS:
-            state.services.data = {};
-            state = merge({}, state, { services: { data: response?.entities.services.data, isLoading: false, error: null } });
-            break;
-        case SERVICE_DEPENDENCIES_REQUEST:
-            //TODO
-        case SERVICE_DEPENDENCIES_FAILURE:
-            //TODO
-        case SERVICE_DEPENDENCIES_SUCCESS:
-            if (args) {
-                const service = state.services.data[args];
-                if (service) {
-                    Object.assign(service, response?.entities);
-                    console.log(service) //TODO
-                    const normalized = normalize(state.services, Schemas.SERVICE_ARRAY);
-                    state = merge({}, state, normalized.entities);
-                }
-            }
-            break;
-    }
-    return state;
+  const { type, response, error, entity } = action;
+  switch (type) {
+    case SERVICE_REQUEST:
+    case SERVICES_REQUEST:
+    case SERVICE_DEPENDENCIES_REQUEST:
+      state =  merge({}, state, { services: { isLoading: true } });
+      break;
+    case SERVICE_FAILURE:
+    case SERVICES_FAILURE:
+    case SERVICE_DEPENDENCIES_FAILURE:
+      state.services = { data: {}, isLoading: false, error: error };
+      break;
+    case SERVICE_SUCCESS:
+      state = merge({}, state, { services: { data: response?.services, isLoading: false, error: null } });
+      break;
+    case SERVICES_SUCCESS:
+      state.services.data = {};
+      state = merge({}, state, { services: { data: response?.services, isLoading: false, error: null } });
+      break;
+    case SERVICE_DEPENDENCIES_SUCCESS:
+      if (entity) {
+        const service = state.services.data[entity];
+        if (service) {
+          const serviceWithDependencies = Object.assign(service, response);
+          const normalizedService = normalize(serviceWithDependencies, Schemas.SERVICE).entities;
+          console.log(normalizedService)
+          state = merge({}, state, { services: { data: normalizedService.services, isLoading: false, error: null } });
+          console.log(state)
+        }
+      }
+      break;
+  }
+  return state;
 };
 
 export default entities;

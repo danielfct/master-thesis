@@ -27,7 +27,7 @@ import React from "react";
 
 interface Props<T> {
   isLoading: boolean;
-  error: string;
+  error?: string | null;
   emptyMessage: string;
   list: T[];
   card: (element: T) => JSX.Element;

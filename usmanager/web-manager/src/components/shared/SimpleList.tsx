@@ -29,7 +29,7 @@ interface GenericSimpleListProps<T> {
     emptyMessage: string;
     list: T[];
     show: (element: T) => JSX.Element;
-    separator?: boolean | { color: string };
+    useSeparator?: boolean | { color: string };
 }
 
 type Props<T> = GenericSimpleListProps<T>;
@@ -37,11 +37,11 @@ type Props<T> = GenericSimpleListProps<T>;
 export default class SimpleList<T> extends React.Component<Props<T>, {}> {
 
     private getSeparatorColor = (): string | undefined => {
-        if (typeof this.props.separator === 'boolean' && this.props.separator) {
+        if (typeof this.props.useSeparator === 'boolean' && this.props.useSeparator) {
             return "black";
         }
-        else if (typeof this.props.separator === 'object') {
-            return this.props.separator.color ? this.props.separator.color : "black";
+        else if (typeof this.props.useSeparator === 'object') {
+            return this.props.useSeparator.color ? this.props.useSeparator.color : "black";
         }
     };
 

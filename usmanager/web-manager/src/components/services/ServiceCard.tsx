@@ -47,7 +47,7 @@ export default class ServiceCard extends React.Component<Props, {}> {
                         state: this.props}}>
                         <div className='card-content'>
                             {Object.entries(this.props.service)
-                                .filter(([key, _]) => key !== 'id')
+                                .filter(([key, _]) => key !== 'id' && key !== 'dependencies')
                                 .map(([key, value]) =>
                                     <CardItem key={key} label={camelCaseToSentenceCase(key)} value={value}/>)}
                         </div>

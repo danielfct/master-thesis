@@ -28,7 +28,7 @@ import {IService} from "./Service";
 import {connect} from "react-redux";
 import List from "../shared/List";
 import {bindActionCreators} from "redux";
-import {loadServiceDependencies} from "../../actions";
+import {loadServiceDependencies, loadServices} from "../../actions";
 import ListItem from "../shared/ListItem";
 import styles from './ServiceDependencyList.module.css';
 import M from "materialize-css";
@@ -39,11 +39,14 @@ export interface IServiceDependency extends IService {
 }
 
 interface StateToProps {
-  dependencies: IServiceDependency[],
+  isLoading: boolean
+  error?: string | null;
+  dependencies: string[],
   services: string[];
 }
 
 interface DispatchToProps {
+  loadServices: (name?: string) => any;
   loadServiceDependencies: (serviceName: string) => void;
 }
 
@@ -66,13 +69,14 @@ class ServiceDependencyList extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = this.props.dependencies.reduce((state: any, dependency: IService) => {
-      state[dependency.serviceName] = false;
+    this.state = props.dependencies.reduce((state: any, dependency: string) => {
+      state[dependency] = false;
       return state;
     }, {});
   }
 
   componentDidMount(): void {
+    this.props.loadServices();
     const {serviceName} = this.props.service;
     if (serviceName) {
       this.props.loadServiceDependencies(serviceName);
@@ -89,30 +93,27 @@ class ServiceDependencyList extends React.Component<Props, State> {
       });
     }
     else {
-      this.setState(this.props.dependencies.reduce((newState: any, dependency: IService) => {
-        const dependencyName = dependency.serviceName;
-        newState[dependencyName] = checked;
+      this.setState(this.props.dependencies.reduce((newState: any, dependency: string) => {
+        newState[dependency] = checked;
         return newState;
       }, {}));
     }
   };
 
-  private dependency = (dependency: IService) => {
-    return <ListItem>
-      <div className="row">
-        <div className="col s12">
-          <p>
-            <label>
-              <input id={dependency.serviceName}
-                     type="checkbox"
-                     onChange={this.handleCheckbox}
-                     checked={this.state[dependency.serviceName]}/>
-              <span>{dependency.serviceName}</span>
-            </label>
-          </p>
-        </div>
-      </div>
-    </ListItem>;
+  private dependency = (dependency: string) => {
+    return (
+      <ListItem>
+        <p>
+          <label>
+            <input id={dependency}
+                   type="checkbox"
+                   onChange={this.handleCheckbox}
+                   checked={this.state[dependency]}/>
+            <span>{dependency}</span>
+          </label>
+        </p>
+      </ListItem>
+    );
   };
 
   private onDeleteSuccess = () =>
@@ -123,7 +124,7 @@ class ServiceDependencyList extends React.Component<Props, State> {
 
   private handleRemoveDependencies = () => {
     const toDelete = Object.entries(this.state).filter(([_, checked]) => checked).map(([name, _]) => name);
-    const dependencies = this.props.dependencies.filter(dependency => toDelete.includes(dependency.serviceName));
+    const dependencies = this.props.dependencies.filter(dependency => toDelete.includes(dependency));
     if (toDelete.length > 1) {
       const request = dependencies.join(" ");
       patchData(`/services/${this.props.service.id}/dependencies`, request,() => {
@@ -131,31 +132,29 @@ class ServiceDependencyList extends React.Component<Props, State> {
         },
         "delete");
     } else {
-      const dependencyId = dependencies[0].id;
-      deleteData(`/services/${this.props.service.serviceName}/dependencies/${dependencyId}`, this.onDeleteSuccess, this.onDeleteFailure);
+      const dependency = dependencies[0];
+      deleteData(`/services/${this.props.service.serviceName}/dependencies/${dependency}`, this.onDeleteSuccess, this.onDeleteFailure);
     }
   };
 
   render() {
-    if (!this.props.dependencies) {
-      return <div>Failed to fetch dependencies</div>;
-    }
-    const dependenciesNames = this.props.dependencies.map(d => d.serviceName);
-    const selectableServices = this.props.services
-                                   .filter(name => !this.props.service || name !== this.props.service.serviceName && !dependenciesNames.includes(name));
-    const ServiceDependenciesList = List<IService>();
+    const {services, service, dependencies} = this.props;
+    const selectableServices = services.filter(name => !service || name !== service.serviceName && !dependencies.includes(name));
+    const ServiceDependenciesList = List<string>();
     return (
       <div>
         <div className={`${styles.controlsContainer}`}>
-          {this.props.dependencies.length > 0 && <p className={`${styles.nolabelCheckbox}`}>>
+          {dependencies.length > 0 && (
+            <p className={`${styles.nolabelCheckbox}`}>
               <label>
-                  <input id={GLOBAL_CHECKBOX_ID}
-                         type="checkbox"
-                         onChange={this.handleCheckbox}
-                         ref={this.globalCheckbox}/>
-                  <span/>
+                <input id={GLOBAL_CHECKBOX_ID}
+                       type="checkbox"
+                       onChange={this.handleCheckbox}
+                       ref={this.globalCheckbox}/>
+                <span/>
               </label>
-          </p>}
+            </p>
+          )}
           <button className='dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
                   data-position="bottom" data-tooltip="New dependency"
                   data-target='servicesDropdown'
@@ -181,11 +180,10 @@ class ServiceDependencyList extends React.Component<Props, State> {
           </button>
         </div>
         <ServiceDependenciesList
-          /*TODO*/
-          isLoading={false}
-          error={""}
+          isLoading={this.props.isLoading}
+          error={this.props.error}
           emptyMessage={`Dependencies list is empty`}
-          list={this.props.dependencies}
+          list={dependencies}
           show={this.dependency}
           useSeparator/>
       </div>
@@ -195,15 +193,18 @@ class ServiceDependencyList extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceDependencyProps): StateToProps {
-  const service = ownProps.service.serviceName && state.entities.services.data[ownProps.service.serviceName];
+  const serviceName = ownProps.service.serviceName;
+  const service = serviceName && state.entities.services.data[serviceName];
   const dependencies = service && service.dependencies;
   return {
-    dependencies: dependencies && dependencies.map(dependency => state.entities.services.data[dependency]) || [],
+    isLoading: state.entities.services.isLoading,
+    error: state.entities.services.error,
+    dependencies: dependencies || [],
     services: Object.keys(state.entities.services.data)
   }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({ loadServiceDependencies }, dispatch);
+  bindActionCreators({ loadServices, loadServiceDependencies }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceDependencyList);

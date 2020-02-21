@@ -31,7 +31,7 @@ import Error from "./Error";
 
 interface Props<T> {
     isLoading: boolean;
-    error: string;
+    error?: string | null;
     emptyMessage: string;
     list: T[];
     show: (element: T) => JSX.Element;

@@ -56,13 +56,13 @@ const fetchServices = (name?: string) => ({
         types: [ SERVICES_REQUEST, SERVICES_SUCCESS, SERVICES_FAILURE ],
         endpoint: `services`,
         schema: Schemas.SERVICE_ARRAY,
-        args: 'services'
+        entity: 'services'
       }
       : {
         types: [ SERVICE_REQUEST, SERVICE_SUCCESS, SERVICE_FAILURE ],
         endpoint: `services/${name}`,
         schema: Schemas.SERVICE,
-        args: 'services'
+        entity: 'services'
       }
 });
 
@@ -86,7 +86,7 @@ const fetchServiceDependencies = (serviceName: string) => ({
     types: [ SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_SUCCESS, SERVICE_DEPENDENCIES_FAILURE ],
     endpoint: `services/${serviceName}/dependencies`,
     schema: Schemas.SERVICE_DEPENDENCY_ARRAY,
-    args: serviceName
+    entity: serviceName
   }
 });
 
