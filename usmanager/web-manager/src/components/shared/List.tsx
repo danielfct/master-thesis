@@ -28,6 +28,8 @@ import {PagedList} from "./PagedList";
 import SimpleList from "./SimpleList";
 import LoadingSpinner from "./LoadingSpinner";
 import Error from "./Error";
+import AnimatedList from "./list/AnimatedList";
+import Empty from "./Empty";
 
 interface Props<T> {
     isLoading: boolean;
@@ -36,26 +38,33 @@ interface Props<T> {
     list: T[];
     show: (element: T) => JSX.Element;
     predicate?: (element: T, filter: string) => boolean;
-    pagination?: { pagesize: number, page?: number, bottom?: boolean };
-    useSeparator?: boolean | { color: string };
+    paginate?: { pagesize: number, page?: number, bottom?: boolean };
+    separate?: boolean | { color: string };
+    animate?: boolean;
 }
 
 class GenericList<T> extends React.Component<Props<T>, {}> {
 
     render() {
-        const {isLoading, error, predicate, pagination} = this.props;
+        const {isLoading, error, emptyMessage, list, predicate, paginate, animate} = this.props;
         if (isLoading) {
             return <LoadingSpinner/>;
         }
         if (error) {
             return <Error message={error}/>;
         }
+        if (list.length === 0) {
+            return <Empty message={emptyMessage}/>
+        }
         if (predicate) {
             const Filtered = FilteredList<T>();
             return <Filtered {...this.props} predicate={predicate}/>;
         }
-        if (pagination) {
-            return <PagedList {...this.props} pagination={pagination}/>;
+        if (paginate) {
+            return <PagedList {...this.props} paginate={paginate}/>;
+        }
+        if (animate) {
+            return <AnimatedList {...this.props} />
         }
         return <SimpleList<T> {...this.props}/>;
     }

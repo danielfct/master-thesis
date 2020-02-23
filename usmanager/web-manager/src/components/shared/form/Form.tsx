@@ -43,7 +43,7 @@ export interface IErrors {
   [key: string]: string;
 }
 
-type restOperation = { url: string, successCallback: () => void, failureCallback: (reason: string) => void }
+type restOperation = { url: string, successCallback: (reply?: any) => void, failureCallback: (reason: string) => void }
 
 interface FormPageProps {
   fields: IFields;
@@ -140,24 +140,11 @@ class Form extends React.Component<Props, State> {
       return;
     }
     if (this.props.new) {
-      postData(
-        this.props.post.url,
-        this.state.values,
-        data => {
-          console.log(data);
-          this.props.post.successCallback();
-        });
+      postData(this.props.post.url, this.state.values, this.props.post.successCallback, this.props.post.failureCallback);
     }
     else {
-      putData(
-        this.props.put.url,
-        this.state.values,
-        data => {
-          console.log(data);
-          this.props.put.successCallback();
-        });
+      putData(this.props.put.url, this.state.values, this.props.put.successCallback, this.props.post.failureCallback);
     }
-
   };
 
   private setValues = (values: IValues) =>

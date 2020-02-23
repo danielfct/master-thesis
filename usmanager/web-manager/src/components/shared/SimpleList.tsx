@@ -23,13 +23,11 @@
  */
 
 import * as React from "react";
-import Empty from "./Empty";
 
 interface GenericSimpleListProps<T> {
-    emptyMessage: string;
     list: T[];
     show: (element: T) => JSX.Element;
-    useSeparator?: boolean | { color: string };
+    separate?: boolean | { color: string };
 }
 
 type Props<T> = GenericSimpleListProps<T>;
@@ -37,19 +35,17 @@ type Props<T> = GenericSimpleListProps<T>;
 export default class SimpleList<T> extends React.Component<Props<T>, {}> {
 
     private getSeparatorColor = (): string | undefined => {
-        if (typeof this.props.useSeparator === 'boolean' && this.props.useSeparator) {
+        const {separate} = this.props;
+        if (typeof separate === 'boolean' && separate) {
             return "black";
         }
-        else if (typeof this.props.useSeparator === 'object') {
-            return this.props.useSeparator.color ? this.props.useSeparator.color : "black";
+        else if (typeof separate === 'object') {
+            return separate.color ? separate.color : "black";
         }
     };
 
     render() {
-        const {emptyMessage, list, show} = this.props;
-        if (list.length === 0) {
-            return <Empty message={emptyMessage}/>
-        }
+        const {list, show} = this.props;
         const separatorColor = this.getSeparatorColor();
         return (
             <div>

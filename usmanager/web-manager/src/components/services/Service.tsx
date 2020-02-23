@@ -37,7 +37,9 @@ import LoadingSpinner from "../shared/LoadingSpinner";
 import * as queryString from "querystring";
 import {ReduxState} from "../../reducers";
 import Field, {getTypeFromValue} from "../shared/form/Field";
-import PageComponent from "../shared/PageComponent";
+import BaseComponent from "../shared/BaseComponent";
+import entities from "../../reducers/entities";
+import Error from "../shared/Error";
 
 export interface IService extends IData {
   serviceName: string;
@@ -69,6 +71,8 @@ const emptyService = (): Partial<IService> => ({
 });
 
 interface StateToProps {
+  isLoading: boolean;
+  error?: string | null;
   service: Partial<IService>;
   formService?: Partial<IService>,
 }
@@ -86,7 +90,7 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 const getServiceNameFromPathname = (props: Props) =>
   props.match.params.name.split('#')[0];
 
-class Service extends PageComponent<Props, {}> {
+class Service extends BaseComponent<Props, {}> {
 
   private tabs = createRef<HTMLUListElement>();
 
@@ -106,20 +110,24 @@ class Service extends PageComponent<Props, {}> {
   private isServiceNew = (): boolean =>
     !!queryString.parse(this.props.location.search)['?new'];
 
-  private onPostSuccess = () =>
+  private onPostSuccess = () => {
     super.toast(`Service ${getServiceNameFromPathname(this.props)} successfully created`);
+    //TODO save dependencies
+  };
 
   private onPostFailure = (reason: string) =>
     super.toast(`Unable to save ${getServiceNameFromPathname(this.props)}`, 10000, reason, true);
 
-  private onPutSuccess = () =>
+  private onPutSuccess = () => {
     super.toast(`Changes to ${getServiceNameFromPathname(this.props)} successfully saved`);
+    //TODO save dependencies
+  };
 
   private onPutFailure = (reason: string) =>
     super.toast(`Unable to update ${getServiceNameFromPathname(this.props)}`, 10000, reason, true);
 
   private onDeleteSuccess = () => {
-    super.toast(`Service ${getServiceNameFromPathname(this.props)} successfully removed`);
+    super.toast(`Service <b>${getServiceNameFromPathname(this.props)}</b> successfully removed`);
     this.props.history.push(`/services`)
   };
 
@@ -145,6 +153,7 @@ class Service extends PageComponent<Props, {}> {
     }, {});
 
   render() {
+    const {isLoading, error, formService, service} = this.props;
     // @ts-ignore
     const serviceKey: (keyof IService) = this.props.formService && Object.keys(this.props.formService)[0];
     return (
@@ -155,16 +164,17 @@ class Service extends PageComponent<Props, {}> {
             <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
           </ul>
           <div className="tab-content col s12" id="details">
-            {!this.props.formService
-              ? <LoadingSpinner/>
-              : <Form fields={this.getFields(this.props.formService)}
-                      values={this.props.service}
-                      new={this.isServiceNew()}
-                      post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                      put={{url: `services/${this.props.service[serviceKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                      delete={{url: `services/${this.props.service[serviceKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
-                      id={serviceKey}>
-                {Object.keys(this.props.formService).map(key =>
+            {isLoading && <LoadingSpinner/>}
+            {error && <Error message={error}/>}
+            {formService && (
+              <Form fields={this.getFields(formService)}
+                    values={service}
+                    new={this.isServiceNew()}
+                    post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
+                    put={{url: `services/${service[serviceKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
+                    delete={{url: `services/${service[serviceKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                    id={serviceKey}>
+                {Object.keys(formService).map(key =>
                   key === 'serviceType'
                     ? <Field id={key}
                              type="dropdown"
@@ -175,12 +185,13 @@ class Service extends PageComponent<Props, {}> {
                              label={key}
                     />
                 )}
-              </Form>}
+              </Form>
+            )}
           </div>
           <div className="tab-content" id="dependencies">
-            {!this.props.service
-              ? <LoadingSpinner/>
-              : <ServiceDependencyList service={this.props.service}/>}
+            {isLoading && <LoadingSpinner/>}
+            {error && <Error message={error}/>}
+            {service && <ServiceDependencyList service={service}/>}
           </div>
         </div>
       </MainLayout>)
@@ -196,9 +207,14 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     delete formService["id"];
     delete formService["dependencies"];
   }
+  const isLoading = state.entities.services.isLoading;
+  const error = state.entities.services.error;
   return  {
+    isLoading,
+    error,
     service,
-    formService
+    formService,
+
   }
 }
 

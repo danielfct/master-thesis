@@ -28,26 +28,28 @@ import {IService} from "./Service";
 import {connect} from "react-redux";
 import List from "../shared/List";
 import {bindActionCreators} from "redux";
-import {loadServiceDependencies, loadServices} from "../../actions";
+import {loadServiceDependencies, loadServices, removeServiceDependencies} from "../../actions";
 import ListItem from "../shared/ListItem";
 import styles from './ServiceDependencyList.module.css';
 import M from "materialize-css";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {deleteData, patchData} from "../../utils/api";
+import BaseComponent from "../shared/BaseComponent";
 
 export interface IServiceDependency extends IService {
 }
 
 interface StateToProps {
-  isLoading: boolean
+  isLoading: boolean;
   error?: string | null;
-  dependencies: string[],
+  dependencies: string[];
   services: string[];
 }
 
 interface DispatchToProps {
   loadServices: (name?: string) => any;
   loadServiceDependencies: (serviceName: string) => void;
+  removeServiceDependencies: (stringName: string, dependencies: string[]) => void;
 }
 
 interface ServiceDependencyProps {
@@ -57,12 +59,12 @@ interface ServiceDependencyProps {
 type Props = StateToProps & DispatchToProps & ServiceDependencyProps;
 
 interface State {
-  [key: string]: boolean;
+  [key: string]: boolean | undefined;
 }
 
 const GLOBAL_CHECKBOX_ID = "GLOBAL_CHECKBOX";
 
-class ServiceDependencyList extends React.Component<Props, State> {
+class ServiceDependencyList extends BaseComponent<Props, State> {
 
   private dropdown = createRef<HTMLButtonElement>();
   private globalCheckbox = createRef<HTMLInputElement>();
@@ -88,7 +90,7 @@ class ServiceDependencyList extends React.Component<Props, State> {
     if (id !== GLOBAL_CHECKBOX_ID) {
       this.setState({[id]: checked}, () => {
         if (this.globalCheckbox.current) {
-          this.globalCheckbox.current.checked = Object.values(this.state).every((checked: boolean) => checked);
+          this.globalCheckbox.current.checked = Object.values(this.state).every((checked: boolean | undefined) => checked);
         }
       });
     }
@@ -100,40 +102,39 @@ class ServiceDependencyList extends React.Component<Props, State> {
     }
   };
 
-  private dependency = (dependency: string) => {
-    return (
-      <ListItem>
-        <p>
-          <label>
-            <input id={dependency}
-                   type="checkbox"
-                   onChange={this.handleCheckbox}
-                   checked={this.state[dependency]}/>
-            <span>{dependency}</span>
-          </label>
-        </p>
-      </ListItem>
-    );
+  private dependency = (dependency: string): JSX.Element =>
+    <ListItem>
+      <p>
+        <label>
+          <input id={dependency}
+                 type="checkbox"
+                 onChange={this.handleCheckbox}
+                 checked={this.state[dependency]}/>
+          <span>{dependency}</span>
+        </label>
+      </p>
+    </ListItem>;
+
+  private onDeleteSuccess = (): void => {
+    const dependencies = Object.entries(this.state).filter(([_, value]) => value).map(([key, value]) => key);
+    const serviceName = this.props.service.serviceName;
+    if (serviceName) {
+      this.props.removeServiceDependencies(serviceName, dependencies);
+      dependencies.forEach(dependency => this.setState({[dependency]: undefined}));
+    }
+    /*super.toast(`${dependencies.length == 1 ? 'Dependency' : 'All dependencies'} removed successfully`);*/
   };
 
-  private onDeleteSuccess = () =>
-    M.toast({html: `<div>Dependency successfully removed!</div>`});
+  private onDeleteFailure = (reason: string): void =>
+    super.toast(`Unable to delete dependency`, 10000, reason, true);
 
-  private onDeleteFailure = (reason: string) =>
-    M.toast({html: `Failed to delete dependency: ${reason}`});
-
-  private handleRemoveDependencies = () => {
-    const toDelete = Object.entries(this.state).filter(([_, checked]) => checked).map(([name, _]) => name);
-    const dependencies = this.props.dependencies.filter(dependency => toDelete.includes(dependency));
-    if (toDelete.length > 1) {
-      const request = dependencies.join(" ");
-      patchData(`/services/${this.props.service.id}/dependencies`, request,() => {
-          M.toast({ html: '<div>Dependencies removed</div>' });
-        },
-        "delete");
+  private handleRemoveDependencies = (): void => {
+    const dependencies = Object.entries(this.state).filter(([_, checked]) => checked).map(([name, _]) => name);
+    if (dependencies.length > 1) {
+      patchData(`services/${this.props.service.serviceName}/dependencies`, dependencies, this.onDeleteSuccess, this.onDeleteFailure, "delete");
     } else {
       const dependency = dependencies[0];
-      deleteData(`/services/${this.props.service.serviceName}/dependencies/${dependency}`, this.onDeleteSuccess, this.onDeleteFailure);
+      deleteData(`services/${this.props.service.serviceName}/dependencies/${dependency}`, this.onDeleteSuccess, this.onDeleteFailure);
     }
   };
 
@@ -174,7 +175,7 @@ class ServiceDependencyList extends React.Component<Props, State> {
             </PerfectScrollbar>
           </ul>
           <button className="btn-flat btn-small waves-effect waves-light red-text right"
-                  style={Object.values(this.state).some((checked: boolean) => checked) ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                  style={Object.values(this.state).some((checked: boolean | undefined) => checked) ? {transform: "scale(1)"} : {transform: "scale(0)"}}
                   onClick={this.handleRemoveDependencies}>
             Remove
           </button>
@@ -185,7 +186,8 @@ class ServiceDependencyList extends React.Component<Props, State> {
           emptyMessage={`Dependencies list is empty`}
           list={dependencies}
           show={this.dependency}
-          useSeparator/>
+          separate
+          animate/>
       </div>
     )
   }
@@ -205,6 +207,6 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceDependencyProps): S
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({ loadServices, loadServiceDependencies }, dispatch);
+  bindActionCreators({ loadServices, loadServiceDependencies, removeServiceDependencies }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceDependencyList);

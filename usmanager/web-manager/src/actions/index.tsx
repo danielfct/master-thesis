@@ -26,6 +26,7 @@ import {CALL_API, Schemas} from "../middleware/api";
 import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
 import {IService} from "../components/services/Service";
 import {IServiceDependency} from "../components/services/ServiceDependencyList";
+import {EntitiesAction, EntitiesState} from "../reducers/entities";
 
 export const SERVICES_REQUEST = 'SERVICES_REQUEST';
 export const SERVICES_SUCCESS = 'SERVICES_SUCCESS';
@@ -89,6 +90,15 @@ const fetchServiceDependencies = (serviceName: string) => ({
     entity: serviceName
   }
 });
+
+export const REMOVE_SERVICE_DEPENDENCIES = 'REMOVE_SERVICE_DEPENDENCY';
+export function removeServiceDependencies(serviceName: string, dependencies: string[]): EntitiesAction {
+  return {
+    type: REMOVE_SERVICE_DEPENDENCIES,
+    entity: serviceName,
+    data: { dependenciesNames: dependencies }
+  }
+}
 
 export const DELETE_SERVICE = 'DELETE_SERVICE';
 export function deleteService(service: IService) {

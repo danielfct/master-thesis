@@ -95,20 +95,29 @@ public class ServicesController {
     return servicesService.getDependencies(serviceName);
   }
 
-  @PatchMapping("/{serviceId}/dependencies")
-  public void removeDependencies(@PathVariable Long serviceId, @RequestBody BatchRequest<Long> batchRequest) {
-    System.out.println(batchRequest);
+  @PatchMapping("/{serviceName}/dependencies")
+  public void batchDependencies(@PathVariable String serviceName, @RequestBody BatchRequest<String> batchRequest) {
     BatchRequest.Request request = batchRequest.getRequest();
-    Long[] body = batchRequest.getBody();
-    if (request == BatchRequest.Request.DELETE) {
-      List<Long> dependencyIds = Arrays.asList(body);
-      servicesService.removeDependencies(serviceId, dependencyIds);
+    String[] body = batchRequest.getBody();
+    List<String> dependencies = Arrays.asList(body);
+    switch (request) {
+      case POST:
+        servicesService.addDependencies(serviceName, dependencies);
+        break;
+      case PUT:
+        servicesService.updateDependencies(serviceName, dependencies);
+        break;
+      case DELETE:
+        servicesService.removeDependencies(serviceName, dependencies);
+        break;
+      default:
+        break;
     }
   }
 
-  @DeleteMapping("/{id}/dependencies/{dependencyId}")
-  public void removeDependency(@PathVariable Long id, @PathVariable Long dependencyId) {
-    servicesService.removeDependency(id, dependencyId);
+  @DeleteMapping("/{serviceName}/dependencies/{dependencyName}")
+  public void removeDependency(@PathVariable String serviceName, @PathVariable String dependencyName) {
+    servicesService.removeDependency(serviceName, dependencyName);
   }
 
   @GetMapping("/{id}/eventPredictions")

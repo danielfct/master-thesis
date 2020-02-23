@@ -32,6 +32,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependen
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -63,6 +64,7 @@ public class ServiceEntity {
   private Long id;
 
   @NotNull
+  @Column(unique = true)
   private String serviceName;
 
   @NotNull

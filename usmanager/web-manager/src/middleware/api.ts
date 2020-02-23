@@ -95,7 +95,7 @@ export default (store: any) => (next: (action: any) => void) => (action: any) =>
     next(actionWith({ type: requestType }));
     return callApi(endpoint, schema).then(
       response => {
-          next(actionWith({ type: successType, entity, response }));
+          next(actionWith({ type: successType, entity, data: response }));
       },
       error => {
           next(actionWith({ type: failureType, error: error.message || 'Error fetching data' } ));

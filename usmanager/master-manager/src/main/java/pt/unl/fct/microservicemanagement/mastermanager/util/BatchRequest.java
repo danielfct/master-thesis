@@ -24,7 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.util;
 
+import lombok.Data;
 
+@Data
 public class BatchRequest<T> {
 
   public enum Request {
@@ -32,22 +34,7 @@ public class BatchRequest<T> {
   }
 
   private Request request;
+
   private T[] body;
-
-  public Request getRequest() {
-    return request;
-  }
-
-  public void setRequest(Request request) {
-    this.request = request;
-  }
-
-  public T[] getBody() {
-    return body;
-  }
-
-  public void setBody(T[] body) {
-    this.body = body;
-  }
 
 }

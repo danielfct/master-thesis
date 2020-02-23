@@ -48,26 +48,30 @@ export function getData(url: string): any {
      }*/
 }
 
-export function postData(url: string, requestBody: any, callback: (data: any) => void): void {
-    sendData(url, 'POST', requestBody, callback);
+export function postData(url: string, requestBody: any,
+                         successCallback: (response: any) => void, failureCallback: (reason: string) => void): void {
+    sendData(url, 'POST', requestBody, successCallback, failureCallback);
 }
 
-export function putData(url: string, requestBody: any, callback: (data: any) => void): void {
-    sendData(url, 'PUT', requestBody, callback);
+export function putData(url: string, requestBody: any,
+                        successCallback: (response: any) => void, failureCallback: (reason: string) => void): void {
+    sendData(url, 'PUT', requestBody, successCallback, failureCallback);
 }
 
-export function patchData(url: string, requestBody: any, callback: (data?: any) => void, action?: "post" | "put" | "delete", ): void {
+export function patchData(url: string, requestBody: any,
+                          successCallback: (response: any) => void, failureCallback: (reason: string) => void,
+                          action?: "post" | "put" | "delete", ): void {
     if (action) {
-        requestBody = { [action]: requestBody };
+        requestBody = { request: action.toUpperCase(), body: requestBody };
     }
-    sendData(url, 'PATCH', requestBody, callback);
+    sendData(url, 'PATCH', requestBody, successCallback, failureCallback);
 }
 
-const sendData = (endpoint: string, method: Method, data: any, callback: (data: any) => void) => {
-    const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
-    console.trace();
+const sendData = (endpoint: string, method: Method, data: any,
+                  successCallback: (response: any) => void, failureCallback: (reason: string) => void) => {
+    const url = new URL(endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`);
     console.log(`${method} ${url} ${JSON.stringify(data)}`);
-    axios(url, {
+    axios(url.href, {
         method,
         headers: {
             //TODO remove headers
@@ -76,35 +80,19 @@ const sendData = (endpoint: string, method: Method, data: any, callback: (data: 
             'Accept': 'application/json;charset=UTF-8',
         },
         data,
-    }).then(response => {
-        console.log(response)
-    }).catch(error => console.error(error))
-
-
-    /*fetch(url, {
-        method,
-        body,
-        mode: 'cors',
-        headers: new Headers({
-            'Content-type': 'application/json;charset=UTF-8',
-            'Accept': 'application/json;charset=UTF-8',
-        })
-    }).then(response => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error(`${response.status} ${response.statusText}`);
-    }).then(json => {
-        callback(json);
-    }).catch(e => {
-        M.toast({html: `<div>${e.message}</div>`});
-    });*/
+    }).then((response: AxiosResponse) => {
+        console.log(response);
+        successCallback(response)
+    }).catch((error: AxiosError) => {
+        console.error(error);
+        failureCallback(error.message);
+    })
 };
 
-export function deleteData(url: string, successCallback: () => void, failureCallback: (reason: string) => void): void {
+export function deleteData(endpoint: string, successCallback: () => void, failureCallback: (reason: string) => void): void {
+    const url = new URL(endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`);
     console.log(`DELETE ${url}`);
-    axios(`${API_URL}/${url}`, {
-        method: 'DELETE',
+    axios.delete(url.href, {
         // TODO set options from setupAxiosInterceptors instead, after login
         headers: {
             'Authorization': 'Basic YWRtaW46YWRtaW4=', //TODO remove

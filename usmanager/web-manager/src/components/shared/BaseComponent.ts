@@ -1,7 +1,7 @@
 import React from "react";
 import M from "materialize-css";
 
-export default class PageComponent<P, S> extends React.Component<P, S> {
+export default class BaseComponent<P, S> extends React.Component<P, S> {
 
   private toasts: M.Toast[] = [];
 

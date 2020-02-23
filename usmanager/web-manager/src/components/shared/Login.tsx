@@ -31,7 +31,7 @@ import {bindActionCreators} from "redux";
 import {showSidenavByUser} from "../../actions";
 import {connect} from "react-redux";
 import {AxiosError} from "axios";
-import PageComponent from "./PageComponent";
+import BaseComponent from "./BaseComponent";
 
 interface State {
   username: string;
@@ -48,7 +48,7 @@ interface LoginProps {
 
 type Props = LoginProps & DispatchToProps & RouteComponentProps;
 
-class Login extends PageComponent<Props, State> {
+class Login extends BaseComponent<Props, State> {
 
   private tabs = createRef<HTMLUListElement>();
 
@@ -78,7 +78,7 @@ class Login extends PageComponent<Props, State> {
         M.toast({ html: `<div>Welcome ${username}</div>` });
         this.props.history.push(`/home`);
       }).catch((e:AxiosError) => {
-        super.toast(`Failed to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true);
+        super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true);
     })
   };
 

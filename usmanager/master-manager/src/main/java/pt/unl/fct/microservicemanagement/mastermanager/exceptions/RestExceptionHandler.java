@@ -133,6 +133,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     return buildResponseEntity(apiError);
   }
 
+
+  /**
+   * Handle javax.persistence.EntityNotFoundException
+   */
+  @ExceptionHandler(javax.persistence.EntityNotFoundException.class)
+  protected ResponseEntity<Object> handleEntityNotFound(javax.persistence.EntityNotFoundException ex) {
+    return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, ex));
+  }
+
   /**
    * Handle HttpMessageNotReadableException. Happens when request JSON is malformed.
    *
@@ -186,13 +195,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     return buildResponseEntity(apiError);
   }
 
-  /**
-   * Handle javax.persistence.EntityNotFoundException
-   */
-  @ExceptionHandler(javax.persistence.EntityNotFoundException.class)
-  protected ResponseEntity<Object> handleEntityNotFound(javax.persistence.EntityNotFoundException ex) {
-    return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, ex));
-  }
 
   /**
    * Handle DataIntegrityViolationException, inspects the cause for different DB causes.

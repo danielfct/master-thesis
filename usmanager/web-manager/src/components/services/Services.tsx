@@ -33,7 +33,7 @@ import {ReduxState} from "../../reducers";
 import CardList from "../shared/CardList";
 import {IService} from "./Service";
 import styles from './Services.module.css'
-import PageComponent from "../shared/PageComponent";
+import BaseComponent from "../shared/BaseComponent";
 
 interface StateToProps {
   isLoading: boolean
@@ -47,7 +47,7 @@ interface DispatchToProps {
 
 type Props = StateToProps & DispatchToProps;
 
-class Services extends PageComponent<Props, {}> {
+class Services extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     this.props.loadServices();

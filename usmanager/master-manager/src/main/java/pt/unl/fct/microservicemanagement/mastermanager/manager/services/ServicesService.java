@@ -123,16 +123,16 @@ public class ServicesService {
     return services.serviceDependsOnOtherService(serviceId, otherServiceName);
   }
 
-  public void removeDependency(Long serviceId, Long dependencyId) {
-    removeDependencies(serviceId, List.of(dependencyId));
+  public void removeDependency(String serviceName, String dependencies) {
+    removeDependencies(serviceName, List.of(dependencies));
   }
 
-  public void removeDependencies(Long serviceId, List<Long> dependenciesId) {
-    var service = getService(serviceId);
-    System.out.println(service.getDependencies());
-    service.getDependencies().removeIf(dependency -> dependenciesId.contains(dependency.getId()));
-    service = services.save(service);
-    System.out.println(service.getDependencies());
+  public void removeDependencies(String serviceName, List<String> dependencies) {
+    var service = getService(serviceName);
+    log.info("Removing dependencies {}", dependencies);
+    service.getDependencies()
+        .removeIf(dependency -> dependencies.contains(dependency.getServiceDependency().getServiceName()));
+    services.save(service);
   }
 
   public Iterable<EventPredictionEntity> getServiceEventPredictions(Long id) {
