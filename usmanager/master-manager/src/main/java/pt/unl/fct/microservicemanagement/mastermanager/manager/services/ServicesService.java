@@ -29,6 +29,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependency.ServiceDependency;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.sql.Date;
@@ -95,8 +96,8 @@ public class ServicesService {
     service.setDefaultInternalPort(saveServiceConfigReq.getDefaultInternalPort());
     service.setDefaultDb(saveServiceConfigReq.getDefaultDb());
     service.setLaunchCommand(saveServiceConfigReq.getLaunchCommand());
-    service.setMinReplics(saveServiceConfigReq.getMinReplics());
-    service.setMaxReplics(saveServiceConfigReq.getMaxReplics());
+    service.setMinReplicas(saveServiceConfigReq.getMinReplicas());
+    service.setMaxReplicas(saveServiceConfigReq.getMaxReplicas());
     service.setOutputLabel(saveServiceConfigReq.getOutputLabel());
     service.setServiceType(saveServiceConfigReq.getServiceType());
     return services.save(service).getId();
@@ -123,6 +124,18 @@ public class ServicesService {
     return services.serviceDependsOnOtherService(serviceId, otherServiceName);
   }
 
+  public void addDependency(String serviceName, String dependencyName) {
+    var service = getService(serviceName);
+    var dependency = getService(dependencyName);
+    var serviceDependency = ServiceDependency.builder().service(service).dependency(dependency).build();
+    service = service.toBuilder().dependency(serviceDependency).build();
+    services.save(service);
+  }
+
+  public void addDependencies(String serviceName, List<String> dependenciesNames) {
+    dependenciesNames.forEach(dependencyName -> addDependency(serviceName, dependencyName));
+  }
+
   public void removeDependency(String serviceName, String dependencies) {
     removeDependencies(serviceName, List.of(dependencies));
   }
@@ -131,7 +144,7 @@ public class ServicesService {
     var service = getService(serviceName);
     log.info("Removing dependencies {}", dependencies);
     service.getDependencies()
-        .removeIf(dependency -> dependencies.contains(dependency.getServiceDependency().getServiceName()));
+        .removeIf(dependency -> dependencies.contains(dependency.getDependency().getServiceName()));
     services.save(service);
   }
 
@@ -171,19 +184,19 @@ public class ServicesService {
     var description = serviceEventPredictionReq.getDescription();
     var startDate = serviceEventPredictionReq.getStartDateTimeStamp();
     var endDate = serviceEventPredictionReq.getEndDateTimeStamp();
-    var minReplicas = serviceEventPredictionReq.getMinReplics();
+    var minReplicas = serviceEventPredictionReq.getMinReplicas();
     var updateTime = Timestamp.from(Instant.now());
 
     /*EventPredictionEntity serviceEventPredition =
         (id > 0 ? getEventPrediction(service.getId(), id).toBuilder() : EventPredictionEntity.builder())
-            .service(service).description(description).startDate(startDate).endDate(endDate).minReplics(minReplicas)
+            .service(service).description(description).startDate(startDate).endDate(endDate).minReplicas(minReplicas)
             .lastUpdate(updateTime).build();
     service.addEventPrediction(serviceEventPredition);
     services.save(service);*/
 
     EventPredictionEntity serviceEventPredition =
         (id > 0 ? serviceEventPredictions.findById(id).get().toBuilder() : EventPredictionEntity.builder())
-            .service(service).description(description).startDate(startDate).endDate(endDate).minReplics(minReplicas)
+            .service(service).description(description).startDate(startDate).endDate(endDate).minReplicas(minReplicas)
             .lastUpdate(updateTime).build();
     return serviceEventPredictions.save(serviceEventPredition).getId();
   }
@@ -197,14 +210,14 @@ public class ServicesService {
     return services.getAppsByServiceName(serviceName);
   }
 
-  public int getMinReplicsByServiceName(String serviceName) {
+  public int getMinReplicasByServiceName(String serviceName) {
     final var date = new Date(System.currentTimeMillis());
-    Integer customMinReplics = serviceEventPredictions.getMinReplicsByServiceName(serviceName, date);
-    return customMinReplics == null ? services.getMinReplicsByServiceName(serviceName) : customMinReplics;
+    Integer customMinReplicas = serviceEventPredictions.getMinReplicasByServiceName(serviceName, date);
+    return customMinReplicas == null ? services.getMinReplicasByServiceName(serviceName) : customMinReplicas;
   }
 
-  public int getMaxReplicsByServiceName(String serviceName) {
-    return services.getMaxReplicsByServiceName(serviceName);
+  public int getMaxReplicasByServiceName(String serviceName) {
+    return services.getMaxReplicasByServiceName(serviceName);
   }
 
   private void assertServiceExists(Long serviceId) {

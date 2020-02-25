@@ -24,7 +24,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import CardItem from '../shared/CardItem';
+import CardItem from '../shared/list/CardItem';
 import ServiceRules from './ServiceRules';
 import MainLayout from '../shared/MainLayout';
 import {getData} from "../../utils/api";

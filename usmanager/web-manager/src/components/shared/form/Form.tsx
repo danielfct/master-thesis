@@ -30,6 +30,7 @@ import {RouteComponentProps, withRouter} from "react-router";
 import {getTypeFromValue, FieldProps, IValidation} from "./Field";
 import {camelCaseToSentenceCase} from "../../../utils/text";
 import ConfirmDialog from "../ConfirmDialog";
+import { isEqual } from "lodash";
 
 export interface IFields {
   [key: string]: FieldProps;
@@ -43,16 +44,21 @@ export interface IErrors {
   [key: string]: string;
 }
 
-type restOperation = { url: string, successCallback: (reply?: any) => void, failureCallback: (reason: string) => void }
+type restOperation = {
+  url: string,
+  successCallback: (reply?: any, args?: any) => void,
+  failureCallback: (reason: string, args?: any) => void
+}
 
 interface FormPageProps {
+  id: string;
   fields: IFields;
   values: IValues;
-  new: boolean;
+  isNew: boolean;
+  showSaveButton: boolean;
   post: restOperation;
   put: restOperation;
   delete?: restOperation;
-  id: string;
 }
 
 type Props = FormPageProps & RouteComponentProps;
@@ -61,6 +67,7 @@ interface State {
   values: IValues;
   errors: IErrors;
   isEditing: boolean;
+  showSaveButton: boolean;
 }
 
 export interface IFormContext extends State {
@@ -93,14 +100,18 @@ class Form extends React.Component<Props, State> {
 
   private fab = createRef<HTMLDivElement>();
 
-  state = {
+  state: State = {
     values: this.props.values,
     errors: {},
-    isEditing: this.props.new,
+    isEditing: this.props.isNew,
+    showSaveButton: false,
   };
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     M.FloatingActionButton.init(this.fab.current as Element);
+    if (prevProps.showSaveButton != this.props.showSaveButton || prevState.values != this.state.values) {
+      this.setState({showSaveButton: this.props.showSaveButton || this.props.isNew || !isEqual(this.props.values, this.state.values)})
+    }
   }
 
   private validate = (fieldName: string): string => {
@@ -129,8 +140,11 @@ class Form extends React.Component<Props, State> {
   };
 
   private onClickDelete = (): void => {
+    const args = this.state.values[this.props.id];
     if (this.props.delete) {
-      deleteData(this.props.delete.url, this.props.delete.successCallback, this.props.delete.failureCallback);
+      deleteData(this.props.delete.url,
+        () => this.props.delete?.successCallback(args),
+        () => this.props.delete?.failureCallback(args));
     }
   };
 
@@ -139,16 +153,25 @@ class Form extends React.Component<Props, State> {
     if (!this.validateForm()) {
       return;
     }
-    if (this.props.new) {
-      postData(this.props.post.url, this.state.values, this.props.post.successCallback, this.props.post.failureCallback);
+    const {id, isNew, post, put} = this.props;
+    const args = this.state.values[id];
+    if (isNew) {
+      postData(post.url, this.state.values,
+        () => post.successCallback(args),
+        () => post.failureCallback(args));
     }
     else {
-      putData(this.props.put.url, this.state.values, this.props.put.successCallback, this.props.post.failureCallback);
+      putData(put.url, this.state.values,
+        () => put.successCallback(args),
+        () => put.failureCallback(args));
     }
   };
 
-  private setValues = (values: IValues) =>
+
+  private setValues = (values: IValues) => {
     this.setState({ values: { ...this.state.values, ...values } });
+  };
+
 
   render() {
     const context: IFormContext = {
@@ -156,38 +179,39 @@ class Form extends React.Component<Props, State> {
       setValues: this.setValues,
       validate: this.validate
     };
-    const {isEditing} = this.state;
+    const {showSaveButton} = this.state;
     const {children} = this.props;
     return (
       <>
         <ConfirmDialog message={`delete ${this.props.values[this.props.id]}`} confirmCallback={this.onClickDelete}/>
         <form onSubmit={this.handleSubmit} noValidate>
-          <div className={`${styles.controlsContainer}`}>
-            {this.props.new
+          <div className={`controlsContainer`}>
+            {this.props.isNew
               ?
-              <button className={`btn-flat btn-small waves-effect waves-light green-text right slide`}
+              <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text right slide`}
                       type="submit">
                 Save
               </button>
               :
               <div>
-                <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                <button className={`btn-floating btn-flat btn-small waves-effect waves-black right tooltipped`}
                         data-position="bottom" data-tooltip="Edit"
                         type="button"
                         onClick={this.onClickEdit}>
                   <i className="large material-icons">edit</i>
                 </button>
-                <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text right slide`}
-                        style={isEditing ? {transform: "scale(1)"} : {transform: "scale(0)"}}
-                        type="button"
-                        data-target="confirm-dialog">
-                  Delete
-                </button>
-                <button className={`btn-flat btn-small waves-effect waves-light green-text right slide`}
-                        style={isEditing ? {transform: "scale(1)"} : {transform: "scale(0)"}}
-                        type="submit">
-                  Save
-                </button>
+                <div className={`${styles.controlButton}`}>
+                  <button className={`modal-trigger btn-flat btn-small waves-effect waves-black red-text`}
+                          type="button"
+                          data-target="confirm-dialog">
+                    Delete
+                  </button>
+                  <button className={`btn-flat btn-small waves-effect waves-black green-text slide`}
+                          style={showSaveButton ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                          type="submit">
+                    Save
+                  </button>
+                </div>
               </div>
             }
           </div>

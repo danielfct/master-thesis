@@ -28,15 +28,13 @@
 
 .content {
     padding: 10px 10px;
-}
-
-.controlsContainer {
-    margin: 0 -0.75rem;
-    padding: 15px 40px;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.8);
-    overflow: auto;
+    margin: 0 30px;
 }
 
 button {
-    margin-left: 10px !important;
+    margin-right: 10px !important;
+}
+
+.controlButton {
+    float: left !important;
 }

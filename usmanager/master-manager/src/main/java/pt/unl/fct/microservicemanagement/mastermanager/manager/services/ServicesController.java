@@ -99,13 +99,10 @@ public class ServicesController {
   public void batchDependencies(@PathVariable String serviceName, @RequestBody BatchRequest<String> batchRequest) {
     BatchRequest.Request request = batchRequest.getRequest();
     String[] body = batchRequest.getBody();
-    List<String> dependencies = Arrays.asList(body);
+    var dependencies = Arrays.asList(body);
     switch (request) {
       case POST:
         servicesService.addDependencies(serviceName, dependencies);
-        break;
-      case PUT:
-        servicesService.updateDependencies(serviceName, dependencies);
         break;
       case DELETE:
         servicesService.removeDependencies(serviceName, dependencies);

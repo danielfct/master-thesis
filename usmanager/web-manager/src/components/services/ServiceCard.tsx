@@ -24,35 +24,77 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import CardItem from '../shared/CardItem';
+import CardItem from '../shared/list/CardItem';
 import {camelCaseToSentenceCase} from "../../utils/text";
 import styles from './ServiceCard.module.css';
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {IService} from "./Service";
+import CardTitle from "../shared/list/CardTitle";
 
 interface ServiceCardProps {
     service: IService;
+    longPressBackspaceCallback: () => void;
 }
 
 type Props = ServiceCardProps;
 
 export default class ServiceCard extends React.Component<Props, {}> {
 
-    render = () =>
-        <div className='col s6 m4 l3'>
-            <div className={`card ${styles.gridCard} hoverable`}>
-                <PerfectScrollbar>
-                    <Link to={{
-                        pathname: `/services/${this.props.service.serviceName}#details`,
-                        state: this.props}}>
-                        <div className='card-content'>
-                            {Object.entries(this.props.service)
-                                .filter(([key, _]) => key !== 'id' && key !== 'dependencies')
-                                .map(([key, value]) =>
-                                    <CardItem key={key} label={camelCaseToSentenceCase(key)} value={value}/>)}
-                        </div>
-                    </Link>
-                </PerfectScrollbar>
-            </div>
-        </div>;
+    private getReplicasMessage = (minReplicas: number, maxReplicas: number): string => {
+        if (minReplicas == maxReplicas) {
+            return `${minReplicas}`;
+        }
+        else if (maxReplicas == 0) {
+            return `At least ${minReplicas}`
+        }
+        else {
+            return `At least ${minReplicas} up to ${maxReplicas}`;
+        }
+    };
+
+    render = () => {
+        const {service} = this.props;
+        return (
+          <div className={`col s6 m4 l3 ${styles.serviceCard}`}>
+              <Link to={{
+                  pathname: `/services/${service.serviceName}`,
+                  state: this.props.service}}>
+                  <CardTitle title={service.serviceName}/>
+              </Link>
+              <div className={`card gridCard hoverable`}>
+                  <PerfectScrollbar>
+                      <Link to={{
+                          pathname: `/services/${service.serviceName}`,
+                          state: service}}>
+                          <div className='card-content'>
+                              <CardItem key={'serviceType'}
+                                        label={'Service type'}
+                                        value={`${service.serviceType}`}/>
+                              <CardItem key={'replicas'}
+                                        label={'Replicas'}
+                                        value={this.getReplicasMessage(service.minReplicas, service.maxReplicas)}/>
+                              <CardItem key={'ports'}
+                                        label={'Ports'}
+                                        value={`${service.defaultExternalPort}:${service.defaultInternalPort}`}/>
+                              {service.launchCommand != '' &&
+                              <CardItem key={'launchCommand'}
+                                        label={'Launch command'}
+                                        value={service.launchCommand}/>}
+                              <CardItem key={'outputLabel'}
+                                        label={'Output label'}
+                                        value={`${service.outputLabel}`}/>
+                              {service.defaultDb != 'NOT_APPLICABLE' &&
+                              <CardItem key={'database'}
+                                        label={'Database'}
+                                        value={service.defaultDb}/>}
+                              <CardItem key={'memory'}
+                                        label={'Memory'}
+                                        value={`${service.expectedMemoryConsumption} bytes`}/>
+                          </div>
+                      </Link>
+                  </PerfectScrollbar>
+              </div>
+          </div>
+        );
+    }
 }

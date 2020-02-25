@@ -24,7 +24,7 @@
 
 import React from 'react';
 import M from 'materialize-css';
-import CardItem from '../shared/CardItem';
+import CardItem from '../shared/list/CardItem';
 import {getData, deleteData, postData} from '../../utils/api';
 
 export default class ContainerCard extends React.Component {

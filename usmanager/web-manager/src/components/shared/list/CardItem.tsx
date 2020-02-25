@@ -22,57 +22,17 @@
  * SOFTWARE.
  */
 
-import List from "./List";
-import React from "react";
+import React from 'react';
+import styles from './CardItem.module.css';
 
-interface Props<T> {
-  isLoading: boolean;
-  error?: string | null;
-  emptyMessage: string;
-  list: T[];
-  card: (element: T) => JSX.Element;
-  predicate?: (element: T, filter: string) => boolean;
+interface CardItemProps {
+  label: string;
+  value: string;
 }
 
-interface State {
-  pagesize: number;
-}
+const CardItem: React.FC<CardItemProps> = ({label, value}) =>
+  <div className={`${styles.cardItem}`}>
+      {label}: <p className={`${styles.cardValue}`}>{value}</p>
+  </div>;
 
-export default class CardList<T> extends React.Component<Props<T>, State> {
-
-  constructor(props: Props<T>) {
-    super(props);
-    this.state = {
-      pagesize: this.calcPagesize()
-    }
-  }
-
-  componentDidMount(): void {
-    window.addEventListener('resize', this.handleResize);
-  }
-
-  componentWillUnmount(): void {
-    window.removeEventListener('resize', this.handleResize);
-  }
-
-  private handleResize = (_: Event) => {
-    this.setState({pagesize: this.calcPagesize()})
-  };
-
-  private calcPagesize = () => {
-    const width = window.innerWidth;
-    if (width <= 600) {
-      return 4;
-    } else if (width <= 992) {
-      return 6;
-    } else {
-      return 8;
-    }
-  };
-
-  render() {
-    const GenericList = List<T>();
-    return <GenericList {...this.props} show={this.props.card} paginate={{pagesize: this.state.pagesize}}/>
-  }
-
-}
+export default CardItem;

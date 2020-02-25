@@ -34,10 +34,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ServiceEventPredictionRepository extends CrudRepository<EventPredictionEntity, Long> {
 
-  @Query("select sp.minReplics "
+  @Query("select sp.minReplicas "
       + "from EventPredictionEntity sp inner join sp.service s "
       + "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
       + "order by sp.lastUpdate desc")
-  Integer getMinReplicsByServiceName(@Param("serviceName") String serviceName, @Param("date") Date date);
+  Integer getMinReplicasByServiceName(@Param("serviceName") String serviceName, @Param("date") Date date);
 
 }

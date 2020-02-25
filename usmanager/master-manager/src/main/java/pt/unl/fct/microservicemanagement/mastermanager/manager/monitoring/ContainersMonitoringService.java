@@ -272,8 +272,8 @@ public class ContainersMonitoringService {
       final var containerDecisions = servicesDecisions.getValue();
       final var relevantContainerDecisions = relevantServicesDecisions.getOrDefault(serviceName, new ArrayList<>());
       final var currentReplicas = containerDecisions.size();
-      final var minimumReplicas = servicesConfigService.getMinReplicsByServiceName(serviceName);
-      final var maximumReplicas = servicesConfigService.getMaxReplicsByServiceName(serviceName);
+      final var minimumReplicas = servicesConfigService.getMinReplicasByServiceName(serviceName);
+      final var maximumReplicas = servicesConfigService.getMaxReplicasByServiceName(serviceName);
       if (currentReplicas < minimumReplicas) {
         startContainer(containerDecisions, relevantContainerDecisions, servicesLocationsRegions);
       } else if (!relevantContainerDecisions.isEmpty()) {

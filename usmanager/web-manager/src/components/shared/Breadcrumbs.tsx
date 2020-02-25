@@ -26,7 +26,7 @@ import React from "react";
 import {Link, RouteComponentProps, RouteProps, withRouter} from "react-router-dom";
 import styles from './Breadcrumbs.module.css';
 import {authenticatedRoutes} from "../../containers/Root.dev";
-import {capitalize} from "../../utils/text";
+import {camelCaseToSentenceCase, capitalize, snakeCaseToCamelCase} from "../../utils/text";
 
 export type IBreadcrumb = { title: string, link?: string };
 
@@ -72,6 +72,8 @@ const breadcrumbs = (props: Props): IBreadcrumbs => {
                 title = title.substring(0, title.indexOf('#'));
             }
         }
+        title = snakeCaseToCamelCase(title);
+        title = camelCaseToSentenceCase(title);
         return {
             title,
             link,

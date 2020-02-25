@@ -78,7 +78,7 @@ class Login extends BaseComponent<Props, State> {
         M.toast({ html: `<div>Welcome ${username}</div>` });
         this.props.history.push(`/home`);
       }).catch((e:AxiosError) => {
-        super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true);
+      super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true);
     })
   };
 
@@ -88,7 +88,7 @@ class Login extends BaseComponent<Props, State> {
     }
     const {username, password, showPassword} = this.state;
     return (
-      <div className={`row container ${styles.container}`}>
+      <div className={`container ${styles.container} row`}>
         <ul className={`tabs ${styles.tabs} col s9 m6 l6 offset-s1 offset-m3 offset-l3`} ref={this.tabs}>
           <li className={`tab ${styles.tab} col s12`}><a>Login</a></li>
         </ul>
@@ -117,7 +117,8 @@ class Login extends BaseComponent<Props, State> {
             </button>
           </form>
         </div>
-      </div>)
+      </div>
+    );
   }
 
 }

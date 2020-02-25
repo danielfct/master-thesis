@@ -26,10 +26,10 @@ import React, {createRef} from "react";
 import {ReduxState} from "../../reducers";
 import {IService} from "./Service";
 import {connect} from "react-redux";
-import List from "../shared/List";
+import List from "../shared/list/List";
 import {bindActionCreators} from "redux";
-import {loadServiceDependencies, loadServices, removeServiceDependencies} from "../../actions";
-import ListItem from "../shared/ListItem";
+import {addServiceDependency, loadServiceDependencies, loadServices, removeServiceDependencies} from "../../actions";
+import ListItem from "../shared/list/ListItem";
 import styles from './ServiceDependencyList.module.css';
 import M from "materialize-css";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -42,121 +42,156 @@ export interface IServiceDependency extends IService {
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  dependencies: string[];
-  services: string[];
+  dependenciesNames: string[];
+  servicesNames: string[];
 }
 
 interface DispatchToProps {
   loadServices: (name?: string) => any;
   loadServiceDependencies: (serviceName: string) => void;
-  removeServiceDependencies: (stringName: string, dependencies: string[]) => void;
+  removeServiceDependencies: (serviceName: string, dependencies: string[]) => void;
+  addServiceDependency: (serviceName: string, dependencyName: string) => void;
 }
 
 interface ServiceDependencyProps {
   service: IService | Partial<IService>;
+  addServiceDependencyCallback: (dependency: string) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceDependencyProps;
 
 interface State {
-  [key: string]: boolean | undefined;
+  [key: string]: { isChecked: boolean, isNew: boolean } | undefined;
 }
-
-const GLOBAL_CHECKBOX_ID = "GLOBAL_CHECKBOX";
 
 class ServiceDependencyList extends BaseComponent<Props, State> {
 
   private dropdown = createRef<HTMLButtonElement>();
   private globalCheckbox = createRef<HTMLInputElement>();
 
-  constructor(props: Props) {
-    super(props);
-    this.state = props.dependencies.reduce((state: any, dependency: string) => {
-      state[dependency] = false;
-      return state;
-    }, {});
-  }
+  state: State = {};
 
   componentDidMount(): void {
-    this.props.loadServices();
     const {serviceName} = this.props.service;
     if (serviceName) {
       this.props.loadServiceDependencies(serviceName);
     }
+    else {
+      this.props.loadServices();
+    }
     M.Dropdown.init(this.dropdown.current as Element);
   }
 
-  private handleCheckbox = ({target:{id, checked}}:any) => {
-    if (id !== GLOBAL_CHECKBOX_ID) {
-      this.setState({[id]: checked}, () => {
-        if (this.globalCheckbox.current) {
-          this.globalCheckbox.current.checked = Object.values(this.state).every((checked: boolean | undefined) => checked);
-        }
-      });
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (this.globalCheckbox.current) {
+      this.globalCheckbox.current.checked = Object.values(this.state)
+                                                  .map(dependency => !!dependency?.isChecked)
+                                                  .every(checked => checked);
     }
-    else {
-      this.setState(this.props.dependencies.reduce((newState: any, dependency: string) => {
-        newState[dependency] = checked;
-        return newState;
+    if (prevProps.dependenciesNames !== this.props.dependenciesNames)
+      this.setState(this.props.dependenciesNames.reduce((state: State, dependency: string) => {
+        state[dependency] = { isChecked: false, isNew: false };
+        return state;
       }, {}));
-    }
+  }
+
+  private handleGlobalCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {checked} = event.target;
+    this.setState(state => Object.entries(state).reduce((newState: State, [dependencyName, dependency]) => {
+      newState[dependencyName] = { isChecked: checked, isNew: dependency?.isNew || false };
+      return newState;
+    }, {}));
   };
 
-  private dependency = (dependency: string): JSX.Element =>
-    <ListItem>
+
+  private handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {id: dependencyName, checked} = event.target;
+    this.setState(state => ({[dependencyName]: { isChecked: checked, isNew: state[dependencyName]?.isNew || false } }));
+  };
+
+  private dependency = (dependency: string, index: number): JSX.Element =>
+    <ListItem separate={index != Object.entries(this.state).filter(([_, dependency]) => dependency).length - 1}>
       <p>
         <label>
           <input id={dependency}
                  type="checkbox"
                  onChange={this.handleCheckbox}
-                 checked={this.state[dependency]}/>
+                 checked={this.state[dependency]?.isChecked}/>
           <span>{dependency}</span>
         </label>
       </p>
     </ListItem>;
 
   private onDeleteSuccess = (): void => {
-    const dependencies = Object.entries(this.state).filter(([_, value]) => value).map(([key, value]) => key);
+    const dependencies = Object.entries(this.state).filter(([_, dependency]) => dependency?.isChecked).map(([key, value]) => key);
     const serviceName = this.props.service.serviceName;
     if (serviceName) {
       this.props.removeServiceDependencies(serviceName, dependencies);
       dependencies.forEach(dependency => this.setState({[dependency]: undefined}));
     }
-    /*super.toast(`${dependencies.length == 1 ? 'Dependency' : 'All dependencies'} removed successfully`);*/
   };
 
   private onDeleteFailure = (reason: string): void =>
     super.toast(`Unable to delete dependency`, 10000, reason, true);
 
   private handleRemoveDependencies = (): void => {
-    const dependencies = Object.entries(this.state).filter(([_, checked]) => checked).map(([name, _]) => name);
-    if (dependencies.length > 1) {
-      patchData(`services/${this.props.service.serviceName}/dependencies`, dependencies, this.onDeleteSuccess, this.onDeleteFailure, "delete");
-    } else {
-      const dependency = dependencies[0];
-      deleteData(`services/${this.props.service.serviceName}/dependencies/${dependency}`, this.onDeleteSuccess, this.onDeleteFailure);
+    const checkedDependencies = Object.entries(this.state).filter(([_, dependency]) => dependency?.isChecked);
+    checkedDependencies
+      .filter(([_, dependency]) => dependency?.isNew)
+      .map(([name, _]) => name)
+      .forEach(dependencyName => this.setState({[dependencyName]: undefined}));
+    const existingDependenciesNames = checkedDependencies
+      .filter(([_, dependency]) => !dependency?.isNew)
+      .map(([name, _]) => name);
+    if (existingDependenciesNames.length) {
+      if (existingDependenciesNames.length > 1) {
+        patchData(`services/${this.props.service.serviceName}/dependencies`, existingDependenciesNames,
+          this.onDeleteSuccess, this.onDeleteFailure, "delete");
+      }
+      else {
+        const dependencyName = existingDependenciesNames[0];
+        deleteData(`services/${this.props.service.serviceName}/dependencies/${dependencyName}`,
+          this.onDeleteSuccess, this.onDeleteFailure);
+      }
     }
+
+  };
+
+  private handleAddDependency = (event: React.MouseEvent<HTMLLIElement>): void => {
+    const dependencyName = (event.target as HTMLLIElement).innerHTML;
+    this.props.addServiceDependencyCallback(dependencyName);
+    this.setState({ [dependencyName]: { isChecked: false, isNew: true } });
+  };
+
+  private getDependencyNames = (): string[] =>
+    Object.entries(this.state)
+          .filter(([_, dependency]) => dependency)
+          .map(([name, _]) => name);
+
+  private getSelectableServicesNames = (dependenciesNames: string[]) => {
+    const {servicesNames, service} = this.props;
+    return servicesNames.filter(name => !service || name !== service.serviceName && !dependenciesNames.includes(name));
   };
 
   render() {
-    const {services, service, dependencies} = this.props;
-    const selectableServices = services.filter(name => !service || name !== service.serviceName && !dependencies.includes(name));
+    const dependenciesNames = this.getDependencyNames();
+    console.log(this.state)
+    const selectableServices = this.getSelectableServicesNames(dependenciesNames);
     const ServiceDependenciesList = List<string>();
     return (
       <div>
-        <div className={`${styles.controlsContainer}`}>
-          {dependencies.length > 0 && (
+        <div className={`controlsContainer`}>
+          {dependenciesNames.length > 0 && (
             <p className={`${styles.nolabelCheckbox}`}>
               <label>
-                <input id={GLOBAL_CHECKBOX_ID}
-                       type="checkbox"
-                       onChange={this.handleCheckbox}
+                <input type="checkbox"
+                       onChange={this.handleGlobalCheckbox}
                        ref={this.globalCheckbox}/>
                 <span/>
               </label>
             </p>
           )}
-          <button className='dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
+          <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
                   data-position="bottom" data-tooltip="New dependency"
                   data-target='servicesDropdown'
                   ref={this.dropdown}>
@@ -168,14 +203,18 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
             </li>
             <PerfectScrollbar>
               {selectableServices.map((service, index) =>
-                <li key={index}>
+                <li key={index} onClick={this.handleAddDependency}>
                   <a>{service}</a>
                 </li>
               )}
             </PerfectScrollbar>
           </ul>
           <button className="btn-flat btn-small waves-effect waves-light red-text right"
-                  style={Object.values(this.state).some((checked: boolean | undefined) => checked) ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                  style={Object.values(this.state)
+                               .map(dependency => dependency?.isChecked || false)
+                               .some(checked => checked)
+                    ? {transform: "scale(1)"}
+                    : {transform: "scale(0)"}}
                   onClick={this.handleRemoveDependencies}>
             Remove
           </button>
@@ -184,10 +223,8 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
           isLoading={this.props.isLoading}
           error={this.props.error}
           emptyMessage={`Dependencies list is empty`}
-          list={dependencies}
-          show={this.dependency}
-          separate
-          animate/>
+          list={dependenciesNames}
+          show={this.dependency}/>
       </div>
     )
   }
@@ -199,14 +236,19 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceDependencyProps): S
   const service = serviceName && state.entities.services.data[serviceName];
   const dependencies = service && service.dependencies;
   return {
-    isLoading: state.entities.services.isLoading,
-    error: state.entities.services.error,
-    dependencies: dependencies || [],
-    services: Object.keys(state.entities.services.data)
+    isLoading: state.entities.services.isLoadingDependencies,
+    error: state.entities.services.loadDependenciesError,
+    dependenciesNames: dependencies || [],
+    servicesNames: Object.keys(state.entities.services.data)
   }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({ loadServices, loadServiceDependencies, removeServiceDependencies }, dispatch);
+  bindActionCreators({
+    loadServices,
+    loadServiceDependencies,
+    removeServiceDependencies,
+    addServiceDependency
+  }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceDependencyList);

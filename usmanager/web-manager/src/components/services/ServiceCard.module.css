@@ -22,10 +22,6 @@
  * SOFTWARE.
  */
 
-.gridCard {
-    width: auto !important;
-    background: #36393F;
-    color: white;
-    border: 1px solid black;
-    height: 250px;
+.serviceCard {
+    margin-top: 20px;
 }

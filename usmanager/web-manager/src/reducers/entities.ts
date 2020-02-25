@@ -32,18 +32,20 @@ import {
   SERVICE_SUCCESS,
   SERVICE_DEPENDENCIES_REQUEST,
   SERVICE_DEPENDENCIES_FAILURE,
-  REMOVE_SERVICE_DEPENDENCIES
+  REMOVE_SERVICE_DEPENDENCIES, ADD_SERVICE_DEPENDENCY
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
 import {IService} from "../components/services/Service";
-import {merge, mergeWith } from 'lodash';
+import {merge, mergeWith, assign, pick, keys } from 'lodash';
 
 export type EntitiesState = {
   services: {
     data: { [key: string]: IService },
-    isLoading: boolean,
-    error?: string | null
+    isLoadingServices: boolean,
+    loadServicesError?: string | null,
+    isLoadingDependencies: boolean,
+    loadDependenciesError?: string | null,
   },
   //TODO other entities
 }
@@ -61,32 +63,56 @@ export type EntitiesAction = {
   },
 };
 
-const entities = (state: EntitiesState = { services: { data: {}, isLoading: false, error: null } },
+const entities = (state: EntitiesState = {
+                    services: {
+                      data: {},
+                      isLoadingServices: false,
+                      loadServicesError: null,
+                      isLoadingDependencies: false,
+                      loadDependenciesError: null
+                    }
+                  },
                   action: EntitiesAction
 ) => {
   const { type, error, entity, data } = action;
   switch (type) {
     case SERVICE_REQUEST:
     case SERVICES_REQUEST:
+      state = merge({}, state, { services: { isLoadingServices: true } });
+      break;
     case SERVICE_DEPENDENCIES_REQUEST:
-      state = merge({}, state, { services: { isLoading: true } });
+      state = merge({}, state, { services: { isLoadingDependencies: true } });
       break;
     case SERVICE_FAILURE:
     case SERVICES_FAILURE:
+      state = merge({}, state, { services: { isLoadingServices: false, loadServicesError: error } });
+      break;
     case SERVICE_DEPENDENCIES_FAILURE:
-      state = merge({}, state, { services: { isLoading: false, error: error } });
+      state = merge({}, state, { services: { isLoadingDependencies: false, loadDependenciesError: error } });
       break;
     case SERVICE_SUCCESS:
     case SERVICES_SUCCESS:
-      state = merge({}, { services: { data: data?.services } }, state);
-      state = merge({}, state, { services: { isLoading: false, error: null } });
+      const services = { services: { data: data?.services } };
+      assign(services, pick(state.services, keys(services)));
+      state = merge({}, services, state);
+      state = merge({}, state, { services: { isLoadingServices: false, loadServicesError: null } });
       break;
     case SERVICE_DEPENDENCIES_SUCCESS:
       if (entity) {
         const service = state.services.data[entity];
-        const serviceWithDependencies = Object.assign(service ? service : [entity], data);
+        const dependencies = { dependencies: data?.dependencies || [] };
+        const serviceWithDependencies = Object.assign(service ? service : [entity], dependencies);
         const normalizedService = normalize(serviceWithDependencies, Schemas.SERVICE).entities;
-        state = merge({}, state, { services: { data: normalizedService.services, isLoading: false, error: null } });
+        state = merge({}, state, { services: { data: normalizedService.services, isLoadingDependencies: false, loadDependenciesError: null } });
+      }
+      break;
+    case ADD_SERVICE_DEPENDENCY:
+      if (entity) {
+        const service = state.services.data[entity];
+        if (data?.dependenciesNames?.length) {
+          service.dependencies?.unshift(data?.dependenciesNames[0]);
+          state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
+        }
       }
       break;
     case REMOVE_SERVICE_DEPENDENCIES:

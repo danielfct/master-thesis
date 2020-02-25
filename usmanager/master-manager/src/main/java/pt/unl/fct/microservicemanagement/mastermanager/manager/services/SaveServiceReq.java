@@ -35,8 +35,8 @@ class SaveServiceReq {
   private final String defaultInternalPort;
   private final String defaultDb;
   private final String launchCommand;
-  private final int minReplics;
-  private final int maxReplics;
+  private final int minReplicas;
+  private final int maxReplicas;
   private final String outputLabel;
   private final String serviceType;
 

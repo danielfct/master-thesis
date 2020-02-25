@@ -28,9 +28,8 @@ import './PagedList.css';
 
 export interface IPagedList<T> {
     list: T[];
-    show: (x: T) => JSX.Element;
+    show: (element: T, index: number) => JSX.Element;
     paginate: { pagesize: number, page?: number, bottom?: boolean };
-    separate?: boolean | { color: string };
 }
 
 interface State {
@@ -51,13 +50,29 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
         this.max = Math.max(0, Math.ceil(props.list.length / (this.state.pagesize || 1)) - 1);
     }
 
+    private setPage = (pageIndex: number): void => {
+        this.max = Math.max(0, Math.ceil(this.props.list.length / (this.state.pagesize || 1)) - 1);
+        this.setState(state => ({page: state.page === undefined ? 0 : Math.max(0, pageIndex)}));
+    };
+
+    private prevPage = (): void => {
+        const {page} = this.state;
+        this.setPage(page === undefined ? 0 : Math.max(0, page - 1));
+    };
+
+    private nextPage = (): void => {
+        const {page} = this.state;
+        this.setPage(page === undefined ? 0 : Math.min(this.max, page + 1));
+    };
+
     render() {
-        const {list: l, show, paginate, separate} = this.props;
+        const {list: l, show, paginate} = this.props;
         const {page = 0, pagesize = l.length} = this.state;
         const list = l.slice(page * pagesize, page * pagesize + pagesize);
+        // TODO: page transition. e.g. slide to the left while new page comes from the right. Using react spring
         return (
           <div>
-              <ul className="pagination center-align no-select" style={this.max < 1 ? { visibility: "hidden" } : undefined}>
+              <ul className={`pagination center-align no-select`}  style={this.max < 1 ? { visibility: "hidden" } : undefined}>
                   {!paginate.bottom && (
                     <li className={page === 0 ? "disabled prev" : "prev"}>
                         <a onClick={this.prevPage}>
@@ -89,25 +104,10 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
                     </li>
                   )}
               </ul>
-              <SimpleList<T> {...{list, show, separate}}/>
+              <SimpleList<T> list={list} show={show}/>
           </div>
         );
     }
-
-    private setPage = (pageIndex: number): void => {
-        this.max = Math.max(0, Math.ceil(this.props.list.length / (this.state.pagesize || 1)) - 1);
-        this.setState(state => ({page: state.page === undefined ? 0 : Math.max(0, pageIndex)}));
-    };
-
-    private prevPage = (): void => {
-        const {page} = this.state;
-        this.setPage(page === undefined ? 0 : Math.max(0, page - 1));
-    };
-
-    private nextPage = (): void => {
-        const {page} = this.state;
-        this.setPage(page === undefined ? 0 : Math.min(this.max, page + 1));
-    };
 
 }
 

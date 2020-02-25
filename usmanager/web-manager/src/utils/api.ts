@@ -60,7 +60,7 @@ export function putData(url: string, requestBody: any,
 
 export function patchData(url: string, requestBody: any,
                           successCallback: (response: any) => void, failureCallback: (reason: string) => void,
-                          action?: "post" | "put" | "delete", ): void {
+                          action?: "post" | "delete", ): void {
     if (action) {
         requestBody = { request: action.toUpperCase(), body: requestBody };
     }

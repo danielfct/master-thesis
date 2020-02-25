@@ -25,3 +25,11 @@
 .container {
     margin: 10px;
 }
+
+.details {
+    padding: 0 !important;
+}
+
+.dependencies {
+    padding: 0 !important;
+}

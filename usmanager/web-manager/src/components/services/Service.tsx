@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import React, {createRef} from 'react';
+import React, {AnchorHTMLAttributes, createRef} from 'react';
 import M from 'materialize-css';
 import {Redirect, RouteComponentProps} from 'react-router';
 import {camelCaseToSentenceCase} from "../../utils/text";
@@ -30,7 +30,7 @@ import Form, {IFields, IValues, min, required, requiredAndNumberAndMin} from "..
 import {mapLabelToIcon} from "../../utils/image";
 import IData from "../shared/IData";
 import ServiceDependencyList from "./ServiceDependencyList";
-import {loadServices} from "../../actions";
+import {addServiceDependency, loadServices} from "../../actions";
 import {connect, MapStateToProps} from "react-redux";
 import MainLayout from "../shared/MainLayout";
 import LoadingSpinner from "../shared/LoadingSpinner";
@@ -40,6 +40,10 @@ import Field, {getTypeFromValue} from "../shared/form/Field";
 import BaseComponent from "../shared/BaseComponent";
 import entities from "../../reducers/entities";
 import Error from "../shared/Error";
+import {inspect} from "util";
+import styles from './Services.module.css';
+import Tabs, {Tab} from "../shared/Tabs";
+import {patchData, postData} from "../../utils/api";
 
 export interface IService extends IData {
   serviceName: string;
@@ -48,8 +52,8 @@ export interface IService extends IData {
   defaultInternalPort: number;
   defaultDb: string;
   launchCommand: string;
-  minReplics: number;
-  maxReplics: number;
+  minReplicas: number;
+  maxReplicas: number;
   outputLabel: string;
   serviceType: string;
   expectedMemoryConsumption: number;
@@ -63,12 +67,18 @@ const emptyService = (): Partial<IService> => ({
   defaultInternalPort: 0,
   defaultDb: '',
   launchCommand: '',
-  minReplics: 0,
-  maxReplics: 0,
+  minReplicas: 0,
+  maxReplicas: 0,
   outputLabel: '',
   serviceType: '',
   expectedMemoryConsumption: 0,
 });
+
+const getServiceNameFromPathname = (props: Props) =>
+  props.match.params.name.split('#')[0];
+
+const isServiceNew = (search: string): boolean =>
+  !!queryString.parse(search)['?new'];
 
 interface StateToProps {
   isLoading: boolean;
@@ -79,6 +89,7 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadServices: (name: string) => any;
+  addServiceDependency: (serviceName: string, dependencyName: string) => void;
 }
 
 interface MatchParams {
@@ -87,19 +98,23 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-const getServiceNameFromPathname = (props: Props) =>
-  props.match.params.name.split('#')[0];
+interface State {
+  newDependencies: string[];
+}
 
-class Service extends BaseComponent<Props, {}> {
 
-  private tabs = createRef<HTMLUListElement>();
+class Service extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { newDependencies: [] };
+  }
 
   componentDidMount(): void {
     const serviceName = getServiceNameFromPathname(this.props);
-    if (serviceName && serviceName !== 'service') {
+    if (serviceName && !isServiceNew(this.props.location.search)) {
       this.props.loadServices(serviceName);
     }
-    M.Tabs.init(this.tabs.current as Element);
   };
 
   componentWillUnmount(): void {
@@ -107,32 +122,53 @@ class Service extends BaseComponent<Props, {}> {
     //TODO cancel axios loadServices
   }
 
-  private isServiceNew = (): boolean =>
-    !!queryString.parse(this.props.location.search)['?new'];
-
-  private onPostSuccess = () => {
-    super.toast(`Service ${getServiceNameFromPathname(this.props)} successfully created`);
-    //TODO save dependencies
+  private addServiceDependency = (dependencyName: string): void => {
+    this.setState({ newDependencies: this.state.newDependencies.concat(dependencyName) });
   };
 
-  private onPostFailure = (reason: string) =>
-    super.toast(`Unable to save ${getServiceNameFromPathname(this.props)}`, 10000, reason, true);
-
-  private onPutSuccess = () => {
-    super.toast(`Changes to ${getServiceNameFromPathname(this.props)} successfully saved`);
-    //TODO save dependencies
+  private saveServiceDependencies = (serviceName: string, successCallback: () => void): void => {
+    if (this.state.newDependencies.length) {
+      patchData(`services/${serviceName}/dependencies`, this.state.newDependencies,
+        () => this.onSaveDependenciesSuccess(serviceName, successCallback),
+        (reason) => this.onSaveDependenciesFailure(serviceName, reason), 'post');
+    }
+    else {
+      successCallback();
+    }
   };
 
-  private onPutFailure = (reason: string) =>
-    super.toast(`Unable to update ${getServiceNameFromPathname(this.props)}`, 10000, reason, true);
+  private onSaveDependenciesSuccess = (serviceName: string, successCallback: () => void): void => {
+    successCallback();
+    this.state.newDependencies.forEach(dependencyName =>
+      this.props.addServiceDependency(serviceName, dependencyName)
+    );
+    this.setState({ newDependencies: [] });
+  };
 
-  private onDeleteSuccess = () => {
-    super.toast(`Service <b>${getServiceNameFromPathname(this.props)}</b> successfully removed`);
+  private onSaveDependenciesFailure = (serviceName: string, reason: string): void =>
+    super.toast(`Service <b>${serviceName}</b> saved, but unable to save dependencies`, 10000, reason, true);
+
+  private onPostSuccess = (serviceName: string): void => {
+    this.saveServiceDependencies(serviceName, () => super.toast(`Service <b>${serviceName}</b> is now created`));
+  };
+
+  private onPostFailure = (reason: string, serviceName: string): void =>
+    super.toast(`Unable to save ${serviceName}`, 10000, reason, true);
+
+  private onPutSuccess = (serviceName: string): void => {
+    this.saveServiceDependencies(serviceName, () => super.toast(`Changes to service <b>${serviceName}</b> are now saved`));
+  };
+
+  private onPutFailure = (reason: string, serviceName: string): void =>
+    super.toast(`Unable to update ${serviceName}`, 10000, reason, true);
+
+  private onDeleteSuccess = (serviceName: string): void => {
+    super.toast(`Service <b>${serviceName}</b> successfully removed`);
     this.props.history.push(`/services`)
   };
 
-  private onDeleteFailure = (reason: string) =>
-    super.toast(`Unable to delete ${getServiceNameFromPathname(this.props)}`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, serviceName: string): void =>
+    super.toast(`Unable to delete ${serviceName}`, 10000, reason, true);
 
   private getFields = (service: Partial<IService>): IFields =>
     Object.entries(service).map(([key, value]) => {
@@ -152,74 +188,98 @@ class Service extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
-  render() {
+  private details = () => {
     const {isLoading, error, formService, service} = this.props;
     // @ts-ignore
     const serviceKey: (keyof IService) = this.props.formService && Object.keys(this.props.formService)[0];
     return (
+      <>
+        {isLoading && <LoadingSpinner/>}
+        {error && <Error message={error}/>}
+        {!error && formService && (
+          <Form id={serviceKey}
+                fields={this.getFields(formService)}
+                values={service}
+                isNew={isServiceNew(this.props.location.search)}
+                showSaveButton={!!this.state.newDependencies.length}
+                post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
+                put={{url: `services/${service[serviceKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
+                delete={{url: `services/${service[serviceKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+          >
+            {Object.keys(formService).map(key =>
+              key === 'serviceType'
+                ? <Field id={key}
+                         type="dropdown"
+                         label={key}
+                         options={{defaultValue: "Choose service type", values: ["Frontend", "Backend", "Database", "System"]}}
+                />
+                : <Field id={key}
+                         label={key}
+                />
+            )}
+          </Form>
+        )}
+      </>
+    )
+  };
+
+  private dependencies = () => {
+    const {isLoading, error, service} = this.props;
+    return (
+      <>
+        {isLoading && <LoadingSpinner/>}
+        {error && <Error message={error}/>}
+        {!error && service && <ServiceDependencyList service={service} addServiceDependencyCallback={this.addServiceDependency}/>}
+      </>
+    )
+  };
+
+  private tabs: Tab[] = [
+    {
+      title: 'Details',
+      id: 'details',
+      content: () => this.details()
+    },
+    {
+      title: 'Dependencies',
+      id: 'dependencies',
+      content: () => this.dependencies()
+    }
+  ];
+
+  render() {
+    return (
       <MainLayout>
         <div className="container">
-          <ul className="tabs" ref={this.tabs}>
-            <li className="tab col s6"><a href="#details">Details</a></li>
-            <li className="tab col s6"><a href="#dependencies">Dependencies</a></li>
-          </ul>
-          <div className="tab-content col s12" id="details">
-            {isLoading && <LoadingSpinner/>}
-            {error && <Error message={error}/>}
-            {formService && (
-              <Form fields={this.getFields(formService)}
-                    values={service}
-                    new={this.isServiceNew()}
-                    post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                    put={{url: `services/${service[serviceKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                    delete={{url: `services/${service[serviceKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
-                    id={serviceKey}>
-                {Object.keys(formService).map(key =>
-                  key === 'serviceType'
-                    ? <Field id={key}
-                             type="dropdown"
-                             label={key}
-                             options={{defaultValue: "Choose service type", values: ["Frontend", "Backend", "Database", "System"]}}
-                    />
-                    : <Field id={key}
-                             label={key}
-                    />
-                )}
-              </Form>
-            )}
-          </div>
-          <div className="tab-content" id="dependencies">
-            {isLoading && <LoadingSpinner/>}
-            {error && <Error message={error}/>}
-            {service && <ServiceDependencyList service={service}/>}
-          </div>
+          <Tabs {...this.props} tabs={this.tabs}/>
         </div>
-      </MainLayout>)
+      </MainLayout>
+    );
   }
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const name = getServiceNameFromPathname(props);
-  const service = name === 'service' ? emptyService() : state.entities.services.data[name];
+  const service = isServiceNew(props.location.search) ? emptyService() : state.entities.services.data[name];
   let formService;
   if (service) {
     formService = { ...service };
     delete formService["id"];
     delete formService["dependencies"];
   }
-  const isLoading = state.entities.services.isLoading;
-  const error = state.entities.services.error;
+  const isLoading = state.entities.services.isLoadingServices;
+  const error = state.entities.services.loadServicesError;
   return  {
     isLoading,
     error,
     service,
     formService,
-
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadServices,
+  addServiceDependency
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Service);

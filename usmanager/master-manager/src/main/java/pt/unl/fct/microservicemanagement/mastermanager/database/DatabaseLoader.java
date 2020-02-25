@@ -96,8 +96,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${front-endHost}")
           .serviceType("frontend")
           .expectedMemoryConsumption(209715200d)
@@ -110,8 +110,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("user-db:27017")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${userDatabaseHost}")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${userHost}")
           .serviceType("backend")
           .expectedMemoryConsumption(62914560d)
@@ -124,8 +124,8 @@ public class DatabaseLoader {
           .defaultInternalPort("27017")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${userDatabaseHost}")
           .serviceType("database")
           .expectedMemoryConsumption(262144000d)
@@ -138,8 +138,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("catalogue-db:3306")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${catalogueDatabaseHost}")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${catalogueHost}")
           .serviceType("backend")
           .expectedMemoryConsumption(62914560d)
@@ -152,8 +152,8 @@ public class DatabaseLoader {
           .defaultInternalPort("3306")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${catalogueDatabaseHost}")
           .serviceType("database")
           .expectedMemoryConsumption(262144000d)
@@ -166,8 +166,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${paymentHost}")
           .serviceType("backend")
           .expectedMemoryConsumption(62914560d)
@@ -180,8 +180,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("carts-db:27017")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${cartsDatabaseHost}")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${cartsHost}")
           .serviceType("backend")
           .expectedMemoryConsumption(262144000d)
@@ -194,8 +194,8 @@ public class DatabaseLoader {
           .defaultInternalPort("27017")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${cartsDatabaseHost}")
           .serviceType("database")
           .expectedMemoryConsumption(262144000d)
@@ -208,8 +208,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("orders-db:27017")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${ordersDatabaseHost}")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${ordersHost}")
           .serviceType("backend")
           .expectedMemoryConsumption(262144000d)
@@ -223,8 +223,8 @@ public class DatabaseLoader {
           .defaultInternalPort("27017")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${ordersDatabaseHost}")
           .serviceType("database")
           .expectedMemoryConsumption(262144000d)
@@ -237,8 +237,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${shippingHost}")
           .serviceType("backend")
           .expectedMemoryConsumption(262144000d)
@@ -251,8 +251,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${queue-masterHost}")
           .serviceType("backend")
           .expectedMemoryConsumption(262144000d)
@@ -265,8 +265,8 @@ public class DatabaseLoader {
           .defaultInternalPort("5672")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
-          .minReplics(1)
-          .maxReplics(1)
+          .minReplicas(1)
+          .maxReplicas(1)
           .outputLabel("${rabbitmqHost}")
           .serviceType("backend")
           .expectedMemoryConsumption(262144000d)
@@ -279,8 +279,8 @@ public class DatabaseLoader {
           .defaultInternalPort("8761")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${externalPort} ${internalPort} ${hostname} ${zone}")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${eurekaHost}")
           .serviceType("system")
           .expectedMemoryConsumption(262144000d)
@@ -293,8 +293,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${loadBalancerHost}")
           .serviceType("system")
           .expectedMemoryConsumption(10485760d)
@@ -307,8 +307,8 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${dockerApiProxyHost}")
           .serviceType("system")
           .expectedMemoryConsumption(10485760d)
@@ -321,8 +321,8 @@ public class DatabaseLoader {
           .defaultInternalPort("9090")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${prometheusHost}")
           .serviceType("system")
           .expectedMemoryConsumption(52428800d)
@@ -335,8 +335,8 @@ public class DatabaseLoader {
           .defaultInternalPort("1919")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${requestLocationMonitorHost}")
           .serviceType("system")
           .expectedMemoryConsumption(52428800d)
@@ -352,8 +352,8 @@ public class DatabaseLoader {
           .defaultDb("NOT_APPLICABLE")
           // TODO
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(1)
+          .minReplicas(1)
+          .maxReplicas(1)
           .outputLabel("${masterManagerHost}")
           .serviceType("system")
           // TODO
@@ -371,8 +371,8 @@ public class DatabaseLoader {
           // TODO
           .launchCommand("")
           // TODO
-          .minReplics(1)
-          .maxReplics(0)
+          .minReplicas(1)
+          .maxReplicas(0)
           .outputLabel("${localManagerHost}")
           .serviceType("system")
           // TODO
@@ -389,8 +389,8 @@ public class DatabaseLoader {
           .defaultDb("NOT_APPLICABLE")
           // TODO
           .launchCommand("agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0")
-          .minReplics(1)
-          .maxReplics(3)
+          .minReplicas(1)
+          .maxReplicas(3)
           .outputLabel("${consulServerHost}")
           .serviceType("system")
           // TODO
@@ -406,8 +406,8 @@ public class DatabaseLoader {
           .defaultDb("NOT_APPLICABLE")
           // TODO
           .launchCommand("")
-          .minReplics(1)
-          .maxReplics(1)
+          .minReplicas(1)
+          .maxReplicas(1)
           .outputLabel("${consulClientHost}")
           .serviceType("system")
           // TODO
@@ -518,107 +518,107 @@ public class DatabaseLoader {
       // service dependencies
       var frontendEurekaServerDependency = ServiceDependency.builder()
           .service(frontend)
-          .serviceDependency(eurekaServer)
+          .dependency(eurekaServer)
           .build();
       servicesDependencies.save(frontendEurekaServerDependency);
       var frontendUserDependency = ServiceDependency.builder()
           .service(frontend)
-          .serviceDependency(user)
+          .dependency(user)
           .build();
       servicesDependencies.save(frontendUserDependency);
       var frontendCatalogueDependency = ServiceDependency.builder()
           .service(frontend)
-          .serviceDependency(catalogue)
+          .dependency(catalogue)
           .build();
       servicesDependencies.save(frontendCatalogueDependency);
       var frontendPaymentDependency = ServiceDependency.builder()
           .service(frontend)
-          .serviceDependency(payment)
+          .dependency(payment)
           .build();
       servicesDependencies.save(frontendPaymentDependency);
       var frontendCartsDependency = ServiceDependency.builder()
           .service(frontend)
-          .serviceDependency(carts)
+          .dependency(carts)
           .build();
       servicesDependencies.save(frontendCartsDependency);
       var userEurekaServerDependency = ServiceDependency.builder()
           .service(user)
-          .serviceDependency(eurekaServer)
+          .dependency(eurekaServer)
           .build();
       servicesDependencies.save(userEurekaServerDependency);
       var userUserDbDependency = ServiceDependency.builder()
           .service(user)
-          .serviceDependency(userDb)
+          .dependency(userDb)
           .build();
       servicesDependencies.save(userUserDbDependency);
       var catalogueEurekaServerDependency = ServiceDependency.builder()
           .service(catalogue)
-          .serviceDependency(eurekaServer)
+          .dependency(eurekaServer)
           .build();
       servicesDependencies.save(catalogueEurekaServerDependency);
       var catalogueCatalogueDbDependency = ServiceDependency.builder()
           .service(catalogue)
-          .serviceDependency(catalogueDb)
+          .dependency(catalogueDb)
           .build();
       servicesDependencies.save(catalogueCatalogueDbDependency);
       var paymentEurekaServerDependency = ServiceDependency.builder()
           .service(payment)
-          .serviceDependency(eurekaServer)
+          .dependency(eurekaServer)
           .build();
       servicesDependencies.save(paymentEurekaServerDependency);
       var cartsEurekaServerDependency = ServiceDependency.builder()
           .service(carts)
-          .serviceDependency(eurekaServer)
+          .dependency(eurekaServer)
           .build();
       servicesDependencies.save(cartsEurekaServerDependency);
       var cartsCartsDbDependency = ServiceDependency.builder()
           .service(carts)
-          .serviceDependency(cartsDb)
+          .dependency(cartsDb)
           .build();
       servicesDependencies.save(cartsCartsDbDependency);
       var ordersEurekaServerDependency = ServiceDependency.builder()
           .service(orders)
-          .serviceDependency(eurekaServer)
+          .dependency(eurekaServer)
           .build();
       servicesDependencies.save(ordersEurekaServerDependency);
       var ordersPaymentDependency = ServiceDependency.builder()
           .service(orders)
-          .serviceDependency(payment)
+          .dependency(payment)
           .build();
       servicesDependencies.save(ordersPaymentDependency);
       var ordersShippingDependency = ServiceDependency.builder()
           .service(orders)
-          .serviceDependency(shipping)
+          .dependency(shipping)
           .build();
       servicesDependencies.save(ordersShippingDependency);
       var ordersOrdersDbDependency = ServiceDependency.builder()
           .service(orders)
-          .serviceDependency(ordersDb)
+          .dependency(ordersDb)
           .build();
       servicesDependencies.save(ordersOrdersDbDependency);
       var shippingEurekaServerDependency = ServiceDependency.builder()
           .service(shipping)
-          .serviceDependency(eurekaServer)
+          .dependency(eurekaServer)
           .build();
       servicesDependencies.save(shippingEurekaServerDependency);
       var shippingRabbitmqDependency = ServiceDependency.builder()
           .service(shipping)
-          .serviceDependency(rabbitmq)
+          .dependency(rabbitmq)
           .build();
       servicesDependencies.save(shippingRabbitmqDependency);
       var queueMasterEurekaServerDependency = ServiceDependency.builder()
           .service(queueMaster)
-          .serviceDependency(eurekaServer)
+          .dependency(eurekaServer)
           .build();
       servicesDependencies.save(queueMasterEurekaServerDependency);
       var queueMasterRabbitmqDependency = ServiceDependency.builder()
           .service(queueMaster)
-          .serviceDependency(rabbitmq)
+          .dependency(rabbitmq)
           .build();
       servicesDependencies.save(queueMasterRabbitmqDependency);
       var rabbitmqEurekaServerDependency = ServiceDependency.builder()
           .service(rabbitmq)
-          .serviceDependency(eurekaServer)
+          .dependency(eurekaServer)
           .build();
       servicesDependencies.save(rabbitmqEurekaServerDependency);
 

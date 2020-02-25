@@ -91,6 +91,15 @@ const fetchServiceDependencies = (serviceName: string) => ({
   }
 });
 
+export const ADD_SERVICE_DEPENDENCY = 'ADD_SERVICE_DEPENDENCY';
+export function addServiceDependency(serviceName: string, dependency: string): EntitiesAction {
+  return {
+    type: ADD_SERVICE_DEPENDENCY,
+    entity: serviceName,
+    data: { dependenciesNames: new Array(dependency) }
+  }
+}
+
 export const REMOVE_SERVICE_DEPENDENCIES = 'REMOVE_SERVICE_DEPENDENCY';
 export function removeServiceDependencies(serviceName: string, dependencies: string[]): EntitiesAction {
   return {

@@ -25,7 +25,7 @@
 import React from 'react';
 import M from 'materialize-css';
 import { Link } from 'react-router-dom';
-import CardItem from '../shared/CardItem';
+import CardItem from '../shared/list/CardItem';
 import {deleteData} from "../../utils/api";
 
 export default class DefaultHostSimulatedMetricsCard extends React.Component {

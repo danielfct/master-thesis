@@ -24,7 +24,7 @@
 
 import React from "react";
 import M from "materialize-css";
-import CardItem from "../shared/CardItem";
+import CardItem from "../shared/list/CardItem";
 import {deleteData, postData} from "../../utils/api";
 
 export default class RegionCard extends React.Component {

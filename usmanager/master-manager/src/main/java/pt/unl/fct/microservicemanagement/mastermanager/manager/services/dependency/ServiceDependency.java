@@ -57,9 +57,9 @@ public class ServiceDependency {
   @ManyToOne
   private ServiceEntity service;
 
-  @JoinColumn(name = "service_dependency_id")
+  @JoinColumn(name = "dependency_id")
   @ManyToOne
-  private ServiceEntity serviceDependency;
+  private ServiceEntity dependency;
 
   @Override
   public boolean equals(Object o) {

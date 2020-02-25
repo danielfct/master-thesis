@@ -30,7 +30,7 @@ import AddButton from "../shared/AddButton";
 import {connect} from "react-redux";
 import {loadServices} from "../../actions";
 import {ReduxState} from "../../reducers";
-import CardList from "../shared/CardList";
+import CardList from "../shared/list/CardList";
 import {IService} from "./Service";
 import styles from './Services.module.css'
 import BaseComponent from "../shared/BaseComponent";
@@ -53,15 +53,18 @@ class Services extends BaseComponent<Props, {}> {
     this.props.loadServices();
   }
 
+  private backspaceLongPress = (): void =>
+    console.log("long pressed");
+
   private service = (service: IService): JSX.Element =>
-    <ServiceCard key={service.id} service={service} />;
+    <ServiceCard key={service.id} service={service} longPressBackspaceCallback={this.backspaceLongPress}/>;
 
   private predicate = (service: IService, search: string): boolean =>
     service.serviceName.includes(search);
 
   render = () =>
     <MainLayout>
-      <AddButton tooltip={'Add service'} pathname={'/services/service?new=true'}/>
+      <AddButton tooltip={'Add service'} pathname={'/services/new_service?new=true'}/>
       <div className={`${styles.container}`}>
         <CardList<IService>
           isLoading={this.props.isLoading}
@@ -77,8 +80,8 @@ class Services extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.services.isLoading,
-    error: state.entities.services.error,
+    isLoading: state.entities.services.isLoadingServices,
+    error: state.entities.services.loadServicesError,
     services: Object.values(state.entities.services.data),
   }
 );

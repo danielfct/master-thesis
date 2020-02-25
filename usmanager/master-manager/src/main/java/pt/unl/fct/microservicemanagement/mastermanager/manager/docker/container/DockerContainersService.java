@@ -147,9 +147,9 @@ public class DockerContainersService {
     List<String> customEnvs = Collections.emptyList();
     Map<String, String> customLabels = Collections.emptyMap();
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
-    int minReplics = serviceService.getMinReplicsByServiceName(service.getServiceName());
-    var containers = new ArrayList<SimpleContainer>(minReplics);
-    for (int i = 0; i < minReplics; i++) {
+    int minReplicas = serviceService.getMinReplicasByServiceName(service.getServiceName());
+    var containers = new ArrayList<SimpleContainer>(minReplicas);
+    for (int i = 0; i < minReplicas; i++) {
       String hostname = hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region, country, city);
       SimpleContainer container = launchContainer(hostname, service, customEnvs, customLabels, dynamicLaunchParams);
       containers.add(container);

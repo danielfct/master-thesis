@@ -22,6 +22,13 @@
  * SOFTWARE.
  */
 
+export const snakeCaseToCamelCase = (text: string): string => text.replace(
+  /([_][a-z])/g,
+  (group) => group.toUpperCase()
+                  .replace('-', '')
+                  .replace('_', '')
+);
+
 export const camelCaseToSentenceCase = (text: string): string => {
     let sentenceCase = text.replace( /([A-Z])/g, " $1" );
     sentenceCase = sentenceCase.charAt(0).toUpperCase() + sentenceCase.slice(1);

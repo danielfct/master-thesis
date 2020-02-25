@@ -42,7 +42,7 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
 
   List<ServiceEntity> findByDockerRepository(@Param("dockerRepository") String dockerRepository);
 
-  @Query("select d.serviceDependency "
+  @Query("select d.dependency "
       + "from ServiceEntity s inner join s.dependencies d "
       + "where s.serviceName = :serviceName")
   List<ServiceEntity> getDependencies(@Param("serviceName") String serviceName);
@@ -57,7 +57,7 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.serviceName = :serviceName")
   boolean hasService(@Param("serviceName") String serviceName);
 
-  @Query("select d.serviceDependency "
+  @Query("select d.dependency "
       + "from ServiceEntity s inner join s.dependencies d "
       + "where s.id = :serviceId and d.id = :dependencyId")
   Optional<ServiceEntity> getDependency(@Param("serviceId") long serviceId, @Param("dependencyId") long dependencyId);
@@ -68,13 +68,13 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
 
   @Query("select case when count(d) > 0 then true else false end "
       + "from ServiceEntity s inner join s.dependencies d "
-      + "where s.id = :serviceId and d.serviceDependency.serviceName = :otherServiceName")
+      + "where s.id = :serviceId and d.dependency.serviceName = :otherServiceName")
   boolean serviceDependsOnOtherService(@Param("serviceId") long serviceId,
                                        @Param("otherServiceName") String otherServiceName);
 
-  @Query("select d.serviceDependency "
+  @Query("select d.dependency "
       + "from ServiceEntity s inner join s.dependencies d "
-      + "where s.id = :serviceId and d.serviceDependency.serviceType = :serviceType")
+      + "where s.id = :serviceId and d.dependency.serviceType = :serviceType")
   List<ServiceEntity> getDependenciesByType(@Param("serviceId") long serviceId,
                                             @Param("serviceType") String serviceType);
 
@@ -84,15 +84,15 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.serviceName = :serviceName")
   AppPackage getAppsByServiceName(@Param("serviceName") String serviceName);
 
-  @Query("select s.maxReplics "
+  @Query("select s.maxReplicas "
       + "from ServiceEntity s "
       + "where s.serviceName = :serviceName")
-  int getMaxReplicsByServiceName(@Param("serviceName") String serviceName);
+  int getMaxReplicasByServiceName(@Param("serviceName") String serviceName);
 
-  @Query("select s.minReplics "
+  @Query("select s.minReplicas "
       + "from ServiceEntity s "
       + "where s.serviceName = :serviceName")
-  int getMinReplicsByServiceName(@Param("serviceName") String serviceName);
+  int getMinReplicasByServiceName(@Param("serviceName") String serviceName);
 
   @Query("select p "
       + "from ServiceEntity s join s.eventPredictions p "

@@ -42,7 +42,7 @@ public class SaveServiceEventPredictionReq {
   private final String startTime;
   private final String endDate;
   private final String endTime;
-  private final int minReplics;
+  private final int minReplicas;
 
   public Timestamp getStartDateTimeStamp() {
     int count = StringUtils.countOccurrencesOf(startTime, ":");

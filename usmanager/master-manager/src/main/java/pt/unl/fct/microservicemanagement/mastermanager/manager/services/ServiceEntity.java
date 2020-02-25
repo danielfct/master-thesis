@@ -79,10 +79,10 @@ public class ServiceEntity {
   private String launchCommand;
 
   @Min(0)
-  private Integer minReplics;
+  private Integer minReplicas;
 
   @Min(0)
-  private Integer maxReplics;
+  private Integer maxReplicas;
 
   private String outputLabel;
 
@@ -107,7 +107,7 @@ public class ServiceEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "serviceDependency", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ServiceDependency> depends;
 
   @Singular

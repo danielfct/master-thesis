@@ -81,8 +81,8 @@ public class EventPredictionEntity {
   @Column(name = "end_time")
   private Timestamp endTime;
 
-  @Column(name = "min_replics")
-  private int minReplics;
+  @Column(name = "min_replicas")
+  private int minReplicas;
 
   @Basic
   @Column(name = "last_update")

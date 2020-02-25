@@ -28,21 +28,34 @@ import {Link} from "react-router-dom";
 
 interface ListItemProps<T> {
   link?: { pathname: string, state: any };
+  separate?: boolean | { color: string };
 }
 
 export default class ListItem<T> extends React.Component<ListItemProps<T>,{}> {
 
+  private getSeparatorColor = (): string | undefined => {
+    const {separate} = this.props;
+    if (typeof separate === 'boolean' && separate) {
+      return "black";
+    }
+    else if (typeof separate === 'object') {
+      return separate.color ? separate.color : "black";
+    }
+  };
+
   render() {
     const {link} = this.props;
+    const separatorColor = this.getSeparatorColor();
     return (
       link
-        ? <Link to={ {pathname: link.pathname, state: link.state} }>
+        ? <Link to={{pathname: link.pathname, state: link.state}}>
           <div className={`${styles.item}`}>
             {this.props.children}
           </div>
         </Link>
-        : <div className={`${styles.item} white-text`}>
-              {this.props.children}
+        : <div className={`${styles.item} white-text`}
+               style={separatorColor ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
+          {this.props.children}
         </div>
     );
   }

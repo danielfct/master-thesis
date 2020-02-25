@@ -23,38 +23,29 @@
  */
 
 import * as React from "react";
+import UseLongPress from "./UseLongPress";
 
 interface GenericSimpleListProps<T> {
-    list: T[];
-    show: (element: T) => JSX.Element;
-    separate?: boolean | { color: string };
+  list: T[];
+  show: (element: T, index: number) => JSX.Element;
 }
 
 type Props<T> = GenericSimpleListProps<T>;
 
 export default class SimpleList<T> extends React.Component<Props<T>, {}> {
 
-    private getSeparatorColor = (): string | undefined => {
-        const {separate} = this.props;
-        if (typeof separate === 'boolean' && separate) {
-            return "black";
-        }
-        else if (typeof separate === 'object') {
-            return separate.color ? separate.color : "black";
-        }
-    };
+  render() {
+    const {list, show} = this.props;
 
-    render() {
-        const {list, show} = this.props;
-        const separatorColor = this.getSeparatorColor();
-        return (
-            <div>
-                {list.map((c, i) => (
-                    <div key={i}
-                         style={separatorColor && i != list.length - 1 ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
-                        {show(c)}
-                    </div>
-                ))}
-            </div>);
-    }
+    return (
+      <div>
+        {list.map((c, i) => (
+          <div key={i}>
+            <UseLongPress callback={() => {console.log("long clicked")}} ms={500}>
+              {show(c, i)}
+            </UseLongPress>
+          </div>
+        ))}
+      </div>);
+  }
 }

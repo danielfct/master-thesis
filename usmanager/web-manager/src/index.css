@@ -464,3 +464,23 @@ textarea.materialize-textarea[readonly="readonly"] {
 .modal-overlay {
     overflow: inherit;
 }
+
+.controlsContainer {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.8);
+    padding: 15px 40px;
+    overflow: auto;
+}
+
+.gridCard {
+    width: auto !important;
+    background: #36393F;
+    color: white;
+    border: 1px solid black;
+    height: 250px;
+    margin: 0 !important;
+}
+
+.card .card-content {
+    padding: 10px;
+    border-radius: 0 0 2px 2px;
+}

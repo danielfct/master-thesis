@@ -22,55 +22,43 @@
  * SOFTWARE.
  */
 
-import * as React from 'react';
-import FilteredList from './FilteredList';
+import React from "react";
+import {connect} from "react-redux";
 import {PagedList} from "./PagedList";
 import SimpleList from "./SimpleList";
-import LoadingSpinner from "./LoadingSpinner";
-import Error from "./Error";
-import AnimatedList from "./list/AnimatedList";
+import {ReduxState} from "../../../reducers";
 import Empty from "./Empty";
 
 interface Props<T> {
-    isLoading: boolean;
-    error?: string | null;
-    emptyMessage: string;
     list: T[];
-    show: (element: T) => JSX.Element;
-    predicate?: (element: T, filter: string) => boolean;
+    show: (element: T, index: number) => JSX.Element;
+    predicate: (x: T, s: string) => boolean;
+    search: string;
     paginate?: { pagesize: number, page?: number, bottom?: boolean };
-    separate?: boolean | { color: string };
-    animate?: boolean;
 }
 
-class GenericList<T> extends React.Component<Props<T>, {}> {
+class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
 
     render() {
-        const {isLoading, error, emptyMessage, list, predicate, paginate, animate} = this.props;
-        if (isLoading) {
-            return <LoadingSpinner/>;
-        }
-        if (error) {
-            return <Error message={error}/>;
-        }
-        if (list.length === 0) {
-            return <Empty message={emptyMessage}/>
-        }
-        if (predicate) {
-            const Filtered = FilteredList<T>();
-            return <Filtered {...this.props} predicate={predicate}/>;
+        const {list, predicate, search, paginate, ...otherProps} = this.props;
+        const filteredList = list.filter((s:T) => predicate(s, search));
+        if (list.length !== filteredList.length && filteredList.length === 0) {
+            return <Empty message={search} error={'No matches found'}/>;
         }
         if (paginate) {
-            return <PagedList {...this.props} paginate={paginate}/>;
+            return <PagedList {...otherProps} list={filteredList} paginate={paginate}/>
         }
-        if (animate) {
-            return <AnimatedList {...this.props} />
-        }
-        return <SimpleList<T> {...this.props}/>;
+        return <SimpleList<T> {...otherProps} list={filteredList}/>
     }
 
 }
 
-export default function List<T>() {
-    return (GenericList as new(props: Props<T>) => GenericList<T>);
+const mapStateToProps = (state: ReduxState) => (
+  {
+      search: state.ui.search.toLowerCase()
+  }
+);
+
+export default function FilteredList<T>() {
+    return connect(mapStateToProps)(GenericFilteredList as new(props: Props<T>) => GenericFilteredList<T>);
 }
