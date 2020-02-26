@@ -23,9 +23,9 @@
  */
 
 import {CALL_API, Schemas} from "../middleware/api";
-import {IBreadcrumbs} from "../components/shared/Breadcrumbs";
-import {IService} from "../components/services/Service";
-import {IServiceDependency} from "../components/services/ServiceDependencyList";
+import {IBreadcrumbs} from "../components/breadcrumbs/Breadcrumbs";
+import {IService} from "../routes/services/Service";
+import {IServiceDependency} from "../routes/services/ServiceDependencyList";
 import {EntitiesAction, EntitiesState} from "../reducers/entities";
 
 export const SERVICES_REQUEST = 'SERVICES_REQUEST';

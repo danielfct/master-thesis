@@ -22,32 +22,10 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import 'react-perfect-scrollbar/dist/css/styles.css';
-import * as serviceWorker from './serviceWorker';
-import Root from "./containers/Root";
-import {BrowserRouter} from "react-router-dom";
-import configureStore from "./store/configureStore";
-import Footer from "./views/footer/Footer";
-import {saveState} from "./store/localStorage";
+import React from "react";
+import MainLayout from "../views/mainLayout/MainLayout";
+import BaseComponent from "./BaseComponent";
 
-// TODO implement labelToIcon function
-
-const store = configureStore();
-
-store.subscribe(() => {
-  saveState(store.getState());
-});
-
-ReactDOM.render(
-  <BrowserRouter>
-    <Root store={store}/>
-  </BrowserRouter>,
-  document.getElementById('body'));
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+export default class extends BaseComponent<{}, {}> {
+    render = () => <MainLayout/>
+}

@@ -22,32 +22,20 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import 'react-perfect-scrollbar/dist/css/styles.css';
-import * as serviceWorker from './serviceWorker';
-import Root from "./containers/Root";
-import {BrowserRouter} from "react-router-dom";
-import configureStore from "./store/configureStore";
-import Footer from "./views/footer/Footer";
-import {saveState} from "./store/localStorage";
+import {Redirect, Route} from "react-router";
+import React from "react";
+import {isAuthenticated} from "../utils/auth";
 
-// TODO implement labelToIcon function
+interface Props {
+    exact: boolean;
+    path: string;
+    component: any;
+    title?: string;
+}
 
-const store = configureStore();
+const AuthenticatedRoute = ({exact, path, component:Component, title}: Props) =>
+    isAuthenticated()
+        ? <Route exact={exact} path={path} render={props => <Component {...props} title={title}/>}/>
+        : <Redirect to="/login" />;
 
-store.subscribe(() => {
-  saveState(store.getState());
-});
-
-ReactDOM.render(
-  <BrowserRouter>
-    <Root store={store}/>
-  </BrowserRouter>,
-  document.getElementById('body'));
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+export default AuthenticatedRoute;

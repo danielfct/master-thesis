@@ -23,31 +23,39 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import 'react-perfect-scrollbar/dist/css/styles.css';
-import * as serviceWorker from './serviceWorker';
-import Root from "./containers/Root";
-import {BrowserRouter} from "react-router-dom";
-import configureStore from "./store/configureStore";
-import Footer from "./views/footer/Footer";
-import {saveState} from "./store/localStorage";
+import Sidenav from "../sidenav/Sidenav";
+import {ReduxState} from "../../reducers";
+import {connect} from "react-redux";
+import Breadcrumbs from "../../components/breadcrumbs/Breadcrumbs";
+import M from "materialize-css";
 
-// TODO implement labelToIcon function
+interface StateToProps {
+  sidenavVisible: boolean;
+}
 
-const store = configureStore();
+type Props = StateToProps;
 
-store.subscribe(() => {
-  saveState(store.getState());
-});
+class MainLayout extends React.Component<Props, {}> {
 
-ReactDOM.render(
-  <BrowserRouter>
-    <Root store={store}/>
-  </BrowserRouter>,
-  document.getElementById('body'));
+  render = () =>
+    <div>
+      <Sidenav/>
+      <div className="section content" style={this.props.sidenavVisible ? undefined : {paddingLeft: 0}}>
+        <div className="row col s12">
+          <Breadcrumbs/>
+        </div>
+        <div className='row col s12 m12'>
+          {this.props.children}
+        </div>
+      </div>
+    </div>
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+}
+
+const mapStateToProps = (state: ReduxState): StateToProps => (
+  {
+    sidenavVisible: state.ui.sidenav.user,
+  }
+);
+
+export default connect(mapStateToProps)(MainLayout);

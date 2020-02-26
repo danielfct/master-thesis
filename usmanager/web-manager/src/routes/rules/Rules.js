@@ -23,31 +23,42 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import 'react-perfect-scrollbar/dist/css/styles.css';
-import * as serviceWorker from './serviceWorker';
-import Root from "./containers/Root";
-import {BrowserRouter} from "react-router-dom";
-import configureStore from "./store/configureStore";
-import Footer from "./views/footer/Footer";
-import {saveState} from "./store/localStorage";
+import RuleCard from './RuleCard';
+import MainLayout from '../../views/mainLayout/MainLayout';
+import { Link } from 'react-router-dom';
+import {getData} from "../../utils/api";
 
-// TODO implement labelToIcon function
+export default class Rules extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = { data: [], loading: false };
+  }
 
-const store = configureStore();
+  componentDidMount() {
+    this.loadRules();
+  };
 
-store.subscribe(() => {
-  saveState(store.getState());
-});
+  loadRules = () => {
+    this.setState({ loading: true });
+    getData(
+        '/rules',
+        data => this.setState({ data: data, loading: false })
+    );
+  };
 
-ReactDOM.render(
-  <BrowserRouter>
-    <Root store={store}/>
-  </BrowserRouter>,
-  document.getElementById('body'));
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  /*<MainLayout title={{title:'Rules'}}>*/
+  render() {
+    return (
+        <MainLayout>
+          {this.state.data && this.state.data.map(rule => (
+              <RuleCard viewDetails={true} key={rule.id} rule={rule}/>
+          ))}
+          <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="New rule">
+            <Link className="waves-effect waves-light btn-floating grey darken-3" to='/rules/rule'>
+              <i className="large material-icons">add</i>
+            </Link>
+          </div>
+        </MainLayout>
+    );
+  };
+}

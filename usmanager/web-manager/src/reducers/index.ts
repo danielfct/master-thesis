@@ -25,7 +25,7 @@
 import { combineReducers } from 'redux'
 import entities, {EntitiesState} from "./entities";
 import {loadingBar, search, sidenav, UIState} from "./ui";
-import {IService} from "../components/services/Service";
+import {IService} from "../routes/services/Service";
 
 export interface ReduxState {
     ui: UIState;

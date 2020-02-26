@@ -22,32 +22,27 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import 'react-perfect-scrollbar/dist/css/styles.css';
-import * as serviceWorker from './serviceWorker';
-import Root from "./containers/Root";
-import {BrowserRouter} from "react-router-dom";
-import configureStore from "./store/configureStore";
-import Footer from "./views/footer/Footer";
-import {saveState} from "./store/localStorage";
+import * as React from "react";
+import UseLongPress from "./UseLongPress";
 
-// TODO implement labelToIcon function
+interface GenericSimpleListProps<T> {
+  list: T[];
+  show: (element: T, index: number) => JSX.Element;
+}
 
-const store = configureStore();
+type Props<T> = GenericSimpleListProps<T>;
 
-store.subscribe(() => {
-  saveState(store.getState());
-});
+export default class SimpleList<T> extends React.Component<Props<T>, {}> {
 
-ReactDOM.render(
-  <BrowserRouter>
-    <Root store={store}/>
-  </BrowserRouter>,
-  document.getElementById('body'));
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  render() {
+    const {list, show} = this.props;
+    return (
+      <div>
+        {list.map((c, i) => (
+          <div key={i}>
+              {show(c, i)}
+          </div>
+        ))}
+      </div>);
+  }
+}

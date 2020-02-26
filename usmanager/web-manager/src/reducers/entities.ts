@@ -36,8 +36,8 @@ import {
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
-import {IService} from "../components/services/Service";
-import {merge, mergeWith, assign, pick, keys } from 'lodash';
+import {IService} from "../routes/services/Service";
+import {merge, mergeWith, assign, pick, keys, isEqual } from 'lodash';
 
 export type EntitiesState = {
   services: {
@@ -91,11 +91,24 @@ const entities = (state: EntitiesState = {
       state = merge({}, state, { services: { isLoadingDependencies: false, loadDependenciesError: error } });
       break;
     case SERVICE_SUCCESS:
+      state = { ...state, services: {
+          data: merge({}, state.services.data, data?.services),
+          isLoadingServices: false,
+          loadServicesError: null,
+          isLoadingDependencies: state.services.isLoadingDependencies,
+          loadDependenciesError: state.services.loadDependenciesError
+        }
+      };
+      break;
     case SERVICES_SUCCESS:
-      const services = { services: { data: data?.services } };
-      assign(services, pick(state.services, keys(services)));
-      state = merge({}, services, state);
-      state = merge({}, state, { services: { isLoadingServices: false, loadServicesError: null } });
+      state = { ...state, services: {
+          data: merge({}, pick(state.services.data, keys(data?.services)), data?.services),
+          isLoadingServices: false,
+          loadServicesError: null,
+          isLoadingDependencies: state.services.isLoadingDependencies,
+          loadDependenciesError: state.services.loadDependenciesError
+        }
+      };
       break;
     case SERVICE_DEPENDENCIES_SUCCESS:
       if (entity) {

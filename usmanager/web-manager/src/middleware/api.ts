@@ -24,8 +24,8 @@
 
 import {normalize, schema} from 'normalizr';
 import {camelizeKeys} from 'humps';
-import {IService} from "../components/services/Service";
-import {IServiceDependency} from "../components/services/ServiceDependencyList";
+import {IService} from "../routes/services/Service";
+import {IServiceDependency} from "../routes/services/ServiceDependencyList";
 import axios from "axios";
 import {API_URL} from "../utils/api";
 
