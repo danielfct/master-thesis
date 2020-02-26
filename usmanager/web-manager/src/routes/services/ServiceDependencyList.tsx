@@ -111,7 +111,7 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
 
   private dependency = (dependency: string, index: number): JSX.Element =>
     <ListItem separate={index != Object.entries(this.state).filter(([_, dependency]) => dependency).length - 1}>
-      <p>
+      <div className={`${styles.dependencyItem}`}>
         <label>
           <input id={dependency}
                  type="checkbox"
@@ -119,7 +119,7 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
                  checked={this.state[dependency]?.isChecked}/>
           <span>{dependency}</span>
         </label>
-      </p>
+      </div>
     </ListItem>;
 
   private onDeleteSuccess = (): void => {

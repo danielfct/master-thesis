@@ -23,7 +23,6 @@
  */
 
 .item {
-    padding: 15px 40px;
     display: flex;
     align-items: center;
 }

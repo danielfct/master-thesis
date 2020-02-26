@@ -56,5 +56,7 @@ ul.dropdown li.disabled a:hover {
     margin-bottom: -7.5px;
 }
 
-
+.dependencyItem {
+    padding: 15px 40px;
+}
 

@@ -32,9 +32,9 @@ import AnimatedList from "./AnimatedList";
 import Empty from "./Empty";
 
 interface Props<T> {
-    isLoading: boolean;
+    isLoading?: boolean;
     error?: string | null;
-    emptyMessage: string;
+    emptyMessage?: string;
     list: T[];
     show: (element: T, index: number) => JSX.Element;
     predicate?: (element: T, filter: string) => boolean;
@@ -52,7 +52,7 @@ class GenericList<T> extends React.Component<Props<T>, {}> {
         if (error) {
             return <Error message={error}/>;
         }
-        if (list.length === 0) {
+        if (list.length === 0 && emptyMessage) {
             return <Empty message={emptyMessage}/>
         }
         if (predicate) {

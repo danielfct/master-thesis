@@ -109,13 +109,19 @@ export function removeServiceDependencies(serviceName: string, dependencies: str
   }
 }
 
-export const DELETE_SERVICE = 'DELETE_SERVICE';
-export function deleteService(service: IService) {
-    return {
-        type: DELETE_SERVICE,
-        service
-    }
-}
+export const LOGS_REQUEST = 'LOGS_REQUEST';
+export const LOGS_SUCCESS = 'LOGS_SUCCESS';
+export const LOGS_FAILURE = 'LOGS_FAILURE';
+export const loadLogs = () => (dispatch: any) => {
+  return dispatch(fetchLogs());
+};
+const fetchLogs = () => ({
+  [CALL_API]: {
+    types: [ LOGS_REQUEST, LOGS_SUCCESS, LOGS_FAILURE ],
+    endpoint: `logs`,
+    schema: Schemas.LOGS_ARRAY,
+  }
+});
 
 export const SIDENAV_SHOW_USER = 'SIDENAV_SHOW_USER';
 

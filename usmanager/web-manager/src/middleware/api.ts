@@ -28,6 +28,7 @@ import {IService} from "../routes/services/Service";
 import {IServiceDependency} from "../routes/services/ServiceDependencyList";
 import axios from "axios";
 import {API_URL} from "../utils/api";
+import {ILogs} from "../routes/logs/Logs";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -54,6 +55,7 @@ interface ISchemas {
     SERVICE_ARRAY: schema.Entity<IService>[];
     SERVICE_DEPENDENCY: schema.Entity<IServiceDependency>;
     SERVICE_DEPENDENCY_ARRAY: schema.Entity<IServiceDependency>[];
+    LOGS_ARRAY: schema.Entity<ILogs>[]
 }
 
 const dependencySchema: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', {}, {
@@ -65,11 +67,16 @@ const serviceSchema: schema.Entity<IService> = new schema.Entity('services', { d
     idAttribute: (service: IService) => service.serviceName
 });
 
+const logsSchema: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
+    idAttribute: (logs: ILogs) => logs.eventId.toString()
+});
+
 export const Schemas: ISchemas = {
     SERVICE: serviceSchema,
     SERVICE_ARRAY: [serviceSchema],
     SERVICE_DEPENDENCY : dependencySchema,
     SERVICE_DEPENDENCY_ARRAY: [dependencySchema],
+    LOGS_ARRAY: [logsSchema]
 };
 
 /*const repoSchema = new schema.Entity('repos', {

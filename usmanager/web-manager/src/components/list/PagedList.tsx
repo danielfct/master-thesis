@@ -85,12 +85,9 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
                   add first_page and last_page icons (https://materializecss.com/icons.html),
                   and implement firstPage and lastPage functions
                   */}
-                  {Array.from({ length: this.max + 1 }, (x, i) => i + 1)
-                        .map((pageNumber, index) => (
-                            <PageNumber key={index} page={pageNumber} active={index === page} setPage={this.setPage}/>
-                          )
-                        )
-                  }
+                  <Pagination max={this.max}
+                              page={page}
+                              setPage={this.setPage}/>
                   <li className={page === this.max ? "disabled next" : "next"}>
                       <a onClick={this.nextPage}>
                           <i className="material-icons">chevron_right</i>
@@ -125,8 +122,57 @@ class PageNumber extends React.Component<PageNumberProps, {}> {
 
     render() {
         const {page, active} = this.props;
-        return <li key={page} className={active ? "active" : "waves-effect"}>
-            <a onClick={this.changePage}>{page}</a>
-        </li>
+        return (
+          <li key={page} className={active ? "active" : "waves-effect"}>
+              <a onClick={this.changePage}>{page}</a>
+          </li>
+        );
     };
+}
+
+interface PaginationProps {
+    max: number;
+    page: number;
+    setPage: (pageIndex: number) => void;
+}
+
+class Pagination extends React.Component<PaginationProps, {}> {
+
+    private noEllipsis = (max: number) =>
+      Array.from({ length: max + 1 }, (x, i) => i + 1)
+
+    private beforeEllipsis = (max: number, page: number): number[] =>
+      Array.from({ length: 3 }, (x, i) => page + i + 1)
+
+    private afterEllipsis = (max: number, page: number): number[] =>
+      Array.from({ length: 3 }, (x, i) => max - i + 1).reverse()
+
+    render() {
+        const {max, page, setPage} = this.props;
+        const needsEllipsis = max >= 10;
+        return (
+          <>
+              {!needsEllipsis && (
+                <>
+                    {this.noEllipsis(max).map((pageNumber, index) =>
+                      <PageNumber key={index} page={pageNumber} active={index === page} setPage={setPage}/>
+                    )}
+                </>
+              )}
+              {needsEllipsis && (
+                <>
+                    {this.beforeEllipsis(max, page).map((pageNumber, index) =>
+                      <PageNumber key={index} page={pageNumber} active={index === page} setPage={setPage}/>
+                    )}
+                    <i className="material-icons white-text bottom" style={{margin: '7px 7px 0 7px'}}>more_horiz</i>
+                    {this.afterEllipsis(max, page).map((pageNumber, index) =>
+                      <PageNumber key={index} page={pageNumber} active={max - index === page} setPage={setPage}/>
+                    )}
+                </>
+              )}
+          </>
+
+        );
+    }
+
 }

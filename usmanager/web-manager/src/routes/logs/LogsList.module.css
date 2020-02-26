@@ -1,0 +1,15 @@
+.list {
+    background-color: #36393F;
+    outline: 1px solid black;
+    margin: 0 40px;
+    padding: 20px;
+}
+
+.item {
+    width: 100vw;
+    padding: 3px;
+}
+
+.column {
+    margin: 0 7px;
+}
