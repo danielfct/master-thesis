@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import axios, {AxiosError, AxiosResponse, Method} from "axios";
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {isAuthenticated} from "./auth";
 
 export const API_URL = 'http://localhost:8080';
@@ -111,12 +111,12 @@ export function deleteData(endpoint: string, successCallback: () => void, failur
 
 export const setupAxiosInterceptors = (token: string): void => {
     axios.interceptors.request.use(
-        (config) => {
+        (config: AxiosRequestConfig) => {
             if (isAuthenticated()) {
-                config.headers.authorization = token;
+                config.headers['Authorization'] = token;
             }
-            config.headers.contentType = 'application/json;charset=UTF-8';
-            config.headers.accept = 'application/json;charset=UTF-8';
+            config.headers['Content-Type'] = 'application/json;charset=UTF-8';
+            config.headers['Accept'] = 'application/json;charset=UTF-8';
             config.timeout = TIMEOUT;
             return config
         }
