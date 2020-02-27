@@ -36,7 +36,6 @@ export default class SimpleList<T> extends React.Component<Props<T>, {}> {
 
   render() {
     const {list, show, header} = this.props;
-    console.log(header)
     return (
       <div>
         {header && header()}

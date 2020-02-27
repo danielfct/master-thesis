@@ -31,19 +31,11 @@ type Props = StateToProps & DispatchToProps & LogsListProps;
 
 class LogsList extends React.Component<Props, {}> {
 
-  componentDidMount(): void {
-    this.loadData();
-    setInterval(this.loadData, 5000);
-  }
+  private reloadLogs: NodeJS.Timeout | null = null;
 
-  async loadData() {
-    try {
-      const res = await this.props.loadLogs();
-      console.log(res);
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  componentDidMount(): void {
+    this.props.loadLogs();
+  };
 
   private predicate = (logs: ILogs, search: string): boolean =>
     logs.formattedMessage.toLowerCase().includes(search) || logs.levelString.toLowerCase().includes(search);
@@ -89,7 +81,12 @@ class LogsList extends React.Component<Props, {}> {
 
     private reload = (): void =>
     {
-//TODO
+      if (this.reloadLogs) {
+        clearTimeout(this.reloadLogs);
+      }
+      else {
+        this.reloadLogs = setInterval(this.props.loadLogs, 5000);
+      }
     };
 
   render = () => {
@@ -98,7 +95,6 @@ class LogsList extends React.Component<Props, {}> {
     return (
       <>
         <ReloadButton tooltip={'Reload'} reloadCallback={this.reload}/>
-        {/*<div className={`section ${styles.list}`}>*/}
         <div className={`${styles.container} ${styles.list}`}>
           <LogsList
             isLoading={isLoading}
