@@ -34,7 +34,16 @@ interface Props<T> {
     show: (element: T, index: number) => JSX.Element;
     predicate: (x: T, s: string) => boolean;
     search: string;
-    paginate?: { pagesize: number, page?: number, bottom?: boolean };
+    paginate?: {
+        pagesize: {
+            initial: number,
+            options?: ('all' | number)[],
+        },
+        page?: {
+            index?: number,
+            last?: boolean
+        },
+    };
 }
 
 class GenericFilteredList<T> extends React.Component<Props<T>, {}> {

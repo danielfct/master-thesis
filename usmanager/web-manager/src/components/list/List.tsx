@@ -38,8 +38,18 @@ interface Props<T> {
     list: T[];
     show: (element: T, index: number) => JSX.Element;
     predicate?: (element: T, filter: string) => boolean;
-    paginate?: { pagesize: number, page?: number, bottom?: boolean };
+    paginate?: {
+        pagesize: {
+            initial: number,
+            options?: ('all' | number)[],
+        },
+        page?: {
+            index?: number,
+            last?: boolean
+        },
+    };
     animate?: boolean;
+    header?: () => JSX.Element;
 }
 
 class GenericList<T> extends React.Component<Props<T>, {}> {

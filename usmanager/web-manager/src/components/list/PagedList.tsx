@@ -25,16 +25,28 @@
 import * as React from "react";
 import SimpleList from './SimpleList';
 import './PagedList.css';
+import {Dropdown} from "../form/Dropdown";
+import Pagination from "./Pagination";
 
 export interface IPagedList<T> {
     list: T[];
     show: (element: T, index: number) => JSX.Element;
-    paginate: { pagesize: number, page?: number, bottom?: boolean };
+    paginate: {
+        pagesize: {
+            initial: number,
+            options?: ('all' | number)[],
+        },
+        page?: {
+            index?: number,
+            last?: boolean
+        }
+    };
 }
 
 interface State {
-    pagesize?: number;
-    page?: number;
+    max: number;
+    pagesize: number;
+    page: number;
 }
 
 export class PagedList<T> extends React.Component<IPagedList<T>, State> {
@@ -43,16 +55,19 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
 
     constructor(props: IPagedList<T>) {
         super(props);
+        const initialMax = Math.max(0, Math.ceil(props.list.length / (props.paginate.pagesize.initial || 1)) - 1);
         this.state = {
-            page: props.paginate.page || 0,
-            pagesize: props.paginate.pagesize,
+            max: initialMax,
+            page: (props.paginate.page?.last ? initialMax : props.paginate.page?.index) || 0,
+            pagesize: props.paginate.pagesize.initial,
         };
-        this.max = Math.max(0, Math.ceil(props.list.length / (this.state.pagesize || 1)) - 1);
     }
 
     private setPage = (pageIndex: number): void => {
-        this.max = Math.max(0, Math.ceil(this.props.list.length / (this.state.pagesize || 1)) - 1);
-        this.setState(state => ({page: state.page === undefined ? 0 : Math.max(0, pageIndex)}));
+        this.setState(state => ({
+            page: state.page === undefined ? 0 : Math.max(0, pageIndex),
+            max: Math.max(0, Math.ceil(this.props.list.length / this.state.pagesize) - 1)
+        }));
     };
 
     private prevPage = (): void => {
@@ -62,7 +77,23 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
 
     private nextPage = (): void => {
         const {page} = this.state;
-        this.setPage(page === undefined ? 0 : Math.min(this.max, page + 1));
+        this.setPage(page === undefined ? 0 : Math.min(this.state.max, page + 1));
+    };
+
+    private setPageSize = (e: React.FormEvent<HTMLSelectElement>) => {
+        const selectedPageSize = e.currentTarget.value;
+        let pagesize: number;
+        if (selectedPageSize === 'all') {
+            pagesize = Number.MAX_VALUE;
+        } else {
+            pagesize = parseInt(selectedPageSize);
+        }
+        const max = Math.max(0, Math.ceil(this.props.list.length / pagesize) - 1);
+        this.setState({
+            pagesize,
+            max,
+            page: max,
+        })
     };
 
     render() {
@@ -71,108 +102,25 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
         const list = l.slice(page * pagesize, page * pagesize + pagesize);
         // TODO: page transition. e.g. slide to the left while new page comes from the right. Using react spring
         return (
-          <div>
-              <ul className={`pagination center-align no-select`}  style={this.max < 1 ? { visibility: "hidden" } : undefined}>
-                  {!paginate.bottom && (
-                    <li className={page === 0 ? "disabled prev" : "prev"}>
-                        <a onClick={this.prevPage}>
-                            <i className="material-icons">chevron_left</i>
-                        </a>
-                    </li>
-                  )}
-                  {/*TODO:
-                  if too many pages, add 3 dots to intermediate pages. e.g. 1, 2, 3 ... 50.
-                  add first_page and last_page icons (https://materializecss.com/icons.html),
-                  and implement firstPage and lastPage functions
-                  */}
-                  <Pagination max={this.max}
-                              page={page}
-                              setPage={this.setPage}/>
-                  <li className={page === this.max ? "disabled next" : "next"}>
-                      <a onClick={this.nextPage}>
-                          <i className="material-icons">chevron_right</i>
-                      </a>
-                  </li>
-                  {paginate.bottom && (
-                    <li className={page === 0 ? "disabled prev" : "prev"}>
-                        <a onClick={this.prevPage}>
-                            <i className="material-icons">chevron_left</i>
-                        </a>
-                    </li>
-                  )}
-              </ul>
-              <SimpleList<T> list={list} show={show}/>
+          <div className={'list'}>
+              {paginate.pagesize.options && (
+                <div className={'pageSize'}>
+                    <Dropdown
+                      id={'pageSize'}
+                      name={'pageSize'}
+                      value={this.state.pagesize === Number.MAX_VALUE ? 'all' : this.state.pagesize?.toString()}
+                      onChange={this.setPageSize}
+                      options={{defaultValue: 'Page size', values: paginate.pagesize.options}}>
+                    </Dropdown>
+                </div>
+              )}
+              <Pagination max={this.state.max}
+                          page={page}
+                          setPage={this.setPage}
+                          prevPage={this.prevPage}
+                          nextPage={this.nextPage}/>
+              <SimpleList<T> {...this.props} list={list} show={show}/>
           </div>
         );
     }
-
-}
-
-interface PageNumberProps {
-    page: number;
-    active: boolean;
-    setPage: (pageIndex: number) => void;
-}
-
-class PageNumber extends React.Component<PageNumberProps, {}> {
-
-    private changePage = () => {
-        this.props.setPage(this.props.page - 1);
-    };
-
-    render() {
-        const {page, active} = this.props;
-        return (
-          <li key={page} className={active ? "active" : "waves-effect"}>
-              <a onClick={this.changePage}>{page}</a>
-          </li>
-        );
-    };
-}
-
-interface PaginationProps {
-    max: number;
-    page: number;
-    setPage: (pageIndex: number) => void;
-}
-
-class Pagination extends React.Component<PaginationProps, {}> {
-
-    private noEllipsis = (max: number) =>
-      Array.from({ length: max + 1 }, (x, i) => i + 1)
-
-    private beforeEllipsis = (max: number, page: number): number[] =>
-      Array.from({ length: 3 }, (x, i) => page + i + 1)
-
-    private afterEllipsis = (max: number, page: number): number[] =>
-      Array.from({ length: 3 }, (x, i) => max - i + 1).reverse()
-
-    render() {
-        const {max, page, setPage} = this.props;
-        const needsEllipsis = max >= 10;
-        return (
-          <>
-              {!needsEllipsis && (
-                <>
-                    {this.noEllipsis(max).map((pageNumber, index) =>
-                      <PageNumber key={index} page={pageNumber} active={index === page} setPage={setPage}/>
-                    )}
-                </>
-              )}
-              {needsEllipsis && (
-                <>
-                    {this.beforeEllipsis(max, page).map((pageNumber, index) =>
-                      <PageNumber key={index} page={pageNumber} active={index === page} setPage={setPage}/>
-                    )}
-                    <i className="material-icons white-text bottom" style={{margin: '7px 7px 0 7px'}}>more_horiz</i>
-                    {this.afterEllipsis(max, page).map((pageNumber, index) =>
-                      <PageNumber key={index} page={pageNumber} active={max - index === page} setPage={setPage}/>
-                    )}
-                </>
-              )}
-          </>
-
-        );
-    }
-
 }

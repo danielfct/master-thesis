@@ -25,7 +25,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import CardItem from '../../components/list/CardItem';
-import {camelCaseToSentenceCase} from "../../utils/text";
 import styles from './ServiceCard.module.css';
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {IService} from "./Service";

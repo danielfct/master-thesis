@@ -3,14 +3,14 @@ import M from "materialize-css";
 import {capitalize} from "../../utils/text";
 
 interface Props {
-  className: string;
+  className?: string;
   id: string;
   name: string;
   value: string;
   disabled?: boolean;
-  options?: {defaultValue: string, values: string[]};
+  options?: {defaultValue?: string | number, values: (string | number)[]};
   onChange: (e: React.FormEvent<HTMLSelectElement>) => void;
-  onBlur: (e: React.FormEvent<HTMLSelectElement>) => void;
+  onBlur?: (e: React.FormEvent<HTMLSelectElement>) => void;
 }
 
 export class Dropdown extends React.Component<Props, {}> {
@@ -44,12 +44,14 @@ export class Dropdown extends React.Component<Props, {}> {
       >
         {options && (
           <>
-            <option key={options.defaultValue} value="" disabled hidden>
-              {options.defaultValue}
-            </option>
+            {options.defaultValue && (
+              <option key={options.defaultValue} value="" disabled hidden>
+                {options.defaultValue}
+              </option>
+            )}
             {options.values.map(option =>
-              <option key={option} value={option.toLowerCase()}>
-                {capitalize(option)}
+              <option key={option} value={option.toString().toLowerCase()}>
+                {capitalize(option.toString())}
               </option>
             )}
           </>

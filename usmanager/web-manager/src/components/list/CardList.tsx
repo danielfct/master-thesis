@@ -74,7 +74,7 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
     const GenericList = List<T>();
     return <GenericList {...this.props}
                         show={this.props.card}
-                        paginate={{pagesize: this.state.pagesize}}/>
+                        paginate={{pagesize: { initial: this.state.pagesize }}}/>
   }
 
 }

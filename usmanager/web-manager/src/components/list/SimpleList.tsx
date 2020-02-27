@@ -23,11 +23,11 @@
  */
 
 import * as React from "react";
-import UseLongPress from "./UseLongPress";
 
 interface GenericSimpleListProps<T> {
   list: T[];
   show: (element: T, index: number) => JSX.Element;
+  header?: () => JSX.Element;
 }
 
 type Props<T> = GenericSimpleListProps<T>;
@@ -35,9 +35,11 @@ type Props<T> = GenericSimpleListProps<T>;
 export default class SimpleList<T> extends React.Component<Props<T>, {}> {
 
   render() {
-    const {list, show} = this.props;
+    const {list, show, header} = this.props;
+    console.log(header)
     return (
       <div>
+        {header && header()}
         {list.map((c, i) => (
           <div key={i}>
               {show(c, i)}

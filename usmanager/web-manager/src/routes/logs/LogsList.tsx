@@ -9,6 +9,9 @@ import {ILogs} from "./Logs";
 import ListItem from "../../components/list/ListItem";
 import styles from './LogsList.module.css';
 import {IService} from "../services/Service";
+import ReloadButton from "../../components/list/ReloadButton";
+import {capitalize} from "../../utils/text";
+import {Dropdown} from "../../components/form/Dropdown";
 
 interface StateToProps {
   isLoading: boolean;
@@ -42,14 +45,41 @@ class LogsList extends React.Component<Props, {}> {
     }
   }
 
+  private predicate = (logs: ILogs, search: string): boolean =>
+    logs.formattedMessage.toLowerCase().includes(search) || logs.levelString.toLowerCase().includes(search);
+
+  private getLevelColor = (levelString: string) => {
+    switch(levelString.toLowerCase()) {
+      case 'trace': return 'grey-text';
+      case 'debug': return 'green-text';
+      case 'info': return 'blue-text';
+      case 'warn': return 'yellow-text';
+      case 'error': return 'red-text';
+    }
+  };
+  private header = (): JSX.Element =>
+    <ListItem>
+      <div className={`${styles.headerItem}`}>
+        <span className={`${styles.timestampColumn}`}>
+          timestamp
+        </span>
+        <span className={`${styles.levelColumn}`}>
+          level
+        </span>
+        <span className={`${styles.infoColumn}`}>
+          message
+        </span>
+      </div>
+    </ListItem>;
+
   private log = (log: ILogs): JSX.Element =>
     <ListItem>
       <div className={`${styles.item}`}>
         <span className={`${styles.column}`}>
           {new Date(log.timestmp).toLocaleString()}
         </span>
-        <span className={`${styles.column}`}>
-          {log.levelString}
+        <span className={`${styles.column} ${this.getLevelColor(log.levelString)}`}>
+          {capitalize(log.levelString.toLowerCase())}
         </span>
         <span className={`${styles.column}`}>
           {log.formattedMessage}
@@ -57,25 +87,30 @@ class LogsList extends React.Component<Props, {}> {
       </div>
     </ListItem>;
 
-
-  private predicate = (logs: ILogs, search: string): boolean =>
-    logs.formattedMessage.toLowerCase().includes(search) || logs.levelString.toLowerCase().includes(search);
+    private reload = (): void =>
+    {
+//TODO
+    };
 
   render = () => {
     const {isLoading, error, logs} = this.props;
     const LogsList = List<ILogs>();
     return (
-      <div className={`${styles.list}`}>
-        {/*<Reload></Reload>*/}
-        <LogsList
-          isLoading={isLoading}
-          error={error}
-          emptyMessage={'No logs to show'}
-          list={logs}
-          show={this.log}
-          paginate={{ pagesize: 25}}
-          predicate={this.predicate}/>
-      </div>
+      <>
+        <ReloadButton tooltip={'Reload'} reloadCallback={this.reload}/>
+        {/*<div className={`section ${styles.list}`}>*/}
+        <div className={`${styles.container} ${styles.list}`}>
+          <LogsList
+            isLoading={isLoading}
+            error={error}
+            emptyMessage={'No logs to show'}
+            list={logs}
+            show={this.log}
+            paginate={{pagesize: { initial: 25, options: [5, 10, 25, 50, 100, 'all'] }, page: { last: true }}}
+            predicate={this.predicate}
+            header={this.header}/>
+        </div>
+      </>
     );
   }
 
@@ -85,7 +120,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
   {
     isLoading: state.entities.logs.isLoading,
     error: state.entities.logs.error,
-    logs: state.entities.logs && Object.values(state.entities.logs.data).reverse() || [],
+    logs: state.entities.logs && Object.values(state.entities.logs.data) || [],
   }
 );
 
