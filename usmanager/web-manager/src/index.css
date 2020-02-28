@@ -203,27 +203,6 @@ p {
     width: 100%;
 }
 
-/* Style sticky scroll*/
-
-/*.custom-loader {
-    height: 8px;
-    margin-bottom: -4px;
-    z-index: 999;
-}*/
-
-/*.page-content {
-    padding: 4px;
-}
-
-.sticky {
-    position: fixed;
-    top: 0;
-}*/
-
-/*.sticky+.page-content {
-    padding-top: 4px;
-}*/
-
 .page-footer {
     background-color: #282828;
     padding: 0;
@@ -331,7 +310,7 @@ button:hover {
 
 .fixed-action-btn {
     position: absolute;
-    top: 72px;
+    top: 66px;
     right: 23px;
     bottom: unset;
     padding-top: 0;
@@ -482,3 +461,7 @@ textarea.materialize-textarea[readonly="readonly"] {
     border-radius: 0 0 2px 2px;
 }
 
+.section {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}

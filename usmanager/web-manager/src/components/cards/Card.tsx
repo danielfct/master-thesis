@@ -1,20 +1,9 @@
-import React from "react";
+import React, {createRef, WheelEventHandler} from "react";
 import ScrollBar from "react-perfect-scrollbar";
 import {Link} from "react-router-dom";
 import CardTitle from "../list/CardTitle";
 
-/*$.fn.isolatedScroll = function() {
-  this.bind('mousewheel DOMMouseScroll', function (e) {
-    var delta = e.wheelDelta || (e.originalEvent && e.originalEvent.wheelDelta) || -e.detail,
-      bottomOverflow = this.scrollTop + $(this).outerHeight() - this.scrollHeight >= 0,
-      topOverflow = this.scrollTop <= 0;
 
-    if ((delta < 0 && bottomOverflow) || (delta > 0 && topOverflow)) {
-      e.preventDefault();
-    }
-  });
-  return this;
-};*/
 
 interface CardProps<T> {
   title?: string;
@@ -28,11 +17,27 @@ type Props<T> = CardProps<T>;
 
 export default class Card<T> extends React.Component<Props<T>, {}> {
 
+  DEFAULT_HEIGHT = 150;
+
   private scrollbar: (ScrollBar | null) = null;
+  private card = createRef<HTMLDivElement>();
+  private cardContent = createRef<HTMLDivElement>();
 
   componentDidMount(): void {
     this.scrollbar?.updateScroll();
+    this.blockBodyScroll();
   }
+
+  private blockBodyScroll = () => {
+    const cardContent = this.cardContent.current;
+    let height = this.props.height || this.DEFAULT_HEIGHT;
+    if (typeof height == 'string') {
+      height = height.replace(/[^0-9]/g,'');
+    }
+    if (cardContent && cardContent.scrollHeight > height) {
+      this.card.current?.addEventListener('wheel', event => event.preventDefault())
+    }
+  };
 
   render() {
     const {title, link, height, margin, hoverable, children} = this.props;
@@ -48,7 +53,9 @@ export default class Card<T> extends React.Component<Props<T>, {}> {
               </Link>
               : <CardTitle title={title}/>
           )}
-          <div className={`card gridCard`} style={{height: height || 150}}>
+          <div className={`card gridCard`}
+               style={{height: height || 150}}
+               ref={this.card}>
             <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}
                        component="div">
               {link
@@ -56,11 +63,11 @@ export default class Card<T> extends React.Component<Props<T>, {}> {
                   pathname: link?.to.pathname,
                   state: link?.to.state
                 }}>
-                  <div className='card-content'>
+                  <div className='card-content' ref={this.cardContent}>
                     {children}
                   </div>
                 </Link>
-                : <div className='card-content'>
+                : <div className='card-content' ref={this.cardContent}>
                   {children}
                 </div>
               }
