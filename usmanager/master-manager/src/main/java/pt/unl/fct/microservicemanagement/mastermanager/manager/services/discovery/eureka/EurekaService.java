@@ -27,10 +27,10 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services.discove
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 
 import java.util.Collections;
 import java.util.List;
@@ -75,7 +75,7 @@ public class EurekaService {
         serviceService.getService(EUREKA);
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
     List<String> availableHostnames = regions.stream()
-        .map(region -> hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region.getRegionName()))
+        .map(region -> hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region.getName()))
         .collect(Collectors.toList());
     List<String> customEnvs = Collections.emptyList();
     Map<String, String> customLabels = Collections.emptyMap();

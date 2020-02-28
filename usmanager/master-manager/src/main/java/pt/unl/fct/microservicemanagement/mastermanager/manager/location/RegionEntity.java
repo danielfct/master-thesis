@@ -29,6 +29,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -51,10 +52,11 @@ public class RegionEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
-  private String regionName;
+  @NotNull
+  @Column(unique = true)
+  private String name;
 
-  private String regionDescription;
+  private String description;
 
   @Column(columnDefinition = "boolean default true")
   private boolean active;

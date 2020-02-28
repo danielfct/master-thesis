@@ -34,7 +34,6 @@ export const SERVICES_FAILURE = 'SERVICES_FAILURE';
 export const SERVICE_REQUEST = 'SERVICE_REQUEST';
 export const SERVICE_SUCCESS = 'SERVICE_SUCCESS';
 export const SERVICE_FAILURE = 'SERVICE_FAILURE';
-
 export const loadServices = (name?: string) => (dispatch: any) => {
   /*let cached;
   if (name) {
@@ -49,7 +48,6 @@ export const loadServices = (name?: string) => (dispatch: any) => {
   return cached ? null : dispatch(fetchServices(name));*/
   return dispatch(fetchServices(name));
 };
-
 const fetchServices = (name?: string) => ({
   [CALL_API]:
     !name
@@ -66,11 +64,9 @@ const fetchServices = (name?: string) => ({
         entity: 'services'
       }
 });
-
 export const SERVICE_DEPENDENCIES_REQUEST = 'SERVICE_DEPENDENCIES_REQUEST';
 export const SERVICE_DEPENDENCIES_SUCCESS = 'SERVICE_DEPENDENCIES_SUCCESS';
 export const SERVICE_DEPENDENCIES_FAILURE = 'SERVICE_DEPENDENCIES_FAILURE';
-
 export const loadServiceDependencies = (serviceName: string) => (dispatch: any, getState: any) => {
   /*const cachedService = getState().entities.services[service.serviceName];
   let cached = cachedService && cachedService.dependencies;
@@ -81,7 +77,6 @@ export const loadServiceDependencies = (serviceName: string) => (dispatch: any, 
   return cached ? null : dispatch(fetchServiceDependencies(service, id));*/
   return dispatch(fetchServiceDependencies(serviceName));
 };
-
 const fetchServiceDependencies = (serviceName: string) => ({
   [CALL_API]: {
     types: [ SERVICE_DEPENDENCIES_REQUEST, SERVICE_DEPENDENCIES_SUCCESS, SERVICE_DEPENDENCIES_FAILURE ],
@@ -90,7 +85,6 @@ const fetchServiceDependencies = (serviceName: string) => ({
     entity: serviceName
   }
 });
-
 export const ADD_SERVICE_DEPENDENCY = 'ADD_SERVICE_DEPENDENCY';
 export function addServiceDependency(serviceName: string, dependency: string): EntitiesAction {
   return {
@@ -99,7 +93,6 @@ export function addServiceDependency(serviceName: string, dependency: string): E
     data: { dependenciesNames: new Array(dependency) }
   }
 }
-
 export const REMOVE_SERVICE_DEPENDENCIES = 'REMOVE_SERVICE_DEPENDENCY';
 export function removeServiceDependencies(serviceName: string, dependencies: string[]): EntitiesAction {
   return {
@@ -122,6 +115,33 @@ const fetchLogs = () => ({
     schema: Schemas.LOGS_ARRAY,
   }
 });
+
+export const REGIONS_REQUEST = 'REGIONS_REQUEST';
+export const REGIONS_SUCCESS = 'REGIONS_SUCCESS';
+export const REGIONS_FAILURE = 'REGIONS_FAILURE';
+export const REGION_REQUEST = 'REGION_REQUEST';
+export const REGION_SUCCESS = 'REGION_SUCCESS';
+export const REGION_FAILURE = 'REGION_FAILURE';
+export const loadRegions = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchRegions(name));
+};
+const fetchRegions = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ REGIONS_REQUEST, REGIONS_SUCCESS, REGIONS_FAILURE ],
+        endpoint: `regions`,
+        schema: Schemas.REGION_ARRAY,
+        entity: 'regions'
+      }
+      : {
+        types: [ REGION_REQUEST, REGION_SUCCESS, REGION_FAILURE ],
+        endpoint: `regions/${name}`,
+        schema: Schemas.REGION,
+        entity: 'regions'
+      }
+});
+
 
 export const SIDENAV_SHOW_USER = 'SIDENAV_SHOW_USER';
 

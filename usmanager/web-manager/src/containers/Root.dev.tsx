@@ -63,7 +63,6 @@ import DefaultHostSimulatedMetrics from "../routes/metrics/DefaultHostSimulatedM
 import DefaultHostSimulatedMetricsDetail from "../routes/metrics/DefaultHostSimulatedMetricsDetail";
 import SpecificHostSimulatedMetrics from "../routes/metrics/SpecificHostSimulatedMetrics";
 import SpecificHostSimulatedMetricsDetail from "../routes/metrics/SpecificHostSimulatedMetricsDetail";
-import Regions from "../routes/region/Region";
 import {Provider} from "react-redux";
 import PageNotFound from "../components/PageNotFound";
 import Login from "../views/login/Login";
@@ -71,6 +70,8 @@ import AuthenticatedRoute from "../components/AuthenticatedRoute";
 import Footer from "../views/footer/Footer";
 import DevTools from "./DevTools";
 import Logs from "../routes/logs/Logs";
+import Region from "../routes/region/Region";
+import Regions from "../routes/region/Regions";
 
 interface RootContainerProps {
     store: any;
@@ -116,6 +117,7 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/metrics/simulated/hosts/specific": { title: "", component: SpecificHostSimulatedMetrics, search: true },
     "/metrics/simulated/hosts/specific/metric/:id?": { title: "", component: SpecificHostSimulatedMetricsDetail },
     "/regions": { title: "", component: Regions, search: true },
+    "/regions/:name": { title: "", component: Region },
     "/logs": { title: "Logs", component: Logs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };

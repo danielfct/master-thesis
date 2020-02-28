@@ -624,20 +624,20 @@ public class DatabaseLoader {
 
       // regions
       var usEast1 = RegionEntity.builder()
-          .regionName("us-east-1")
-          .regionDescription("US East (N. Virginia)")
+          .name("us-east-1")
+          .description("US East (N. Virginia)")
           .active(true)
           .build();
       regions.save(usEast1);
       var euCentral1 = RegionEntity.builder()
-          .regionName("eu-central-1")
-          .regionDescription("EU (Frankfurt)")
+          .name("eu-central-1")
+          .description("EU (Frankfurt)")
           .active(true)
           .build();
       regions.save(euCentral1);
       var euWest2 = RegionEntity.builder()
-          .regionName("eu-west-2")
-          .regionDescription("EU (London)")
+          .name("eu-west-2")
+          .description("EU (London)")
           .active(true)
           .build();
       regions.save(euWest2);

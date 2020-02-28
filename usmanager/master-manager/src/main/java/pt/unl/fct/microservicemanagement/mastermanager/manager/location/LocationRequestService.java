@@ -301,7 +301,7 @@ public class LocationRequestService {
       default:
     }
     for (RegionEntity region : regions) {
-      String regionName = region.getRegionName();
+      String regionName = region.getName();
       if (regionName.contains(regionNameBegin)) {
         foundRegion.add(regionName);
       }

@@ -24,14 +24,16 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.location;
 
+import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/regions")
@@ -48,31 +50,26 @@ public class RegionsController {
     return regionsService.getRegions();
   }
 
-  @GetMapping("/{id}")
-  public RegionEntity getRegion(@PathVariable long id) {
-    return regionsService.getRegion(id);
+  @GetMapping("/{name}")
+  public RegionEntity getRegion(@PathVariable String name) {
+    return regionsService.getRegion(name);
   }
 
-  /*@PostMapping
-  public long addRegion(@RequestBody Region region) {
+  @PostMapping
+  public RegionEntity addRegion(@RequestBody RegionEntity region) {
     Validation.validatePostRequest(region.getId());
     return regionsService.addRegion(region);
   }
 
-  @PutMapping(value = "/{id}")
-  public long updateRegion(@PathVariable long id, @RequestBody Region region) {
-    Validation.validatePutRequest(id, region.getId());
-    return regionsService.updateRegion(id, region);
-  }*/
-
-  @PostMapping("/{id}")
-  public long saveRegion(@PathVariable long id, @RequestBody RegionEntity region) {
-    return regionsService.saveRegion(id, region);
+  @PutMapping(value = "/{name}")
+  public RegionEntity updateRegion(@PathVariable String name, @RequestBody RegionEntity region) {
+    Validation.validatePutRequest(region.getId());
+    return regionsService.updateRegion(name, region);
   }
 
-  @DeleteMapping("/{id}")
-  public void deleteRegion(@PathVariable long id) {
-    regionsService.deleteRegion(id);
+  @DeleteMapping("/{name}")
+  public void deleteRegion(@PathVariable String name) {
+    regionsService.deleteRegion(name);
   }
 
 }

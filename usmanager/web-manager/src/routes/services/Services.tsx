@@ -25,7 +25,6 @@
 import React from 'react';
 import MainLayout from '../../views/mainLayout/MainLayout';
 import ServiceCard from './ServiceCard';
-
 import AddButton from "../../components/form/AddButton";
 import {connect} from "react-redux";
 import {loadServices} from "../../actions";
@@ -53,11 +52,8 @@ class Services extends BaseComponent<Props, {}> {
     this.props.loadServices();
   }
 
-  private backspaceLongPress = (): void =>
-    console.log("long pressed");
-
   private service = (service: IService): JSX.Element =>
-    <ServiceCard key={service.id} service={service} longPressBackspaceCallback={this.backspaceLongPress}/>;
+    <ServiceCard key={service.id} service={service}/>;
 
   private predicate = (service: IService, search: string): boolean =>
     service.serviceName.includes(search);
@@ -80,9 +76,9 @@ class Services extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.services.isLoadingServices,
-    error: state.entities.services.loadServicesError,
-    services: Object.values(state.entities.services.data),
+    isLoading: state.entities.services?.isLoadingServices,
+    error: state.entities.services?.loadServicesError,
+    services: (state.entities.services?.data && Object.values(state.entities.services?.data)) || [],
   }
 );
 

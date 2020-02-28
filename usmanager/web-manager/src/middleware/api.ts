@@ -29,6 +29,7 @@ import {IServiceDependency} from "../routes/services/ServiceDependencyList";
 import axios from "axios";
 import {API_URL} from "../utils/api";
 import {ILogs} from "../routes/logs/Logs";
+import {IRegion} from "../routes/region/Region";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -55,13 +56,14 @@ interface ISchemas {
     SERVICE_ARRAY: schema.Entity<IService>[];
     SERVICE_DEPENDENCY: schema.Entity<IServiceDependency>;
     SERVICE_DEPENDENCY_ARRAY: schema.Entity<IServiceDependency>[];
-    LOGS_ARRAY: schema.Entity<ILogs>[]
+    LOGS_ARRAY: schema.Entity<ILogs>[];
+    REGION: schema.Entity<IRegion>;
+    REGION_ARRAY: schema.Entity<IRegion>[];
 }
 
 const dependencySchema: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', {}, {
     idAttribute: (dependency: IServiceDependency) => dependency.serviceName
 });
-
 const dependencies = new schema.Array(dependencySchema);
 const serviceSchema: schema.Entity<IService> = new schema.Entity('services', { dependencies }, {
     idAttribute: (service: IService) => service.serviceName
@@ -71,12 +73,18 @@ const logsSchema: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
     idAttribute: (logs: ILogs) => logs.eventId.toString()
 });
 
+const regionSchema: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
+    idAttribute: (region: IRegion) => region.name.toString()
+});
+
 export const Schemas: ISchemas = {
     SERVICE: serviceSchema,
     SERVICE_ARRAY: [serviceSchema],
     SERVICE_DEPENDENCY : dependencySchema,
     SERVICE_DEPENDENCY_ARRAY: [dependencySchema],
-    LOGS_ARRAY: [logsSchema]
+    LOGS_ARRAY: [logsSchema],
+    REGION: regionSchema,
+    REGION_ARRAY: [regionSchema]
 };
 
 /*const repoSchema = new schema.Entity('repos', {

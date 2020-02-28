@@ -25,3 +25,7 @@
 .serviceCard {
     margin: 10px 0;
 }
+
+.serviceCardContent {
+    height: 250px;
+}

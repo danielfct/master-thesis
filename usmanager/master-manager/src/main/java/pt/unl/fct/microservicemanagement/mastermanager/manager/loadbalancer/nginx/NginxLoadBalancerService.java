@@ -87,7 +87,7 @@ public class NginxLoadBalancerService {
         serviceService.getService(LOAD_BALANCER);
     double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();
     List<String> hostnameList = regions.stream()
-        .map(region -> hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region.getRegionName()))
+        .map(region -> hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region.getName()))
         .collect(Collectors.toList());
     hostnameList.forEach(hostname -> launchLoadBalancer(hostname, serviceName));
     return hostnameList;

@@ -19,10 +19,7 @@ export default class extends React.Component<Props, {}> {
     M.Tabs.init(this.tabs.current as Element);
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-
-  }
-
+  //TODO disable tab click when just 1
   render() {
     const {tabs} = this.props;
     return (
@@ -30,7 +27,7 @@ export default class extends React.Component<Props, {}> {
         <ul className="tabs" ref={this.tabs}>
           {tabs.map((tab, index) =>
             <li key={index} className={`tab col s${12/tabs.length}`}>
-              <a href={`#${tab.id}`}>{tab.title}</a>
+              <a href={tabs.length == 1 ? undefined : `#${tab.id}`}>{tab.title}</a>
             </li>
           )}
         </ul>

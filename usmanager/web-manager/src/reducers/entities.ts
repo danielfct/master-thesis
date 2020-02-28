@@ -32,13 +32,20 @@ import {
   SERVICE_SUCCESS,
   SERVICE_DEPENDENCIES_REQUEST,
   SERVICE_DEPENDENCIES_FAILURE,
-  REMOVE_SERVICE_DEPENDENCIES, ADD_SERVICE_DEPENDENCY, LOGS_REQUEST, LOGS_FAILURE, LOGS_SUCCESS
+  REMOVE_SERVICE_DEPENDENCIES,
+  ADD_SERVICE_DEPENDENCY,
+  LOGS_REQUEST,
+  LOGS_FAILURE,
+  LOGS_SUCCESS,
+  REGIONS_REQUEST,
+  REGIONS_FAILURE, REGIONS_SUCCESS
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
 import {IService} from "../routes/services/Service";
 import {merge, mergeWith, assign, pick, keys, isEqual } from 'lodash';
 import {ILogs} from "../routes/logs/Logs";
+import {IRegion} from "../routes/region/Region";
 
 export type EntitiesState = {
   services: {
@@ -50,6 +57,11 @@ export type EntitiesState = {
   },
   logs: {
     data: { [key: number]: ILogs },
+    isLoading: boolean,
+    error?: string | null,
+  },
+  regions: {
+    data: { [key: string]: IRegion },
     isLoading: boolean,
     error?: string | null,
   }
@@ -66,6 +78,7 @@ export type EntitiesAction = {
     dependencies?: IService[],
     dependenciesNames?: string[],
     logs?: ILogs[],
+    regions?: IRegion[],
     //TODO other entities
   },
 };
@@ -79,6 +92,11 @@ const entities = (state: EntitiesState = {
                       loadDependenciesError: null,
                     },
                     logs: {
+                      data: {},
+                      isLoading: false,
+                      error: null
+                    },
+                    regions: {
                       data: {},
                       isLoading: false,
                       error: null
@@ -144,16 +162,27 @@ const entities = (state: EntitiesState = {
       }
       break;
     case LOGS_REQUEST:
-      //TODO
-      return state;
+      return merge({}, state, { logs: { isLoading: true } });
     case LOGS_FAILURE:
-      //TODO
-      return state;
+      return merge({}, state, { logs: { isLoading: false, error: error } });
     case LOGS_SUCCESS:
       return {
         ...state,
         logs: {
           data: data?.logs,
+          isLoading: false,
+          error: null,
+        }
+      };
+    case REGIONS_REQUEST:
+      return merge({}, state, { regions: { isLoading: true } });
+    case REGIONS_FAILURE:
+      return merge({}, state, { regions: { isLoading: false, error: error } });
+    case REGIONS_SUCCESS:
+      return {
+        ...state,
+        regions: {
+          data: data?.regions,
           isLoading: false,
           error: null,
         }

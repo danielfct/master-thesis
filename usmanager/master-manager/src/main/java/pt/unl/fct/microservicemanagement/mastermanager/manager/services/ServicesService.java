@@ -88,21 +88,6 @@ public class ServicesService {
     return services.save(service);
   }
 
-  /*  public Long saveService(String serviceName, SaveServiceReq saveServiceConfigReq) {
-    var service = id > 0 ? getService(id) : new ServiceEntity();
-    service.setServiceName(saveServiceConfigReq.getServiceName());
-    service.setDockerRepository(saveServiceConfigReq.getDockerRepo());
-    service.setDefaultExternalPort(saveServiceConfigReq.getDefaultExternalPort());
-    service.setDefaultInternalPort(saveServiceConfigReq.getDefaultInternalPort());
-    service.setDefaultDb(saveServiceConfigReq.getDefaultDb());
-    service.setLaunchCommand(saveServiceConfigReq.getLaunchCommand());
-    service.setMinReplicas(saveServiceConfigReq.getMinReplicas());
-    service.setMaxReplicas(saveServiceConfigReq.getMaxReplicas());
-    service.setOutputLabel(saveServiceConfigReq.getOutputLabel());
-    service.setServiceType(saveServiceConfigReq.getServiceType());
-    return services.save(service).getId();
-  }*/
-
   public void deleteService(String serviceName) {
     var service = getService(serviceName);
     services.delete(service);

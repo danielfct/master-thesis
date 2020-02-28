@@ -474,7 +474,6 @@ textarea.materialize-textarea[readonly="readonly"] {
     background: #36393F;
     color: white;
     border: 1px solid black;
-    height: 250px;
     margin: 0 !important;
 }
 
@@ -482,3 +481,4 @@ textarea.materialize-textarea[readonly="readonly"] {
     padding: 10px;
     border-radius: 0 0 2px 2px;
 }
+

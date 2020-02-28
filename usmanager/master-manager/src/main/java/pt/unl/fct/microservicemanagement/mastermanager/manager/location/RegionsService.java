@@ -24,10 +24,16 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.location;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 
 import org.springframework.stereotype.Service;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
+@Slf4j
 @Service
 public class RegionsService {
 
@@ -41,29 +47,36 @@ public class RegionsService {
     return regions.findAll();
   }
 
-  public RegionEntity getRegion(long id) {
-    return regions.findById(id).orElseThrow(() -> new NotFoundException("Region not found"));
+  public RegionEntity getRegion(Long id) {
+    return regions.findById(id).orElseThrow(() ->
+        new EntityNotFoundException(RegionEntity.class, "id", id.toString()));
   }
 
-  /*public long addRegion(Region region) {
-    return regions.save(region).getId();
+  public RegionEntity getRegion(String name) {
+    return regions.findByNameIgnoreCase(name).orElseThrow(() ->
+        new EntityNotFoundException(RegionEntity.class, "name", name));
   }
 
-  public long updateRegion(long id, Region newRegion) {
-    final var region = getRegion(id);
-    Utils.copyValidProperties(newRegion, region);
-    return regions.save(region).getId();
-  }*/
-
-  public long saveRegion(long id, RegionEntity region) {
-    if (id > 0) {
-      region.setId(id);
-    }
-    return regions.save(region).getId();
+  public RegionEntity addRegion(RegionEntity region) {
+    log.debug("Saving region {}", ToStringBuilder.reflectionToString(region));
+    return regions.save(region);
   }
 
-  public void deleteRegion(long id) {
-    regions.deleteById(id);
+  public RegionEntity updateRegion(String name, RegionEntity newRegion) {
+    var region = getRegion(name);
+    log.debug("Updating region {} with {}",
+        ToStringBuilder.reflectionToString(region), ToStringBuilder.reflectionToString(newRegion));
+    log.debug("Region before copying properties: {}",
+        ToStringBuilder.reflectionToString(region));
+    ObjectUtils.copyValidProperties(newRegion, region);
+    log.debug("Region after copying properties: {}",
+        ToStringBuilder.reflectionToString(region));
+    return regions.save(region);
+  }
+
+  public void deleteRegion(String name) {
+    var region = getRegion(name);
+    regions.delete(region);
   }
 
 }

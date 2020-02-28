@@ -59,11 +59,6 @@ public class ServicesController {
     return servicesService.getServices();
   }
 
-  /*@GetMapping("/{serviceId}")
-  public ServiceEntity getService(@PathVariable Long serviceId) {
-    return servicesService.getService(serviceId);
-  }*/
-
   @GetMapping("/{serviceName}")
   public ServiceEntity getService(@PathVariable String serviceName) {
     return servicesService.getService(serviceName);
@@ -77,13 +72,9 @@ public class ServicesController {
 
   @PutMapping("/{serviceName}")
   public ServiceEntity updateService(@PathVariable String serviceName, @RequestBody ServiceEntity service) {
+    Validation.validatePutRequest(service.getId());
     return servicesService.updateService(serviceName, service);
   }
-
-  /*@PostMapping("/{serviceName}")
-  public Long saveService(@PathVariable String serviceName, @RequestBody SaveServiceReq saveServiceConfigReq) {
-    return servicesService.saveService(serviceName, saveServiceConfigReq);
-  }*/
 
   @DeleteMapping("/{serviceName}")
   public void deleteService(@PathVariable String serviceName) {

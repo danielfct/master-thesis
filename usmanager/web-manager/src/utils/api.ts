@@ -30,22 +30,25 @@ export const API_URL = 'http://localhost:8080';
 const TIMEOUT = 5000;
 
 
-export function getData(url: string): any {
-    /* console.log(`GET ${url}`);
-     return (dispatch: any) => {
-         fetch(url, {
-             method: 'GET'
-         }).then(response => {
-             if (response.ok) {
-                 return response.json();
-             }
-             throw new Error(`${response.status} ${response.statusText}`);
-         }).then(json => {
-             dispatch(fetchData(json));
-         }).catch(e => {
-             dispatch(fetchError(e))
-         });
-     }*/
+//TODO delete
+export function getData(url: string, callback: (data: any) => void): any {
+    fetch(url, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Basic YWRtaW46YWRtaW4=',
+            'Content-type': 'application/json;charset=UTF-8',
+            'Accept': 'application/json;charset=UTF-8',
+        })
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error(`${response.status} ${response.statusText}`);
+    }).then(json => {
+        callback(json);
+    }).catch(e => {
+        console.log(e);
+    });
 }
 
 export function postData(url: string, requestBody: any,
@@ -111,14 +114,14 @@ export function deleteData(endpoint: string, successCallback: () => void, failur
 
 export const setupAxiosInterceptors = (token: string): void => {
     axios.interceptors.request.use(
-        (config: AxiosRequestConfig) => {
-            if (isAuthenticated()) {
-                config.headers['Authorization'] = token;
-            }
-            config.headers['Content-Type'] = 'application/json;charset=UTF-8';
-            config.headers['Accept'] = 'application/json;charset=UTF-8';
-            config.timeout = TIMEOUT;
-            return config
-        }
+      (config: AxiosRequestConfig) => {
+          if (isAuthenticated()) {
+              config.headers['Authorization'] = token;
+          }
+          config.headers['Content-Type'] = 'application/json;charset=UTF-8';
+          config.headers['Accept'] = 'application/json;charset=UTF-8';
+          config.timeout = TIMEOUT;
+          return config
+      }
     )
 };

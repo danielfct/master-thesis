@@ -38,6 +38,7 @@ import BaseComponent from "../../components/BaseComponent";
 import Error from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import {patchData} from "../../utils/api";
+import {hasNewSearch} from "../../utils/text";
 
 export interface IService extends IData {
   serviceName: string;
@@ -71,9 +72,6 @@ const emptyService = (): Partial<IService> => ({
 const getServiceNameFromPathname = (props: Props) =>
   props.match.params.name.split('#')[0];
 
-const isServiceNew = (search: string): boolean =>
-  !!queryString.parse(search)['?new'];
-
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
@@ -96,17 +94,15 @@ interface State {
   newDependencies: string[];
 }
 
-
 class Service extends BaseComponent<Props, State> {
 
-  constructor(props: Props) {
-    super(props);
-    this.state = { newDependencies: [] };
-  }
+  state: State = {
+    newDependencies: []
+  };
 
   componentDidMount(): void {
     const serviceName = getServiceNameFromPathname(this.props);
-    if (serviceName && !isServiceNew(this.props.location.search)) {
+    if (serviceName && !hasNewSearch(this.props.location.search)) {
       this.props.loadServices(serviceName);
     }
   };
@@ -128,7 +124,7 @@ class Service extends BaseComponent<Props, State> {
 
   private onSaveDependenciesSuccess = (serviceName: string, successCallback: () => void): void => {
     successCallback();
-    if (!isServiceNew(this.props.location.search)) {
+    if (!hasNewSearch(this.props.location.search)) {
       this.state.newDependencies.forEach(dependencyName =>
         this.props.addServiceDependency(serviceName, dependencyName)
       );
@@ -182,7 +178,7 @@ class Service extends BaseComponent<Props, State> {
   private details = () => {
     const {isLoading, error, formService, service} = this.props;
     // @ts-ignore
-    const serviceKey: (keyof IService) = this.props.formService && Object.keys(this.props.formService)[0];
+    const serviceKey: (keyof IService) = formService && Object.keys(formService)[0];
     return (
       <>
         {isLoading && <LoadingSpinner/>}
@@ -191,7 +187,7 @@ class Service extends BaseComponent<Props, State> {
           <Form id={serviceKey}
                 fields={this.getFields(formService)}
                 values={service}
-                isNew={isServiceNew(this.props.location.search)}
+                isNew={hasNewSearch(this.props.location.search)}
                 showSaveButton={!!this.state.newDependencies.length}
                 post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
                 put={{url: `services/${service[serviceKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
@@ -227,16 +223,25 @@ class Service extends BaseComponent<Props, State> {
     )
   };
 
+  private eventPredictions = () => {
+    return <div/>;
+  };
+
   private tabs: Tab[] = [
     {
-      title: 'Details',
-      id: 'details',
+      title: 'Service',
+      id: 'service',
       content: () => this.details()
     },
     {
       title: 'Dependencies',
       id: 'dependencies',
       content: () => this.dependencies()
+    },
+    {
+      title: 'Event predictions',
+      id: 'eventPredictions',
+      content: () => this.eventPredictions()
     }
   ];
 
@@ -249,19 +254,20 @@ class Service extends BaseComponent<Props, State> {
       </MainLayout>
     );
   }
+
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const name = getServiceNameFromPathname(props);
-  const service = isServiceNew(props.location.search) ? emptyService() : state.entities.services.data[name];
+  const service = hasNewSearch(props.location.search) ? emptyService() : state.entities.services.data[name];
   let formService;
   if (service) {
     formService = { ...service };
     delete formService["id"];
     delete formService["dependencies"];
   }
-  const isLoading = state.entities.services.isLoadingServices;
-  const error = state.entities.services.loadServicesError;
+  const isLoading = state.entities.services?.isLoadingServices;
+  const error = state.entities.services?.loadServicesError;
   return  {
     isLoading,
     error,

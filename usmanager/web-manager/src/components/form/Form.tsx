@@ -30,7 +30,7 @@ import {RouteComponentProps, withRouter} from "react-router";
 import {getTypeFromValue, FieldProps, IValidation} from "./Field";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
-import { isEqual } from "lodash";
+import { isEqual, isEqualWith } from "lodash";
 
 export interface IFields {
   [key: string]: FieldProps;
@@ -55,7 +55,7 @@ interface FormPageProps {
   fields: IFields;
   values: IValues;
   isNew: boolean;
-  showSaveButton: boolean;
+  showSaveButton?: boolean;
   post: restOperation;
   put: restOperation;
   delete?: restOperation;
@@ -110,7 +110,15 @@ class Form extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     M.FloatingActionButton.init(this.fab.current as Element);
     if (prevProps.showSaveButton != this.props.showSaveButton || prevState.values != this.state.values) {
-      this.setState({showSaveButton: this.props.showSaveButton || this.props.isNew || !isEqual(this.props.values, this.state.values)})
+      this.setState({
+        showSaveButton: this.props.showSaveButton
+          || this.props.isNew
+          || !isEqualWith(this.props.values, this.state.values, (first, second) =>
+            ((typeof first == 'boolean' && typeof second == 'string' && first.toString() == second)
+              || (typeof first == 'string' && typeof second == 'boolean') && first == second.toString()
+              || (typeof first == 'number' && typeof second == 'string') && first.toString() == second
+              || (typeof first == 'string' && typeof second == 'number') && first == second.toString()) || undefined)
+      })
     }
   }
 
