@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-import React from 'react';
+import React, {createRef} from 'react';
 import { Link } from 'react-router-dom';
 import CardItem from '../../components/list/CardItem';
 import styles from './ServiceCard.module.css';
-import PerfectScrollbar from "react-perfect-scrollbar";
 import {IService} from "./Service";
 import CardTitle from "../../components/list/CardTitle";
+import ScrollBar from "react-perfect-scrollbar";
 
 interface ServiceCardProps {
   service: IService;
@@ -37,6 +37,8 @@ interface ServiceCardProps {
 type Props = ServiceCardProps;
 
 export default class ServiceCard extends React.Component<Props, {}> {
+
+  private scrollbar: (ScrollBar | null) = null;
 
   private getReplicasMessage = (minReplicas: number, maxReplicas: number): string => {
     if (minReplicas == maxReplicas) {
@@ -50,6 +52,10 @@ export default class ServiceCard extends React.Component<Props, {}> {
     }
   };
 
+  componentDidMount(): void {
+    this.scrollbar?.updateScroll();
+  }
+
   //TODO scrollbar doesnt trigger when mouse hovers
   render() {
     const {service} = this.props;
@@ -60,8 +66,13 @@ export default class ServiceCard extends React.Component<Props, {}> {
             pathname: `/services/${service.serviceName}`,
             state: service}}>
             <CardTitle title={service.serviceName}/>
+          </Link>
             <div className={`card gridCard ${styles.serviceCardContent}`}>
-              <PerfectScrollbar>
+              <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}
+                                component="div">
+                <Link to={{
+                  pathname: `/services/${service.serviceName}`,
+                  state: service}}>
                 <div className='card-content'>
                   <CardItem key={'serviceType'}
                             label={'Service type'}
@@ -87,9 +98,9 @@ export default class ServiceCard extends React.Component<Props, {}> {
                             label={'Memory'}
                             value={`${service.expectedMemoryConsumption} bytes`}/>
                 </div>
-              </PerfectScrollbar>
+                </Link>
+              </ScrollBar>
             </div>
-          </Link>
         </div>
       </div>
     );

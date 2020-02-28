@@ -98,8 +98,6 @@ export const requiredAndNumberAndMin = (values: IValues, fieldName: string, args
 
 class Form extends React.Component<Props, State> {
 
-  private fab = createRef<HTMLDivElement>();
-
   state: State = {
     values: this.props.values,
     errors: {},
@@ -108,7 +106,6 @@ class Form extends React.Component<Props, State> {
   };
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    M.FloatingActionButton.init(this.fab.current as Element);
     if (prevProps.showSaveButton != this.props.showSaveButton || prevState.values != this.state.values) {
       this.setState({
         showSaveButton: this.props.showSaveButton

@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-import PerfectScrollbar from "react-perfect-scrollbar";
 import {Link} from "react-router-dom";
 import React, {createRef} from "react";
 import M from "materialize-css";
@@ -30,6 +29,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {showSidenavByUser, showSidenavByWidth} from "../../actions";
 import {ReduxState} from "../../reducers";
+import ScrollBar from "react-perfect-scrollbar";
 
 const sidenavLinks = [
     { link: '/containers', name: 'Containers' },
@@ -59,11 +59,17 @@ type Props = StateToProps & DispatchToProps;
 class Sidenav extends React.Component<Props, {}> {
 
     private sidenav = createRef<HTMLUListElement>();
+    private scrollbar: (ScrollBar | null) = null;
 
     componentDidMount(): void {
         window.addEventListener('resize', this.handleResize);
         M.Sidenav.init(this.sidenav.current as Element);
+        this.scrollbar?.updateScroll();
     };
+
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+        this.scrollbar?.updateScroll();
+    }
 
     componentWillUnmount(): void {
         window.removeEventListener('resize', this.handleResize);
@@ -73,13 +79,12 @@ class Sidenav extends React.Component<Props, {}> {
       window.innerWidth > 992;
 
     private handleResize = (_: any) => {
-        const sidenav = M.Sidenav.getInstance(this.sidenav.current as Element);
-        sidenav.close();
         let show = this.shouldShowSidenav();
         const {width} = this.props.sidenav;
         if (show !== width) {
             this.props.showSidenavByWidth(show);
         }
+        this.scrollbar?.updateScroll();
     };
 
     private handleSidenav = () => {
@@ -112,7 +117,8 @@ class Sidenav extends React.Component<Props, {}> {
                       <i className="material-icons">menu</i>
                   </a>
               </div>
-              <PerfectScrollbar>
+              <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}
+                         component="div">
                   {sidenavLinks.map((link, index) =>
                     <div key={index}>
                         <li>
@@ -125,7 +131,7 @@ class Sidenav extends React.Component<Props, {}> {
                         </li>}
                     </div>
                   )}
-              </PerfectScrollbar>
+              </ScrollBar>
           </ul>
         )
     }

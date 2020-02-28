@@ -190,6 +190,7 @@ const entities = (state: EntitiesState = {
     default:
       return state;
   }
+  return state;
 };
 
 
