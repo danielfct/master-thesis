@@ -22,13 +22,10 @@
  * SOFTWARE.
  */
 
-import React, {createRef} from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import CardItem from '../../components/list/CardItem';
-import styles from './ServiceCard.module.css';
 import {IService} from "./Service";
-import CardTitle from "../../components/list/CardTitle";
-import ScrollBar from "react-perfect-scrollbar";
+import Card from "../../components/cards/Card";
 
 interface ServiceCardProps {
   service: IService;
@@ -36,73 +33,48 @@ interface ServiceCardProps {
 
 type Props = ServiceCardProps;
 
-export default class ServiceCard extends React.Component<Props, {}> {
-
-  private scrollbar: (ScrollBar | null) = null;
-
-  private getReplicasMessage = (minReplicas: number, maxReplicas: number): string => {
-    if (minReplicas == maxReplicas) {
-      return `${minReplicas}`;
-    }
-    else if (maxReplicas == 0) {
-      return `At least ${minReplicas}`
-    }
-    else {
-      return `At least ${minReplicas} up to ${maxReplicas}`;
-    }
-  };
-
-  componentDidMount(): void {
-    this.scrollbar?.updateScroll();
+const getReplicasMessage = (minReplicas: number, maxReplicas: number): string => {
+  if (minReplicas == maxReplicas) {
+    return `${minReplicas}`;
   }
-
-  //TODO scrollbar doesnt trigger when mouse hovers
-  render() {
-    const {service} = this.props;
-    return (
-      <div className={`col s6 m4 l3 ${styles.serviceCard}`}>
-        <div className={'hoverable'}>
-          <Link to={{
-            pathname: `/services/${service.serviceName}`,
-            state: service}}>
-            <CardTitle title={service.serviceName}/>
-          </Link>
-            <div className={`card gridCard ${styles.serviceCardContent}`}>
-              <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}
-                                component="div">
-                <Link to={{
-                  pathname: `/services/${service.serviceName}`,
-                  state: service}}>
-                <div className='card-content'>
-                  <CardItem key={'serviceType'}
-                            label={'Service type'}
-                            value={`${service.serviceType}`}/>
-                  <CardItem key={'replicas'}
-                            label={'Replicas'}
-                            value={this.getReplicasMessage(service.minReplicas, service.maxReplicas)}/>
-                  <CardItem key={'ports'}
-                            label={'Ports'}
-                            value={`${service.defaultExternalPort}:${service.defaultInternalPort}`}/>
-                  {service.launchCommand != '' &&
-                  <CardItem key={'launchCommand'}
-                            label={'Launch command'}
-                            value={service.launchCommand}/>}
-                  <CardItem key={'outputLabel'}
-                            label={'Output label'}
-                            value={`${service.outputLabel}`}/>
-                  {service.defaultDb != 'NOT_APPLICABLE' &&
-                  <CardItem key={'database'}
-                            label={'Database'}
-                            value={service.defaultDb}/>}
-                  <CardItem key={'memory'}
-                            label={'Memory'}
-                            value={`${service.expectedMemoryConsumption} bytes`}/>
-                </div>
-                </Link>
-              </ScrollBar>
-            </div>
-        </div>
-      </div>
-    );
+  else if (maxReplicas == 0) {
+    return `At least ${minReplicas}`
   }
-}
+  else {
+    return `At least ${minReplicas} up to ${maxReplicas}`;
+  }
+};
+
+const ServiceCard = ({service}: Props) => (
+  <Card<IService> title={service.serviceName}
+                  link={{to: {pathname: `/services/${service.serviceName}`, state: service}}}
+                  height={'250px'}
+                  margin={'10px 0'}
+                  hoverable>
+    <CardItem key={'serviceType'}
+              label={'Service type'}
+              value={`${service.serviceType}`}/>
+    <CardItem key={'replicas'}
+              label={'Replicas'}
+              value={getReplicasMessage(service.minReplicas, service.maxReplicas)}/>
+    <CardItem key={'ports'}
+              label={'Ports'}
+              value={`${service.defaultExternalPort}:${service.defaultInternalPort}`}/>
+    {service.launchCommand != '' &&
+    <CardItem key={'launchCommand'}
+              label={'Launch command'}
+              value={service.launchCommand}/>}
+    <CardItem key={'outputLabel'}
+              label={'Output label'}
+              value={`${service.outputLabel}`}/>
+    {service.defaultDb != 'NOT_APPLICABLE' &&
+    <CardItem key={'database'}
+              label={'Database'}
+              value={service.defaultDb}/>}
+    <CardItem key={'memory'}
+              label={'Memory'}
+              value={`${service.expectedMemoryConsumption} bytes`}/>
+  </Card>
+);
+
+export default ServiceCard;
