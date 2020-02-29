@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependency;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

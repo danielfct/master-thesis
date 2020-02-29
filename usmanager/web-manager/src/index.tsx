@@ -34,7 +34,7 @@ import Footer from "./views/footer/Footer";
 import {saveState} from "./store/localStorage";
 
 // TODO implement labelToIcon function
-// TODO remove scrollbar on main page
+// TODO fix tooltips (maybe M.Tooltip.init(document.querySelectorAll('.tooltipped')))
 
 const store = configureStore();
 

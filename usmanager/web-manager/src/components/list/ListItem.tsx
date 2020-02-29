@@ -51,12 +51,13 @@ export default class ListItem<T> extends React.Component<ListItemProps<T>,{}> {
     return (
       link
         ? <Link to={{pathname: link.pathname, state: link.state}}>
-          <div className={`${styles.item}`}>
+          <div id='listItem' className={`${styles.item}`}
+               style={separatorColor ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
             {this.props.children}
           </div>
         </Link>
         : <UseLongPress callback={longPressCallback && longPressCallback} ms={500}>
-          <div className={`${styles.item} white-text`}
+          <div id='listItem' className={`${styles.item} white-text`}
                style={separatorColor ? {borderBottom: `1px solid ${separatorColor}`} : undefined}>
             {this.props.children}
           </div>

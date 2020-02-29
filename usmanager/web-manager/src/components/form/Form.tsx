@@ -23,7 +23,7 @@
  */
 
 import React, {createRef, FormEvent} from "react";
-import {deleteData, postData, putData} from "../../utils/api";
+import {deleteData, postData, putData, RestOperation} from "../../utils/api";
 import M from "materialize-css";
 import styles from './Form.module.css';
 import {RouteComponentProps, withRouter} from "react-router";
@@ -44,21 +44,15 @@ export interface IErrors {
   [key: string]: string;
 }
 
-type restOperation = {
-  url: string,
-  successCallback: (reply?: any, args?: any) => void,
-  failureCallback: (reason: string, args?: any) => void
-}
-
 interface FormPageProps {
   id: string;
   fields: IFields;
   values: IValues;
   isNew: boolean;
   showSaveButton?: boolean;
-  post: restOperation;
-  put: restOperation;
-  delete?: restOperation;
+  post: RestOperation;
+  put: RestOperation;
+  delete?: RestOperation;
 }
 
 type Props = FormPageProps & RouteComponentProps;

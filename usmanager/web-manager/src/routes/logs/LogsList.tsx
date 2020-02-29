@@ -1,5 +1,4 @@
 import List from "../../components/list/List";
-import MainLayout from "../../views/mainLayout/MainLayout";
 import React from "react";
 import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
@@ -8,10 +7,8 @@ import {connect} from "react-redux";
 import {ILogs} from "./Logs";
 import ListItem from "../../components/list/ListItem";
 import styles from './LogsList.module.css';
-import {IService} from "../services/Service";
 import ReloadButton from "../../components/list/ReloadButton";
 import {capitalize} from "../../utils/text";
-import {Dropdown} from "../../components/form/Dropdown";
 
 interface StateToProps {
   isLoading: boolean;
@@ -95,7 +92,7 @@ class LogsList extends React.Component<Props, {}> {
     return (
       <>
         <ReloadButton tooltip={'Reload'} reloadCallback={this.reload}/>
-        <div className={`${styles.container} ${styles.list}`}>
+        <div className={`${styles.container} ${!isLoading && !error ? styles.list : undefined}`}>
           <LogsList
             isLoading={isLoading}
             error={error}

@@ -54,6 +54,8 @@ export type EntitiesState = {
     loadServicesError?: string | null,
     isLoadingDependencies: boolean,
     loadDependenciesError?: string | null,
+    isLoadingApps: boolean,
+    loadAppsError?: string | null,
   },
   logs: {
     data: { [key: number]: ILogs },
@@ -90,6 +92,8 @@ const entities = (state: EntitiesState = {
                       loadServicesError: null,
                       isLoadingDependencies: false,
                       loadDependenciesError: null,
+                      isLoadingApps: false,
+                      loadAppsError: null,
                     },
                     logs: {
                       data: {},

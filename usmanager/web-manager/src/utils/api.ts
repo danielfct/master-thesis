@@ -25,6 +25,12 @@
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {isAuthenticated} from "./auth";
 
+export type RestOperation = {
+    url: string,
+    successCallback: (reply?: any, args?: any) => void,
+    failureCallback: (reason: string, args?: any) => void
+}
+
 export const API_URL = 'http://localhost:8080';
 /*const API_URL = '/';*/
 const TIMEOUT = 5000;

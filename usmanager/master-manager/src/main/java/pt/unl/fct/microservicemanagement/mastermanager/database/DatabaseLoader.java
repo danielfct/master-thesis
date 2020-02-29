@@ -52,8 +52,8 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.R
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependency.ServiceDependency;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependency.ServiceDependencyRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.users.UserEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.users.UsersRepository;
 

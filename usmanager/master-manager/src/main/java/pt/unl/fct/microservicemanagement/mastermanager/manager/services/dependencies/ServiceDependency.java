@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependency;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 

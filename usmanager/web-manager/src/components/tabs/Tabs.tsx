@@ -19,20 +19,23 @@ export default class extends React.Component<Props, {}> {
     M.Tabs.init(this.tabs.current as Element);
   }
 
-  //TODO disable tab click when just 1
+  updatePathname = (event: any) => {
+    this.props.history.push(`#${event.target.id}`);
+  };
+
   render() {
     const {tabs} = this.props;
     return (
       <>
         <ul className="tabs" ref={this.tabs}>
           {tabs.map((tab, index) =>
-            <li key={index} className={`tab col s${12/tabs.length}`}>
+            <li key={index} className={`tab col s${Math.floor(12/tabs.length)}`} onClick={this.updatePathname}>
               <a href={tabs.length == 1 ? undefined : `#${tab.id}`}>{tab.title}</a>
             </li>
           )}
         </ul>
         {tabs.map((tab, index) =>
-          <div key={index} className={`tab-content ${styles.tabContent} col s12`} id={tab.id}>
+          <div  id={tab.id} key={index} className={`tab-content ${styles.tabContent} col s12`}>
             {tab.content()}
           </div>
         )}

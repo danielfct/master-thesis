@@ -138,7 +138,7 @@ export default class Root extends React.Component<Props, {}> {
                         <Route path="/" exact component={Login} />
                         <Route path="/login" exact component={Login} />
                         {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
-                            <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
+                            <AuthenticatedRoute exact path={path} title={title} component={component}/>)}
                     </Switch>
                     {/*<DevTools/>*/}
                 </Provider>

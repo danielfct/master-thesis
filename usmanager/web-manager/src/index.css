@@ -254,6 +254,7 @@ p {
 .tabs .tab a:focus.active {
     background-color: transparent;
     color: white;
+    padding: 0 2px;
 }
 
 .tabs .indicator {
@@ -464,4 +465,8 @@ textarea.materialize-textarea[readonly="readonly"] {
 .section {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+}
+
+label > span:hover {
+    color: grey !important;
 }
