@@ -29,10 +29,11 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {addServiceDependency, loadServiceDependencies, loadServices, removeServiceDependencies} from "../../actions";
 import BaseComponent from "../../components/BaseComponent";
-import {withRouter} from "react-router-dom";
+import {Link, withRouter} from "react-router-dom";
 import {RouteComponentProps} from "react-router";
-import Dependency from "./Dependency";
 import ControlledList from "../../components/list/ControlledList";
+import ListItem from "../../components/list/ListItem";
+import styles from "./ServiceDependencyList.module.css";
 
 export interface IServiceDependency extends IService {
 }
@@ -72,11 +73,19 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
 
   private dependency = (index: number, dependency: string, separate: boolean, checked: boolean,
                         handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <Dependency key={index}
-                dependency={dependency}
-                separate={separate}
-                checked={checked}
-                handleCheckbox={handleCheckbox}/>;
+    <ListItem key={index} separate={separate}>
+      <div className={`${styles.dependencyItemContent}`}>
+        <label>
+          <input id={dependency}
+                 type="checkbox"
+                 onChange={handleCheckbox}
+                 checked={checked}/>
+          <span id={'checkbox'}>{dependency}</span>
+        </label>
+      </div>
+      <Link to={`/services/${dependency}`}
+            className={`${styles.link}`}/>
+    </ListItem>;
 
   private onAdd = (dependency: string): void =>
     this.props.onAddServiceDependency(dependency);
