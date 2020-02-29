@@ -31,6 +31,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ComponentTypeRepository extends CrudRepository<ComponentTypeEntity, Long> {
 
-  ComponentTypeEntity findByComponentTypeName(@Param("componentTypeName") String componentTypeName);
+  ComponentTypeEntity findByName(@Param("componentTypeName") String componentTypeName);
 
 }

@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
@@ -93,6 +94,42 @@ public class ServicesService {
     services.delete(service);
   }
 
+  public AppPackage getApp(String serviceName, String appName) {
+    assertServiceExists(serviceName);
+    return services.getApp(serviceName, appName).orElseThrow(() ->
+        new EntityNotFoundException(ServiceEntity.class, "appName", appName));
+  }
+
+  public List<AppPackage> getApps(String serviceName) {
+    assertServiceExists(serviceName);
+    return services.getAppsByServiceName(serviceName);
+  }
+
+  public void addApp(String serviceName, String appName) {
+    var service = getService(serviceName);
+    var app = getApp(serviceName, appName);
+    //TODO define launchOrder
+    var appService = AppService.builder().appPackage(app).service(service).launchOrder(0).build();
+    service = service.toBuilder().appService(appService).build();
+    services.save(service);
+  }
+
+  public void addApps(String serviceName, List<String> appNames) {
+    appNames.forEach(appName -> addApp(serviceName, appName));
+  }
+
+  public void removeApp(String serviceName, String app) {
+    removeDependencies(serviceName, List.of(app));
+  }
+
+  public void removeApps(String serviceName, List<String> apps) {
+    var service = getService(serviceName);
+    log.info("Removing apps {}", apps);
+    service.getAppServices()
+        .removeIf(app -> apps.contains(app.getAppPackage().getName()));
+    services.save(service);
+  }
+
   public List<ServiceEntity> getDependencies(String serviceName) {
     assertServiceExists(serviceName);
     return services.getDependencies(serviceName);
@@ -121,8 +158,8 @@ public class ServicesService {
     dependenciesNames.forEach(dependencyName -> addDependency(serviceName, dependencyName));
   }
 
-  public void removeDependency(String serviceName, String dependencies) {
-    removeDependencies(serviceName, List.of(dependencies));
+  public void removeDependency(String serviceName, String dependency) {
+    removeDependencies(serviceName, List.of(dependency));
   }
 
   public void removeDependencies(String serviceName, List<String> dependencies) {
@@ -189,10 +226,6 @@ public class ServicesService {
   public void deleteServiceEventPrediction(Long serviceId, Long serviceEventPredictionId) {
     var serviceEventPrediction = getEventPrediction(serviceId, serviceEventPredictionId);
     serviceEventPredictions.delete(serviceEventPrediction);
-  }
-
-  public AppPackage getApp(String serviceName) {
-    return services.getAppsByServiceName(serviceName);
   }
 
   public int getMinReplicasByServiceName(String serviceName) {

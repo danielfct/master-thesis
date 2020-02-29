@@ -62,7 +62,6 @@ public class ComponentDecisionValueLog {
   @JoinColumn(name = "field_id")
   private FieldEntity field;
 
-  @Column(name = "component_value")
   private double componentValue;
 
   @Override

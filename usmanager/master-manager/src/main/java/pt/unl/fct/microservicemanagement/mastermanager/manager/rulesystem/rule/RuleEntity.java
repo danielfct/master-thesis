@@ -40,6 +40,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -62,14 +63,14 @@ public class RuleEntity {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "rule_name")
-  private String ruleName;
+  @NotNull
+  @Column(unique = true)
+  private String name;
 
   @ManyToOne
   @JoinColumn(name = "component_type_id")
   private ComponentTypeEntity componentType;
 
-  @Column(name = "priority")
   private int priority;
 
   @ManyToOne

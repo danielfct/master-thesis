@@ -106,7 +106,7 @@ public class DecisionsService {
   }
 
   private ComponentDecisionLog saveComponentDecisionLog(String componentTypeName, String decisionName, long ruleId) {
-    ComponentTypeEntity componentType = componentTypes.findByComponentTypeName(componentTypeName);
+    ComponentTypeEntity componentType = componentTypes.findByName(componentTypeName);
     DecisionEntity decision = decisions.getDecisionByComponentTypeAndByDecisionName(componentTypeName, decisionName);
     RuleEntity rule = rulesService.getRule(ruleId);
     var timestamp = Timestamp.from(Instant.now());
@@ -122,7 +122,7 @@ public class DecisionsService {
         .map(fieldValue ->
             ComponentDecisionValueLog.builder()
                 .componentDecisionLog(componentDecisionLog)
-                .field(fields.findByFieldName(fieldValue.getKey().split("-effective-val")[0]))
+                .field(fields.findByName(fieldValue.getKey().split("-effective-val")[0]))
                 .componentValue(fieldValue.getValue())
                 .build())
         .collect(Collectors.toList());

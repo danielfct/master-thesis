@@ -62,10 +62,10 @@ public class OperatorEntity {
   // - NOT_EQUAL_TO; - EQUAL_TO; - GREATER_THAN; - LESS_THAN;
   // - GREATER_THAN_OR_EQUAL_TO; - LESS_THAN_OR_EQUAL_TO
   //TODO enum
-  @Column(name = "operator_name", unique = true)
-  private String operatorName;
+  @Column(unique = true)
+  private String name;
 
-  @Column(name = "operator_symbol", unique = true)
+  @Column(unique = true)
   private String operatorSymbol;
 
   @JsonIgnore

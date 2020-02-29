@@ -26,7 +26,6 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackagesService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.Event;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
@@ -45,6 +44,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decisi
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.RuleDecision;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -184,7 +184,7 @@ public class RulesService {
 
   public long saveRule(long id, RuleReq ruleReq) {
     final RuleEntity rule = id > 0 ? getRule(id) : new RuleEntity();
-    rule.setRuleName(ruleReq.getRuleName());
+    rule.setName(ruleReq.getRuleName());
     final var componentType = getComponentType(ruleReq.getComponentTypeId());
     rule.setComponentType(componentType);
     final var decision = decisions.getDecision(ruleReq.getDecisionId());
@@ -613,8 +613,8 @@ public class RulesService {
     for (var conditionEntity : conditionsEntities) {
       double value = conditionEntity.getConditionValue();
       String valueModeName = conditionEntity.getValueMode().getValueModeName();
-      var fieldName = String.format("%s-%S", conditionEntity.getField().getFieldName(), valueModeName);
-      var operator = Operator.fromValue(conditionEntity.getOperator().getOperatorName());
+      var fieldName = String.format("%s-%S", conditionEntity.getField().getName(), valueModeName);
+      var operator = Operator.fromValue(conditionEntity.getOperator().getName());
       var condition = new Condition(fieldName, value, operator);
       conditionsList.add(condition);
     }

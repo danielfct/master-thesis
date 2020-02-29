@@ -415,7 +415,7 @@ public class DatabaseLoader {
           .build();
 
       var sockShop = AppPackage.builder()
-          .appName("Sock Shop")
+          .name("Sock Shop")
           .build();
       appPackages.save(sockShop);
 
@@ -696,42 +696,42 @@ public class DatabaseLoader {
 
       // component types
       var container = ComponentTypeEntity.builder()
-          .componentTypeName("Container")
+          .name("Container")
           .build();
       componentTypes.save(container);
       var host = ComponentTypeEntity.builder()
-          .componentTypeName("Host")
+          .name("Host")
           .build();
       componentTypes.save(host);
 
       // operator
       var notEqualTo = OperatorEntity.builder()
-          .operatorName("NOT_EQUAL_TO")
+          .name("NOT_EQUAL_TO")
           .operatorSymbol("!=")
           .build();
       operators.save(notEqualTo);
       var equalTo = OperatorEntity.builder()
-          .operatorName("EQUAL_TO")
+          .name("EQUAL_TO")
           .operatorSymbol("==")
           .build();
       operators.save(equalTo);
       var greaterThan = OperatorEntity.builder()
-          .operatorName("GREATER_THAN")
+          .name("GREATER_THAN")
           .operatorSymbol(">")
           .build();
       operators.save(greaterThan);
       var lessThan = OperatorEntity.builder()
-          .operatorName("LESS_THAN")
+          .name("LESS_THAN")
           .operatorSymbol("<")
           .build();
       operators.save(lessThan);
       var greaterThanOrEqualTo = OperatorEntity.builder()
-          .operatorName("GREATER_THAN_OR_EQUAL_TO")
+          .name("GREATER_THAN_OR_EQUAL_TO")
           .operatorSymbol(">=")
           .build();
       operators.save(greaterThanOrEqualTo);
       var lessThanOrEqualTo = OperatorEntity.builder()
-          .operatorName("LESS_THAN_OR_EQUAL_TO")
+          .name("LESS_THAN_OR_EQUAL_TO")
           .operatorSymbol("<=")
           .build();
       operators.save(lessThanOrEqualTo);
@@ -778,43 +778,43 @@ public class DatabaseLoader {
       // TODO is missing more fields...
 
       var cpu = FieldEntity.builder()
-          .fieldName("cpu")
+          .name("cpu")
           .build();
       fields.save(cpu);
       var ram = FieldEntity.builder()
-          .fieldName("ram")
+          .name("ram")
           .build();
       fields.save(ram);
       var cpuPercentage = FieldEntity.builder()
-          .fieldName("cpu-%")
+          .name("cpu-%")
           .build();
       fields.save(cpuPercentage);
       var ramPercentage = FieldEntity.builder()
-          .fieldName("ram-%")
+          .name("ram-%")
           .build();
       fields.save(ramPercentage);
       var rxBytes = FieldEntity.builder()
-          .fieldName("rx-bytes")
+          .name("rx-bytes")
           .build();
       fields.save(rxBytes);
       var txBytes = FieldEntity.builder()
-          .fieldName("tx-bytes")
+          .name("tx-bytes")
           .build();
       fields.save(txBytes);
       var rxBytesPerSec = FieldEntity.builder()
-          .fieldName("rx-bytes-per-sec")
+          .name("rx-bytes-per-sec")
           .build();
       fields.save(rxBytesPerSec);
       var txBytesPerSec = FieldEntity.builder()
-          .fieldName("tx-bytes-per-sec")
+          .name("tx-bytes-per-sec")
           .build();
       fields.save(txBytesPerSec);
       var latency = FieldEntity.builder()
-          .fieldName("latency")
+          .name("latency")
           .build();
       fields.save(latency);
       var bandwidthPercentage = FieldEntity.builder()
-          .fieldName("bandwidth-%")
+          .name("bandwidth-%")
           .build();
       fields.save(bandwidthPercentage);
 
@@ -838,7 +838,7 @@ public class DatabaseLoader {
 
       // rules
       var cpuAndRamPercentageOver90Rule = RuleEntity.builder()
-          .ruleName("%CPU > 90% and %RAM > 90")
+          .name("%CPU > 90% and %RAM > 90")
           .componentType(host)
           .priority(1)
           .decision(hostDecisionStart)

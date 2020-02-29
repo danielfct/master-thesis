@@ -56,17 +56,14 @@ public class ServiceEvent {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "container_id")
   private String containerId;
 
-  @Column(name = "service_name")
   private String serviceName;
 
   @ManyToOne
   @JoinColumn(name = "decision_id")
   private DecisionEntity decision;
 
-  @Column(name = "count")
   private int count;
 
   @Override

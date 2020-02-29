@@ -24,22 +24,23 @@
 
 import React from 'react';
 import {RouteComponentProps} from 'react-router';
-import Form, {IFields, required, requiredAndNumberAndMin} from "../../components/form/Form"
+import Form, {IFields, required, requiredAndNotAllowed, requiredAndNumberAndMin} from "../../components/form/Form"
 import IData from "../../components/IData";
 import ServiceDependencyList from "./ServiceDependencyList";
 import {addServiceDependency, loadServices} from "../../actions";
 import {connect} from "react-redux";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import * as queryString from "querystring";
 import {ReduxState} from "../../reducers";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import BaseComponent from "../../components/BaseComponent";
 import Error from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import {patchData} from "../../utils/api";
-import {hasNewSearch} from "../../utils/text";
 import ServiceAppList from "./ServiceAppList";
+import ServiceDependentList from "./ServiceDependentList";
+import ServicePredictionList from "./ServicePredictionList";
+import ServiceRuleList from "./ServiceRuleList";
 
 export interface IService extends IData {
   serviceName: string;
@@ -53,7 +54,11 @@ export interface IService extends IData {
   outputLabel: string;
   serviceType: string;
   expectedMemoryConsumption: number;
+  apps?: string[];
   dependencies?: string[];
+  dependents?: string[];
+  predictions?: string[];
+  rules?: string[];
 }
 
 const emptyService = (): Partial<IService> => ({
@@ -70,16 +75,22 @@ const emptyService = (): Partial<IService> => ({
   expectedMemoryConsumption: 0,
 });
 
-const getServiceNameFromPathname = (props: Props) =>
-  props.match.params.name.split('#')[0];
+const isNewService = (name: string) =>
+  name === 'new_service';
 
 interface StateToProps {
   isLoadingServices: boolean;
-  isLoadingDependencies: boolean;
   isLoadingApps: boolean;
+  isLoadingDependencies: boolean;
+  isLoadingDependentsBy: boolean;
+  isLoadingPredictions: boolean;
+  isLoadingRules: boolean;
   loadServicesError?: string | null;
-  loadDependenciesError?: string | null;
   loadAppsError?: string | null;
+  loadDependenciesError?: string | null;
+  loadDependentsByError?: string | null;
+  loadPredictionsError?: string | null;
+  loadRulesError?: string | null;
   service: Partial<IService>;
   formService?: Partial<IService>,
 }
@@ -95,9 +106,12 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-interface State {
-  newDependencies: string[];
-  newApps: string[];
+type State = {
+  newApps: string[],
+  newDependencies: string[],
+  newDependentsBy: string[],
+  newPredictions: string[],
+  newRules: string[],
 }
 
 class Service extends BaseComponent<Props, State> {
@@ -105,17 +119,22 @@ class Service extends BaseComponent<Props, State> {
   state: State = {
     newDependencies: [],
     newApps: [],
+    newDependentsBy: [],
+    newPredictions: [],
+    newRules: [],
   };
 
   componentDidMount(): void {
-    const serviceName = getServiceNameFromPathname(this.props);
-    if (serviceName && !hasNewSearch(this.props.location.search)) {
+    const serviceName = this.props.match.params.name;
+    if (serviceName && !isNewService(serviceName)) {
       this.props.loadServices(serviceName);
     }
   };
 
   private onAddServiceDependency = (dependency: string): void => {
-    this.setState({ newDependencies: this.state.newDependencies.concat(dependency) });
+    this.setState({
+      newDependencies: this.state.newDependencies.concat(dependency)
+    });
   };
 
   private onRemoveServiceDependencies = (dependencies: string[]): void => {
@@ -125,8 +144,9 @@ class Service extends BaseComponent<Props, State> {
   };
 
   private saveServiceDependencies = (serviceName: string, successCallback: () => void): void => {
-    if (this.state.newDependencies.length) {
-      patchData(`services/${serviceName}/dependencies`, this.state.newDependencies,
+    const {newDependencies} = this.state;
+    if (newDependencies.length) {
+      patchData(`services/${serviceName}/dependencies`, newDependencies,
         () => this.onSaveDependenciesSuccess(serviceName, successCallback),
         (reason) => this.onSaveDependenciesFailure(serviceName, reason), 'post');
     }
@@ -137,7 +157,7 @@ class Service extends BaseComponent<Props, State> {
 
   private onSaveDependenciesSuccess = (serviceName: string, successCallback: () => void): void => {
     successCallback();
-    if (!hasNewSearch(this.props.location.search)) {
+    if (!isNewService(this.props.match.params.name)) {
       this.state.newDependencies.forEach(dependencyName =>
         this.props.addServiceDependency(serviceName, dependencyName)
       );
@@ -148,19 +168,68 @@ class Service extends BaseComponent<Props, State> {
   private onSaveDependenciesFailure = (serviceName: string, reason: string): void =>
     super.toast(`Service <b>${serviceName}</b> saved, but unable to save dependencies`, 10000, reason, true);
 
-  private addServiceApp = (appName: string): void => {
-    this.setState({ newApps: this.state.newApps.concat(appName) });
+
+  private onAddServiceApp = (app: string): void => {
+    this.setState({
+      newApps: this.state.newApps.concat(app)
+    });
   };
 
+  private onRemoveServiceApps = (apps: string[]): void => {
+    this.setState({
+      newDependencies: this.state.newApps.filter(app => !apps.includes(app))
+    });
+  };
+
+  private onAddServiceDependentBy = (dependentBy: string): void => {
+    this.setState({
+      newDependentsBy: this.state.newDependentsBy.concat(dependentBy)
+    });
+  };
+
+  private onRemoveServiceDependentsBy = (dependentsBy: string[]): void => {
+    this.setState({
+      newDependentsBy: this.state.newDependentsBy.filter(dependentBy => !dependentsBy.includes(dependentBy))
+    });
+  };
+
+  private onAddServicePrediction = (prediction: string): void => {
+    this.setState({
+      newPredictions: this.state.newPredictions.concat(prediction)
+    });
+  };
+
+  private onRemoveServicePredictions = (predictions: string[]): void => {
+    this.setState({
+      newPredictions: this.state.newPredictions.filter(prediction => !predictions.includes(prediction))
+    });
+  };
+
+  private onAddServiceRule = (rule: string): void => {
+    this.setState({
+      newRules: this.state.newRules.concat(rule)
+    });
+  };
+
+  private onRemoveServiceRules = (rules: string[]): void => {
+    this.setState({
+      newRules: this.state.newRules.filter(rule => !rules.includes(rule))
+    });
+  };
+
+  //TODO save other entities too
+  private saveEntities = (serviceName: string, successCallback: () => void) =>
+    this.saveServiceDependencies(serviceName, successCallback);
+
   private onPostSuccess = (serviceName: string): void => {
-    this.saveServiceDependencies(serviceName, () => super.toast(`Service <b>${serviceName}</b> is now created`));
+    this.saveEntities(serviceName, () => super.toast(`Service <b>${serviceName}</b> is now created`));
   };
 
   private onPostFailure = (reason: string, serviceName: string): void =>
     super.toast(`Unable to save ${serviceName}`, 10000, reason, true);
 
   private onPutSuccess = (serviceName: string): void => {
-    this.saveServiceDependencies(serviceName, () => super.toast(`Changes to service <b>${serviceName}</b> are now saved`));
+    this.saveEntities(serviceName, () => super.toast(`Changes to service <b>${serviceName}</b> are now saved`));
   };
 
   private onPutFailure = (reason: string, serviceName: string): void =>
@@ -182,7 +251,7 @@ class Service extends BaseComponent<Props, State> {
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 0 }
-            : { rule: required }
+            : key === 'serviceName' ? { rule: requiredAndNotAllowed, args: ['new_service'] } : { rule: required }
         }
       };
     }).reduce((fields, field) => {
@@ -204,8 +273,8 @@ class Service extends BaseComponent<Props, State> {
           <Form id={serviceKey}
                 fields={this.getFields(formService)}
                 values={service}
-                isNew={hasNewSearch(this.props.location.search)}
-                showSaveButton={!!this.state.newDependencies.length}
+                isNew={isNewService(this.props.match.params.name)}
+                showSaveButton={!!this.state['newDependencies'].length}
                 post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
                 put={{url: `services/${service[serviceKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={{url: `services/${service[serviceKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}>
@@ -227,6 +296,7 @@ class Service extends BaseComponent<Props, State> {
   };
 
   private apps = () => {
+    const {newApps} = this.state;
     const {isLoadingApps, loadAppsError, service} = this.props;
     return (
       <>
@@ -235,7 +305,10 @@ class Service extends BaseComponent<Props, State> {
         {loadAppsError &&
         <Error message={loadAppsError}/>}
         {!loadAppsError && service &&
-        <ServiceAppList service={service} addServiceAppCallback={this.addServiceApp}/>}
+        <ServiceAppList service={service}
+                        newApps={newApps}
+                        onAddServiceApp={this.onAddServiceApp}
+                        onRemoveServiceApps={this.onRemoveServiceApps}/>}
       </>
     )
   };
@@ -259,21 +332,57 @@ class Service extends BaseComponent<Props, State> {
   };
 
   private dependentBy = () => {
+    const {newDependentsBy} = this.state;
+    const {isLoadingDependentsBy, loadDependentsByError, service} = this.props;
     return (
-      <div/>
+      <>
+        {isLoadingDependentsBy &&
+        <LoadingSpinner/>}
+        {loadDependentsByError &&
+        <Error message={loadDependentsByError}/>}
+        {!loadDependentsByError && service &&
+        <ServiceDependentList service={service}
+                              newDependentsBy={newDependentsBy}
+                              onAddServiceDependentBy={this.onAddServiceDependentBy}
+                              onRemoveServiceDependentsBy={this.onRemoveServiceDependentsBy}/>}
+      </>
     )
   };
 
   private predictions = () => {
+    const {newPredictions} = this.state;
+    const {isLoadingPredictions, loadPredictionsError, service} = this.props;
     return (
-      <div/>
+      <>
+        {isLoadingPredictions &&
+        <LoadingSpinner/>}
+        {loadPredictionsError &&
+        <Error message={loadPredictionsError}/>}
+        {!loadPredictionsError && service &&
+        <ServicePredictionList service={service}
+                               newPredictions={newPredictions}
+                               onAddServicePrediction={this.onAddServicePrediction}
+                               onRemoveServicePredictions={this.onRemoveServicePredictions}/>}
+      </>
     )
   };
 
   private rules = () => {
+    const {newRules} = this.state;
+    const {isLoadingRules, loadRulesError, service} = this.props;
     return (
-      <div/>
-    );
+      <>
+        {isLoadingRules &&
+        <LoadingSpinner/>}
+        {loadRulesError &&
+        <Error message={loadRulesError}/>}
+        {!loadRulesError && service &&
+        <ServiceRuleList service={service}
+                         newRules={newRules}
+                         onAddServiceRule={this.onAddServiceRule}
+                         onRemoveServiceRules={this.onRemoveServiceRules}/>}
+      </>
+    )
   };
 
   private tabs: Tab[] = [
@@ -322,27 +431,43 @@ class Service extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const name = getServiceNameFromPathname(props);
-  const service = hasNewSearch(props.location.search) ? emptyService() : state.entities.services.data[name];
+  const name = props.match.params.name;
+  const service = isNewService(name) ? emptyService() : state.entities.services.data[name];
   let formService;
   if (service) {
     formService = { ...service };
     delete formService["id"];
+    delete formService["apps"];
     delete formService["dependencies"];
+    delete formService["dependents"];
+    delete formService["predictions"];
+    delete formService["rules"];
   }
   const isLoadingServices = state.entities.services?.isLoadingServices;
-  const isLoadingDependencies = state.entities.services?.isLoadingDependencies;
   const isLoadingApps = state.entities.services?.isLoadingApps;
+  const isLoadingDependencies = state.entities.services?.isLoadingDependencies;
+  const isLoadingDependentsBy = state.entities.services?.isLoadingDependentsBy;
+  const isLoadingPredictions = state.entities.services?.isLoadingPredictions;
+  const isLoadingRules = state.entities.services?.isLoadingRules;
   const loadServicesError = state.entities.services?.loadServicesError;
-  const loadDependenciesError = state.entities.services?.loadDependenciesError;
   const loadAppsError = state.entities.services?.loadAppsError;
+  const loadDependenciesError = state.entities.services?.loadDependenciesError;
+  const loadDependentsByError = state.entities.services?.loadDependentsByError;
+  const loadPredictionsError = state.entities.services?.loadPredictionsError;
+  const loadRulesError = state.entities.services?.loadRulesError;
   return  {
     isLoadingServices,
-    isLoadingDependencies,
     isLoadingApps,
+    isLoadingDependencies,
+    isLoadingDependentsBy,
+    isLoadingPredictions,
+    isLoadingRules,
     loadServicesError,
-    loadDependenciesError,
     loadAppsError,
+    loadDependenciesError,
+    loadDependentsByError,
+    loadPredictionsError,
+    loadRulesError,
     service,
     formService,
   }

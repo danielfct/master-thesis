@@ -39,7 +39,3 @@ export const camelCaseToSentenceCase = (text: string): string => {
 
 export const capitalize = (text: string): string =>
     text.charAt(0).toUpperCase() + text.substring(1);
-
-
-export const hasNewSearch = (search: string): boolean =>
-  !!queryString.parse(search)['?new'];

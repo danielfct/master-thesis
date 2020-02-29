@@ -30,10 +30,9 @@ import {bindActionCreators} from "redux";
 import {addServiceDependency, loadServiceDependencies, loadServices, removeServiceDependencies} from "../../actions";
 import BaseComponent from "../../components/BaseComponent";
 import {Link, withRouter} from "react-router-dom";
-import {RouteComponentProps} from "react-router";
 import ControlledList from "../../components/list/ControlledList";
 import ListItem from "../../components/list/ListItem";
-import styles from "./ServiceDependencyList.module.css";
+import styles from "../../components/list/ListItem.module.css";
 
 export interface IServiceDependency extends IService {
 }
@@ -59,7 +58,7 @@ interface ServiceDependencyProps {
   onRemoveServiceDependencies: (dependencies: string[]) => void;
 }
 
-type Props = StateToProps & DispatchToProps & ServiceDependencyProps & RouteComponentProps;
+type Props = StateToProps & DispatchToProps & ServiceDependencyProps;
 
 class ServiceDependencyList extends BaseComponent<Props, {}> {
 
@@ -74,7 +73,7 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
   private dependency = (index: number, dependency: string, separate: boolean, checked: boolean,
                         handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
     <ListItem key={index} separate={separate}>
-      <div className={`${styles.dependencyItemContent}`}>
+      <div className={`${styles.itemContent}`}>
         <label>
           <input id={dependency}
                  type="checkbox"
@@ -149,4 +148,4 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
     removeServiceDependencies,
   }, dispatch);
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ServiceDependencyList));
+export default connect(mapStateToProps, mapDispatchToProps)(ServiceDependencyList);

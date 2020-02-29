@@ -52,7 +52,6 @@ public class HostRule {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "hostname")
   private String hostname;
 
   @ManyToOne

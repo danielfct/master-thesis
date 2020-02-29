@@ -42,6 +42,11 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
 
   List<ServiceEntity> findByDockerRepository(@Param("dockerRepository") String dockerRepository);
 
+  @Query("select a.appPackage "
+      + "from ServiceEntity s inner join s.appServices a "
+      + "where s.serviceName = :serviceName and a.appPackage.name = :appName")
+  Optional<AppPackage> getApp(@Param("serviceName") String serviceName, String appName);
+
   @Query("select d.dependency "
       + "from ServiceEntity s inner join s.dependencies d "
       + "where s.serviceName = :serviceName")
@@ -78,11 +83,10 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
   List<ServiceEntity> getDependenciesByType(@Param("serviceId") long serviceId,
                                             @Param("serviceType") String serviceType);
 
-  //TODO single ou lista?
   @Query("select apps.appPackage "
       + "from ServiceEntity s inner join s.appServices apps "
       + "where s.serviceName = :serviceName")
-  AppPackage getAppsByServiceName(@Param("serviceName") String serviceName);
+  List<AppPackage> getAppsByServiceName(@Param("serviceName") String serviceName);
 
   @Query("select s.maxReplicas "
       + "from ServiceEntity s "

@@ -31,7 +31,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.SimulatedMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ContainerDecisionResult;
@@ -39,6 +38,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decisi
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -71,7 +71,7 @@ public class ContainersMonitoringService {
   private final ContainerMonitoringRepository containersMonitoring;
 
   private final DockerContainersService dockerContainersService;
-  private final ServicesService servicesConfigService;
+  private final ServicesService servicesService;
   private final RulesService rulesService;
   private final ServicesEventsService servicesEventsService;
   private final HostsService hostsService;
@@ -87,7 +87,7 @@ public class ContainersMonitoringService {
 
   public ContainersMonitoringService(ContainerMonitoringRepository containersMonitoring,
                                      DockerContainersService dockerContainersService,
-                                     ServicesService servicesConfigService, RulesService rulesService,
+                                     ServicesService servicesService, RulesService rulesService,
                                      ServicesEventsService servicesEventsService, HostsService hostsService,
                                      LocationRequestService requestLocationMonitoringService,
                                      DecisionsService decisionsService,
@@ -96,7 +96,7 @@ public class ContainersMonitoringService {
                                      ContainerProperties containerProperties) {
     this.containersMonitoring = containersMonitoring;
     this.dockerContainersService = dockerContainersService;
-    this.servicesConfigService = servicesConfigService;
+    this.servicesService = servicesService;
     this.rulesService = rulesService;
     this.servicesEventsService = servicesEventsService;
     this.hostsService = hostsService;
@@ -187,7 +187,7 @@ public class ContainersMonitoringService {
         //TODO utilidade?
         testLogsService.saveMonitoringServiceLogTests(containerId, serviceName, field, value);
       });
-      long appId = servicesConfigService.getApp(serviceName).getId();
+      long appId = servicesService.getApp(serviceName, "Sock Shop").getId(); //TODO run rules on every app
       final var containerDecisionResult = runAppRules(appId, serviceHostname, containerId, serviceName, newFields);
       var serviceDecisions = servicesDecisions.get(serviceName);
       if (serviceDecisions != null) {
@@ -272,8 +272,8 @@ public class ContainersMonitoringService {
       final var containerDecisions = servicesDecisions.getValue();
       final var relevantContainerDecisions = relevantServicesDecisions.getOrDefault(serviceName, new ArrayList<>());
       final var currentReplicas = containerDecisions.size();
-      final var minimumReplicas = servicesConfigService.getMinReplicasByServiceName(serviceName);
-      final var maximumReplicas = servicesConfigService.getMaxReplicasByServiceName(serviceName);
+      final var minimumReplicas = servicesService.getMinReplicasByServiceName(serviceName);
+      final var maximumReplicas = servicesService.getMaxReplicasByServiceName(serviceName);
       if (currentReplicas < minimumReplicas) {
         startContainer(containerDecisions, relevantContainerDecisions, servicesLocationsRegions);
       } else if (!relevantContainerDecisions.isEmpty()) {
@@ -335,7 +335,7 @@ public class ContainersMonitoringService {
       log.info("Starting service '{}'. Location: '{}' ({})",
           serviceName, hostname, startLocation.getRegion());
     }
-    final var serviceAvgMem = servicesConfigService.getService(serviceName).getExpectedMemoryConsumption();
+    final var serviceAvgMem = servicesService.getService(serviceName).getExpectedMemoryConsumption();
     final var toHostname = hostsService.getAvailableNodeHostname(serviceAvgMem, startLocation);
     final var replicatedContainerId = dockerContainersService.replicateContainer(containerId, hostname, toHostname);
     final var selectedHostDetails = hostsService.getHostDetails(toHostname);

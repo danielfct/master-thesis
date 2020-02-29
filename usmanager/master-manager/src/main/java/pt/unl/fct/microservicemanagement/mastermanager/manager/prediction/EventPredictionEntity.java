@@ -36,6 +36,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -58,34 +59,31 @@ public class EventPredictionEntity {
   @GeneratedValue
   private Long id;
 
+  @NotNull
+  @Column(unique = true)
+  private String name;
+
   @JoinColumn(name = "service_id")
   @ManyToOne
   private ServiceEntity service;
 
-  @Column(name = "description")
   private String description;
 
   @Basic
-  @Column(name = "start_date")
   private Timestamp startDate;
 
   @Basic
-  @Column(name = "start_time")
   private Timestamp startTime;
 
   @Basic
-  @Column(name = "end_date")
   private Timestamp endDate;
 
   @Basic
-  @Column(name = "end_time")
   private Timestamp endTime;
 
-  @Column(name = "min_replicas")
   private int minReplicas;
 
   @Basic
-  @Column(name = "last_update")
   @JsonIgnore
   private Timestamp lastUpdate;
 

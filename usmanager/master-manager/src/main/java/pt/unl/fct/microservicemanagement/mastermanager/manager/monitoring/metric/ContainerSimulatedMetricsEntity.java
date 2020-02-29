@@ -50,19 +50,14 @@ public class ContainerSimulatedMetricsEntity {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "container_id")
   private String containerId;
 
-  @Column(name = "field")
   private String field;
 
-  @Column(name = "min_value")
   private double minValue;
 
-  @Column(name = "max_value")
   private double maxValue;
 
-  @Column(name = "override")
   private boolean override;
 
   @Override

@@ -72,7 +72,6 @@ public class DecisionEntity {
   // Possible values:
   // - NONE; - REPLICATE; - MIGRATE; - STOP;
   // - NONE; - START; - STOP
-  @Column(name = "decision_name")
   private String decisionName;
 
   @JsonIgnore

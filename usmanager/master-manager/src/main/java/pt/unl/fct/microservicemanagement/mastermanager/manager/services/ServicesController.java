@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
 import pt.unl.fct.microservicemanagement.mastermanager.util.BatchRequest;
@@ -81,8 +82,35 @@ public class ServicesController {
     servicesService.deleteService(serviceName);
   }
 
+  @GetMapping("/{serviceName}/apps")
+  public List<AppPackage> getServiceApps(@PathVariable String serviceName) {
+    return servicesService.getApps(serviceName);
+  }
+
+  @PatchMapping("/{serviceName}/apps")
+  public void batchApps(@PathVariable String serviceName, @RequestBody BatchRequest<String> batchRequest) {
+    BatchRequest.Request request = batchRequest.getRequest();
+    String[] body = batchRequest.getBody();
+    var apps = Arrays.asList(body);
+    switch (request) {
+      case POST:
+        servicesService.addApps(serviceName, apps);
+        break;
+      case DELETE:
+        servicesService.removeApps(serviceName, apps);
+        break;
+      default:
+        break;
+    }
+  }
+
+  @DeleteMapping("/{serviceName}/apps/{appName}")
+  public void removeApp(@PathVariable String serviceName, @PathVariable String appName) {
+    servicesService.removeApp(serviceName, appName);
+  }
+
   @GetMapping("/{serviceName}/dependencies")
-  public List<ServiceEntity> getServicesDependencies(@PathVariable String serviceName) {
+  public List<ServiceEntity> getServiceDependencies(@PathVariable String serviceName) {
     return servicesService.getDependencies(serviceName);
   }
 

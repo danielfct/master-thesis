@@ -22,15 +22,14 @@
  * SOFTWARE.
  */
 
-import React, {createRef, FormEvent} from "react";
+import React from "react";
 import {deleteData, postData, putData, RestOperation} from "../../utils/api";
-import M from "materialize-css";
 import styles from './Form.module.css';
 import {RouteComponentProps, withRouter} from "react-router";
 import {getTypeFromValue, FieldProps, IValidation} from "./Field";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
-import { isEqual, isEqualWith } from "lodash";
+import { isEqualWith } from "lodash";
 
 export interface IFields {
   [key: string]: FieldProps;
@@ -77,6 +76,11 @@ export const required = (values: IValues, fieldName: string): string =>
     ? `${camelCaseToSentenceCase(fieldName)} is required`
     : "";
 
+export const notAllowed = (values: IValues, fieldName: string, args: any[]): string =>
+  args.indexOf(values[fieldName].toLowerCase()) != -1
+    ? `${values[fieldName]} is not allowed`
+    : "";
+
 export const min = (values: IValues, fieldName: string, args: any): string =>
   values[fieldName] < args
     ? `Required minimum value of ${args}`
@@ -86,6 +90,9 @@ export const number = (values: IValues, fieldName: string): string =>
   getTypeFromValue(values[fieldName]) !== 'number'
     ? `${camelCaseToSentenceCase(fieldName)} is a number`
     : "";
+
+export const requiredAndNotAllowed = (values: IValues, fieldName: string, args: any[]) =>
+  required(values, fieldName) || notAllowed(values, fieldName, args);
 
 export const requiredAndNumberAndMin = (values: IValues, fieldName: string, args: any) =>
   required(values, fieldName) || number(values, fieldName) || min(values, fieldName, args);
@@ -193,19 +200,19 @@ class Form extends React.Component<Props, State> {
               </button>
               :
               <div>
-                <button className={`btn-floating btn-flat btn-small waves-effect waves-black right tooltipped`}
+                <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
                         data-position="bottom" data-tooltip="Edit"
                         type="button"
                         onClick={this.onClickEdit}>
                   <i className="large material-icons">edit</i>
                 </button>
                 <div className={`${styles.controlButton}`}>
-                  <button className={`modal-trigger btn-flat btn-small waves-effect waves-black red-text`}
+                  <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
                           type="button"
                           data-target="confirm-dialog">
                     Delete
                   </button>
-                  <button className={`btn-flat btn-small waves-effect waves-black green-text slide`}
+                  <button className={`btn-flat btn-small waves-effect waves-light green-text slide`}
                           style={showSaveButton ? {transform: "scale(1)"} : {transform: "scale(0)"}}
                           type="submit">
                     Save

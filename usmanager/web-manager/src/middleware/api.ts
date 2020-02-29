@@ -30,6 +30,10 @@ import axios from "axios";
 import {API_URL} from "../utils/api";
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
+import {IDependent} from "../routes/services/ServiceDependentList";
+import {IPrediction} from "../routes/services/ServicePredictionList";
+import {IRule} from "../routes/services/ServiceRuleList";
+import {IApp} from "../routes/services/ServiceAppList";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -54,18 +58,48 @@ const callApi = (endpoint: string, schema: any) => {
 interface ISchemas {
     SERVICE: schema.Entity<IService>;
     SERVICE_ARRAY: schema.Entity<IService>[];
+    SERVICE_APP: schema.Entity<IApp>;
+    SERVICE_APP_ARRAY: schema.Entity<IApp>[];
     SERVICE_DEPENDENCY: schema.Entity<IServiceDependency>;
     SERVICE_DEPENDENCY_ARRAY: schema.Entity<IServiceDependency>[];
+    SERVICE_DEPENDENTBY: schema.Entity<IDependent>;
+    SERVICE_DEPENDENTBY_ARRAY: schema.Entity<IDependent>[];
+    SERVICE_PREDICTION: schema.Entity<IPrediction>;
+    SERVICE_PREDICTION_ARRAY: schema.Entity<IPrediction>[];
+    SERVICE_RULE: schema.Entity<IRule>;
+    SERVICE_RULE_ARRAY: schema.Entity<IRule>[];
     LOGS_ARRAY: schema.Entity<ILogs>[];
     REGION: schema.Entity<IRegion>;
     REGION_ARRAY: schema.Entity<IRegion>[];
 }
 
+const appSchema: schema.Entity<IApp> = new schema.Entity('apps', {}, {
+    idAttribute: (app: IApp) => app.name
+});
+const apps = new schema.Array(appSchema);
 const dependencySchema: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', {}, {
     idAttribute: (dependency: IServiceDependency) => dependency.serviceName
 });
 const dependencies = new schema.Array(dependencySchema);
-const serviceSchema: schema.Entity<IService> = new schema.Entity('services', { dependencies }, {
+const dependentBySchema: schema.Entity<IDependent> = new schema.Entity('dependentsBy', {}, {
+    idAttribute: (dependent: IDependent) => dependent.serviceName
+});
+const dependentsBy = new schema.Array(dependentBySchema);
+const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predictions', {}, {
+    idAttribute: (prediction: IPrediction) => prediction.name
+});
+const predictions = new schema.Array(predictionSchema);
+const ruleSchema: schema.Entity<IRule> = new schema.Entity('rules', {}, {
+    idAttribute: (rule: IRule) => rule.name
+});
+const rules = new schema.Array(ruleSchema);
+const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {
+    apps,
+    dependencies,
+    dependentsBy,
+    predictions,
+    rules
+}, {
     idAttribute: (service: IService) => service.serviceName
 });
 
@@ -80,8 +114,16 @@ const regionSchema: schema.Entity<IRegion> = new schema.Entity('regions', undefi
 export const Schemas: ISchemas = {
     SERVICE: serviceSchema,
     SERVICE_ARRAY: [serviceSchema],
-    SERVICE_DEPENDENCY : dependencySchema,
+    SERVICE_APP: appSchema,
+    SERVICE_APP_ARRAY: [appSchema],
+    SERVICE_DEPENDENCY: dependencySchema,
     SERVICE_DEPENDENCY_ARRAY: [dependencySchema],
+    SERVICE_DEPENDENTBY: dependentBySchema,
+    SERVICE_DEPENDENTBY_ARRAY: [dependentBySchema],
+    SERVICE_PREDICTION: predictionSchema,
+    SERVICE_PREDICTION_ARRAY: [predictionSchema],
+    SERVICE_RULE: ruleSchema,
+    SERVICE_RULE_ARRAY: [ruleSchema],
     LOGS_ARRAY: [logsSchema],
     REGION: regionSchema,
     REGION_ARRAY: [regionSchema]

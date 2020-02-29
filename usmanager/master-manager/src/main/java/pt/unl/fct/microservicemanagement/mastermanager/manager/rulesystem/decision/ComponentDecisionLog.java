@@ -78,7 +78,6 @@ public class ComponentDecisionLog {
   private RuleEntity rule;
 
   @Basic
-  @Column(name = "timestamp")
   private Timestamp timestamp;
 
   @JsonIgnore

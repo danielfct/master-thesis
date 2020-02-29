@@ -56,13 +56,10 @@ public class ComponentDecisionServiceLog {
   @JoinColumn(name = "component_decision_log_id")
   private ComponentDecisionLog componentDecisionLog;
 
-  @Column(name = "container_id")
   private String containerId;
 
-  @Column(name = "service_name")
   private String serviceName;
 
-  @Column(name = "other_info")
   private String otherInfo;
 
   @Override

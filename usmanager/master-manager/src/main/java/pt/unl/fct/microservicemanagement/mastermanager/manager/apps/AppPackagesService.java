@@ -55,7 +55,7 @@ public class AppPackagesService {
 
   public long saveApp(long id, SaveAppReq saveAppReq) {
     AppPackage app = id > 0 ? getApp(id) : new AppPackage();
-    app.setAppName(saveAppReq.getAppName());
+    app.setName(saveAppReq.getAppName());
     return apps.save(app).getId();
   }
 

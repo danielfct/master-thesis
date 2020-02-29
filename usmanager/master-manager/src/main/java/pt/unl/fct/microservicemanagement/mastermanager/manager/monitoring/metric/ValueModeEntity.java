@@ -58,7 +58,6 @@ public class ValueModeEntity {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "value_mode_name")
   private String valueModeName;
 
   @JsonIgnore

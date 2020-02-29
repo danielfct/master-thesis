@@ -62,8 +62,8 @@ public class FieldEntity {
   //TODO enum
   // Possible values:
   // - cpu, - ram, ...
-  @Column(name = "field_name", unique = true)
-  private String fieldName;
+  @Column(unique = true)
+  private String name;
 
   @JsonIgnore
   @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)

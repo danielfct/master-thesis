@@ -54,14 +54,12 @@ public class HostEventEntity {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "hostname")
   private String hostname;
 
   @ManyToOne
   @JoinColumn(name = "decision_id")
   private DecisionEntity decision;
 
-  @Column(name = "count")
   private int count;
 
   @Override

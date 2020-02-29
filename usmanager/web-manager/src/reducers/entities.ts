@@ -38,7 +38,16 @@ import {
   LOGS_FAILURE,
   LOGS_SUCCESS,
   REGIONS_REQUEST,
-  REGIONS_FAILURE, REGIONS_SUCCESS
+  REGIONS_FAILURE,
+  REGIONS_SUCCESS,
+  SERVICE_APPS_REQUEST,
+  SERVICE_DEPENDENTSBY_REQUEST,
+  SERVICE_PREDICTIONS_REQUEST,
+  SERVICE_RULES_REQUEST,
+  SERVICE_APPS_FAILURE,
+  SERVICE_DEPENDENTSBY_FAILURE,
+  SERVICE_PREDICTIONS_FAILURE,
+  SERVICE_RULES_FAILURE, SERVICE_APPS_SUCCESS
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
@@ -46,16 +55,27 @@ import {IService} from "../routes/services/Service";
 import {merge, mergeWith, assign, pick, keys, isEqual } from 'lodash';
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
+import {IServiceDependency} from "../routes/services/ServiceDependencyList";
+import {IDependent} from "../routes/services/ServiceDependentList";
+import {IApp} from "../routes/services/ServiceAppList";
+import {IPrediction} from "../routes/services/ServicePredictionList";
+import {IRule} from "../routes/services/ServiceRuleList";
 
 export type EntitiesState = {
   services: {
     data: { [key: string]: IService },
     isLoadingServices: boolean,
     loadServicesError?: string | null,
-    isLoadingDependencies: boolean,
-    loadDependenciesError?: string | null,
     isLoadingApps: boolean,
     loadAppsError?: string | null,
+    isLoadingDependencies: boolean,
+    loadDependenciesError?: string | null,
+    isLoadingDependentsBy: boolean,
+    loadDependentsByError?: string | null,
+    isLoadingPredictions: boolean,
+    loadPredictionsError?: string | null,
+    isLoadingRules: boolean,
+    loadRulesError?: string | null,
   },
   logs: {
     data: { [key: number]: ILogs },
@@ -77,8 +97,16 @@ export type EntitiesAction = {
   error?: string,
   data?: {
     services?: IService[],
+    apps?: IApp[],
+    appsNames?: string[],
     dependencies?: IService[],
     dependenciesNames?: string[],
+    dependentsBy?: IDependent[],
+    dependentsByNames?: string[],
+    predictions?: IPrediction[],
+    predictionsNames?: string[],
+    rules?: IRule[],
+    rulesNames?: string[],
     logs?: ILogs[],
     regions?: IRegion[],
     //TODO other entities
@@ -90,10 +118,16 @@ const entities = (state: EntitiesState = {
                       data: {},
                       isLoadingServices: false,
                       loadServicesError: null,
-                      isLoadingDependencies: false,
-                      loadDependenciesError: null,
                       isLoadingApps: false,
                       loadAppsError: null,
+                      isLoadingDependencies: false,
+                      loadDependenciesError: null,
+                      isLoadingDependentsBy: false,
+                      loadDependentsByError: null,
+                      isLoadingPredictions: false,
+                      loadPredictionsError: null,
+                      isLoadingRules: false,
+                      loadRulesError: null,
                     },
                     logs: {
                       data: {},
@@ -113,13 +147,29 @@ const entities = (state: EntitiesState = {
     case SERVICE_REQUEST:
     case SERVICES_REQUEST:
       return merge({}, state, { services: { isLoadingServices: true } });
+    case SERVICE_APPS_REQUEST:
+      return merge({}, state, { services: { isLoadingApps: true } });
     case SERVICE_DEPENDENCIES_REQUEST:
       return merge({}, state, { services: { isLoadingDependencies: true } });
+    case SERVICE_DEPENDENTSBY_REQUEST:
+      return merge({}, state, { services: { isLoadingDependentsBy: true } });
+    case SERVICE_PREDICTIONS_REQUEST:
+      return merge({}, state, { services: { isLoadingPredictions: true } });
+    case SERVICE_RULES_REQUEST:
+      return merge({}, state, { services: { isLoadingRules: true } });
     case SERVICE_FAILURE:
     case SERVICES_FAILURE:
       return merge({}, state, { services: { isLoadingServices: false, loadServicesError: error } });
+    case SERVICE_APPS_FAILURE:
+      return merge({}, state, { services: { isLoadingApps: false, loadAppsError: error } });
     case SERVICE_DEPENDENCIES_FAILURE:
       return merge({}, state, { services: { isLoadingDependencies: false, loadDependenciesError: error } });
+    case SERVICE_DEPENDENTSBY_FAILURE:
+      return merge({}, state, { services: { isLoadingDependentsBy: false, loadDependentsByError: error } });
+    case SERVICE_PREDICTIONS_FAILURE:
+      return merge({}, state, { services: { isLoadingPredictions: false, loadPredictionsError: error } });
+    case SERVICE_RULES_FAILURE:
+      return merge({}, state, { services: { isLoadingRules: false, loadRulesError: error } });
     case SERVICE_SUCCESS:
       return {
         ...state,
@@ -127,8 +177,16 @@ const entities = (state: EntitiesState = {
           data: merge({}, state.services.data, data?.services),
           isLoadingServices: false,
           loadServicesError: null,
+          isLoadingApps: state.services.isLoadingApps,
+          loadAppsError: state.services.loadAppsError,
           isLoadingDependencies: state.services.isLoadingDependencies,
-          loadDependenciesError: state.services.loadDependenciesError
+          loadDependenciesError: state.services.loadDependenciesError,
+          isLoadingDependentsBy: state.services.isLoadingDependentsBy,
+          loadDependentsByError: state.services.loadDependentsByError,
+          isLoadingPredictions: state.services.isLoadingPredictions,
+          loadPredictionsError: state.services.loadPredictionsError,
+          isLoadingRules: state.services.isLoadingRules,
+          loadRulesError: state.services.loadRulesError,
         }
       };
     case SERVICES_SUCCESS:
@@ -141,12 +199,32 @@ const entities = (state: EntitiesState = {
           loadServicesError: null,
         }
       };
-    case SERVICE_DEPENDENCIES_SUCCESS:
+    case SERVICE_APPS_SUCCESS: {
       const service = entity && state.services.data[entity];
-      const dependencies = { dependencies: data?.dependencies || [] };
+      const apps = { apps: data?.apps || [] };
+      const serviceWithApps = Object.assign(service ? service : [entity], apps);
+      const normalizedService = normalize(serviceWithApps, Schemas.SERVICE).entities;
+      return merge({}, state, {
+        services: {
+          data: normalizedService.services,
+          isLoadingApps: false,
+          loadAppsError: null
+        }
+      });
+    }
+    case SERVICE_DEPENDENCIES_SUCCESS: {
+      const service = entity && state.services.data[entity];
+      const dependencies = {dependencies: data?.dependencies || []};
       const serviceWithDependencies = Object.assign(service ? service : [entity], dependencies);
       const normalizedService = normalize(serviceWithDependencies, Schemas.SERVICE).entities;
-      return merge({}, state, { services: { data: normalizedService.services, isLoadingDependencies: false, loadDependenciesError: null } });
+      return merge({}, state, {
+        services: {
+          data: normalizedService.services,
+          isLoadingDependencies: false,
+          loadDependenciesError: null
+        }
+      });
+    }
     case ADD_SERVICE_DEPENDENCY:
       if (entity) {
         const service = state.services.data[entity];

@@ -64,17 +64,42 @@ const fetchServices = (name?: string) => ({
         entity: 'services'
       }
 });
+
+export const SERVICE_APPS_REQUEST = 'SERVICE_APPS_REQUEST';
+export const SERVICE_APPS_SUCCESS = 'SERVICE_APPS_SUCCESS';
+export const SERVICE_APPS_FAILURE = 'SERVICE_APPS_FAILURE';
+export const loadServiceApps = (serviceName: string) => (dispatch: any) => {
+  return dispatch(fetchServiceApps(serviceName));
+};
+const fetchServiceApps = (serviceName: string) => ({
+  [CALL_API]: {
+    types: [ SERVICE_APPS_REQUEST, SERVICE_APPS_SUCCESS, SERVICE_APPS_FAILURE ],
+    endpoint: `services/${serviceName}/apps`,
+    schema: Schemas.SERVICE_APP_ARRAY,
+    entity: serviceName
+  }
+});
+export const ADD_SERVICE_APP = 'ADD_SERVICE_APP';
+export function addServiceApp(serviceName: string, app: string): EntitiesAction {
+  return {
+    type: ADD_SERVICE_APP,
+    entity: serviceName,
+    data: { appsNames: new Array(app) }
+  }
+}
+export const REMOVE_SERVICE_APP = 'REMOVE_SERVICE_APP';
+export function removeServiceApps(serviceName: string, apps: string[]): EntitiesAction {
+  return {
+    type: REMOVE_SERVICE_APP,
+    entity: serviceName,
+    data: { appsNames: apps }
+  }
+}
+
 export const SERVICE_DEPENDENCIES_REQUEST = 'SERVICE_DEPENDENCIES_REQUEST';
 export const SERVICE_DEPENDENCIES_SUCCESS = 'SERVICE_DEPENDENCIES_SUCCESS';
 export const SERVICE_DEPENDENCIES_FAILURE = 'SERVICE_DEPENDENCIES_FAILURE';
-export const loadServiceDependencies = (serviceName: string) => (dispatch: any, getState: any) => {
-  /*const cachedService = getState().entities.services[service.serviceName];
-  let cached = cachedService && cachedService.dependencies;
-  if (id) {
-      cached = cached[id];
-  }
-  console.log('service dependencies of ' + service.serviceName + ' cached? ' + cached);
-  return cached ? null : dispatch(fetchServiceDependencies(service, id));*/
+export const loadServiceDependencies = (serviceName: string) => (dispatch: any) => {
   return dispatch(fetchServiceDependencies(serviceName));
 };
 const fetchServiceDependencies = (serviceName: string) => ({
@@ -99,6 +124,99 @@ export function removeServiceDependencies(serviceName: string, dependencies: str
     type: REMOVE_SERVICE_DEPENDENCIES,
     entity: serviceName,
     data: { dependenciesNames: dependencies }
+  }
+}
+
+export const SERVICE_DEPENDENTSBY_REQUEST = 'SERVICE_DEPENDENTSBY_REQUEST';
+export const SERVICE_DEPENDENTSBY_SUCCESS = 'SERVICE_DEPENDENTSBY_SUCCESS';
+export const SERVICE_DEPENDENTSBY_FAILURE = 'SERVICE_DEPENDENTSBY_FAILURE';
+export const loadServiceDependentsBy = (serviceName: string) => (dispatch: any) => {
+  return dispatch(fetchServiceDependentsBy(serviceName));
+};
+const fetchServiceDependentsBy = (serviceName: string) => ({
+  [CALL_API]: {
+    types: [ SERVICE_DEPENDENTSBY_REQUEST, SERVICE_DEPENDENTSBY_SUCCESS, SERVICE_DEPENDENTSBY_FAILURE ],
+    endpoint: `services/${serviceName}/dependents_by`,
+    schema: Schemas.SERVICE_DEPENDENTBY_ARRAY,
+    entity: serviceName
+  }
+});
+export const ADD_SERVICE_DEPENDENTSBY = 'ADD_SERVICE_DEPENDENTSBY';
+export function addServiceDependentBy(serviceName: string, dependentBy: string): EntitiesAction {
+  return {
+    type: ADD_SERVICE_DEPENDENTSBY,
+    entity: serviceName,
+    data: { dependentsByNames: new Array(dependentBy) }
+  }
+}
+export const REMOVE_SERVICE_DEPENDENTSBY = 'REMOVE_SERVICE_DEPENDENTSBY';
+export function removeServiceDependentsBy(serviceName: string, dependentsBy: string[]): EntitiesAction {
+  return {
+    type: REMOVE_SERVICE_DEPENDENTSBY,
+    entity: serviceName,
+    data: { dependentsByNames: dependentsBy }
+  }
+}
+
+export const SERVICE_PREDICTIONS_REQUEST = 'SERVICE_PREDICTIONS_REQUEST';
+export const SERVICE_PREDICTIONS_SUCCESS = 'SERVICE_PREDICTIONS_SUCCESS';
+export const SERVICE_PREDICTIONS_FAILURE = 'SERVICE_PREDICTIONS_FAILURE';
+export const loadServicePredictions = (serviceName: string) => (dispatch: any) => {
+  return dispatch(fetchServicePredictions(serviceName));
+};
+const fetchServicePredictions = (serviceName: string) => ({
+  [CALL_API]: {
+    types: [ SERVICE_PREDICTIONS_REQUEST, SERVICE_PREDICTIONS_SUCCESS, SERVICE_PREDICTIONS_FAILURE ],
+    endpoint: `services/${serviceName}/predictions`,
+    schema: Schemas.SERVICE_PREDICTION_ARRAY,
+    entity: serviceName
+  }
+});
+export const ADD_SERVICE_PREDICTION = 'ADD_SERVICE_PREDICTION';
+export function addServicePrediction(serviceName: string, prediction: string): EntitiesAction {
+  return {
+    type: ADD_SERVICE_PREDICTION,
+    entity: serviceName,
+    data: { predictionsNames: new Array(prediction) }
+  }
+}
+export const REMOVE_SERVICE_PREDICTION = 'REMOVE_SERVICE_PREDICTION';
+export function removeServicePredictions(serviceName: string, predictions: string[]): EntitiesAction {
+  return {
+    type: REMOVE_SERVICE_PREDICTION,
+    entity: serviceName,
+    data: { predictionsNames: predictions }
+  }
+}
+
+export const SERVICE_RULES_REQUEST = 'SERVICE_RULES_REQUEST';
+export const SERVICE_RULES_SUCCESS = 'SERVICE_RULES_SUCCESS';
+export const SERVICE_RULES_FAILURE = 'SERVICE_RULES_FAILURE';
+export const loadServiceRules = (serviceName: string) => (dispatch: any) => {
+  return dispatch(fetchServiceRules(serviceName));
+};
+const fetchServiceRules = (serviceName: string) => ({
+  [CALL_API]: {
+    types: [ SERVICE_RULES_REQUEST, SERVICE_RULES_SUCCESS, SERVICE_RULES_FAILURE ],
+    endpoint: `services/${serviceName}/rules`,
+    schema: Schemas.SERVICE_RULE_ARRAY,
+    entity: serviceName
+  }
+});
+export const ADD_SERVICE_RULE = 'ADD_SERVICE_RULE';
+export function addServiceRule(serviceName: string, rule: string): EntitiesAction {
+  return {
+    type: ADD_SERVICE_RULE,
+    entity: serviceName,
+    data: { rulesNames: new Array(rule) }
+  }
+}
+export const REMOVE_SERVICE_RULE = 'REMOVE_SERVICE_RULE';
+export function removeServiceRules(serviceName: string, rules: string[]): EntitiesAction {
+  return {
+    type: REMOVE_SERVICE_RULE,
+    entity: serviceName,
+    data: { rulesNames: rules }
   }
 }
 

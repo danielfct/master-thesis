@@ -75,7 +75,6 @@ public class ConditionEntity {
   @JoinColumn(name = "operator_id")
   private OperatorEntity operator;
 
-  @Column(name = "condition_value")
   private double conditionValue;
 
   //TODO

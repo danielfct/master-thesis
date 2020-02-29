@@ -50,19 +50,14 @@ public class MonitoringServiceLogTests {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "container_id")
   private String containerId;
 
-  @Column(name = "service_name")
   private String serviceName;
 
-  @Column(name = "field")
   private String field;
 
-  @Column(name = "last_update")
   private String lastUpdate;
 
-  @Column(name = "effective_value")
   private double effectiveValue;
 
   @Override

@@ -53,29 +53,21 @@ public class HostMonitoringEntity {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "hostname")
   private String hostname;
 
-  @Column(name = "field")
   private String field;
 
-  @Column(name = "min_value")
   private double minValue;
 
-  @Column(name = "max_value")
   private double maxValue;
 
-  @Column(name = "sum_value")
   private double sumValue;
 
-  @Column(name = "last_value")
   private double lastValue;
 
-  @Column(name = "count")
   private long count;
 
   @Basic
-  @Column(name = "last_update")
   private Timestamp lastUpdate;
 
   void logValue(double value, Timestamp updateTime) {

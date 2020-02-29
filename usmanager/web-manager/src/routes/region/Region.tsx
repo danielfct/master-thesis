@@ -2,7 +2,6 @@ import IData from "../../components/IData";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
 import {IService} from "../services/Service";
-import {hasNewSearch} from "../../utils/text";
 import Form, {IFields, required, requiredAndNumberAndMin} from "../../components/form/Form";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import LoadingSpinner from "../../components/LoadingSpinner";
@@ -26,8 +25,8 @@ const emptyRegion = (): Partial<IRegion> => ({
   active: true,
 });
 
-const getRegionFromPathname = (props: Props) =>
-  props.match.params.name.split('#')[0];
+const isNewRegion = (name: string) =>
+  name === 'new_region';
 
 interface StateToProps {
   isLoading: boolean;
@@ -49,8 +48,8 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 class Region extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    const regionName = getRegionFromPathname(this.props);
-    if (regionName && !hasNewSearch(this.props.location.search)) {
+    const regionName = this.props.match.params.name;
+    if (regionName && !isNewRegion(regionName)) {
       this.props.loadRegions(regionName);
     }
   };
@@ -106,7 +105,7 @@ class Region extends BaseComponent<Props, {}> {
           <Form id={regionKey}
                 fields={this.getFields(formRegion)}
                 values={region}
-                isNew={hasNewSearch(this.props.location.search)}
+                isNew={isNewRegion(this.props.match.params.name)}
                 post={{url: 'regions', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
                 put={{url: `regions/${region[regionKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={{url: `regions/${region[regionKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
@@ -151,8 +150,8 @@ class Region extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const name = getRegionFromPathname(props);
-  const region = hasNewSearch(props.location.search) ? emptyRegion() : state.entities.regions.data[name];
+  const name = props.match.params.name;
+  const region = isNewRegion(name) ? emptyRegion() : state.entities.regions.data[name];
   let formRegion;
   if (region) {
     formRegion = { ...region };

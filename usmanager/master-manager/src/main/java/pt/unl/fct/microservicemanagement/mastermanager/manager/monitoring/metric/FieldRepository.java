@@ -31,6 +31,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FieldRepository extends CrudRepository<FieldEntity, Long> {
 
-  FieldEntity findByFieldName(@Param("fieldName") String fieldName);
+  FieldEntity findByName(@Param("fieldName") String fieldName);
 
 }

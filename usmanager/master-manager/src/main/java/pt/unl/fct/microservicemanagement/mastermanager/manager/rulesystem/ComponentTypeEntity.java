@@ -63,8 +63,8 @@ public class ComponentTypeEntity {
   // Possible values:
   // - container; - host
   //TODO enum
-  @Column(name = "component_type_name", unique = true)
-  private String componentTypeName;
+  @Column(unique = true)
+  private String name;
 
   @JsonIgnore
   @OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)

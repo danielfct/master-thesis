@@ -36,7 +36,7 @@ public interface RuleRepository extends CrudRepository<RuleEntity, Long> {
 
   @Query("select r "
       + "from RuleEntity r inner join r.componentType rt "
-      + "where rt.componentTypeName = :componentType")
+      + "where rt.name = :componentType")
   List<RuleEntity> getRulesByComponentType(@Param("componentType") String componentType);
 
 }

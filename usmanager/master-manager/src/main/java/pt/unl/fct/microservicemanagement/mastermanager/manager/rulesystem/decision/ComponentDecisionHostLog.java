@@ -58,7 +58,6 @@ public class ComponentDecisionHostLog {
   @JoinColumn(name = "component_decision_log_id")
   private ComponentDecisionLog componentDecisionLog;
 
-  @Column(name = "hostname")
   private String hostname;
 
   @Override

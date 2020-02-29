@@ -50,19 +50,14 @@ public class ServiceSimulatedMetricsEntity {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "service_name")
   private String serviceName;
 
-  @Column(name = "field")
   private String field;
 
-  @Column(name = "min_value")
   private double minValue;
 
-  @Column(name = "max_value")
   private double maxValue;
 
-  @Column(name = "override")
   private boolean override;
 
   @Override
