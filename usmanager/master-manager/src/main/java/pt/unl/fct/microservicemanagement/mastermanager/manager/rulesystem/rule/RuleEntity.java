@@ -67,11 +67,12 @@ public class RuleEntity {
   @Column(unique = true)
   private String name;
 
+  private int priority;
+
+  @JsonIgnore
   @ManyToOne
   @JoinColumn(name = "component_type_id")
   private ComponentTypeEntity componentType;
-
-  private int priority;
 
   @ManyToOne
   @JoinColumn(name = "decision_id")
@@ -90,7 +91,7 @@ public class RuleEntity {
   @JsonIgnore
   @OneToMany(mappedBy = "rule", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
-  private Set<ServiceRule> serviceRules = new HashSet<>();
+  private Set<ServiceRuleEntity> serviceRules = new HashSet<>();
 
   @JsonIgnore
   @OneToMany(mappedBy = "rule", cascade = CascadeType.ALL, orphanRemoval = true)

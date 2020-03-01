@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +53,21 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.serviceName = :serviceName")
   List<ServiceEntity> getDependencies(@Param("serviceName") String serviceName);
 
+  @Query("select d.service "
+      + "from ServiceEntity s inner join s.depends d "
+      + "where s.serviceName = :serviceName")
+  List<ServiceEntity> getDependees(@Param("serviceName") String serviceName);
+
+  @Query("select r.rule "
+      + "from ServiceEntity s inner join s.rules r "
+      + "where s.serviceName = :serviceName")
+  List<RuleEntity> getRules(@Param("serviceName") String serviceName);
+
+  @Query("select r.rule "
+      + "from ServiceEntity s inner join s.rules r "
+      + "where s.serviceName = :serviceName and r.rule.name = :ruleName")
+  Optional<RuleEntity> getRule(@Param("serviceName") String serviceName, @Param("ruleName") String ruleName);
+
   @Query("select case when count(s) > 0 then true else false end "
       + "from ServiceEntity s "
       + "where s.id = :serviceId")
@@ -62,10 +78,16 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.serviceName = :serviceName")
   boolean hasService(@Param("serviceName") String serviceName);
 
+  @Query("select apps.appPackage "
+      + "from ServiceEntity s inner join s.appServices apps "
+      + "where s.serviceName = :serviceName")
+  List<AppPackage> getAppsByServiceName(@Param("serviceName") String serviceName);
+
   @Query("select d.dependency "
       + "from ServiceEntity s inner join s.dependencies d "
-      + "where s.id = :serviceId and d.id = :dependencyId")
-  Optional<ServiceEntity> getDependency(@Param("serviceId") long serviceId, @Param("dependencyId") long dependencyId);
+      + "where s.serviceName = :serviceName and d.dependency.serviceName = :dependencyName")
+  Optional<ServiceEntity> getDependency(@Param("serviceName") String serviceName,
+                                        @Param("dependencyName") String dependencyName);
 
   /*@Query("delete from Service s inner join s.dependencies d "
           + "where s.id = :serviceId and d.id = :dependencyId")
@@ -83,10 +105,17 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
   List<ServiceEntity> getDependenciesByType(@Param("serviceId") long serviceId,
                                             @Param("serviceType") String serviceType);
 
-  @Query("select apps.appPackage "
-      + "from ServiceEntity s inner join s.appServices apps "
+  @Query("select p "
+      + "from ServiceEntity s join s.eventPredictions p "
       + "where s.serviceName = :serviceName")
-  List<AppPackage> getAppsByServiceName(@Param("serviceName") String serviceName);
+  List<EventPredictionEntity> getPredictions(@Param("serviceName") String serviceName);
+
+  @Query("select p "
+      + "from ServiceEntity s join s.eventPredictions p "
+      + "where s.id = :serviceId and p.id = :serviceEventPredictions")
+  Optional<EventPredictionEntity> getPrediction(@Param("serviceId") long serviceId,
+                                                @Param("serviceEventPredictions")
+                                                    long serviceEventPredictions);
 
   @Query("select s.maxReplicas "
       + "from ServiceEntity s "
@@ -98,15 +127,4 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.serviceName = :serviceName")
   int getMinReplicasByServiceName(@Param("serviceName") String serviceName);
 
-  @Query("select p "
-      + "from ServiceEntity s join s.eventPredictions p "
-      + "where s.id = :serviceId")
-  List<EventPredictionEntity> getServiceEventPredictions(@Param("serviceId") long id);
-
-  @Query("select p "
-      + "from ServiceEntity s join s.eventPredictions p "
-      + "where s.id = :serviceId and p.id = :serviceEventPredictions")
-  Optional<EventPredictionEntity> getServiceEventPrediction(@Param("serviceId") long serviceId,
-                                                            @Param("serviceEventPredictions")
-                                                                long serviceEventPredictions);
 }

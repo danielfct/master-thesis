@@ -63,10 +63,6 @@ public class EventPredictionEntity {
   @Column(unique = true)
   private String name;
 
-  @JoinColumn(name = "service_id")
-  @ManyToOne
-  private ServiceEntity service;
-
   private String description;
 
   @Basic
@@ -83,8 +79,13 @@ public class EventPredictionEntity {
 
   private int minReplicas;
 
-  @Basic
   @JsonIgnore
+  @JoinColumn(name = "service_id")
+  @ManyToOne
+  private ServiceEntity service;
+
+  @JsonIgnore
+  @Basic
   private Timestamp lastUpdate;
 
   @Override

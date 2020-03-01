@@ -47,7 +47,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Table(name = "service_rules")
-public class ServiceRule {
+public class ServiceRuleEntity {
 
   @Id
   @GeneratedValue
@@ -66,10 +66,10 @@ public class ServiceRule {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ServiceRule)) {
+    if (!(o instanceof ServiceRuleEntity)) {
       return false;
     }
-    ServiceRule other = (ServiceRule) o;
+    ServiceRuleEntity other = (ServiceRuleEntity) o;
     return id != null && id.equals(other.getId());
   }
 

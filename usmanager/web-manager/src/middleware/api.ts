@@ -30,7 +30,7 @@ import axios from "axios";
 import {API_URL} from "../utils/api";
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
-import {IDependent} from "../routes/services/ServiceDependentList";
+import {IDependee} from "../routes/services/ServiceDependeeList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {IRule} from "../routes/services/ServiceRuleList";
 import {IApp} from "../routes/services/ServiceAppList";
@@ -62,53 +62,62 @@ interface ISchemas {
     SERVICE_APP_ARRAY: schema.Entity<IApp>[];
     SERVICE_DEPENDENCY: schema.Entity<IServiceDependency>;
     SERVICE_DEPENDENCY_ARRAY: schema.Entity<IServiceDependency>[];
-    SERVICE_DEPENDENTBY: schema.Entity<IDependent>;
-    SERVICE_DEPENDENTBY_ARRAY: schema.Entity<IDependent>[];
+    SERVICE_DEPENDEE: schema.Entity<IDependee>;
+    SERVICE_DEPENDEE_ARRAY: schema.Entity<IDependee>[];
     SERVICE_PREDICTION: schema.Entity<IPrediction>;
     SERVICE_PREDICTION_ARRAY: schema.Entity<IPrediction>[];
     SERVICE_RULE: schema.Entity<IRule>;
     SERVICE_RULE_ARRAY: schema.Entity<IRule>[];
-    LOGS_ARRAY: schema.Entity<ILogs>[];
+    APP: schema.Entity<IApp>;
+    APP_ARRAY: schema.Entity<IApp>[];
     REGION: schema.Entity<IRegion>;
     REGION_ARRAY: schema.Entity<IRegion>[];
+    RULE: schema.Entity<IRule>;
+    RULE_ARRAY: schema.Entity<IRule>[];
+    LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
 const appSchema: schema.Entity<IApp> = new schema.Entity('apps', {}, {
     idAttribute: (app: IApp) => app.name
 });
 const apps = new schema.Array(appSchema);
+
 const dependencySchema: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', {}, {
     idAttribute: (dependency: IServiceDependency) => dependency.serviceName
 });
 const dependencies = new schema.Array(dependencySchema);
-const dependentBySchema: schema.Entity<IDependent> = new schema.Entity('dependentsBy', {}, {
-    idAttribute: (dependent: IDependent) => dependent.serviceName
+
+const dependeeSchema: schema.Entity<IDependee> = new schema.Entity('dependees', {}, {
+    idAttribute: (dependee: IDependee) => dependee.serviceName
 });
-const dependentsBy = new schema.Array(dependentBySchema);
-const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predictions', {}, {
+const dependees = new schema.Array(dependeeSchema);
+
+const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('dependees', {}, {
     idAttribute: (prediction: IPrediction) => prediction.name
 });
 const predictions = new schema.Array(predictionSchema);
+
 const ruleSchema: schema.Entity<IRule> = new schema.Entity('rules', {}, {
     idAttribute: (rule: IRule) => rule.name
 });
 const rules = new schema.Array(ruleSchema);
+
 const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {
     apps,
     dependencies,
-    dependentsBy,
+    dependees,
     predictions,
     rules
 }, {
     idAttribute: (service: IService) => service.serviceName
 });
 
-const logsSchema: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
-    idAttribute: (logs: ILogs) => logs.eventId.toString()
-});
-
 const regionSchema: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
     idAttribute: (region: IRegion) => region.name.toString()
+});
+
+const logsSchema: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
+    idAttribute: (logs: ILogs) => logs.eventId.toString()
 });
 
 export const Schemas: ISchemas = {
@@ -118,15 +127,19 @@ export const Schemas: ISchemas = {
     SERVICE_APP_ARRAY: [appSchema],
     SERVICE_DEPENDENCY: dependencySchema,
     SERVICE_DEPENDENCY_ARRAY: [dependencySchema],
-    SERVICE_DEPENDENTBY: dependentBySchema,
-    SERVICE_DEPENDENTBY_ARRAY: [dependentBySchema],
+    SERVICE_DEPENDEE: dependeeSchema,
+    SERVICE_DEPENDEE_ARRAY: [dependeeSchema],
     SERVICE_PREDICTION: predictionSchema,
     SERVICE_PREDICTION_ARRAY: [predictionSchema],
     SERVICE_RULE: ruleSchema,
     SERVICE_RULE_ARRAY: [ruleSchema],
-    LOGS_ARRAY: [logsSchema],
+    APP: appSchema,
+    APP_ARRAY: [appSchema],
     REGION: regionSchema,
-    REGION_ARRAY: [regionSchema]
+    REGION_ARRAY: [regionSchema],
+    RULE: ruleSchema,
+    RULE_ARRAY: [ruleSchema],
+    LOGS_ARRAY: [logsSchema],
 };
 
 /*const repoSchema = new schema.Entity('repos', {

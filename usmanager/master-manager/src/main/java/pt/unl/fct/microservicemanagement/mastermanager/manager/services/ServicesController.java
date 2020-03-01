@@ -26,7 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.BatchRequest;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
@@ -41,8 +41,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -88,7 +86,7 @@ public class ServicesController {
   }
 
   @PatchMapping("/{serviceName}/apps")
-  public void batchApps(@PathVariable String serviceName, @RequestBody BatchRequest<String> batchRequest) {
+  public void batchServiceApps(@PathVariable String serviceName, @RequestBody BatchRequest<String> batchRequest) {
     BatchRequest.Request request = batchRequest.getRequest();
     String[] body = batchRequest.getBody();
     var apps = Arrays.asList(body);
@@ -105,7 +103,7 @@ public class ServicesController {
   }
 
   @DeleteMapping("/{serviceName}/apps/{appName}")
-  public void removeApp(@PathVariable String serviceName, @PathVariable String appName) {
+  public void removeServiceApp(@PathVariable String serviceName, @PathVariable String appName) {
     servicesService.removeApp(serviceName, appName);
   }
 
@@ -115,7 +113,8 @@ public class ServicesController {
   }
 
   @PatchMapping("/{serviceName}/dependencies")
-  public void batchDependencies(@PathVariable String serviceName, @RequestBody BatchRequest<String> batchRequest) {
+  public void batchServiceDependencies(@PathVariable String serviceName,
+                                       @RequestBody BatchRequest<String> batchRequest) {
     BatchRequest.Request request = batchRequest.getRequest();
     String[] body = batchRequest.getBody();
     var dependencies = Arrays.asList(body);
@@ -132,19 +131,42 @@ public class ServicesController {
   }
 
   @DeleteMapping("/{serviceName}/dependencies/{dependencyName}")
-  public void removeDependency(@PathVariable String serviceName, @PathVariable String dependencyName) {
+  public void removeServiceDependency(@PathVariable String serviceName, @PathVariable String dependencyName) {
     servicesService.removeDependency(serviceName, dependencyName);
   }
 
-  @GetMapping("/{id}/eventPredictions")
-  public Iterable<EventPredictionEntity> getServiceEventPredictions(@PathVariable Long id) {
-    return servicesService.getServiceEventPredictions(id);
+  @GetMapping("/{serviceName}/dependees")
+  public List<ServiceEntity> getServiceDependees(@PathVariable String serviceName) {
+    return servicesService.getDependees(serviceName);
   }
 
-  @GetMapping("/{serviceId}/eventPredictions/{eventPredictionId}")
-  public EventPredictionEntity getServiceEventPrediction(@PathVariable Long serviceId,
-                                                         @PathVariable Long eventPredictionId) {
-    return servicesService.getEventPrediction(serviceId, eventPredictionId);
+  @GetMapping("/{serviceName}/predictions")
+  public Iterable<EventPredictionEntity> getServicePredictions(@PathVariable String serviceName) {
+    return servicesService.getPredictions(serviceName);
+  }
+
+  @PatchMapping("/{serviceName}/predictions")
+  public void batchServicePredictions(@PathVariable String serviceName,
+                                      @RequestBody BatchRequest<EventPredictionEntity> batchRequest) {
+    BatchRequest.Request request = batchRequest.getRequest();
+    EventPredictionEntity[] body = batchRequest.getBody();
+    var predictions = Arrays.asList(body);
+    switch (request) {
+      case POST:
+        servicesService.addPredictions(serviceName, predictions);
+        break;
+      case DELETE:
+        servicesService.removePredictions(serviceName, predictions);
+        break;
+      default:
+        break;
+    }
+  }
+
+  @DeleteMapping("/{serviceName}/predictions/{predictionName}")
+  public void removeServicePrediction(@PathVariable String serviceName,
+                                      @PathVariable EventPredictionEntity prediction) {
+    servicesService.removePrediction(serviceName, prediction);
   }
 
   /*@PostMapping("/{id}/serviceEventPredictions")
@@ -164,18 +186,33 @@ public class ServicesController {
     servicesService.updateServiceEventPrediction(serviceId, serviceEventPredictionId, serviceEventPrediction);
   }*/
 
-
-  @RequestMapping(value = "/{serviceId}/eventPrediction/", method = RequestMethod.POST)
-  public @ResponseBody Long saveServiceEventPrediction(@PathVariable Long serviceId,
-                                                       @RequestBody SaveServiceEventPredictionReq
-                                                           serviceEventPredictionReq) {
-    return servicesService.saveServiceEventPrediction(serviceId, serviceEventPredictionReq);
+  @GetMapping("/{serviceName}/rules")
+  public Iterable<RuleEntity> getServiceRules(@PathVariable String serviceName) {
+    return servicesService.getRules(serviceName);
   }
 
-  @DeleteMapping("/{serviceId}/serviceEventPredictions/{serviceEventPredictionId}")
-  public void deleteServiceEventPrediction(@PathVariable Long serviceId,
-                                           @PathVariable Long serviceEventPredictionId) {
-    servicesService.deleteServiceEventPrediction(serviceId, serviceEventPredictionId);
+  @PatchMapping("/{serviceName}/rules")
+  public void batchServiceRules(@PathVariable String serviceName,
+                                @RequestBody BatchRequest<String> batchRequest) {
+    BatchRequest.Request request = batchRequest.getRequest();
+    String[] body = batchRequest.getBody();
+    var rules = Arrays.asList(body);
+    switch (request) {
+      case POST:
+        servicesService.addRules(serviceName, rules);
+        break;
+      case DELETE:
+        servicesService.removeRules(serviceName, rules);
+        break;
+      default:
+        break;
+    }
+  }
+
+  @DeleteMapping("/{serviceName}/rules/{ruleName}")
+  public void removeServiceRule(@PathVariable String serviceName,
+                                @PathVariable String ruleName) {
+    servicesService.removeRule(serviceName, ruleName);
   }
 
   //TODO change to ?search=

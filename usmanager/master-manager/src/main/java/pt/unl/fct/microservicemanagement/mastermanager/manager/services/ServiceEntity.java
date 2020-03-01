@@ -26,7 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.ServiceRule;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
 
 import java.util.Set;
@@ -118,7 +118,7 @@ public class ServiceEntity {
   @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceRule> rules;
+  private Set<ServiceRuleEntity> rules;
 
   public boolean hasLaunchCommand() {
     return launchCommand != null && !launchCommand.isBlank();

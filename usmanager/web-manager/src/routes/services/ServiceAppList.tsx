@@ -9,11 +9,9 @@ import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {
   addServiceApp,
-  addServiceDependency,
+  loadApps,
   loadServiceApps,
-  loadServiceDependencies,
-  loadServices, removeServiceApps,
-  removeServiceDependencies
+  removeServiceApps
 } from "../../actions";
 import {connect} from "react-redux";
 import Data from "../../components/IData";
@@ -25,12 +23,12 @@ export interface IApp extends Data {
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  /*apps: { [key: string]: IApp },*/
+  apps: { [key: string]: IApp },
   serviceApps: string[];
 }
 
 interface DispatchToProps {
-  /*loadApps: (name?: string) => any;*/
+  loadApps: (name?: string) => any;
   loadServiceApps: (serviceName: string) => void;
   removeServiceApps: (serviceName: string, apps: string[]) => void;
   addServiceApp: (serviceName: string, app: string) => void;
@@ -48,7 +46,7 @@ type Props = StateToProps & DispatchToProps & ServiceAppListProps;
 class ServiceAppList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    /*this.props.loadApps();*/
+    this.props.loadApps();
     const {serviceName} = this.props.service;
     if (serviceName) {
       this.props.loadServiceApps(serviceName);
@@ -87,19 +85,18 @@ class ServiceAppList extends BaseComponent<Props, {}> {
   private onDeleteFailure = (reason: string): void =>
     super.toast(`Unable to delete app`, 10000, reason, true);
 
-  /*  private getSelectableAppsNames = () => {
-      const {apps, service, serviceApps} = this.props;
-      const {newApps} = this.props;
-      return Object.keys(apps)
-                   .filter(name => !service || name !== service.serviceName && !dependencies.includes(name) && !newDependencies.includes(name));
-    };*/
+  private getSelectableAppsNames = () => {
+    const {apps, service, serviceApps} = this.props;
+    const {newApps} = this.props;
+    return Object.keys(apps).filter(name => !service && !serviceApps.includes(name) && !newApps.includes(name));
+  };
 
   render() {
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage={`Apps list is empty`}
                            data={this.props.serviceApps}
-                           dropdown={{title: 'Add app', data: []}} //TODO data
+                           dropdown={{title: 'Add app', empty: 'No more apps to add', data: this.getSelectableAppsNames()}}
                            show={this.app}
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
@@ -120,13 +117,14 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceAppListProps): Stat
   return {
     isLoading: state.entities.services.isLoadingApps,
     error: state.entities.services.loadAppsError,
+    apps: state.entities.apps.data,
     serviceApps: serviceApps || [],
   }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
-    /*loadApps,*/
+    loadApps,
     loadServiceApps,
     removeServiceApps,
     addServiceApp

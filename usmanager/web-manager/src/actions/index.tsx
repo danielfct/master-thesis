@@ -35,17 +35,6 @@ export const SERVICE_REQUEST = 'SERVICE_REQUEST';
 export const SERVICE_SUCCESS = 'SERVICE_SUCCESS';
 export const SERVICE_FAILURE = 'SERVICE_FAILURE';
 export const loadServices = (name?: string) => (dispatch: any) => {
-  /*let cached;
-  if (name) {
-      let entity = getState().entities.services[name];
-      cached = entity && entity.hasOwnProperty(requiredField);
-  }
-  else {
-      let entities = getState().entities.services;
-      cached = entities && entities.length
-          && entities.every((entity: IService) => entity.hasOwnProperty(requiredField));
-  }
-  return cached ? null : dispatch(fetchServices(name));*/
   return dispatch(fetchServices(name));
 };
 const fetchServices = (name?: string) => ({
@@ -87,10 +76,10 @@ export function addServiceApp(serviceName: string, app: string): EntitiesAction 
     data: { appsNames: new Array(app) }
   }
 }
-export const REMOVE_SERVICE_APP = 'REMOVE_SERVICE_APP';
+export const REMOVE_SERVICE_APPS = 'REMOVE_SERVICE_APPS';
 export function removeServiceApps(serviceName: string, apps: string[]): EntitiesAction {
   return {
-    type: REMOVE_SERVICE_APP,
+    type: REMOVE_SERVICE_APPS,
     entity: serviceName,
     data: { appsNames: apps }
   }
@@ -127,36 +116,20 @@ export function removeServiceDependencies(serviceName: string, dependencies: str
   }
 }
 
-export const SERVICE_DEPENDENTSBY_REQUEST = 'SERVICE_DEPENDENTSBY_REQUEST';
-export const SERVICE_DEPENDENTSBY_SUCCESS = 'SERVICE_DEPENDENTSBY_SUCCESS';
-export const SERVICE_DEPENDENTSBY_FAILURE = 'SERVICE_DEPENDENTSBY_FAILURE';
-export const loadServiceDependentsBy = (serviceName: string) => (dispatch: any) => {
-  return dispatch(fetchServiceDependentsBy(serviceName));
+export const SERVICE_DEPENDEES_REQUEST = 'SERVICE_DEPENDEES_REQUEST';
+export const SERVICE_DEPENDEES_SUCCESS = 'SERVICE_DEPENDEES_SUCCESS';
+export const SERVICE_DEPENDEES_FAILURE = 'SERVICE_DEPENDEES_FAILURE';
+export const loadServiceDependees = (serviceName: string) => (dispatch: any) => {
+  return dispatch(fetchServiceDependees(serviceName));
 };
-const fetchServiceDependentsBy = (serviceName: string) => ({
+const fetchServiceDependees = (serviceName: string) => ({
   [CALL_API]: {
-    types: [ SERVICE_DEPENDENTSBY_REQUEST, SERVICE_DEPENDENTSBY_SUCCESS, SERVICE_DEPENDENTSBY_FAILURE ],
-    endpoint: `services/${serviceName}/dependents_by`,
-    schema: Schemas.SERVICE_DEPENDENTBY_ARRAY,
+    types: [ SERVICE_DEPENDEES_REQUEST, SERVICE_DEPENDEES_SUCCESS, SERVICE_DEPENDEES_FAILURE ],
+    endpoint: `services/${serviceName}/dependees`,
+    schema: Schemas.SERVICE_DEPENDEE_ARRAY,
     entity: serviceName
   }
 });
-export const ADD_SERVICE_DEPENDENTSBY = 'ADD_SERVICE_DEPENDENTSBY';
-export function addServiceDependentBy(serviceName: string, dependentBy: string): EntitiesAction {
-  return {
-    type: ADD_SERVICE_DEPENDENTSBY,
-    entity: serviceName,
-    data: { dependentsByNames: new Array(dependentBy) }
-  }
-}
-export const REMOVE_SERVICE_DEPENDENTSBY = 'REMOVE_SERVICE_DEPENDENTSBY';
-export function removeServiceDependentsBy(serviceName: string, dependentsBy: string[]): EntitiesAction {
-  return {
-    type: REMOVE_SERVICE_DEPENDENTSBY,
-    entity: serviceName,
-    data: { dependentsByNames: dependentsBy }
-  }
-}
 
 export const SERVICE_PREDICTIONS_REQUEST = 'SERVICE_PREDICTIONS_REQUEST';
 export const SERVICE_PREDICTIONS_SUCCESS = 'SERVICE_PREDICTIONS_SUCCESS';
@@ -180,10 +153,10 @@ export function addServicePrediction(serviceName: string, prediction: string): E
     data: { predictionsNames: new Array(prediction) }
   }
 }
-export const REMOVE_SERVICE_PREDICTION = 'REMOVE_SERVICE_PREDICTION';
+export const REMOVE_SERVICE_PREDICTIONS = 'REMOVE_SERVICE_PREDICTIONS';
 export function removeServicePredictions(serviceName: string, predictions: string[]): EntitiesAction {
   return {
-    type: REMOVE_SERVICE_PREDICTION,
+    type: REMOVE_SERVICE_PREDICTIONS,
     entity: serviceName,
     data: { predictionsNames: predictions }
   }
@@ -211,27 +184,39 @@ export function addServiceRule(serviceName: string, rule: string): EntitiesActio
     data: { rulesNames: new Array(rule) }
   }
 }
-export const REMOVE_SERVICE_RULE = 'REMOVE_SERVICE_RULE';
+export const REMOVE_SERVICE_RULES = 'REMOVE_SERVICE_RULES';
 export function removeServiceRules(serviceName: string, rules: string[]): EntitiesAction {
   return {
-    type: REMOVE_SERVICE_RULE,
+    type: REMOVE_SERVICE_RULES,
     entity: serviceName,
     data: { rulesNames: rules }
   }
 }
 
-export const LOGS_REQUEST = 'LOGS_REQUEST';
-export const LOGS_SUCCESS = 'LOGS_SUCCESS';
-export const LOGS_FAILURE = 'LOGS_FAILURE';
-export const loadLogs = () => (dispatch: any) => {
-  return dispatch(fetchLogs());
+export const APPS_REQUEST = 'APPS_REQUEST';
+export const APPS_SUCCESS = 'APPS_SUCCESS';
+export const APPS_FAILURE = 'APPS_FAILURE';
+export const APP_REQUEST = 'APP_REQUEST';
+export const APP_SUCCESS = 'APP_SUCCESS';
+export const APP_FAILURE = 'APP_FAILURE';
+export const loadApps = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchApps(name));
 };
-const fetchLogs = () => ({
-  [CALL_API]: {
-    types: [ LOGS_REQUEST, LOGS_SUCCESS, LOGS_FAILURE ],
-    endpoint: `logs`,
-    schema: Schemas.LOGS_ARRAY,
-  }
+const fetchApps = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ APPS_REQUEST, APPS_SUCCESS, APPS_FAILURE ],
+        endpoint: `apps`,
+        schema: Schemas.APP_ARRAY,
+        entity: 'apps'
+      }
+      : {
+        types: [ APP_REQUEST, APP_SUCCESS, APP_FAILURE ],
+        endpoint: `apps/${name}`,
+        schema: Schemas.APP,
+        entity: 'apps'
+      }
 });
 
 export const REGIONS_REQUEST = 'REGIONS_REQUEST';
@@ -260,6 +245,45 @@ const fetchRegions = (name?: string) => ({
       }
 });
 
+export const RULES_REQUEST = 'RULES_REQUEST';
+export const RULES_SUCCESS = 'RULES_SUCCESS';
+export const RULES_FAILURE = 'RULES_FAILURE';
+export const RULE_REQUEST = 'RULE_REQUEST';
+export const RULE_SUCCESS = 'RULE_SUCCESS';
+export const RULE_FAILURE = 'RULE_FAILURE';
+export const loadRules = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchRules(name));
+};
+const fetchRules = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ RULES_REQUEST, RULES_SUCCESS, RULES_FAILURE ],
+        endpoint: `rules`,
+        schema: Schemas.RULE_ARRAY,
+        entity: 'rules'
+      }
+      : {
+        types: [ RULE_REQUEST, RULE_SUCCESS, RULE_FAILURE ],
+        endpoint: `rules/${name}`,
+        schema: Schemas.RULE,
+        entity: 'rules'
+      }
+});
+
+export const LOGS_REQUEST = 'LOGS_REQUEST';
+export const LOGS_SUCCESS = 'LOGS_SUCCESS';
+export const LOGS_FAILURE = 'LOGS_FAILURE';
+export const loadLogs = () => (dispatch: any) => {
+  return dispatch(fetchLogs());
+};
+const fetchLogs = () => ({
+  [CALL_API]: {
+    types: [ LOGS_REQUEST, LOGS_SUCCESS, LOGS_FAILURE ],
+    endpoint: `logs`,
+    schema: Schemas.LOGS_ARRAY,
+  }
+});
 
 export const SIDENAV_SHOW_USER = 'SIDENAV_SHOW_USER';
 

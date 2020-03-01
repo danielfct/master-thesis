@@ -103,8 +103,7 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
     super.toast(`Unable to delete dependency`, 10000, reason, true);
 
   private getSelectableServicesNames = () => {
-    const {services, service, dependencies} = this.props;
-    const {newDependencies} = this.props;
+    const {services, service, dependencies, newDependencies} = this.props;
     return Object.keys(services)
                  .filter(name => !service || name !== service.serviceName && !dependencies.includes(name) && !newDependencies.includes(name));
   };
@@ -114,7 +113,7 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
                            error={this.props.error}
                            emptyMessage={`Dependencies list is empty`}
                            data={this.props.dependencies}
-                           dropdown={{title: 'Add dependency', data: this.getSelectableServicesNames()}}
+                           dropdown={{title: 'Add dependency', empty: 'No more dependencies to add', data: this.getSelectableServicesNames()}}
                            show={this.dependency}
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}

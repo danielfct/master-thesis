@@ -26,7 +26,6 @@ import React from 'react';
 import {RouteComponentProps} from 'react-router';
 import Form, {IFields, required, requiredAndNotAllowed, requiredAndNumberAndMin} from "../../components/form/Form"
 import IData from "../../components/IData";
-import ServiceDependencyList from "./ServiceDependencyList";
 import {addServiceDependency, loadServices} from "../../actions";
 import {connect} from "react-redux";
 import MainLayout from "../../views/mainLayout/MainLayout";
@@ -38,7 +37,8 @@ import Error from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import {patchData} from "../../utils/api";
 import ServiceAppList from "./ServiceAppList";
-import ServiceDependentList from "./ServiceDependentList";
+import ServiceDependencyList from "./ServiceDependencyList";
+import ServiceDependeeList from "./ServiceDependeeList";
 import ServicePredictionList from "./ServicePredictionList";
 import ServiceRuleList from "./ServiceRuleList";
 
@@ -56,7 +56,7 @@ export interface IService extends IData {
   expectedMemoryConsumption: number;
   apps?: string[];
   dependencies?: string[];
-  dependents?: string[];
+  dependees?: string[];
   predictions?: string[];
   rules?: string[];
 }
@@ -82,13 +82,13 @@ interface StateToProps {
   isLoadingServices: boolean;
   isLoadingApps: boolean;
   isLoadingDependencies: boolean;
-  isLoadingDependentsBy: boolean;
+  isLoadingDependees: boolean;
   isLoadingPredictions: boolean;
   isLoadingRules: boolean;
   loadServicesError?: string | null;
   loadAppsError?: string | null;
   loadDependenciesError?: string | null;
-  loadDependentsByError?: string | null;
+  loadDependeesError?: string | null;
   loadPredictionsError?: string | null;
   loadRulesError?: string | null;
   service: Partial<IService>;
@@ -109,7 +109,7 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 type State = {
   newApps: string[],
   newDependencies: string[],
-  newDependentsBy: string[],
+  newDependees: string[],
   newPredictions: string[],
   newRules: string[],
 }
@@ -117,9 +117,9 @@ type State = {
 class Service extends BaseComponent<Props, State> {
 
   state: State = {
-    newDependencies: [],
     newApps: [],
-    newDependentsBy: [],
+    newDependencies: [],
+    newDependees: [],
     newPredictions: [],
     newRules: [],
   };
@@ -178,18 +178,6 @@ class Service extends BaseComponent<Props, State> {
   private onRemoveServiceApps = (apps: string[]): void => {
     this.setState({
       newDependencies: this.state.newApps.filter(app => !apps.includes(app))
-    });
-  };
-
-  private onAddServiceDependentBy = (dependentBy: string): void => {
-    this.setState({
-      newDependentsBy: this.state.newDependentsBy.concat(dependentBy)
-    });
-  };
-
-  private onRemoveServiceDependentsBy = (dependentsBy: string[]): void => {
-    this.setState({
-      newDependentsBy: this.state.newDependentsBy.filter(dependentBy => !dependentsBy.includes(dependentBy))
     });
   };
 
@@ -331,20 +319,18 @@ class Service extends BaseComponent<Props, State> {
     )
   };
 
-  private dependentBy = () => {
-    const {newDependentsBy} = this.state;
-    const {isLoadingDependentsBy, loadDependentsByError, service} = this.props;
+  private dependees = () => {
+    const {newDependees} = this.state;
+    const {isLoadingDependees, loadDependeesError, service} = this.props;
     return (
       <>
-        {isLoadingDependentsBy &&
+        {isLoadingDependees &&
         <LoadingSpinner/>}
-        {loadDependentsByError &&
-        <Error message={loadDependentsByError}/>}
-        {!loadDependentsByError && service &&
-        <ServiceDependentList service={service}
-                              newDependentsBy={newDependentsBy}
-                              onAddServiceDependentBy={this.onAddServiceDependentBy}
-                              onRemoveServiceDependentsBy={this.onRemoveServiceDependentsBy}/>}
+        {loadDependeesError &&
+        <Error message={loadDependeesError}/>}
+        {!loadDependeesError && service &&
+        <ServiceDependeeList service={service}
+                              newDependees={newDependees}/>}
       </>
     )
   };
@@ -385,6 +371,7 @@ class Service extends BaseComponent<Props, State> {
     )
   };
 
+  //TODO fix dropdown
   private tabs: Tab[] = [
     {
       title: 'Service',
@@ -402,9 +389,9 @@ class Service extends BaseComponent<Props, State> {
       content: () => this.dependencies()
     },
     {
-      title: 'Dependent by',
-      id: 'dependentBy',
-      content: () => this.dependentBy()
+      title: 'Dependees',
+      id: 'dependees',
+      content: () => this.dependees()
     },
     {
       title: 'Predictions',
@@ -439,33 +426,33 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     delete formService["id"];
     delete formService["apps"];
     delete formService["dependencies"];
-    delete formService["dependents"];
+    delete formService["dependees"];
     delete formService["predictions"];
     delete formService["rules"];
   }
   const isLoadingServices = state.entities.services?.isLoadingServices;
   const isLoadingApps = state.entities.services?.isLoadingApps;
   const isLoadingDependencies = state.entities.services?.isLoadingDependencies;
-  const isLoadingDependentsBy = state.entities.services?.isLoadingDependentsBy;
+  const isLoadingDependees = state.entities.services?.isLoadingDependees;
   const isLoadingPredictions = state.entities.services?.isLoadingPredictions;
   const isLoadingRules = state.entities.services?.isLoadingRules;
   const loadServicesError = state.entities.services?.loadServicesError;
   const loadAppsError = state.entities.services?.loadAppsError;
   const loadDependenciesError = state.entities.services?.loadDependenciesError;
-  const loadDependentsByError = state.entities.services?.loadDependentsByError;
+  const loadDependeesError = state.entities.services?.loadDependeesError;
   const loadPredictionsError = state.entities.services?.loadPredictionsError;
   const loadRulesError = state.entities.services?.loadRulesError;
   return  {
     isLoadingServices,
     isLoadingApps,
     isLoadingDependencies,
-    isLoadingDependentsBy,
+    isLoadingDependees,
     isLoadingPredictions,
     isLoadingRules,
     loadServicesError,
     loadAppsError,
     loadDependenciesError,
-    loadDependentsByError,
+    loadDependeesError,
     loadPredictionsError,
     loadRulesError,
     service,

@@ -31,7 +31,7 @@ import Error from "../errors/Error";
 import AnimatedList from "./AnimatedList";
 import Empty from "./Empty";
 
-interface Props<T> {
+interface ListProps<T> {
     isLoading?: boolean;
     error?: string | null;
     emptyMessage?: string;
@@ -51,6 +51,8 @@ interface Props<T> {
     animate?: boolean;
     header?: () => JSX.Element;
 }
+
+type Props<T> = ListProps<T>;
 
 class GenericList<T> extends React.Component<Props<T>, {}> {
 

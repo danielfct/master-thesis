@@ -11,10 +11,10 @@ interface ControlledListProps {
   error?: string | null;
   emptyMessage: string;
   data: string[];
-  dropdown: { title: string, data: string[] };
+  dropdown?: { title: string, empty: string, data: string[] };
   show: (index: number, element: string, separate: boolean, checked: boolean,
          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void) => JSX.Element;
-  onAdd: (data: string) => void;
+  onAdd?: (data: string) => void;
   onRemove: (data: string[]) => void;
   onDelete: RestOperation;
 }
@@ -72,7 +72,7 @@ export default class ControlledList extends BaseComponent<Props, State> {
   private onAdd = (event: React.MouseEvent<HTMLLIElement>): void => {
     const data = (event.target as HTMLLIElement).innerHTML;
     this.setState({ [data]: { isChecked: false, isNew: true } });
-    this.props.onAdd(data);
+    this.props.onAdd?.(data);
   };
 
   private onRemove = (): void => {
@@ -111,6 +111,7 @@ export default class ControlledList extends BaseComponent<Props, State> {
     this.props.onDelete.failureCallback(reason);
 
   render() {
+    const {isLoading, error, emptyMessage, dropdown} = this.props;
     const data = Object.entries(this.state)
                        .filter(([_, data]) => data)
                        .map(([data, _]) => data);
@@ -128,24 +129,28 @@ export default class ControlledList extends BaseComponent<Props, State> {
               </label>
             </p>
           )}
-          <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
-                  data-position="bottom" data-tooltip={this.props.dropdown.title}
-                  data-target='dropdown'
-                  ref={this.dropdown}>
-            <i className="material-icons">add</i>
-          </button>
-          <ul id='dropdown' className={`dropdown-content ${styles.dropdown}`}>
-            <li className={`${styles.disabled}`}>
-              <a>{this.props.dropdown.title}</a>
-            </li>
-            <PerfectScrollbar>
-              {this.props.dropdown.data.map((data, index) =>
-                <li key={index} onClick={this.onAdd}>
-                  <a>{data}</a>
+          {dropdown && (
+            <>
+              <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                      data-position="bottom" data-tooltip={dropdown.title}
+                      data-target='dropdown'
+                      ref={this.dropdown}>
+                <i className="material-icons">add</i>
+              </button>
+              <ul id='dropdown' className={`dropdown-content ${styles.dropdown}`}>
+                <li className={`${styles.disabled}`}>
+                  <a>{dropdown.data.length ? dropdown.title : dropdown.empty}</a>
                 </li>
-              )}
-            </PerfectScrollbar>
-          </ul>
+                <PerfectScrollbar>
+                  {dropdown.data.map((data, index) =>
+                    <li key={index} onClick={this.onAdd}>
+                      <a>{data}</a>
+                    </li>
+                  )}
+                </PerfectScrollbar>
+              </ul>
+            </>
+          )}
           <button className="btn-flat btn-small waves-effect waves-light red-text right"
                   style={Object.values(this.state)
                                .map(dependency => dependency?.isChecked || false)
@@ -157,9 +162,9 @@ export default class ControlledList extends BaseComponent<Props, State> {
           </button>
         </div>
         <DataList
-          isLoading={this.props.isLoading}
-          error={this.props.error}
-          emptyMessage={this.props.emptyMessage}
+          isLoading={isLoading}
+          error={error}
+          emptyMessage={emptyMessage}
           list={data}
           show={this.show}/>
       </div>

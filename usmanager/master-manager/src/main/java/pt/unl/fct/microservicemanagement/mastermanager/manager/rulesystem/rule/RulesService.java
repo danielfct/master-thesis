@@ -346,11 +346,11 @@ public class RulesService {
     return success;
   }
 
-  public List<ServiceRule> getServiceRulesByServiceId(long serviceId) {
+  public List<ServiceRuleEntity> getServiceRulesByServiceId(long serviceId) {
     return serviceRules.getServiceRulesByServiceId(serviceId);
   }
 
-  private List<ServiceRule> getServiceRulesByServiceName(String serviceName) {
+  private List<ServiceRuleEntity> getServiceRulesByServiceName(String serviceName) {
     return serviceRules.getServiceRulesByServiceName(serviceName);
   }
 
@@ -360,7 +360,7 @@ public class RulesService {
     if (serviceRule != null) {
       id = serviceRule.getId();
     } else {
-      serviceRule = new ServiceRule();
+      serviceRule = new ServiceRuleEntity();
       final var service = servicesService.getService(serviceId);
       serviceRule.setService(service);
       final var rule = getRule(ruleId);
@@ -598,7 +598,7 @@ public class RulesService {
   }
 
   private List<Rule> generateRulesByService(long appId, String serviceName) {
-    List<ServiceRule> serviceRulesList = getServiceRulesByServiceName(serviceName);
+    List<ServiceRuleEntity> serviceRulesList = getServiceRulesByServiceName(serviceName);
     List<Rule> rulesList = generateRulesByApp(appId);
     serviceRulesList.forEach(rule -> rulesList.add(generateRule(rule.getRule())));
     log.info("Generating service rules... (count: " + rulesList.size() + ")");

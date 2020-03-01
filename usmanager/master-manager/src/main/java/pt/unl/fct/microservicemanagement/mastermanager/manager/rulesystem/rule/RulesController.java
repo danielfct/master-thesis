@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.ComponentTypeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.ValueModeEntity;
@@ -152,7 +151,7 @@ public class RulesController {
 
 
   @GetMapping("/services/{serviceId}")
-  public List<ServiceRule> getAppRulesByServiceId(@PathVariable long serviceId) {
+  public List<ServiceRuleEntity> getAppRulesByServiceId(@PathVariable long serviceId) {
     return rulesService.getServiceRulesByServiceId(serviceId);
   }
 

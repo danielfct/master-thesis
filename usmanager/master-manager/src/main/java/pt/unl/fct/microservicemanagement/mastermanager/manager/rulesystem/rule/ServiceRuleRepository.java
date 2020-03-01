@@ -32,21 +32,21 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ServiceRuleRepository extends CrudRepository<ServiceRule, Long> {
+public interface ServiceRuleRepository extends CrudRepository<ServiceRuleEntity, Long> {
 
   @Query("select servicerule "
-      + "from ServiceRule servicerule inner join servicerule.service service "
+      + "from ServiceRuleEntity servicerule inner join servicerule.service service "
       + "where service.id = :serviceId")
-  List<ServiceRule> getServiceRulesByServiceId(@Param("serviceId") long serviceId);
+  List<ServiceRuleEntity> getServiceRulesByServiceId(@Param("serviceId") long serviceId);
 
   @Query("select servicerule "
-      + "from ServiceRule servicerule inner join servicerule.service service "
+      + "from ServiceRuleEntity servicerule inner join servicerule.service service "
       + "where service.serviceName = :serviceName")
-  List<ServiceRule> getServiceRulesByServiceName(@Param("serviceName") String serviceName);
+  List<ServiceRuleEntity> getServiceRulesByServiceName(@Param("serviceName") String serviceName);
 
   @Query("select servicerule "
-      + "from ServiceRule servicerule inner join servicerule.service service inner join servicerule.rule rule "
+      + "from ServiceRuleEntity servicerule inner join servicerule.service service inner join servicerule.rule rule "
       + "where service.id = :serviceId and rule.id = :ruleId")
-  ServiceRule getServiceRuleByServiceIdAndRuleId(@Param("serviceId") long serviceId, @Param("ruleId") long ruleId);
+  ServiceRuleEntity getServiceRuleByServiceIdAndRuleId(@Param("serviceId") long serviceId, @Param("ruleId") long ruleId);
 
 }
