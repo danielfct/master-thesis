@@ -177,7 +177,7 @@ class Service extends BaseComponent<Props, State> {
 
   private onRemoveServiceApps = (apps: string[]): void => {
     this.setState({
-      newDependencies: this.state.newApps.filter(app => !apps.includes(app))
+      newApps: this.state.newApps.filter(app => !apps.includes(app))
     });
   };
 
@@ -249,6 +249,10 @@ class Service extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
+  private shouldShowSaveButton = () =>
+    !!this.state.newApps.length || !!this.state.newDependencies.length || !!this.state.newDependees.length
+    || !!this.state.newPredictions.length || !!this.state.newRules.length;
+
   private details = () => {
     const {isLoadingServices, loadServicesError, formService, service} = this.props;
     // @ts-ignore
@@ -262,7 +266,7 @@ class Service extends BaseComponent<Props, State> {
                 fields={this.getFields(formService)}
                 values={service}
                 isNew={isNewService(this.props.match.params.name)}
-                showSaveButton={!!this.state['newDependencies'].length}
+                showSaveButton={this.shouldShowSaveButton()}
                 post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
                 put={{url: `services/${service[serviceKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={{url: `services/${service[serviceKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}>
@@ -330,7 +334,7 @@ class Service extends BaseComponent<Props, State> {
         <Error message={loadDependeesError}/>}
         {!loadDependeesError && service &&
         <ServiceDependeeList service={service}
-                              newDependees={newDependees}/>}
+                             newDependees={newDependees}/>}
       </>
     )
   };

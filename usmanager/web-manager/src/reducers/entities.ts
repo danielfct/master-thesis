@@ -59,7 +59,7 @@ import {
   RULES_REQUEST,
   RULES_FAILURE,
   RULES_SUCCESS,
-  SERVICE_PREDICTIONS_SUCCESS, SERVICE_RULES_SUCCESS
+  SERVICE_PREDICTIONS_SUCCESS, SERVICE_RULES_SUCCESS, APPS_REQUEST, APPS_FAILURE, APPS_SUCCESS
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
@@ -384,6 +384,19 @@ const entities = (state: EntitiesState = {
         ...state,
         rules: {
           data: data?.rules,
+          isLoading: false,
+          error: null,
+        }
+      };
+    case APPS_REQUEST:
+      return merge({}, state, { apps: { isLoading: true } });
+    case APPS_FAILURE:
+      return merge({}, state, { apps: { isLoading: false, error: error } });
+    case APPS_SUCCESS:
+      return {
+        ...state,
+        apps: {
+          data: data?.apps,
           isLoading: false,
           error: null,
         }

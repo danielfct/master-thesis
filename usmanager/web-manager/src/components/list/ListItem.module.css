@@ -29,6 +29,8 @@
 .itemContent {
     padding: 15px 40px;
     width: 30%;
+    font-size: 1.1rem;
+    color: white;
 }
 
 .link {

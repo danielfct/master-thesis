@@ -1,6 +1,5 @@
 import React, {createRef} from "react";
 import M from "materialize-css";
-import styles from './ConfirmDialog.module.css';
 
 interface Props {
   message: string;
@@ -15,17 +14,16 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
   private modal = createRef<HTMLDivElement>();
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    M.Modal.init(this.modal.current as Element, { startingTop: '38.5%', endingTop: '38.5%', preventScrolling:false });
+    M.Modal.init(this.modal.current as Element, { startingTop: '38.5%', endingTop: '38.5%', preventScrolling: false });
   }
 
-  render = () =>
-    <div>
-      {/*<button data-target="confirm-dialog" className="btn-flat modal-trigger white-text">Modal</button>*/}
-      <div id="confirm-dialog" className={`modal ${styles.confirmDialog}`} ref={this.modal}>
+  render() {
+    return (
+      <div id="confirm-dialog" className='modal dialog' ref={this.modal}>
         <div className="modal-content">
-          <h5>Are you sure you want to <div className={`${styles.message}`}>{this.props.message}?</div></h5>
+          <div className="modal-message">Are you sure you want to <div className={`dialog-message`}>{this.props.message}?</div></div>
         </div>
-        <div className={`modal-footer ${styles.footer}`}>
+        <div className={`modal-footer dialog-footer`}>
           <button className="modal-close waves-effect waves-red btn-flat white-text"
                   onClick={this.props.cancelCallback}>
             No
@@ -36,5 +34,7 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
           </button>
         </div>
       </div>
-    </div>
+    );
+  }
+
 }

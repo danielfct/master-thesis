@@ -470,3 +470,108 @@ textarea.materialize-textarea[readonly="readonly"] {
 label > span:hover {
     color: grey !important;
 }
+
+.modal-title {
+    color: white;
+    font-size: 1.6rem;
+}
+
+.modal-message {
+    color: white;
+    font-size: 1.4rem;
+}
+
+.dialog {
+    background: #282828;
+    outline: transparent;
+    overflow: hidden;
+}
+
+.dialog-message {
+    display: inline;
+    color: #F44336;
+}
+
+.dialog-footer {
+    background: #282828 !important;
+}
+
+.modal .modal-footer {
+    height: unset;
+}
+
+
+textarea {
+    outline-color: white;
+    color: white;
+}
+
+.datepicker-date-display {
+    background-color: #36393F;
+}
+
+.datepicker-table,
+.datepicker-footer,
+.datepicker-calendar {
+    background-color: #282828;
+}
+
+.datepicker-cancel,
+.datepicker-done,
+.datepicker-day-button,
+.timepicker-close {
+    color: white;
+}
+
+.datepicker-day-button:hover,
+.datepicker-table td:hover:not(.is-empty),
+.datepicker-table td.is-selected {
+    background-color: grey !important;
+}
+
+.month-prev {
+    margin-left: 10px;
+}
+
+.month-prev svg,
+.month-next svg {
+    fill: white;
+}
+
+.timepicker-digital-display {
+    background-color: #36393F;
+}
+
+.timepicker-analog-display {
+    background-color: #282828;
+}
+
+.timepicker-dial .timepicker-minutes {
+    background-color: #36393F;
+
+}
+
+.timepicker-plate {
+    background-color: #36393F;
+
+}
+
+.timepicker-canvas line {
+    stroke: darkgrey;
+}
+
+.timepicker-canvas-bg {
+    fill: darkgrey;
+}
+
+.timepicker-canvas-bearing {
+    fill: darkgrey;
+}
+
+
+.timepicker-tick {
+    color: white;
+}
+.timepicker-tick:hover {
+    background-color: unset;
+}

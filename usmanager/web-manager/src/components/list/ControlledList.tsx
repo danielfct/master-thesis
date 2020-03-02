@@ -1,20 +1,25 @@
 import React, {createRef} from "react";
 import M from "materialize-css";
 import List from "./List";
-import styles from "../../routes/services/ServiceDependencyList.module.css";
+import styles from "./ControlledList.module.css";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import BaseComponent from "../BaseComponent";
 import {deleteData, patchData, RestOperation} from "../../utils/api";
+import {decodeHTML} from "../../utils/text";
+import InputDialog from "../dialogs/InputDialog";
+import {IFields, IValues} from "../form/Form";
 
 interface ControlledListProps {
   isLoading: boolean;
   error?: string | null;
   emptyMessage: string;
   data: string[];
-  dropdown?: { title: string, empty: string, data: string[] };
+  dropdown?: { id: string, title: string, empty: string, data: string[] };
+  input?: { title: string, fields: IFields, values: IValues, input: JSX.Element };
   show: (index: number, element: string, separate: boolean, checked: boolean,
          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void) => JSX.Element;
   onAdd?: (data: string) => void;
+  onAddInput?: (input: any) => void;
   onRemove: (data: string[]) => void;
   onDelete: RestOperation;
 }
@@ -27,8 +32,8 @@ interface State {
 
 export default class ControlledList extends BaseComponent<Props, State> {
 
-  private dropdown = createRef<HTMLButtonElement>();
   private globalCheckbox = createRef<HTMLInputElement>();
+  private dropdown = createRef<HTMLButtonElement>();
 
   state: State = {};
 
@@ -70,9 +75,13 @@ export default class ControlledList extends BaseComponent<Props, State> {
   };
 
   private onAdd = (event: React.MouseEvent<HTMLLIElement>): void => {
-    const data = (event.target as HTMLLIElement).innerHTML;
+    const data = decodeHTML((event.target as HTMLLIElement).innerHTML);
     this.setState({ [data]: { isChecked: false, isNew: true } });
     this.props.onAdd?.(data);
+  };
+
+  private onAddInput = (input: any): void => {
+    this.props.onAddInput?.(input);
   };
 
   private onRemove = (): void => {
@@ -111,7 +120,7 @@ export default class ControlledList extends BaseComponent<Props, State> {
     this.props.onDelete.failureCallback(reason);
 
   render() {
-    const {isLoading, error, emptyMessage, dropdown} = this.props;
+    const {isLoading, error, emptyMessage, dropdown, input} = this.props;
     const data = Object.entries(this.state)
                        .filter(([_, data]) => data)
                        .map(([data, _]) => data);
@@ -133,13 +142,16 @@ export default class ControlledList extends BaseComponent<Props, State> {
             <>
               <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
                       data-position="bottom" data-tooltip={dropdown.title}
-                      data-target='dropdown'
+                      data-target={`dropdown-${dropdown.id}`}
                       ref={this.dropdown}>
                 <i className="material-icons">add</i>
               </button>
-              <ul id='dropdown' className={`dropdown-content ${styles.dropdown}`}>
+              <ul id={`dropdown-${dropdown.id}`}
+                  className={`dropdown-content ${styles.dropdown}`}>
                 <li className={`${styles.disabled}`}>
-                  <a>{dropdown.data.length ? dropdown.title : dropdown.empty}</a>
+                  <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : undefined}`}>
+                    {dropdown.data.length ? dropdown.title : dropdown.empty}
+                  </a>
                 </li>
                 <PerfectScrollbar>
                   {dropdown.data.map((data, index) =>
@@ -149,6 +161,18 @@ export default class ControlledList extends BaseComponent<Props, State> {
                   )}
                 </PerfectScrollbar>
               </ul>
+            </>
+          )}
+          {input && (
+            <>
+              <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                      data-position="bottom" data-tooltip={input.title}
+                      data-target="input-dialog">
+                <i className="material-icons">add</i>
+              </button>
+              <InputDialog title={input?.title} fields={input?.fields} values={input?.values} confirmCallback={this.onAddInput}>
+                {input?.input}
+              </InputDialog>
             </>
           )}
           <button className="btn-flat btn-small waves-effect waves-light red-text right"

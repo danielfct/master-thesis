@@ -40,11 +40,9 @@ class ServiceDependeeList extends BaseComponent<Props, {}> {
   }
 
   private dependee = (dependee: string, index: number): JSX.Element =>
-    <ListItem key={index}>
+    <ListItem key={index} separate>
       <div className={`${styles.itemContent}`}>
-        <label>
-          <span id={'checkbox'}>{dependee}</span>
-        </label>
+        <span>{dependee}</span>
       </div>
       <Link to={`/services/${dependee}`}
             className={`${styles.link}`}/>
@@ -52,13 +50,13 @@ class ServiceDependeeList extends BaseComponent<Props, {}> {
 
   render() {
     const DependeesList = List<string>();
-    return <DependeesList isLoading={this.props.isLoading}
-                          error={this.props.error}
-                          emptyMessage={`Dependees list is empty`}
-                          list={this.props.dependeeNames}
-                          show={this.dependee}
-    />;
-
+    return (
+      <DependeesList isLoading={this.props.isLoading}
+                     error={this.props.error}
+                     emptyMessage={`Dependees list is empty`}
+                     list={this.props.dependeeNames}
+                     show={this.dependee}/>
+    );
   }
 
 }

@@ -33,6 +33,7 @@ import {Link, withRouter} from "react-router-dom";
 import ControlledList from "../../components/list/ControlledList";
 import ListItem from "../../components/list/ListItem";
 import styles from "../../components/list/ListItem.module.css";
+import PerfectScrollbar from "react-perfect-scrollbar";
 
 export interface IServiceDependency extends IService {
 }
@@ -113,7 +114,12 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
                            error={this.props.error}
                            emptyMessage={`Dependencies list is empty`}
                            data={this.props.dependencies}
-                           dropdown={{title: 'Add dependency', empty: 'No more dependencies to add', data: this.getSelectableServicesNames()}}
+                           dropdown={{
+                             id: 'dependencies',
+                             title: 'Add dependency',
+                             empty: 'No more dependencies to add',
+                             data: this.getSelectableServicesNames()
+                           }}
                            show={this.dependency}
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}

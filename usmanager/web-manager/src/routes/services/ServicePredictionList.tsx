@@ -16,6 +16,8 @@ import {
   removeServiceDependencies, removeServicePredictions
 } from "../../actions";
 import {connect} from "react-redux";
+import {IFields, IValues, required, requiredAndNotAllowed, requiredAndNumberAndMin} from "../../components/form/Form";
+import Field, {getTypeFromValue} from "../../components/form/Field";
 
 export interface IPrediction extends Data {
   name: string;
@@ -26,6 +28,16 @@ export interface IPrediction extends Data {
   endTime: string;   //TODO type?
   minReplicas: number;
 }
+
+const emptyPrediction = (): Partial<IPrediction> => ({
+  name: '',
+  description: '',
+  startDate: '',
+  startTime: '',
+  endDate: '',
+  endTime: '',
+  minReplicas: 0
+});
 
 interface StateToProps {
   isLoading: boolean;
@@ -89,12 +101,49 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
   private onDeleteFailure = (reason: string): void =>
     super.toast(`Unable to delete prediction`, 10000, reason, true);
 
+  private getFields = (): IFields =>
+    Object.entries(emptyPrediction()).map(([key, value]) => {
+      return {
+        [key]: {
+          id: key,
+          label: key,
+          validation: getTypeFromValue(value) === 'number'
+            ? { rule: requiredAndNumberAndMin, args: 0 }
+            : { rule: required }
+        }
+      };
+    }).reduce((fields, field) => {
+      for (let key in field) {
+        fields[key] = field[key];
+      }
+      return fields;
+    }, {});
+
+  private input = () =>
+    <div>
+      <Field key='name' id='name' label='name'/>
+      <Field key='description' id='description' label='description' type='multilinetextbox'/>
+      {/*<div style={{display: 'flex'}}>*/}
+        <Field key='startDate' id='startDate' label='startDate' type='datepicker'/>{/* //TODO mindate*/}
+        <Field key='startTime' id='startTime' label='startTime' type='timepicker'/>
+      {/*</div>
+      <div style={{display: 'flex'}}>*/}
+       {/* <Field key='endTime' id='endTime' label='endTime'/>
+        <Field key='minReplicas' id='minReplicas' label='minReplicas'/>*/}
+      {/*</div>*/}
+    </div>;
+
   render() {
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage={`Predictions list is empty`}
                            data={this.props.predictions}
-                           /*dropdown={{title: 'Add dependency', empty: 'No more dependencies to add', data: this.getSelectableServicesNames()}}*/
+                           input={{
+                             title: 'Add prediction',
+                             fields: this.getFields(),
+                             values: emptyPrediction(),
+                             input: this.input()
+                           }}
                            show={this.prediction}
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}

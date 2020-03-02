@@ -66,8 +66,8 @@ class ServiceRuleList extends BaseComponent<Props, {}> {
           <span id={'checkbox'}>{rule}</span>
         </label>
       </div>
-      <Link to={`/rules/${rule}`} //TODO change maybe
-            className={`${styles.link}`}/>
+      {/*<Link to={`/rules/${rule}`} //TODO
+            className={`${styles.link}`}/>*/}
     </ListItem>;
 
   private onAdd = (rule: string): void =>
@@ -96,7 +96,12 @@ class ServiceRuleList extends BaseComponent<Props, {}> {
                            error={this.props.error}
                            emptyMessage={`Rules list is empty`}
                            data={this.props.rulesName}
-                           dropdown={{title: 'Add rule', empty: 'No more rules to add', data: this.getSelectableRules()}}
+                           dropdown={{
+                             id: 'rules',
+                             title: 'Add rule',
+                             empty: 'No more rules to add',
+                             data: this.getSelectableRules()
+                           }}
                            show={this.rule}
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}

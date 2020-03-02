@@ -86,9 +86,9 @@ class ServiceAppList extends BaseComponent<Props, {}> {
     super.toast(`Unable to delete app`, 10000, reason, true);
 
   private getSelectableAppsNames = () => {
-    const {apps, service, serviceApps} = this.props;
+    const {apps, serviceApps} = this.props;
     const {newApps} = this.props;
-    return Object.keys(apps).filter(name => !service && !serviceApps.includes(name) && !newApps.includes(name));
+    return Object.keys(apps).filter(name => !serviceApps.includes(name) && !newApps.includes(name));
   };
 
   render() {
@@ -96,7 +96,12 @@ class ServiceAppList extends BaseComponent<Props, {}> {
                            error={this.props.error}
                            emptyMessage={`Apps list is empty`}
                            data={this.props.serviceApps}
-                           dropdown={{title: 'Add app', empty: 'No more apps to add', data: this.getSelectableAppsNames()}}
+                           dropdown={{
+                             id: 'apps',
+                             title: 'Add app',
+                             empty: 'No more apps to add',
+                             data: this.getSelectableAppsNames()
+                           }}
                            show={this.app}
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}

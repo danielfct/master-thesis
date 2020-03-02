@@ -47,11 +47,12 @@ interface FormPageProps {
   id: string;
   fields: IFields;
   values: IValues;
-  isNew: boolean;
+  isNew?: boolean;
   showSaveButton?: boolean;
-  post: RestOperation;
-  put: RestOperation;
+  post?: RestOperation;
+  put?: RestOperation;
   delete?: RestOperation;
+  showControls?: boolean;
 }
 
 type Props = FormPageProps & RouteComponentProps;
@@ -102,7 +103,7 @@ class Form extends React.Component<Props, State> {
   state: State = {
     values: this.props.values,
     errors: {},
-    isEditing: this.props.isNew,
+    isEditing: this.props.isNew == undefined || this.props.isNew,
     showSaveButton: false,
   };
 
@@ -162,14 +163,18 @@ class Form extends React.Component<Props, State> {
     const {id, isNew, post, put} = this.props;
     const args = this.state.values[id];
     if (isNew) {
-      postData(post.url, this.state.values,
-        () => post.successCallback(args),
-        () => post.failureCallback(args));
+      if (post?.url) {
+        postData(post.url, this.state.values,
+          () => post.successCallback(args),
+          () => post.failureCallback(args));
+      }
     }
     else {
-      putData(put.url, this.state.values,
-        () => put.successCallback(args),
-        () => put.failureCallback(args));
+      if (put?.url) {
+        putData(put.url, this.state.values,
+          () => put.successCallback(args),
+          () => put.failureCallback(args));
+      }
     }
   };
 
@@ -186,41 +191,43 @@ class Form extends React.Component<Props, State> {
       validate: this.validate
     };
     const {showSaveButton} = this.state;
-    const {children} = this.props;
+    const {id, isNew, values, showControls, children} = this.props;
     return (
       <>
-        <ConfirmDialog message={`delete ${this.props.values[this.props.id]}`} confirmCallback={this.onClickDelete}/>
+        <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>
         <form onSubmit={this.handleSubmit} noValidate>
-          <div className={`controlsContainer`}>
-            {this.props.isNew
-              ?
-              <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text right slide`}
-                      type="submit">
-                Save
-              </button>
-              :
-              <div>
-                <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
-                        data-position="bottom" data-tooltip="Edit"
-                        type="button"
-                        onClick={this.onClickEdit}>
-                  <i className="large material-icons">edit</i>
+          {(showControls == undefined || showControls) && (
+            <div className={`controlsContainer`}>
+              {isNew
+                ?
+                <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text right slide`}
+                        type="submit">
+                  Save
                 </button>
-                <div className={`${styles.controlButton}`}>
-                  <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
+                :
+                <div>
+                  <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                          data-position="bottom" data-tooltip="Edit"
                           type="button"
-                          data-target="confirm-dialog">
-                    Delete
+                          onClick={this.onClickEdit}>
+                    <i className="large material-icons">edit</i>
                   </button>
-                  <button className={`btn-flat btn-small waves-effect waves-light green-text slide`}
-                          style={showSaveButton ? {transform: "scale(1)"} : {transform: "scale(0)"}}
-                          type="submit">
-                    Save
-                  </button>
+                  <div className={`${styles.controlButton}`}>
+                    <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
+                            type="button"
+                            data-target="confirm-dialog">
+                      Delete
+                    </button>
+                    <button className={`btn-flat btn-small waves-effect waves-light green-text slide`}
+                            style={showSaveButton ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                            type="submit">
+                      Save
+                    </button>
+                  </div>
                 </div>
-              </div>
-            }
-          </div>
+              }
+            </div>
+          )}
           <div className={`${styles.content}`}>
             <FormContext.Provider value={context}>
               {children}

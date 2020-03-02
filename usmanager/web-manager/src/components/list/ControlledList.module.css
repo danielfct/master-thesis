@@ -25,6 +25,7 @@
 .dropdown {
     width: auto !important;
     overflow-y: hidden;
+    background-color: #282828;
 }
 
 ul.dropdown li a {
@@ -41,10 +42,13 @@ ul.dropdown li.disabled a {
     color: grey;
 }
 
+.dropdownEmpty {
+    border-bottom: solid 1px black !important;
+}
+
 ul.dropdown li.disabled a:hover {
     background-color: #282828;
     cursor: default;
-    border-bottom: solid 1px #666;
 }
 
 .nolabelCheckbox {
@@ -54,14 +58,4 @@ ul.dropdown li.disabled a:hover {
 
 .nolabelCheckbox label span {
     margin-bottom: -7.5px;
-}
-
-.dependencyItemContent {
-    padding: 15px 40px;
-    width: 30%;
-}
-
-.link {
-    cursor: pointer;
-    width: 70%;
 }

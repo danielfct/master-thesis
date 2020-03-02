@@ -114,8 +114,8 @@ class Region extends BaseComponent<Props, {}> {
               key === 'active'
                 ? <Field key={index}
                          id={key}
-                         type="dropdown"
                          label={key}
+                         type="dropdown"
                          options={{defaultValue: "Is region active?", values: ["True", "False"]}}
                 />
                 : <Field key={index}
