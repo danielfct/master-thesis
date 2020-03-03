@@ -8,6 +8,7 @@ import {MultilineTextBox} from "./MultilineTextBox";
 import {Dropdown} from "./Dropdown";
 import {Datepicker} from "./Datepicker";
 import {Timepicker} from "./Timepicker";
+import styles from './Field.module.css';
 
 export interface IValidation {
   rule: (values: IValues, fieldName: string, args: any) => string;
@@ -20,6 +21,7 @@ export interface FieldProps {
   label?: string;
   options?: { defaultValue: string, values: string[] };
   validation?: IValidation;
+  icon?: boolean;
 }
 
 export const getTypeFromValue = (value: any): string =>
@@ -36,79 +38,92 @@ export default class Field extends React.Component<FieldProps> {
   }
 
   private onChange = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-                      formContext: IFormContext, id: string): void =>
+                      id: string, formContext: IFormContext): void =>
     formContext.setValues({ [id]: e.currentTarget.value });
 
+  private onSelect = (value: string, id: string, formContext: IFormContext) => {
+    formContext.setValues({ [id]: value });
+    formContext.validate(id);
+  };
+
   private onBlur = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-                    formContext: IFormContext, id: string): void =>
+                    id: string, formContext: IFormContext): void =>
     formContext.validate(id);
 
   render() {
-    const {id, type, label, options} = this.props;
+    const {id, type, label, options, icon} = this.props;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
-    const getEditorClassname = (errors: IErrors): string => getError(errors) ? "validate invalid" : "validate";
+    const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
+      const hasErrors = getError(errors);
+      if (hasErrors) {
+        return styles.invalidateField;
+      }
+      else if (!hasErrors && !disabled && (getTypeFromValue(value) !== 'text' || value)) {
+        return styles.validateField;
+      }
+      else {
+        return styles.noValidationField;
+      }
+    };
     return (
       <FormContext.Consumer>
         {(formContext: IFormContext | null) => (
           formContext && (
-            <div key={id} className="input-field col s12">
+            <div key={id}
+                 className={`input-field col s12`}
+                 style={icon != undefined && !icon ? {marginLeft: '10px'} : undefined}>
               {label && (
                 <>
-                  <i className="material-icons prefix">{mapLabelToIcon(label)}</i>
-                  <label className="active" htmlFor={id}>{camelCaseToSentenceCase(label)}</label>
+                  {(icon == undefined || icon) &&
+                  <i className="material-icons prefix">{mapLabelToIcon(label)}</i>}
+                  <label className="active" htmlFor={id}>
+                    {camelCaseToSentenceCase(label)}
+                  </label>
                 </>
               )}
               {(!type || type.toLowerCase() === "textbox") && (
-                <TextBox className={getEditorClassname(formContext.errors)}
+                <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
                          id={id}
                          name={id}
-                         value={formContext?.values[id]}
-                         disabled={!formContext?.isEditing}
-                         onChange={e => this.onChange(e, formContext, id)}
-                         onBlur={e => this.onBlur(e, formContext, id)}
-                />
+                         value={formContext.values[id]}
+                         disabled={!formContext.isEditing}
+                         onChange={e => this.onChange(e, id, formContext)}
+                         onBlur={e => this.onBlur(e, id, formContext)}/>
               )}
               {type && type.toLowerCase() === "multilinetextbox" && (
-                <MultilineTextBox className={getEditorClassname(formContext.errors)}
+                <MultilineTextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
                                   id={id}
                                   name={id}
-                                  value={formContext?.values[id]}
-                                  disabled={!formContext?.isEditing}
-                                  onChange={e => this.onChange(e, formContext, id)}
-                                  onBlur={e => this.onBlur(e, formContext, id)}
-
-                />
+                                  value={formContext.values[id]}
+                                  disabled={!formContext.isEditing}
+                                  onChange={e => this.onChange(e, id, formContext)}
+                                  onBlur={e => this.onBlur(e, id, formContext)}/>
               )}
               {type && type.toLowerCase() === "dropdown" && (
-                <Dropdown className={getEditorClassname(formContext.errors)}
+                <Dropdown className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
                           id={id}
                           name={id}
-                          value={formContext?.values[id]}
-                          disabled={!formContext?.isEditing}
-                          onChange={e => this.onChange(e, formContext, id)}
-                          onBlur={e => this.onBlur(e, formContext, id)}
-                          options={options}
-                />
+                          value={formContext.values[id]}
+                          disabled={!formContext.isEditing}
+                          onChange={e => this.onChange(e, id, formContext)}
+                          onBlur={e => this.onBlur(e, id, formContext)}
+                          options={options}/>
               )}
               {(type && type.toLowerCase() === "datepicker") && (
-                <Datepicker className={getEditorClassname(formContext.errors)}
-                         id={id}
-                         name={id}
-                         value={formContext?.values[id]}
-                         disabled={!formContext?.isEditing}
-                         onChange={e => this.onChange(e, formContext, id)}
-                         onBlur={e => this.onBlur(e, formContext, id)}
-                />
-              )}
-              {(type && type.toLowerCase() === "timepicker") && (
-                <Timepicker className={getEditorClassname(formContext.errors)}
+                <Datepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
                             id={id}
                             name={id}
-                            value={formContext?.values[id]}
+                            value={formContext.values[id]}
+                            disabled={!formContext.isEditing}
+                            onSelect={value => this.onSelect(value, id, formContext)}/>
+              )}
+              {(type && type.toLowerCase() === "timepicker") && (
+                <Timepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                            id={id}
+                            name={id}
+                            value={formContext.values[id]}
                             disabled={!formContext?.isEditing}
-                            onChange={e => this.onChange(e, formContext, id)}
-                            onBlur={e => this.onBlur(e, formContext, id)}
-                />
+                            onSelect={value => this.onSelect(value, id, formContext)}/>
               )}
               {getError(formContext.errors) && (
                 <span className={"helper-text red-text darken-3"}>

@@ -30,6 +30,7 @@ import {getTypeFromValue, FieldProps, IValidation} from "./Field";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
 import { isEqualWith } from "lodash";
+import ScrollBar from "react-perfect-scrollbar";
 
 export interface IFields {
   [key: string]: FieldProps;
@@ -52,7 +53,8 @@ interface FormPageProps {
   post?: RestOperation;
   put?: RestOperation;
   delete?: RestOperation;
-  showControls?: boolean;
+  controlsMode?: 'top' | 'form';
+  onModalConfirm?: (values: IValues) => void;
 }
 
 type Props = FormPageProps & RouteComponentProps;
@@ -178,11 +180,20 @@ class Form extends React.Component<Props, State> {
     }
   };
 
-
-  private setValues = (values: IValues) => {
+  private setValues = (values: IValues) =>
     this.setState({ values: { ...this.state.values, ...values } });
+
+  private onModalConfirm = (event: React.FormEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    if (!this.validateForm()) {
+      return;
+    }
+    this.props.onModalConfirm?.(this.state.values);
+    this.clearValues();
   };
 
+  private clearValues = () =>
+    this.setState({ values: this.props.values, errors: {}});
 
   render() {
     const context: IFormContext = {
@@ -191,12 +202,12 @@ class Form extends React.Component<Props, State> {
       validate: this.validate
     };
     const {showSaveButton} = this.state;
-    const {id, isNew, values, showControls, children} = this.props;
+    const {id, isNew, values, controlsMode, children} = this.props;
     return (
       <>
         <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>
         <form onSubmit={this.handleSubmit} noValidate>
-          {(showControls == undefined || showControls) && (
+          {(controlsMode == undefined || controlsMode === 'top') && (
             <div className={`controlsContainer`}>
               {isNew
                 ?
@@ -233,6 +244,24 @@ class Form extends React.Component<Props, State> {
               {children}
             </FormContext.Provider>
           </div>
+          {(controlsMode === 'form') && (
+            <div className='modal-footer dialog-footer'>
+              <button className="waves-effect waves-light btn-flat red-text left"
+                      type="button"
+                      onClick={this.clearValues}>
+                Clear
+              </button>
+              <button className="modal-close waves-effect waves-light btn-flat red-text"
+                      type="button">
+                Cancel
+              </button>
+              <button className="waves-effect waves-light btn-flat green-text"
+                      type="button"
+                      onClick={this.onModalConfirm}>
+                Confirm
+              </button>
+            </div>
+          )}
         </form>
       </>
     )

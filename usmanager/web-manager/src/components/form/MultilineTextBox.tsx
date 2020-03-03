@@ -16,7 +16,7 @@ export class MultilineTextBox extends React.Component<Props, {}> {
     const {className, id, name, value, disabled, onChange, onBlur} = this.props;
     return (
       <textarea
-        className={className}
+        className={`materialize-textarea ${className}`}
         style={
           className.includes('invalid')
             ? { borderBottom: "1px solid #F44336", boxShadow: "0 1px 0 0 #F44336" }
@@ -27,8 +27,7 @@ export class MultilineTextBox extends React.Component<Props, {}> {
         value={value}
         disabled={disabled}
         onChange={onChange}
-        onBlur={onBlur}
-      />
+        onBlur={onBlur}/>
     )
   }
 

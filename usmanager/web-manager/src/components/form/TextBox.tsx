@@ -19,11 +19,6 @@ export class TextBox extends React.Component<TextBoxProps, any> {
       <>
         <input
           className={className}
-          style={
-            className.includes('invalid')
-              ? { borderBottom: "1px solid #F44336", boxShadow: "0 1px 0 0 #F44336" }
-              : undefined
-          }
           id={id}
           name={name}
           type={getTypeFromValue(value)}
@@ -32,6 +27,7 @@ export class TextBox extends React.Component<TextBoxProps, any> {
           autoComplete="off"
           onChange={onChange}
           onBlur={onBlur}
+          formNoValidate={true}
         />
       </>
     )

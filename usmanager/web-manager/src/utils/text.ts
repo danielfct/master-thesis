@@ -45,3 +45,5 @@ export const decodeHTML = (html: string) => {
     txt.innerHTML = html;
     return txt.value;
 };
+
+export const zeroPad = (num: number, maxLength: number) => String(num).padStart(maxLength, '0')

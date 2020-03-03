@@ -15,11 +15,11 @@ interface ControlledListProps {
   emptyMessage: string;
   data: string[];
   dropdown?: { id: string, title: string, empty: string, data: string[] };
-  input?: { title: string, fields: IFields, values: IValues, input: JSX.Element };
+  formModal?: { title: string, fields: IFields, values: IValues, content: JSX.Element };
   show: (index: number, element: string, separate: boolean, checked: boolean,
          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void) => JSX.Element;
   onAdd?: (data: string) => void;
-  onAddInput?: (input: any) => void;
+  onAddInput?: (input: IValues) => void;
   onRemove: (data: string[]) => void;
   onDelete: RestOperation;
 }
@@ -120,7 +120,7 @@ export default class ControlledList extends BaseComponent<Props, State> {
     this.props.onDelete.failureCallback(reason);
 
   render() {
-    const {isLoading, error, emptyMessage, dropdown, input} = this.props;
+    const {isLoading, error, emptyMessage, dropdown, formModal} = this.props;
     const data = Object.entries(this.state)
                        .filter(([_, data]) => data)
                        .map(([data, _]) => data);
@@ -163,15 +163,18 @@ export default class ControlledList extends BaseComponent<Props, State> {
               </ul>
             </>
           )}
-          {input && (
+          {formModal && (
             <>
               <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
-                      data-position="bottom" data-tooltip={input.title}
+                      data-position="bottom" data-tooltip={formModal.title}
                       data-target="input-dialog">
                 <i className="material-icons">add</i>
               </button>
-              <InputDialog title={input?.title} fields={input?.fields} values={input?.values} confirmCallback={this.onAddInput}>
-                {input?.input}
+              <InputDialog title={formModal?.title}
+                           fields={formModal?.fields}
+                           values={formModal?.values}
+                           confirmCallback={this.onAddInput}>
+                {formModal?.content}
               </InputDialog>
             </>
           )}

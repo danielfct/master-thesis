@@ -15,48 +15,53 @@ type Props = InputDialogProps;
 
 export default class InputDialog extends BaseComponent<Props, {}> {
 
-  private modal = createRef<HTMLDivElement>();
+  private scrollMaxHeight = document.body.clientHeight * 0.7;
+
   private scrollbar: (ScrollBar | null) = null;
+  private modal = createRef<HTMLDivElement>();
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    M.Modal.init(this.modal.current as Element, { preventScrolling: false });
-    this.scrollbar?.updateScroll();
+    M.Modal.init(this.modal.current as Element, { preventScrolling: false, onOpenEnd: this.onModalOpen });
   }
 
-  componentDidMount(): void {
+  private onModalOpen = (): void => {
     this.scrollbar?.updateScroll();
-  }
+  };
 
-  private confirmCallback = () =>
-    this.props.confirmCallback('test'); //TODO
+  private confirmCallback = (values: IValues): void => {
+    let modal = M.Modal.getInstance(this.modal.current as Element);
+    modal.close();
+    this.props.confirmCallback(values);
+  };
 
   render() {
     const {title, fields, values, children} = this.props;
     return (
       <div>
         <div id="input-dialog" className='modal dialog' ref={this.modal}>
-          {/*//TODO fix scrollbar*/}
-          <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}
-                     component='div'>
+          <ScrollBar ref={(ref) => { this.scrollbar = ref; }}
+                     component={'div'}
+                     style={{maxHeight: Math.floor(this.scrollMaxHeight)}}>
             <div className="modal-content">
-
               <div className='modal-title'>{title}</div>
               <Form id='inputDialog'
                     fields={fields}
                     values={values}
-                    showControls={false}>
+                    controlsMode={'form'}
+                    onModalConfirm={this.confirmCallback}>
                 {children}
               </Form>
             </div>
-            <div className='modal-footer dialog-footer'>
-              <button className="modal-close waves-effect waves-red btn-flat white-text">
+            {/*<div className='modal-footer dialog-footer'>
+              <button className="modal-close waves-effect waves-light btn-flat red-text">
                 Cancel
               </button>
-              <button className="modal-close waves-effect waves-green btn-flat white-text"
+              <button className="modal-close waves-effect waves-light btn-flat green-text"
+                      type="submit"
                       onClick={this.confirmCallback}>
                 Confirm
               </button>
-            </div>
+            </div>*/}
           </ScrollBar>
         </div>
       </div>

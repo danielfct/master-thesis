@@ -40,8 +40,7 @@ export class Dropdown extends React.Component<Props, {}> {
         disabled={disabled}
         onChange={onChange}
         onBlur={onBlur}
-        ref={this.dropdown}
-      >
+        ref={this.dropdown}>
         {options && (
           <>
             {options.defaultValue && (

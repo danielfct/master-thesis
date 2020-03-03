@@ -85,8 +85,10 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
             className={`${styles.link}`}/>*/}
     </ListItem>;
 
-  private onAdd = (prediction: string): void =>
-    this.props.onAddServicePrediction(prediction);
+  private onAdd = (prediction: IValues): void => {
+    console.log(prediction)
+    /*this.props.onAddServicePrediction(prediction);*/
+  }
 
   private onRemove = (predictions: string[]) =>
     this.props.onRemoveServicePredictions(predictions);
@@ -119,18 +121,23 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
-  private input = () =>
+  private addModal = () =>
     <div>
       <Field key='name' id='name' label='name'/>
       <Field key='description' id='description' label='description' type='multilinetextbox'/>
-      {/*<div style={{display: 'flex'}}>*/}
-        <Field key='startDate' id='startDate' label='startDate' type='datepicker'/>{/* //TODO mindate*/}
-        <Field key='startTime' id='startTime' label='startTime' type='timepicker'/>
-      {/*</div>
-      <div style={{display: 'flex'}}>*/}
-       {/* <Field key='endTime' id='endTime' label='endTime'/>
-        <Field key='minReplicas' id='minReplicas' label='minReplicas'/>*/}
-      {/*</div>*/}
+      <div className={'col s6 inline-field'}>
+        <Field key='startDate' id='startDate' label='startDate' type='datepicker'/>
+      </div>
+      <div className={'col s6 inline-field'}>
+        <Field key='startTime' id='startTime' label='startTime' type='timepicker' icon={false}/>
+      </div>
+      <div className={'col s6 inline-field'}>
+        <Field key='endDate' id='endDate' label='endDate' type='datepicker'/>
+      </div>
+      <div className={'col s6 inline-field'}>
+        <Field key='endTime' id='endTime' label='endTime' type='timepicker' icon={false}/>
+      </div>
+      <Field key='minReplicas' id='minReplicas' label='minReplicas'/>
     </div>;
 
   render() {
@@ -138,14 +145,14 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
                            error={this.props.error}
                            emptyMessage={`Predictions list is empty`}
                            data={this.props.predictions}
-                           input={{
+                           formModal={{
                              title: 'Add prediction',
                              fields: this.getFields(),
                              values: emptyPrediction(),
-                             input: this.input()
+                             content: this.addModal()
                            }}
                            show={this.prediction}
-                           onAdd={this.onAdd}
+                           onAddInput={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
                              url: `services/${this.props.service.serviceName}/predictions`,
