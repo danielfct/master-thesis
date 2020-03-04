@@ -64,7 +64,7 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
   List<RuleEntity> getRules(@Param("serviceName") String serviceName);
 
   @Query("select r.rule "
-      + "from ServiceEntity s inner join s.rules r "
+      + "from ServiceEntity s join s.rules r "
       + "where s.serviceName = :serviceName and r.rule.name = :ruleName")
   Optional<RuleEntity> getRule(@Param("serviceName") String serviceName, @Param("ruleName") String ruleName);
 

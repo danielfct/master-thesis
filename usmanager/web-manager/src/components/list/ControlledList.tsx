@@ -4,7 +4,7 @@ import List from "./List";
 import styles from "./ControlledList.module.css";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import BaseComponent from "../BaseComponent";
-import {deleteData, patchData, RestOperation} from "../../utils/api";
+import {deleteData, RestOperation} from "../../utils/api";
 import {decodeHTML} from "../../utils/text";
 import InputDialog from "../dialogs/InputDialog";
 import {IFields, IValues} from "../form/Form";
@@ -15,7 +15,7 @@ interface ControlledListProps {
   emptyMessage: string;
   data: string[];
   dropdown?: { id: string, title: string, empty: string, data: string[] };
-  formModal?: { title: string, fields: IFields, values: IValues, content: JSX.Element };
+  formModal?: { key: string, title: string, fields: IFields, values: IValues, content: JSX.Element };
   show: (index: number, element: string, separate: boolean, checked: boolean,
          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void) => JSX.Element;
   onAdd?: (data: string) => void;
@@ -81,6 +81,8 @@ export default class ControlledList extends BaseComponent<Props, State> {
   };
 
   private onAddInput = (input: any): void => {
+    const key = this.props.formModal && input[this.props.formModal.key];
+    this.setState({ [key]: { isChecked: false, isNew: true } });
     this.props.onAddInput?.(input);
   };
 
@@ -95,12 +97,10 @@ export default class ControlledList extends BaseComponent<Props, State> {
     if (persistedData.length) {
       const {url} = this.props.onDelete;
       if (persistedData.length == 1) {
-        deleteData(`${url}/${persistedData[0]}`,
-          () => this.onDeleteSuccess(persistedData), this.onDeleteFailure);
+        deleteData(`${url}/${persistedData[0]}`, () => this.onDeleteSuccess(persistedData), this.onDeleteFailure);
       }
       else {
-        patchData(url, persistedData,
-          () => this.onDeleteSuccess(persistedData), this.onDeleteFailure, "delete");
+        deleteData(url, () => this.onDeleteSuccess(persistedData), this.onDeleteFailure, persistedData);
       }
     }
   };
@@ -165,17 +165,17 @@ export default class ControlledList extends BaseComponent<Props, State> {
           )}
           {formModal && (
             <>
-              <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
-                      data-position="bottom" data-tooltip={formModal.title}
-                      data-target="input-dialog">
-                <i className="material-icons">add</i>
-              </button>
               <InputDialog title={formModal?.title}
                            fields={formModal?.fields}
                            values={formModal?.values}
                            confirmCallback={this.onAddInput}>
                 {formModal?.content}
               </InputDialog>
+              <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                      data-position="bottom" data-tooltip={formModal.title}
+                      data-target="input-dialog">
+                <i className="material-icons">add</i>
+              </button>
             </>
           )}
           <button className="btn-flat btn-small waves-effect waves-light red-text right"

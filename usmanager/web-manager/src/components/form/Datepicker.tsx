@@ -50,15 +50,15 @@ export class Datepicker extends React.Component<Props, State> {
   render() {
     const {className, id, name, value, disabled} = this.props;
     return (
-      <input type="text"
-             className={`datepicker ${className}`}
-             id={id}
-             name={name}
-             value={value}
-             disabled={disabled}
-             autoComplete="off"
-             ref={this.datepicker}/>
-
+      <input
+        className={`datepicker ${className}`}
+        type="text"
+        id={id}
+        name={name}
+        value={value}
+        disabled={disabled}
+        autoComplete="off"
+        ref={this.datepicker}/>
     );
   }
 

@@ -838,7 +838,7 @@ public class DatabaseLoader {
 
       // rules
       var cpuAndRamPercentageOver90Rule = RuleEntity.builder()
-          .name("%CPU > 90% and %RAM > 90")
+          .name("CPUandRAMover90")
           .componentType(host)
           .priority(1)
           .decision(hostDecisionStart)

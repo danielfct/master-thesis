@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackagesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
@@ -110,7 +111,7 @@ public class RulesService {
                       FieldRepository fieldRepo, OperatorRepository operatorRepo,
                       ComponentTypeRepository componentTypeRepo, DecisionsService decisions,
                       ConditionRepository conditionRepo, ValueModeRepository valueModeRepo,
-                      AppPackagesService appsService, ServicesService servicesService,
+                      AppPackagesService appsService, @Lazy ServicesService servicesService,
                       RulesProperties rulesProperties) {
     this.rules = ruleRepo;
     this.ruleConditions = ruleConditionRepo;
@@ -151,6 +152,10 @@ public class RulesService {
 
   public RuleEntity getRule(long id) {
     return rules.findById(id).orElseThrow(() -> new NotFoundException("Rule not found"));
+  }
+
+  public RuleEntity getRule(String name) {
+    return rules.findByNameIgnoreCase(name).orElseThrow(() -> new NotFoundException("Rule not found"));
   }
 
   /*public long addRuleRule rule, long componentTypeId, long decisionId) {

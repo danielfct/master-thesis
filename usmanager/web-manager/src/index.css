@@ -587,3 +587,35 @@ textarea {
 .inline-field {
     padding-left: 0 !important;
 }
+
+.invalidate-field {
+    border-bottom: 1px solid #F44336 !important;
+    box-shadow: 0 1px 0 0 #F44336 !important;
+}
+
+.validate-field {
+    border-bottom: 1px solid #4CAF50 !important;
+    box-shadow: 0 1px 0 0 #4CAF50 !important;
+}
+
+.no-validation-field {
+    border-bottom: 1px solid #9e9e9e !important;
+    box-shadow: inherit !important;
+}
+
+/*TODO: fix dropdown validations*/
+
+select.invalidate-field ~ input.select-dropdown {
+    border-bottom: 1px solid #F44336 !important;
+    box-shadow: 0 1px 0 0 #F44336 !important;
+}
+
+select.validate-field ~ input.select-dropdown {
+    border-bottom: 1px solid #4CAF50 !important;
+    box-shadow: 0 1px 0 0 #4CAF50 !important;
+}
+
+select.no-validation-field ~ input.select-dropdown {
+    border-bottom: 1px solid #9e9e9e !important;
+    box-shadow: inherit !important;
+}

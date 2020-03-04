@@ -49,6 +49,11 @@ public class AppPackagesService {
         .orElseThrow(() -> new NotFoundException("App package not found"));
   }
 
+  public AppPackage getApp(String name) {
+    return apps.findByNameIgnoreCase(name)
+        .orElseThrow(() -> new NotFoundException("App package not found"));
+  }
+
   public List<ServiceOrder> getServiceByAppId(long appId) {
     return apps.getServiceOrderByService(appId);
   }

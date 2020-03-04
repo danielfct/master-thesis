@@ -55,15 +55,17 @@ interface FormPageProps {
   delete?: RestOperation;
   controlsMode?: 'top' | 'form';
   onModalConfirm?: (values: IValues) => void;
+  saveEntities?: (args: any) => void;
 }
 
 type Props = FormPageProps & RouteComponentProps;
 
 interface State {
   values: IValues;
+  savedValues: IValues;
   errors: IErrors;
   isEditing: boolean;
-  showSaveButton: boolean;
+  needsSave: boolean;
 }
 
 export interface IFormContext extends State {
@@ -104,24 +106,27 @@ class Form extends React.Component<Props, State> {
 
   state: State = {
     values: this.props.values,
+    savedValues: this.props.values,
     errors: {},
     isEditing: this.props.isNew == undefined || this.props.isNew,
-    showSaveButton: false,
+    needsSave: false,
   };
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if (prevProps.showSaveButton != this.props.showSaveButton || prevState.values != this.state.values) {
       this.setState({
-        showSaveButton: this.props.showSaveButton
-          || this.props.isNew
-          || !isEqualWith(this.props.values, this.state.values, (first, second) =>
-            ((typeof first == 'boolean' && typeof second == 'string' && first.toString() == second)
-              || (typeof first == 'string' && typeof second == 'boolean') && first == second.toString()
-              || (typeof first == 'number' && typeof second == 'string') && first.toString() == second
-              || (typeof first == 'string' && typeof second == 'number') && first == second.toString()) || undefined)
+        needsSave: this.props.showSaveButton || this.props.isNew || this.entityNeedsSave()
       })
     }
   }
+
+  private entityNeedsSave = () =>
+    !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
+      ((typeof first == 'boolean' && typeof second == 'string' && first.toString() == second)
+        || (typeof first == 'string' && typeof second == 'boolean') && first == second.toString()
+        || (typeof first == 'number' && typeof second == 'string') && first.toString() == second
+        || (typeof first == 'string' && typeof second == 'number') && first == second.toString()) || undefined)
+
 
   private validate = (fieldName: string): string => {
     const {fields} = this.props;
@@ -162,20 +167,31 @@ class Form extends React.Component<Props, State> {
     if (!this.validateForm()) {
       return;
     }
-    const {id, isNew, post, put} = this.props;
+    const {id, isNew, post, put, saveEntities} = this.props;
     const args = this.state.values[id];
     if (isNew) {
       if (post?.url) {
         postData(post.url, this.state.values,
-          () => post.successCallback(args),
+          () => {
+            this.setState({savedValues: this.state.values});
+            post.successCallback(args);
+          },
           () => post.failureCallback(args));
       }
     }
     else {
       if (put?.url) {
-        putData(put.url, this.state.values,
-          () => put.successCallback(args),
-          () => put.failureCallback(args));
+        if (this.entityNeedsSave()) {
+          putData(put.url, this.state.values,
+            () => {
+              this.setState({savedValues: this.state.values});
+              put.successCallback(args)
+            },
+            () => put.failureCallback(args));
+        }
+        else {
+          saveEntities?.(args);
+        }
       }
     }
   };
@@ -201,7 +217,7 @@ class Form extends React.Component<Props, State> {
       setValues: this.setValues,
       validate: this.validate
     };
-    const {showSaveButton} = this.state;
+    const {needsSave} = this.state;
     const {id, isNew, values, controlsMode, children} = this.props;
     return (
       <>
@@ -230,7 +246,7 @@ class Form extends React.Component<Props, State> {
                       Delete
                     </button>
                     <button className={`btn-flat btn-small waves-effect waves-light green-text slide`}
-                            style={showSaveButton ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                            style={needsSave ? {transform: "scale(1)"} : {transform: "scale(0)"}}
                             type="submit">
                       Save
                     </button>

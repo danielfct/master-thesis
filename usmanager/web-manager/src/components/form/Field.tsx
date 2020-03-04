@@ -8,7 +8,6 @@ import {MultilineTextBox} from "./MultilineTextBox";
 import {Dropdown} from "./Dropdown";
 import {Datepicker} from "./Datepicker";
 import {Timepicker} from "./Timepicker";
-import styles from './Field.module.css';
 
 export interface IValidation {
   rule: (values: IValues, fieldName: string, args: any) => string;
@@ -56,13 +55,13 @@ export default class Field extends React.Component<FieldProps> {
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
       const hasErrors = getError(errors);
       if (hasErrors) {
-        return styles.invalidateField;
+        return "invalidate-field";
       }
       else if (!hasErrors && !disabled && (getTypeFromValue(value) !== 'text' || value)) {
-        return styles.validateField;
+        return "validate-field";
       }
       else {
-        return styles.noValidationField;
+        return "no-validation-field";
       }
     };
     return (

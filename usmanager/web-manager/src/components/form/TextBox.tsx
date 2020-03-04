@@ -16,20 +16,17 @@ export class TextBox extends React.Component<TextBoxProps, any> {
   render(): any {
     const {className, id, name, value, disabled, onChange, onBlur} = this.props;
     return (
-      <>
-        <input
-          className={className}
-          id={id}
-          name={name}
-          type={getTypeFromValue(value)}
-          value={value}
-          disabled={disabled}
-          autoComplete="off"
-          onChange={onChange}
-          onBlur={onBlur}
-          formNoValidate={true}
-        />
-      </>
+      <input
+        className={className}
+        id={id}
+        name={name}
+        type={getTypeFromValue(value)}
+        value={value}
+        disabled={disabled}
+        autoComplete="off"
+        onChange={onChange}
+        onBlur={onBlur}
+        formNoValidate={true}/>
     )
   }
 

@@ -90,6 +90,7 @@ const sendData = (endpoint: string, method: Method, data: any,
       'Accept': 'application/json;charset=UTF-8',
     },
     data,
+    timeout: TIMEOUT,
   }).then((response: AxiosResponse) => {
     console.log(response);
     successCallback(response)
@@ -99,7 +100,10 @@ const sendData = (endpoint: string, method: Method, data: any,
   })
 };
 
-export function deleteData(endpoint: string, successCallback: () => void, failureCallback: (reason: string) => void): void {
+export function deleteData(endpoint: string,
+                           successCallback: () => void,
+                           failureCallback: (reason: string) => void,
+                           data?: any): void {
   const url = new URL(endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`);
   console.log(`DELETE ${url}`);
   axios.delete(url.href, {
@@ -109,6 +113,7 @@ export function deleteData(endpoint: string, successCallback: () => void, failur
       'Content-type': 'application/json;charset=UTF-8',
       'Accept': 'application/json;charset=UTF-8',
     },
+    data,
     timeout: TIMEOUT,
   }).then((response: AxiosResponse) => {
     console.log(response);

@@ -55,8 +55,11 @@ class Services extends BaseComponent<Props, {}> {
   private service = (service: IService): JSX.Element =>
     <ServiceCard key={service.id} service={service}/>;
 
-  private predicate = (service: IService, search: string): boolean =>
-    service.serviceName.includes(search);
+  private predicate = (service: IService, search: string): boolean => {
+    console.log(service)
+    return service.serviceName.includes(search);
+  }
+
 
   render = () =>
     <MainLayout>

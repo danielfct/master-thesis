@@ -33,7 +33,6 @@ import {Link, withRouter} from "react-router-dom";
 import ControlledList from "../../components/list/ControlledList";
 import ListItem from "../../components/list/ListItem";
 import styles from "../../components/list/ListItem.module.css";
-import PerfectScrollbar from "react-perfect-scrollbar";
 
 export interface IServiceDependency extends IService {
 }

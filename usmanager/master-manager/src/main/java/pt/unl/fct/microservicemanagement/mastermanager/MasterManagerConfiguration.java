@@ -31,7 +31,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MasterManagerConfiguration implements WebMvcConfigurer {
 
-  //TODO ver se é necessário
   @Override
   public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/**");

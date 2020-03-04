@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -38,5 +39,7 @@ public interface RuleRepository extends CrudRepository<RuleEntity, Long> {
       + "from RuleEntity r inner join r.componentType rt "
       + "where rt.name = :componentType")
   List<RuleEntity> getRulesByComponentType(@Param("componentType") String componentType);
+
+  Optional<RuleEntity> findByNameIgnoreCase(@Param("name") String name);
 
 }

@@ -4,28 +4,25 @@ import Data from "../../components/IData";
 import BaseComponent from "../../components/BaseComponent";
 import ListItem from "../../components/list/ListItem";
 import styles from "../../components/list/ListItem.module.css";
-import {Link} from "react-router-dom";
 import ControlledList from "../../components/list/ControlledList";
 import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {
-  addServiceDependency, addServicePrediction,
-  loadServiceDependencies,
+  addServicePrediction,
   loadServicePredictions,
-  loadServices,
-  removeServiceDependencies, removeServicePredictions
+  removeServicePredictions
 } from "../../actions";
 import {connect} from "react-redux";
-import {IFields, IValues, required, requiredAndNotAllowed, requiredAndNumberAndMin} from "../../components/form/Form";
+import {IFields, IValues, required, requiredAndNumberAndMin} from "../../components/form/Form";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 
 export interface IPrediction extends Data {
   name: string;
   description: string;
-  startDate: string;   //TODO type?
-  startTime: string;   //TODO type?
-  endDate: string;   //TODO type?
-  endTime: string;   //TODO type?
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
   minReplicas: number;
 }
 
@@ -53,8 +50,8 @@ interface DispatchToProps {
 
 interface ServicePredictionListProps {
   service: IService | Partial<IService>;
-  newPredictions: string[];
-  onAddServicePrediction: (prediction: string) => void;
+  newPredictions: IPrediction[];
+  onAddServicePrediction: (prediction: IPrediction) => void;
   onRemoveServicePredictions: (prediction: string[]) => void;
 }
 
@@ -86,9 +83,8 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
     </ListItem>;
 
   private onAdd = (prediction: IValues): void => {
-    console.log(prediction)
-    /*this.props.onAddServicePrediction(prediction);*/
-  }
+    this.props.onAddServicePrediction(prediction as IPrediction);
+  };
 
   private onRemove = (predictions: string[]) =>
     this.props.onRemoveServicePredictions(predictions);
@@ -146,6 +142,7 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
                            emptyMessage={`Predictions list is empty`}
                            data={this.props.predictions}
                            formModal={{
+                             key: 'name',
                              title: 'Add prediction',
                              fields: this.getFields(),
                              values: emptyPrediction(),

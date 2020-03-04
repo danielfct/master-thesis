@@ -26,11 +26,12 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackagesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.SaveServiceEventPredictionReq;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
@@ -51,10 +52,15 @@ public class ServicesService {
 
   private final ServiceRepository services;
   private final ServiceEventPredictionRepository serviceEventPredictions;
+  private final RulesService rulesService;
+  private final AppPackagesService appsService;
 
-  public ServicesService(ServiceRepository services, ServiceEventPredictionRepository serviceEventPredictions) {
+  public ServicesService(ServiceRepository services, ServiceEventPredictionRepository serviceEventPredictions,
+                         RulesService rulesService, AppPackagesService appsService) {
     this.services = services;
     this.serviceEventPredictions = serviceEventPredictions;
+    this.rulesService = rulesService;
+    this.appsService = appsService;
   }
 
   public Iterable<ServiceEntity> getServices() {
@@ -110,7 +116,7 @@ public class ServicesService {
 
   public void addApp(String serviceName, String appName) {
     var service = getService(serviceName);
-    var app = getApp(serviceName, appName);
+    var app = appsService.getApp(appName);
     //TODO define launchOrder
     var appService = AppService.builder().appPackage(app).service(service).launchOrder(0).build();
     service = service.toBuilder().appService(appService).build();
@@ -122,7 +128,7 @@ public class ServicesService {
   }
 
   public void removeApp(String serviceName, String app) {
-    removeDependencies(serviceName, List.of(app));
+    removeApps(serviceName, List.of(app));
   }
 
   public void removeApps(String serviceName, List<String> apps) {
@@ -194,16 +200,14 @@ public class ServicesService {
     predictions.forEach(prediction -> addPrediction(serviceName, prediction));
   }
 
-  public void removePrediction(String serviceName, EventPredictionEntity prediction) {
-    removePredictions(serviceName, List.of(prediction));
+  public void removePrediction(String serviceName, String predictionName) {
+    removePredictions(serviceName, List.of(predictionName));
   }
 
-  public void removePredictions(String serviceName, List<EventPredictionEntity> predictions) {
+  public void removePredictions(String serviceName, List<String> predictionsName) {
     var service = getService(serviceName);
-    log.info("Removing predictions {}", predictions);
-    var predictionsNames = predictions.stream().map(EventPredictionEntity::getName).collect(Collectors.toList());
     service.getEventPredictions()
-        .removeIf(prediction -> predictionsNames.contains(prediction.getName()));
+        .removeIf(prediction -> predictionsName.contains(prediction.getName()));
     services.save(service);
   }
 
@@ -223,13 +227,14 @@ public class ServicesService {
   public RuleEntity getRule(String serviceName, String ruleName) {
     assertServiceExists(serviceName);
     return services.getRule(serviceName, ruleName).orElseThrow(() ->
-        new EntityNotFoundException(RuleEntity.class, "ruleName", ruleName)
+        new EntityNotFoundException(RuleEntity.class, "name", ruleName)
     );
   }
 
   public void addRule(String serviceName, String ruleName) {
     var service = getService(serviceName);
-    var rule = getRule(serviceName, ruleName);
+    var rule = rulesService.getRule(ruleName);
+    log.info("Adding rule {}", ruleName);
     var serviceRule = ServiceRuleEntity.builder().service(service).rule(rule).build();
     service = service.toBuilder().rule(serviceRule).build();
     services.save(service);
@@ -249,48 +254,6 @@ public class ServicesService {
     service.getRules()
         .removeIf(rule -> rulesName.contains(rule.getRule().getName()));
     services.save(service);
-  }
-
-
-  /*public Long addServiceEventPrediction(Long serviceId, ServiceEventPrediction serviceEventPrediction) {
-        services.findById(serviceId).orElseThrow(NotFoundException::new);
-        //TODO add serviceEventPrediction to service and then save it
-        return serviceEventPredictions.save(serviceEventPrediction).getId();
-    }
-
-    public void updateServiceEventPrediction(Long serviceId,
-                                             final Long serviceEventPredictionId,
-                                             final ServiceEventPrediction newServiceEventPrediction) {
-        final var service = services.findById(serviceId)
-                .orElseThrow(NotFoundException::new);
-        final var serviceEventPrediction = services.getServiceEventPrediction(serviceId, serviceEventPredictionId)
-                .orElseThrow(NotFoundException::new);
-        Utils.copyValidProperties(newServiceEventPrediction, serviceEventPrediction);
-        serviceEventPrediction.setService(service);
-        serviceEventPrediction.setLastUpdate(Timestamp.from(Instant.now()));
-        serviceEventPredictions.save(serviceEventPrediction);
-    }*/
-
-  public Long saveServiceEventPrediction(Long id, SaveServiceEventPredictionReq serviceEventPredictionReq) {
-    var service = getService(serviceEventPredictionReq.getServiceId());
-    var description = serviceEventPredictionReq.getDescription();
-    var startDate = serviceEventPredictionReq.getStartDateTimeStamp();
-    var endDate = serviceEventPredictionReq.getEndDateTimeStamp();
-    var minReplicas = serviceEventPredictionReq.getMinReplicas();
-    var updateTime = Timestamp.from(Instant.now());
-
-    /*EventPredictionEntity serviceEventPredition =
-        (id > 0 ? getEventPrediction(service.getId(), id).toBuilder() : EventPredictionEntity.builder())
-            .service(service).description(description).startDate(startDate).endDate(endDate).minReplicas(minReplicas)
-            .lastUpdate(updateTime).build();
-    service.addEventPrediction(serviceEventPredition);
-    services.save(service);*/
-
-    EventPredictionEntity serviceEventPredition =
-        (id > 0 ? serviceEventPredictions.findById(id).get().toBuilder() : EventPredictionEntity.builder())
-            .service(service).description(description).startDate(startDate).endDate(endDate).minReplicas(minReplicas)
-            .lastUpdate(updateTime).build();
-    return serviceEventPredictions.save(serviceEventPredition).getId();
   }
 
   public void deleteServiceEventPrediction(Long serviceId, Long serviceEventPredictionId) {

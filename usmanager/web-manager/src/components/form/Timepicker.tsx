@@ -54,16 +54,14 @@ export class Timepicker extends React.Component<Props, State> {
   render() {
     const {className, id, name, value, disabled} = this.props;
     return (
-      <input type="text"
-             className={`timepicker ${className}`}
+      <input className={`timepicker ${className}`}
+             type="text"
              id={id}
              name={name}
              value={value}
              disabled={disabled}
              autoComplete="off"
-             ref={this.timepicker}
-      />
-
+             ref={this.timepicker}/>
     )
   }
 

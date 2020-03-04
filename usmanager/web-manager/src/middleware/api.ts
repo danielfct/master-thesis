@@ -92,7 +92,7 @@ const dependeeSchema: schema.Entity<IDependee> = new schema.Entity('dependees', 
 });
 const dependees = new schema.Array(dependeeSchema);
 
-const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('dependees', {}, {
+const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predictions', {}, {
     idAttribute: (prediction: IPrediction) => prediction.name
 });
 const predictions = new schema.Array(predictionSchema);

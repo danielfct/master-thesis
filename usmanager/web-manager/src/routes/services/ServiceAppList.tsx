@@ -106,7 +106,7 @@ class ServiceAppList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `services/${this.props.service.serviceName}/dependencies`,
+                             url: `services/${this.props.service.serviceName}/apps`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;

@@ -27,6 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.AppRule;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -49,4 +50,8 @@ public interface AppPackageRepository extends CrudRepository<AppPackage, Long> {
       + "where a.id = :appId")
   List<AppRule> getRules(@Param("appId") long appId);
 
+  Optional<AppPackage> findByNameIgnoreCase(@Param("name") String name);
+
 }
+
+

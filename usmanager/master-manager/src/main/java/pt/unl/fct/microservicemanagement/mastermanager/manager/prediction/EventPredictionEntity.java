@@ -27,8 +27,9 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,6 +39,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -45,6 +47,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Builder(toBuilder = true)
@@ -65,17 +68,21 @@ public class EventPredictionEntity {
 
   private String description;
 
-  @Basic
-  private Timestamp startDate;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  @JsonFormat(pattern = "dd/MM/yyyy")
+  private LocalDate startDate;
 
-  @Basic
-  private Timestamp startTime;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+  @JsonFormat(pattern = "HH:mm")
+  private LocalTime startTime;
 
-  @Basic
-  private Timestamp endDate;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  @JsonFormat(pattern = "dd/MM/yyyy")
+  private LocalDate endDate;
 
-  @Basic
-  private Timestamp endTime;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+  @JsonFormat(pattern = "HH:mm")
+  private LocalTime endTime;
 
   private int minReplicas;
 
@@ -85,7 +92,6 @@ public class EventPredictionEntity {
   private ServiceEntity service;
 
   @JsonIgnore
-  @Basic
   private Timestamp lastUpdate;
 
   @Override

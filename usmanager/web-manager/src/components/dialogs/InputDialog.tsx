@@ -37,22 +37,21 @@ export default class InputDialog extends BaseComponent<Props, {}> {
   render() {
     const {title, fields, values, children} = this.props;
     return (
-      <div>
-        <div id="input-dialog" className='modal dialog' ref={this.modal}>
-          <ScrollBar ref={(ref) => { this.scrollbar = ref; }}
-                     component={'div'}
-                     style={{maxHeight: Math.floor(this.scrollMaxHeight)}}>
-            <div className="modal-content">
-              <div className='modal-title'>{title}</div>
-              <Form id='inputDialog'
-                    fields={fields}
-                    values={values}
-                    controlsMode={'form'}
-                    onModalConfirm={this.confirmCallback}>
-                {children}
-              </Form>
-            </div>
-            {/*<div className='modal-footer dialog-footer'>
+      <div id="input-dialog" className='modal dialog' ref={this.modal}>
+        <ScrollBar ref={(ref) => { this.scrollbar = ref; }}
+                   component={'div'}
+                   style={{maxHeight: Math.floor(this.scrollMaxHeight)}}>
+          <div className="modal-content">
+            <div className='modal-title'>{title}</div>
+            <Form id='inputDialog'
+                  fields={fields}
+                  values={values}
+                  controlsMode={'form'}
+                  onModalConfirm={this.confirmCallback}>
+              {children}
+            </Form>
+          </div>
+          {/*<div className='modal-footer dialog-footer'>
               <button className="modal-close waves-effect waves-light btn-flat red-text">
                 Cancel
               </button>
@@ -62,8 +61,7 @@ export default class InputDialog extends BaseComponent<Props, {}> {
                 Confirm
               </button>
             </div>*/}
-          </ScrollBar>
-        </div>
+        </ScrollBar>
       </div>
     );
   }
