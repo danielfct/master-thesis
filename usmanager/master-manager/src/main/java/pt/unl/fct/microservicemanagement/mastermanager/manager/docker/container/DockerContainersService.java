@@ -31,7 +31,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundExcept
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackagesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -75,7 +75,7 @@ public class DockerContainersService {
 
   private final DockerCoreService dockerCoreService;
   private final DockerNodesService dockerNodesService;
-  private final AppPackagesService appPackagesService;
+  private final AppsService appsService;
   private final ServicesService serviceService;
   private final NginxLoadBalancerService nginxLoadBalancerService;
   private final EurekaService eurekaService;
@@ -86,13 +86,13 @@ public class DockerContainersService {
 
   //FIXME remove @Lazy
   public DockerContainersService(DockerCoreService dockerCoreService, DockerNodesService dockerNodesService,
-                                 AppPackagesService appPackagesService, ServicesService serviceService,
+                                 AppsService appsService, ServicesService serviceService,
                                  @Lazy NginxLoadBalancerService nginxLoadBalancerService,
                                  @Lazy EurekaService eurekaService, @Lazy HostsService hostsService,
                                  DockerProperties dockerProperties, ContainerProperties containerProperties) {
     this.dockerCoreService = dockerCoreService;
     this.dockerNodesService = dockerNodesService;
-    this.appPackagesService = appPackagesService;
+    this.appsService = appsService;
     this.serviceService = serviceService;
     this.nginxLoadBalancerService = nginxLoadBalancerService;
     this.eurekaService = eurekaService;
@@ -115,7 +115,7 @@ public class DockerContainersService {
     var serviceContainers = new HashMap<String, List<SimpleContainer>>();
     var dynamicLaunchParams = new HashMap<String, String>();
     log.info("Launching app '{}' at {}, {}, {}", applicationId, region, country, city);
-    appPackagesService.getServiceByAppId(applicationId).stream()
+    appsService.getServiceByAppId(applicationId).stream()
         .filter(serviceOrder -> !Objects.equals(serviceOrder.getService().getServiceType(), "database"))
         .map(ServiceOrder::getService)
         .forEach(service -> {

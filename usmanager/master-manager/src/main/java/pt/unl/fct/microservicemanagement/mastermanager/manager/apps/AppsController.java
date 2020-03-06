@@ -24,18 +24,19 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.AppRule;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.AppRuleReq;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.AddServiceApp;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,67 +45,83 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/apps")
 public final class AppsController {
 
-  private final AppPackagesService appPackagesService;
-  private final RulesService ruleService;
+  private final AppsService appsService;
 
-  public AppsController(AppPackagesService appPackagesService, RulesService ruleService) {
-    this.appPackagesService = appPackagesService;
-    this.ruleService = ruleService;
+  public AppsController(AppsService appsService) {
+    this.appsService = appsService;
   }
 
   @GetMapping
   public Iterable<AppPackage> getApps() {
-    return appPackagesService.getApps();
+    return appsService.getApps();
   }
 
-  @GetMapping("/{appId}")
-  public AppPackage getApp(@PathVariable long appId) {
-    return appPackagesService.getApp(appId);
+  @GetMapping("/{appName}")
+  public AppPackage getApp(@PathVariable String appName) {
+    return appsService.getApp(appName);
   }
 
-  @PostMapping("/{appId}")
-  public long saveApp(@PathVariable long appId, @RequestBody SaveAppReq saveAppReq) {
-    return appPackagesService.saveApp(appId, saveAppReq);
+  @PostMapping
+  public AppPackage addApp(@RequestBody AppPackage app) {
+    Validation.validatePostRequest(app.getId());
+    return appsService.addApp(app);
   }
 
-  /*@PostMapping
-  public long addApp(@JsonValue final String appName) {
-    return appPackageService.addApp(appName);
+  @PutMapping("/{appName}")
+  public AppPackage updateApp(@PathVariable String appName, @RequestBody AppPackage app) {
+    Validation.validatePutRequest(app.getId());
+    return appsService.updateApp(appName, app);
   }
 
-  @PutMapping("/{appId}")
-  public void updateApp(@PathVariable long appId,
-                        @JsonValue String appName) {
-    appPackageService.updateApp(appId, appName);
-  }*/
-
-  @DeleteMapping("/{appId}")
-  public void deleteApp(@PathVariable long appId) {
-    appPackagesService.deleteApp(appId);
+  @DeleteMapping("/{appName}")
+  public void deleteApp(@PathVariable String serviceName) {
+    appsService.deleteApp(serviceName);
   }
 
-  @GetMapping("/{appId}/services")
-  public List<ServiceOrder> getServicesByAppId(@PathVariable long appId) {
-    return appPackagesService.getServiceByAppId(appId);
+  @GetMapping("/{appName}/services")
+  public List<AppServiceEntity> getAppServices(@PathVariable String appName) {
+    return appsService.getServices(appName);
   }
 
-
-  //TODO move to rules service
-
-  @GetMapping("/{appId}/rules")
-  public List<AppRule> getAppRulesByAppId(@PathVariable long appId) {
-    return ruleService.getAppRulesByAppId(appId);
+  @PostMapping("/{appName}/services")
+  public void addAppServices(@PathVariable String appName,
+                             @RequestBody AddServiceApp[] services) {
+    appsService.addServices(appName, Arrays.asList(services));
   }
 
-  @PostMapping("/{appId}/rules")
-  public long saveAppRule(@PathVariable long appId, @RequestBody AppRuleReq appRule) {
-    return ruleService.saveAppRule(appId, appRule.getRuleId());
+  @DeleteMapping("/{appName}/services")
+  public void removeAppServices(@PathVariable String appName,
+                                @RequestBody String[] services) {
+    appsService.removeServices(appName, Arrays.asList(services));
   }
 
-  @DeleteMapping("/{appId}/rules")
-  public boolean deleteAppRule(@PathVariable long appId, @RequestBody AppRuleReq appRule)
-      {
-    return ruleService.deleteAppRule(appId, appRule.getRuleId());
+  @DeleteMapping("/{appName}/services/{serviceName}")
+  public void removeAppService(@PathVariable String appName,
+                               @PathVariable String serviceName) {
+    appsService.removeService(appName, serviceName);
+  }
+
+  @GetMapping("/{appName}/rules")
+  public List<AppRule> getAppRules(@PathVariable String appName) {
+    return appsService.getRules(appName);
+  }
+
+  @PostMapping("/{appName}/rules")
+  public void addAppRules(@PathVariable String appName,
+                          @RequestBody String[] rules) {
+    appsService.addRules(appName, Arrays.asList(rules));
+  }
+
+  @DeleteMapping("/{appName}/rules")
+  public void removeAppRules(@PathVariable String appName,
+                             @RequestBody String[] rules) {
+    appsService.removeRules(appName, Arrays.asList(rules));
+  }
+
+  @DeleteMapping("/{appName}/rules/{ruleName}")
+  public void removeAppRule(@PathVariable String appName,
+                            @PathVariable String ruleName) {
+    appsService.removeService(appName, ruleName);
   }
 
 }

@@ -85,8 +85,8 @@ public class ServicesController {
 
   @PostMapping("/{serviceName}/apps")
   public void addServiceApps(@PathVariable String serviceName,
-                             @RequestBody String[] apps) {
-    servicesService.addApps(serviceName, Arrays.asList(apps));
+                             @RequestBody AddServiceApp[] addServiceApps) {
+    servicesService.addApps(serviceName, Arrays.asList(addServiceApps));
   }
 
   @DeleteMapping("/{serviceName}/apps")

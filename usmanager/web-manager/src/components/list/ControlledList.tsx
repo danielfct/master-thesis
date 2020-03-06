@@ -9,13 +9,25 @@ import {decodeHTML} from "../../utils/text";
 import InputDialog from "../dialogs/InputDialog";
 import {IFields, IValues} from "../form/Form";
 
+type FormModal = {
+  id: string,
+  dataKey: string,
+  title?: string,
+  fields: IFields,
+  values: IValues,
+  position?: string,
+  content: () => JSX.Element,
+  onOpen?: (selected: any) => void,
+  selected?: any,
+};
+
 interface ControlledListProps {
   isLoading: boolean;
   error?: string | null;
   emptyMessage: string;
   data: string[];
-  dropdown?: { id: string, title: string, empty: string, data: string[] };
-  formModal?: { key: string, title: string, fields: IFields, values: IValues, content: JSX.Element };
+  dropdown?: { id: string, title: string, empty: string, data: string[], formModal?: FormModal};
+  formModal?: FormModal;
   show: (index: number, element: string, separate: boolean, checked: boolean,
          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void) => JSX.Element;
   onAdd?: (data: string) => void;
@@ -34,6 +46,7 @@ export default class ControlledList extends BaseComponent<Props, State> {
 
   private globalCheckbox = createRef<HTMLInputElement>();
   private dropdown = createRef<HTMLButtonElement>();
+  private selected?: string;
 
   state: State = {};
 
@@ -80,8 +93,16 @@ export default class ControlledList extends BaseComponent<Props, State> {
     this.props.onAdd?.(data);
   };
 
-  private onAddInput = (input: any): void => {
-    const key = this.props.formModal && input[this.props.formModal.key];
+  private onAddDropdownModalInput = (input: any): void => {
+    if (this.selected && this.props.dropdown?.formModal) {
+      input = { [this.props.dropdown?.formModal.dataKey]: this.selected, ...input };
+      this.setState({ [this.selected]: { isChecked: false, isNew: true } });
+      this.props.onAddInput?.(input);
+    }
+  };
+
+  private onAddFormModalInput = (input: any): void => {
+    const key = this.props.formModal && input[this.props.formModal.dataKey];
     this.setState({ [key]: { isChecked: false, isNew: true } });
     this.props.onAddInput?.(input);
   };
@@ -119,6 +140,22 @@ export default class ControlledList extends BaseComponent<Props, State> {
   private onDeleteFailure = (reason: string): void =>
     this.props.onDelete.failureCallback(reason);
 
+  private inputDialog = (formModal: FormModal, preSelected?: boolean): JSX.Element => {
+    return <InputDialog id={formModal.id}
+                        title={formModal.title}
+                        fields={formModal.fields}
+                        values={formModal.values}
+                        position={formModal.position}
+                        confirmCallback={preSelected ? this.onAddDropdownModalInput : this.onAddFormModalInput}
+    open={!!formModal.selected}>
+      {formModal?.content()}
+    </InputDialog>;
+  };
+  private setSelected = (event: any) => {
+    this.selected = decodeHTML((event.target as HTMLLIElement).innerHTML);
+    this.props.dropdown?.formModal?.onOpen?.(this.selected);
+  };
+
   render() {
     const {isLoading, error, emptyMessage, dropdown, formModal} = this.props;
     const data = Object.entries(this.state)
@@ -155,28 +192,26 @@ export default class ControlledList extends BaseComponent<Props, State> {
                 </li>
                 <PerfectScrollbar>
                   {dropdown.data.map((data, index) =>
-                    <li key={index} onClick={this.onAdd}>
-                      <a>{data}</a>
+                    <li key={index} onClick={!dropdown?.formModal ? this.onAdd : this.setSelected}>
+                      <a className={'modal-trigger'} data-target={dropdown.formModal?.id}>
+                        {data}
+                      </a>
                     </li>
                   )}
                 </PerfectScrollbar>
               </ul>
+              {dropdown?.formModal && this.inputDialog(dropdown?.formModal, true)}
             </>
           )}
-          {formModal && (
-            <>
-              <InputDialog title={formModal?.title}
-                           fields={formModal?.fields}
-                           values={formModal?.values}
-                           confirmCallback={this.onAddInput}>
-                {formModal?.content}
-              </InputDialog>
-              <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
-                      data-position="bottom" data-tooltip={formModal.title}
-                      data-target="input-dialog">
-                <i className="material-icons">add</i>
-              </button>
-            </>
+          {(formModal &&
+              <>
+                  <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                          data-position="bottom" data-tooltip={formModal.title}
+                          data-target={formModal.id}>
+                      <i className="material-icons">add</i>
+                  </button>
+                {this.inputDialog(formModal)}
+              </>
           )}
           <button className="btn-flat btn-small waves-effect waves-light red-text right"
                   style={Object.values(this.state)

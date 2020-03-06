@@ -45,7 +45,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
@@ -67,7 +66,7 @@ public class AppPackage {
   @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "appPackage", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<AppService> appServices;
+  private Set<AppServiceEntity> appServices;
 
   @Singular
   @JsonIgnore

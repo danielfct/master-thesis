@@ -26,7 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule;
 
 import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackagesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.Event;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
@@ -94,7 +94,6 @@ public class RulesService {
   private final ConditionRepository conditions;
   private final ValueModeRepository valueModes;
 
-  private final AppPackagesService appsService;
   private final ServicesService servicesService;
 
   private final String containerRuleTemplateFile;
@@ -111,7 +110,7 @@ public class RulesService {
                       FieldRepository fieldRepo, OperatorRepository operatorRepo,
                       ComponentTypeRepository componentTypeRepo, DecisionsService decisions,
                       ConditionRepository conditionRepo, ValueModeRepository valueModeRepo,
-                      AppPackagesService appsService, @Lazy ServicesService servicesService,
+                      @Lazy ServicesService servicesService,
                       RulesProperties rulesProperties) {
     this.rules = ruleRepo;
     this.ruleConditions = ruleConditionRepo;
@@ -125,7 +124,6 @@ public class RulesService {
     this.decisions = decisions;
     this.conditions = conditionRepo;
     this.valueModes = valueModeRepo;
-    this.appsService = appsService;
     this.servicesService = servicesService;
     this.containerRuleTemplateFile = rulesProperties.getContainerRuleTemplateFile();
     this.hostRuleTemplateFile = rulesProperties.getHostRuleTemplateFile();
@@ -321,23 +319,6 @@ public class RulesService {
 
   public List<AppRule> getAppRulesByAppId(long appId) {
     return appRules.getAppRulesByAppId(appId);
-  }
-
-  public long saveAppRule(long appId, long ruleId) {
-    var appRule = appRules.getAppRuleByAppIdAndRuleId(appId, ruleId);
-    final long id;
-    if (appRule != null) {
-      id = appRule.getId();
-    } else {
-      appRule = new AppRule();
-      final var appPackage = appsService.getApp(appId);
-      appRule.setAppPackage(appPackage);
-      final var rule = getRule(ruleId);
-      appRule.setRule(rule);
-      id = appRules.save(appRule).getId();
-    }
-    setLastUpdateAppRules();
-    return id;
   }
 
   public boolean deleteAppRule(long appId, long ruleId) {

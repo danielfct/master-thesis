@@ -28,6 +28,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AppServiceRepository extends CrudRepository<AppService, Long> {
+public interface AppServiceRepository extends CrudRepository<AppServiceEntity, Long> {
 
 }

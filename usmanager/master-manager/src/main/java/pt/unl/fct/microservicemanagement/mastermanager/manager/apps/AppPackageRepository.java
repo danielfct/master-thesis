@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.AppRule;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,12 +34,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 
 @Repository
 public interface AppPackageRepository extends CrudRepository<AppPackage, Long> {
 
-  //TODO fix path
+  @Query("select case when count(a) > 0 then true else false end "
+      + "from AppPackage a "
+      + "where a.id = :appId")
+  boolean hasApp(@Param("appId") long appId);
+
+  @Query("select case when count(a) > 0 then true else false end "
+      + "from AppPackage a "
+      + "where a.name = :appName")
+  boolean hasApp(@Param("appName") String appName);
+
   @Query("select new pt.unl.fct.microservicemanagement.mastermanager.manager.services"
       + ".ServiceOrder(s.service, s.launchOrder) "
       + "from AppPackage a inner join a.appServices s "
@@ -47,10 +56,15 @@ public interface AppPackageRepository extends CrudRepository<AppPackage, Long> {
 
   @Query("select r "
       + "from AppPackage a join a.appRules r "
-      + "where a.id = :appId")
-  List<AppRule> getRules(@Param("appId") long appId);
+      + "where a.name = :appName")
+  List<AppRule> getRules(@Param("appName") String appName);
 
   Optional<AppPackage> findByNameIgnoreCase(@Param("name") String name);
+
+  @Query("select s "
+      + "from AppPackage a join a.appServices s "
+      + "where a.name = :appName")
+  List<AppServiceEntity> getServices(@Param("appName") String appName);
 
 }
 

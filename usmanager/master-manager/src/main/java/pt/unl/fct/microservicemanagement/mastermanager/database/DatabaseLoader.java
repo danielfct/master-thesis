@@ -26,7 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.database;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackageRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostRepository;
@@ -419,79 +419,79 @@ public class DatabaseLoader {
           .build();
       appPackages.save(sockShop);
 
-      var sockShopFrontend = AppService.builder()
+      var sockShopFrontend = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(frontend)
           .launchOrder(25)
           .build();
       appServices.save(sockShopFrontend);
-      var sockShopUser = AppService.builder()
+      var sockShopUser = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(user)
           .launchOrder(10)
           .build();
       appServices.save(sockShopUser);
-      var sockShopUserDb = AppService.builder()
+      var sockShopUserDb = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(userDb)
           .launchOrder(0)
           .build();
       appServices.save(sockShopUserDb);
-      var sockShopCatalogue = AppService.builder()
+      var sockShopCatalogue = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(catalogue)
           .launchOrder(5)
           .build();
       appServices.save(sockShopCatalogue);
-      var sockShopCatalogueDb = AppService.builder()
+      var sockShopCatalogueDb = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(catalogueDb)
           .launchOrder(0)
           .build();
       appServices.save(sockShopCatalogueDb);
-      var sockShopPayment = AppService.builder()
+      var sockShopPayment = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(payment)
           .launchOrder(5)
           .build();
       appServices.save(sockShopPayment);
-      var sockShopCarts = AppService.builder()
+      var sockShopCarts = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(carts)
           .launchOrder(10)
           .build();
       appServices.save(sockShopCarts);
-      var sockShopCartsDb = AppService.builder()
+      var sockShopCartsDb = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(cartsDb)
           .launchOrder(0)
           .build();
       appServices.save(sockShopFrontend);
-      var sockShopOrders = AppService.builder()
+      var sockShopOrders = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(orders)
           .launchOrder(20)
           .build();
       appServices.save(sockShopOrders);
-      var sockShopOrdersDb = AppService.builder()
+      var sockShopOrdersDb = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(ordersDb)
           .launchOrder(0)
           .build();
       appServices.save(sockShopCartsDb);
-      var sockShopShipping = AppService.builder()
+      var sockShopShipping = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(shipping)
           .launchOrder(15)
           .build();
       appServices.save(sockShopShipping);
-      var sockShopQueueMaster = AppService.builder()
+      var sockShopQueueMaster = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(queueMaster)
           .launchOrder(15)
           .build();
       appServices.save(sockShopQueueMaster);
-      var sockShopRabbitmq = AppService.builder()
+      var sockShopRabbitmq = AppServiceEntity.builder()
           .appPackage(sockShop)
           .service(rabbitmq)
           .launchOrder(5)

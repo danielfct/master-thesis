@@ -33,7 +33,7 @@ import {IRegion} from "../routes/region/Region";
 import {IDependee} from "../routes/services/ServiceDependeeList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {IRule} from "../routes/services/ServiceRuleList";
-import {IApp} from "../routes/services/ServiceAppList";
+import {IApp, IAppService} from "../routes/services/ServiceAppList";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -69,6 +69,7 @@ interface ISchemas {
     SERVICE_RULE: schema.Entity<IRule>;
     SERVICE_RULE_ARRAY: schema.Entity<IRule>[];
     APP: schema.Entity<IApp>;
+    APP_SERVICE_ARRAY: schema.Entity<IAppService>[];
     APP_ARRAY: schema.Entity<IApp>[];
     REGION: schema.Entity<IRegion>;
     REGION_ARRAY: schema.Entity<IRegion>[];
@@ -81,6 +82,12 @@ const appSchema: schema.Entity<IApp> = new schema.Entity('apps', {}, {
     idAttribute: (app: IApp) => app.name
 });
 const apps = new schema.Array(appSchema);
+const appServiceSchema: schema.Entity<IAppService> = new schema.Entity('appServices', undefined, {
+    idAttribute: (app: IAppService) => app.service.serviceName
+});
+apps.define({
+    appServiceSchema
+});
 
 const dependencySchema: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', {}, {
     idAttribute: (dependency: IServiceDependency) => dependency.serviceName
@@ -111,6 +118,7 @@ const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {
 }, {
     idAttribute: (service: IService) => service.serviceName
 });
+const services = new schema.Array(serviceSchema);
 
 const regionSchema: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
     idAttribute: (region: IRegion) => region.name.toString()
@@ -135,6 +143,7 @@ export const Schemas: ISchemas = {
     SERVICE_RULE_ARRAY: [ruleSchema],
     APP: appSchema,
     APP_ARRAY: [appSchema],
+    APP_SERVICE_ARRAY: [appServiceSchema],
     REGION: regionSchema,
     REGION_ARRAY: [regionSchema],
     RULE: ruleSchema,

@@ -218,6 +218,21 @@ const fetchApps = (name?: string) => ({
         entity: 'apps'
       }
 });
+export const APP_SERVICES_REQUEST = 'APP_SERVICES_REQUEST';
+export const APP_SERVICES_SUCCESS = 'APP_SERVICES_SUCCESS';
+export const APP_SERVICES_FAILURE = 'APP_SERVICES_FAILURE';
+export const loadAppServices = (appName: string) => (dispatch: any) => {
+  return dispatch(fetchAppServices(appName));
+};
+const fetchAppServices = (appName: string) => ({
+  [CALL_API]: {
+    types: [ APP_SERVICES_REQUEST, APP_SERVICES_SUCCESS, APP_SERVICES_FAILURE ],
+    endpoint: `apps/${appName}/services`,
+    schema: Schemas.APP_SERVICE_ARRAY,
+    entity: appName
+  }
+});
+
 
 export const REGIONS_REQUEST = 'REGIONS_REQUEST';
 export const REGIONS_SUCCESS = 'REGIONS_SUCCESS';

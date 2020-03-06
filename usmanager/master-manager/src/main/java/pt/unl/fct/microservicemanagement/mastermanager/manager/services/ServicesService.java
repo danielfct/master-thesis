@@ -24,10 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackagesService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleEntity;
@@ -40,7 +41,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -53,10 +53,10 @@ public class ServicesService {
   private final ServiceRepository services;
   private final ServiceEventPredictionRepository serviceEventPredictions;
   private final RulesService rulesService;
-  private final AppPackagesService appsService;
+  private final AppsService appsService;
 
   public ServicesService(ServiceRepository services, ServiceEventPredictionRepository serviceEventPredictions,
-                         RulesService rulesService, AppPackagesService appsService) {
+                         RulesService rulesService, @Lazy AppsService appsService) {
     this.services = services;
     this.serviceEventPredictions = serviceEventPredictions;
     this.rulesService = rulesService;
@@ -114,17 +114,21 @@ public class ServicesService {
     return services.getAppsByServiceName(serviceName);
   }
 
-  public void addApp(String serviceName, String appName) {
+  public void addApp(String serviceName, AddServiceApp addServiceApp) {
     var service = getService(serviceName);
+    var appName = addServiceApp.getName();
+    var launchOrder = addServiceApp.getLaunchOrder();
     var app = appsService.getApp(appName);
-    //TODO define launchOrder
-    var appService = AppService.builder().appPackage(app).service(service).launchOrder(0).build();
+    var appService = AppServiceEntity.builder()
+        .appPackage(app)
+        .service(service)
+        .launchOrder(launchOrder).build();
     service = service.toBuilder().appService(appService).build();
     services.save(service);
   }
 
-  public void addApps(String serviceName, List<String> appNames) {
-    appNames.forEach(appName -> addApp(serviceName, appName));
+  public void addApps(String serviceName, List<AddServiceApp> addServiceApps) {
+    addServiceApps.forEach(addServiceApp -> addApp(serviceName, addServiceApp));
   }
 
   public void removeApp(String serviceName, String app) {

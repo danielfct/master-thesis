@@ -474,7 +474,12 @@ label > span:hover {
 .modal-title {
     color: white;
     font-size: 1.6rem;
-    margin-bottom: 5px;
+    padding: 10px;
+    border-bottom: 2px solid black;
+}
+
+.modal-content {
+    padding: 0 !important;
 }
 
 .modal-message {
@@ -499,6 +504,10 @@ label > span:hover {
 
 .modal .modal-footer {
     height: unset;
+}
+
+.modal .modal-footer .btn-flat.left {
+    margin: 0 10px;
 }
 
 textarea {
@@ -618,4 +627,30 @@ select.validate-field ~ input.select-dropdown {
 select.no-validation-field ~ input.select-dropdown {
     border-bottom: 1px solid #9e9e9e !important;
     box-shadow: inherit !important;
+}
+
+.collapsible {
+    border-top: unset;
+    border-left: unset;
+    border-right: unset;
+    /*background-color: #36393F;*/
+    box-shadow: unset;
+}
+
+.collapsible-header {
+    background-color: #282828;
+    color: white;
+    border: unset;
+    padding-left: unset;
+}
+
+.collapsible-header:focus {
+    outline: unset;
+}
+
+.collapsible-body {
+    background-color: #36393F;
+    color: white;
+    border: 1px solid black;
+    padding: 0;
 }

@@ -59,7 +59,13 @@ import {
   RULES_REQUEST,
   RULES_FAILURE,
   RULES_SUCCESS,
-  SERVICE_PREDICTIONS_SUCCESS, SERVICE_RULES_SUCCESS, APPS_REQUEST, APPS_FAILURE, APPS_SUCCESS
+  SERVICE_PREDICTIONS_SUCCESS,
+  SERVICE_RULES_SUCCESS,
+  APPS_REQUEST,
+  APPS_FAILURE,
+  APPS_SUCCESS,
+  APP_SERVICES_FAILURE,
+  APP_SERVICES_SUCCESS, APP_SERVICES_REQUEST
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
@@ -67,7 +73,7 @@ import {IService} from "../routes/services/Service";
 import {merge, pick, keys } from 'lodash';
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
-import {IApp} from "../routes/services/ServiceAppList";
+import {IApp, IAppService} from "../routes/services/ServiceAppList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {IRule} from "../routes/services/ServiceRuleList";
 import {IDependee} from "../routes/services/ServiceDependeeList";
@@ -89,9 +95,11 @@ export type EntitiesState = {
     loadRulesError?: string | null,
   },
   apps: {
-    data: { [key: number]: IApp },
+    data: { [key: string]: IApp },
     isLoading: boolean,
     error?: string | null,
+    isLoadingServices: boolean,
+    loadServicesError?: string | null,
   },
   regions: {
     data: { [key: string]: IRegion },
@@ -119,6 +127,7 @@ export type EntitiesAction = {
   data?: {
     services?: IService[],
     apps?: IApp[],
+    appServices?: IAppService[],
     appsNames?: string[],
     dependencies?: IService[],
     dependenciesNames?: string[],
@@ -152,7 +161,9 @@ const entities = (state: EntitiesState = {
                     apps: {
                       data: {},
                       isLoading: false,
-                      error: null
+                      error: null,
+                      isLoadingServices: false,
+                      loadServicesError: null,
                     },
                     regions: {
                       data: {},
@@ -171,7 +182,7 @@ const entities = (state: EntitiesState = {
                     },
                   },
                   action: EntitiesAction
-) => {
+): EntitiesState => {
   const { type, error, entity, data } = action;
   switch (type) {
     case SERVICE_REQUEST:
@@ -211,7 +222,7 @@ const entities = (state: EntitiesState = {
           loadAppsError: state.services.loadAppsError,
           isLoadingDependencies: state.services.isLoadingDependencies,
           loadDependenciesError: state.services.loadDependenciesError,
-          isLoadingDependee: state.services.isLoadingDependees,
+          isLoadingDependees: state.services.isLoadingDependees,
           loadDependeesError: state.services.loadDependeesError,
           isLoadingPredictions: state.services.isLoadingPredictions,
           loadPredictionsError: state.services.loadPredictionsError,
@@ -370,7 +381,8 @@ const entities = (state: EntitiesState = {
       return {
         ...state,
         regions: {
-          data: data?.regions,
+          ...state.regions,
+          data: merge({}, pick(state.regions.data, keys(data?.regions)), data?.regions),
           isLoading: false,
           error: null,
         }
@@ -383,24 +395,42 @@ const entities = (state: EntitiesState = {
       return {
         ...state,
         rules: {
-          data: data?.rules,
+          ...state.rules,
+          data: merge({}, pick(state.rules.data, keys(data?.rules)), data?.rules),
           isLoading: false,
           error: null,
         }
       };
     case APPS_REQUEST:
       return merge({}, state, { apps: { isLoading: true } });
+    case APP_SERVICES_REQUEST:
+      return merge({}, state, { apps: { isLoadingServices: true } });
     case APPS_FAILURE:
       return merge({}, state, { apps: { isLoading: false, error: error } });
+    case APP_SERVICES_FAILURE:
+      return merge({}, state, { apps: { isLoadingServices: false, loadServicesError: error } });
     case APPS_SUCCESS:
       return {
         ...state,
         apps: {
-          data: data?.apps,
+          ...state.apps,
+          data: merge({}, pick(state.apps.data, keys(data?.apps)), data?.apps),
           isLoading: false,
           error: null,
         }
       };
+    case APP_SERVICES_SUCCESS:
+      const app = entity && state.apps.data[entity];
+      const services = { services: data?.appServices || [] };
+      const appWithServices = Object.assign(app ? app : [entity], services);
+      const normalizedApp = normalize(appWithServices, Schemas.APP).entities;
+      return merge({}, state, {
+        apps: {
+          data: normalizedApp.apps,
+          isLoadingServices: false,
+          loadServicesError: null
+        }
+      });
     case LOGS_REQUEST:
       return merge({}, state, { logs: { isLoading: true } });
     case LOGS_FAILURE:
@@ -409,7 +439,8 @@ const entities = (state: EntitiesState = {
       return {
         ...state,
         logs: {
-          data: data?.logs,
+          ...state.apps,
+          data: merge({}, pick(state.logs.data, keys(data?.logs)), data?.logs),
           isLoading: false,
           error: null,
         }

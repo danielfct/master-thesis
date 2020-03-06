@@ -21,6 +21,7 @@ export interface FieldProps {
   options?: { defaultValue: string, values: string[] };
   validation?: IValidation;
   icon?: boolean;
+  disabled?: boolean;
 }
 
 export const getTypeFromValue = (value: any): string =>
@@ -50,7 +51,7 @@ export default class Field extends React.Component<FieldProps> {
     formContext.validate(id);
 
   render() {
-    const {id, type, label, options, icon} = this.props;
+    const {id, type, label, options, icon, disabled} = this.props;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
       const hasErrors = getError(errors);
@@ -85,7 +86,7 @@ export default class Field extends React.Component<FieldProps> {
                          id={id}
                          name={id}
                          value={formContext.values[id]}
-                         disabled={!formContext.isEditing}
+                         disabled={disabled || !formContext.isEditing}
                          onChange={e => this.onChange(e, id, formContext)}
                          onBlur={e => this.onBlur(e, id, formContext)}/>
               )}
@@ -94,7 +95,7 @@ export default class Field extends React.Component<FieldProps> {
                                   id={id}
                                   name={id}
                                   value={formContext.values[id]}
-                                  disabled={!formContext.isEditing}
+                                  disabled={disabled || !formContext.isEditing}
                                   onChange={e => this.onChange(e, id, formContext)}
                                   onBlur={e => this.onBlur(e, id, formContext)}/>
               )}
@@ -103,7 +104,7 @@ export default class Field extends React.Component<FieldProps> {
                           id={id}
                           name={id}
                           value={formContext.values[id]}
-                          disabled={!formContext.isEditing}
+                          disabled={disabled || !formContext.isEditing}
                           onChange={e => this.onChange(e, id, formContext)}
                           onBlur={e => this.onBlur(e, id, formContext)}
                           options={options}/>
@@ -113,7 +114,7 @@ export default class Field extends React.Component<FieldProps> {
                             id={id}
                             name={id}
                             value={formContext.values[id]}
-                            disabled={!formContext.isEditing}
+                            disabled={disabled || !formContext.isEditing}
                             onSelect={value => this.onSelect(value, id, formContext)}/>
               )}
               {(type && type.toLowerCase() === "timepicker") && (
@@ -121,7 +122,7 @@ export default class Field extends React.Component<FieldProps> {
                             id={id}
                             name={id}
                             value={formContext.values[id]}
-                            disabled={!formContext?.isEditing}
+                            disabled={disabled || !formContext?.isEditing}
                             onSelect={value => this.onSelect(value, id, formContext)}/>
               )}
               {getError(formContext.errors) && (

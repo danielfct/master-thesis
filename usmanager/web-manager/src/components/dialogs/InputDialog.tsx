@@ -3,12 +3,16 @@ import React, {createRef} from "react";
 import M from "materialize-css";
 import Form, {IFields, IValues} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
+import ResizeObserver from 'react-resize-observer';
 
 interface InputDialogProps {
-  title: string;
-  fields: IFields,
-  values: IValues,
+  id: string;
+  title?: string;
+  fields: IFields;
+  values: IValues;
+  position?: string;
   confirmCallback: (input: any) => void;
+  open?: boolean;
 }
 
 type Props = InputDialogProps;
@@ -21,11 +25,23 @@ export default class InputDialog extends BaseComponent<Props, {}> {
   private modal = createRef<HTMLDivElement>();
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    M.Modal.init(this.modal.current as Element, { preventScrolling: false, onOpenEnd: this.onModalOpen });
+    M.Modal.init(this.modal.current as Element, {
+      preventScrolling: false,
+      startingTop: prevProps.position,
+      endingTop: prevProps.position,
+      onOpenEnd: this.onModalOpen
+    });
+    if (this.props.open) {
+      let modal = M.Modal.getInstance(this.modal.current as Element);
+      modal.open();
+    }
   }
 
-  private onModalOpen = (): void => {
+  private updateScrollbar = () =>
     this.scrollbar?.updateScroll();
+
+  private onModalOpen = (): void => {
+    this.updateScrollbar();
   };
 
   private confirmCallback = (values: IValues): void => {
@@ -35,14 +51,14 @@ export default class InputDialog extends BaseComponent<Props, {}> {
   };
 
   render() {
-    const {title, fields, values, children} = this.props;
+    const {id, title, fields, values, children} = this.props;
     return (
-      <div id="input-dialog" className='modal dialog' ref={this.modal}>
+      <div id={id} className='modal dialog' ref={this.modal}>
         <ScrollBar ref={(ref) => { this.scrollbar = ref; }}
                    component={'div'}
                    style={{maxHeight: Math.floor(this.scrollMaxHeight)}}>
           <div className="modal-content">
-            <div className='modal-title'>{title}</div>
+            {title && <div className='modal-title'>{title}</div>}
             <Form id='inputDialog'
                   fields={fields}
                   values={values}
@@ -51,16 +67,6 @@ export default class InputDialog extends BaseComponent<Props, {}> {
               {children}
             </Form>
           </div>
-          {/*<div className='modal-footer dialog-footer'>
-              <button className="modal-close waves-effect waves-light btn-flat red-text">
-                Cancel
-              </button>
-              <button className="modal-close waves-effect waves-light btn-flat green-text"
-                      type="submit"
-                      onClick={this.confirmCallback}>
-                Confirm
-              </button>
-            </div>*/}
         </ScrollBar>
       </div>
     );

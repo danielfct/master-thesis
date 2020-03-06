@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import javax.persistence.Entity;
@@ -47,12 +48,13 @@ import lombok.Setter;
 @Setter
 @Getter
 @Table(name = "app_services")
-public class AppService {
+public class AppServiceEntity {
 
   @Id
   @GeneratedValue
   private Long id;
 
+  @JsonIgnore
   @ManyToOne
   @JoinColumn(name = "app_package_id")
   private AppPackage appPackage;
@@ -68,10 +70,10 @@ public class AppService {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof AppService)) {
+    if (!(o instanceof AppServiceEntity)) {
       return false;
     }
-    AppService other = (AppService) o;
+    AppServiceEntity other = (AppServiceEntity) o;
     return id != null && id.equals(other.getId());
   }
 

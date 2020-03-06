@@ -142,11 +142,13 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
                            emptyMessage={`Predictions list is empty`}
                            data={this.props.predictions}
                            formModal={{
-                             key: 'name',
+                             id: 'servicePrediction',
+                             dataKey: 'name',
                              title: 'Add prediction',
                              fields: this.getFields(),
                              values: emptyPrediction(),
-                             content: this.addModal()
+                             content: this.addModal,
+                             position: '15%'
                            }}
                            show={this.prediction}
                            onAddInput={this.onAdd}

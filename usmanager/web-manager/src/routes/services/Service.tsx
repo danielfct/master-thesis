@@ -25,7 +25,7 @@
 import React from 'react';
 import {RouteComponentProps} from 'react-router';
 import Form, {
-  IFields,
+  IFields, IValues,
   required,
   requiredAndNotAllowed,
   requiredAndNumberAndMin
@@ -40,8 +40,8 @@ import Field, {getTypeFromValue} from "../../components/form/Field";
 import BaseComponent from "../../components/BaseComponent";
 import Error from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
-import {patchData, postData} from "../../utils/api";
-import ServiceAppList from "./ServiceAppList";
+import {postData} from "../../utils/api";
+import ServiceAppList, {IAddServiceApp} from "./ServiceAppList";
 import ServiceDependencyList from "./ServiceDependencyList";
 import ServiceDependeeList from "./ServiceDependeeList";
 import ServicePredictionList, {IPrediction} from "./ServicePredictionList";
@@ -106,7 +106,7 @@ interface MatchParams {
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
-  newApps: string[],
+  newApps: IAddServiceApp[],
   newDependencies: string[],
   newDependees: string[],
   newPredictions: IPrediction[],
@@ -131,7 +131,7 @@ class Service extends BaseComponent<Props, State> {
     }
   };
 
-  private onAddServiceApp = (app: string): void => {
+  private onAddServiceApp = (app: IAddServiceApp): void => {
     this.setState({
       newApps: this.state.newApps.concat(app)
     });
@@ -139,7 +139,7 @@ class Service extends BaseComponent<Props, State> {
 
   private onRemoveServiceApps = (apps: string[]): void => {
     this.setState({
-      newApps: this.state.newApps.filter(app => !apps.includes(app))
+      newApps: this.state.newApps.filter(app => !apps.includes(app.name))
     });
   };
 
@@ -154,8 +154,8 @@ class Service extends BaseComponent<Props, State> {
 
   private onSaveAppsSuccess = (serviceName: string): void => {
     if (!isNewService(this.props.match.params.name)) {
-      this.state.newApps.forEach(appName =>
-        this.props.addServiceApp(serviceName, appName)
+      this.state.newApps.forEach(app =>
+        this.props.addServiceApp(serviceName, app.name)
       );
     }
     this.setState({ newApps: [] });
