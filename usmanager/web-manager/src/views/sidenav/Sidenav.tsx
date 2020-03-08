@@ -34,7 +34,7 @@ import ScrollBar from "react-perfect-scrollbar";
 const sidenavLinks = [
     { link: '/containers', name: 'Containers' },
     { link: '/nodes', name: 'Nodes' },
-    { link: '/hosts/edge', name: 'Edge Hosts' }, //TODO rename to /hosts and display edge + cloud nodes
+    { link: '/hosts', name: 'Hosts' },
     { link: '/apps', name: 'Apps' },
     { link: '/services', name: 'Services' },
     { link: '/rules', name: 'Rules' },

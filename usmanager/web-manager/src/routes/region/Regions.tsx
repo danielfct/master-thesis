@@ -32,12 +32,13 @@ class Regions extends BaseComponent<Props, {}> {
     <RegionCard key={region.id} region={region}/>;
 
   private predicate = (region: IRegion, search: string): boolean =>
-    region.name.includes(search) || region.description.includes(search);
+    region.name.toLowerCase().includes(search)
+    || region.description.toLowerCase().includes(search);
 
   render() {
     return (
       <MainLayout>
-        <AddButton tooltip={'Add region'} pathname={'/regions/new_region?new=true'}/>
+        <AddButton tooltip={'Add region'} pathname={'/regions/new_region'}/>
         <div className={`${styles.container}`}>
           <CardList<IRegion>
             isLoading={this.props.isLoading}

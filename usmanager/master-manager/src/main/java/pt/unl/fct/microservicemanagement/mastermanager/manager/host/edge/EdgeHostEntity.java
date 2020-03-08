@@ -24,10 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -50,7 +52,8 @@ public class EdgeHostEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
+  @NotNull
+  @Column(unique = true)
   private String hostname;
 
   private String sshUsername;

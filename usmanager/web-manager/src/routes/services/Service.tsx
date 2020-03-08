@@ -25,7 +25,7 @@
 import React from 'react';
 import {RouteComponentProps} from 'react-router';
 import Form, {
-  IFields, IValues,
+  IFields,
   required,
   requiredAndNotAllowed,
   requiredAndNumberAndMin
@@ -34,7 +34,7 @@ import IData from "../../components/IData";
 import {addServiceApp, addServiceDependency, addServicePrediction, addServiceRule, loadServices} from "../../actions";
 import {connect} from "react-redux";
 import MainLayout from "../../views/mainLayout/MainLayout";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingSpinner from "../../components/list/LoadingSpinner";
 import {ReduxState} from "../../reducers";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import BaseComponent from "../../components/BaseComponent";

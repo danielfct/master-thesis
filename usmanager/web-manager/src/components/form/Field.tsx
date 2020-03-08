@@ -8,6 +8,7 @@ import {MultilineTextBox} from "./MultilineTextBox";
 import {Dropdown} from "./Dropdown";
 import {Datepicker} from "./Datepicker";
 import {Timepicker} from "./Timepicker";
+import {NumberBox} from "./NumberBox";
 
 export interface IValidation {
   rule: (values: IValues, fieldName: string, args: any) => string;
@@ -16,7 +17,7 @@ export interface IValidation {
 
 export interface FieldProps {
   id: string;
-  type?: "textbox" | "multilinetextbox" | "dropdown" | "datepicker" | "timepicker";
+  type?: "textbox" | "numberbox" | "multilinetextbox" | "dropdown" | "datepicker" | "timepicker";
   label?: string;
   options?: { defaultValue: string, values: string[] };
   validation?: IValidation;
@@ -25,7 +26,7 @@ export interface FieldProps {
 }
 
 export const getTypeFromValue = (value: any): string =>
-  value === undefined || value === '' || isNaN(value) ? 'text' : 'number';
+  value === undefined || value === '' || typeof value === 'boolean' || isNaN(value) ? 'text' : 'number';
 
 export default class Field extends React.Component<FieldProps> {
 
@@ -89,6 +90,15 @@ export default class Field extends React.Component<FieldProps> {
                          disabled={disabled || !formContext.isEditing}
                          onChange={e => this.onChange(e, id, formContext)}
                          onBlur={e => this.onBlur(e, id, formContext)}/>
+              )}
+              {type && type.toLowerCase() === "numberbox" && (
+                <NumberBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                           id={id}
+                           name={id}
+                           value={formContext.values[id]}
+                           disabled={disabled || !formContext.isEditing}
+                           onChange={e => this.onChange(e, id, formContext)}
+                           onBlur={e => this.onBlur(e, id, formContext)}/>
               )}
               {type && type.toLowerCase() === "multilinetextbox" && (
                 <MultilineTextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}

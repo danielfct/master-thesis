@@ -2,6 +2,7 @@ import * as React from "react";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
 import {PageNumber} from "./PageNumber";
+import styles from './Pagination.module.css';
 
 interface StateToProps {
   sidenavVisible: boolean;
@@ -51,7 +52,7 @@ class Pagination extends React.Component<Props, {}> {
           )}
           {beforeEllipsis.length == 1 && (
             <>
-              <i className="material-icons white-text bottom" style={{margin: '7px 7px 0 7px'}}>more_horiz</i>
+              <i className={`material-icons white-text bottom ${styles.threeDotsIcon}`}>more_horiz</i>
               {afterEllipsis.length == 1 && (
                 betweenEllipsis.map((pageNumber, index) =>
                   <PageNumber key={index} page={pageNumber} active={true}
@@ -61,7 +62,7 @@ class Pagination extends React.Component<Props, {}> {
             </>
           )}
           {afterEllipsis.length == 1 && (
-            <i className="material-icons white-text bottom" style={{margin: '7px 7px 0 7px'}}>more_horiz</i>
+            <i className={`material-icons white-text bottom ${styles.threeDotsIcon}`}>more_horiz</i>
           )}
           {afterEllipsis.map((pageNumber, index) =>
             <PageNumber key={index} page={pageNumber} active={max - (afterEllipsis.length - index) + 1 === page}
@@ -71,7 +72,7 @@ class Pagination extends React.Component<Props, {}> {
     }
     return (
       <ul className='pagination no-select'
-          style={max < 1 ? { visibility: "hidden" } : (sidenavVisible ? {left: "100px"} : undefined)}>
+          style={sidenavVisible ? {left: "100px"} : undefined}>
         <li className={page === 0 ? "disabled" : undefined}>
           <a onClick={prevPage}>
             <i className="material-icons small">chevron_left</i>

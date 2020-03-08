@@ -35,7 +35,8 @@ class LogsList extends React.Component<Props, {}> {
   };
 
   private predicate = (logs: ILogs, search: string): boolean =>
-    logs.formattedMessage.toLowerCase().includes(search) || logs.levelString.toLowerCase().includes(search);
+    logs.formattedMessage.toLowerCase().includes(search)
+    || logs.levelString.toLowerCase().includes(search);
 
   private getLevelColor = (levelString: string) => {
     switch(levelString.toLowerCase()) {

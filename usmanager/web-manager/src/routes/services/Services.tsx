@@ -55,15 +55,12 @@ class Services extends BaseComponent<Props, {}> {
   private service = (service: IService): JSX.Element =>
     <ServiceCard key={service.id} service={service}/>;
 
-  private predicate = (service: IService, search: string): boolean => {
-    console.log(service)
-    return service.serviceName.includes(search);
-  }
-
+  private predicate = (service: IService, search: string): boolean =>
+    service.serviceName.toLowerCase().includes(search);
 
   render = () =>
     <MainLayout>
-      <AddButton tooltip={'Add service'} pathname={'/services/new_service?new=true'}/>
+      <AddButton tooltip={'Add service'} pathname={'/services/new_service'}/>
       <div className={`${styles.container}`}>
         <CardList<IService>
           isLoading={this.props.isLoading}

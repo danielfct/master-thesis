@@ -26,7 +26,7 @@ import React from 'react';
 import M from 'materialize-css';
 import {deleteData, postData} from "../../utils/api";
 
-export default class EdgeHostCard extends React.Component {
+export default class OldEdgeHostCard extends React.Component {
   constructor (props) {
     super(props);
     const edgeHost = this.props.edgeHost;

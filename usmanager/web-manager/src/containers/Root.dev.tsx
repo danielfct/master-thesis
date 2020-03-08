@@ -27,12 +27,10 @@ import M from "materialize-css";
 import {Route, Switch} from "react-router-dom";
 import LoadingBar from "react-redux-loading-bar";
 import Navbar from "../views/navbar/Navbar";
-import Sidenav from "../views/sidenav/Sidenav";
 import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
 import AppPackage from "../routes/apps/AppPackage";
-import EdgeHosts from "../routes/hosts/EdgeHost";
 import Containers from "../routes/containers/Containers";
 import LaunchContainer from "../routes/containers/LaunchContainer";
 import RulesLandingPage from "../routes/rules/RulesLandingPage";
@@ -50,8 +48,6 @@ import GenericHostsRulesList from "../routes/rules/GenericHostsRulesList";
 import GenericHostRulesPage from "../routes/rules/GenericHostRulesPage";
 import ServiceEventPredictions from "../routes/eventPrediction/ServiceEventPrediction";
 import ServiceEventPredictionDetail from "../routes/eventPrediction/ServiceEventPredictionDetail";
-import Nodes from "../routes/nodes/Node";
-import AddNode from "../routes/nodes/AddNode";
 import EurekaPage from "../routes/eureka/Eureka";
 import LoadBalancerPage from "../routes/loadBalancer/LoadBalancer";
 import SimulatedMetricsLandingPage from "../routes/metrics/SimulatedMetricsLandingPage";
@@ -68,10 +64,16 @@ import PageNotFound from "../components/PageNotFound";
 import Login from "../views/login/Login";
 import AuthenticatedRoute from "../components/AuthenticatedRoute";
 import Footer from "../views/footer/Footer";
-import DevTools from "./DevTools";
 import Logs from "../routes/logs/Logs";
 import Region from "../routes/region/Region";
 import Regions from "../routes/region/Regions";
+import Nodes from "../routes/nodes/Nodes";
+import Node from "../routes/nodes/Node";
+import CloudHost from "../routes/hosts/CloudHost";
+import EdgeHost from "../routes/hosts/EdgeHost";
+import Hosts from "../routes/hosts/Hosts";
+import CloudHosts from "../routes/hosts/CloudHosts";
+import EdgeHosts from "../routes/hosts/EdgeHosts";
 
 interface RootContainerProps {
     store: any;
@@ -82,42 +84,46 @@ type Props = RootContainerProps;
 export const authenticatedRoutes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
     "/home": { title: 'Microservices dynamic system management', component: Landing },
     "/services": { title: "Services", component: Services, search: true },
-    "/services/:name": { title: "", component: Service },
-    "/services/service": { title: "", component: Service },
-    "/apps": { title: "", component: AppPackage, search: true },
-    "/hosts/edge": { title: "", component: EdgeHosts, search: true },
-    "/containers": { title: "", component: Containers, search: true },
-    "/containers/launch/:containerId?": { title: "", component: LaunchContainer },
-    "/rules": { title: "", component: Rules, search: true },
-    "/rules/management": { title: "", component: RulesLandingPage, search: true },
+    "/services/:name": { component: Service },
+    "/services/service": { component: Service },
+    "/apps": { component: AppPackage, search: true },
+    "/hosts": { component: Hosts, search: true },
+    "/hosts/cloud": { component: CloudHosts },
+    "/hosts/cloud/:instanceId": { component: CloudHost },
+    "/hosts/edge": { component: EdgeHosts },
+    "/hosts/edge/:hostname": { component: EdgeHost },
+    "/containers": { component: Containers, search: true },
+    "/containers/launch/:containerId?": { component: LaunchContainer },
+    "/rules": { component: Rules, search: true },
+    "/rules/management": { component: RulesLandingPage, search: true },
     "/rules/rules/:ruleId?": { title: "",component: RulePage },
-    "/rules/conditions": { title: "",  component: Conditions, search: true },
-    "/rules/conditions/condition/:conditionId?": { title: "",  component: ConditionPage },
-    "/rules/apps": { title: "",  component: AppsRulesList, search: true },
-    "/rules/apps/app/:appId": { title: "", component: AppRulesPage },
-    "/rules/services": { title: "", component: ServicesRulesList, search: true },
-    "/rules/services/service/:serviceId": { title: "", component: ServiceRulesPage },
-    "/rules/hosts": { title: "", component: HostsRulesList, search: true },
-    "/rules/hosts/host/:hostname": { title: "", component: HostRulesPage },
-    "/rules/generic/hosts": { title: "", component: GenericHostsRulesList, search: true },
-    "/rules/generic/hosts/rule": { title: "", component: GenericHostRulesPage },
-    "/rules/serviceEventPredictions": { title: "", component: ServiceEventPredictions, search: true },
-    "/rules/serviceEventPredictions/serviceEventPrediction/:id?": { title: "", component: ServiceEventPredictionDetail },
-    "/nodes": { title: "", component: Nodes, search: true },
-    "/nodes/add": { title: "", component: AddNode },
-    "/eureka": { title: "", component: EurekaPage, search: true },
-    "/loadbalancer": { title: "", component: LoadBalancerPage, search: true },
-    "/metrics/simulated": { title: "", component: SimulatedMetricsLandingPage, search: true },
-    "/metrics/simulated/services": { title: "", component: ServiceSimulatedMetrics, search: true },
-    "/metrics/simulated/services/service/:id?": { title: "", component: ServiceSimulatedMetricsDetail },
-    "/metrics/simulated/containers": { title: "", component: ContainerSimulatedMetrics, search: true },
-    "/metrics/simulated/containers/metric/:id?": { title: "", component: ContainerSimulatedMetricsDetail },
-    "/metrics/simulated/hosts/default": { title: "", component: DefaultHostSimulatedMetrics, search: true },
-    "/metrics/simulated/hosts/metric/:id?": { title: "", component: DefaultHostSimulatedMetricsDetail },
-    "/metrics/simulated/hosts/specific": { title: "", component: SpecificHostSimulatedMetrics, search: true },
-    "/metrics/simulated/hosts/specific/metric/:id?": { title: "", component: SpecificHostSimulatedMetricsDetail },
-    "/regions": { title: "", component: Regions, search: true },
-    "/regions/:name": { title: "", component: Region },
+    "/rules/conditions": {  component: Conditions, search: true },
+    "/rules/conditions/condition/:conditionId?": {  component: ConditionPage },
+    "/rules/apps": {  component: AppsRulesList, search: true },
+    "/rules/apps/app/:appId": { component: AppRulesPage },
+    "/rules/services": { component: ServicesRulesList, search: true },
+    "/rules/services/service/:serviceId": { component: ServiceRulesPage },
+    "/rules/hosts": { component: HostsRulesList, search: true },
+    "/rules/hosts/host/:hostname": { component: HostRulesPage },
+    "/rules/generic/hosts": { component: GenericHostsRulesList, search: true },
+    "/rules/generic/hosts/rule": { component: GenericHostRulesPage },
+    "/rules/serviceEventPredictions": { component: ServiceEventPredictions, search: true },
+    "/rules/serviceEventPredictions/serviceEventPrediction/:id?": { component: ServiceEventPredictionDetail },
+    "/nodes": { component: Nodes, search: true },
+    "/nodes/:id": { component: Node },
+    "/eureka": { component: EurekaPage, search: true },
+    "/loadbalancer": { component: LoadBalancerPage, search: true },
+    "/metrics/simulated": { component: SimulatedMetricsLandingPage, search: true },
+    "/metrics/simulated/services": { component: ServiceSimulatedMetrics, search: true },
+    "/metrics/simulated/services/service/:id?": { component: ServiceSimulatedMetricsDetail },
+    "/metrics/simulated/containers": { component: ContainerSimulatedMetrics, search: true },
+    "/metrics/simulated/containers/metric/:id?": { component: ContainerSimulatedMetricsDetail },
+    "/metrics/simulated/hosts/default": { component: DefaultHostSimulatedMetrics, search: true },
+    "/metrics/simulated/hosts/metric/:id?": { component: DefaultHostSimulatedMetricsDetail },
+    "/metrics/simulated/hosts/specific": { component: SpecificHostSimulatedMetrics, search: true },
+    "/metrics/simulated/hosts/specific/metric/:id?": { component: SpecificHostSimulatedMetricsDetail },
+    "/regions": { component: Regions, search: true },
+    "/regions/:name": { component: Region },
     "/logs": { title: "Logs", component: Logs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };

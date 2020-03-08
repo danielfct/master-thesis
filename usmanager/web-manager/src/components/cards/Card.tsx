@@ -39,42 +39,36 @@ export default class Card<T> extends React.Component<Props<T>, {}> {
     }
   };
 
-  render() {
-    const {title, link, height, margin, hoverable, children} = this.props;
+  private cardElement = (): JSX.Element => {
+    const {title, height, hoverable, children} = this.props;
     return (
-      <div className={`col s6 m4 l3`} style={{margin}}>
-        <div className={hoverable ? 'hoverable' : undefined}>
-          {title && (
-            link
-              ? <Link to={{
-                pathname: link?.to.pathname,
-                state: link?.to.state}}>
-                <CardTitle title={title}/>
-              </Link>
-              : <CardTitle title={title}/>
-          )}
-          <div className={`card gridCard`}
-               style={{height: height || 150}}
-               ref={this.card}>
-            <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}
-                       component="div">
-              {link
-                ? <Link to={{
-                  pathname: link?.to.pathname,
-                  state: link?.to.state
-                }}>
-                  <div className='card-content' ref={this.cardContent}>
-                    {children}
-                  </div>
-                </Link>
-                : <div className='card-content' ref={this.cardContent}>
-                  {children}
-                </div>
-              }
-            </ScrollBar>
-          </div>
+      <div className={hoverable ? 'hoverable' : undefined}>
+        {title && <CardTitle title={title}/>}
+        <div className={`card gridCard`}
+             style={{height: height || 150}}
+             ref={this.card}>
+          <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}
+                     component="div">
+            <div className='card-content' ref={this.cardContent}>
+              {children}
+            </div>
+          </ScrollBar>
         </div>
       </div>
-    );
-  }
+    )
+  };
+
+  render() {
+    const {link, margin} = this.props;
+    return (
+      <div className={`col s6 m4 l3`} style={{margin}}>
+        {link
+          ? <Link to={{
+            pathname: link?.to.pathname,
+            state: link?.to.state}}>
+            {this.cardElement()}
+          </Link>
+          : this.cardElement()}
+      </div>
+    )}
 }

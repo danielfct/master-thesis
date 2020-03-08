@@ -8,6 +8,7 @@ import {deleteData, RestOperation} from "../../utils/api";
 import {decodeHTML} from "../../utils/text";
 import InputDialog from "../dialogs/InputDialog";
 import {IFields, IValues} from "../form/Form";
+import ScrollBar from "react-perfect-scrollbar";
 
 type FormModal = {
   id: string,
@@ -18,7 +19,7 @@ type FormModal = {
   position?: string,
   content: () => JSX.Element,
   onOpen?: (selected: any) => void,
-  selected?: any,
+  open?: boolean,
 };
 
 interface ControlledListProps {
@@ -46,12 +47,13 @@ export default class ControlledList extends BaseComponent<Props, State> {
 
   private globalCheckbox = createRef<HTMLInputElement>();
   private dropdown = createRef<HTMLButtonElement>();
+  private scrollbar: (ScrollBar | null) = null;
   private selected?: string;
 
   state: State = {};
 
   componentDidMount(): void {
-    M.Dropdown.init(this.dropdown.current as Element);
+    this.init()
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -66,7 +68,17 @@ export default class ControlledList extends BaseComponent<Props, State> {
         return state;
       }, {}));
     }
+    this.init();
   }
+
+  private init = () =>
+    M.Dropdown.init(this.dropdown.current as Element,
+      {
+        onOpenEnd: this.onOpenDropdown
+      });
+
+  private onOpenDropdown = () =>
+    this.scrollbar?.updateScroll();
 
   private handleGlobalCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {checked} = event.target;
@@ -147,7 +159,7 @@ export default class ControlledList extends BaseComponent<Props, State> {
                         values={formModal.values}
                         position={formModal.position}
                         confirmCallback={preSelected ? this.onAddDropdownModalInput : this.onAddFormModalInput}
-    open={!!formModal.selected}>
+                        open={formModal.open}>
       {formModal?.content()}
     </InputDialog>;
   };
@@ -190,10 +202,10 @@ export default class ControlledList extends BaseComponent<Props, State> {
                     {dropdown.data.length ? dropdown.title : dropdown.empty}
                   </a>
                 </li>
-                <PerfectScrollbar>
+                <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
                   {dropdown.data.map((data, index) =>
                     <li key={index} onClick={!dropdown?.formModal ? this.onAdd : this.setSelected}>
-                      <a className={'modal-trigger'} data-target={dropdown.formModal?.id}>
+                      <a>
                         {data}
                       </a>
                     </li>

@@ -654,3 +654,13 @@ select.no-validation-field ~ input.select-dropdown {
     border: 1px solid black;
     padding: 0;
 }
+
+.subtitle {
+    font-size: 1.15rem;
+    color: white;
+}
+
+.dropdown-content a {
+    color: white;
+}
+

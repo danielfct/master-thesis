@@ -26,7 +26,7 @@ import * as React from 'react';
 import FilteredList from './FilteredList';
 import {PagedList} from "./PagedList";
 import SimpleList from "./SimpleList";
-import LoadingSpinner from "../LoadingSpinner";
+import LoadingSpinner from "./LoadingSpinner";
 import Error from "../errors/Error";
 import AnimatedList from "./AnimatedList";
 import Empty from "./Empty";

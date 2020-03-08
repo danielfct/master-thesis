@@ -26,7 +26,7 @@ import React from 'react';
 import M from 'materialize-css';
 import $ from 'jquery';
 import MainLayout from '../../views/mainLayout/MainLayout';
-import EdgeHostCard from './EdgeHostCard';
+import OldEdgeHostCard from './OldEdgeHostCard';
 import {getData} from "../../utils/api";
 
 export default class EdgeHosts extends React.Component {
@@ -87,7 +87,7 @@ export default class EdgeHosts extends React.Component {
   loadHosts = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhosthosts/edge',
+      'http://localhost:8080/hosts/edge',
       data =>
         this.setState({ data: data, loading: false })
     );
@@ -97,8 +97,8 @@ export default class EdgeHosts extends React.Component {
     let edgeHostsNodes;
     if (this.state.data) {
       edgeHostsNodes = this.state.data.map((edgeHost, index) => (
-        <EdgeHostCard key={index} index={index} edgeHost={edgeHost} updateNewEdgeHost={this.updateNewEdgeHost}
-                      onRemove={this.loadHosts}/>
+        <OldEdgeHostCard key={index} index={index} edgeHost={edgeHost} updateNewEdgeHost={this.updateNewEdgeHost}
+                         onRemove={this.loadHosts}/>
       ));
     }
  {/*   <MainLayout title={{title:'Edge hosts'}}>*/}

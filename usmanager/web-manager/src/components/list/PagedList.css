@@ -27,13 +27,11 @@
 
 
 .pagination {
-    position: absolute;
+    /*position: absolute;*/
     width: 100%;
     text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    top: 70px;
-    /*left: 100px;*/
+    margin: -10px auto 10px;
+    /*top: 70px;*/
     right: 0;
 }
 

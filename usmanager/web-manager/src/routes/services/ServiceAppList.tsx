@@ -20,6 +20,7 @@ import Field from "../../components/form/Field";
 import {IFields, IValues, required, requiredAndNumberAndMin} from "../../components/form/Form";
 import List from "../../components/list/List";
 import M from "materialize-css";
+import Collapsible from "../../components/collapsible/Collapsible";
 
 export interface IApp extends Data {
   name: string;
@@ -45,6 +46,7 @@ interface StateToProps {
   error?: string | null;
   apps: { [key: string]: IApp },
   serviceApps: string[];
+  isLoadingAppServices: boolean;
 }
 
 interface DispatchToProps {
@@ -70,19 +72,16 @@ type State = {
 
 class ServiceAppList extends BaseComponent<Props, State> {
 
-  //FIXME: fix scrollbar when collapsible is opened/closed
-
   private collapsible = createRef<HTMLUListElement>();
 
   state: State = {};
-  
+
   componentDidMount(): void {
     this.props.loadApps();
     const {serviceName} = this.props.service;
     if (serviceName) {
       this.props.loadServiceApps(serviceName);
     }
-
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
@@ -106,7 +105,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
     </ListItem>;
 
   private onAdd = (app: IValues): void => {
-    console.log(app)
     this.props.onAddServiceApp(app as IAddServiceApp);
     this.setState({selectedApp: undefined});
   };
@@ -128,8 +126,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
     const {apps, serviceApps} = this.props;
     const {newApps} = this.props;
     const newAppsNames = newApps.map(app => app.name);
-    console.log(serviceApps);
-    console.log(newAppsNames)
     return Object.keys(apps).filter(name => !serviceApps.includes(name) && !newAppsNames.includes(name));
   };
 
@@ -142,9 +138,9 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   private appServicesList = (): IAppService[] | undefined => {
     if (this.state.selectedApp) {
-      return Object.values(this.props.apps[this.state.selectedApp].services)
-                   .filter(service => service.service.serviceName !== this.props.service.serviceName)
-                   .sort((a,b) => a.launchOrder - b.launchOrder);
+      return this.props.apps[this.state.selectedApp] && Object.values(this.props.apps[this.state.selectedApp].services)
+                                                              .filter(service => service.service.serviceName !== this.props.service.serviceName)
+                                                              .sort((a,b) => a.launchOrder - b.launchOrder);
     }
   };
 
@@ -154,20 +150,10 @@ class ServiceAppList extends BaseComponent<Props, State> {
     return (
       <>
         <Field key='launchOrder' id='launchOrder' label='launchOrder'/>
-        <ul className="collapsible" ref={this.collapsible}>
-          <li>
-            <div className="collapsible-header">
-              Other services' launch order
-              <i className="material-icons">arrow_drop_down</i>
-            </div>
-            <div className="collapsible-body">
-              {list &&
-              <OtherServicesList
-                  list={list}
-                  show={this.appServicesLaunchOrder}/>}
-            </div>
-          </li>
-        </ul>
+        <Collapsible id={'otherServicesList'}
+                     title={'Other services\' launch order'}>
+          {list && <OtherServicesList list={list} show={this.appServicesLaunchOrder}/>}
+        </Collapsible>
       </>
     )};
 
@@ -190,6 +176,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   private onModalOpen = (selectedApp: string): void => {
     this.setState({selectedApp: selectedApp});
+    this.props.loadAppServices(selectedApp);
   };
 
   render() {
@@ -210,7 +197,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                                content: this.addModal,
                                position: '20%',
                                onOpen: this.onModalOpen,
-                               selected: this.state.selectedApp,
+                               open: this.state.selectedApp !== undefined && !this.props.isLoadingAppServices,
                              }
                            }}
                            show={this.app}
@@ -235,6 +222,7 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceAppListProps): Stat
     error: state.entities.services.loadAppsError,
     apps: state.entities.apps.data,
     serviceApps: serviceApps || [],
+    isLoadingAppServices: state.entities.apps.isLoadingServices,
   }
 }
 

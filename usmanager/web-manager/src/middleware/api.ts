@@ -34,6 +34,9 @@ import {IDependee} from "../routes/services/ServiceDependeeList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {IRule} from "../routes/services/ServiceRuleList";
 import {IApp, IAppService} from "../routes/services/ServiceAppList";
+import {INode} from "../routes/nodes/Node";
+import {ICloudHost} from "../routes/hosts/CloudHost";
+import {IEdgeHost} from "../routes/hosts/EdgeHost";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -75,19 +78,28 @@ interface ISchemas {
     REGION_ARRAY: schema.Entity<IRegion>[];
     RULE: schema.Entity<IRule>;
     RULE_ARRAY: schema.Entity<IRule>[];
+    NODE: schema.Entity<INode>;
+    NODE_ARRAY: schema.Entity<INode>[];
+    CLOUD_HOST: schema.Entity<ICloudHost>;
+    CLOUD_HOST_ARRAY: schema.Entity<ICloudHost>[];
+    EDGE_HOST: schema.Entity<IEdgeHost>;
+    EDGE_HOST_ARRAY: schema.Entity<IEdgeHost>[];
     LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
-const appSchema: schema.Entity<IApp> = new schema.Entity('apps', {}, {
-    idAttribute: (app: IApp) => app.name
-});
-const apps = new schema.Array(appSchema);
+
 const appServiceSchema: schema.Entity<IAppService> = new schema.Entity('appServices', undefined, {
     idAttribute: (app: IAppService) => app.service.serviceName
 });
-apps.define({
-    appServiceSchema
-});
+const appServices = new schema.Array(appServiceSchema);
+const appSchema: schema.Entity<IApp> = new schema.Entity('apps',
+  {
+      appServices
+  },
+  {
+      idAttribute: (app: IApp) => app.name
+  });
+const apps = new schema.Array(appSchema);
 
 const dependencySchema: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', {}, {
     idAttribute: (dependency: IServiceDependency) => dependency.serviceName
@@ -109,6 +121,11 @@ const ruleSchema: schema.Entity<IRule> = new schema.Entity('rules', {}, {
 });
 const rules = new schema.Array(ruleSchema);
 
+const nodeSchema: schema.Entity<INode> = new schema.Entity('nodes', {}, {
+    idAttribute: (node: INode) => node.id.toString()
+});
+/*const nodes = new schema.Array(nodeSchema);*/
+
 const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {
     apps,
     dependencies,
@@ -118,10 +135,18 @@ const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {
 }, {
     idAttribute: (service: IService) => service.serviceName
 });
-const services = new schema.Array(serviceSchema);
+//const services = new schema.Array(serviceSchema);
 
 const regionSchema: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
-    idAttribute: (region: IRegion) => region.name.toString()
+    idAttribute: (region: IRegion) => region.name
+});
+
+const cloudHostSchema: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', {}, {
+    idAttribute: (host: ICloudHost) => host.instanceId
+});
+
+const edgeHostSchema: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', {}, {
+    idAttribute: (host: IEdgeHost) => host.hostname
 });
 
 const logsSchema: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
@@ -148,6 +173,12 @@ export const Schemas: ISchemas = {
     REGION_ARRAY: [regionSchema],
     RULE: ruleSchema,
     RULE_ARRAY: [ruleSchema],
+    NODE: nodeSchema,
+    NODE_ARRAY: [nodeSchema],
+    CLOUD_HOST: cloudHostSchema,
+    CLOUD_HOST_ARRAY: [cloudHostSchema],
+    EDGE_HOST: edgeHostSchema,
+    EDGE_HOST_ARRAY: [edgeHostSchema],
     LOGS_ARRAY: [logsSchema],
 };
 

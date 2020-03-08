@@ -114,11 +114,11 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
                     </Dropdown>
                 </div>
               )}
-              <Pagination max={this.state.max}
+              {this.state.max > 0 && <Pagination max={this.state.max}
                           page={page}
                           setPage={this.setPage}
                           prevPage={this.prevPage}
-                          nextPage={this.nextPage}/>
+                          nextPage={this.nextPage}/>}
               <SimpleList<T> {...this.props} list={list} show={show}/>
           </div>
         );

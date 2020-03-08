@@ -133,6 +133,7 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceDependencyProps): StateToProps {
+  //FIXME: crashes when not loading from services page
   const serviceName = ownProps.service.serviceName;
   const service = serviceName && state.entities.services.data[serviceName];
   const dependencies = service && service.dependencies;

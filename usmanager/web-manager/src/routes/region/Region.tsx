@@ -1,10 +1,9 @@
 import IData from "../../components/IData";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import {IService} from "../services/Service";
-import Form, {IFields, required, requiredAndNumberAndMin} from "../../components/form/Form";
-import Field, {getTypeFromValue} from "../../components/form/Field";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import Form, {IFields, required} from "../../components/form/Form";
+import Field from "../../components/form/Field";
+import LoadingSpinner from "../../components/list/LoadingSpinner";
 import Error from "../../components/errors/Error";
 import React from "react";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
@@ -96,7 +95,6 @@ class Region extends BaseComponent<Props, {}> {
     const {isLoading, error, formRegion, region} = this.props;
     // @ts-ignore
     const regionKey: (keyof IRegion) = formRegion && Object.keys(formRegion)[0];
-    console.log(region)
     return (
       <>
         {isLoading && <LoadingSpinner/>}
@@ -108,20 +106,17 @@ class Region extends BaseComponent<Props, {}> {
                 isNew={isNewRegion(this.props.match.params.name)}
                 post={{url: 'regions', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
                 put={{url: `regions/${region[regionKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={{url: `regions/${region[regionKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
-          >
+                delete={{url: `regions/${region[regionKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}>
             {Object.keys(formRegion).map((key, index) =>
               key === 'active'
                 ? <Field key={index}
                          id={key}
                          label={key}
                          type="dropdown"
-                         options={{defaultValue: "Is region active?", values: ["True", "False"]}}
-                />
+                         options={{defaultValue: "Is region active?", values: ["True", "False"]}}/>
                 : <Field key={index}
                          id={key}
-                         label={key}
-                />
+                         label={key}/>
             )}
           </Form>
         )}
@@ -150,6 +145,8 @@ class Region extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
+  const isLoading = state.entities.regions?.isLoading;
+  const error = state.entities.regions?.error;
   const name = props.match.params.name;
   const region = isNewRegion(name) ? emptyRegion() : state.entities.regions.data[name];
   let formRegion;
@@ -157,8 +154,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     formRegion = { ...region };
     delete formRegion["id"];
   }
-  const isLoading = state.entities.regions?.isLoading;
-  const error = state.entities.regions?.error;
   return  {
     isLoading,
     error,

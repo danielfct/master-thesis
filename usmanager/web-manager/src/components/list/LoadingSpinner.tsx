@@ -23,21 +23,20 @@
  */
 
 import React from "react";
+import styles from './LoadingSpinner.module.css';
 
 const LoadingSpinner: React.FC = () =>
-  <div className="center-horizontal">
-      <div className="center-vertical">
-          <div className="preloader-wrapper active">
-              <div className="spinner-layer spinner-white-only">
-                  <div className="circle-clipper left">
-                      <div className="circle"/>
-                  </div>
-                  <div className="gap-patch">
-                      <div className="circle"/>
-                  </div>
-                  <div className="circle-clipper right">
-                      <div className="circle"/>
-                  </div>
+  <div className={styles.container}>
+      <div className="preloader-wrapper active">
+          <div className="spinner-layer spinner-white-only">
+              <div className="circle-clipper left">
+                  <div className="circle"/>
+              </div>
+              <div className="gap-patch">
+                  <div className="circle"/>
+              </div>
+              <div className="circle-clipper right">
+                  <div className="circle"/>
               </div>
           </div>
       </div>

@@ -6,12 +6,10 @@ interface Props {
   error?: string;
 }
 
-export default class Empty extends React.Component<Props, {}> {
+const Empty: React.FC<Props> = ({message, error}: Props) =>
+  <div className={`${styles.container}`}>
+    <i className={`${styles.icon} material-icons`}>error_outline</i>
+    <h6 className={`${styles.message}`}>{message} <div className='red-text'>{error || ''}</div></h6>
+  </div>;
 
-  render = () =>
-    <div className={`${styles.container} row`}>
-      <i className={`${styles.icon} material-icons`}>error_outline</i>
-      <h6 className={`${styles.message}`}>{this.props.message} <div className='red-text'>{this.props.error || ''}</div></h6>
-    </div>
-
-}
+export default Empty;

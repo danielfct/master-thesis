@@ -286,6 +286,84 @@ const fetchRules = (name?: string) => ({
       }
 });
 
+export const NODES_REQUEST = 'NODES_REQUEST';
+export const NODES_SUCCESS = 'NODES_SUCCESS';
+export const NODES_FAILURE = 'NODES_FAILURE';
+export const NODE_REQUEST = 'NODE_REQUEST';
+export const NODE_SUCCESS = 'NODE_SUCCESS';
+export const NODE_FAILURE = 'NODE_FAILURE';
+export const loadNodes = (id?: string) => (dispatch: any) => {
+  return dispatch(fetchNodes(id));
+};
+const fetchNodes = (id?: string) => ({
+  [CALL_API]:
+    !id
+      ? {
+        types: [ NODES_REQUEST, NODES_SUCCESS, NODES_FAILURE ],
+        endpoint: `nodes`,
+        schema: Schemas.NODE_ARRAY,
+        entity: 'nodes'
+      }
+      : {
+        types: [ NODE_REQUEST, NODE_SUCCESS, NODE_FAILURE ],
+        endpoint: `nodes/${id}`,
+        schema: Schemas.NODE,
+        entity: 'nodes'
+      }
+});
+
+export const CLOUD_HOSTS_REQUEST = 'CLOUD_HOSTS_REQUEST';
+export const CLOUD_HOSTS_SUCCESS = 'CLOUD_HOSTS_SUCCESS';
+export const CLOUD_HOSTS_FAILURE = 'CLOUD_HOSTS_FAILURE';
+export const CLOUD_HOST_REQUEST = 'CLOUD_HOST_REQUEST';
+export const CLOUD_HOST_SUCCESS = 'CLOUD_HOST_SUCCESS';
+export const CLOUD_HOST_FAILURE = 'CLOUD_HOST_FAILURE';
+export const loadCloudHosts = (instanceId?: string) => (dispatch: any) => {
+  return dispatch(fetchCloudHosts(instanceId));
+};
+const fetchCloudHosts = (instanceId?: string) => ({
+  [CALL_API]:
+    !instanceId
+      ? {
+        types: [ CLOUD_HOSTS_REQUEST, CLOUD_HOSTS_SUCCESS, CLOUD_HOSTS_FAILURE ],
+        endpoint: `hosts/cloud`,
+        schema: Schemas.CLOUD_HOST_ARRAY,
+        entity: 'cloudHosts'
+      }
+      : {
+        types: [ CLOUD_HOST_REQUEST, CLOUD_HOST_SUCCESS, CLOUD_HOST_FAILURE ],
+        endpoint: `hosts/cloud/${instanceId}`,
+        schema: Schemas.CLOUD_HOST,
+        entity: 'cloudHosts'
+      }
+});
+
+export const EDGE_HOSTS_REQUEST = 'EDGE_HOSTS_REQUEST';
+export const EDGE_HOSTS_SUCCESS = 'EDGE_HOSTS_SUCCESS';
+export const EDGE_HOSTS_FAILURE = 'EDGE_HOSTS_FAILURE';
+export const EDGE_HOST_REQUEST = 'EDGE_HOST_REQUEST';
+export const EDGE_HOST_SUCCESS = 'EDGE_HOST_SUCCESS';
+export const EDGE_HOST_FAILURE = 'EDGE_HOST_FAILURE';
+export const loadEdgeHosts = (hostname?: string) => (dispatch: any) => {
+  return dispatch(fetchEdgeHosts(hostname));
+};
+const fetchEdgeHosts = (hostname?: string) => ({
+  [CALL_API]:
+    !hostname
+      ? {
+        types: [ EDGE_HOSTS_REQUEST, EDGE_HOSTS_SUCCESS, EDGE_HOSTS_FAILURE ],
+        endpoint: `hosts/edge`,
+        schema: Schemas.EDGE_HOST_ARRAY,
+        entity: 'edgeHosts'
+      }
+      : {
+        types: [ EDGE_HOST_REQUEST, EDGE_HOST_SUCCESS, EDGE_HOST_FAILURE ],
+        endpoint: `hosts/edge/${hostname}`,
+        schema: Schemas.EDGE_HOST,
+        entity: 'edgeHosts'
+      }
+});
+
 export const LOGS_REQUEST = 'LOGS_REQUEST';
 export const LOGS_SUCCESS = 'LOGS_SUCCESS';
 export const LOGS_FAILURE = 'LOGS_FAILURE';

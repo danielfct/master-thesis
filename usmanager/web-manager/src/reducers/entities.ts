@@ -65,7 +65,13 @@ import {
   APPS_FAILURE,
   APPS_SUCCESS,
   APP_SERVICES_FAILURE,
-  APP_SERVICES_SUCCESS, APP_SERVICES_REQUEST
+  APP_SERVICES_SUCCESS,
+  APP_SERVICES_REQUEST,
+  NODES_REQUEST,
+  NODES_FAILURE,
+  NODES_SUCCESS,
+  CLOUD_HOSTS_REQUEST,
+  CLOUD_HOSTS_FAILURE, CLOUD_HOSTS_SUCCESS, EDGE_HOSTS_REQUEST, EDGE_HOSTS_FAILURE, EDGE_HOSTS_SUCCESS
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
@@ -77,6 +83,9 @@ import {IApp, IAppService} from "../routes/services/ServiceAppList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {IRule} from "../routes/services/ServiceRuleList";
 import {IDependee} from "../routes/services/ServiceDependeeList";
+import {INode} from "../routes/nodes/Node";
+import {ICloudHost} from "../routes/hosts/CloudHost";
+import {IEdgeHost} from "../routes/hosts/EdgeHost";
 
 export type EntitiesState = {
   services: {
@@ -111,6 +120,23 @@ export type EntitiesState = {
     isLoading: boolean,
     error?: string | null,
   },
+  nodes: {
+    data: { [key: string]: INode },
+    isLoading: boolean,
+    error?: string | null,
+  },
+  hosts: {
+    cloud: {
+      data: { [key: string]: ICloudHost },
+      isLoading: boolean,
+      error?: string | null,
+    },
+    edge: {
+      data: { [key: string]: IEdgeHost },
+      isLoading: boolean,
+      error?: string | null,
+    }
+  },
   logs: {
     data: { [key: number]: ILogs },
     isLoading: boolean,
@@ -134,10 +160,13 @@ export type EntitiesAction = {
     dependees?: IDependee[],
     predictions?: IPrediction[],
     predictionsNames?: string[],
+    regions?: IRegion[],
     rules?: IRule[],
     rulesNames?: string[],
+    nodes?: INode[],
+    cloudHosts?: ICloudHost[],
+    edgeHosts?: ICloudHost[],
     logs?: ILogs[],
-    regions?: IRegion[],
     //TODO other entities
   },
 };
@@ -174,6 +203,23 @@ const entities = (state: EntitiesState = {
                       data: {},
                       isLoading: false,
                       error: null
+                    },
+                    nodes: {
+                      data: {},
+                      isLoading: false,
+                      error: null
+                    },
+                    hosts: {
+                      cloud: {
+                        data: {},
+                        isLoading: false,
+                        error: null,
+                      },
+                      edge: {
+                        data: {},
+                        isLoading: false,
+                        error: null,
+                      },
                     },
                     logs: {
                       data: {},
@@ -345,7 +391,7 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         const filteredApps = service.apps?.filter(app => !data?.appsNames?.includes(app));
-        const serviceWithApps = Object.assign(service, {apps: filteredApps});
+        const serviceWithApps = Object.assign(service, { apps: filteredApps });
         return merge({}, state, { services: { data: serviceWithApps } });
       }
       break;
@@ -353,7 +399,7 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         const filteredDependencies = service.dependencies?.filter(dependency => !data?.dependenciesNames?.includes(dependency));
-        const serviceWithDependencies = Object.assign(service, {dependencies: filteredDependencies});
+        const serviceWithDependencies = Object.assign(service, { dependencies: filteredDependencies });
         return merge({}, state, { services: { data: serviceWithDependencies } });
       }
       break;
@@ -383,6 +429,20 @@ const entities = (state: EntitiesState = {
         regions: {
           ...state.regions,
           data: merge({}, pick(state.regions.data, keys(data?.regions)), data?.regions),
+          isLoading: false,
+          error: null,
+        }
+      };
+    case NODES_REQUEST:
+      return merge({}, state, { nodes: { isLoading: true } });
+    case NODES_FAILURE:
+      return merge({}, state, { nodes: { isLoading: false, error: error } });
+    case NODES_SUCCESS:
+      return {
+        ...state,
+        nodes: {
+          ...state.nodes,
+          data: merge({}, pick(state.nodes.data, keys(data?.nodes)), data?.nodes),
           isLoading: false,
           error: null,
         }
@@ -431,6 +491,40 @@ const entities = (state: EntitiesState = {
           loadServicesError: null
         }
       });
+    case CLOUD_HOSTS_REQUEST:
+      return merge({}, state, { hosts: { cloud: { isLoading: true } } });
+    case CLOUD_HOSTS_FAILURE:
+      return merge({}, state, { hosts: { cloud: { isLoading: false, error: error } } });
+    case CLOUD_HOSTS_SUCCESS:
+      return {
+        ...state,
+        hosts: {
+          ...state.hosts,
+          cloud: {
+            ...state.hosts.cloud,
+            data: merge({}, pick(state.hosts.cloud.data, keys(data?.cloudHosts)), data?.cloudHosts),
+            isLoading: false,
+            error: null,
+          }
+        }
+      };
+    case EDGE_HOSTS_REQUEST:
+      return merge({}, state, { hosts: { edge: { isLoading: true } } });
+    case EDGE_HOSTS_FAILURE:
+      return merge({}, state, { hosts: { edge: { isLoading: false, error: error } } });
+    case EDGE_HOSTS_SUCCESS:
+      return {
+        ...state,
+        hosts: {
+          ...state.hosts,
+          edge: {
+            ...state.hosts.edge,
+            data: merge({}, pick(state.hosts.edge.data, keys(data?.edgeHosts)), data?.edgeHosts),
+            isLoading: false,
+            error: null,
+          }
+        }
+      };
     case LOGS_REQUEST:
       return merge({}, state, { logs: { isLoading: true } });
     case LOGS_FAILURE:

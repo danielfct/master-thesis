@@ -30,7 +30,6 @@ import {getTypeFromValue, FieldProps, IValidation} from "./Field";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
 import { isEqualWith } from "lodash";
-import ScrollBar from "react-perfect-scrollbar";
 
 export interface IFields {
   [key: string]: FieldProps;
@@ -56,6 +55,8 @@ interface FormPageProps {
   controlsMode?: 'top' | 'form';
   onModalConfirm?: (values: IValues) => void;
   saveEntities?: (args: any) => void;
+  editable?: boolean;
+  deletable?: boolean;
 }
 
 type Props = FormPageProps & RouteComponentProps;
@@ -218,7 +219,7 @@ class Form extends React.Component<Props, State> {
       validate: this.validate
     };
     const {needsSave} = this.state;
-    const {id, isNew, values, controlsMode, children} = this.props;
+    const {id, isNew, values, controlsMode, editable, deletable, children} = this.props;
     return (
       <>
         <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>
@@ -233,18 +234,22 @@ class Form extends React.Component<Props, State> {
                 </button>
                 :
                 <div>
-                  <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
-                          data-position="bottom" data-tooltip="Edit"
-                          type="button"
-                          onClick={this.onClickEdit}>
-                    <i className="large material-icons">edit</i>
-                  </button>
-                  <div className={`${styles.controlButton}`}>
-                    <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
+                  {(editable == undefined || editable) && (
+                    <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                            data-position="bottom" data-tooltip="Edit"
                             type="button"
-                            data-target="confirm-dialog">
-                      Delete
+                            onClick={this.onClickEdit}>
+                      <i className="large material-icons">edit</i>
                     </button>
+                  )}
+                  <div className={`${styles.controlButton}`}>
+                    {deletable && (
+                      <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
+                              type="button"
+                              data-target="confirm-dialog">
+                        Delete
+                      </button>
+                    )}
                     <button className={`btn-flat btn-small waves-effect waves-light green-text slide`}
                             style={needsSave ? {transform: "scale(1)"} : {transform: "scale(0)"}}
                             type="submit">
