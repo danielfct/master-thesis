@@ -53,7 +53,7 @@ class Region extends BaseComponent<Props, {}> {
     }
   };
 
-  private onPostSuccess = (regionName: string): void => {
+  private onPostSuccess = (reply: any, regionName: string): void => {
     super.toast(`Region <b>${regionName}</b> is now created`);
   };
 
@@ -99,7 +99,7 @@ class Region extends BaseComponent<Props, {}> {
       <>
         {isLoading && <LoadingSpinner/>}
         {error && <Error message={error}/>}
-        {!error && formRegion && (
+        {!isLoading && !error && formRegion && (
           <Form id={regionKey}
                 fields={this.getFields(formRegion)}
                 values={region}
@@ -113,7 +113,7 @@ class Region extends BaseComponent<Props, {}> {
                          id={key}
                          label={key}
                          type="dropdown"
-                         options={{defaultValue: "Is region active?", values: ["True", "False"]}}/>
+                         dropdown={{defaultValue: "Is region active?", values: ["True", "False"]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -145,8 +145,8 @@ class Region extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.regions?.isLoading;
-  const error = state.entities.regions?.error;
+  const isLoading = state.entities.regions.isLoading;
+  const error = state.entities.regions.error;
   const name = props.match.params.name;
   const region = isNewRegion(name) ? emptyRegion() : state.entities.regions.data[name];
   let formRegion;

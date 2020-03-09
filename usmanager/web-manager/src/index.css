@@ -163,6 +163,10 @@ p {
     line-height: 2rem;
 }
 
+ul.tabs {
+    overflow: hidden;
+}
+
 .parallax-container {
     min-height: 380px;
     line-height: 0;

@@ -54,7 +54,7 @@ class CloudHost extends BaseComponent<Props, {}> {
     }
   };
 
-  private onPostSuccess = (cloudHostInstanceId: string): void => {
+  private onPostSuccess = (reply: any, cloudHostInstanceId: string): void => {
     super.toast(`Cloud host <b>${cloudHostInstanceId}</b> has now started`);
   };
 
@@ -93,7 +93,7 @@ class CloudHost extends BaseComponent<Props, {}> {
       <>
         {isLoading && <LoadingSpinner/>}
         {error && <Error message={error}/>}
-        {!error && cloudHost && (
+        {!isLoading && !error && cloudHost && (
           <Form id={cloudHostKey}
                 fields={this.getFields()}
                 values={cloudHost}

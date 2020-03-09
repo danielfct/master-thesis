@@ -270,7 +270,7 @@ class Service extends BaseComponent<Props, State> {
     this.saveServiceRules(serviceName);
   };
 
-  private onPostSuccess = (serviceName: string): void => {
+  private onPostSuccess = (reply: any, serviceName: string): void => {
     super.toast(`Service <b>${serviceName}</b> is now created`);
     this.saveEntities(serviceName);
   };
@@ -325,7 +325,7 @@ class Service extends BaseComponent<Props, State> {
       <>
         {isLoadingServices && <LoadingSpinner/>}
         {loadServicesError && <Error message={loadServicesError}/>}
-        {!loadServicesError && formService && (
+        {!isLoadingServices && !loadServicesError && formService && (
           <Form id={serviceKey}
                 fields={this.getFields(formService)}
                 values={service}
@@ -341,7 +341,7 @@ class Service extends BaseComponent<Props, State> {
                          id={key}
                          type="dropdown"
                          label={key}
-                         options={{defaultValue: "Choose service type", values: ["Frontend", "Backend", "Database", "System"]}}/>
+                         dropdown={{defaultValue: "Choose service type", values: ["Frontend", "Backend", "Database", "System"]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>

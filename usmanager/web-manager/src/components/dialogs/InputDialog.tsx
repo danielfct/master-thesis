@@ -60,7 +60,7 @@ export default class InputDialog extends BaseComponent<Props, {}> {
             <Form id='inputDialog'
                   fields={fields}
                   values={values}
-                  controlsMode={'form'}
+                  controlsMode={'modal'}
                   onModalConfirm={this.confirmCallback}>
               {children}
             </Form>

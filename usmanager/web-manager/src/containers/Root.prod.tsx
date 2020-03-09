@@ -30,9 +30,6 @@ import Navbar from "../views/navbar/Navbar";
 import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
-import AppPackage from "../routes/apps/AppPackage";
-import Containers from "../routes/containers/Containers";
-import LaunchContainer from "../routes/containers/LaunchContainer";
 import RulesLandingPage from "../routes/rules/RulesLandingPage";
 import Rules from "../routes/rules/Rules";
 import RulePage from "../routes/rules/RulePage";
@@ -74,6 +71,10 @@ import CloudHost from "../routes/hosts/CloudHost";
 import EdgeHost from "../routes/hosts/EdgeHost";
 import CloudHosts from "../routes/hosts/CloudHosts";
 import EdgeHosts from "../routes/hosts/EdgeHosts";
+import Containers from "../routes/containers/Containers";
+import Container from "../routes/containers/Container";
+import Apps from "../routes/apps/Apps";
+import App from "../routes/apps/App";
 
 
 interface RootContainerProps {
@@ -87,14 +88,15 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/services": { title: "Services", component: Services, search: true },
     "/services/:name": { component: Service },
     "/services/service": { component: Service },
-    "/apps": { component: AppPackage, search: true },
+    "/apps": { component: Apps, search: true },
+    "/apps/:name": { component: App },
     "/hosts": { component: Hosts, search: true },
     "/hosts/cloud": { component: CloudHosts },
     "/hosts/cloud/:instanceId": { component: CloudHost },
     "/hosts/edge": { component: EdgeHosts },
     "/hosts/edge/:hostname": { component: EdgeHost },
     "/containers": { component: Containers, search: true },
-    "/containers/launch/:containerId?": { component: LaunchContainer },
+    "/containers/:id": { component: Container },
     "/rules": { component: Rules, search: true },
     "/rules/management": { component: RulesLandingPage, search: true },
     "/rules/rules/:ruleId?": { title: "",component: RulePage },

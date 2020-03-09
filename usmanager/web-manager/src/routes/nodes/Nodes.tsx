@@ -55,9 +55,9 @@ class Nodes extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.nodes?.isLoading,
-    error: state.entities.nodes?.error,
-    nodes: (state.entities.nodes?.data && Object.values(state.entities.nodes?.data)) || [],
+    isLoading: state.entities.nodes.isLoading,
+    error: state.entities.nodes.error,
+    nodes: (state.entities.nodes.data && Object.values(state.entities.nodes.data)) || [],
   }
 );
 

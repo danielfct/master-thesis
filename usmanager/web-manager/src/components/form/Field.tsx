@@ -9,6 +9,7 @@ import {Dropdown} from "./Dropdown";
 import {Datepicker} from "./Datepicker";
 import {Timepicker} from "./Timepicker";
 import {NumberBox} from "./NumberBox";
+import Collapsible from "../collapsible/Collapsible";
 
 export interface IValidation {
   rule: (values: IValues, fieldName: string, args: any) => string;
@@ -17,9 +18,9 @@ export interface IValidation {
 
 export interface FieldProps {
   id: string;
-  type?: "textbox" | "numberbox" | "multilinetextbox" | "dropdown" | "datepicker" | "timepicker";
+  type?: "textbox" | "datebox" | "numberbox" | "multilinetextbox" | "collapsible" | "dropdown" | "datepicker" | "timepicker";
   label?: string;
-  options?: { defaultValue: string, values: string[] };
+  dropdown?: { defaultValue: string, values: string[], selectCallback?: (value: any) => void };
   validation?: IValidation;
   icon?: boolean;
   disabled?: boolean;
@@ -51,8 +52,13 @@ export default class Field extends React.Component<FieldProps> {
                     id: string, formContext: IFormContext): void =>
     formContext.validate(id);
 
+  private getDateStringFromTimestamp = (value: number) => {
+    const date = new Date(value * 1000);
+    return `${date.toLocaleDateString("pt")} ${date.toLocaleTimeString("pt") }`
+  };
+
   render() {
-    const {id, type, label, options, icon, disabled} = this.props;
+    const {id, type, label, dropdown, icon, disabled} = this.props;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
       const hasErrors = getError(errors);
@@ -86,7 +92,16 @@ export default class Field extends React.Component<FieldProps> {
                 <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
                          id={id}
                          name={id}
-                         value={formContext.values[id]}
+                         value={formContext.values[id].toString()}
+                         disabled={disabled || !formContext.isEditing}
+                         onChange={e => this.onChange(e, id, formContext)}
+                         onBlur={e => this.onBlur(e, id, formContext)}/>
+              )}
+              {type && type.toLowerCase() === "datebox" && (
+                <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                         id={id}
+                         name={id}
+                         value={this.getDateStringFromTimestamp(formContext.values[id])}
                          disabled={disabled || !formContext.isEditing}
                          onChange={e => this.onChange(e, id, formContext)}
                          onBlur={e => this.onBlur(e, id, formContext)}/>
@@ -115,9 +130,9 @@ export default class Field extends React.Component<FieldProps> {
                           name={id}
                           value={formContext.values[id]}
                           disabled={disabled || !formContext.isEditing}
-                          onChange={e => this.onChange(e, id, formContext)}
+                          onChange={e => { this.onChange(e, id, formContext); dropdown?.selectCallback?.((e.target as HTMLSelectElement).value) }}
                           onBlur={e => this.onBlur(e, id, formContext)}
-                          options={options}/>
+                          dropdown={dropdown}/>
               )}
               {(type && type.toLowerCase() === "datepicker") && (
                 <Datepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}

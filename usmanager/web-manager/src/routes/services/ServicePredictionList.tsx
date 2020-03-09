@@ -78,8 +78,6 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
           <span id={'checkbox'}>{prediction}</span>
         </label>
       </div>
-      {/*<Link to={`/services/${dependency}`}
-            className={`${styles.link}`}/>*/}
     </ListItem>;
 
   private onAdd = (prediction: IValues): void => {

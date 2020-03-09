@@ -232,7 +232,22 @@ const fetchAppServices = (appName: string) => ({
     entity: appName
   }
 });
-
+export const ADD_APP_SERVICE = 'ADD_APP_SERVICE';
+export function addAppService(appName: string, serviceName: string): EntitiesAction {
+  return {
+    type: ADD_APP_SERVICE,
+    entity: appName,
+    data: { serviceNames: new Array(serviceName) }
+  }
+}
+export const REMOVE_APP_SERVICES = 'REMOVE_APP_SERVICES';
+export function removeAppServices(appName: string, serviceNames: string[]): EntitiesAction {
+  return {
+    type: REMOVE_APP_SERVICES,
+    entity: appName,
+    data: { serviceNames: serviceNames }
+  }
+}
 
 export const REGIONS_REQUEST = 'REGIONS_REQUEST';
 export const REGIONS_SUCCESS = 'REGIONS_SUCCESS';
@@ -361,6 +376,32 @@ const fetchEdgeHosts = (hostname?: string) => ({
         endpoint: `hosts/edge/${hostname}`,
         schema: Schemas.EDGE_HOST,
         entity: 'edgeHosts'
+      }
+});
+
+export const CONTAINERS_REQUEST = 'CONTAINERS_REQUEST';
+export const CONTAINERS_SUCCESS = 'CONTAINERS_SUCCESS';
+export const CONTAINERS_FAILURE = 'CONTAINERS_FAILURE';
+export const CONTAINER_REQUEST = 'CONTAINER_REQUEST';
+export const CONTAINER_SUCCESS = 'CONTAINER_SUCCESS';
+export const CONTAINER_FAILURE = 'CONTAINER_FAILURE';
+export const loadContainers = (id?: string) => (dispatch: any) => {
+  return dispatch(fetchContainers(id));
+};
+const fetchContainers = (id?: string) => ({
+  [CALL_API]:
+    !id
+      ? {
+        types: [ CONTAINERS_REQUEST, CONTAINERS_SUCCESS, CONTAINERS_FAILURE ],
+        endpoint: `containers`,
+        schema: Schemas.CONTAINER_ARRAY,
+        entity: 'containers'
+      }
+      : {
+        types: [ CONTAINER_REQUEST, CONTAINER_SUCCESS, CONTAINER_FAILURE ],
+        endpoint: `containers/${id}`,
+        schema: Schemas.CONTAINER,
+        entity: 'containers'
       }
 });
 

@@ -8,7 +8,7 @@ interface Props {
   name: string;
   value: string;
   disabled?: boolean;
-  options?: {defaultValue?: string | number, values: (string | number)[]};
+  dropdown?: {defaultValue?: string | number, values: (string | number)[]};
   onChange: (e: React.FormEvent<HTMLSelectElement>) => void;
   onBlur?: (e: React.FormEvent<HTMLSelectElement>) => void;
 }
@@ -30,7 +30,7 @@ export class Dropdown extends React.Component<Props, {}> {
   }
 
   render() {
-    const {className, id, name, value, disabled, onChange, onBlur, options} = this.props;
+    const {className, id, name, value, disabled, onChange, onBlur, dropdown} = this.props;
     return (
       <select
         className={className}
@@ -41,14 +41,14 @@ export class Dropdown extends React.Component<Props, {}> {
         onChange={onChange}
         onBlur={onBlur}
         ref={this.dropdown}>
-        {options && (
+        {dropdown && (
           <>
-            {options.defaultValue && (
-              <option key={options.defaultValue} value="" disabled hidden>
-                {options.defaultValue}
+            {dropdown.defaultValue && (
+              <option key={dropdown.defaultValue} value="" disabled hidden>
+                {dropdown.defaultValue}
               </option>
             )}
-            {options.values.map(option =>
+            {dropdown.values.map(option =>
               <option key={option} value={option.toString().toLowerCase()}>
                 {capitalize(option.toString())}
               </option>

@@ -60,7 +60,7 @@ class EdgeHost extends BaseComponent<Props, {}> {
     }
   };
 
-  private onPostSuccess = (edgeHostHostname: string): void => {
+  private onPostSuccess = (reply: any, edgeHostHostname: string): void => {
     super.toast(`Edge host <b>${edgeHostHostname}</b> is now saved`);
   };
 
@@ -100,7 +100,7 @@ class EdgeHost extends BaseComponent<Props, {}> {
       <>
         {isLoading && <LoadingSpinner/>}
         {error && <Error message={error}/>}
-        {!error && edgeHost && (
+        {!isLoading && !error && edgeHost && (
           <Form id={edgeHostKey}
                 fields={this.getFields()}
                 values={edgeHost}
@@ -113,7 +113,7 @@ class EdgeHost extends BaseComponent<Props, {}> {
                          id={key}
                          type="dropdown"
                          label={key}
-                         options={{defaultValue: "Is a local machine?", values: ["True", "False"]}}/>
+                         dropdown={{defaultValue: "Is a local machine?", values: ["True", "False"]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>

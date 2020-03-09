@@ -57,7 +57,7 @@ class ServiceRuleList extends BaseComponent<Props, {}> {
   private rule = (index: number, rule: string, separate: boolean, checked: boolean,
                   handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
     <ListItem key={index} separate={separate}>
-      <div className={`${styles.itemContent}`}>
+      <div className={`${styles.linkedItemContent}`}>
         <label>
           <input id={rule}
                  type="checkbox"

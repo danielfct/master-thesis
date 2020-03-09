@@ -41,7 +41,7 @@ class ServiceDependeeList extends BaseComponent<Props, {}> {
 
   private dependee = (dependee: string, index: number): JSX.Element =>
     <ListItem key={index} separate>
-      <div className={`${styles.itemContent}`}>
+      <div className={`${styles.linkedItemContent}`}>
         <span>{dependee}</span>
       </div>
       <Link to={`/services/${dependee}`}

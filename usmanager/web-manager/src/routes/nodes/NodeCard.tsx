@@ -9,7 +9,7 @@ interface NodeCardProps {
 
 type Props = NodeCardProps;
 
-const ServiceCard = ({node}: Props) => (
+const NodeCard = ({node}: Props) => (
   <Card<INode> title={node.id.toString()}
                link={{to: {pathname: `/nodes/${node.id}`, state: node}}}
                height={'125px'}
@@ -27,4 +27,4 @@ const ServiceCard = ({node}: Props) => (
   </Card>
 );
 
-export default ServiceCard;
+export default NodeCard;

@@ -29,7 +29,7 @@ import {RouteComponentProps, withRouter} from "react-router";
 import {getTypeFromValue, FieldProps, IValidation} from "./Field";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
-import { isEqualWith } from "lodash";
+import { isEqualWith, merge } from "lodash";
 
 export interface IFields {
   [key: string]: FieldProps;
@@ -52,7 +52,7 @@ interface FormPageProps {
   post?: RestOperation;
   put?: RestOperation;
   delete?: RestOperation;
-  controlsMode?: 'top' | 'form';
+  controlsMode?: 'top' | 'modal';
   onModalConfirm?: (values: IValues) => void;
   saveEntities?: (args: any) => void;
   editable?: boolean;
@@ -113,11 +113,20 @@ class Form extends React.Component<Props, State> {
     needsSave: false,
   };
 
+
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if (prevProps.showSaveButton != this.props.showSaveButton || prevState.values != this.state.values) {
       this.setState({
         needsSave: this.props.showSaveButton || this.props.isNew || this.entityNeedsSave()
       })
+    }
+    if (prevProps.values != this.props.values) {
+      this.setState(Object.keys(this.props.values).reduce((state: State, data: string) => {
+        if (!!this.props.values[data]) {
+          state.values[data] = this.props.values[data];
+        }
+        return state;
+      }, this.state));
     }
   }
 
@@ -173,9 +182,9 @@ class Form extends React.Component<Props, State> {
     if (isNew) {
       if (post?.url) {
         postData(post.url, this.state.values,
-          () => {
+          (reply) => {
             this.setState({savedValues: this.state.values});
-            post.successCallback(args);
+            post.successCallback(reply, args);
           },
           () => post.failureCallback(args));
       }
@@ -265,7 +274,7 @@ class Form extends React.Component<Props, State> {
               {children}
             </FormContext.Provider>
           </div>
-          {(controlsMode === 'form') && (
+          {(controlsMode === 'modal') && (
             <div className='modal-footer dialog-footer'>
               <button className="waves-effect waves-light btn-flat red-text left"
                       type="button"

@@ -18,15 +18,7 @@ export interface INode extends IData {
   role: string;
 }
 
-interface INewNode {
-  region: string,
-  country: string,
-  city: string,
-  hostname: string,
-  quantity: number
-}
-
-const emptyNode = (): INewNode => ({
+const emptyNode = () => ({
   region: '',
   country: '',
   city: '',
@@ -62,7 +54,7 @@ class Node extends BaseComponent<Props, {}> {
     }
   };
 
-  private onPostSuccess = (nodeId: string): void => {
+  private onPostSuccess = (reply: any, nodeId: string): void => {
     super.toast(`Node <b>${nodeId}</b> has now started`);
   };
 
@@ -125,27 +117,27 @@ class Node extends BaseComponent<Props, {}> {
                  id={'region'}
                  label={'region'}
                  type="dropdown"
-                 options={{defaultValue: "Select region", values: this.getSelectableRegions()}}/>
+                 dropdown={{defaultValue: "Select region", values: this.getSelectableRegions()}}/>
           <Field key={'country'}
                  id={'country'}
                  label={'country'}
                  type="dropdown"
-                 options={{defaultValue: "Select country", values: this.getSelectableCountries()}}/>
+                 dropdown={{defaultValue: "Select country", values: this.getSelectableCountries()}}/>
           <Field key={'city'}
                  id={'city'}
                  label={'city'}
                  type="dropdown"
-                 options={{defaultValue: "Select city", values: this.getSelectableCities()}}/>
+                 dropdown={{defaultValue: "Select city", values: this.getSelectableCities()}}/>
           <Field key={'hostname'}
                  id={'hostname'}
                  label={'hostname'}
                  type="dropdown"
-                 options={{defaultValue: "Select hostname", values: this.getSelectableHostnames()}}/>
+                 dropdown={{defaultValue: "Select hostname", values: this.getSelectableHostnames()}}/>
           {/*<Field key={'role'}
                id={'role'}
                label={'role'}
                type="dropdown"
-               options={{defaultValue: "Select role", values: this.getSelectableRoles()}}/>*/}
+               dropdown={{defaultValue: "Select role", values: this.getSelectableRoles()}}/>*/}
           <Field key={'quantity'}
                  id={'quantity'}
                  label={'quantity'}
@@ -170,7 +162,7 @@ class Node extends BaseComponent<Props, {}> {
       <>
         {isLoading && <LoadingSpinner/>}
         {error && <Error message={error}/>}
-        {!error && node && (
+        {!isLoading && !error && node && (
           <Form id={nodeKey}
                 fields={this.getFields()}
                 values={node}
@@ -208,10 +200,10 @@ class Node extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const id = props.match.params.id;
-  const node = isNewNode(id) ? emptyNode() : state.entities.nodes.data[id];
   const isLoading = state.entities.nodes?.isLoading;
   const error = state.entities.nodes?.error;
+  const id = props.match.params.id;
+  const node = isNewNode(id) ? emptyNode() : state.entities.nodes.data[id];
   return  {
     isLoading,
     error,

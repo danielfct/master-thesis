@@ -5,7 +5,7 @@ interface TextBoxProps {
   className: string;
   id: string;
   name: string;
-  value?: string;
+  value?: any;
   disabled?: boolean;
   onChange: (e: React.FormEvent<HTMLInputElement>) => void;
   onBlur: (e: React.FormEvent<HTMLInputElement>) => void;

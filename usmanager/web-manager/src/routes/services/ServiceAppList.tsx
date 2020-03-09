@@ -21,15 +21,7 @@ import {IFields, IValues, required, requiredAndNumberAndMin} from "../../compone
 import List from "../../components/list/List";
 import M from "materialize-css";
 import Collapsible from "../../components/collapsible/Collapsible";
-
-export interface IApp extends Data {
-  name: string;
-  services: IAppService[]
-}
-
-/*export interface IAppService extends IApp {
-  launchOrder: number;
-}*/
+import {IApp} from "../apps/App";
 
 export interface IAppService extends Data {
   service: IService;
@@ -91,7 +83,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
   private app = (index: number, app: string, separate: boolean, checked: boolean,
                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
     <ListItem key={index} separate={separate}>
-      <div className={`${listItemstyles.itemContent}`}>
+      <div className={`${listItemstyles.linkedItemContent}`}>
         <label>
           <input id={app}
                  type="checkbox"
@@ -123,8 +115,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
     super.toast(`Unable to delete app`, 10000, reason, true);
 
   private getSelectableAppsNames = () => {
-    const {apps, serviceApps} = this.props;
-    const {newApps} = this.props;
+    const {apps, serviceApps, newApps} = this.props;
     const newAppsNames = newApps.map(app => app.name);
     return Object.keys(apps).filter(name => !serviceApps.includes(name) && !newAppsNames.includes(name));
   };

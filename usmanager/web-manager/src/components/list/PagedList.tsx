@@ -110,7 +110,7 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
                       name={'pageSize'}
                       value={this.state.pagesize === Number.MAX_VALUE ? 'all' : this.state.pagesize?.toString()}
                       onChange={this.setPageSize}
-                      options={{defaultValue: 'Page size', values: paginate.pagesize.options}}>
+                      dropdown={{defaultValue: 'Page size', values: paginate.pagesize.options}}>
                     </Dropdown>
                 </div>
               )}

@@ -33,10 +33,12 @@ import {IRegion} from "../routes/region/Region";
 import {IDependee} from "../routes/services/ServiceDependeeList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {IRule} from "../routes/services/ServiceRuleList";
-import {IApp, IAppService} from "../routes/services/ServiceAppList";
+import {IAppService} from "../routes/services/ServiceAppList";
 import {INode} from "../routes/nodes/Node";
 import {ICloudHost} from "../routes/hosts/CloudHost";
 import {IEdgeHost} from "../routes/hosts/EdgeHost";
+import {IContainer} from "../routes/containers/Container";
+import {IApp} from "../routes/apps/App";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -84,6 +86,8 @@ interface ISchemas {
     CLOUD_HOST_ARRAY: schema.Entity<ICloudHost>[];
     EDGE_HOST: schema.Entity<IEdgeHost>;
     EDGE_HOST_ARRAY: schema.Entity<IEdgeHost>[];
+    CONTAINER: schema.Entity<IContainer>;
+    CONTAINER_ARRAY: schema.Entity<IContainer>[];
     LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
@@ -149,6 +153,10 @@ const edgeHostSchema: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', 
     idAttribute: (host: IEdgeHost) => host.hostname
 });
 
+const containerSchema: schema.Entity<IContainer> = new schema.Entity('containers', {}, {
+    idAttribute: (container: IContainer) => container.id.toString()
+});
+
 const logsSchema: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
     idAttribute: (logs: ILogs) => logs.eventId.toString()
 });
@@ -179,6 +187,8 @@ export const Schemas: ISchemas = {
     CLOUD_HOST_ARRAY: [cloudHostSchema],
     EDGE_HOST: edgeHostSchema,
     EDGE_HOST_ARRAY: [edgeHostSchema],
+    CONTAINER: containerSchema,
+    CONTAINER_ARRAY: [containerSchema],
     LOGS_ARRAY: [logsSchema],
 };
 
