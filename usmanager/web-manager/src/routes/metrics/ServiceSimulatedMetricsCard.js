@@ -31,7 +31,7 @@ import {deleteData} from "../../utils/api";
 export default class ServiceSimulatedMetricsCard extends React.Component {
   onClickRemove = () => {
     deleteData(
-      `http://localhostmetrics/simulated/services/${this.props.simulatedMetric.id}`,
+      `http://localhost:8080/metrics/simulated/services/${this.props.simulatedMetric.id}`,
       data => {
         M.toast({ html: '<div>IService simulated metric removed successfully!</div>' });
         this.props.reloadSimulatedMetrics();

@@ -25,8 +25,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.AppRule;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.app.AppRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.AddServiceApp;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -126,7 +126,7 @@ public class AppsService {
     apps.save(app);
   }
 
-  public List<AppRule> getRules(String appName) {
+  public List<AppRuleEntity> getRules(String appName) {
     assertAppExists(appName);
     return apps.getRules(appName);
   }
@@ -134,7 +134,7 @@ public class AppsService {
   public void addRule(String appName, String ruleName) {
     var app = getApp(appName);
     var rule = rules.getRule(ruleName);
-    var appRule = AppRule.builder().appPackage(app).rule(rule).build();
+    var appRule = AppRuleEntity.builder().appPackage(app).rule(rule).build();
     app = app.toBuilder().appRule(appRule).build();
     apps.save(app);
   }

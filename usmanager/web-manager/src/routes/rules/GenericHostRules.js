@@ -37,7 +37,7 @@ export default class GenericHostRules extends React.Component {
 
   loadGenericHostRules = () => {
     this.setState({ loading: true });
-    getData('http://localhostrules/hosts/genericRules',
+    getData('http://localhost:8080/rules/hosts/genericRules',
       data => {
         this.setState({ genericHostRules: data, loading: false });
       });

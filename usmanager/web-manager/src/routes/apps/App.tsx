@@ -103,7 +103,7 @@ class App extends BaseComponent<Props, State> {
   };
 
   private onPostSuccess = (reply: any, appName: string): void => {
-    super.toast(`App <b>${appName}</b> has been created`);
+    super.toast(`App <b>${appName}</b> saved`);
     this.saveEntities(appName);
   };
 
@@ -153,7 +153,7 @@ class App extends BaseComponent<Props, State> {
     return (
       <>
         {isLoading && <LoadingSpinner/>}
-        {error && <Error message={error}/>}
+        {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formApp && (
           <Form id={appKey}
                 fields={this.getFields(formApp)}
@@ -181,6 +181,9 @@ class App extends BaseComponent<Props, State> {
                      onAddAppService={this.onAddAppService}
                      onRemoveAppServices={this.onRemoveAppServices}/>;
 
+  private rules = (): JSX.Element =>
+    <></>; //TODO
+
   private tabs: Tab[] = [
     {
       title: 'App',
@@ -192,6 +195,11 @@ class App extends BaseComponent<Props, State> {
       id: 'services',
       content: () => this.services()
     },
+    {
+      title: 'Rules',
+      id: 'rules',
+      content: () => this.rules()
+    }
   ];
 
   render() {

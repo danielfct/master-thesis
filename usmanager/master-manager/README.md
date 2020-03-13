@@ -36,7 +36,7 @@ Usa o sistema de gestão de regras de negócios Drools para gerir as regras apli
 
 ### Ferramentas usadas
 
-[<img src="https://i.imgur.com/71OViyN.png" alt="" width="48" height="62"> Drools](https://www.drools.org/) - Drools is a Business Rules Management System (BRMS) solution
+[<img src="https://i.imgur.com/71OViyN.png" alt="" width="48" height="62"> Drools](https://www.drools.org/) - Drools is a Business OldRules Management System (BRMS) solution
 
 [<img src="https://i.imgur.com/DBrGTaL.png" alt="" width="48" height="48"> Postman](https://www.postman.com/) - The Collaboration Platform for API Development
 

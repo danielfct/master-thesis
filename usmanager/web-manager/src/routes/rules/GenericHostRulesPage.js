@@ -45,7 +45,7 @@ export default class GenericHostRulesPage extends React.Component {
   loadHostRules = () => {
     this.setState({ loadedRules: false, loading: true });
     getData(
-        'http://localhostrules/hosts/generic',
+        'http://localhost:8080/rules/hosts/generic',
         data => this.setState({ rules: data, loadedRules: true, loading: false })
     );
   };
@@ -53,14 +53,14 @@ export default class GenericHostRulesPage extends React.Component {
   loadAllRules = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhostrules/hosts',
+        'http://localhost:8080/rules/hosts',
         data => this.setState({ allRules: data, loading: false })
     );
   };
 
   onRemoveRule = (ruleId, event) => {
     deleteData(
-        `http://localhosthosts/generic/${ruleId}`,
+        `http://localhost:8080/hosts/generic/${ruleId}`,
         () => {
           M.toast({ html: '<div>Rule successfully deleted from generic hosts rules!</div>' });
           this.loadHostRules();
@@ -69,7 +69,7 @@ export default class GenericHostRulesPage extends React.Component {
 
   addRule = (ruleId, event) => {
     postData(
-        `http://localhosthosts/rules/generic/${ruleId}`,
+        `http://localhost:8080/hosts/rules/generic/${ruleId}`,
         event.target[0].value,
         data => {
           M.toast({ html: '<div>Rule successfully added to generic host rules!</div>' });

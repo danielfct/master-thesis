@@ -26,7 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
@@ -54,6 +54,11 @@ public class ServicesController {
   @GetMapping
   public Iterable<ServiceEntity> getServices() {
     return servicesService.getServices();
+  }
+
+  @GetMapping("/{serviceId}")
+  public ServiceEntity getService(@PathVariable Long serviceId) {
+    return servicesService.getService(serviceId);
   }
 
   @GetMapping("/{serviceName}")

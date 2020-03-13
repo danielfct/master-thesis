@@ -161,7 +161,7 @@ class Node extends BaseComponent<Props, {}> {
     return (
       <>
         {isLoading && <LoadingSpinner/>}
-        {error && <Error message={error}/>}
+        {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && node && (
           <Form id={nodeKey}
                 fields={this.getFields()}

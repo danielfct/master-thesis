@@ -65,7 +65,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
   loadNodes = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhostnodes',
+        'http://localhost:8080/nodes',
         data => this.setState({ nodes: data, loading: false })
     );
   };
@@ -73,7 +73,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
   loadFields = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhostrules/fields',
+        'http://localhost:8080/rules/fields',
         data => this.setState({ fields: data, loading: false })
     );
   };
@@ -82,7 +82,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     if (this.state.id !== 0) {
       this.setState({ loading: true });
       getData(
-          `http://localhostmetrics/simulated/hosts/specific/${this.state.id}`,
+          `http://localhost:8080/metrics/simulated/hosts/specific/${this.state.id}`,
           data => this.setState({ values: data, loading: false })
       );
     }
@@ -115,7 +115,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
   onSubmitForm = event => {
     event.preventDefault();
     postData(
-        `http://localhostmetrics/simulated/hosts/specific/${this.state.id}`,
+        `http://localhost:8080/metrics/simulated/hosts/specific/${this.state.id}`,
         event.target[0].value,
         data => {
           this.setState({ isEdit: false, formSubmit: true });

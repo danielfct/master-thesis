@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.AppRule;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.app.AppRuleEntity;
 
 import java.util.Set;
 
@@ -71,7 +71,7 @@ public class AppPackage {
   @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "appPackage", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<AppRule> appRules;
+  private Set<AppRuleEntity> appRules;
 
   @Override
   public boolean equals(Object o) {

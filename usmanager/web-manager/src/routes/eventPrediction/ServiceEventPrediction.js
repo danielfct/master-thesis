@@ -48,7 +48,7 @@ export default class ServiceEventPredictions extends React.Component {
   loadServiceEventPredictions = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostservices/eventPredictions',
+      'http://localhost:8080/services/eventPredictions',
       data => this.setState({ data: data, loading: false })
     );
   };

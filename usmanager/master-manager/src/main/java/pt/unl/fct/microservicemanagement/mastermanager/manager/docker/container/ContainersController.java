@@ -72,9 +72,9 @@ public class ContainersController {
     return dockerContainersService.launchContainer(hostname, serviceName, internalPort, externalPort);
   }
 
-  @GetMapping("/{id}")
-  public SimpleContainer getContainer(@PathVariable String id) {
-    return dockerContainersService.getContainer(id);
+  @GetMapping("/{containerId}")
+  public SimpleContainer getContainer(@PathVariable String containerId) {
+    return dockerContainersService.getContainer(containerId);
   }
 
   @DeleteMapping("/{id}")

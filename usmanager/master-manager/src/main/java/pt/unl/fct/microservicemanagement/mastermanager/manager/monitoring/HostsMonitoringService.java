@@ -39,7 +39,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.services.Services
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.RuleDecision;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesService;
 
 import java.sql.Timestamp;
 import java.time.Instant;

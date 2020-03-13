@@ -15,11 +15,7 @@ import {
   removeServiceRules
 } from "../../actions";
 import {connect} from "react-redux";
-
-export interface IRule extends Data {
-  name: string;
-  priority: number;
-}
+import {IRule} from "../rules/Rule";
 
 interface StateToProps {
   isLoading: boolean;

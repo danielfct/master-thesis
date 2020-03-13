@@ -99,7 +99,7 @@ class EdgeHost extends BaseComponent<Props, {}> {
     return (
       <>
         {isLoading && <LoadingSpinner/>}
-        {error && <Error message={error}/>}
+        {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && edgeHost && (
           <Form id={edgeHostKey}
                 fields={this.getFields()}
@@ -124,11 +124,19 @@ class EdgeHost extends BaseComponent<Props, {}> {
     )
   };
 
+  private rules = (): JSX.Element =>
+    <></>; //TODO
+
   private tabs: Tab[] = [
     {
       title: 'Edge host',
       id: 'edgeHost',
       content: () => this.details()
+    },
+    {
+      title: 'Rules',
+      id: 'rules',
+      content: () => this.rules()
     },
   ];
 

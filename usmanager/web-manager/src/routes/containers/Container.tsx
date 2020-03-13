@@ -220,7 +220,7 @@ class Container extends BaseComponent<Props, State> {
     return (
       <>
         {isLoading && <LoadingSpinner/>}
-        {error && <Error message={error}/>}
+        {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formContainer && (
           <Form id={containerKey}
                 fields={this.getFields()}

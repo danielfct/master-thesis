@@ -48,7 +48,7 @@ export default class ServiceSimulatedMetrics extends React.Component {
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostmetrics/simulated/services',
+      'http://localhost:8080/metrics/simulated/services',
       data => this.setState({ data: data, loading: false })
     );
   };

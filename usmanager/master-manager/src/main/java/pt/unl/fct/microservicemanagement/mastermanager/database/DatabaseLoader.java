@@ -32,24 +32,24 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHos
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.FieldEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.FieldRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.ValueModeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.ValueModeRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.ComponentTypeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.ComponentTypeRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.GenericHostRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.GenericHostRuleRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.OperatorEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.OperatorRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleConditionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.GenericHostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.GenericHostRuleRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleConditionRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
@@ -696,7 +696,7 @@ public class DatabaseLoader {
 
       // component types
       var container = ComponentTypeEntity.builder()
-          .name("Container")
+          .name("Service")
           .build();
       componentTypes.save(container);
       var host = ComponentTypeEntity.builder()
@@ -739,37 +739,37 @@ public class DatabaseLoader {
       // decision
       var containerDecisionNone = DecisionEntity.builder()
           .componentType(container)
-          .decisionName("NONE")
+          .name("NONE")
           .build();
       decisions.save(containerDecisionNone);
       var containerDecisionReplicate = DecisionEntity.builder()
           .componentType(container)
-          .decisionName("REPLICATE")
+          .name("REPLICATE")
           .build();
       decisions.save(containerDecisionReplicate);
       var containerDecisionMigrate = DecisionEntity.builder()
           .componentType(container)
-          .decisionName("MIGRATE")
+          .name("MIGRATE")
           .build();
       decisions.save(containerDecisionMigrate);
       var containerDecisionStop = DecisionEntity.builder()
           .componentType(container)
-          .decisionName("STOP")
+          .name("STOP")
           .build();
       decisions.save(containerDecisionStop);
       var hostDecisionNone = DecisionEntity.builder()
           .componentType(host)
-          .decisionName("NONE")
+          .name("NONE")
           .build();
       decisions.save(hostDecisionNone);
       var hostDecisionStart = DecisionEntity.builder()
           .componentType(host)
-          .decisionName("START")
+          .name("START")
           .build();
       decisions.save(hostDecisionStart);
       var hostDecisionStop = DecisionEntity.builder()
           .componentType(host)
-          .decisionName("STOP")
+          .name("STOP")
           .build();
       decisions.save(hostDecisionStop);
 
@@ -847,6 +847,7 @@ public class DatabaseLoader {
 
       // conditions
       var cpuPercentageOver90 = ConditionEntity.builder()
+          .name("cpuPercentageOver90")
           .valueMode(effectiveValue)
           .field(cpuPercentage)
           .operator(greaterThan)
@@ -854,6 +855,7 @@ public class DatabaseLoader {
           .build();
       conditions.save(cpuPercentageOver90);
       var ramPercentageOver90 = ConditionEntity.builder()
+          .name("ramPercentageOver90")
           .valueMode(effectiveValue)
           .field(ramPercentage)
           .operator(greaterThan)

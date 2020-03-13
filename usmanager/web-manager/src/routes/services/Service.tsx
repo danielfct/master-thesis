@@ -271,7 +271,7 @@ class Service extends BaseComponent<Props, State> {
   };
 
   private onPostSuccess = (reply: any, serviceName: string): void => {
-    super.toast(`Service <b>${serviceName}</b> is now created`);
+    super.toast(`Service <b>${serviceName}</b> saved`);
     this.saveEntities(serviceName);
   };
 

@@ -57,7 +57,7 @@ export default class HostRulesPage extends React.Component {
   loadHostRules = () => {
     this.setState({ loadedRules: false, loading: true });
     getData(
-      `http://localhosthosts/${this.state.hostname}/rules`,
+      `http://localhost:8080/hosts/${this.state.hostname}/rules`,
       data => this.setState({ rules: data, loadedRules: true, loading: false })
     );
   };
@@ -65,7 +65,7 @@ export default class HostRulesPage extends React.Component {
   loadAllRules = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostrules/hosts',
+      'http://localhost:8080/rules/hosts',
       data => this.setState({ allRules: data, loading: false })
     );
   };
@@ -76,7 +76,7 @@ export default class HostRulesPage extends React.Component {
       ruleId: Number(ruleId)
     };
     deleteData(
-      `http://localhosthosts/${this.state.hostname}/rules/`, JSON.stringify(data),
+      `http://localhost:8080/hosts/${this.state.hostname}/rules/`, JSON.stringify(data),
       data => {
         M.toast({ html: '<div>Rule successfully deleted from hosts rules!</div>' });
         this.loadHostRules();

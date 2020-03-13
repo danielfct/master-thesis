@@ -31,9 +31,9 @@ import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
 import RulesLandingPage from "../routes/rules/RulesLandingPage";
-import Rules from "../routes/rules/Rules";
+import OldRules from "../routes/rules/OldRules";
 import RulePage from "../routes/rules/RulePage";
-import Conditions from "../routes/rules/Conditions";
+import OldConditions from "../routes/rules/OldConditions";
 import ConditionPage from "../routes/rules/ConditionPage";
 import AppsRulesList from "../routes/rules/AppsRulesList";
 import AppRulesPage from "../routes/rules/AppRulesPage";
@@ -97,10 +97,10 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/hosts/edge/:hostname": { component: EdgeHost },
     "/containers": { component: Containers, search: true },
     "/containers/:id": { component: Container },
-    "/rules": { component: Rules, search: true },
+    "/rules": { component: OldRules, search: true },
     "/rules/management": { component: RulesLandingPage, search: true },
     "/rules/rules/:ruleId?": { title: "",component: RulePage },
-    "/rules/conditions": {  component: Conditions, search: true },
+    "/rules/conditions": {  component: OldConditions, search: true },
     "/rules/conditions/condition/:conditionId?": {  component: ConditionPage },
     "/rules/apps": {  component: AppsRulesList, search: true },
     "/rules/apps/app/:appId": { component: AppRulesPage },

@@ -24,9 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.FieldEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

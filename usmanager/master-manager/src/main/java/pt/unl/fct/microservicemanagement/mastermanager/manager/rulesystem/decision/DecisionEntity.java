@@ -25,16 +25,16 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.ComponentTypeEntity;
+import lombok.Singular;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -64,35 +64,35 @@ public class DecisionEntity {
   @GeneratedValue
   private Long id;
 
+  //TODO use enum
+  // Possible values:
+  // - NONE; - REPLICATE; - MIGRATE; - STOP; (services)
+  // - NONE; - START; - STOP (hosts)
+  private String name;
+
   @ManyToOne
   @JoinColumn(name = "component_type_id")
   private ComponentTypeEntity componentType;
 
-  //TODO use enum
-  // Possible values:
-  // - NONE; - REPLICATE; - MIGRATE; - STOP;
-  // - NONE; - START; - STOP
-  private String decisionName;
-
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
   private Set<RuleEntity> rules = new HashSet<>();
 
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ComponentDecisionLog> componentDecisionLogs = new HashSet<>();
-
-  @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<HostEventEntity> hostEventEntities = new HashSet<>();
-
-  @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
   private Set<ServiceEvent> serviceEvents = new HashSet<>();
+
+  @Singular
+  @JsonIgnore
+  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<HostEventEntity> hostEvents = new HashSet<>();
+
+  @Singular
+  @JsonIgnore
+  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ComponentDecisionLog> componentDecisionLogs = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {

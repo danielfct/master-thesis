@@ -114,7 +114,7 @@ export default class RulePage extends React.Component {
 
   addCondition = (conditionId, event) => {
     if (this.state.ruleId !== 0) {
-      postData(`http://localhostrules/${this.state.ruleId}/conditions`,
+      postData(`http://localhost:8080/rules/${this.state.ruleId}/conditions`,
           conditionId,
           data => {
             M.toast({ html: '<div>Condition successfully added to rule!</div>' });
@@ -161,7 +161,7 @@ export default class RulePage extends React.Component {
   };
 
   onDelete = () => {
-    deleteData(`http://localhostrules/${this.state.ruleId}`,
+    deleteData(`http://localhost:8080/rules/${this.state.ruleId}`,
         () => {
           this.setState({ isDeleted: true });
           M.toast({ html: '<div>Rule successfully deleted!</div>' });
@@ -169,7 +169,7 @@ export default class RulePage extends React.Component {
   };
 
   onRemoveCondition = (conditionId, event) => {
-    deleteData(`http://localhostrules/${this.state.ruleId}/conditions/${conditionId}`,
+    deleteData(`http://localhost:8080/rules/${this.state.ruleId}/conditions/${conditionId}`,
         () => {
           M.toast({ html: '<div>Condition successfully deleted from rule!</div>' });
           this.loadConditions();
@@ -178,7 +178,7 @@ export default class RulePage extends React.Component {
 
   onSubmitForm = event => {
     event.preventDefault();
-    postData(`http://localhostrules/${this.state.ruleId}`,
+    postData(`http://localhost:8080/rules/${this.state.ruleId}`,
         event.target[0].value,
         data => {
           this.setState({ ruleId: data, isEdit: false });
@@ -208,7 +208,7 @@ export default class RulePage extends React.Component {
   loadAllConditions = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhostconditions',
+        'http://localhost:8080/conditions',
         data => this.setState({ allConditions: data, loading: false })
     );
   };

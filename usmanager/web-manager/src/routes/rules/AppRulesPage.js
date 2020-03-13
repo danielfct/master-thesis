@@ -58,7 +58,7 @@ export default class AppRulesPage extends React.Component {
 
   loadApp = () => {
     getData(
-      `http://localhostapps/${this.state.appId}`,
+      `http://localhost:8080/apps/${this.state.appId}`,
       data => this.setState({ app: data, loading: false })
     );
   };
@@ -66,7 +66,7 @@ export default class AppRulesPage extends React.Component {
   loadAppRules = () => {
     this.setState({ loadedRules: false, loading: true });
     getData(
-      `http://localhostapps/${this.state.appId}/rules`,
+      `http://localhost:8080/apps/${this.state.appId}/rules`,
       data => this.setState({ rules: data, loadedRules: true, loading: false })
     );
   };
@@ -74,14 +74,14 @@ export default class AppRulesPage extends React.Component {
   loadAllRules = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostrules/containers',
+      'http://localhost:8080/rules/containers',
       data => this.setState({ allRules: data, loading: false })
     );
   };
 
   onRemoveRule = (ruleId, event) => {
     deleteData(
-      `http://localhostapps/${this.state.appId}/rules/${ruleId}`,
+      `http://localhost:8080/apps/${this.state.appId}/rules/${ruleId}`,
       data => {
         M.toast({ html: '<div>Rule successfully deleted from app rules!</div>' });
         this.loadAppRules();
@@ -90,7 +90,7 @@ export default class AppRulesPage extends React.Component {
 
   addRule = (ruleId, event) => {
     postData(
-      `http://localhostapps/${this.state.appId}/rules`,
+      `http://localhost:8080/apps/${this.state.appId}/rules`,
       {
         appId: Number(this.state.appId), //TODO remove appId from server too
         ruleId: Number(ruleId)

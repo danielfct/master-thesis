@@ -48,7 +48,7 @@ export default class DefaultHostSimulatedMetrics extends React.Component {
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostmetrics/simulated/hosts/default',
+      'http://localhost:8080/metrics/simulated/hosts/default',
       data => this.setState({ data: data, loading: false })
     );
   };

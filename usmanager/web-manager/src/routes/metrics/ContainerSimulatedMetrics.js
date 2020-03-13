@@ -48,7 +48,7 @@ export default class ContainerSimulatedMetrics extends React.Component {
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostmetrics/simulated/containers',
+      'http://localhost:8080/metrics/simulated/containers',
       data => this.setState({ data: data, loading: false })
     );
   };

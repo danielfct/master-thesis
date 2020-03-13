@@ -25,10 +25,11 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.ComponentTypeRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.FieldRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.ComponentTypeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -38,35 +39,34 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleEntity;
 
 @org.springframework.stereotype.Service
 @Slf4j
 public class DecisionsService {
 
   private final DecisionRepository decisions;
-  private final ComponentTypeRepository componentTypes;
+  private final ComponentTypesService componentTypesService;
   private final ComponentDecisionLogRepository componentDecisionLogs;
   private final ComponentDecisionServiceLogRepository componentDecisionServiceLogs;
   private final ComponentDecisionHostLogRepository componentDecisionHostLogs;
   private final ComponentDecisionValueLogRepository componentDecisionValueLogs;
   private final RulesService rulesService;
-  private final FieldRepository fields;
+  private final FieldsService fieldsService;
 
-  public DecisionsService(DecisionRepository decisions, ComponentTypeRepository componentTypes,
+  public DecisionsService(DecisionRepository decisions, ComponentTypesService componentTypesService,
                           ComponentDecisionLogRepository componentDecisionLogs,
                           ComponentDecisionServiceLogRepository componentDecisionServiceLogs,
                           ComponentDecisionHostLogRepository componentDecisionHostLogs,
                           ComponentDecisionValueLogRepository componentDecisionValueLogs,
-                          @Lazy RulesService rulesService, FieldRepository fields) {
+                          @Lazy RulesService rulesService, FieldsService fieldsService) {
     this.decisions = decisions;
-    this.componentTypes = componentTypes;
+    this.componentTypesService = componentTypesService;
     this.componentDecisionLogs = componentDecisionLogs;
     this.componentDecisionServiceLogs = componentDecisionServiceLogs;
     this.componentDecisionHostLogs = componentDecisionHostLogs;
     this.componentDecisionValueLogs = componentDecisionValueLogs;
     this.rulesService = rulesService;
-    this.fields = fields;
+    this.fieldsService = fieldsService;
   }
 
   public Iterable<DecisionEntity> getDecisions() {
@@ -82,7 +82,7 @@ public class DecisionsService {
   }
 
   public List<DecisionEntity> getContainerDecisions() {
-    return decisions.getDecisionsByComponentType("Container");
+    return decisions.getDecisionsByComponentType("Service");
   }
 
   public DecisionEntity getDecisionByComponentTypeAndByDecisionName(String componentTypeName, String decisionName) {
@@ -106,7 +106,7 @@ public class DecisionsService {
   }
 
   private ComponentDecisionLog saveComponentDecisionLog(String componentTypeName, String decisionName, long ruleId) {
-    ComponentTypeEntity componentType = componentTypes.findByName(componentTypeName);
+    ComponentTypeEntity componentType = componentTypesService.getComponentType(componentTypeName);
     DecisionEntity decision = decisions.getDecisionByComponentTypeAndByDecisionName(componentTypeName, decisionName);
     RuleEntity rule = rulesService.getRule(ruleId);
     var timestamp = Timestamp.from(Instant.now());
@@ -122,7 +122,7 @@ public class DecisionsService {
         .map(fieldValue ->
             ComponentDecisionValueLog.builder()
                 .componentDecisionLog(componentDecisionLog)
-                .field(fields.findByName(fieldValue.getKey().split("-effective-val")[0]))
+                .field(fieldsService.getField(fieldValue.getKey().split("-effective-val")[0]))
                 .componentValue(fieldValue.getValue())
                 .build())
         .collect(Collectors.toList());

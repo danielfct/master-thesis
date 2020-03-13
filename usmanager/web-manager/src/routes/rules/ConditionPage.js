@@ -67,7 +67,7 @@ export default class ConditionPage extends React.Component {
     if (this.state.conditionId !== 0) {
       this.setState({ loading: true });
       getData(
-        `http://localhostconditions/${this.state.conditionId}`,
+        `http://localhost:8080/conditions/${this.state.conditionId}`,
         data => {
           const currentCondition = {
             valueModeId: data.valueMode.id,
@@ -83,7 +83,7 @@ export default class ConditionPage extends React.Component {
   loadValueModes = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostrules/valueModes',
+      'http://localhost:8080/rules/valueModes',
       data => this.setState({ valueModes: data, loading: false })
     );
   };
@@ -91,7 +91,7 @@ export default class ConditionPage extends React.Component {
   loadFields = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostrules/fields',
+      'http://localhost:8080/rules/fields',
       data => this.setState({ fields: data, loading: false })
     );
   };
@@ -99,7 +99,7 @@ export default class ConditionPage extends React.Component {
   loadOperators = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostrules/operators/',
+      'http://localhost:8080/rules/operators/',
       data => this.setState({ operators: data, loading: false })
     );
   };
@@ -157,7 +157,7 @@ export default class ConditionPage extends React.Component {
 
   onDelete = () => {
     deleteData(
-      `http://localhostconditions/${this.state.conditionId}`,
+      `http://localhost:8080/conditions/${this.state.conditionId}`,
       () => {
         this.setState({ isDeleted: true });
         M.toast({ html: '<div>Condition successfully deleted!</div>' });
@@ -167,7 +167,7 @@ export default class ConditionPage extends React.Component {
   onSubmitForm = event => {
     event.preventDefault();
     postData(
-      `http://localhostconditions/${this.state.conditionId}`,
+      `http://localhost:8080/conditions/${this.state.conditionId}`,
       event.target[0].value,
       data => {
         this.setState({ conditionId: data, isEdit: false });

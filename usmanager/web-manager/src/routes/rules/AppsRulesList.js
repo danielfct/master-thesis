@@ -25,7 +25,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import CardItem from '../../components/list/CardItem';
-import AppRules from './AppRules';
 import MainLayout from '../../views/mainLayout/MainLayout';
 import {getData} from "../../utils/api";
 
@@ -42,7 +41,7 @@ export default class AppsRulesList extends React.Component {
   loadApps = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostapps',
+      'http://localhost:8080/apps',
       data => this.setState({ apps: data, loading: false })
     );
   };
@@ -66,7 +65,7 @@ export default class AppsRulesList extends React.Component {
                     </div>
                   </div>
                   <CardItem label='App' value={app.appName}/>
-                  <AppRules app={app}/>
+                  {/*<AppRules app={app}/>*/}
                 </div>
               </div>
             </div>

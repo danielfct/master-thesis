@@ -24,10 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.FieldEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.ValueModeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.OperatorEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.RuleConditionEntity;
+import lombok.Singular;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleConditionEntity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -41,6 +42,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -63,6 +65,10 @@ public class ConditionEntity {
   @GeneratedValue
   private Long id;
 
+  @NotNull
+  @Column(unique = true)
+  private String name;
+
   @ManyToOne
   @JoinColumn(name = "value_mode_id")
   private ValueModeEntity valueMode;
@@ -75,12 +81,11 @@ public class ConditionEntity {
   @JoinColumn(name = "operator_id")
   private OperatorEntity operator;
 
-  private double conditionValue;
+  private double value;
 
-  //TODO
+  @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
   private Set<RuleConditionEntity> ruleConditions = new HashSet<>();
 
   @Override

@@ -38,7 +38,7 @@ export default class HostRules extends React.Component {
   loadHostRules = () => {
     this.setState({ loading: true });
     getData(
-      `http://localhosthosts/'${this.props.host.hostname}'/rules`,
+      `http://localhost:8080/hosts/'${this.props.host.hostname}'/rules`,
       data => this.setState({ hostRules: data, loading: false })
     );
   };

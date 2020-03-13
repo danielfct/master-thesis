@@ -24,19 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.Operator;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
 
-@AllArgsConstructor
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-//TODO protected
+import lombok.Data;
+
+@Data
 public final class Condition {
 
   private final String fieldName;

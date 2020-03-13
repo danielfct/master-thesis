@@ -30,7 +30,7 @@ import {deleteData} from "../../utils/api";
 export default class ServiceEventPredictionCard extends React.Component {
   onClickRemove = () => {
     deleteData(
-      `http://localhostservices/eventPredictions/${this.props.serviceEvent.id}`,
+      `http://localhost:8080/services/eventPredictions/${this.props.serviceEvent.id}`,
       () => {
         M.toast({ html: '<div>IService event prediction removed successfully!</div>' });
         this.props.reloadServiceEvents();

@@ -28,7 +28,7 @@ class Regions extends BaseComponent<Props, {}> {
     this.props.loadRegions();
   }
 
-  private service = (region: IRegion): JSX.Element =>
+  private region = (region: IRegion): JSX.Element =>
     <RegionCard key={region.id} region={region}/>;
 
   private predicate = (region: IRegion, search: string): boolean =>
@@ -45,7 +45,7 @@ class Regions extends BaseComponent<Props, {}> {
             error={this.props.error}
             emptyMessage={"No regions to display"}
             list={this.props.regions}
-            card={this.service}
+            card={this.region}
             predicate={this.predicate}/>
         </div>
       </MainLayout>
@@ -56,9 +56,9 @@ class Regions extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.regions?.isLoading,
-    error: state.entities.regions?.error,
-    regions: (state.entities.regions?.data && Object.values(state.entities.regions?.data)) || [],
+    isLoading: state.entities.regions.isLoading,
+    error: state.entities.regions.error,
+    regions: (state.entities.regions.data && Object.values(state.entities.regions.data)) || [],
   }
 );
 

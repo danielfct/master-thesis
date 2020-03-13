@@ -58,7 +58,7 @@ export default class ServiceRulesPage extends React.Component {
 
   loadService = () => {
     getData(
-      `http://localhostservices/${this.state.serviceId}`,
+      `http://localhost:8080/services/${this.state.serviceId}`,
       data => this.setState({ service: data, loading: false })
     );
   };
@@ -66,7 +66,7 @@ export default class ServiceRulesPage extends React.Component {
   loadServiceRules = () => {
     this.setState({ loadedRules: false, loading: true });
     getData(
-      `http://localhostservices/${this.state.serviceId}/rules`,
+      `http://localhost:8080/services/${this.state.serviceId}/rules`,
       data => this.setState({ rules: data, loadedRules: true, loading: false })
     );
   };
@@ -81,7 +81,7 @@ export default class ServiceRulesPage extends React.Component {
 
   onRemoveRule = (ruleId, event) => {
     deleteData(
-      `http://localhostservices/${this.state.serviceId}/rules/${ruleId}`,
+      `http://localhost:8080/services/${this.state.serviceId}/rules/${ruleId}`,
       () => {
         M.toast({ html: '<div>Rule successfully deleted from service rules!</div>' });
         this.loadServiceRules();
@@ -89,7 +89,7 @@ export default class ServiceRulesPage extends React.Component {
   };
 
   addRule = (ruleId, event) => {
-    postData(`http://localhostservices/${this.state.serviceId}/rules`,
+    postData(`http://localhost:8080/services/${this.state.serviceId}/rules`,
       {
         ruleId
       },

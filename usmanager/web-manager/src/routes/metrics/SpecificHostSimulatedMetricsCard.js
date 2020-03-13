@@ -31,7 +31,7 @@ import {deleteData} from "../../utils/api";
 export default class SpecificHostSimulatedMetricsCard extends React.Component {
   onClickRemove = () => {
     deleteData(
-      `http://localhostmetrics/simulated/hosts/specific/'${this.props.simulatedMetric.id}`,
+      `http://localhost:8080/metrics/simulated/hosts/specific/'${this.props.simulatedMetric.id}`,
       () => {
         M.toast({ html: '<div>Specific host simulated metric removed successfully!</div>' });
         this.props.reloadSimulatedMetrics();

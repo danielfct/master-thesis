@@ -54,7 +54,7 @@ class Region extends BaseComponent<Props, {}> {
   };
 
   private onPostSuccess = (reply: any, regionName: string): void => {
-    super.toast(`Region <b>${regionName}</b> is now created`);
+    super.toast(`Region <b>${regionName}</b> saved`);
   };
 
   private onPostFailure = (reason: string, regionName: string): void =>
@@ -98,7 +98,7 @@ class Region extends BaseComponent<Props, {}> {
     return (
       <>
         {isLoading && <LoadingSpinner/>}
-        {error && <Error message={error}/>}
+        {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formRegion && (
           <Form id={regionKey}
                 fields={this.getFields(formRegion)}

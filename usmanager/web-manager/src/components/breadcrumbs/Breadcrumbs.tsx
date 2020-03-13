@@ -73,7 +73,7 @@ const breadcrumbs = (props: Props): IBreadcrumbs => {
             }
         }
         title = snakeCaseToCamelCase(title);
-        title = camelCaseToSentenceCase(title);
+        title = capitalize(title);
         return {
             title,
             link,

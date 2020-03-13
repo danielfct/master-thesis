@@ -44,7 +44,7 @@ export default class HostsRulesList extends React.Component {
   loadHosts = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhosthosts',
+      'http://localhost:8080/hosts',
       data => this.setState({ hosts: data, loading: false })
     );
   };

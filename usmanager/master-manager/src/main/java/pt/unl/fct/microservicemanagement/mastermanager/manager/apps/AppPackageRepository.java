@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rule.AppRule;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.app.AppRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 
 import java.util.List;
@@ -57,7 +57,7 @@ public interface AppPackageRepository extends CrudRepository<AppPackage, Long> {
   @Query("select r "
       + "from AppPackage a join a.appRules r "
       + "where a.name = :appName")
-  List<AppRule> getRules(@Param("appName") String appName);
+  List<AppRuleEntity> getRules(@Param("appName") String appName);
 
   Optional<AppPackage> findByNameIgnoreCase(@Param("name") String name);
 

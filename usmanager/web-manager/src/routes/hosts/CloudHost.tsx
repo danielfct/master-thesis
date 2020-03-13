@@ -92,7 +92,7 @@ class CloudHost extends BaseComponent<Props, {}> {
     return (
       <>
         {isLoading && <LoadingSpinner/>}
-        {error && <Error message={error}/>}
+        {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && cloudHost && (
           <Form id={cloudHostKey}
                 fields={this.getFields()}
@@ -113,11 +113,19 @@ class CloudHost extends BaseComponent<Props, {}> {
     )
   };
 
+  private rules = (): JSX.Element =>
+    <></>; //TODO
+
   private tabs: Tab[] = [
     {
       title: 'Cloud host',
       id: 'cloudHost',
       content: () => this.details()
+    },
+    {
+      title: 'Rules',
+      id: 'rules',
+      content: () => this.rules()
     },
   ];
 

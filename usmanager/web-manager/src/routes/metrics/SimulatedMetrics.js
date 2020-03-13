@@ -65,7 +65,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
   loadServices = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhostservices',
+        'http://localhost:8080/services',
         data => this.setState({ services: data, loading: false })
     );
   };
@@ -73,7 +73,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
   loadFields = () => {
     this.setState({ loading: true });
     getData(
-        'http://localhostrules/fields',
+        'http://localhost:8080/rules/fields',
         data => this.setState({ fields: data, loading: false })
     );
   };
@@ -82,7 +82,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
       getData(
-          `http://localhostmetrics/simulated/services/${this.state.id}`,
+          `http://localhost:8080/metrics/simulated/services/${this.state.id}`,
           data => this.setState({ values: data, loading: false })
       );
     }
@@ -111,7 +111,7 @@ export default class ServiceSimulatedMetricsDetail extends React.Component {
   onSubmitForm = event => {
     event.preventDefault();
     postData(
-        `http://localhostmetrics/simulated/services/${this.state.id}`,
+        `http://localhost:8080/metrics/simulated/services/${this.state.id}`,
         event.target[0].value,
         data => {
           this.setState({ isEdit: false, formSubmit: true });

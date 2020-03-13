@@ -31,9 +31,9 @@ import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
 import RulesLandingPage from "../routes/rules/RulesLandingPage";
-import Rules from "../routes/rules/Rules";
+import OldRules from "../routes/rules/OldRules";
 import RulePage from "../routes/rules/RulePage";
-import Conditions from "../routes/rules/Conditions";
+import OldConditions from "../routes/rules/OldConditions";
 import ConditionPage from "../routes/rules/ConditionPage";
 import AppsRulesList from "../routes/rules/AppsRulesList";
 import AppRulesPage from "../routes/rules/AppRulesPage";
@@ -75,6 +75,8 @@ import Containers from "../routes/containers/Containers";
 import Container from "../routes/containers/Container";
 import Apps from "../routes/apps/Apps";
 import App from "../routes/apps/App";
+import Rules from "../routes/rules/Rules";
+import Rule from "../routes/rules/Rule";
 
 interface RootContainerProps {
     store: any;
@@ -84,7 +86,7 @@ type Props = RootContainerProps;
 
 export const authenticatedRoutes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
     "/home": { title: 'Microservices dynamic system management', component: Landing },
-    "/services": { title: "Services", component: Services, search: true },
+    "/services": { component: Services, search: true },
     "/services/:name": { component: Service },
     "/services/service": { component: Service },
     "/apps": { component: Apps, search: true },
@@ -97,9 +99,10 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/containers": { component: Containers, search: true },
     "/containers/:id": { component: Container },
     "/rules": { component: Rules, search: true },
+    "/rules/:name": { component: Rule },
     "/rules/management": { component: RulesLandingPage, search: true },
     "/rules/rules/:ruleId?": { title: "",component: RulePage },
-    "/rules/conditions": {  component: Conditions, search: true },
+    "/rules/conditions": {  component: OldConditions, search: true },
     "/rules/conditions/condition/:conditionId?": {  component: ConditionPage },
     "/rules/apps": {  component: AppsRulesList, search: true },
     "/rules/apps/app/:appId": { component: AppRulesPage },
@@ -126,7 +129,7 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/metrics/simulated/hosts/specific/metric/:id?": { component: SpecificHostSimulatedMetricsDetail },
     "/regions": { component: Regions, search: true },
     "/regions/:name": { component: Region },
-    "/logs": { title: "Logs", component: Logs, search: true },
+    "/logs": { component: Logs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };
 

@@ -108,13 +108,13 @@ import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
 import {IAppService} from "../routes/services/ServiceAppList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
-import {IRule} from "../routes/services/ServiceRuleList";
 import {IDependee} from "../routes/services/ServiceDependeeList";
 import {INode} from "../routes/nodes/Node";
 import {ICloudHost} from "../routes/hosts/CloudHost";
 import {IEdgeHost} from "../routes/hosts/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
+import {IRule} from "../routes/rules/Rule";
 
 export type EntitiesState = {
   services: {

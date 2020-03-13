@@ -72,7 +72,7 @@ location-request:
   port: 1919
   minimum-request-count-percentage: 15.0
 rules:
-  container-rule-template-file: container-rule-template.drl
+  service-rule-template-file: service-rule-template.drl
   host-rule-template-file: host-rule-template.drl
 #debug: true
 #trace: true

@@ -50,9 +50,14 @@ public class RegionsController {
     return regionsService.getRegions();
   }
 
-  @GetMapping("/{name}")
-  public RegionEntity getRegion(@PathVariable String name) {
-    return regionsService.getRegion(name);
+  @GetMapping("/{regionId}")
+  public RegionEntity getRegion(@PathVariable Long regionId) {
+    return regionsService.getRegion(regionId);
+  }
+
+  @GetMapping("/{regionName}")
+  public RegionEntity getRegion(@PathVariable String regionName) {
+    return regionsService.getRegion(regionName);
   }
 
   @PostMapping

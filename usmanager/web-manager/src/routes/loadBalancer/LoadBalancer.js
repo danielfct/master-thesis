@@ -48,7 +48,7 @@ export default class LoadBalancerPage extends React.Component {
   loadServices = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostservices',
+      'http://localhost:8080/services',
       // TODO get filtered data from server instead
     data =>
         this.setState({ services: data.filter(v => v.serviceType === 'frontend'), loading: false })
@@ -58,7 +58,7 @@ export default class LoadBalancerPage extends React.Component {
   loadRegions = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhostregions',
+      'http://localhost:8080/regions',
       data =>
         this.setState({ availableRegions: data, loading: false })
     );
@@ -78,7 +78,7 @@ export default class LoadBalancerPage extends React.Component {
     newAvailableRegions.splice(index, 1);
     this.setState({ loading: true });
     getData(
-      `http://localhostregions/${regionId}`,
+      `http://localhost:8080/regions/${regionId}`,
       data => {
         const newChosenRegions = this.state.chosenRegions;
         newChosenRegions.push(data);
@@ -100,7 +100,7 @@ export default class LoadBalancerPage extends React.Component {
     newChosenRegions.splice(index, 1);
     this.setState({ loading: true });
     getData(
-      `http://localhostregions/${regionId}`,
+      `http://localhost:8080/regions/${regionId}`,
       data => {
         const newAvailableRegions = this.state.availableRegions;
         newAvailableRegions.push(data);
@@ -124,7 +124,7 @@ export default class LoadBalancerPage extends React.Component {
     event.preventDefault();
     const service = $('#service').val();
     postData(
-      'http://localhostcontainers/loadBalancer',
+      'http://localhost:8080/containers/loadBalancer',
       //FIXME
       {
         serviceName: service,
