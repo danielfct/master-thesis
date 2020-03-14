@@ -8,33 +8,46 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
+public enum RuleDecision {
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode(callSuper = true)
-public class HostDecisionResult extends DecisionResult {
+  NONE("NONE"),
+  REPLICATE("REPLICATE"),
+  MIGRATE("MIGRATE"),
+  START("START"),
+  STOP("STOP");
 
-  public HostDecisionResult(String hostname) {
-    this(hostname, RuleDecision.NONE, 0, Collections.emptyMap(), 0);
+  private static Map<String, RuleDecision> constants = new HashMap<>();
+
+  private final String value;
+
+  static {
+    for (RuleDecision c : values()) {
+      constants.put(c.value, c);
+    }
   }
 
-  public HostDecisionResult(String hostname, RuleDecision decision, long ruleId,
-                            Map<String, Double> fields, int priority) {
-    super(hostname, decision, ruleId, fields, priority,
-        fields.values().stream().mapToDouble(Double::doubleValue).sum());
+  RuleDecision(String value) {
+    this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    return this.value;
+  }
+
+  public static RuleDecision fromValue(String value) {
+    RuleDecision constant = constants.get(value);
+    if (constant == null) {
+      throw new IllegalArgumentException(value);
+    } else {
+      return constant;
+    }
   }
 
 }
-
 

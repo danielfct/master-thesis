@@ -22,22 +22,42 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps;
 
-import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 
 @Repository
-public interface ServiceEventPredictionRepository extends CrudRepository<ServiceEventPredictionEntity, Long> {
+public interface AppRuleRepository extends CrudRepository<AppRuleEntity, Long> {
 
-  @Query("select sp.minReplicas "
-      + "from ServiceEventPredictionEntity sp inner join sp.service s "
-      + "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
-      + "order by sp.lastUpdate desc")
-  Integer getMinReplicasByServiceName(@Param("serviceName") String serviceName, @Param("date") Date date);
+  Optional<AppRuleEntity> findByNameIgnoreCase(@Param("name") String name);
+
+  @Query("select appRule "
+      + "from AppRuleEntity appRule join appRule.appPackage app "
+      + "where app.name = :appName")
+  List<AppRuleEntity> getRulesByAppName(@Param("appName") String appName);
+
+  @Query("select case when count(r) > 0 then true else false end "
+      + "from AppRuleEntity r "
+      + "where r.name = :ruleName")
+  boolean hasRule(@Param("ruleName") String ruleName);
+
+  @Query("select rc.condition "
+      + "from AppRuleEntity r join r.conditions rc "
+      + "where r.name = :ruleName")
+  List<ConditionEntity> getConditions(@Param("ruleName") String ruleName);
+
+  @Query("select rc.condition "
+      + "from AppRuleEntity r join r.conditions rc "
+      + "where r.name = :ruleName and rc.condition.name = :conditionName")
+  Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
+                                         @Param("conditionName") String conditionName);
+
 
 }

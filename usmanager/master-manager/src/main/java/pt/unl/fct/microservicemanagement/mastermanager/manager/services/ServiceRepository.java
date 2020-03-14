@@ -25,8 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +34,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 
 @Repository
 public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
@@ -58,15 +58,15 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.serviceName = :serviceName")
   List<ServiceEntity> getDependees(@Param("serviceName") String serviceName);
 
-  @Query("select r.rule "
-      + "from ServiceEntity s inner join s.rules r "
-      + "where s.serviceName = :serviceName")
-  List<RuleEntity> getRules(@Param("serviceName") String serviceName);
-
-  @Query("select r.rule "
+  @Query("select r "
       + "from ServiceEntity s join s.rules r "
-      + "where s.serviceName = :serviceName and r.rule.name = :ruleName")
-  Optional<RuleEntity> getRule(@Param("serviceName") String serviceName, @Param("ruleName") String ruleName);
+      + "where s.serviceName = :serviceName")
+  List<ServiceRuleEntity> getRules(@Param("serviceName") String serviceName);
+
+  @Query("select r "
+      + "from ServiceEntity s join s.rules r "
+      + "where s.serviceName = :serviceName and r.name = :ruleName")
+  Optional<ServiceRuleEntity> getRule(@Param("serviceName") String serviceName, @Param("ruleName") String ruleName);
 
   @Query("select case when count(s) > 0 then true else false end "
       + "from ServiceEntity s "
@@ -108,13 +108,13 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
   @Query("select p "
       + "from ServiceEntity s join s.eventPredictions p "
       + "where s.serviceName = :serviceName")
-  List<EventPredictionEntity> getPredictions(@Param("serviceName") String serviceName);
+  List<ServiceEventPredictionEntity> getPredictions(@Param("serviceName") String serviceName);
 
   @Query("select p "
       + "from ServiceEntity s join s.eventPredictions p "
       + "where s.id = :serviceId and p.id = :serviceEventPredictions")
-  Optional<EventPredictionEntity> getPrediction(@Param("serviceId") long serviceId,
-                                                @Param("serviceEventPredictions")
+  Optional<ServiceEventPredictionEntity> getPrediction(@Param("serviceId") long serviceId,
+                                                       @Param("serviceEventPredictions")
                                                     long serviceEventPredictions);
 
   @Query("select s.maxReplicas "

@@ -24,9 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ComponentDecisionLog;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -69,17 +67,7 @@ public class ComponentTypeEntity {
   @JsonIgnore
   @OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
-  private Set<RuleEntity> rules = new HashSet<>();
-
-  @JsonIgnore
-  @OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
   private Set<DecisionEntity> decisions = new HashSet<>();
-
-  @JsonIgnore
-  @OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ComponentDecisionLog> componentDecisionLogs = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {

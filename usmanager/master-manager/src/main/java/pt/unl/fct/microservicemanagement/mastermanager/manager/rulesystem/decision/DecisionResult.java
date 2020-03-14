@@ -27,6 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decis
 import java.util.Map;
 
 import lombok.Data;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 
 @Data
 public class DecisionResult implements Comparable<DecisionResult> {

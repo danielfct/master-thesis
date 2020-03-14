@@ -1,12 +1,21 @@
+/*
+ * Copyright (c) 2020 usmanager
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.Event;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ContainerDecisionResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.Decision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.RuleDecision;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,15 +25,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.drools.core.event.DefaultAgendaEventListener;
 import org.drools.template.ObjectDataCompiler;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.ReleaseId;
+import org.kie.api.event.rule.AfterMatchFiredEvent;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.io.Resource;
 import org.kie.api.runtime.StatelessKieSession;
@@ -128,14 +143,14 @@ public class DroolsService {
     return result.toString(StandardCharsets.UTF_8);
   }
 
-  public ContainerDecisionResult evaluate(String serviceHostname, ContainerEvent event) {
+  public ServiceDecisionResult evaluate(String serviceHostname, ContainerEvent event) {
     var containerDecision = new Decision();
     String serviceName = event.getServiceName();
     StatelessKieSession serviceRuleSession = serviceRuleSessions.get(serviceName);
     serviceRuleSession.getGlobals().set("containerDecision", containerDecision);
     serviceRuleSession.execute(event);
     long ruleId = getRuleFired(new ArrayList<>(serviceRuleSession.getAgendaEventListeners()));
-    return new ContainerDecisionResult(serviceHostname, event.getContainerId(), event.getServiceName(),
+    return new ServiceDecisionResult(serviceHostname, event.getContainerId(), event.getServiceName(),
         containerDecision.getDecision(), ruleId, event.getFields(), containerDecision.getPriority());
   }
 
@@ -163,6 +178,40 @@ public class DroolsService {
     String[] ruleNameSplit = matchList.get(0).getRule().getName().split("_");
     trackingAgendaEvent.reset();
     return Long.parseLong(ruleNameSplit[2]);
+  }
+
+  @Getter
+  static final class TrackingAgendaEventListener extends DefaultAgendaEventListener {
+
+    private final List<Match> matchList;
+
+    TrackingAgendaEventListener() {
+      matchList = new LinkedList<>();
+    }
+
+    @Override
+    public void afterMatchFired(AfterMatchFiredEvent event) {
+      matchList.add(event.getMatch());
+    }
+
+    public boolean isRuleFired(String ruleName) {
+      return matchList.stream()
+          .map(Match::getRule).map(org.kie.api.definition.rule.Rule::getName)
+          .anyMatch(n -> Objects.equals(n, ruleName));
+    }
+
+    public void reset() {
+      matchList.clear();
+    }
+
+    @Override
+    public String toString() {
+      return matchList.isEmpty()
+          ? "No matches occurred."
+          : "Matches: " + matchList.stream()
+          .map(m -> "\n  rule: " + m.getRule().getName()).collect(Collectors.joining());
+    }
+
   }
 
 }

@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.fields;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionValueEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,8 +35,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -45,6 +48,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 
 @Entity
 @Builder(toBuilder = true)
@@ -52,38 +56,41 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "fields")
-public class FieldEntity {
+@Table(name = "service_rules")
+public class ServiceRuleEntity {
 
   @Id
   @GeneratedValue
   private Long id;
 
-  //TODO enum
-  // Possible values:
-  // - cpu, - ram, ...
+  @NotNull
   @Column(unique = true)
   private String name;
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ConditionEntity> conditions = new HashSet<>();
+  private int priority;
 
+  @ManyToOne
+  @JoinColumn(name = "service_id")
+  private ServiceEntity service;
+
+  @ManyToOne
+  @JoinColumn(name = "decision_id")
+  private DecisionEntity decision;
+
+  @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ServiceDecisionValueEntity> componentDecisionValueLogs = new HashSet<>();
+  @OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ServiceRuleConditionEntity> conditions = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof FieldEntity)) {
+    if (!(o instanceof ServiceRuleEntity)) {
       return false;
     }
-    FieldEntity other = (FieldEntity) o;
+    ServiceRuleEntity other = (ServiceRuleEntity) o;
     return id != null && id.equals(other.getId());
   }
 

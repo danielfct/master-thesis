@@ -24,11 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition;
 
-import lombok.Singular;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -51,6 +52,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 
 @Entity
 @Builder(toBuilder = true)
@@ -85,8 +87,18 @@ public class ConditionEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "condition", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<RuleConditionEntity> ruleConditions = new HashSet<>();
+  @OneToMany(mappedBy = "appCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<AppRuleConditionEntity> appRuleConditions = new HashSet<>();
+
+  @Singular
+  @JsonIgnore
+  @OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<HostRuleConditionEntity> hostRuleConditions = new HashSet<>();
+
+  @Singular
+  @JsonIgnore
+  @OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ServiceRuleConditionEntity> serviceConditions = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {

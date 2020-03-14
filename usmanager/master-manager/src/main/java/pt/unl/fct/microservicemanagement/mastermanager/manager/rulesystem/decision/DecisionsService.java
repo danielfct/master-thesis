@@ -24,12 +24,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypesService;
+import org.springframework.stereotype.Service;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -38,34 +39,33 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 
-@org.springframework.stereotype.Service
+@Service
 @Slf4j
 public class DecisionsService {
 
+  private final ServiceRulesService serviceRulesService;
+  private final HostRulesService hostRulesService;
   private final DecisionRepository decisions;
-  private final ComponentTypesService componentTypesService;
-  private final ComponentDecisionLogRepository componentDecisionLogs;
-  private final ComponentDecisionServiceLogRepository componentDecisionServiceLogs;
-  private final ComponentDecisionHostLogRepository componentDecisionHostLogs;
-  private final ComponentDecisionValueLogRepository componentDecisionValueLogs;
-  private final RulesService rulesService;
+  private final ServiceDecisionRepository serviceDecisions;
+  private final HostDecisionRepository hostDecisions;
+  private final ServiceDecisionValueRepository serviceDecisionValues;
+  private final HostDecisionValueRepository hostDecisionValues;
   private final FieldsService fieldsService;
 
-  public DecisionsService(DecisionRepository decisions, ComponentTypesService componentTypesService,
-                          ComponentDecisionLogRepository componentDecisionLogs,
-                          ComponentDecisionServiceLogRepository componentDecisionServiceLogs,
-                          ComponentDecisionHostLogRepository componentDecisionHostLogs,
-                          ComponentDecisionValueLogRepository componentDecisionValueLogs,
-                          @Lazy RulesService rulesService, FieldsService fieldsService) {
+  public DecisionsService(ServiceRulesService serviceRulesService, HostRulesService hostRulesService,
+                          DecisionRepository decisions, ServiceDecisionRepository serviceDecisions,
+                          HostDecisionRepository hostDecisions,
+                          ServiceDecisionValueRepository serviceDecisionValues,
+                          HostDecisionValueRepository hostDecisionValues,
+                          FieldsService fieldsService) {
+    this.serviceRulesService = serviceRulesService;
+    this.hostRulesService = hostRulesService;
     this.decisions = decisions;
-    this.componentTypesService = componentTypesService;
-    this.componentDecisionLogs = componentDecisionLogs;
-    this.componentDecisionServiceLogs = componentDecisionServiceLogs;
-    this.componentDecisionHostLogs = componentDecisionHostLogs;
-    this.componentDecisionValueLogs = componentDecisionValueLogs;
-    this.rulesService = rulesService;
+    this.serviceDecisions = serviceDecisions;
+    this.hostDecisions = hostDecisions;
+    this.serviceDecisionValues = serviceDecisionValues;
+    this.hostDecisionValues = hostDecisionValues;
     this.fieldsService = fieldsService;
   }
 
@@ -73,68 +73,90 @@ public class DecisionsService {
     return decisions.findAll();
   }
 
-  public DecisionEntity getDecision(long id) {
-    return decisions.findById(id).orElseThrow(() -> new NotFoundException("Decision not found"));
+  public DecisionEntity getDecision(Long id) {
+    return decisions.findById(id).orElseThrow(() ->
+        new EntityNotFoundException(DecisionEntity.class, "id", id.toString()));
   }
 
-  public List<DecisionEntity> getHostDecisions() {
-    return decisions.getDecisionsByComponentType("Host");
-  }
-
-  public List<DecisionEntity> getContainerDecisions() {
+  public List<DecisionEntity> getServicesPossibleDecisions() {
     return decisions.getDecisionsByComponentType("Service");
+  }
+
+  public List<DecisionEntity> getHostsPossibleDecisions() {
+    return decisions.getDecisionsByComponentType("Host");
   }
 
   public DecisionEntity getDecisionByComponentTypeAndByDecisionName(String componentTypeName, String decisionName) {
     return decisions.getDecisionByComponentTypeAndByDecisionName(componentTypeName, decisionName);
   }
 
-  public ComponentDecisionServiceLog saveComponentDecisionServiceLog(String containerId, String serviceName,
-                                                                     String decision, long ruleId, String otherInfo) {
-    var componentDecisionLog = saveComponentDecisionLog("Container", decision, ruleId);
-    var componentDecisionServiceLog = ComponentDecisionServiceLog.builder()
-        .componentDecisionLog(componentDecisionLog).containerId(containerId).serviceName(serviceName)
-        .otherInfo(otherInfo).build();
-    return componentDecisionServiceLogs.save(componentDecisionServiceLog);
-  }
-
-  public ComponentDecisionHostLog saveComponentDecisionHostLog(String hostname, String decision, long ruleId) {
-    final var componentDecisionLog = saveComponentDecisionLog("Host", decision, ruleId);
-    final var componentDecisionHostLog = ComponentDecisionHostLog.builder().componentDecisionLog(componentDecisionLog)
-        .hostname(hostname).build();
-    return componentDecisionHostLogs.save(componentDecisionHostLog);
-  }
-
-  private ComponentDecisionLog saveComponentDecisionLog(String componentTypeName, String decisionName, long ruleId) {
-    ComponentTypeEntity componentType = componentTypesService.getComponentType(componentTypeName);
-    DecisionEntity decision = decisions.getDecisionByComponentTypeAndByDecisionName(componentTypeName, decisionName);
-    RuleEntity rule = rulesService.getRule(ruleId);
-    var timestamp = Timestamp.from(Instant.now());
-    var componentDecisionLog = ComponentDecisionLog.builder().componentType(componentType).decision(decision).rule(rule)
+  public ServiceDecisionEntity addServiceDecision(String containerId, String serviceName,
+                                                  String decisionName, long ruleId, String otherInfo) {
+    ServiceRuleEntity rule = serviceRulesService.getRule(ruleId);
+    DecisionEntity decision = decisions.getDecisionByComponentTypeAndByDecisionName("Service",
+        decisionName);
+    Timestamp timestamp = Timestamp.from(Instant.now());
+    ServiceDecisionEntity serviceDecision = ServiceDecisionEntity.builder()
+        .containerId(containerId)
+        .serviceName(serviceName)
+        .otherInfo(otherInfo)
+        .rule(rule)
+        .decision(decision)
         .timestamp(timestamp).build();
-    return componentDecisionLogs.save(componentDecisionLog);
+    return serviceDecisions.save(serviceDecision);
   }
 
-  public void saveComponentDecisionValueLogsFromFields(ComponentDecisionLog componentDecisionLog,
-                                                       final Map<String, Double> fieldsValues) {
-    final var componentDecisionValueLogsList = fieldsValues.entrySet().stream()
-        .filter(fieldValue -> fieldValue.getKey().contains("effective-val"))
-        .map(fieldValue ->
-            ComponentDecisionValueLog.builder()
-                .componentDecisionLog(componentDecisionLog)
-                .field(fieldsService.getField(fieldValue.getKey().split("-effective-val")[0]))
-                .componentValue(fieldValue.getValue())
-                .build())
-        .collect(Collectors.toList());
-    componentDecisionValueLogs.saveAll(componentDecisionValueLogsList);
+  public HostDecisionEntity addHostDecision(String hostname, String decisionName, long ruleId) {
+    HostRuleEntity rule = hostRulesService.getRule(ruleId);
+    DecisionEntity decision = decisions.getDecisionByComponentTypeAndByDecisionName("Host", decisionName);
+    Timestamp timestamp = Timestamp.from(Instant.now());
+    HostDecisionEntity hostDecision = HostDecisionEntity.builder()
+        .hostname(hostname)
+        .rule(rule)
+        .decision(decision)
+        .timestamp(timestamp).build();
+    return hostDecisions.save(hostDecision);
   }
 
-  public List<ComponentDecisionServiceLog> getComponentDecisionServiceLogByServiceName(String serviceName) {
-    return componentDecisionServiceLogs.findByServiceName(serviceName);
+  public void addServiceDecisionValueFromFields(ServiceDecisionEntity serviceDecision,
+                                                    Map<String, Double> fields) {
+    serviceDecisionValues.saveAll(
+        fields.entrySet().stream()
+            .filter(field -> field.getKey().contains("effective-val"))
+            .map(field ->
+                ServiceDecisionValueEntity.builder()
+                    .serviceDecision(serviceDecision)
+                    .field(fieldsService.getField(field.getKey().split("-effective-val")[0]))
+                    .value(field.getValue())
+                    .build())
+            .collect(Collectors.toList())
+    );
   }
 
-  public List<ComponentDecisionServiceLog> getComponentDecisionServiceLogByContainerId(String containerId) {
-    return componentDecisionServiceLogs.findByServiceName(containerId);
+  public void addHostDecisionValueFromFields(HostDecisionEntity hostDecision, Map<String, Double> fields) {
+    hostDecisionValues.saveAll(
+        fields.entrySet().stream()
+            .filter(field -> field.getKey().contains("effective-val"))
+            .map(field ->
+                HostDecisionValueEntity.builder()
+                    .hostDecision(hostDecision)
+                    .field(fieldsService.getField(field.getKey().split("-effective-val")[0]))
+                    .value(field.getValue())
+                    .build())
+            .collect(Collectors.toList())
+    );
+  }
+
+  public List<ServiceDecisionEntity> getServiceDecisions(String serviceName) {
+    return serviceDecisions.findByServiceName(serviceName);
+  }
+
+  public List<ServiceDecisionEntity> getContainerDecisions(String containerId) {
+    return serviceDecisions.findByContainerId(containerId);
+  }
+
+  public List<HostDecisionEntity> getHostDecisions(String hostname) {
+    return hostDecisions.findByHostname(hostname);
   }
 
 }

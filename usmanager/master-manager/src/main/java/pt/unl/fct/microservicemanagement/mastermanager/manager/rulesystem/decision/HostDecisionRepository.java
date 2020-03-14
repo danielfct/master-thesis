@@ -10,31 +10,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode(callSuper = true)
-public class HostDecisionResult extends DecisionResult {
+@Repository
+public interface HostDecisionRepository extends CrudRepository<HostDecisionEntity, Long> {
 
-  public HostDecisionResult(String hostname) {
-    this(hostname, RuleDecision.NONE, 0, Collections.emptyMap(), 0);
-  }
-
-  public HostDecisionResult(String hostname, RuleDecision decision, long ruleId,
-                            Map<String, Double> fields, int priority) {
-    super(hostname, decision, ruleId, fields, priority,
-        fields.values().stream().mapToDouble(Double::doubleValue).sum());
-  }
+  List<HostDecisionEntity> findByHostname(String hostname);
 
 }
-
-

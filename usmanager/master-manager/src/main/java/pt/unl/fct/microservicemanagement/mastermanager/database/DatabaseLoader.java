@@ -34,6 +34,9 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEn
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
@@ -42,14 +45,8 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condit
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.GenericHostRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.GenericHostRuleRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleConditionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
@@ -73,8 +70,8 @@ public class DatabaseLoader {
                                  ServiceDependencyRepository servicesDependencies, RegionRepository regions,
                                  EdgeHostRepository edgeHosts, ComponentTypeRepository componentTypes,
                                  OperatorRepository operators, DecisionRepository decisions, FieldRepository fields,
-                                 ValueModeRepository valueModes, RuleRepository rules, ConditionRepository conditions,
-                                 RuleConditionRepository ruleConditions, GenericHostRuleRepository genericHostRules) {
+                                 ValueModeRepository valueModes, ConditionRepository conditions,
+                                 HostRuleRepository hostRules) {
     return args -> {
 
       // sytem users
@@ -820,30 +817,21 @@ public class DatabaseLoader {
 
       // value modes
       var effectiveValue = ValueModeEntity.builder()
-          .valueModeName("effective-val")
+          .name("effective-val")
           .build();
       valueModes.save(effectiveValue);
       var averageValue = ValueModeEntity.builder()
-          .valueModeName("avg-val")
+          .name("avg-val")
           .build();
       valueModes.save(averageValue);
       var deviationPercentageOnAverageValue = ValueModeEntity.builder()
-          .valueModeName("deviation-%-on-avg-val")
+          .name("deviation-%-on-avg-val")
           .build();
       valueModes.save(deviationPercentageOnAverageValue);
       var deviationPercentageOnLastValue = ValueModeEntity.builder()
-          .valueModeName("deviation-%-on-last-val")
+          .name("deviation-%-on-last-val")
           .build();
       valueModes.save(deviationPercentageOnLastValue);
-
-      // rules
-      var cpuAndRamPercentageOver90Rule = RuleEntity.builder()
-          .name("CPUandRAMover90")
-          .componentType(host)
-          .priority(1)
-          .decision(hostDecisionStart)
-          .build();
-      rules.save(cpuAndRamPercentageOver90Rule);
 
       // conditions
       var cpuPercentageOver90 = ConditionEntity.builder()
@@ -851,7 +839,7 @@ public class DatabaseLoader {
           .valueMode(effectiveValue)
           .field(cpuPercentage)
           .operator(greaterThan)
-          .conditionValue(90)
+          .value(90)
           .build();
       conditions.save(cpuPercentageOver90);
       var ramPercentageOver90 = ConditionEntity.builder()
@@ -859,27 +847,30 @@ public class DatabaseLoader {
           .valueMode(effectiveValue)
           .field(ramPercentage)
           .operator(greaterThan)
-          .conditionValue(90)
+          .value(90)
           .build();
       conditions.save(ramPercentageOver90);
 
-      // rule conditions
-      var cpuAndRamPercentageOver90Condition1 = RuleConditionEntity.builder()
-          .rule(cpuAndRamPercentageOver90Rule)
-          .condition(cpuPercentageOver90)
-          .build();
-      ruleConditions.save(cpuAndRamPercentageOver90Condition1);
-      var cpuAndRamPercentageOver90Condition2 = RuleConditionEntity.builder()
-          .rule(cpuAndRamPercentageOver90Rule)
-          .condition(ramPercentageOver90)
-          .build();
-      ruleConditions.save(cpuAndRamPercentageOver90Condition2);
-
       // generic host rules
-      var cpuAndRamPercentageOver90GenericHostRule = GenericHostRuleEntity.builder()
-          .rule(cpuAndRamPercentageOver90Rule)
+      var cpuAndRamOver90GenericHostRule = HostRuleEntity.builder()
+          .name("CpuAndRamOver90")
+          .priority(1)
+          .decision(hostDecisionStart)
           .build();
-      genericHostRules.save(cpuAndRamPercentageOver90GenericHostRule);
+      cpuAndRamOver90GenericHostRule = hostRules.save(cpuAndRamOver90GenericHostRule);
+      var cpuOver90Condition = HostRuleConditionEntity.builder()
+          .hostRule(cpuAndRamOver90GenericHostRule)
+          .hostCondition(cpuPercentageOver90)
+          .build();
+      var ramOver90Condition = HostRuleConditionEntity.builder()
+          .hostRule(cpuAndRamOver90GenericHostRule)
+          .hostCondition(ramPercentageOver90)
+          .build();
+      cpuAndRamOver90GenericHostRule = cpuAndRamOver90GenericHostRule.toBuilder()
+          .condition(cpuOver90Condition)
+          .condition(ramOver90Condition)
+          .build();
+      hostRules.save(cpuAndRamOver90GenericHostRule);
     };
   }
 

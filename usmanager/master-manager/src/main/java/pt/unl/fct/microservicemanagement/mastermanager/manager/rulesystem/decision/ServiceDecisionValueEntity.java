@@ -10,31 +10,60 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
-import java.util.Collections;
-import java.util.Map;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 
-import lombok.EqualsAndHashCode;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 
-@Getter
+@Entity
+@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
 @Setter
-@ToString
-@EqualsAndHashCode(callSuper = true)
-public class HostDecisionResult extends DecisionResult {
+@Getter
+@Table(name = "service_decision_values")
+public class ServiceDecisionValueEntity {
 
-  public HostDecisionResult(String hostname) {
-    this(hostname, RuleDecision.NONE, 0, Collections.emptyMap(), 0);
+  @Id
+  @GeneratedValue
+  private Long id;
+
+  @ManyToOne
+  @JoinColumn(name = "service_decision_id")
+  private ServiceDecisionEntity serviceDecision;
+
+  @ManyToOne
+  @JoinColumn(name = "field_id")
+  private FieldEntity field;
+
+  private double value;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ServiceDecisionValueEntity)) {
+      return false;
+    }
+    ServiceDecisionValueEntity other = (ServiceDecisionValueEntity) o;
+    return id != null && id.equals(other.getId());
   }
 
-  public HostDecisionResult(String hostname, RuleDecision decision, long ruleId,
-                            Map<String, Double> fields, int priority) {
-    super(hostname, decision, ruleId, fields, priority,
-        fields.values().stream().mapToDouble(Double::doubleValue).sum());
+  @Override
+  public int hashCode() {
+    return 31;
   }
 
 }
-
-

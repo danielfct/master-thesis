@@ -30,7 +30,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ContainerDecisionResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,13 +102,13 @@ public class LocationRequestService {
   }
 
   public Map<String, HostDetails> getBestLocationToStartServices(
-      Map<String, List<ContainerDecisionResult>> allServicesDecisions, int secondsFromLastRun) {
+      Map<String, List<ServiceDecisionResult>> allServicesDecisions, int secondsFromLastRun) {
     Pair<Map<String, Map<String, Integer>>, Map<String, Integer>> servicesLocationMonitoring = getLocationMonitoring(
         secondsFromLastRun);
     Map<String, HostDetails> finalLocations = new HashMap<>();
-    for (Entry<String, List<ContainerDecisionResult>> services : allServicesDecisions.entrySet()) {
+    for (Entry<String, List<ServiceDecisionResult>> services : allServicesDecisions.entrySet()) {
       String serviceName = services.getKey();
-      List<ContainerDecisionResult> serviceAllDecisions = services.getValue();
+      List<ServiceDecisionResult> serviceAllDecisions = services.getValue();
       if (servicesLocationMonitoring.getSecond().containsKey(serviceName)) {
         if (!serviceAllDecisions.isEmpty()) {
           HostDetails location = getBestLocationByService(serviceName,
@@ -170,12 +170,12 @@ public class LocationRequestService {
     return Pair.of(serviceCountLocations, serviceTotalRequestCount);
   }
 
-  private Map<String, Integer> getLocationsByRunningContainers(List<ContainerDecisionResult> allDecisions) {
+  private Map<String, Integer> getLocationsByRunningContainers(List<ServiceDecisionResult> allDecisions) {
     Map<String, Integer> availableLocations = new HashMap<>();
     Map<String, HostDetails> hostnamesFound = new HashMap<>();
 
-    for (ContainerDecisionResult containerDecisionResult : allDecisions) {
-      String serviceHostname = containerDecisionResult.getHostname();
+    for (ServiceDecisionResult serviceDecisionResult : allDecisions) {
+      String serviceHostname = serviceDecisionResult.getHostname();
       if (!hostnamesFound.containsKey(serviceHostname)) {
         HostDetails hostDetails = hostsService.getHostDetails(serviceHostname);
         hostnamesFound.put(serviceHostname, hostDetails);

@@ -22,22 +22,24 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.fields;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionValueEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -45,6 +47,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Builder(toBuilder = true)
@@ -52,38 +55,54 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "fields")
-public class FieldEntity {
+@Table(name = "service_event_predictions")
+public class ServiceEventPredictionEntity {
 
   @Id
   @GeneratedValue
   private Long id;
 
-  //TODO enum
-  // Possible values:
-  // - cpu, - ram, ...
+  @NotNull
   @Column(unique = true)
   private String name;
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ConditionEntity> conditions = new HashSet<>();
+  private String description;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  @JsonFormat(pattern = "dd/MM/yyyy")
+  private LocalDate startDate;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+  @JsonFormat(pattern = "HH:mm")
+  private LocalTime startTime;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  @JsonFormat(pattern = "dd/MM/yyyy")
+  private LocalDate endDate;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+  @JsonFormat(pattern = "HH:mm")
+  private LocalTime endTime;
+
+  private int minReplicas;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private Set<ServiceDecisionValueEntity> componentDecisionValueLogs = new HashSet<>();
+  @JoinColumn(name = "service_id")
+  @ManyToOne
+  private ServiceEntity service;
+
+  @JsonIgnore
+  private Timestamp lastUpdate;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof FieldEntity)) {
+    if (!(o instanceof ServiceEventPredictionEntity)) {
       return false;
     }
-    FieldEntity other = (FieldEntity) o;
+    ServiceEventPredictionEntity other = (ServiceEventPredictionEntity) o;
     return id != null && id.equals(other.getId());
   }
 

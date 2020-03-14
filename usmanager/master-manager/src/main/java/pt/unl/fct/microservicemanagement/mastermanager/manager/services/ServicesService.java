@@ -24,16 +24,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.service.ServiceRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
@@ -44,6 +42,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -52,14 +51,14 @@ public class ServicesService {
 
   private final ServiceRepository services;
   private final ServiceEventPredictionRepository serviceEventPredictions;
-  private final RulesService rulesService;
+  private final ServiceRulesService serviceRulesService;
   private final AppsService appsService;
 
   public ServicesService(ServiceRepository services, ServiceEventPredictionRepository serviceEventPredictions,
-                         RulesService rulesService, @Lazy AppsService appsService) {
+                         ServiceRulesService serviceRulesService, @Lazy AppsService appsService) {
     this.services = services;
     this.serviceEventPredictions = serviceEventPredictions;
-    this.rulesService = rulesService;
+    this.serviceRulesService = serviceRulesService;
     this.appsService = appsService;
   }
 
@@ -189,19 +188,19 @@ public class ServicesService {
     return services.getDependees(serviceName);
   }
 
-  public Iterable<EventPredictionEntity> getPredictions(String serviceName) {
+  public Iterable<ServiceEventPredictionEntity> getPredictions(String serviceName) {
     assertServiceExists(serviceName);
     return services.getPredictions(serviceName);
   }
 
-  public void addPrediction(String serviceName, EventPredictionEntity prediction) {
+  public void addPrediction(String serviceName, ServiceEventPredictionEntity prediction) {
     var service = getService(serviceName);
     var servicePrediction = prediction.toBuilder().service(service).lastUpdate(Timestamp.from(Instant.now())).build();
     service = service.toBuilder().eventPrediction(servicePrediction).build();
     services.save(service);
   }
 
-  public void addPredictions(String serviceName, List<EventPredictionEntity> predictions) {
+  public void addPredictions(String serviceName, List<ServiceEventPredictionEntity> predictions) {
     predictions.forEach(prediction -> addPrediction(serviceName, prediction));
   }
 
@@ -217,31 +216,30 @@ public class ServicesService {
   }
 
   // FIXME
-  public EventPredictionEntity getEventPrediction(Long serviceId, Long eventPredictionId) {
+  public ServiceEventPredictionEntity getEventPrediction(Long serviceId, Long eventPredictionId) {
     assertServiceExists(serviceId);
     return services.getPrediction(serviceId, eventPredictionId).orElseThrow(() ->
-        new EntityNotFoundException(EventPredictionEntity.class, "eventPredictionId", eventPredictionId.toString())
+        new EntityNotFoundException(ServiceEventPredictionEntity.class, "eventPredictionId", eventPredictionId.toString())
     );
   }
 
-  public Iterable<RuleEntity> getRules(String serviceName) {
+  public Iterable<ServiceRuleEntity> getRules(String serviceName) {
     assertServiceExists(serviceName);
     return services.getRules(serviceName);
   }
 
-  public RuleEntity getRule(String serviceName, String ruleName) {
+  public ServiceRuleEntity getRule(String serviceName, String ruleName) {
     assertServiceExists(serviceName);
     return services.getRule(serviceName, ruleName).orElseThrow(() ->
-        new EntityNotFoundException(RuleEntity.class, "name", ruleName)
+        new EntityNotFoundException(ServiceRuleEntity.class, "name", ruleName)
     );
   }
 
   public void addRule(String serviceName, String ruleName) {
     var service = getService(serviceName);
-    var rule = rulesService.getRule(ruleName);
+    var rule = serviceRulesService.getRule(ruleName);
     log.info("Adding rule {}", ruleName);
-    var serviceRule = ServiceRuleEntity.builder().service(service).rule(rule).build();
-    service = service.toBuilder().rule(serviceRule).build();
+    service = service.toBuilder().rule(rule).build();
     services.save(service);
   }
 
@@ -257,7 +255,7 @@ public class ServicesService {
     var service = getService(serviceName);
     log.info("Removing rules {}", rulesName);
     service.getRules()
-        .removeIf(rule -> rulesName.contains(rule.getRule().getName()));
+        .removeIf(rule -> rulesName.contains(rule.getName()));
     services.save(service);
   }
 
@@ -284,7 +282,7 @@ public class ServicesService {
 
   private void assertServiceExists(String serviceName) {
     if (!services.hasService(serviceName)) {
-      throw new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName.toString());
+      throw new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName);
     }
   }
 

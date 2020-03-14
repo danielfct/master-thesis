@@ -33,11 +33,12 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.SimulatedMetricsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ContainerDecisionResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.RuleDecision;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
 import java.sql.Timestamp;
@@ -72,7 +73,7 @@ public class ContainersMonitoringService {
 
   private final DockerContainersService dockerContainersService;
   private final ServicesService servicesService;
-  private final RulesService rulesService;
+  private final ServiceRulesService serviceRulesService;
   private final ServicesEventsService servicesEventsService;
   private final HostsService hostsService;
   private final LocationRequestService requestLocationMonitoringService;
@@ -87,7 +88,7 @@ public class ContainersMonitoringService {
 
   public ContainersMonitoringService(ContainerMonitoringRepository containersMonitoring,
                                      DockerContainersService dockerContainersService,
-                                     ServicesService servicesService, RulesService rulesService,
+                                     ServicesService servicesService, ServiceRulesService serviceRulesService,
                                      ServicesEventsService servicesEventsService, HostsService hostsService,
                                      LocationRequestService requestLocationMonitoringService,
                                      DecisionsService decisionsService,
@@ -97,7 +98,7 @@ public class ContainersMonitoringService {
     this.containersMonitoring = containersMonitoring;
     this.dockerContainersService = dockerContainersService;
     this.servicesService = servicesService;
-    this.rulesService = rulesService;
+    this.serviceRulesService = serviceRulesService;
     this.servicesEventsService = servicesEventsService;
     this.hostsService = hostsService;
     this.requestLocationMonitoringService = requestLocationMonitoringService;
@@ -174,34 +175,36 @@ public class ContainersMonitoringService {
 
   private void monitorContainersTask(int secondsFromLastRun) {
     log.info("Starting container monitoring task...");
-    var servicesDecisions = new HashMap<String, List<ContainerDecisionResult>>();
+    var servicesDecisions = new HashMap<String, List<ServiceDecisionResult>>();
     List<SimpleContainer> containers = dockerContainersService.getAppContainers();
     for (SimpleContainer container : containers) {
       log.info("On {}", container);
       String containerId = container.getId();
       String serviceName = container.getLabels().get(DockerContainer.Label.SERVICE_NAME);
       String serviceHostname = container.getHostname();
-      final Map<String, Double> newFields = getContainerStats(container, secondsFromLastRun);
+      Map<String, Double> newFields = getContainerStats(container, secondsFromLastRun);
       newFields.forEach((field, value) -> {
         saveMonitoringServiceLog(containerId, serviceName, field, value);
         //TODO utilidade?
         testLogsService.saveMonitoringServiceLogTests(containerId, serviceName, field, value);
       });
-      long appId = servicesService.getApp(serviceName, "Sock Shop").getId(); //TODO run rules on every app
-      final var containerDecisionResult = runAppRules(appId, serviceHostname, containerId, serviceName, newFields);
+      //TODO run rules on every app
+      String appName = servicesService.getApp(serviceName, "Sock Shop").getName();
+      ServiceDecisionResult serviceDecisionResult =
+          runAppRules(appName, serviceHostname, containerId, serviceName, newFields);
       var serviceDecisions = servicesDecisions.get(serviceName);
       if (serviceDecisions != null) {
-        serviceDecisions.add(containerDecisionResult);
+        serviceDecisions.add(serviceDecisionResult);
       } else {
-        serviceDecisions = new LinkedList<>(List.of(containerDecisionResult));
+        serviceDecisions = new LinkedList<>(List.of(serviceDecisionResult));
         servicesDecisions.put(serviceName, serviceDecisions);
       }
     }
     processContainerDecisions(servicesDecisions, secondsFromLastRun);
   }
 
-  private ContainerDecisionResult runAppRules(long appId, String serviceHostname, String containerId,
-                                              String serviceName, Map<String, Double> newFields) {
+  private ServiceDecisionResult runAppRules(String appName, String serviceHostname, String containerId,
+                                            String serviceName, Map<String, Double> newFields) {
     List<ServiceMonitoring> loggedFields = getMonitoringServiceLogs(containerId);
     var containerEvent = new ContainerEvent(containerId, serviceName);
     Map<String, Double> containerEventFields = containerEvent.getFields();
@@ -217,26 +220,26 @@ public class ContainersMonitoringService {
       }
       containerEventFields.put(field + "-effective-val", newValue);
       //TODO conta com este newValue?
-      final var sumValue = loggedField.getSumValue();
-      final double average = sumValue / (count * 1.0);
+      double sumValue = loggedField.getSumValue();
+      double average = sumValue / (count * 1.0);
       containerEventFields.put(field + "-avg-val", average);
-      final double deviationFromAvgValue = ((newValue - average) / average) * 100;
+      double deviationFromAvgValue = ((newValue - average) / average) * 100;
       containerEventFields.put(field + "-deviation-%-on-avg-val", deviationFromAvgValue);
-      final var lastValue = loggedField.getLastValue();
-      final double deviationFromLastValue = ((newValue - lastValue) / lastValue) * 100;
+      double lastValue = loggedField.getLastValue();
+      double deviationFromLastValue = ((newValue - lastValue) / lastValue) * 100;
       containerEventFields.put(field + "-deviation-%-on-last-val", deviationFromLastValue);
     }
     return containerEventFields.isEmpty()
-        ? new ContainerDecisionResult(serviceHostname, containerId, serviceName)
-        : rulesService.processContainerEvent(appId, serviceHostname, containerEvent);
+        ? new ServiceDecisionResult(serviceHostname, containerId, serviceName)
+        : serviceRulesService.processServiceEvent(appName, serviceHostname, containerEvent);
   }
 
-  private void processContainerDecisions(Map<String, List<ContainerDecisionResult>> servicesDecisions,
+  private void processContainerDecisions(Map<String, List<ServiceDecisionResult>> servicesDecisions,
                                          int secondsFromLastRun) {
     log.info("Processing container decisions...");
-    var relevantServicesDecisions = new HashMap<String, List<ContainerDecisionResult>>();
-    for (List<ContainerDecisionResult> serviceDecisions : servicesDecisions.values()) {
-      for (ContainerDecisionResult containerDecision : serviceDecisions) {
+    var relevantServicesDecisions = new HashMap<String, List<ServiceDecisionResult>>();
+    for (List<ServiceDecisionResult> serviceDecisions : servicesDecisions.values()) {
+      for (ServiceDecisionResult containerDecision : serviceDecisions) {
         String serviceName = containerDecision.getServiceName();
         String containerId = containerDecision.getContainerId();
         RuleDecision decision = containerDecision.getDecision();
@@ -247,7 +250,7 @@ public class ContainersMonitoringService {
         if (decision == RuleDecision.STOP && serviceEventCount >= stopContainerOnEventCount
             || decision == RuleDecision.REPLICATE && serviceEventCount >= replicateContainerOnEventCount
             || decision == RuleDecision.MIGRATE && serviceEventCount >= migrateContainerOnEventCount) {
-          var relevantServiceDecisions = relevantServicesDecisions.get(serviceName);
+          List<ServiceDecisionResult> relevantServiceDecisions = relevantServicesDecisions.get(serviceName);
           if (relevantServiceDecisions != null) {
             relevantServiceDecisions.add(containerDecision);
           } else {
@@ -262,24 +265,25 @@ public class ContainersMonitoringService {
     }
   }
 
-  private void processRelevantContainerDecisions(Map<String, List<ContainerDecisionResult>> relevantServicesDecisions,
-                                                 Map<String, List<ContainerDecisionResult>> allServicesDecisions,
+  private void processRelevantContainerDecisions(Map<String, List<ServiceDecisionResult>> relevantServicesDecisions,
+                                                 Map<String, List<ServiceDecisionResult>> allServicesDecisions,
                                                  int secondsFromLastRun) {
-    final Map<String, HostDetails> servicesLocationsRegions =
+    Map<String, HostDetails> servicesLocationsRegions =
         requestLocationMonitoringService.getBestLocationToStartServices(allServicesDecisions, secondsFromLastRun);
-    for (Entry<String, List<ContainerDecisionResult>> servicesDecisions : allServicesDecisions.entrySet()) {
-      final var serviceName = servicesDecisions.getKey();
-      final var containerDecisions = servicesDecisions.getValue();
-      final var relevantContainerDecisions = relevantServicesDecisions.getOrDefault(serviceName, new ArrayList<>());
-      final var currentReplicas = containerDecisions.size();
-      final var minimumReplicas = servicesService.getMinReplicasByServiceName(serviceName);
-      final var maximumReplicas = servicesService.getMaxReplicasByServiceName(serviceName);
+    for (Entry<String, List<ServiceDecisionResult>> servicesDecisions : allServicesDecisions.entrySet()) {
+      String serviceName = servicesDecisions.getKey();
+      List<ServiceDecisionResult> containerDecisions = servicesDecisions.getValue();
+      List<ServiceDecisionResult> relevantContainerDecisions =
+          relevantServicesDecisions.getOrDefault(serviceName, new ArrayList<>());
+      int currentReplicas = containerDecisions.size();
+      int minimumReplicas = servicesService.getMinReplicasByServiceName(serviceName);
+      int maximumReplicas = servicesService.getMaxReplicasByServiceName(serviceName);
       if (currentReplicas < minimumReplicas) {
         startContainer(containerDecisions, relevantContainerDecisions, servicesLocationsRegions);
       } else if (!relevantContainerDecisions.isEmpty()) {
         Collections.sort(relevantContainerDecisions);
-        final var topPriorityDecisionResult = relevantContainerDecisions.get(0);
-        final var topPriorityDecision = topPriorityDecisionResult.getDecision();
+        ServiceDecisionResult topPriorityDecisionResult = relevantContainerDecisions.get(0);
+        RuleDecision topPriorityDecision = topPriorityDecisionResult.getDecision();
         if (topPriorityDecision == RuleDecision.REPLICATE) {
           if (maximumReplicas == 0 || currentReplicas < maximumReplicas) {
             startContainer(topPriorityDecisionResult, servicesLocationsRegions);
@@ -294,13 +298,13 @@ public class ContainersMonitoringService {
     }
   }
 
-  private void startContainer(List<ContainerDecisionResult> allContainersDecisions,
-                              List<ContainerDecisionResult> relevantContainersDecisions,
+  private void startContainer(List<ServiceDecisionResult> allContainersDecisions,
+                              List<ServiceDecisionResult> relevantContainersDecisions,
                               Map<String, HostDetails> servicesLocationsRegions) {
-    Optional<ContainerDecisionResult> containerDecision = Optional.empty();
+    Optional<ServiceDecisionResult> containerDecision = Optional.empty();
     if (!relevantContainersDecisions.isEmpty()) {
       Collections.sort(relevantContainersDecisions);
-      final var topPriorityContainerDecision = relevantContainersDecisions.get(0);
+      ServiceDecisionResult topPriorityContainerDecision = relevantContainersDecisions.get(0);
       if (topPriorityContainerDecision.getDecision() == RuleDecision.REPLICATE) {
         containerDecision = Optional.of(topPriorityContainerDecision);
       }
@@ -316,15 +320,15 @@ public class ContainersMonitoringService {
             .findFirst();
       }
     }
-    containerDecision.ifPresent(containerDecisionResult ->
-        startContainer(containerDecisionResult, servicesLocationsRegions));
+    containerDecision.ifPresent(serviceDecisionResult ->
+        startContainer(serviceDecisionResult, servicesLocationsRegions));
   }
 
-  private void startContainer(ContainerDecisionResult topPriorityContainerDecision,
+  private void startContainer(ServiceDecisionResult topPriorityContainerDecision,
                               final Map<String, HostDetails> servicesLocationsRegions) {
-    final var containerId = topPriorityContainerDecision.getContainerId();
-    final var hostname = topPriorityContainerDecision.getHostname();
-    final var serviceName = topPriorityContainerDecision.getServiceName();
+    String containerId = topPriorityContainerDecision.getContainerId();
+    String hostname = topPriorityContainerDecision.getHostname();
+    String serviceName = topPriorityContainerDecision.getServiceName();
     final HostDetails startLocation;
     if (servicesLocationsRegions.containsKey(serviceName)) {
       startLocation = servicesLocationsRegions.get(serviceName);
@@ -335,14 +339,14 @@ public class ContainersMonitoringService {
       log.info("Starting service '{}'. Location: '{}' ({})",
           serviceName, hostname, startLocation.getRegion());
     }
-    final var serviceAvgMem = servicesService.getService(serviceName).getExpectedMemoryConsumption();
-    final var toHostname = hostsService.getAvailableNodeHostname(serviceAvgMem, startLocation);
-    final var replicatedContainerId = dockerContainersService.replicateContainer(containerId, hostname, toHostname);
-    final var selectedHostDetails = hostsService.getHostDetails(toHostname);
+    double serviceAvgMem = servicesService.getService(serviceName).getExpectedMemoryConsumption();
+    String toHostname = hostsService.getAvailableNodeHostname(serviceAvgMem, startLocation);
+    SimpleContainer replicatedContainerId = dockerContainersService.replicateContainer(containerId, hostname,
+        toHostname);
+    HostDetails selectedHostDetails = hostsService.getHostDetails(toHostname);
     log.info("RuleDecision executed: Replicated container '{}' of service '{}' to container '{}' "
-            + "on host '{} ({}_{}_{})'",
-        containerId, serviceName, replicatedContainerId, toHostname, selectedHostDetails.getRegion(),
-        selectedHostDetails.getCountry(), selectedHostDetails.getCity());
+            + "on host '{} ({}_{}_{})'", containerId, serviceName, replicatedContainerId, toHostname,
+        selectedHostDetails.getRegion(), selectedHostDetails.getCountry(), selectedHostDetails.getCity());
     /*if (selectedHostDetails instanceof EdgeHostDetails) {
       final var edgeHostDetails = (EdgeHostDetails) selectedHostDetails;
       log.info("RuleDecision executed: Replicated container '{}' of service '{}' to container '{}' " +
@@ -355,10 +359,10 @@ public class ContainersMonitoringService {
               "on aws host '{} ({})'",
           containerId, serviceName, replicatedContainerId, toHostname, awsHostDetails.getRegion());
     }*/
-    saveComponentDecisionService(hostname, selectedHostDetails, topPriorityContainerDecision);
+    saveServiceDecision(hostname, selectedHostDetails, topPriorityContainerDecision);
   }
 
-  private void stopContainer(ContainerDecisionResult leastPriorityContainerDecision) {
+  private void stopContainer(ServiceDecisionResult leastPriorityContainerDecision) {
     final var containerId = leastPriorityContainerDecision.getContainerId();
     final var hostname = leastPriorityContainerDecision.getHostname();
     final var serviceName = leastPriorityContainerDecision.getServiceName();
@@ -377,20 +381,11 @@ public class ContainersMonitoringService {
       log.info("RuleDecision executed: Stopped container '{}' of service '{}' on aws host '{} ({})'",
           containerId, serviceName, hostname, awsHostDetails.getRegion());
     }*/
-    saveComponentDecisionService(hostname, selectedHostDetails, leastPriorityContainerDecision);
+    saveServiceDecision(hostname, selectedHostDetails, leastPriorityContainerDecision);
   }
 
-  private void saveComponentDecisionService(String hostname, HostDetails host,
-                                            final ContainerDecisionResult containerDecision) {
-    /* final String hostname = host.getHostname();*/
-    final String containerId = containerDecision.getContainerId();
-    final String serviceName = containerDecision.getServiceName();
-    final String decision = containerDecision.getDecision().toString();
-    final long ruleId = containerDecision.getRuleId();
-    final Map<String, Double> fields = containerDecision.getFields();
-    var otherInfo = "";
-    otherInfo = String.format("RuleDecision on host: %s (%s_%s_%s)", hostname,
-        host.getRegion(), host.getCountry(), host.getCity());
+  private void saveServiceDecision(String hostname, HostDetails host, ServiceDecisionResult containerDecision) {
+    servicesEventsService.resetServiceEvent(containerDecision.getServiceName());
     /*if (host instanceof EdgeHostDetails) {
       final var edgeHostDetails = (EdgeHostDetails)host;
       otherInfo = String.format("RuleDecision on Edge host: %s (%s_%s_%s)", hostname,
@@ -399,11 +394,12 @@ public class ContainersMonitoringService {
       final var awsHostDetails = (AwsHostDetails)host;
       otherInfo = String.format("RuleDecision on Aws host: %s (%s)", hostname, awsHostDetails.getRegion());
     }*/
-    servicesEventsService.resetServiceEvent(serviceName);
-    final var componentDecisionServiceLog =
-        decisionsService.saveComponentDecisionServiceLog(containerId, serviceName, decision, ruleId, otherInfo);
-    decisionsService.saveComponentDecisionValueLogsFromFields(componentDecisionServiceLog.getComponentDecisionLog(),
-        fields);
+    ServiceDecisionEntity serviceDecision =
+        decisionsService.addServiceDecision(containerDecision.getContainerId(), containerDecision.getServiceName(),
+            containerDecision.getDecision().name(), containerDecision.getRuleId(),
+            String.format("RuleDecision on host: %s (%s_%s_%s)",
+                hostname, host.getRegion(), host.getCountry(), host.getCity()));
+    decisionsService.addServiceDecisionValueFromFields(serviceDecision, containerDecision.getFields());
   }
 
 

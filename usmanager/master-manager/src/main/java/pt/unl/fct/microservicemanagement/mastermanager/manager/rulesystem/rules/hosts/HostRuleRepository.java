@@ -22,9 +22,12 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
-import java.util.Date;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
+
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -32,12 +35,31 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ServiceEventPredictionRepository extends CrudRepository<ServiceEventPredictionEntity, Long> {
+public interface HostRuleRepository extends CrudRepository<HostRuleEntity, Long> {
 
-  @Query("select sp.minReplicas "
-      + "from ServiceEventPredictionEntity sp inner join sp.service s "
-      + "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
-      + "order by sp.lastUpdate desc")
-  Integer getMinReplicasByServiceName(@Param("serviceName") String serviceName, @Param("date") Date date);
+  Optional<HostRuleEntity> findByNameIgnoreCase(@Param("name") String name);
+
+  List<HostRuleEntity> findByHostname(@Param("hostname") String hostname);
+
+  @Query("select case when count(r) > 0 then true else false end "
+      + "from HostRuleEntity r "
+      + "where r.name = :ruleName")
+  boolean hasRule(@Param("ruleName") String ruleName);
+
+  @Query("select rc.condition "
+      + "from HostRuleEntity r join r.conditions rc "
+      + "where r.name = :ruleName")
+  List<ConditionEntity> getConditions(@Param("ruleName") String ruleName);
+
+  @Query("select rc.condition "
+      + "from HostRuleEntity r join r.conditions rc "
+      + "where r.name = :ruleName and rc.condition.name = :conditionName")
+  Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
+                                         @Param("conditionName") String conditionName);
+
+  @Query("select r "
+      + "from HostRuleEntity r "
+      + "where r.hostname is null")
+  List<HostRuleEntity> findGenericHostRules();
 
 }

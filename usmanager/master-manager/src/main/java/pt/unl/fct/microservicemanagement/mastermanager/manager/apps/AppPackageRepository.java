@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.app.AppRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 
 import java.util.List;

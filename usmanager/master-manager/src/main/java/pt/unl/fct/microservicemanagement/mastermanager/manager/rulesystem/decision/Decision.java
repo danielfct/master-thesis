@@ -25,8 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
 import lombok.Data;
-
-//TODO make protected
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 
 @Data
 public final class Decision {

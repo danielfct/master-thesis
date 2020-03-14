@@ -22,38 +22,34 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.EventType;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.Condition;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 
-import lombok.Data;
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public final class ServiceDecisionResult extends DecisionResult {
 
-@Data
-public final class Rule {
+  private final String containerId;
+  private final String serviceName;
 
-  private final long id;
-  private final List<Condition> conditions;
-  private final RuleDecision decision;
-  private final int priority;
-  private final EventType eventType;
-
-  public Rule(long id, List<Condition> conditions, RuleDecision decision, int priority) {
-    this.id = id;
-    this.conditions = conditions;
-    this.decision = decision;
-    this.priority = priority;
-    this.eventType = null;
+  public ServiceDecisionResult(String serviceHostname, String containerId, String serviceName) {
+    this(serviceHostname, containerId, serviceName, RuleDecision.NONE, 0, new HashMap<>(), 0);
   }
 
-  @Override
-  public String toString() {
-    return conditions.stream().map(c ->
-        "fields[\"" + c.getFieldName() + "\"] " + c.getOperator() + " " + c.getValue())
-        .collect(Collectors.joining(" && "));
+  public ServiceDecisionResult(String serviceHostname, String containerId, String serviceName, RuleDecision decision,
+                               long ruleId, Map<String, Double> fields, int priority) {
+    super(serviceHostname, decision, ruleId, fields, priority,
+        fields.values().stream().mapToDouble(Double::doubleValue).sum());
+    this.containerId = containerId;
+    this.serviceName = serviceName;
   }
 
 }

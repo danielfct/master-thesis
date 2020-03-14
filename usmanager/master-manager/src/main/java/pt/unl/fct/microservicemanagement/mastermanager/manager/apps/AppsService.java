@@ -25,8 +25,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.app.AppRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.AddServiceApp;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -44,9 +44,9 @@ public class AppsService {
 
   private final AppPackageRepository apps;
   private final ServicesService services;
-  private final RulesService rules;
+  private final AppRulesService rules;
 
-  public AppsService(AppPackageRepository apps, ServicesService services, RulesService rules) {
+  public AppsService(AppPackageRepository apps, ServicesService services, AppRulesService rules) {
     this.apps = apps;
     this.services = services;
     this.rules = rules;
@@ -134,7 +134,7 @@ public class AppsService {
   public void addRule(String appName, String ruleName) {
     var app = getApp(appName);
     var rule = rules.getRule(ruleName);
-    var appRule = AppRuleEntity.builder().appPackage(app).rule(rule).build();
+    var appRule = AppRuleEntity.builder().appPackage(app).build();
     app = app.toBuilder().appRule(appRule).build();
     apps.save(app);
   }
@@ -151,7 +151,7 @@ public class AppsService {
     var app = getApp(appName);
     log.info("Removing rules {}", rules);
     app.getAppRules()
-        .removeIf(rule -> rules.contains(rule.getRule().getName()));
+        .removeIf(rule -> rules.contains(rule.getName()));
     apps.save(app);
   }
 

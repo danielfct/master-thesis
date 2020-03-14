@@ -25,8 +25,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.EventPredictionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
@@ -133,13 +133,13 @@ public class ServicesController {
   }
 
   @GetMapping("/{serviceName}/predictions")
-  public Iterable<EventPredictionEntity> getServicePredictions(@PathVariable String serviceName) {
+  public Iterable<ServiceEventPredictionEntity> getServicePredictions(@PathVariable String serviceName) {
     return servicesService.getPredictions(serviceName);
   }
 
   @PostMapping("/{serviceName}/predictions")
   public void addServicePredictions(@PathVariable String serviceName,
-                                    @RequestBody EventPredictionEntity[] predictions) {
+                                    @RequestBody ServiceEventPredictionEntity[] predictions) {
     servicesService.addPredictions(serviceName, Arrays.asList(predictions));
   }
 
@@ -156,7 +156,7 @@ public class ServicesController {
   }
 
   @GetMapping("/{serviceName}/rules")
-  public Iterable<RuleEntity> getServiceRules(@PathVariable String serviceName) {
+  public Iterable<ServiceRuleEntity> getServiceRules(@PathVariable String serviceName) {
     return servicesService.getRules(serviceName);
   }
 

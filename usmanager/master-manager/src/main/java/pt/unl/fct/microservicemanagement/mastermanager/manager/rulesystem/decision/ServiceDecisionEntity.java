@@ -10,13 +10,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEvent;
-
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,7 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Singular;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -41,47 +39,44 @@ import lombok.Singular;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "decisions")
-public class DecisionEntity {
+@Table(name = "service_decisions")
+public class ServiceDecisionEntity {
 
   @Id
   @GeneratedValue
   private Long id;
 
-  //TODO use enum
-  // Possible values:
-  // - NONE; - REPLICATE; - MIGRATE; - STOP; (services)
-  // - NONE; - START; - STOP (hosts)
-  private String name;
+  private String containerId;
+
+  private String serviceName;
+
+  private String otherInfo;
 
   @ManyToOne
-  @JoinColumn(name = "component_type_id")
-  private ComponentTypeEntity componentType;
+  @JoinColumn(name = "decision_id")
+  private DecisionEntity decision;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceEvent> serviceEvents = new HashSet<>();
+  @ManyToOne
+  @JoinColumn(name = "rule_id")
+  private ServiceRuleEntity rule;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<HostEventEntity> hostEvents = new HashSet<>();
+  @Basic
+  private Timestamp timestamp;
 
-  @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceDecisionEntity> componentDecisionLogs = new HashSet<>();
+  @OneToMany(mappedBy = "serviceDecision", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private Set<ServiceDecisionValueEntity> serviceDecisionValues = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof DecisionEntity)) {
+    if (!(o instanceof ServiceDecisionEntity)) {
       return false;
     }
-    DecisionEntity other = (DecisionEntity) o;
+    ServiceDecisionEntity other = (ServiceDecisionEntity) o;
     return id != null && id.equals(other.getId());
   }
 
