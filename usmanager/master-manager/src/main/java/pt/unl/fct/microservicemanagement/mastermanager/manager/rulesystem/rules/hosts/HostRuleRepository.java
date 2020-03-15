@@ -41,19 +41,21 @@ public interface HostRuleRepository extends CrudRepository<HostRuleEntity, Long>
 
   List<HostRuleEntity> findByHostname(@Param("hostname") String hostname);
 
+  HostRuleEntity findByNameAndHostname(@Param("name") String name, @Param("hostname") String hostname);
+
   @Query("select case when count(r) > 0 then true else false end "
       + "from HostRuleEntity r "
       + "where r.name = :ruleName")
   boolean hasRule(@Param("ruleName") String ruleName);
 
-  @Query("select rc.condition "
+  @Query("select rc.hostCondition "
       + "from HostRuleEntity r join r.conditions rc "
       + "where r.name = :ruleName")
   List<ConditionEntity> getConditions(@Param("ruleName") String ruleName);
 
-  @Query("select rc.condition "
+  @Query("select rc.hostCondition "
       + "from HostRuleEntity r join r.conditions rc "
-      + "where r.name = :ruleName and rc.condition.name = :conditionName")
+      + "where r.name = :ruleName and rc.hostCondition.name = :conditionName")
   Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
                                          @Param("conditionName") String conditionName);
 

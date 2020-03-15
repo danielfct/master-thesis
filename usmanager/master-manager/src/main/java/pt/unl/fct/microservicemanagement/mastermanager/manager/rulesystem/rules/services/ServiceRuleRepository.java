@@ -40,13 +40,13 @@ public interface ServiceRuleRepository extends CrudRepository<ServiceRuleEntity,
   Optional<ServiceRuleEntity> findByNameIgnoreCase(@Param("name") String name);
 
   @Query("select r "
-      + "from ServiceRuleEntity r join r.service s "
+      + "from ServiceRuleEntity r join r.services s "
       + "where s.serviceName = :serviceName")
   List<ServiceRuleEntity> getRulesByServiceName(@Param("serviceName") String serviceName);
 
   @Query("select r "
       + "from ServiceRuleEntity r "
-      + "where r.service is null")
+      + "where r.services is empty")
   List<ServiceRuleEntity> findGenericServiceRules();
 
   @Query("select case when count(r) > 0 then true else false end "
@@ -54,14 +54,14 @@ public interface ServiceRuleRepository extends CrudRepository<ServiceRuleEntity,
       + "where r.name = :ruleName")
   boolean hasRule(@Param("ruleName") String ruleName);
 
-  @Query("select rc.condition "
+  @Query("select rc.serviceCondition "
       + "from ServiceRuleEntity r join r.conditions rc "
       + "where r.name = :ruleName")
   List<ConditionEntity> getConditions(@Param("ruleName") String ruleName);
 
-  @Query("select rc.condition "
+  @Query("select rc.serviceCondition "
       + "from ServiceRuleEntity r join r.conditions rc "
-      + "where r.name = :ruleName and rc.condition.name = :conditionName")
+      + "where r.name = :ruleName and rc.serviceCondition.name = :conditionName")
   Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
                                          @Param("conditionName") String conditionName);
 

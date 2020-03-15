@@ -25,7 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
@@ -102,13 +102,13 @@ public class ServicesService {
     services.delete(service);
   }
 
-  public AppPackage getApp(String serviceName, String appName) {
+  public AppEntity getApp(String serviceName, String appName) {
     assertServiceExists(serviceName);
     return services.getApp(serviceName, appName).orElseThrow(() ->
         new EntityNotFoundException(ServiceEntity.class, "appName", appName));
   }
 
-  public List<AppPackage> getApps(String serviceName) {
+  public List<AppEntity> getApps(String serviceName) {
     assertServiceExists(serviceName);
     return services.getAppsByServiceName(serviceName);
   }
@@ -119,7 +119,7 @@ public class ServicesService {
     var launchOrder = addServiceApp.getLaunchOrder();
     var app = appsService.getApp(appName);
     var appService = AppServiceEntity.builder()
-        .appPackage(app)
+        .app(app)
         .service(service)
         .launchOrder(launchOrder)
         .build();
@@ -139,7 +139,7 @@ public class ServicesService {
     var service = getService(serviceName);
     log.info("Removing apps {}", apps);
     service.getAppServices()
-        .removeIf(app -> apps.contains(app.getAppPackage().getName()));
+        .removeIf(app -> apps.contains(app.getApp().getName()));
     services.save(service);
   }
 

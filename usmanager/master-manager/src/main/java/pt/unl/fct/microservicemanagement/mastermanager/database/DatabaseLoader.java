@@ -24,8 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.database;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackageRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
@@ -65,7 +65,7 @@ import org.springframework.stereotype.Component;
 public class DatabaseLoader {
 
   @Bean
-  CommandLineRunner initDatabase(PasswordEncoder encoder, UsersRepository users, AppPackageRepository appPackages,
+  CommandLineRunner initDatabase(PasswordEncoder encoder, UsersRepository users, AppRepository apps,
                                  ServiceRepository services, AppServiceRepository appServices,
                                  ServiceDependencyRepository servicesDependencies, RegionRepository regions,
                                  EdgeHostRepository edgeHosts, ComponentTypeRepository componentTypes,
@@ -74,7 +74,7 @@ public class DatabaseLoader {
                                  HostRuleRepository hostRules) {
     return args -> {
 
-      // sytem users
+      // users
       UserEntity sysAdmin = UserEntity.builder()
           .firstName("admin")
           .lastName("admin")
@@ -411,85 +411,85 @@ public class DatabaseLoader {
           .expectedMemoryConsumption(0d)
           .build();
 
-      var sockShop = AppPackage.builder()
+      var sockShop = AppEntity.builder()
           .name("Sock Shop")
           .build();
-      appPackages.save(sockShop);
+      apps.save(sockShop);
 
       var sockShopFrontend = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(frontend)
           .launchOrder(25)
           .build();
       appServices.save(sockShopFrontend);
       var sockShopUser = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(user)
           .launchOrder(10)
           .build();
       appServices.save(sockShopUser);
       var sockShopUserDb = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(userDb)
           .launchOrder(0)
           .build();
       appServices.save(sockShopUserDb);
       var sockShopCatalogue = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(catalogue)
           .launchOrder(5)
           .build();
       appServices.save(sockShopCatalogue);
       var sockShopCatalogueDb = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(catalogueDb)
           .launchOrder(0)
           .build();
       appServices.save(sockShopCatalogueDb);
       var sockShopPayment = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(payment)
           .launchOrder(5)
           .build();
       appServices.save(sockShopPayment);
       var sockShopCarts = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(carts)
           .launchOrder(10)
           .build();
       appServices.save(sockShopCarts);
       var sockShopCartsDb = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(cartsDb)
           .launchOrder(0)
           .build();
       appServices.save(sockShopFrontend);
       var sockShopOrders = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(orders)
           .launchOrder(20)
           .build();
       appServices.save(sockShopOrders);
       var sockShopOrdersDb = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(ordersDb)
           .launchOrder(0)
           .build();
       appServices.save(sockShopCartsDb);
       var sockShopShipping = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(shipping)
           .launchOrder(15)
           .build();
       appServices.save(sockShopShipping);
       var sockShopQueueMaster = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(queueMaster)
           .launchOrder(15)
           .build();
       appServices.save(sockShopQueueMaster);
       var sockShopRabbitmq = AppServiceEntity.builder()
-          .appPackage(sockShop)
+          .app(sockShop)
           .service(rabbitmq)
           .launchOrder(5)
           .build();
@@ -510,7 +510,7 @@ public class DatabaseLoader {
           sockShopQueueMaster,
           sockShopRabbitmq
       )).build();
-      appPackages.save(sockShop);
+      apps.save(sockShop);
 
       // service dependencies
       var frontendEurekaServerDependency = ServiceDependency.builder()

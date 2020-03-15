@@ -22,26 +22,30 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleEntity;
 
+import java.util.Set;
 
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 
 @Entity
 @Builder(toBuilder = true)
@@ -49,32 +53,36 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "service_event_logs")
-public class ServiceEvent {
+@Table(name = "apps")
+public class AppEntity {
 
   @Id
   @GeneratedValue
   private Long id;
 
-  private String containerId;
+  @NotNull
+  @Column(unique = true)
+  private String name;
 
-  private String serviceName;
+  @Singular
+  @JsonIgnore
+  @OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<AppServiceEntity> appServices;
 
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
-
-  private int count;
+  @Singular
+  @JsonIgnore
+  @ManyToMany(mappedBy = "apps", cascade = CascadeType.ALL)
+  private Set<AppRuleEntity> appRules;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ServiceEvent)) {
+    if (!(o instanceof AppEntity)) {
       return false;
     }
-    ServiceEvent other = (ServiceEvent) o;
+    AppEntity other = (AppEntity) o;
     return id != null && id.equals(other.getId());
   }
 

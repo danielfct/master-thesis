@@ -51,28 +51,28 @@ public final class AppsController {
   }
 
   @GetMapping
-  public Iterable<AppPackage> getApps() {
+  public Iterable<AppEntity> getApps() {
     return appsService.getApps();
   }
 
   @GetMapping("/{appId}")
-  public AppPackage getApp(@PathVariable Long appId) {
+  public AppEntity getApp(@PathVariable Long appId) {
     return appsService.getApp(appId);
   }
 
   @GetMapping("/{appName}")
-  public AppPackage getApp(@PathVariable String appName) {
+  public AppEntity getApp(@PathVariable String appName) {
     return appsService.getApp(appName);
   }
 
   @PostMapping
-  public AppPackage addApp(@RequestBody AppPackage app) {
+  public AppEntity addApp(@RequestBody AppEntity app) {
     Validation.validatePostRequest(app.getId());
     return appsService.addApp(app);
   }
 
   @PutMapping("/{appName}")
-  public AppPackage updateApp(@PathVariable String appName, @RequestBody AppPackage app) {
+  public AppEntity updateApp(@PathVariable String appName, @RequestBody AppEntity app) {
     Validation.validatePutRequest(app.getId());
     return appsService.updateApp(appName, app);
   }

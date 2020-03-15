@@ -24,10 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -36,6 +37,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -70,9 +72,10 @@ public class AppRuleEntity {
 
   private int priority;
 
-  @ManyToOne
-  @JoinColumn(name = "app_package_id")
-  private AppPackage appPackage;
+  @Singular
+  @JsonIgnore
+  @ManyToMany(cascade = CascadeType.ALL)
+  private List<AppEntity> apps;
 
   @ManyToOne
   @JoinColumn(name = "decision_id")

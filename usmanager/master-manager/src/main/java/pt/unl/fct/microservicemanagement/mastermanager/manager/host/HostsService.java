@@ -191,7 +191,7 @@ public class HostsService {
     String region;
     String continent;
     if (edgeHostsService.hasEdgeHost(hostname)) {
-      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
       city = edgeHost.getCity();
       country = edgeHost.getCountry();
       region = edgeHost.getRegion();
@@ -261,7 +261,7 @@ public class HostsService {
       log.info("Swarm manager '{}' is on cloud", managerHostname);
       hostnames.addAll(getWorkerAwsNodes());
     } else {
-      EdgeHostEntity dockerMasterHost = edgeHostsService.getEdgeHostByHostname(managerHostname);
+      EdgeHostEntity dockerMasterHost = edgeHostsService.getEdgeHost(managerHostname);
       if (!dockerMasterHost.isLocal()) {
         log.info("Swarm manager '{}' is an edge node, and accessible through internet", managerHostname);
         hostnames.addAll(getWorkerAwsNodes());

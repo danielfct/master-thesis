@@ -1,31 +1,29 @@
 import React from "react";
 import {IService} from "./Service";
-import Data from "../../components/IData";
 import BaseComponent from "../../components/BaseComponent";
 import ListItem from "../../components/list/ListItem";
 import styles from "../../components/list/ListItem.module.css";
-import {Link} from "react-router-dom";
 import ControlledList from "../../components/list/ControlledList";
 import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {
   addServiceRule,
-  loadRules,
+  loadRulesApp,
   loadServiceRules,
   removeServiceRules
 } from "../../actions";
 import {connect} from "react-redux";
-import {IRule} from "../rules/Rule";
+import {IAppRule} from "../rules/apps/AppRule";
 
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  rules: { [key: string]: IRule },
+  rules: { [key: string]: IAppRule },
   rulesName: string[];
 }
 
 interface DispatchToProps {
-  loadRules: (name?: string) => any;
+  loadRulesApp: (name?: string) => any;
   loadServiceRules: (serviceName: string) => void;
   removeServiceRules: (serviceName: string, rules: string[]) => void;
   addServiceRule: (serviceName: string, rule: string) => void;
@@ -43,7 +41,7 @@ type Props = StateToProps & DispatchToProps & ServiceRuleListProps;
 class ServiceRuleList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    this.props.loadRules();
+    this.props.loadRulesApp();
     const {serviceName} = this.props.service;
     if (serviceName) {
       this.props.loadServiceRules(serviceName);
@@ -117,14 +115,14 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceRuleListProps): Sta
   return {
     isLoading: state.entities.services.isLoadingRules,
     error: state.entities.services.loadRulesError,
-    rules: state.entities.rules.data,
+    rules: state.entities.rules.apps.data,
     rulesName: rulesName || [],
   }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
-    loadRules,
+    loadRulesApp,
     loadServiceRules,
     addServiceRule,
     removeServiceRules,

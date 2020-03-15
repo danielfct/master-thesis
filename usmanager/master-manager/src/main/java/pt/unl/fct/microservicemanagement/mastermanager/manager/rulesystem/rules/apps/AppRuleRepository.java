@@ -24,6 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -31,15 +33,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 
 @Repository
 public interface AppRuleRepository extends CrudRepository<AppRuleEntity, Long> {
 
   Optional<AppRuleEntity> findByNameIgnoreCase(@Param("name") String name);
 
-  @Query("select appRule "
-      + "from AppRuleEntity appRule join appRule.appPackage app "
+  @Query("select r "
+      + "from AppRuleEntity r join r.apps app "
       + "where app.name = :appName")
   List<AppRuleEntity> getRulesByAppName(@Param("appName") String appName);
 
@@ -48,14 +49,14 @@ public interface AppRuleRepository extends CrudRepository<AppRuleEntity, Long> {
       + "where r.name = :ruleName")
   boolean hasRule(@Param("ruleName") String ruleName);
 
-  @Query("select rc.condition "
+  @Query("select rc.appCondition "
       + "from AppRuleEntity r join r.conditions rc "
       + "where r.name = :ruleName")
   List<ConditionEntity> getConditions(@Param("ruleName") String ruleName);
 
-  @Query("select rc.condition "
+  @Query("select rc.appCondition "
       + "from AppRuleEntity r join r.conditions rc "
-      + "where r.name = :ruleName and rc.condition.name = :conditionName")
+      + "where r.name = :ruleName and rc.appCondition.name = :conditionName")
   Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
                                          @Param("conditionName") String conditionName);
 

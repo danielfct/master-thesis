@@ -27,7 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEvent;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
 
 import java.util.List;
 
@@ -44,18 +44,18 @@ public class ServicesEventsService {
     this.decisionsService = decisionsService;
   }
 
-  public List<ServiceEvent> getServiceEventsByServiceName(String serviceName) {
+  public List<ServiceEventEntity> getServiceEventsByServiceName(String serviceName) {
     return serviceEvents.findByServiceName(serviceName);
   }
 
-  public List<ServiceEvent> getServiceEventsByContainerId(String containerId) {
+  public List<ServiceEventEntity> getServiceEventsByContainerId(String containerId) {
     return serviceEvents.findByContainerId(containerId);
   }
 
-  ServiceEvent saveServiceEvent(String containerId, String serviceName, String decisionName) {
+  ServiceEventEntity saveServiceEvent(String containerId, String serviceName, String decisionName) {
     DecisionEntity decision =
         decisionsService.getDecisionByComponentTypeAndByDecisionName("Service", decisionName);
-    ServiceEvent event = getServiceEventsByContainerId(containerId).stream().findFirst().orElse(ServiceEvent.builder()
+    ServiceEventEntity event = getServiceEventsByContainerId(containerId).stream().findFirst().orElse(ServiceEventEntity.builder()
             .containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
     if (event.getDecision().getId() != decision.getId()) {
       event.setDecision(decision);

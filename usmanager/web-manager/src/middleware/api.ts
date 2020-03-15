@@ -39,6 +39,9 @@ import {IEdgeHost} from "../routes/hosts/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
 import {IRule} from "../routes/rules/Rule";
+import {IAppRule} from "../routes/rules/apps/AppRule";
+import {IServiceRule} from "../routes/rules/services/ServiceRule";
+import {IHostRule} from "../routes/rules/hosts/HostRule";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -78,8 +81,12 @@ interface ISchemas {
     APP_ARRAY: schema.Entity<IApp>[];
     REGION: schema.Entity<IRegion>;
     REGION_ARRAY: schema.Entity<IRegion>[];
-    RULE: schema.Entity<IRule>;
-    RULE_ARRAY: schema.Entity<IRule>[];
+    RULE_APP: schema.Entity<IAppRule>;
+    RULE_APP_ARRAY: schema.Entity<IAppRule>[];
+    RULE_HOST: schema.Entity<IHostRule>;
+    RULE_HOST_ARRAY: schema.Entity<IHostRule>[];
+    RULE_SERVICE: schema.Entity<IServiceRule>;
+    RULE_SERVICE_ARRAY: schema.Entity<IServiceRule>[];
     NODE: schema.Entity<INode>;
     NODE_ARRAY: schema.Entity<INode>[];
     CLOUD_HOST: schema.Entity<ICloudHost>;
@@ -120,22 +127,30 @@ const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predicti
 });
 const predictions = new schema.Array(predictionSchema);
 
-const ruleSchema: schema.Entity<IRule> = new schema.Entity('rules', {}, {
-    idAttribute: (rule: IRule) => rule.name
+const ruleAppSchema: schema.Entity<IAppRule> = new schema.Entity('appRules', {}, {
+    idAttribute: (appRule: IAppRule) => appRule.name
 });
-const rules = new schema.Array(ruleSchema);
+const rulesApp = new schema.Array(ruleAppSchema);
+const ruleHostSchema: schema.Entity<IHostRule> = new schema.Entity('hostRules', {}, {
+    idAttribute: (hostRule: IHostRule) => hostRule.name
+});
+const rulesHost = new schema.Array(ruleHostSchema);
+const ruleServiceSchema: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', {}, {
+    idAttribute: (serviceRule: IServiceRule) => serviceRule.name
+});
+const rulesService = new schema.Array(ruleServiceSchema);
 
 const nodeSchema: schema.Entity<INode> = new schema.Entity('nodes', {}, {
     idAttribute: (node: INode) => node.id.toString()
 });
-/*const nodes = new schema.Array(nodeSchema);*/
+const nodes = new schema.Array(nodeSchema);
 
 const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {
     apps,
     dependencies,
     dependees,
     predictions,
-    rules
+    rulesApp
 }, {
     idAttribute: (service: IService) => service.serviceName
 });
@@ -172,15 +187,19 @@ export const Schemas: ISchemas = {
     SERVICE_DEPENDEE_ARRAY: [dependeeSchema],
     SERVICE_PREDICTION: predictionSchema,
     SERVICE_PREDICTION_ARRAY: [predictionSchema],
-    SERVICE_RULE: ruleSchema,
-    SERVICE_RULE_ARRAY: [ruleSchema],
+    SERVICE_RULE: ruleServiceSchema,
+    SERVICE_RULE_ARRAY: [ruleServiceSchema],
     APP: appSchema,
     APP_ARRAY: [appSchema],
     APP_SERVICE_ARRAY: [appServiceSchema],
     REGION: regionSchema,
     REGION_ARRAY: [regionSchema],
-    RULE: ruleSchema,
-    RULE_ARRAY: [ruleSchema],
+    RULE_APP: ruleAppSchema,
+    RULE_APP_ARRAY: [ruleAppSchema],
+    RULE_HOST: ruleHostSchema,
+    RULE_HOST_ARRAY: [ruleHostSchema],
+    RULE_SERVICE: ruleServiceSchema,
+    RULE_SERVICE_ARRAY: [ruleServiceSchema],
     NODE: nodeSchema,
     NODE_ARRAY: [nodeSchema],
     CLOUD_HOST: cloudHostSchema,

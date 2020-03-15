@@ -42,36 +42,36 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppsService {
 
-  private final AppPackageRepository apps;
+  private final AppRepository apps;
   private final ServicesService services;
   private final AppRulesService rules;
 
-  public AppsService(AppPackageRepository apps, ServicesService services, AppRulesService rules) {
+  public AppsService(AppRepository apps, ServicesService services, AppRulesService rules) {
     this.apps = apps;
     this.services = services;
     this.rules = rules;
   }
 
-  public Iterable<AppPackage> getApps() {
+  public Iterable<AppEntity> getApps() {
     return apps.findAll();
   }
 
-  public AppPackage getApp(Long id) {
+  public AppEntity getApp(Long id) {
     return apps.findById(id).orElseThrow(() ->
-        new EntityNotFoundException(AppPackage.class, "id", id.toString()));
+        new EntityNotFoundException(AppEntity.class, "id", id.toString()));
   }
 
-  public AppPackage getApp(String appName) {
+  public AppEntity getApp(String appName) {
     return apps.findByNameIgnoreCase(appName).orElseThrow(() ->
-        new EntityNotFoundException(AppPackage.class, "name", appName));
+        new EntityNotFoundException(AppEntity.class, "name", appName));
   }
 
-  public AppPackage addApp(AppPackage app) {
+  public AppEntity addApp(AppEntity app) {
     log.debug("Saving app {}", ToStringBuilder.reflectionToString(app));
     return apps.save(app);
   }
 
-  public AppPackage updateApp(String appName, AppPackage newApp) {
+  public AppEntity updateApp(String appName, AppEntity newApp) {
     var app = getApp(appName);
     log.debug("Updating app {} with {}",
         ToStringBuilder.reflectionToString(app), ToStringBuilder.reflectionToString(newApp));
@@ -84,8 +84,8 @@ public class AppsService {
   }
 
   public void deleteApp(String name) {
-    final var appPackage = getApp(name);
-    apps.delete(appPackage);
+    var app = getApp(name);
+    apps.delete(app);
   }
 
   public List<AppServiceEntity> getServices(String appName) {
@@ -102,7 +102,7 @@ public class AppsService {
     var app = getApp(appName);
     var service = services.getService(addServiceApp.getName());
     var appService = AppServiceEntity.builder()
-        .appPackage(app)
+        .app(app)
         .service(service)
         .launchOrder(addServiceApp.getLaunchOrder())
         .build();
@@ -133,8 +133,7 @@ public class AppsService {
 
   public void addRule(String appName, String ruleName) {
     var app = getApp(appName);
-    var rule = rules.getRule(ruleName);
-    var appRule = AppRuleEntity.builder().appPackage(app).build();
+    var appRule = rules.getRule(ruleName).toBuilder().app(app).build();
     app = app.toBuilder().appRule(appRule).build();
     apps.save(app);
   }
@@ -155,15 +154,9 @@ public class AppsService {
     apps.save(app);
   }
 
-  private void assertAppExists(Long appId) {
-    if (!apps.hasApp(appId)) {
-      throw new EntityNotFoundException(AppPackage.class, "id", appId.toString());
-    }
-  }
-
   private void assertAppExists(String appName) {
     if (!apps.hasApp(appName)) {
-      throw new EntityNotFoundException(AppPackage.class, "appName", appName.toString());
+      throw new EntityNotFoundException(AppEntity.class, "appName", appName.toString());
     }
   }
 

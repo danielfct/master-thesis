@@ -22,29 +22,24 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
-import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Singular;
 
 @Entity
 @Builder(toBuilder = true)
@@ -52,36 +47,32 @@ import lombok.Singular;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "app_packages")
-public class AppPackage {
+@Table(name = "service_events")
+public class ServiceEventEntity {
 
   @Id
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
-  private String name;
+  private String containerId;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "appPackage", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<AppServiceEntity> appServices;
+  private String serviceName;
 
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "appPackage", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<AppRuleEntity> appRules;
+  @ManyToOne
+  @JoinColumn(name = "decision_id")
+  private DecisionEntity decision;
+
+  private int count;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof AppPackage)) {
+    if (!(o instanceof ServiceEventEntity)) {
       return false;
     }
-    AppPackage other = (AppPackage) o;
+    ServiceEventEntity other = (ServiceEventEntity) o;
     return id != null && id.equals(other.getId());
   }
 

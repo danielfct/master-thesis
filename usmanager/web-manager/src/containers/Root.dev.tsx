@@ -31,11 +31,9 @@ import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
 import RulesLandingPage from "../routes/rules/RulesLandingPage";
-import OldRules from "../routes/rules/OldRules";
 import RulePage from "../routes/rules/RulePage";
 import OldConditions from "../routes/rules/OldConditions";
 import ConditionPage from "../routes/rules/ConditionPage";
-import AppsRulesList from "../routes/rules/AppsRulesList";
 import AppRulesPage from "../routes/rules/AppRulesPage";
 import ServicesRulesList from "../routes/rules/ServicesRulesList";
 import ServiceRulesPage from "../routes/rules/ServiceRulesPage";
@@ -75,8 +73,13 @@ import Containers from "../routes/containers/Containers";
 import Container from "../routes/containers/Container";
 import Apps from "../routes/apps/Apps";
 import App from "../routes/apps/App";
+import AppRules from "../routes/rules/apps/AppRules";
+import AppRule from "../routes/rules/apps/AppRule";
+import HostRules from "../routes/rules/hosts/HostRules";
+import HostRule from "../routes/rules/hosts/HostRule";
+import ServiceRules from "../routes/rules/services/ServiceRules";
+import ServiceRule from "../routes/rules/services/ServiceRule";
 import Rules from "../routes/rules/Rules";
-import Rule from "../routes/rules/Rule";
 
 interface RootContainerProps {
     store: any;
@@ -99,16 +102,22 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/containers": { component: Containers, search: true },
     "/containers/:id": { component: Container },
     "/rules": { component: Rules, search: true },
-    "/rules/:name": { component: Rule },
+    "/rules/apps": { component: AppRules, search: true },
+    "/rules/apps/:name": { component: AppRule },
+    "/rules/hosts": { component: HostRules, search: true },
+    "/rules/hosts/:name": { component: HostRule },
+    "/rules/services": { component: ServiceRules, search: true },
+    "/rules/services/:name": { component: ServiceRule },
+
     "/rules/management": { component: RulesLandingPage, search: true },
     "/rules/rules/:ruleId?": { title: "",component: RulePage },
     "/rules/conditions": {  component: OldConditions, search: true },
     "/rules/conditions/condition/:conditionId?": {  component: ConditionPage },
-    "/rules/apps": {  component: AppsRulesList, search: true },
+    /*"/rules/apps": {  component: AppsRulesList, search: true },*/
     "/rules/apps/app/:appId": { component: AppRulesPage },
-    "/rules/services": { component: ServicesRulesList, search: true },
+    /*"/rules/services": { component: ServicesRulesList, search: true },*/
     "/rules/services/service/:serviceId": { component: ServiceRulesPage },
-    "/rules/hosts": { component: HostsRulesList, search: true },
+    /*"/rules/hosts": { component: HostsRulesList, search: true },*/
     "/rules/hosts/host/:hostname": { component: HostRulesPage },
     "/rules/generic/hosts": { component: GenericHostsRulesList, search: true },
     "/rules/generic/hosts/rule": { component: GenericHostRulesPage },

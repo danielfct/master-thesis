@@ -275,29 +275,81 @@ const fetchRegions = (name?: string) => ({
       }
 });
 
-export const RULES_REQUEST = 'RULES_REQUEST';
-export const RULES_SUCCESS = 'RULES_SUCCESS';
-export const RULES_FAILURE = 'RULES_FAILURE';
-export const RULE_REQUEST = 'RULE_REQUEST';
-export const RULE_SUCCESS = 'RULE_SUCCESS';
-export const RULE_FAILURE = 'RULE_FAILURE';
-export const loadRules = (name?: string) => (dispatch: any) => {
-  return dispatch(fetchRules(name));
+export const RULES_APP_REQUEST = 'RULES_APP_REQUEST';
+export const RULES_APP_SUCCESS = 'RULES_APP_SUCCESS';
+export const RULES_APP_FAILURE = 'RULES_APP_FAILURE';
+export const RULE_APP_REQUEST = 'RULE_APP_REQUEST';
+export const RULE_APP_SUCCESS = 'RULE_APP_SUCCESS';
+export const RULE_APP_FAILURE = 'RULE_APP_FAILURE';
+export const loadRulesApp = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchRulesApp(name));
 };
-const fetchRules = (name?: string) => ({
+const fetchRulesApp = (name?: string) => ({
   [CALL_API]:
     !name
       ? {
-        types: [ RULES_REQUEST, RULES_SUCCESS, RULES_FAILURE ],
-        endpoint: `rules`,
-        schema: Schemas.RULE_ARRAY,
-        entity: 'rules'
+        types: [ RULES_APP_REQUEST, RULES_APP_SUCCESS, RULES_APP_FAILURE ],
+        endpoint: `rules/apps`,
+        schema: Schemas.RULE_APP_ARRAY,
+        entity: 'appRules'
       }
       : {
-        types: [ RULE_REQUEST, RULE_SUCCESS, RULE_FAILURE ],
-        endpoint: `rules/${name}`,
-        schema: Schemas.RULE,
-        entity: 'rules'
+        types: [ RULE_APP_REQUEST, RULE_APP_SUCCESS, RULE_APP_FAILURE ],
+        endpoint: `rules/apps/${name}`,
+        schema: Schemas.RULE_APP,
+        entity: 'appRules'
+      }
+});
+
+export const RULES_HOST_REQUEST = 'RULES_HOST_REQUEST';
+export const RULES_HOST_SUCCESS = 'RULES_HOST_SUCCESS';
+export const RULES_HOST_FAILURE = 'RULES_HOST_FAILURE';
+export const RULE_HOST_REQUEST = 'RULE_HOST_REQUEST';
+export const RULE_HOST_SUCCESS = 'RULE_HOST_SUCCESS';
+export const RULE_HOST_FAILURE = 'RULE_HOST_FAILURE';
+export const loadRulesHost = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchRulesHost(name));
+};
+const fetchRulesHost = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ RULES_HOST_REQUEST, RULES_HOST_SUCCESS, RULES_HOST_FAILURE ],
+        endpoint: `rules/hosts`,
+        schema: Schemas.RULE_HOST_ARRAY,
+        entity: 'hostRules'
+      }
+      : {
+        types: [ RULE_HOST_REQUEST, RULE_HOST_SUCCESS, RULE_HOST_FAILURE ],
+        endpoint: `rules/hosts/${name}`,
+        schema: Schemas.RULE_HOST,
+        entity: 'hostRules'
+      }
+});
+
+export const RULES_SERVICE_REQUEST = 'RULES_SERVICE_REQUEST';
+export const RULES_SERVICE_SUCCESS = 'RULES_SERVICE_SUCCESS';
+export const RULES_SERVICE_FAILURE = 'RULES_SERVICE_FAILURE';
+export const RULE_SERVICE_REQUEST = 'RULE_SERVICE_REQUEST';
+export const RULE_SERVICE_SUCCESS = 'RULE_SERVICE_SUCCESS';
+export const RULE_SERVICE_FAILURE = 'RULE_SERVICE_FAILURE';
+export const loadRulesService = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchRulesService(name));
+};
+const fetchRulesService = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ RULES_SERVICE_REQUEST, RULES_SERVICE_SUCCESS, RULES_SERVICE_FAILURE ],
+        endpoint: `rules/services`,
+        schema: Schemas.RULE_SERVICE_ARRAY,
+        entity: 'serviceRules'
+      }
+      : {
+        types: [ RULE_SERVICE_REQUEST, RULE_SERVICE_SUCCESS, RULE_SERVICE_FAILURE ],
+        endpoint: `rules/services/${name}`,
+        schema: Schemas.RULE_SERVICE,
+        entity: 'serviceRules'
       }
 });
 

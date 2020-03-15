@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEvent;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
 
 import java.util.List;
 
@@ -33,10 +33,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ServiceEventRepository extends CrudRepository<ServiceEvent, Long> {
+public interface ServiceEventRepository extends CrudRepository<ServiceEventEntity, Long> {
 
-  List<ServiceEvent> findByContainerId(@Param("containerId") String containerId);
+  List<ServiceEventEntity> findByContainerId(@Param("containerId") String containerId);
 
-  List<ServiceEvent> findByServiceName(@Param("serviceName") String serviceName);
+  List<ServiceEventEntity> findByServiceName(@Param("serviceName") String serviceName);
 
 }

@@ -27,6 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+//TODO try to delete
 @Repository
 public interface AppServiceRepository extends CrudRepository<AppServiceEntity, Long> {
 

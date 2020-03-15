@@ -59,6 +59,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AwsService {
 
+  //TODO put constants into AwsProperties
 
   //private static final String DEFAULT_INSTANCE_AMI = "ami-0e02218c08bb8ffd5";
   private static final String DEFAULT_INSTANCE_AMI = "ami-0e02218c08bb8ffd5";

@@ -12,7 +12,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decis
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEvent;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -61,17 +61,17 @@ public class DecisionEntity {
   @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceEvent> serviceEvents = new HashSet<>();
+  private Set<ServiceEventEntity> serviceEvents = new HashSet<>();
 
   @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<HostEventEntity> hostEvents = new HashSet<>();
 
-  @Singular
+  /*@Singular
   @JsonIgnore
   @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceDecisionEntity> componentDecisionLogs = new HashSet<>();
+  private Set<ServiceDecisionEntity> componentDecisionLogs = new HashSet<>();*/
 
   @Override
   public boolean equals(Object o) {

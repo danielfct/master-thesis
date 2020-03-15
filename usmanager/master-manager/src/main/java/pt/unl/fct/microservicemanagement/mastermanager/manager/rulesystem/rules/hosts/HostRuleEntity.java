@@ -24,9 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -35,6 +37,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -70,6 +73,11 @@ public class HostRuleEntity {
 
   //TODO what about cloud instances?
   private String hostname;
+
+  @Singular
+  @JsonIgnore
+  @ManyToMany(cascade = CascadeType.ALL)
+  private List<EdgeHostEntity> edgeHosts;
 
   @ManyToOne
   @JoinColumn(name = "decision_id")

@@ -69,15 +69,32 @@ class GenericList<T> extends React.Component<Props<T>, {}> {
         }
         if (predicate) {
             const Filtered = FilteredList<T>();
-            return <Filtered {...this.props} predicate={predicate}/>;
+            return (
+              <div style={{display:'flex'}}>
+                  <Filtered {...this.props} predicate={predicate}/>
+              </div>
+            )
         }
         if (paginate) {
-            return <PagedList {...this.props} paginate={paginate}/>;
+            return (
+              <div style={{display:'flex'}}>
+                  <PagedList {...this.props} paginate={paginate}/>
+              </div>
+            )
         }
         if (animate) {
-            return <AnimatedList {...this.props} />
+            return (
+              <div style={{display:'flex'}}>
+                  <AnimatedList {...this.props} />
+              </div>
+            )
         }
-        return <SimpleList<T> {...this.props}/>;
+        return (
+          <div style={{display:'flex'}}>
+              <SimpleList<T> {...this.props}/>
+          </div>
+        )
+
     }
 
 }

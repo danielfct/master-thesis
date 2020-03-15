@@ -37,7 +37,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decisi
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEvent;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
@@ -244,7 +244,7 @@ public class ContainersMonitoringService {
         String containerId = containerDecision.getContainerId();
         RuleDecision decision = containerDecision.getDecision();
         log.info("ServiceName '{}' on containerId '{}' had decision '{}'", serviceName, containerId, decision);
-        ServiceEvent serviceEvent =
+        ServiceEventEntity serviceEvent =
             servicesEventsService.saveServiceEvent(containerId, serviceName, decision.toString());
         int serviceEventCount = serviceEvent.getCount();
         if (decision == RuleDecision.STOP && serviceEventCount >= stopContainerOnEventCount

@@ -668,3 +668,6 @@ select.no-validation-field ~ input.select-dropdown {
     color: white;
 }
 
+.list {
+    width: 100%;
+}

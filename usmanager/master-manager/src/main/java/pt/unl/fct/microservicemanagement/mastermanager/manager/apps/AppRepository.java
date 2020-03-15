@@ -36,33 +36,33 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AppPackageRepository extends CrudRepository<AppPackage, Long> {
+public interface AppRepository extends CrudRepository<AppEntity, Long> {
 
   @Query("select case when count(a) > 0 then true else false end "
-      + "from AppPackage a "
+      + "from AppEntity a "
       + "where a.id = :appId")
   boolean hasApp(@Param("appId") long appId);
 
   @Query("select case when count(a) > 0 then true else false end "
-      + "from AppPackage a "
+      + "from AppEntity a "
       + "where a.name = :appName")
   boolean hasApp(@Param("appName") String appName);
 
   @Query("select new pt.unl.fct.microservicemanagement.mastermanager.manager.services"
       + ".ServiceOrder(s.service, s.launchOrder) "
-      + "from AppPackage a inner join a.appServices s "
+      + "from AppEntity a inner join a.appServices s "
       + "where a.id = :appId order by s.launchOrder")
   List<ServiceOrder> getServiceOrderByService(@Param("appId") long appId);
 
   @Query("select r "
-      + "from AppPackage a join a.appRules r "
+      + "from AppEntity a join a.appRules r "
       + "where a.name = :appName")
   List<AppRuleEntity> getRules(@Param("appName") String appName);
 
-  Optional<AppPackage> findByNameIgnoreCase(@Param("name") String name);
+  Optional<AppEntity> findByNameIgnoreCase(@Param("name") String name);
 
   @Query("select s "
-      + "from AppPackage a join a.appServices s "
+      + "from AppEntity a join a.appServices s "
       + "where a.name = :appName")
   List<AppServiceEntity> getServices(@Param("appName") String appName);
 

@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host;
 
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsLaunchServiceReq;
@@ -32,7 +31,10 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.Aw
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +43,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,43 +52,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/hosts")
 public class HostsController {
 
-  private final EdgeHostsService edgeHostsService;
   private final AwsService aws;
+  private final EdgeHostsService edgeHostsService;
   private final DockerContainersService dockerContainersService;
 
-  public HostsController(EdgeHostsService edgeHostsService, AwsService aws,
+  public HostsController(AwsService aws, EdgeHostsService edgeHostsService,
                          DockerContainersService dockerContainersService) {
-    this.edgeHostsService = edgeHostsService;
     this.aws = aws;
+    this.edgeHostsService = edgeHostsService;
     this.dockerContainersService = dockerContainersService;
-  }
-
-  @GetMapping("/edge")
-  public Iterable<EdgeHostEntity> getEdgeHosts() {
-    return edgeHostsService.getEdgeHosts();
-  }
-
-  /*@PostMapping("/edge")
-    public long addEdgeHost(@RequestBody EdgeHost edgeHost) {
-        Validation.validatePostRequest(edgeHost.getId());
-        return edgeHostsService.addEdgeHost(edgeHost);
-    }
-
-    @PutMapping("/edge/{id}")
-    public long updateEdgeHost(@PathVariable long id,
-                                             @RequestBody EdgeHost edgeHost) {
-        Validation.validatePutRequest(id, edgeHost.getId());
-        return edgeHostsService.updateEdgeHost(id, edgeHost);
-    }*/
-
-  @PostMapping("/edge/{id}")
-  public long saveEdgeHost(@PathVariable long id, @RequestBody EdgeHostEntity edgeHost) {
-    return edgeHostsService.saveEdgeHost(id, edgeHost);
-  }
-
-  @DeleteMapping("/edge/{id}")
-  public void deleteEdgeHost(@PathVariable long id) {
-    edgeHostsService.deleteEdgeHost(id);
   }
 
   @GetMapping("/cloud")
@@ -122,6 +97,56 @@ public class HostsController {
         String.format("${%sDatabaseHost}", serviceName), launchServiceReq.getDatabase());
     return dockerContainersService.launchContainer(ec2PublicIp, serviceName, internalPort, externalPort,
         dynamicLaunchParams);
+  }
+
+  @GetMapping("/edge")
+  public Iterable<EdgeHostEntity> getEdgeHosts() {
+    return edgeHostsService.getEdgeHosts();
+  }
+
+  @GetMapping("/edge/{hostname}")
+  public EdgeHostEntity getEdgeHost(@PathVariable String hostname) {
+    return edgeHostsService.getEdgeHost(hostname);
+  }
+
+  @PostMapping("/edge")
+  public EdgeHostEntity addEdgeHost(@RequestBody EdgeHostEntity edgeHost) {
+    Validation.validatePostRequest(edgeHost.getId());
+    return edgeHostsService.addEdgeHost(edgeHost);
+  }
+
+  @PutMapping("/edge/{hostname}")
+  public EdgeHostEntity updateEdgeHost(@PathVariable String hostname, @RequestBody EdgeHostEntity edgeHost) {
+    Validation.validatePutRequest(edgeHost.getId());
+    return edgeHostsService.updateEdgeHost(hostname, edgeHost);
+  }
+
+  @DeleteMapping("/edge/{hostname}")
+  public void deleteEdgeHost(@PathVariable String hostname) {
+    edgeHostsService.deleteEdgeHost(hostname);
+  }
+
+  @GetMapping("/edge/{hostname}/rules")
+  public List<HostRuleEntity> getEdgeHostRules(@PathVariable String hostname) {
+    return edgeHostsService.getRules(hostname);
+  }
+
+  @PostMapping("/edge/{hostname}/rules")
+  public void addEdgeHostRules(@PathVariable String hostname,
+                               @RequestBody String[] rules) {
+    edgeHostsService.addRules(hostname, Arrays.asList(rules));
+  }
+
+  @DeleteMapping("/edge/{hostname}/rules")
+  public void removeEdgeHostRules(@PathVariable String hostname,
+                                  @RequestBody String[] rules) {
+    edgeHostsService.removeRules(hostname, Arrays.asList(rules));
+  }
+
+  @DeleteMapping("/edge/{hostname}/rules/{ruleName}")
+  public void removeEdgeHostRule(@PathVariable String hostname,
+                                 @PathVariable String ruleName) {
+    edgeHostsService.removeRule(hostname, ruleName);
   }
 
 }

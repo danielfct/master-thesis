@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppPackage;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 
 import java.util.List;
@@ -43,18 +43,18 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
 
   List<ServiceEntity> findByDockerRepository(@Param("dockerRepository") String dockerRepository);
 
-  @Query("select a.appPackage "
-      + "from ServiceEntity s inner join s.appServices a "
-      + "where s.serviceName = :serviceName and a.appPackage.name = :appName")
-  Optional<AppPackage> getApp(@Param("serviceName") String serviceName, String appName);
+  @Query("select a.app "
+      + "from ServiceEntity s join s.appServices a "
+      + "where s.serviceName = :serviceName and a.app.name = :appName")
+  Optional<AppEntity> getApp(@Param("serviceName") String serviceName, String appName);
 
   @Query("select d.dependency "
-      + "from ServiceEntity s inner join s.dependencies d "
+      + "from ServiceEntity s join s.dependencies d "
       + "where s.serviceName = :serviceName")
   List<ServiceEntity> getDependencies(@Param("serviceName") String serviceName);
 
   @Query("select d.service "
-      + "from ServiceEntity s inner join s.depends d "
+      + "from ServiceEntity s join s.depends d "
       + "where s.serviceName = :serviceName")
   List<ServiceEntity> getDependees(@Param("serviceName") String serviceName);
 
@@ -78,29 +78,29 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.serviceName = :serviceName")
   boolean hasService(@Param("serviceName") String serviceName);
 
-  @Query("select apps.appPackage "
-      + "from ServiceEntity s inner join s.appServices apps "
+  @Query("select apps.app "
+      + "from ServiceEntity s join s.appServices apps "
       + "where s.serviceName = :serviceName")
-  List<AppPackage> getAppsByServiceName(@Param("serviceName") String serviceName);
+  List<AppEntity> getAppsByServiceName(@Param("serviceName") String serviceName);
 
   @Query("select d.dependency "
-      + "from ServiceEntity s inner join s.dependencies d "
+      + "from ServiceEntity s join s.dependencies d "
       + "where s.serviceName = :serviceName and d.dependency.serviceName = :dependencyName")
   Optional<ServiceEntity> getDependency(@Param("serviceName") String serviceName,
                                         @Param("dependencyName") String dependencyName);
 
-  /*@Query("delete from Service s inner join s.dependencies d "
+  /*@Query("delete from Service s join s.dependencies d "
           + "where s.id = :serviceId and d.id = :dependencyId")
   void removeDependency(@Param("serviceId") long serviceId, @Param("dependencyId") long dependencyId);*/
 
   @Query("select case when count(d) > 0 then true else false end "
-      + "from ServiceEntity s inner join s.dependencies d "
+      + "from ServiceEntity s join s.dependencies d "
       + "where s.id = :serviceId and d.dependency.serviceName = :otherServiceName")
   boolean serviceDependsOnOtherService(@Param("serviceId") long serviceId,
                                        @Param("otherServiceName") String otherServiceName);
 
   @Query("select d.dependency "
-      + "from ServiceEntity s inner join s.dependencies d "
+      + "from ServiceEntity s join s.dependencies d "
       + "where s.id = :serviceId and d.dependency.serviceType = :serviceType")
   List<ServiceEntity> getDependenciesByType(@Param("serviceId") long serviceId,
                                             @Param("serviceType") String serviceType);

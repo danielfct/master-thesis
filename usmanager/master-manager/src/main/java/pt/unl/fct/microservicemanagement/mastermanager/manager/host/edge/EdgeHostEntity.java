@@ -24,20 +24,28 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 import org.hibernate.annotations.NaturalId;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+
+import java.util.Set;
 
 @Entity
 @Builder(toBuilder = true)
@@ -68,6 +76,11 @@ public class EdgeHostEntity {
   private String city;
 
   private boolean isLocal;
+
+  @Singular
+  @JsonIgnore
+  @ManyToMany(mappedBy = "edgeHosts", cascade = CascadeType.ALL)
+  private Set<HostRuleEntity> hostRules;
 
   @Override
   public boolean equals(Object o) {

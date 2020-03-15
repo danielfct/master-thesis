@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EdgeHostRepository extends CrudRepository<EdgeHostEntity, Long> {
 
-  EdgeHostEntity findByHostname(@Param("hostname") String hostname);
+  Optional<EdgeHostEntity> findByHostname(@Param("hostname") String hostname);
 
   List<EdgeHostEntity> findByHostnameContaining(@Param("partialHostname") String partialHostname);
 

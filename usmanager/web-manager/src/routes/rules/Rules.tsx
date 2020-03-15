@@ -1,68 +1,69 @@
-import BaseComponent from "../../components/BaseComponent";
-import {IRule} from "./Rule";
-import MainLayout from "../../views/mainLayout/MainLayout";
-import React from "react";
+import React, {createRef} from 'react';
+import MainLayout from '../../views/mainLayout/MainLayout';
 import AddButton from "../../components/form/AddButton";
-import styles from "./Rules.module.css";
-import CardList from "../../components/list/CardList";
-import {ReduxState} from "../../reducers";
-import {connect} from "react-redux";
-import RuleCard from "./Rulecard";
-import {loadRules} from "../../actions";
+import styles from './Rules.module.css'
+import BaseComponent from "../../components/BaseComponent";
+import M from "materialize-css";
+import Collapsible from "../../components/collapsible/Collapsible";
+import AppRulesList from "./apps/AppRulesList";
+import HostRulesList from "./hosts/HostRulesList";
+import ServiceRulesList from "./services/ServiceRulesList";
 
-interface StateToProps {
-  isLoading: boolean
-  error?: string | null;
-  rules: IRule[];
-}
+export default class Rules extends BaseComponent<{}, {}> {
 
-interface DispatchToProps {
-  loadRules: (name?: string) => any;
-}
-
-type Props = StateToProps & DispatchToProps;
-
-class Rules extends BaseComponent<Props, {}> {
+  private appRulesCollapsible = createRef<HTMLUListElement>();
+  private hostRulesCollapsible = createRef<HTMLUListElement>();
+  private servicesRulesCollapsible = createRef<HTMLUListElement>();
 
   componentDidMount(): void {
-    this.props.loadRules();
+    this.init();
   }
 
-  private rule = (rule: IRule): JSX.Element =>
-    <RuleCard key={rule.id} rule={rule}/>;
+  private init = () => {
+    M.Collapsible.init(this.appRulesCollapsible.current as Element);
+    M.Collapsible.init(this.hostRulesCollapsible.current as Element);
+    M.Collapsible.init(this.servicesRulesCollapsible.current as Element);
+  };
 
-  private predicate = (rule: IRule, search: string): boolean =>
-    rule.name.toLowerCase().includes(search);
-
-  render() {
-    return (
-      <MainLayout>
-        <AddButton tooltip={'Add rule'} pathname={'/rules/new_rule'}/>
-        <div className={`${styles.container}`}>
-          <CardList<IRule>
-            isLoading={this.props.isLoading}
-            error={this.props.error}
-            emptyMessage={"No rules to display"}
-            list={this.props.rules}
-            card={this.rule}
-            predicate={this.predicate}/>
-        </div>
-      </MainLayout>
-    );
-  }
+  render = () =>
+    <MainLayout>
+      <AddButton tooltip={'Add rule'} dropdown={{
+        id: 'addRules',
+        title: 'Rule type',
+        empty: 'No more rules to add',
+        data: [
+          {text: 'App', pathname: '/rules/apps/new_rule'},
+          {text: 'Host', pathname: '/rules/hosts/new_rule'},
+          {text: 'Service', pathname: '/rules/edges/new_rule'},
+        ],
+      }}/>
+      <div className={`${styles.collapsibleContainer}`}>
+        <Collapsible id={"appRulesCollapsible"}
+                     title={'Apps'}
+                     active
+                     headerClassname={styles.collapsibleSubtitle}
+                     bodyClassname={styles.collapsibleCardList}>
+          <AppRulesList/>
+        </Collapsible>
+      </div>
+      <div className={`${styles.collapsibleContainer}`}>
+        <Collapsible id={"hostRulesCollapsible"}
+                     title={'Hosts'}
+                     active
+                     headerClassname={styles.collapsibleSubtitle}
+                     bodyClassname={styles.collapsibleCardList}>
+          <HostRulesList/>
+        </Collapsible>
+      </div>
+      <div className={`${styles.collapsibleContainer}`}>
+        <Collapsible id={"servicesRulesCollapsible"}
+                     title={'Services'}
+                     active
+                     headerClassname={styles.collapsibleSubtitle}
+                     bodyClassname={styles.collapsibleCardList}>
+          <ServiceRulesList/>
+        </Collapsible>
+      </div>
+    </MainLayout>
 
 }
-
-const mapStateToProps = (state: ReduxState): StateToProps => (
-  {
-    isLoading: state.entities.rules.isLoading,
-    error: state.entities.rules.error,
-    rules: (state.entities.rules.data && Object.values(state.entities.rules.data)) || [],
-  }
-);
-
-const mapDispatchToProps: DispatchToProps = {
-  loadRules,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Rules);

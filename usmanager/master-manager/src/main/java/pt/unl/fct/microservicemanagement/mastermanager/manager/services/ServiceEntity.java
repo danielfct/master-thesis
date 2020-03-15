@@ -36,6 +36,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
@@ -117,7 +118,7 @@ public class ServiceEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+  @ManyToMany(mappedBy = "services", cascade = CascadeType.ALL)
   private Set<ServiceRuleEntity> rules;
 
   public boolean hasLaunchCommand() {

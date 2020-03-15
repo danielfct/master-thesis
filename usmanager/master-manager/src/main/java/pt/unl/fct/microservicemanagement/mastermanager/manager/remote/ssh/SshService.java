@@ -78,7 +78,7 @@ public class SshService {
     sshClient.addHostKeyVerifier(new PromiscuousVerifier());
     sshClient.connect(hostname);
     if (edgeHostsService.hasEdgeHost(hostname)) {
-      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHostByHostname(hostname);
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
       String username = edgeHost.getSshUsername();
       //TODO improve security password
       String password = new String(Base64.getDecoder().decode(edgeHost.getSshPassword()));
