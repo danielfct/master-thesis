@@ -34,7 +34,7 @@ const emptyServiceRule = () => ({
 });
 
 const isNewRule = (name: string) =>
-  name === 'new_rule';
+  name === 'new_service_rule';
 
 interface StateToProps {
   isLoading: boolean;
@@ -88,7 +88,7 @@ class ServiceRule extends BaseComponent<Props, {}> {
     Object.entries(serviceRule).map(([key, value]) => {
       return {
         [key]: {
-          id: key,
+          id: [key],
           label: key,
           validation: { rule: required }
         }
@@ -119,12 +119,12 @@ class ServiceRule extends BaseComponent<Props, {}> {
             {Object.keys(formServiceRule).map((key, index) =>
               key === 'decision'
                 ? <Field key={index}
-                         id={key}
+                         id={[key]}
                          label={key}
                          type="dropdown"
                          dropdown={{defaultValue: "Decision", values: ["TODO: load decisions"]}}/>
                 : <Field key={index}
-                         id={key}
+                         id={[key]}
                          label={key}/>
             )}
           </Form>

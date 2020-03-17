@@ -1,11 +1,14 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.Condition;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.DroolsService;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ServiceRulesService {
 
+  private final DecisionsService decisionsService;
   private final AppRulesService appRulesService;
   private final DroolsService droolsService;
   private final ConditionsService conditionsService;
@@ -39,9 +43,11 @@ public class ServiceRulesService {
   private final String serviceRuleTemplateFile;
   private final AtomicLong lastUpdateServiceRules;
 
-  public ServiceRulesService(AppRulesService appRulesService, DroolsService droolsService,
+  public ServiceRulesService(@Lazy DecisionsService decisionsService, AppRulesService appRulesService,
+                             DroolsService droolsService,
                              ConditionsService conditionsService, ServiceRuleRepository rules,
                              RulesProperties rulesProperties) {
+    this.decisionsService = decisionsService;
     this.appRulesService = appRulesService;
     this.droolsService = droolsService;
     this.conditionsService = conditionsService;
@@ -87,11 +93,11 @@ public class ServiceRulesService {
     var rule = getRule(ruleName);
     log.debug("Updating rule {} with {}",
         ToStringBuilder.reflectionToString(rule), ToStringBuilder.reflectionToString(newRule));
-    log.debug("Rule before copying properties: {}",
-        ToStringBuilder.reflectionToString(rule));
+    log.debug("Rule before copying properties: {}", ToStringBuilder.reflectionToString(rule));
     ObjectUtils.copyValidProperties(newRule, rule);
-    log.debug("Rule after copying properties: {}",
-        ToStringBuilder.reflectionToString(rule));
+    DecisionEntity decision = decisionsService.getServicePossibleDecision(newRule.getDecision().getName());
+    rule.setDecision(decision);
+    log.debug("Rule after copying properties: {}", ToStringBuilder.reflectionToString(rule));
     rule = rules.save(rule);
     setLastUpdateServiceRules();
     return rule;

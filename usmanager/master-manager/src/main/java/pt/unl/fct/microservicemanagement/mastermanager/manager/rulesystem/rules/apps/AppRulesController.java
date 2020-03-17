@@ -29,11 +29,6 @@ public class AppRulesController {
     return appRulesService.getRules();
   }
 
-  @GetMapping("/{ruleId}")
-  public AppRuleEntity getRule(@PathVariable Long ruleId) {
-    return appRulesService.getRule(ruleId);
-  }
-
   @GetMapping("/{ruleName}")
   public AppRuleEntity getRule(@PathVariable String ruleName) {
     return appRulesService.getRule(ruleName);

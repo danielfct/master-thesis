@@ -26,11 +26,6 @@ public class ValueModesController {
     return valueModesService.getValueModes();
   }
 
-  @GetMapping("/{valueModeId}")
-  public ValueModeEntity getValueMode(@PathVariable Long valueModeId) {
-    return valueModesService.getValueMode(valueModeId);
-  }
-
   @GetMapping("/{valueModeName}")
   public ValueModeEntity getValueMode(@PathVariable String valueModeName) {
     return valueModesService.getValueMode(valueModeName);

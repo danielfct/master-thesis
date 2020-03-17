@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -34,15 +35,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DecisionRepository extends CrudRepository<DecisionEntity, Long> {
 
-  @Query("select d "
-      + "from DecisionEntity d inner join d.componentType r "
-      + "where r.name = :componentType")
-  List<DecisionEntity> getDecisionsByComponentType(@Param("componentType") String componentType);
+  Optional<DecisionEntity> findByNameIgnoreCase(@Param("name") String name);
 
-  @Query("select d "
-      + "from DecisionEntity d inner join d.componentType r "
-      + "where r.name = :componentType and d.name = :decisionName")
-  DecisionEntity getDecisionByComponentTypeAndByDecisionName(@Param("componentType") String componentType,
-                                                             @Param("decisionName") String decisionName);
+  List<DecisionEntity> findByComponentTypeNameIgnoreCase(@Param("componentType") String componentType);
+
+  Optional<DecisionEntity> findByNameIgnoreCaseAndComponentTypeNameIgnoreCase(
+      @Param("decisionName") String decisionName,
+      @Param("componentType") String componentType);
 
 }

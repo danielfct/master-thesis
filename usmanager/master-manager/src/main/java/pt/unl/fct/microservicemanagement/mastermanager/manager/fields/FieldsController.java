@@ -26,11 +26,6 @@ public class FieldsController {
     return fieldsService.getFields();
   }
 
-  @GetMapping("/{fieldId}")
-  public FieldEntity getField(@PathVariable Long fieldId) {
-    return fieldsService.getField(fieldId);
-  }
-
   @GetMapping("/{fieldName}")
   public FieldEntity getField(@PathVariable String fieldName) {
     return fieldsService.getField(fieldName);

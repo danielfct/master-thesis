@@ -36,7 +36,7 @@ export class Dropdown extends React.Component<Props, {}> {
         className={className}
         id={id}
         name={name}
-        value={value}
+        value={value.toString().toLowerCase()}
         disabled={disabled}
         onChange={onChange}
         onBlur={onBlur}

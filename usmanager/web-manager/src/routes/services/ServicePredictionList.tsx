@@ -101,7 +101,7 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
     Object.entries(emptyPrediction()).map(([key, value]) => {
       return {
         [key]: {
-          id: key,
+          id: [key],
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 0 }
@@ -117,21 +117,21 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
 
   private addModal = () =>
     <div>
-      <Field key='name' id='name' label='name'/>
-      <Field key='description' id='description' label='description' type='multilinetextbox'/>
+      <Field key='name' id={['name']} label='name'/>
+      <Field key='description' id={['description']} label='description' type='multilinetextbox'/>
       <div className={'col s6 inline-field'}>
-        <Field key='startDate' id='startDate' label='startDate' type='datepicker'/>
+        <Field key='startDate' id={['startDate']} label='startDate' type='datepicker'/>
       </div>
       <div className={'col s6 inline-field'}>
-        <Field key='startTime' id='startTime' label='startTime' type='timepicker' icon={false}/>
+        <Field key='startTime' id={['startTime']} label='startTime' type='timepicker' icon={false}/>
       </div>
       <div className={'col s6 inline-field'}>
-        <Field key='endDate' id='endDate' label='endDate' type='datepicker'/>
+        <Field key='endDate' id={['endDate']} label='endDate' type='datepicker'/>
       </div>
       <div className={'col s6 inline-field'}>
-        <Field key='endTime' id='endTime' label='endTime' type='timepicker' icon={false}/>
+        <Field key='endTime' id={['endTime']} label='endTime' type='timepicker' icon={false}/>
       </div>
-      <Field key='minReplicas' id='minReplicas' label='minReplicas'/>
+      <Field key='minReplicas' id={['minReplicas']} label='minReplicas'/>
     </div>;
 
   render() {

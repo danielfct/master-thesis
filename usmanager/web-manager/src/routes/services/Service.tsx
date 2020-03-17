@@ -299,7 +299,7 @@ class Service extends BaseComponent<Props, State> {
     Object.entries(service).map(([key, value]) => {
       return {
         [key]: {
-          id: key,
+          id: [key],
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 0 }
@@ -324,7 +324,7 @@ class Service extends BaseComponent<Props, State> {
     return (
       <>
         {isLoadingServices && <LoadingSpinner/>}
-        {loadServicesError && <Error message={loadServicesError}/>}
+        {!isLoadingServices && loadServicesError && <Error message={loadServicesError}/>}
         {!isLoadingServices && !loadServicesError && formService && (
           <Form id={serviceKey}
                 fields={this.getFields(formService)}
@@ -338,12 +338,12 @@ class Service extends BaseComponent<Props, State> {
             {Object.keys(formService).map((key, index) =>
               key === 'serviceType'
                 ? <Field key={index}
-                         id={key}
+                         id={[key]}
                          type="dropdown"
                          label={key}
                          dropdown={{defaultValue: "Choose service type", values: ["Frontend", "Backend", "Database", "System"]}}/>
                 : <Field key={index}
-                         id={key}
+                         id={[key]}
                          label={key}/>
             )}
           </Form>

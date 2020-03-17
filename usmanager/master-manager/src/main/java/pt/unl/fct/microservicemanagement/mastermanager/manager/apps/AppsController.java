@@ -55,11 +55,6 @@ public final class AppsController {
     return appsService.getApps();
   }
 
-  @GetMapping("/{appId}")
-  public AppEntity getApp(@PathVariable Long appId) {
-    return appsService.getApp(appId);
-  }
-
   @GetMapping("/{appName}")
   public AppEntity getApp(@PathVariable String appName) {
     return appsService.getApp(appName);

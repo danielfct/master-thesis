@@ -56,11 +56,6 @@ public class ServicesController {
     return servicesService.getServices();
   }
 
-  @GetMapping("/{serviceId}")
-  public ServiceEntity getService(@PathVariable Long serviceId) {
-    return servicesService.getService(serviceId);
-  }
-
   @GetMapping("/{serviceName}")
   public ServiceEntity getService(@PathVariable String serviceName) {
     return servicesService.getService(serviceName);

@@ -9,7 +9,7 @@ import {Dropdown} from "./Dropdown";
 import {Datepicker} from "./Datepicker";
 import {Timepicker} from "./Timepicker";
 import {NumberBox} from "./NumberBox";
-import Collapsible from "../collapsible/Collapsible";
+import { assign } from "lodash";
 
 export interface IValidation {
   rule: (values: IValues, fieldName: string, args: any) => string;
@@ -17,7 +17,7 @@ export interface IValidation {
 }
 
 export interface FieldProps {
-  id: string;
+  id: string[];
   type?: "textbox" | "datebox" | "numberbox" | "multilinetextbox" | "collapsible" | "dropdown" | "datepicker" | "timepicker";
   label?: string;
   dropdown?: { defaultValue: string, values: string[], selectCallback?: (value: any) => void };
@@ -40,26 +40,55 @@ export default class Field extends React.Component<FieldProps> {
   }
 
   private onChange = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-                      id: string, formContext: IFormContext): void =>
-    formContext.setValues({ [id]: e.currentTarget.value });
+                      id: string[], formContext: IFormContext): void => {
+    const values = this.buildValueObjectFromId(id, e.currentTarget.value);
+    formContext.setValues(values, id.length > 1 ? id[0] : undefined);
+  };
 
-  private onSelect = (value: string, id: string, formContext: IFormContext) => {
-    formContext.setValues({ [id]: value });
-    formContext.validate(id);
+  private onSelect = (value: string, id: string[], formContext: IFormContext) => {
+    const values = this.buildValueObjectFromId(id, value);
+    formContext.setValues(values);
+    formContext.validate(id[0]);
   };
 
   private onBlur = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-                    id: string, formContext: IFormContext): void =>
-    formContext.validate(id);
+                    id: string[], formContext: IFormContext): void =>
+    formContext.validate(id[0]);
 
   private getDateStringFromTimestamp = (value: number) => {
     const date = new Date(value * 1000);
     return `${date.toLocaleDateString("pt")} ${date.toLocaleTimeString("pt") }`
   };
 
+  private buildValueObjectFromId = (id: string[], value: string) => {
+    const reversedIds = [...id].reverse();
+    const values = reversedIds.reduce( ( values: IValues, key, index ) => {
+      if (index == 0) {
+        values[key] = value;
+      }
+      else {
+        values[key] = { [reversedIds[index-1]]: values[reversedIds[index-1]] };
+      }
+      return values;
+    }, {} );
+    const keys = Object.keys(values);
+    for (let i = 0; i < keys.length - 1; i++) {
+      delete values[keys[i]];
+    }
+    return values;
+  };
+
+  private getFormValueFromId = (values: IValues, id: string[]) => {
+    let value;
+    for (let i = 0; i < id.length; i++) {
+      value = i == 0 ? values[id[i]] : value?.[id[i]];
+    }
+    return value;
+  };
+
   render() {
     const {id, type, label, dropdown, icon, disabled} = this.props;
-    const getError = (errors: IErrors): string => (errors ? errors[id] : "");
+    const getError = (errors: IErrors): string => (errors ? errors[id[0]] : "");
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
       const hasErrors = getError(errors);
       if (hasErrors) {
@@ -76,77 +105,77 @@ export default class Field extends React.Component<FieldProps> {
       <FormContext.Consumer>
         {(formContext: IFormContext | null) => (
           formContext && (
-            <div key={id}
+            <div key={id[0]}
                  className={`input-field col s12`}
                  style={icon != undefined && !icon ? {marginLeft: '10px'} : undefined}>
               {label && (
                 <>
                   {(icon == undefined || icon) &&
                   <i className="material-icons prefix">{mapLabelToIcon(label)}</i>}
-                  <label className="active" htmlFor={id}>
+                  <label className="active" htmlFor={id[0]}>
                     {camelCaseToSentenceCase(label)}
                   </label>
                 </>
               )}
               {(!type || type.toLowerCase() === "textbox") && (
-                <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                         id={id}
-                         name={id}
-                         value={formContext.values[id].toString()}
+                <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, this.getFormValueFromId(formContext.values, id))}
+                         id={id[0]}
+                         name={id[0]}
+                         value={this.getFormValueFromId(formContext.values, id).toString()}
                          disabled={disabled || !formContext.isEditing}
                          onChange={e => this.onChange(e, id, formContext)}
                          onBlur={e => this.onBlur(e, id, formContext)}/>
               )}
               {type && type.toLowerCase() === "datebox" && (
-                <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                         id={id}
-                         name={id}
-                         value={this.getDateStringFromTimestamp(formContext.values[id])}
+                <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, this.getFormValueFromId(formContext.values, id))}
+                         id={id[0]}
+                         name={id[0]}
+                         value={this.getDateStringFromTimestamp(this.getFormValueFromId(formContext.values, id))}
                          disabled={disabled || !formContext.isEditing}
                          onChange={e => this.onChange(e, id, formContext)}
                          onBlur={e => this.onBlur(e, id, formContext)}/>
               )}
               {type && type.toLowerCase() === "numberbox" && (
-                <NumberBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                           id={id}
-                           name={id}
-                           value={formContext.values[id]}
+                <NumberBox className={getEditorClassname(formContext.errors, !formContext.isEditing, this.getFormValueFromId(formContext.values, id))}
+                           id={id[0]}
+                           name={id[0]}
+                           value={this.getFormValueFromId(formContext.values, id)}
                            disabled={disabled || !formContext.isEditing}
                            onChange={e => this.onChange(e, id, formContext)}
                            onBlur={e => this.onBlur(e, id, formContext)}/>
               )}
               {type && type.toLowerCase() === "multilinetextbox" && (
-                <MultilineTextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                                  id={id}
-                                  name={id}
-                                  value={formContext.values[id]}
+                <MultilineTextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, this.getFormValueFromId(formContext.values, id))}
+                                  id={id[0]}
+                                  name={id[0]}
+                                  value={this.getFormValueFromId(formContext.values, id)}
                                   disabled={disabled || !formContext.isEditing}
                                   onChange={e => this.onChange(e, id, formContext)}
                                   onBlur={e => this.onBlur(e, id, formContext)}/>
               )}
               {type && type.toLowerCase() === "dropdown" && (
-                <Dropdown className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                          id={id}
-                          name={id}
-                          value={formContext.values[id]}
+                <Dropdown className={getEditorClassname(formContext.errors, !formContext.isEditing, this.getFormValueFromId(formContext.values, id))}
+                          id={id[0]}
+                          name={id[0]}
+                          value={this.getFormValueFromId(formContext.values, id)}
                           disabled={disabled || !formContext.isEditing}
                           onChange={e => { this.onChange(e, id, formContext); dropdown?.selectCallback?.((e.target as HTMLSelectElement).value) }}
                           onBlur={e => this.onBlur(e, id, formContext)}
                           dropdown={dropdown}/>
               )}
               {(type && type.toLowerCase() === "datepicker") && (
-                <Datepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                            id={id}
-                            name={id}
-                            value={formContext.values[id]}
+                <Datepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, this.getFormValueFromId(formContext.values, id))}
+                            id={id[0]}
+                            name={id[0]}
+                            value={this.getFormValueFromId(formContext.values, id)}
                             disabled={disabled || !formContext.isEditing}
-                            onSelect={value => this.onSelect(value, id, formContext)}/>
+                            onSelect={date => this.onSelect(date, id, formContext)}/>
               )}
               {(type && type.toLowerCase() === "timepicker") && (
-                <Timepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                            id={id}
-                            name={id}
-                            value={formContext.values[id]}
+                <Timepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, this.getFormValueFromId(formContext.values, id))}
+                            id={id[0]}
+                            name={id[0]}
+                            value={this.getFormValueFromId(formContext.values, id)}
                             disabled={disabled || !formContext?.isEditing}
                             onSelect={value => this.onSelect(value, id, formContext)}/>
               )}

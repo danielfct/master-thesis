@@ -34,7 +34,7 @@ const emptyAppRule = () => ({
 });
 
 const isNewRule = (name: string) =>
-  name === 'new_rule';
+  name === 'new_app_rule';
 
 interface StateToProps {
   isLoading: boolean;
@@ -88,7 +88,7 @@ class AppRule extends BaseComponent<Props, {}> {
     Object.entries(appRule).map(([key, value]) => {
       return {
         [key]: {
-          id: key,
+          id: [key],
           label: key,
           validation: { rule: required }
         }
@@ -119,12 +119,12 @@ class AppRule extends BaseComponent<Props, {}> {
             {Object.keys(formAppRule).map((key, index) =>
               key === 'decision'
                 ? <Field key={index}
-                         id={key}
+                         id={[key]}
                          label={key}
                          type="dropdown"
                          dropdown={{defaultValue: "Decision", values: ["TODO: load decisions"]}}/>
                 : <Field key={index}
-                         id={key}
+                         id={[key]}
                          label={key}/>
             )}
           </Form>

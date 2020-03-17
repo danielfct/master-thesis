@@ -50,11 +50,6 @@ public class ConditionsController {
     return conditionsService.getConditions();
   }
 
-  @GetMapping("/{conditionId}")
-  public ConditionEntity getCondition(@PathVariable Long conditionId) {
-    return conditionsService.getCondition(conditionId);
-  }
-
   @GetMapping("/{conditionName}")
   public ConditionEntity getCondition(@PathVariable String conditionName) {
     return conditionsService.getCondition(conditionName);

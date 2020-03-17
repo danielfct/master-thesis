@@ -65,11 +65,9 @@ public class AppRulesService {
     AppRuleEntity rule = getRule(ruleName);
     log.debug("Updating rule {} with {}",
         ToStringBuilder.reflectionToString(rule), ToStringBuilder.reflectionToString(newRule));
-    log.debug("Rule before copying properties: {}",
-        ToStringBuilder.reflectionToString(rule));
+    log.debug("Rule before copying properties: {}", ToStringBuilder.reflectionToString(rule));
     ObjectUtils.copyValidProperties(newRule, rule);
-    log.debug("Rule after copying properties: {}",
-        ToStringBuilder.reflectionToString(rule));
+    log.debug("Rule after copying properties: {}", ToStringBuilder.reflectionToString(rule));
     rule = rules.save(rule);
     setLastUpdateAppRules();
     return rule;

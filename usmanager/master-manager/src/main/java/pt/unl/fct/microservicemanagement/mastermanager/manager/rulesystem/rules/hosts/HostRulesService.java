@@ -1,11 +1,14 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.Condition;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.DroolsService;
@@ -17,6 +20,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -28,6 +32,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class HostRulesService {
 
+  private final DecisionsService decisionsService;
   private final ConditionsService conditionsService;
   private final DroolsService droolsService;
 
@@ -36,8 +41,10 @@ public class HostRulesService {
   private final String hostRuleTemplateFile;
   private final AtomicLong lastUpdateHostRules;
 
-  public HostRulesService(ConditionsService conditionsService, DroolsService droolsService,
-                          HostRuleRepository rules, RulesProperties rulesProperties) {
+  public HostRulesService(@Lazy DecisionsService decisionsService, ConditionsService conditionsService,
+                          DroolsService droolsService, HostRuleRepository rules,
+                          RulesProperties rulesProperties) {
+    this.decisionsService = decisionsService;
     this.conditionsService = conditionsService;
     this.droolsService = droolsService;
     this.rules = rules;
@@ -83,12 +90,13 @@ public class HostRulesService {
     HostRuleEntity rule = getRule(ruleName);
     log.debug("Updating rule {} with {}",
         ToStringBuilder.reflectionToString(rule), ToStringBuilder.reflectionToString(newRule));
-    log.debug("Rule before copying properties: {}",
-        ToStringBuilder.reflectionToString(rule));
+    log.debug("Rule before copying properties: {}", ToStringBuilder.reflectionToString(rule));
     ObjectUtils.copyValidProperties(newRule, rule);
-    log.debug("Rule after copying properties: {}",
-        ToStringBuilder.reflectionToString(rule));
+    DecisionEntity decision = decisionsService.getHostPossibleDecision(newRule.getDecision().getName());
+    rule = rule.toBuilder().decision(decision).build();
+    log.debug("Rule after copying properties: {}", ToStringBuilder.reflectionToString(rule));
     rule = rules.save(rule);
+    log.debug("{}", rule.getDecision().getName());
     setLastUpdateHostRules();
     return rule;
   }

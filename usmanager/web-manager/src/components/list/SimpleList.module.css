@@ -8,33 +8,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
-import {IHostRule} from "./HostRule";
-import Card from "../../../components/cards/Card";
-import CardItem from "../../../components/list/CardItem";
-
-interface HostRuleCardProps {
-  rule: IHostRule;
+.listWrapper {
+    display: flex;
 }
 
-type Props = HostRuleCardProps;
-
-const HostRuleCard = ({rule}: Props) => (
-  <Card<IHostRule> title={rule.name}
-                  link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
-                  height={'120px'}
-                  margin={'10px 0'}
-                  hoverable>
-    <CardItem key={'host'}
-              label={'Host'}
-              value={`${rule.hostname == null ? 'Applied to all hosts' : rule.hostname}`}/>
-    <CardItem key={'priority'}
-              label={'Priority'}
-              value={`${rule.priority}`}/>
-    <CardItem key={'decision'}
-              label={'Decision'}
-              value={`${rule.decision.name}`}/>
-  </Card>
-);
-
-export default HostRuleCard;
+.itemListWrapper {
+    width: 100%;
+}

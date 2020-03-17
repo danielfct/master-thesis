@@ -23,6 +23,7 @@
  */
 
 import * as React from "react";
+import styles from './SimpleList.module.css';
 
 interface GenericSimpleListProps<T> {
   list: T[];
@@ -37,13 +38,15 @@ export default class SimpleList<T> extends React.Component<Props<T>, {}> {
   render() {
     const {list, show, header} = this.props;
     return (
-      <div>
-        {header && header()}
-        {list.map((c, i) => (
-          <div key={i}>
+      <div className={styles.listWrapper}>
+        <div className={styles.itemListWrapper}>
+          {header && header()}
+          {list.map((c, i) => (
+            <div key={i}>
               {show(c, i)}
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>);
   }
 }

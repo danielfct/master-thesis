@@ -79,7 +79,7 @@ class Region extends BaseComponent<Props, {}> {
     Object.entries(region).map(([key, value]) => {
       return {
         [key]: {
-          id: key,
+          id: [key],
           label: key,
           validation: { rule: required }
         }
@@ -110,12 +110,12 @@ class Region extends BaseComponent<Props, {}> {
             {Object.keys(formRegion).map((key, index) =>
               key === 'active'
                 ? <Field key={index}
-                         id={key}
+                         id={[key]}
                          label={key}
                          type="dropdown"
                          dropdown={{defaultValue: "Is region active?", values: ["True", "False"]}}/>
                 : <Field key={index}
-                         id={key}
+                         id={[key]}
                          label={key}/>
             )}
           </Form>

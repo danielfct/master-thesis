@@ -50,8 +50,7 @@ public class HostsEventsService {
   }
 
   HostEventEntity saveHostEvent(String hostname, String decisionName) {
-    DecisionEntity decision = decisionsService
-        .getDecisionByComponentTypeAndByDecisionName("Host", decisionName);
+    DecisionEntity decision = decisionsService.getHostPossibleDecision(decisionName);
     HostEventEntity hostEvent = hostEvents
         .findByHostname(hostname).stream().findFirst()
         .orElse(HostEventEntity.builder().hostname(hostname).decision(decision).count(0).build());

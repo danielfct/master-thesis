@@ -73,28 +73,38 @@ public class DecisionsService {
     return decisions.findAll();
   }
 
+  public DecisionEntity getDecision(String name) {
+    return decisions.findByNameIgnoreCase(name).orElseThrow(() ->
+        new EntityNotFoundException(DecisionEntity.class, "name", name));
+  }
+
   public DecisionEntity getDecision(Long id) {
     return decisions.findById(id).orElseThrow(() ->
         new EntityNotFoundException(DecisionEntity.class, "id", id.toString()));
   }
 
   public List<DecisionEntity> getServicesPossibleDecisions() {
-    return decisions.getDecisionsByComponentType("Service");
+    return decisions.findByComponentTypeNameIgnoreCase("service");
   }
 
   public List<DecisionEntity> getHostsPossibleDecisions() {
-    return decisions.getDecisionsByComponentType("Host");
+    return decisions.findByComponentTypeNameIgnoreCase("host");
   }
 
-  public DecisionEntity getDecisionByComponentTypeAndByDecisionName(String componentTypeName, String decisionName) {
-    return decisions.getDecisionByComponentTypeAndByDecisionName(componentTypeName, decisionName);
+  public DecisionEntity getServicePossibleDecision(String decisionName) {
+    return decisions.findByNameIgnoreCaseAndComponentTypeNameIgnoreCase(decisionName, "service").orElseThrow(() ->
+        new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
+  }
+
+  public DecisionEntity getHostPossibleDecision(String decisionName) {
+    return decisions.findByNameIgnoreCaseAndComponentTypeNameIgnoreCase(decisionName, "host").orElseThrow(() ->
+        new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
   }
 
   public ServiceDecisionEntity addServiceDecision(String containerId, String serviceName,
                                                   String decisionName, long ruleId, String otherInfo) {
     ServiceRuleEntity rule = serviceRulesService.getRule(ruleId);
-    DecisionEntity decision = decisions.getDecisionByComponentTypeAndByDecisionName("Service",
-        decisionName);
+    DecisionEntity decision = getServicePossibleDecision(decisionName);
     Timestamp timestamp = Timestamp.from(Instant.now());
     ServiceDecisionEntity serviceDecision = ServiceDecisionEntity.builder()
         .containerId(containerId)
@@ -108,7 +118,7 @@ public class DecisionsService {
 
   public HostDecisionEntity addHostDecision(String hostname, String decisionName, long ruleId) {
     HostRuleEntity rule = hostRulesService.getRule(ruleId);
-    DecisionEntity decision = decisions.getDecisionByComponentTypeAndByDecisionName("Host", decisionName);
+    DecisionEntity decision = getHostPossibleDecision(decisionName);
     Timestamp timestamp = Timestamp.from(Instant.now());
     HostDecisionEntity hostDecision = HostDecisionEntity.builder()
         .hostname(hostname)

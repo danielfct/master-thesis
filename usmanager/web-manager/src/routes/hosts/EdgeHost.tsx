@@ -79,7 +79,7 @@ class EdgeHost extends BaseComponent<Props, {}> {
     Object.entries(emptyEdgeHost()).map(([key, value]) => {
       return {
         [key]: {
-          id: key,
+          id: [key],
           label: key,
           validation: { rule: required }
         }
@@ -110,12 +110,12 @@ class EdgeHost extends BaseComponent<Props, {}> {
             {Object.keys(edgeHost).map((key, index) =>
               key === 'local'
                 ? <Field key={index}
-                         id={key}
+                         id={[key]}
                          type="dropdown"
                          label={key}
                          dropdown={{defaultValue: "Is a local machine?", values: ["True", "False"]}}/>
                 : <Field key={index}
-                         id={key}
+                         id={[key]}
                          label={key}/>
             )}
           </Form>

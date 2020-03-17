@@ -26,11 +26,6 @@ public class OperatorsController {
     return operatorsService.getOperators();
   }
 
-  @GetMapping("/{operatorId}")
-  public OperatorEntity getOperator(@PathVariable Long operatorId) {
-    return operatorsService.getOperator(operatorId);
-  }
-
   @GetMapping("/{operatorName}")
   public OperatorEntity getOperator(@PathVariable String operatorName) {
     return operatorsService.getOperator(operatorName);

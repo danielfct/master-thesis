@@ -70,7 +70,7 @@ interface State {
 }
 
 export interface IFormContext extends State {
-  setValues: (values: IValues) => void;
+  setValues: (values: IValues, id?: string) => void;
   validate: (fieldName: string) => void;
 }
 
@@ -135,8 +135,7 @@ class Form extends React.Component<Props, State> {
       ((typeof first == 'boolean' && typeof second == 'string' && first.toString() == second)
         || (typeof first == 'string' && typeof second == 'boolean') && first == second.toString()
         || (typeof first == 'number' && typeof second == 'string') && first.toString() == second
-        || (typeof first == 'string' && typeof second == 'number') && first == second.toString()) || undefined)
-
+        || (typeof first == 'string' && typeof second == 'number') && first == second.toString()) || undefined);
 
   private validate = (fieldName: string): string => {
     const {fields} = this.props;
@@ -206,8 +205,13 @@ class Form extends React.Component<Props, State> {
     }
   };
 
-  private setValues = (values: IValues) =>
-    this.setState({ values: { ...this.state.values, ...values } });
+  private setValues = (values: IValues, id?: string) => {
+    let newValues = values;
+    if (id) {
+      newValues = merge({}, this.state.values, values);
+    }
+    this.setState({ values: { ...this.state.values, ...newValues } }, () => console.log(this.state.values));
+  };
 
   private onModalConfirm = (event: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -229,6 +233,7 @@ class Form extends React.Component<Props, State> {
     };
     const {needsSave} = this.state;
     const {id, isNew, values, controlsMode, editable, deletable, children} = this.props;
+    console.log(values);
     return (
       <>
         <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>

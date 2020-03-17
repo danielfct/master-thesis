@@ -30,6 +30,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decisi
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
@@ -53,11 +54,10 @@ public class ServicesEventsService {
   }
 
   ServiceEventEntity saveServiceEvent(String containerId, String serviceName, String decisionName) {
-    DecisionEntity decision =
-        decisionsService.getDecisionByComponentTypeAndByDecisionName("Service", decisionName);
+    DecisionEntity decision = decisionsService.getServicePossibleDecision(decisionName);
     ServiceEventEntity event = getServiceEventsByContainerId(containerId).stream().findFirst().orElse(ServiceEventEntity.builder()
             .containerId(containerId).serviceName(serviceName).decision(decision).count(0).build());
-    if (event.getDecision().getId() != decision.getId()) {
+    if (!Objects.equals(event.getDecision().getId(), decision.getId())) {
       event.setDecision(decision);
       event.setCount(1);
     } else {
@@ -68,8 +68,7 @@ public class ServicesEventsService {
   }
 
   void resetServiceEvent(String serviceName) {
-    DecisionEntity decision =
-        decisionsService.getDecisionByComponentTypeAndByDecisionName("Service", "NONE");
+    DecisionEntity decision = decisionsService.getServicePossibleDecision("NONE");
     serviceEvents.findByServiceName(serviceName).forEach(serviceEvent -> {
       serviceEvent.setDecision(decision);
       serviceEvent.setCount(1);

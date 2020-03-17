@@ -47,7 +47,7 @@ class HostRules extends BaseComponent<Props, {}> {
   render() {
     return (
       <MainLayout>
-        <AddButton tooltip={'Add host rule'} pathname={'/rules/hosts/new_rule'}/>
+        <AddButton tooltip={'Add host rule'} pathname={'/rules/hosts/new_host_rule'}/>
         <div className={`${styles.container}`}>
           <CardList<IHostRule>
             isLoading={this.props.isLoading}

@@ -47,7 +47,7 @@ class AppRules extends BaseComponent<Props, {}> {
   render() {
     return (
       <MainLayout>
-        <AddButton tooltip={'Add app rule'} pathname={'/rules/apps/new_rule'}/>
+        <AddButton tooltip={'Add app rule'} pathname={'/rules/apps/new_app_rule'}/>
         <div className={`${styles.container}`}>
           <CardList<IAppRule>
             isLoading={this.props.isLoading}

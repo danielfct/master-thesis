@@ -80,7 +80,7 @@ class Node extends BaseComponent<Props, {}> {
     Object.entries(emptyNode()).map(([key, value]) => {
       return {
         [key]: {
-          id: key,
+          id: [key],
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 1 }
@@ -114,22 +114,22 @@ class Node extends BaseComponent<Props, {}> {
       isNew ?
         <>
           <Field key={'region'}
-                 id={'region'}
+                 id={['region']}
                  label={'region'}
                  type="dropdown"
                  dropdown={{defaultValue: "Select region", values: this.getSelectableRegions()}}/>
           <Field key={'country'}
-                 id={'country'}
+                 id={['country']}
                  label={'country'}
                  type="dropdown"
                  dropdown={{defaultValue: "Select country", values: this.getSelectableCountries()}}/>
           <Field key={'city'}
-                 id={'city'}
+                 id={['city']}
                  label={'city'}
                  type="dropdown"
                  dropdown={{defaultValue: "Select city", values: this.getSelectableCities()}}/>
           <Field key={'hostname'}
-                 id={'hostname'}
+                 id={['hostname']}
                  label={'hostname'}
                  type="dropdown"
                  dropdown={{defaultValue: "Select hostname", values: this.getSelectableHostnames()}}/>
@@ -139,7 +139,7 @@ class Node extends BaseComponent<Props, {}> {
                type="dropdown"
                dropdown={{defaultValue: "Select role", values: this.getSelectableRoles()}}/>*/}
           <Field key={'quantity'}
-                 id={'quantity'}
+                 id={['quantity']}
                  label={'quantity'}
                  type={"numberbox"}/>
         </>
@@ -147,7 +147,7 @@ class Node extends BaseComponent<Props, {}> {
         <>
           {Object.entries(node).map(([key, value], index) =>
             <Field key={index}
-                   id={key}
+                   id={[key]}
                    label={key}/>)}
         </>
     )

@@ -11,7 +11,7 @@
 import {IRule} from "../Rule";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
-import Form, {IFields, required} from "../../../components/form/Form";
+import Form, {IFields, required, requiredAndNumberAndMin} from "../../../components/form/Form";
 import LoadingSpinner from "../../../components/list/LoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
@@ -30,10 +30,11 @@ const emptyHostRule = () => ({
   name: '',
   priority: 0,
   decision: undefined,
+  hostname: '',
 });
 
 const isNewRule = (name: string) =>
-  name === 'new_rule';
+  name === 'new_host_rule';
 
 interface StateToProps {
   isLoading: boolean;
@@ -87,9 +88,13 @@ class HostRule extends BaseComponent<Props, {}> {
     Object.entries(hostRule).map(([key, value]) => {
       return {
         [key]: {
-          id: key,
+          id: [key],
           label: key,
-          validation: { rule: required }
+          validation: key == 'hostname'
+            ? undefined
+            : (key == 'priority'
+              ? { rule: requiredAndNumberAndMin, args: 0 }
+              : { rule: required })
         }
       };
     }).reduce((fields, field) => {
@@ -118,12 +123,12 @@ class HostRule extends BaseComponent<Props, {}> {
             {Object.keys(formHostRule).map((key, index) =>
               key === 'decision'
                 ? <Field key={index}
-                         id={key}
+                         id={[key, "name"]}
                          label={key}
                          type="dropdown"
-                         dropdown={{defaultValue: "Decision", values: ["TODO: load decisions"]}}/>
+                         dropdown={{defaultValue: "Choose decision", values: ["STOP", "START", "decision1", "decision2"]}}/>
                 : <Field key={index}
-                         id={key}
+                         id={[key]}
                          label={key}/>
             )}
           </Form>
@@ -132,12 +137,20 @@ class HostRule extends BaseComponent<Props, {}> {
     )
   };
 
+  private conditions = () =>
+    <div></div>; //TODO
+
   private tabs: Tab[] = [
     {
       title: 'Host rule',
       id: 'hostRule',
-      content: () => this.details()
+      content: () => this.details(),
     },
+    {
+      title: 'Conditions',
+      id: 'conditions',
+      content: () => this.conditions(),
+    }
   ];
 
   render() {
@@ -161,6 +174,9 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   if (hostRule) {
     formHostRule = { ...hostRule };
     delete formHostRule["id"];
+    if (formHostRule["hostname"] == null) {
+      delete formHostRule["hostname"];
+    }
   }
   return  {
     isLoading,

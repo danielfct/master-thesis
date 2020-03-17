@@ -47,7 +47,7 @@ class ServiceRules extends BaseComponent<Props, {}> {
   render() {
     return (
       <MainLayout>
-        <AddButton tooltip={'Add service rule'} pathname={'/rules/services/new_rule'}/>
+        <AddButton tooltip={'Add service rule'} pathname={'/rules/services/new_service_rule'}/>
         <div className={`${styles.container}`}>
           <CardList<IServiceRule>
             isLoading={this.props.isLoading}
