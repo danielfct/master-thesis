@@ -41,6 +41,7 @@ interface StateToProps {
   error?: string | null;
   appRule: Partial<IAppRule>;
   formAppRule?: Partial<IAppRule>,
+  decisions: string[],
 }
 
 interface DispatchToProps {
@@ -119,10 +120,10 @@ class AppRule extends BaseComponent<Props, {}> {
             {Object.keys(formAppRule).map((key, index) =>
               key === 'decision'
                 ? <Field key={index}
-                         id={[key]}
+                         id={[key, "name"]}
                          label={key}
                          type="dropdown"
-                         dropdown={{defaultValue: "Decision", values: ["TODO: load decisions"]}}/>
+                         dropdown={{defaultValue: "Choose decision", values: this.props.decisions}}/>
                 : <Field key={index}
                          id={[key]}
                          label={key}/>
@@ -163,11 +164,16 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     formAppRule = { ...appRule };
     delete formAppRule["id"];
   }
+  const decisions = state.entities.decisions.data
+    && Object.entries(state.entities.decisions.data)
+             .filter(([_, value]) => value.componentType.name.toLowerCase() == 'service')
+             .map(([key, value]) => key);
   return  {
     isLoading,
     error,
     appRule,
     formAppRule,
+    decisions
   }
 }
 

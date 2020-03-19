@@ -1,5 +1,5 @@
 import Data from "../../components/IData";
-import {IAddServiceApp, IAppService} from "../services/ServiceAppList";
+import {IAddServiceApp, IAppService} from "../services/apps/ServiceAppList";
 import IData from "../../components/IData";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";

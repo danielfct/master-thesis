@@ -704,32 +704,32 @@ public class DatabaseLoader {
       // operator
       var notEqualTo = OperatorEntity.builder()
           .name("NOT_EQUAL_TO")
-          .operatorSymbol("!=")
+          .symbol("!=")
           .build();
       operators.save(notEqualTo);
       var equalTo = OperatorEntity.builder()
           .name("EQUAL_TO")
-          .operatorSymbol("==")
+          .symbol("==")
           .build();
       operators.save(equalTo);
       var greaterThan = OperatorEntity.builder()
           .name("GREATER_THAN")
-          .operatorSymbol(">")
+          .symbol(">")
           .build();
       operators.save(greaterThan);
       var lessThan = OperatorEntity.builder()
           .name("LESS_THAN")
-          .operatorSymbol("<")
+          .symbol("<")
           .build();
       operators.save(lessThan);
       var greaterThanOrEqualTo = OperatorEntity.builder()
           .name("GREATER_THAN_OR_EQUAL_TO")
-          .operatorSymbol(">=")
+          .symbol(">=")
           .build();
       operators.save(greaterThanOrEqualTo);
       var lessThanOrEqualTo = OperatorEntity.builder()
           .name("LESS_THAN_OR_EQUAL_TO")
-          .operatorSymbol("<=")
+          .symbol("<=")
           .build();
       operators.save(lessThanOrEqualTo);
 

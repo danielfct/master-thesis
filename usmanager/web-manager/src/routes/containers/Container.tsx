@@ -14,7 +14,7 @@ import IData from "../../components/IData";
 import {ICloudHost} from "../hosts/CloudHost";
 import {IEdgeHost} from "../hosts/EdgeHost";
 import {IService} from "../services/Service";
-import ServiceAppList from "../services/ServiceAppList";
+import ServiceAppList from "../services/apps/ServiceAppList";
 import PortsList from "./PortsList";
 import LabelsList from "./LabelsList";
 import LogsList from "./LogsList";

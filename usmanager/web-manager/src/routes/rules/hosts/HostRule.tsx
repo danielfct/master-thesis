@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IRule} from "../Rule";
+import {ICondition, IDecision, IRule} from "../Rule";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {IFields, required, requiredAndNumberAndMin} from "../../../components/form/Form";
@@ -20,7 +20,12 @@ import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
 import React from "react";
-import {loadRulesHost} from "../../../actions";
+import {addRuleHostCondition, loadDecisions, loadRulesHost, loadServices} from "../../../actions";
+import {IService} from "../../services/Service";
+import ServicePredictionList, {IPrediction} from "../../services/predictions/ServicePredictionList";
+import {postData} from "../../../utils/api";
+import {IAddServiceApp} from "../../services/apps/ServiceAppList";
+import HostRuleConditionList from "./HostRuleConditionList";
 
 export interface IHostRule extends IRule {
   hostname: string
@@ -41,10 +46,13 @@ interface StateToProps {
   error?: string | null;
   hostRule: Partial<IHostRule>;
   formHostRule?: Partial<IHostRule>,
+  decisions: string[],
 }
 
 interface DispatchToProps {
   loadRulesHost: (name: string) => any;
+  loadDecisions: (name?: string) => any;
+  addRuleHostCondition: (ruleName: string, condition: string) => void;
 }
 
 interface MatchParams {
@@ -53,9 +61,19 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-class HostRule extends BaseComponent<Props, {}> {
+type State = {
+  newConditions: ICondition[],
+}
+
+
+class HostRule extends BaseComponent<Props, State> {
+
+  state: State = {
+    newConditions: [],
+  };
 
   componentDidMount(): void {
+    this.props.loadDecisions();
     const ruleName = this.props.match.params.name;
     if (ruleName && !isNewRule(ruleName)) {
       this.props.loadRulesHost(ruleName);
@@ -83,6 +101,39 @@ class HostRule extends BaseComponent<Props, {}> {
 
   private onDeleteFailure = (reason: string, ruleName: string): void =>
     super.toast(`Unable to delete ${ruleName}`, 10000, reason, true);
+
+  private onAddRuleCondition = (condition: ICondition): void => {
+    this.setState({
+      newConditions: this.state.newConditions.concat(condition)
+    });
+  };
+
+  private onRemoveRuleConditions = (conditions: string[]): void => {
+    this.setState({
+      newConditions: this.state.newConditions.filter(condition => !conditions.includes(condition.name))
+    });
+  };
+
+  private saveRuleConditions = (ruleName: string): void => {
+    const {newConditions} = this.state;
+    if (newConditions.length) {
+      postData(`rules/hosts/${ruleName}/conditions`, newConditions,
+        () => this.onSaveConditionsSuccess(ruleName),
+        (reason) => this.onSaveConditionsFailure(ruleName, reason));
+    }
+  };
+
+  private onSaveConditionsSuccess = (ruleName: string): void => {
+    if (!isNewRule(this.props.match.params.name)) {
+      this.state.newConditions.forEach(condition =>
+        this.props.addRuleHostCondition(ruleName, condition.name)
+      );
+    }
+    this.setState({ newConditions: [] });
+  };
+
+  private onSaveConditionsFailure = (ruleName: string, reason: string): void =>
+    super.toast(`Unable to save conditions of rule ${ruleName}`, 10000, reason, true);
 
   private getFields = (hostRule: Partial<IRule>): IFields =>
     Object.entries(hostRule).map(([key, value]) => {
@@ -126,7 +177,7 @@ class HostRule extends BaseComponent<Props, {}> {
                          id={[key, "name"]}
                          label={key}
                          type="dropdown"
-                         dropdown={{defaultValue: "Choose decision", values: ["STOP", "START", "decision1", "decision2"]}}/>
+                         dropdown={{defaultValue: "Choose decision", values: this.props.decisions}}/>
                 : <Field key={index}
                          id={[key]}
                          label={key}/>
@@ -137,8 +188,11 @@ class HostRule extends BaseComponent<Props, {}> {
     )
   };
 
-  private conditions = () =>
-    <div></div>; //TODO
+  private conditions = (): JSX.Element =>
+    <HostRuleConditionList rule={this.props.hostRule}
+                           newConditions={this.state.newConditions}
+                           onAddRuleCondition={this.onAddRuleCondition}
+                           onRemoveRuleConditions={this.onRemoveRuleConditions}/>;
 
   private tabs: Tab[] = [
     {
@@ -148,7 +202,7 @@ class HostRule extends BaseComponent<Props, {}> {
     },
     {
       title: 'Conditions',
-      id: 'conditions',
+      id: 'hostRuleConditions',
       content: () => this.conditions(),
     }
   ];
@@ -176,18 +230,26 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     delete formHostRule["id"];
     if (formHostRule["hostname"] == null) {
       delete formHostRule["hostname"];
+      delete formHostRule["conditions"];
     }
   }
+  const decisions = state.entities.decisions.data
+    && Object.entries(state.entities.decisions.data)
+             .filter(([_, value]) => value.componentType.name.toLowerCase() == 'host')
+             .map(([key, value]) => key);
   return  {
     isLoading,
     error,
     hostRule,
     formHostRule,
+    decisions
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
+  loadDecisions,
+  addRuleHostCondition
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HostRule);

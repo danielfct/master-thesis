@@ -41,11 +41,11 @@ import BaseComponent from "../../components/BaseComponent";
 import Error from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import {postData} from "../../utils/api";
-import ServiceAppList, {IAddServiceApp} from "./ServiceAppList";
-import ServiceDependencyList from "./ServiceDependencyList";
-import ServiceDependeeList from "./ServiceDependeeList";
-import ServicePredictionList, {IPrediction} from "./ServicePredictionList";
-import ServiceRuleList from "./ServiceRuleList";
+import ServiceAppList, {IAddServiceApp} from "./apps/ServiceAppList";
+import ServiceDependencyList from "./dependencies/ServiceDependencyList";
+import ServiceDependeeList from "./dependees/ServiceDependeeList";
+import ServicePredictionList, {IPrediction} from "./predictions/ServicePredictionList";
+import ServiceRuleList from "./rules/ServiceRuleList";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
 
 export interface IService extends IData {

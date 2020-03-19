@@ -210,7 +210,7 @@ class Form extends React.Component<Props, State> {
     if (id) {
       newValues = merge({}, this.state.values, values);
     }
-    this.setState({ values: { ...this.state.values, ...newValues } }, () => console.log(this.state.values));
+    this.setState({ values: { ...this.state.values, ...newValues } });
   };
 
   private onModalConfirm = (event: React.FormEvent<HTMLButtonElement>) => {
@@ -233,7 +233,6 @@ class Form extends React.Component<Props, State> {
     };
     const {needsSave} = this.state;
     const {id, isNew, values, controlsMode, editable, deletable, children} = this.props;
-    console.log(values);
     return (
       <>
         <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>

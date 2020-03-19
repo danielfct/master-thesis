@@ -25,20 +25,20 @@
 import {normalize, schema} from 'normalizr';
 import {camelizeKeys} from 'humps';
 import {IService} from "../routes/services/Service";
-import {IServiceDependency} from "../routes/services/ServiceDependencyList";
+import {IServiceDependency} from "../routes/services/dependencies/ServiceDependencyList";
 import axios from "axios";
 import {API_URL} from "../utils/api";
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
-import {IDependee} from "../routes/services/ServiceDependeeList";
-import {IPrediction} from "../routes/services/ServicePredictionList";
-import {IAppService} from "../routes/services/ServiceAppList";
+import {IDependee} from "../routes/services/dependees/ServiceDependeeList";
+import {IPrediction} from "../routes/services/predictions/ServicePredictionList";
+import {IAppService} from "../routes/services/apps/ServiceAppList";
 import {INode} from "../routes/nodes/Node";
 import {ICloudHost} from "../routes/hosts/CloudHost";
 import {IEdgeHost} from "../routes/hosts/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
-import {IRule} from "../routes/rules/Rule";
+import {ICondition, IDecision, IRule} from "../routes/rules/Rule";
 import {IAppRule} from "../routes/rules/apps/AppRule";
 import {IServiceRule} from "../routes/rules/services/ServiceRule";
 import {IHostRule} from "../routes/rules/hosts/HostRule";
@@ -87,6 +87,10 @@ interface ISchemas {
     RULE_HOST_ARRAY: schema.Entity<IHostRule>[];
     RULE_SERVICE: schema.Entity<IServiceRule>;
     RULE_SERVICE_ARRAY: schema.Entity<IServiceRule>[];
+    RULE_CONDITION: schema.Entity<ICondition>;
+    RULE_CONDITION_ARRAY: schema.Entity<ICondition>[];
+    DECISION: schema.Entity<IDecision>;
+    DECISION_ARRAY: schema.Entity<IDecision>[];
     NODE: schema.Entity<INode>;
     NODE_ARRAY: schema.Entity<INode>[];
     CLOUD_HOST: schema.Entity<ICloudHost>;
@@ -127,18 +131,34 @@ const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predicti
 });
 const predictions = new schema.Array(predictionSchema);
 
-const ruleAppSchema: schema.Entity<IAppRule> = new schema.Entity('appRules', {}, {
+const conditionSchema: schema.Entity<ICondition> = new schema.Entity('conditions', {}, {
+    idAttribute: (condition: ICondition) => condition.name
+});
+const conditions = new schema.Array(conditionSchema);
+
+const ruleAppSchema: schema.Entity<IAppRule> = new schema.Entity('appRules', {
+    conditions
+}, {
     idAttribute: (appRule: IAppRule) => appRule.name
 });
 const rulesApp = new schema.Array(ruleAppSchema);
-const ruleHostSchema: schema.Entity<IHostRule> = new schema.Entity('hostRules', {}, {
+const ruleHostSchema: schema.Entity<IHostRule> = new schema.Entity('hostRules', {
+    conditions
+}, {
     idAttribute: (hostRule: IHostRule) => hostRule.name
 });
 const rulesHost = new schema.Array(ruleHostSchema);
-const ruleServiceSchema: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', {}, {
+const ruleServiceSchema: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', {
+    conditions
+}, {
     idAttribute: (serviceRule: IServiceRule) => serviceRule.name
 });
 const rulesService = new schema.Array(ruleServiceSchema);
+
+const decisionSchema: schema.Entity<IDecision> = new schema.Entity('decisions', {}, {
+    idAttribute: (decision: IDecision) => decision.name
+});
+const decisions = new schema.Array(decisionSchema);
 
 const nodeSchema: schema.Entity<INode> = new schema.Entity('nodes', {}, {
     idAttribute: (node: INode) => node.id.toString()
@@ -150,7 +170,7 @@ const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {
     dependencies,
     dependees,
     predictions,
-    rulesApp
+    rulesService
 }, {
     idAttribute: (service: IService) => service.serviceName
 });
@@ -200,6 +220,10 @@ export const Schemas: ISchemas = {
     RULE_HOST_ARRAY: [ruleHostSchema],
     RULE_SERVICE: ruleServiceSchema,
     RULE_SERVICE_ARRAY: [ruleServiceSchema],
+    RULE_CONDITION: conditionSchema,
+    RULE_CONDITION_ARRAY: [conditionSchema],
+    DECISION: decisionSchema,
+    DECISION_ARRAY: [decisionSchema],
     NODE: nodeSchema,
     NODE_ARRAY: [nodeSchema],
     CLOUD_HOST: cloudHostSchema,

@@ -113,7 +113,23 @@ import {
   RULE_SERVICE_FAILURE,
   RULES_SERVICE_FAILURE,
   RULE_SERVICE_SUCCESS,
-  RULES_SERVICE_SUCCESS
+  RULES_SERVICE_SUCCESS,
+  DECISION_REQUEST,
+  DECISIONS_REQUEST,
+  DECISION_FAILURE,
+  DECISIONS_FAILURE,
+  DECISION_SUCCESS,
+  DECISIONS_SUCCESS,
+  ADD_RULE_HOST_CONDITION,
+  ADD_RULE_SERVICE_CONDITION,
+  REMOVE_RULE_HOST_CONDITIONS,
+  REMOVE_RULE_SERVICE_CONDITIONS,
+  RULE_HOST_CONDITIONS_REQUEST,
+  RULE_HOST_CONDITIONS_FAILURE,
+  RULE_HOST_CONDITIONS_SUCCESS,
+  RULE_SERVICE_CONDITIONS_REQUEST,
+  RULE_SERVICE_CONDITIONS_FAILURE,
+  RULE_SERVICE_CONDITIONS_SUCCESS
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
@@ -121,15 +137,15 @@ import {IService} from "../routes/services/Service";
 import {merge, pick, keys } from 'lodash';
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
-import {IAppService} from "../routes/services/ServiceAppList";
-import {IPrediction} from "../routes/services/ServicePredictionList";
-import {IDependee} from "../routes/services/ServiceDependeeList";
+import {IAppService} from "../routes/services/apps/ServiceAppList";
+import {IPrediction} from "../routes/services/predictions/ServicePredictionList";
+import {IDependee} from "../routes/services/dependees/ServiceDependeeList";
 import {INode} from "../routes/nodes/Node";
 import {ICloudHost} from "../routes/hosts/CloudHost";
 import {IEdgeHost} from "../routes/hosts/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
-import {IRule} from "../routes/rules/Rule";
+import {ICondition, IDecision, IRule} from "../routes/rules/Rule";
 import {IAppRule} from "../routes/rules/apps/AppRule";
 import {IHostRule} from "../routes/rules/hosts/HostRule";
 import {IServiceRule} from "../routes/rules/services/ServiceRule";
@@ -172,12 +188,21 @@ export type EntitiesState = {
       data: { [key: string]: IHostRule },
       isLoading: boolean,
       error?: string | null,
+      isLoadingConditions: boolean,
+      loadConditionsError?: string | null,
     },
     services: {
       data: { [key: string]: IServiceRule },
       isLoading: boolean,
       error?: string | null,
+      isLoadingConditions: boolean,
+      loadConditionsError?: string | null,
     }
+  },
+  decisions: {
+    data: { [key: string]: IDecision },
+    isLoading: boolean,
+    error?: string | null,
   },
   nodes: {
     data: { [key: string]: INode },
@@ -229,6 +254,9 @@ export type EntitiesAction = {
     hostRules?: IHostRule[],
     serviceRules?: IServiceRule[],
     rulesNames?: string[],
+    conditions?: ICondition[],
+    conditionsNames?: string[],
+    decisions?: IDecision[],
     nodes?: INode[],
     cloudHosts?: ICloudHost[],
     edgeHosts?: ICloudHost[],
@@ -274,13 +302,22 @@ const entities = (state: EntitiesState = {
                       hosts: {
                         data: {},
                         isLoading: false,
-                        error: null
+                        error: null,
+                        isLoadingConditions: false,
+                        loadConditionsError: null,
                       },
                       services: {
                         data: {},
                         isLoading: false,
-                        error: null
+                        error: null,
+                        isLoadingConditions: false,
+                        loadConditionsError: null,
                       }
+                    },
+                    decisions: {
+                      data: {},
+                      isLoading: false,
+                      error: null
                     },
                     nodes: {
                       data: {},
@@ -412,7 +449,9 @@ const entities = (state: EntitiesState = {
       const service = entity && state.services.data[entity];
       const predictions = { predictions: data?.predictions || [] };
       const serviceWithPredictions = Object.assign(service ? service : [entity], predictions);
+      console.log(serviceWithPredictions)
       const normalizedService = normalize(serviceWithPredictions, Schemas.SERVICE).entities;
+      console.log(normalizedService.services)
       return merge({}, state, {
         services: {
           data: normalizedService.services,
@@ -551,6 +590,31 @@ const entities = (state: EntitiesState = {
           error: null,
         }
       };
+    case DECISION_REQUEST:
+    case DECISIONS_REQUEST:
+      return merge({}, state, { decisions: { isLoading: true } });
+    case DECISION_FAILURE:
+    case DECISIONS_FAILURE:
+      return merge({}, state, { decisions: { isLoading: false, error: error } });
+    case DECISION_SUCCESS:
+      return {
+        ...state,
+        decisions: {
+          data: merge({}, state.decisions.data, data?.decisions),
+          isLoading: false,
+          error: null,
+        }
+      };
+    case DECISIONS_SUCCESS:
+      return {
+        ...state,
+        decisions: {
+          ...state.nodes,
+          data: merge({}, pick(state.decisions.data, keys(data?.decisions)), data?.decisions),
+          isLoading: false,
+          error: null,
+        }
+      };
     case NODE_REQUEST:
     case NODES_REQUEST:
       return merge({}, state, { nodes: { isLoading: true } });
@@ -672,6 +736,98 @@ const entities = (state: EntitiesState = {
           }
         }
       };
+    case RULE_HOST_CONDITIONS_REQUEST:
+      return merge({}, state, { rules: { hosts: { isLoadingConditions: true } } });
+    case RULE_HOST_CONDITIONS_FAILURE:
+      return merge({}, state, { rules: { hosts: { isLoadingConditions: false, loadConditionsError: error } } });
+    case RULE_HOST_CONDITIONS_SUCCESS: {
+      const rule = entity && state.rules.hosts.data[entity];
+      const conditions = { conditions: data?.conditions || [] };
+      const ruleWithConditions = Object.assign(rule ? rule : [entity], conditions);
+      console.log(ruleWithConditions);
+      const normalizedRule = normalize(ruleWithConditions, Schemas.RULE_HOST).entities;
+      console.log(normalizedRule.hostRules);
+      return merge({}, state, {
+        rules: {
+          hosts : {
+            data: normalizedRule.hostRules,
+            isLoadingConditions: false,
+            loadConditionsError: null
+          }
+        }
+      });
+    }
+    case ADD_RULE_HOST_CONDITION:
+      if (entity) {
+        const rule = state.rules.hosts.data[entity];
+        if (data?.conditionsNames?.length) {
+          rule.conditions?.unshift(data?.conditionsNames[0]);
+          return state = merge({}, state, { rules: { hosts: { data: { [rule.name]: {...rule } } } } });
+        }
+      }
+      break;
+    case REMOVE_RULE_HOST_CONDITIONS:
+      if (entity) {
+        const rule = state.rules.hosts.data[entity];
+        const filteredConditions = rule.conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
+        const ruleWithConditions = Object.assign(rule, { conditions: filteredConditions });
+        const normalizeRule = normalize(ruleWithConditions, Schemas.RULE_HOST).entities;
+        return merge({}, state, {
+          rules: {
+            ...state.rules,
+            hosts: {
+              ...state.rules.hosts,
+              data: normalizeRule.hostRules,
+            }
+          }
+        });
+      }
+      break;
+    case RULE_SERVICE_CONDITIONS_REQUEST:
+      return merge({}, state, { rules: { services: { isLoadingConditions: true } } });
+    case RULE_SERVICE_CONDITIONS_FAILURE:
+      return merge({}, state, { rules: { services: { isLoadingConditions: false, loadConditionsError: error } } });
+    case RULE_SERVICE_CONDITIONS_SUCCESS: {
+      const rule = entity && state.rules.services.data[entity];
+      const conditions = { conditions: data?.predictions || [] };
+      const ruleWithConditions = Object.assign(rule ? rule : [entity], conditions);
+      const normalizedRule = normalize(ruleWithConditions, Schemas.RULE_SERVICE).entities;
+      return merge({}, state, {
+        rules: {
+          services : {
+            data: normalizedRule.serviceRules,
+            isLoadingConditions: false,
+            loadConditionsError: null
+          }
+        }
+      });
+    }
+    case ADD_RULE_SERVICE_CONDITION:
+      if (entity) {
+        const rule = state.rules.services.data[entity];
+        if (data?.conditionsNames?.length) {
+          rule.conditions?.unshift(data?.conditionsNames[0]);
+          return state = merge({}, state, { rules: { services: { data: { [rule.name]: {...rule } } } } });
+        }
+      }
+      break;
+    case REMOVE_RULE_SERVICE_CONDITIONS:
+      if (entity) {
+        const rule = state.rules.services.data[entity];
+        const filteredConditions = rule.conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
+        const ruleWithConditions = Object.assign(rule, { conditions: filteredConditions });
+        const normalizeRule = normalize(ruleWithConditions, Schemas.RULE_SERVICE).entities;
+        return merge({}, state, {
+          rules: {
+            ...state.rules,
+            services: {
+              ...state.rules.services,
+              data: normalizeRule.serviceHosts,
+            }
+          }
+        });
+      }
+      break;
     case APP_REQUEST:
     case APPS_REQUEST:
       return merge({}, state, { apps: { isLoading: true } });

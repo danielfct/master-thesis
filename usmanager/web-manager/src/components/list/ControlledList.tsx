@@ -63,6 +63,7 @@ export default class ControlledList extends BaseComponent<Props, State> {
                                                   .every(checked => checked);
     }
     if (prevProps.data !== this.props.data) {
+      console.log(this.props.data)
       this.setState(this.props.data.reduce((state: State, data: string) => {
         state[data] = { isChecked: false, isNew: false };
         return state;

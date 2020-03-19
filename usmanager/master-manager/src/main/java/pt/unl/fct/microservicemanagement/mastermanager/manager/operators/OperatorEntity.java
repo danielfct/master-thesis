@@ -69,7 +69,7 @@ public class OperatorEntity {
 
   @NotNull
   @Column(unique = true)
-  private String operatorSymbol;
+  private String symbol;
 
   @JsonIgnore
   @OneToMany(mappedBy = "operator", cascade = CascadeType.ALL, orphanRemoval = true)

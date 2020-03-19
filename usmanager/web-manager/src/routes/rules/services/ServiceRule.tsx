@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IRule} from "../Rule";
+import {ICondition, IRule} from "../Rule";
 import {IService} from "../../services/Service";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
@@ -24,7 +24,7 @@ import {connect} from "react-redux";
 import React from "react";
 
 export interface IServiceRule extends IRule {
-  service: IService
+  service: IService,
 }
 
 const emptyServiceRule = () => ({
@@ -41,6 +41,7 @@ interface StateToProps {
   error?: string | null;
   serviceRule: Partial<IServiceRule>;
   formServiceRule?: Partial<IServiceRule>,
+  decisions: string[],
 }
 
 interface DispatchToProps {
@@ -119,10 +120,10 @@ class ServiceRule extends BaseComponent<Props, {}> {
             {Object.keys(formServiceRule).map((key, index) =>
               key === 'decision'
                 ? <Field key={index}
-                         id={[key]}
+                         id={[key, "name"]}
                          label={key}
                          type="dropdown"
-                         dropdown={{defaultValue: "Decision", values: ["TODO: load decisions"]}}/>
+                         dropdown={{defaultValue: "Choose decision", values: this.props.decisions}}/>
                 : <Field key={index}
                          id={[key]}
                          label={key}/>
@@ -163,11 +164,16 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     formServiceRule = { ...serviceRule };
     delete formServiceRule["id"];
   }
+  const decisions = state.entities.decisions.data
+    && Object.entries(state.entities.decisions.data)
+             .filter(([_, value]) => value.componentType.name.toLowerCase() == 'service')
+             .map(([key, value]) => key);
   return  {
     isLoading,
     error,
     serviceRule,
     formServiceRule,
+    decisions
   }
 }
 

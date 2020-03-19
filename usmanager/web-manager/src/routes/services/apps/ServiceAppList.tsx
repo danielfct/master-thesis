@@ -1,27 +1,37 @@
-import BaseComponent from "../../components/BaseComponent";
+/*
+ * Copyright (c) 2020 usmanager
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+import BaseComponent from "../../../components/BaseComponent";
 import React, {createRef} from "react";
-import {IService} from "./Service";
-import ListItem from "../../components/list/ListItem";
-import listItemstyles from "../../components/list/ListItem.module.css";
+import {IService} from "../Service";
+import ListItem from "../../../components/list/ListItem";
+import listItemstyles from "../../../components/list/ListItem.module.css";
 import appServiceStyles from "./ServiceAppList.module.css";
 import {Link} from "react-router-dom";
-import ControlledList from "../../components/list/ControlledList";
-import {ReduxState} from "../../reducers";
+import ControlledList from "../../../components/list/ControlledList";
+import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {
   addServiceApp,
   loadApps, loadAppServices,
   loadServiceApps,
   removeServiceApps
-} from "../../actions";
+} from "../../../actions";
 import {connect} from "react-redux";
-import Data from "../../components/IData";
-import Field from "../../components/form/Field";
-import {IFields, IValues, required, requiredAndNumberAndMin} from "../../components/form/Form";
-import List from "../../components/list/List";
+import Data from "../../../components/IData";
+import Field from "../../../components/form/Field";
+import {IFields, IValues, required, requiredAndNumberAndMin} from "../../../components/form/Form";
+import List from "../../../components/list/List";
 import M from "materialize-css";
-import Collapsible from "../../components/collapsible/Collapsible";
-import {IApp} from "../apps/App";
+import Collapsible from "../../../components/collapsible/Collapsible";
+import {IApp} from "../../apps/App";
 
 export interface IAppService extends Data {
   service: IService;

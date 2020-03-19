@@ -25,7 +25,7 @@
 import {CALL_API, Schemas} from "../middleware/api";
 import {IBreadcrumbs} from "../components/breadcrumbs/Breadcrumbs";
 import {IService} from "../routes/services/Service";
-import {IServiceDependency} from "../routes/services/ServiceDependencyList";
+import {IServiceDependency} from "../routes/services/dependencies/ServiceDependencyList";
 import {EntitiesAction, EntitiesState} from "../reducers/entities";
 
 export const SERVICES_REQUEST = 'SERVICES_REQUEST';
@@ -350,6 +350,94 @@ const fetchRulesService = (name?: string) => ({
         endpoint: `rules/services/${name}`,
         schema: Schemas.RULE_SERVICE,
         entity: 'serviceRules'
+      }
+});
+
+export const RULE_HOST_CONDITIONS_REQUEST = 'RULE_HOST_CONDITIONS_REQUEST';
+export const RULE_HOST_CONDITIONS_SUCCESS = 'RULE_HOST_CONDITIONS_SUCCESS';
+export const RULE_HOST_CONDITIONS_FAILURE = 'RULE_HOST_CONDITIONS_FAILURE';
+export const loadRuleHostConditions = (ruleName: string) => (dispatch: any) => {
+  return dispatch(fetchRuleHostConditions(ruleName));
+};
+const fetchRuleHostConditions = (ruleName: string) => ({
+  [CALL_API]: {
+    types: [ RULE_HOST_CONDITIONS_REQUEST, RULE_HOST_CONDITIONS_SUCCESS, RULE_HOST_CONDITIONS_FAILURE ],
+    endpoint: `rules/hosts/${ruleName}/conditions`,
+    schema: Schemas.RULE_CONDITION_ARRAY,
+    entity: ruleName
+  }
+});
+export const ADD_RULE_HOST_CONDITION = 'ADD_RULE_HOST_CONDITION';
+export function addRuleHostCondition(ruleName: string, condition: string): EntitiesAction {
+  return {
+    type: ADD_RULE_HOST_CONDITION,
+    entity: ruleName,
+    data: { conditionsNames: new Array(condition) }
+  }
+}
+
+export const RULE_SERVICE_CONDITIONS_REQUEST = 'RULE_SERVICE_CONDITIONS_REQUEST';
+export const RULE_SERVICE_CONDITIONS_SUCCESS = 'RULE_SERVICE_CONDITIONS_SUCCESS';
+export const RULE_SERVICE_CONDITIONS_FAILURE = 'RULE_SERVICE_CONDITIONS_FAILURE';
+export const loadRuleServiceConditions = (ruleName: string) => (dispatch: any) => {
+  return dispatch(fetchRuleServiceConditions(ruleName));
+};
+const fetchRuleServiceConditions = (ruleName: string) => ({
+  [CALL_API]: {
+    types: [ RULE_SERVICE_CONDITIONS_REQUEST, RULE_SERVICE_CONDITIONS_SUCCESS, RULE_SERVICE_CONDITIONS_FAILURE ],
+    endpoint: `rules/services/${ruleName}/conditions`,
+    schema: Schemas.RULE_CONDITION_ARRAY,
+    entity: ruleName
+  }
+});
+export const ADD_RULE_SERVICE_CONDITION = 'ADD_RULE_SERVICE_CONDITION';
+export function addRuleServiceCondition(ruleName: string, condition: string): EntitiesAction {
+  return {
+    type: ADD_RULE_SERVICE_CONDITION,
+    entity: ruleName,
+    data: { conditionsNames: new Array(condition) }
+  }
+}
+export const REMOVE_RULE_HOST_CONDITIONS = 'REMOVE_RULE_HOST_CONDITIONS';
+export function removeRuleHostConditions(ruleName: string, condition: string[]): EntitiesAction {
+  return {
+    type: REMOVE_RULE_HOST_CONDITIONS,
+    entity: ruleName,
+    data: { conditionsNames: condition }
+  }
+}
+export const REMOVE_RULE_SERVICE_CONDITIONS = 'REMOVE_RULE_SERVICE_CONDITIONS';
+export function removeRuleServiceConditions(ruleName: string, condition: string[]): EntitiesAction {
+  return {
+    type: REMOVE_RULE_SERVICE_CONDITIONS,
+    entity: ruleName,
+    data: { conditionsNames: condition }
+  }
+}
+
+export const DECISIONS_REQUEST = 'DECISIONS_REQUEST';
+export const DECISIONS_SUCCESS = 'DECISIONS_SUCCESS';
+export const DECISIONS_FAILURE = 'DECISIONS_FAILURE';
+export const DECISION_REQUEST = 'DECISION_REQUEST';
+export const DECISION_SUCCESS = 'DECISION_SUCCESS';
+export const DECISION_FAILURE = 'DECISION_FAILURE';
+export const loadDecisions = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchDecisions(name));
+};
+const fetchDecisions = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ DECISIONS_REQUEST, DECISIONS_SUCCESS, DECISIONS_FAILURE ],
+        endpoint: `decisions`,
+        schema: Schemas.DECISION_ARRAY,
+        entity: 'serviceRules'
+      }
+      : {
+        types: [ DECISION_REQUEST, DECISION_SUCCESS, DECISION_FAILURE ],
+        endpoint: `decisions`,
+        schema: Schemas.DECISION,
+        entity: 'decisions'
       }
 });
 

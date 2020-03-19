@@ -5,6 +5,7 @@ export interface IRule extends IData {
   name: string;
   priority: number;
   decision: IDecision;
+  conditions: string[];
 }
 
 export interface IDecision extends IData {
@@ -17,6 +18,7 @@ interface IComponentType extends IData {
 }
 
 export interface ICondition extends IData {
+  name: string;
   valueMode: IValueMode;
   field: IField;
   operator: IOperator;
