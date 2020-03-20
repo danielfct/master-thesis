@@ -63,7 +63,6 @@ export default class ControlledList extends BaseComponent<Props, State> {
                                                   .every(checked => checked);
     }
     if (prevProps.data !== this.props.data) {
-      console.log(this.props.data)
       this.setState(this.props.data.reduce((state: State, data: string) => {
         state[data] = { isChecked: false, isNew: false };
         return state;
@@ -164,6 +163,7 @@ export default class ControlledList extends BaseComponent<Props, State> {
       {formModal?.content()}
     </InputDialog>;
   };
+
   private setSelected = (event: any) => {
     this.selected = decodeHTML((event.target as HTMLLIElement).innerHTML);
     this.props.dropdown?.formModal?.onOpen?.(this.selected);

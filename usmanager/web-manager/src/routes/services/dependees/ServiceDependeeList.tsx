@@ -55,7 +55,9 @@ class ServiceDependeeList extends BaseComponent<Props, {}> {
         <span>{dependee}</span>
       </div>
       <Link to={`/services/${dependee}`}
-            className={`${styles.link}`}/>
+            className={`${styles.link} waves-effect`}>
+        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+      </Link>
     </ListItem>;
 
   render() {

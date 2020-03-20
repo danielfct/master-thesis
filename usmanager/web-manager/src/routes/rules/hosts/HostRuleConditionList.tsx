@@ -11,16 +11,20 @@ import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {addRuleHostCondition, loadRuleHostConditions, removeRuleHostConditions} from "../../../actions";
 import {connect} from "react-redux";
+import InputDialog from "../../../components/dialogs/InputDialog";
+import {capitalize} from "../../../utils/text";
+import {Redirect} from "react-router";
 
 const emptyCondition = (): Partial<ICondition> => ({
   name: '',
-  /*valueMode: { id: 0, name: '' },
+  valueMode: { id: 0, name: '' },
   field: { id: 0, name: '' },
-  operator: { id: 0, name: '', symbol: '' },*/
+  operator: { id: 0, name: '', symbol: '' },
   value: 0,
 });
 
 interface StateToProps {
+  redirect: boolean;
   isLoading: boolean;
   error?: string | null;
   conditions: string[];
@@ -44,16 +48,18 @@ type Props = StateToProps & DispatchToProps & HostRuleConditionListProps;
 class HostRuleConditionList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    const {name} = this.props.rule;
-    if (name) {
-      this.props.loadRuleHostConditions(name);
+    if (this.props.rule) {
+      const {name} = this.props.rule;
+      if (name) {
+        this.props.loadRuleHostConditions(name);
+      }
     }
   }
 
   private condition = (index: number, condition: string, separate: boolean, checked: boolean,
                        handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
     <ListItem key={index} separate={separate}>
-      <div className={`${styles.itemContent}`}>
+      <div className={styles.linkedItemContent}>
         <label>
           <input id={condition}
                  type="checkbox"
@@ -62,7 +68,57 @@ class HostRuleConditionList extends BaseComponent<Props, {}> {
           <span id={'checkbox'}>{condition}</span>
         </label>
       </div>
+        <div className={`${styles.link} modal-trigger waves-effect`}
+                data-target={`hostRule${condition}`}>
+          <i className={`${styles.linkIcon} material-icons right`}>link</i>
+        </div>
+      {this.inputDialog(condition)}
     </ListItem>;
+
+  private inputDialog = (condition: string): JSX.Element => {
+    return <InputDialog id={`hostRule${condition}`}
+                        title={capitalize(condition)}
+                        fields={this.getModalFields()}
+                        values={this.getModalValues(condition)}
+                        confirmCallback={() => {}}>
+      {/*name: string;
+      valueMode: IValueMode;
+      field: IField;
+      operator: IOperator;
+      value: number;*/}
+      <Field key='name' id={['name']} label='name'/>
+      <Field key='valueMode' id={['valueMode', 'name']} label='valueMode'/>
+      <Field key='field' id={['field', 'name']} label='field'/>
+    </InputDialog>;
+  };
+
+  private getModalFields = (): IFields => (
+    {
+      name: {
+        id: ['name'],
+        label: 'name',
+        validation: { rule: required }
+      },
+      valueMode: {
+        id: ['valueMode', 'name'],
+        label: 'valueMode',
+        validation: { rule: required }
+      },
+      field: {
+        id: ['field', 'name'],
+        label: 'field',
+        validation: { rule: required }
+      }
+    }
+  );
+
+  private getModalValues = (condition: string): IValues => (
+    {
+      name: condition,
+      valueMode: { name: '' },
+      field: { name: '' },
+    }
+  );
 
   private onAdd = (condition: IValues): void => {
     this.props.onAddRuleCondition(condition as ICondition);
@@ -121,6 +177,9 @@ class HostRuleConditionList extends BaseComponent<Props, {}> {
     </div>;
 
   render() {
+    if (this.props.redirect) {
+      return <Redirect to='/rules/hosts'/>;
+    }
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage={`Conditions list is empty`}
@@ -147,10 +206,12 @@ class HostRuleConditionList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleConditionListProps): StateToProps {
-  const ruleName = ownProps.rule.name;
+  const ruleName = ownProps.rule && ownProps.rule.name;
   const rule = ruleName && state.entities.rules.hosts.data[ruleName];
   const conditions = rule && rule.conditions;
+  console.log(ownProps)
   return {
+    redirect: !ownProps.rule,
     isLoading: state.entities.rules.hosts.isLoadingConditions,
     error: state.entities.rules.services.loadConditionsError,
     conditions: conditions || [],

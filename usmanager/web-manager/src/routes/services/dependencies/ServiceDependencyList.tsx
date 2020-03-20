@@ -15,7 +15,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {addServiceDependency, loadServiceDependencies, loadServices, removeServiceDependencies} from "../../../actions";
 import BaseComponent from "../../../components/BaseComponent";
-import {Link, withRouter} from "react-router-dom";
+import {Link} from "react-router-dom";
 import ControlledList from "../../../components/list/ControlledList";
 import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";
@@ -69,7 +69,9 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
         </label>
       </div>
       <Link to={`/services/${dependency}`}
-            className={`${styles.link}`}/>
+            className={`${styles.link} waves-effect`}>
+        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+      </Link>
     </ListItem>;
 
   private onAdd = (dependency: string): void =>

@@ -96,12 +96,6 @@ import {
   CONTAINERS_SUCCESS,
   ADD_APP_SERVICE,
   REMOVE_APP_SERVICES,
-  RULE_APP_REQUEST,
-  RULES_APP_REQUEST,
-  RULE_APP_FAILURE,
-  RULES_APP_FAILURE,
-  RULE_APP_SUCCESS,
-  RULES_APP_SUCCESS,
   RULE_HOST_REQUEST,
   RULES_HOST_REQUEST,
   RULE_HOST_FAILURE,
@@ -146,7 +140,6 @@ import {IEdgeHost} from "../routes/hosts/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
 import {ICondition, IDecision, IRule} from "../routes/rules/Rule";
-import {IAppRule} from "../routes/rules/apps/AppRule";
 import {IHostRule} from "../routes/rules/hosts/HostRule";
 import {IServiceRule} from "../routes/rules/services/ServiceRule";
 
@@ -179,11 +172,6 @@ export type EntitiesState = {
     error?: string | null,
   },
   rules: {
-    apps: {
-      data: { [key: string]: IAppRule },
-      isLoading: boolean,
-      error?: string | null,
-    },
     hosts: {
       data: { [key: string]: IHostRule },
       isLoading: boolean,
@@ -250,7 +238,6 @@ export type EntitiesAction = {
     predictions?: IPrediction[],
     predictionsNames?: string[],
     regions?: IRegion[],
-    appRules?: IAppRule[],
     hostRules?: IHostRule[],
     serviceRules?: IServiceRule[],
     rulesNames?: string[],
@@ -294,11 +281,6 @@ const entities = (state: EntitiesState = {
                       error: null
                     },
                     rules: {
-                      apps: {
-                        data: {},
-                        isLoading: false,
-                        error: null
-                      },
                       hosts: {
                         data: {},
                         isLoading: false,
@@ -462,7 +444,7 @@ const entities = (state: EntitiesState = {
     }
     case SERVICE_RULES_SUCCESS: {
       const service = entity && state.services.data[entity];
-      const rules = { rules: data?.appRules || [] };
+      const rules = { rules: data?.serviceRules || [] };
       const serviceWithRules = Object.assign(service ? service : [entity], rules);
       const normalizedService = normalize(serviceWithRules, Schemas.SERVICE).entities;
       return merge({}, state, {
@@ -638,38 +620,6 @@ const entities = (state: EntitiesState = {
           data: merge({}, pick(state.nodes.data, keys(data?.nodes)), data?.nodes),
           isLoading: false,
           error: null,
-        }
-      };
-    case RULE_APP_REQUEST:
-    case RULES_APP_REQUEST:
-      return merge({}, state, { rules: { apps: { isLoading: true } } });
-    case RULE_APP_FAILURE:
-    case RULES_APP_FAILURE:
-      return merge({}, state, { rules: { apps: { isLoading: false, error: error } } });
-    case RULE_APP_SUCCESS:
-      return {
-        ...state,
-        rules: {
-          ...state.rules,
-          apps: {
-            ...state.rules.apps,
-            data: merge({}, state.rules.apps.data, data?.appRules),
-            isLoading: false,
-            error: null,
-          }
-        }
-      };
-    case RULES_APP_SUCCESS:
-      return {
-        ...state,
-        rules: {
-          ...state.rules,
-          apps: {
-            ...state.rules.apps,
-            data: merge({}, pick(state.rules.apps.data, keys(data?.appRules)), data?.appRules),
-            isLoading: false,
-            error: null,
-          }
         }
       };
     case RULE_HOST_REQUEST:

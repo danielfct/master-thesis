@@ -24,7 +24,7 @@
 
 import React, {Component, createRef} from 'react'
 import {basicAuthenticate, isAuthenticated, registerSuccessfulLogin} from "../../utils/auth";
-import {RouteComponentProps, withRouter} from "react-router";
+import {RouteComponentProps} from "react-router";
 import styles from './Login.module.css';
 import M from "materialize-css";
 import {bindActionCreators} from "redux";

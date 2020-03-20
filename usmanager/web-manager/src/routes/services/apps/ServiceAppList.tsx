@@ -12,7 +12,7 @@ import BaseComponent from "../../../components/BaseComponent";
 import React, {createRef} from "react";
 import {IService} from "../Service";
 import ListItem from "../../../components/list/ListItem";
-import listItemstyles from "../../../components/list/ListItem.module.css";
+import listItemStyles from "../../../components/list/ListItem.module.css";
 import appServiceStyles from "./ServiceAppList.module.css";
 import {Link} from "react-router-dom";
 import ControlledList from "../../../components/list/ControlledList";
@@ -93,7 +93,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
   private app = (index: number, app: string, separate: boolean, checked: boolean,
                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
     <ListItem key={index} separate={separate}>
-      <div className={`${listItemstyles.linkedItemContent}`}>
+      <div className={`${listItemStyles.linkedItemContent}`}>
         <label>
           <input id={app}
                  type="checkbox"
@@ -103,7 +103,9 @@ class ServiceAppList extends BaseComponent<Props, State> {
         </label>
       </div>
       <Link to={`/apps/${app}`}
-            className={`${listItemstyles.link}`}/>
+            className={`${listItemStyles.link} waves-effect`}>
+        <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
+      </Link>
     </ListItem>;
 
   private onAdd = (app: IValues): void => {

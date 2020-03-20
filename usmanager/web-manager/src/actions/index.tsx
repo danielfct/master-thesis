@@ -275,32 +275,6 @@ const fetchRegions = (name?: string) => ({
       }
 });
 
-export const RULES_APP_REQUEST = 'RULES_APP_REQUEST';
-export const RULES_APP_SUCCESS = 'RULES_APP_SUCCESS';
-export const RULES_APP_FAILURE = 'RULES_APP_FAILURE';
-export const RULE_APP_REQUEST = 'RULE_APP_REQUEST';
-export const RULE_APP_SUCCESS = 'RULE_APP_SUCCESS';
-export const RULE_APP_FAILURE = 'RULE_APP_FAILURE';
-export const loadRulesApp = (name?: string) => (dispatch: any) => {
-  return dispatch(fetchRulesApp(name));
-};
-const fetchRulesApp = (name?: string) => ({
-  [CALL_API]:
-    !name
-      ? {
-        types: [ RULES_APP_REQUEST, RULES_APP_SUCCESS, RULES_APP_FAILURE ],
-        endpoint: `rules/apps`,
-        schema: Schemas.RULE_APP_ARRAY,
-        entity: 'appRules'
-      }
-      : {
-        types: [ RULE_APP_REQUEST, RULE_APP_SUCCESS, RULE_APP_FAILURE ],
-        endpoint: `rules/apps/${name}`,
-        schema: Schemas.RULE_APP,
-        entity: 'appRules'
-      }
-});
-
 export const RULES_HOST_REQUEST = 'RULES_HOST_REQUEST';
 export const RULES_HOST_SUCCESS = 'RULES_HOST_SUCCESS';
 export const RULES_HOST_FAILURE = 'RULES_HOST_FAILURE';

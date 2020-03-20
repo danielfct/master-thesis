@@ -83,6 +83,9 @@ export default class Field extends React.Component<FieldProps> {
     for (let i = 0; i < id.length; i++) {
       value = i == 0 ? values[id[i]] : value?.[id[i]];
     }
+    console.log(values);
+    console.log(id);
+    console.log(value);
     return value;
   };
 

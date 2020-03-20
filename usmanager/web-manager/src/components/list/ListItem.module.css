@@ -35,12 +35,25 @@
 
 .linkedItemContent {
     padding: 15px 40px;
-    width: 30%;
+    width: 75%;
     font-size: 1.1rem;
     color: white;
 }
 
 .link {
     cursor: pointer;
-    width: 70%;
+    width: 25%;
+    margin: 0;
+}
+
+.link:hover > .linkIcon {
+    display: block;
+}
+
+.linkIcon {
+    color: white;
+    height: 100%;
+    font-size: 15px;
+    margin: 5px 5px 0 0;
+    display: none;
 }

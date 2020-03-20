@@ -1,7 +1,7 @@
 import BaseComponent from "../../components/BaseComponent";
 import React from "react";
 import ListItem from "../../components/list/ListItem";
-import listItemstyles from "../../components/list/ListItem.module.css";
+import listItemStyles from "../../components/list/ListItem.module.css";
 import {Link} from "react-router-dom";
 import ControlledList from "../../components/list/ControlledList";
 import {ReduxState} from "../../reducers";
@@ -49,7 +49,7 @@ class ServiceAppList extends BaseComponent<Props, {}> {
   private service = (index: number, service: string, separate: boolean, checked: boolean,
                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
     <ListItem key={index} separate={separate}>
-      <div className={`${listItemstyles.linkedItemContent}`}>
+      <div className={`${listItemStyles.linkedItemContent}`}>
         <label>
           <input id={service}
                  type="checkbox"
@@ -59,7 +59,9 @@ class ServiceAppList extends BaseComponent<Props, {}> {
         </label>
       </div>
       <Link to={`/services/${service}`}
-            className={`${listItemstyles.link}`}/>
+            className={`${listItemStyles.link} waves-effect`}>
+        <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
+      </Link>
     </ListItem>;
 
   private onAdd = (service: string): void => {

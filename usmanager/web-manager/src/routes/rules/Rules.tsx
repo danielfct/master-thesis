@@ -5,7 +5,6 @@ import styles from './Rules.module.css'
 import BaseComponent from "../../components/BaseComponent";
 import M from "materialize-css";
 import Collapsible from "../../components/collapsible/Collapsible";
-import AppRulesList from "./apps/AppRulesList";
 import HostRulesList from "./hosts/HostRulesList";
 import ServiceRulesList from "./services/ServiceRulesList";
 
@@ -37,15 +36,6 @@ export default class Rules extends BaseComponent<{}, {}> {
           {text: 'Service', pathname: '/rules/edges/new_edge_rule'},
         ],
       }}/>
-      <div className={`${styles.collapsibleContainer}`}>
-        <Collapsible id={"appRulesCollapsible"}
-                     title={'Apps'}
-                     active
-                     headerClassname={styles.collapsibleSubtitle}
-                     bodyClassname={styles.collapsibleCardList}>
-          <AppRulesList/>
-        </Collapsible>
-      </div>
       <div className={`${styles.collapsibleContainer}`}>
         <Collapsible id={"hostRulesCollapsible"}
                      title={'Hosts'}

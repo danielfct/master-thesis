@@ -18,22 +18,23 @@ import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {
   addServiceRule,
-  loadRulesApp,
+  loadRulesService,
   loadServiceRules,
   removeServiceRules
 } from "../../../actions";
 import {connect} from "react-redux";
-import {IAppRule} from "../../rules/apps/AppRule";
+import {IServiceRule} from "../../rules/services/ServiceRule";
+import {Link} from "react-router-dom";
 
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  rules: { [key: string]: IAppRule },
+  rules: { [key: string]: IServiceRule },
   rulesName: string[];
 }
 
 interface DispatchToProps {
-  loadRulesApp: (name?: string) => any;
+  loadRulesService: (name?: string) => any;
   loadServiceRules: (serviceName: string) => void;
   removeServiceRules: (serviceName: string, rules: string[]) => void;
   addServiceRule: (serviceName: string, rule: string) => void;
@@ -51,7 +52,7 @@ type Props = StateToProps & DispatchToProps & ServiceRuleListProps;
 class ServiceRuleList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    this.props.loadRulesApp();
+    this.props.loadRulesService();
     const {serviceName} = this.props.service;
     if (serviceName) {
       this.props.loadServiceRules(serviceName);
@@ -70,8 +71,10 @@ class ServiceRuleList extends BaseComponent<Props, {}> {
           <span id={'checkbox'}>{rule}</span>
         </label>
       </div>
-      {/*<Link to={`/rules/${rule}`} //TODO
-            className={`${styles.link}`}/>*/}
+      <Link to={`/rules/services/${rule}`}
+            className={`${styles.link} waves-effect`}>
+        <i className={`${styles.linkIcon} material-icons right`}>link</i>
+      </Link>
     </ListItem>;
 
   private onAdd = (rule: string): void =>
@@ -125,14 +128,14 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceRuleListProps): Sta
   return {
     isLoading: state.entities.services.isLoadingRules,
     error: state.entities.services.loadRulesError,
-    rules: state.entities.rules.apps.data,
+    rules: state.entities.rules.services.data,
     rulesName: rulesName || [],
   }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
-    loadRulesApp,
+    loadRulesService,
     loadServiceRules,
     addServiceRule,
     removeServiceRules,

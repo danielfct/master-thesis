@@ -39,7 +39,6 @@ import {IEdgeHost} from "../routes/hosts/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
 import {ICondition, IDecision, IRule} from "../routes/rules/Rule";
-import {IAppRule} from "../routes/rules/apps/AppRule";
 import {IServiceRule} from "../routes/rules/services/ServiceRule";
 import {IHostRule} from "../routes/rules/hosts/HostRule";
 
@@ -81,8 +80,6 @@ interface ISchemas {
     APP_ARRAY: schema.Entity<IApp>[];
     REGION: schema.Entity<IRegion>;
     REGION_ARRAY: schema.Entity<IRegion>[];
-    RULE_APP: schema.Entity<IAppRule>;
-    RULE_APP_ARRAY: schema.Entity<IAppRule>[];
     RULE_HOST: schema.Entity<IHostRule>;
     RULE_HOST_ARRAY: schema.Entity<IHostRule>[];
     RULE_SERVICE: schema.Entity<IServiceRule>;
@@ -136,12 +133,6 @@ const conditionSchema: schema.Entity<ICondition> = new schema.Entity('conditions
 });
 const conditions = new schema.Array(conditionSchema);
 
-const ruleAppSchema: schema.Entity<IAppRule> = new schema.Entity('appRules', {
-    conditions
-}, {
-    idAttribute: (appRule: IAppRule) => appRule.name
-});
-const rulesApp = new schema.Array(ruleAppSchema);
 const ruleHostSchema: schema.Entity<IHostRule> = new schema.Entity('hostRules', {
     conditions
 }, {
@@ -214,8 +205,6 @@ export const Schemas: ISchemas = {
     APP_SERVICE_ARRAY: [appServiceSchema],
     REGION: regionSchema,
     REGION_ARRAY: [regionSchema],
-    RULE_APP: ruleAppSchema,
-    RULE_APP_ARRAY: [ruleAppSchema],
     RULE_HOST: ruleHostSchema,
     RULE_HOST_ARRAY: [ruleHostSchema],
     RULE_SERVICE: ruleServiceSchema,
