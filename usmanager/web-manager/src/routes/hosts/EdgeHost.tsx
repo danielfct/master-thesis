@@ -79,7 +79,7 @@ class EdgeHost extends BaseComponent<Props, {}> {
     Object.entries(emptyEdgeHost()).map(([key, value]) => {
       return {
         [key]: {
-          id: [key],
+          id: key,
           label: key,
           validation: { rule: required }
         }
@@ -91,11 +91,14 @@ class EdgeHost extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
+  private isLocalOption = (isLocal: string): string =>
+    isLocal;
+
+
   private details = () => {
     const {isLoading, error, edgeHost} = this.props;
     // @ts-ignore
     const edgeHostKey: (keyof IEdgeHost) = edgeHost && Object.keys(edgeHost)[0];
-    console.log(edgeHost)
     return (
       <>
         {isLoading && <LoadingSpinner/>}
@@ -110,12 +113,15 @@ class EdgeHost extends BaseComponent<Props, {}> {
             {Object.keys(edgeHost).map((key, index) =>
               key === 'local'
                 ? <Field key={index}
-                         id={[key]}
+                         id={key}
                          type="dropdown"
                          label={key}
-                         dropdown={{defaultValue: "Is a local machine?", values: ["True", "False"]}}/>
+                         dropdown={{
+                           defaultValue: "Is a local machine?",
+                           values: ["True", "False"],
+                           optionToString: this.isLocalOption}}/>
                 : <Field key={index}
-                         id={[key]}
+                         id={key}
                          label={key}/>
             )}
           </Form>

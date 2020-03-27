@@ -78,6 +78,8 @@ import HostRule from "../routes/rules/hosts/HostRule";
 import ServiceRules from "../routes/rules/services/ServiceRules";
 import ServiceRule from "../routes/rules/services/ServiceRule";
 import Rules from "../routes/rules/Rules";
+import Conditions from "../routes/rules/conditions/Conditions";
+import Condition from "../routes/rules/conditions/Condition";
 
 interface RootContainerProps {
     store: any;
@@ -104,6 +106,8 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/rules/hosts/:name": { component: HostRule },
     "/rules/services": { component: ServiceRules, search: true },
     "/rules/services/:name": { component: ServiceRule },
+    "/rules/conditions": { component: Conditions, search: true },
+    "/rules/conditions/:name": { component: Condition },
     /*"/rules/management": { component: RulesLandingPage, search: true },
     "/rules/rules/:ruleId?": { title: "",component: RulePage },
     "/rules/conditions": {  component: OldConditions, search: true },

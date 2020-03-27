@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {ICondition, IDecision, IRule} from "../Rule";
+import {IDecision, IRule} from "../Rule";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {IFields, required, requiredAndNumberAndMin} from "../../../components/form/Form";
@@ -20,12 +20,17 @@ import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
 import React from "react";
-import {addRuleHostCondition, loadDecisions, loadRulesHost, loadServices} from "../../../actions";
-import {IService} from "../../services/Service";
-import ServicePredictionList, {IPrediction} from "../../services/predictions/ServicePredictionList";
+import {
+  addRuleHostCondition,
+  loadCloudHosts,
+  loadDecisions,
+  loadEdgeHosts,
+  loadRulesHost,
+} from "../../../actions";
 import {postData} from "../../../utils/api";
-import {IAddServiceApp} from "../../services/apps/ServiceAppList";
 import HostRuleConditionList from "./HostRuleConditionList";
+import UnsavedChanged from "../../../components/form/UnsavedChanges";
+import {IEdgeHost} from "../../hosts/EdgeHost";
 
 export interface IHostRule extends IRule {
   hostname: string
@@ -35,7 +40,7 @@ const emptyHostRule = () => ({
   name: '',
   priority: 0,
   decision: undefined,
-  hostname: '',
+  hostname: undefined,
 });
 
 const isNewRule = (name: string) =>
@@ -45,13 +50,16 @@ interface StateToProps {
   isLoading: boolean;
   error?: string | null;
   hostRule: Partial<IHostRule>;
-  formHostRule?: Partial<IHostRule>,
-  decisions: string[],
+  formHostRule: Partial<IHostRule>,
+  decisions: IDecision[],
+  hosts: IEdgeHost[],
 }
 
 interface DispatchToProps {
   loadRulesHost: (name: string) => any;
-  loadDecisions: (name?: string) => any;
+  loadDecisions: () => any;
+  loadEdgeHosts: () => any;
+  loadCloudHosts: () => any;
   addRuleHostCondition: (ruleName: string, condition: string) => void;
 }
 
@@ -62,9 +70,9 @@ interface MatchParams {
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
-  newConditions: ICondition[],
+  newConditions: string[],
+  ruleName?: string,
 }
-
 
 class HostRule extends BaseComponent<Props, State> {
 
@@ -74,14 +82,21 @@ class HostRule extends BaseComponent<Props, State> {
 
   componentDidMount(): void {
     this.props.loadDecisions();
+    this.props.loadEdgeHosts();
+    this.props.loadCloudHosts();
     const ruleName = this.props.match.params.name;
     if (ruleName && !isNewRule(ruleName)) {
       this.props.loadRulesHost(ruleName);
     }
   };
 
+  private saveEntities = (ruleName: string) => {
+    this.saveRuleConditions(ruleName);
+  };
+
   private onPostSuccess = (reply: any, ruleName: string): void => {
     super.toast(`Host rule <b>${ruleName}</b> saved`);
+    this.saveEntities(ruleName);
   };
 
   private onPostFailure = (reason: string, ruleName: string): void =>
@@ -89,6 +104,8 @@ class HostRule extends BaseComponent<Props, State> {
 
   private onPutSuccess = (ruleName: string): void => {
     super.toast(`Changes to host rule <b>${ruleName}</b> are now saved`);
+    this.setState({ruleName: ruleName});
+    this.saveEntities(ruleName);
   };
 
   private onPutFailure = (reason: string, ruleName: string): void =>
@@ -102,7 +119,7 @@ class HostRule extends BaseComponent<Props, State> {
   private onDeleteFailure = (reason: string, ruleName: string): void =>
     super.toast(`Unable to delete ${ruleName}`, 10000, reason, true);
 
-  private onAddRuleCondition = (condition: ICondition): void => {
+  private onAddRuleCondition = (condition: string): void => {
     this.setState({
       newConditions: this.state.newConditions.concat(condition)
     });
@@ -110,7 +127,7 @@ class HostRule extends BaseComponent<Props, State> {
 
   private onRemoveRuleConditions = (conditions: string[]): void => {
     this.setState({
-      newConditions: this.state.newConditions.filter(condition => !conditions.includes(condition.name))
+      newConditions: this.state.newConditions.filter(condition => !conditions.includes(condition))
     });
   };
 
@@ -126,7 +143,7 @@ class HostRule extends BaseComponent<Props, State> {
   private onSaveConditionsSuccess = (ruleName: string): void => {
     if (!isNewRule(this.props.match.params.name)) {
       this.state.newConditions.forEach(condition =>
-        this.props.addRuleHostCondition(ruleName, condition.name)
+        this.props.addRuleHostCondition(ruleName, condition)
       );
     }
     this.setState({ newConditions: [] });
@@ -139,7 +156,7 @@ class HostRule extends BaseComponent<Props, State> {
     Object.entries(hostRule).map(([key, value]) => {
       return {
         [key]: {
-          id: [key],
+          id: key,
           label: key,
           validation: key == 'hostname'
             ? undefined
@@ -155,6 +172,15 @@ class HostRule extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
+  private shouldShowSaveButton = () =>
+    !isNewRule(this.props.match.params.name) && !!this.state.newConditions.length;
+
+  private decisionDropdownOption = (decision: IDecision) =>
+    decision.name;
+
+  private hostDropdownOption = (host: IEdgeHost) =>
+    host.hostname;
+
   private details = () => {
     const {isLoading, error, formHostRule, hostRule} = this.props;
     // @ts-ignore
@@ -168,18 +194,32 @@ class HostRule extends BaseComponent<Props, State> {
                 fields={this.getFields(formHostRule)}
                 values={hostRule}
                 isNew={isNewRule(this.props.match.params.name)}
-                post={{url: 'rules', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={{url: `rules/hosts/${hostRule[ruleKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={{url: `rules/hosts/${hostRule[ruleKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}>
+                showSaveButton={this.shouldShowSaveButton()}
+                post={{url: 'rules/hosts', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
+                put={{url: `rules/hosts/${this.state.ruleName || hostRule[ruleKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
+                delete={{url: `rules/hosts/${this.state.ruleName || hostRule[ruleKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                saveEntities={this.saveEntities}>
             {Object.keys(formHostRule).map((key, index) =>
               key === 'decision'
-                ? <Field key={index}
-                         id={[key, "name"]}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{defaultValue: "Choose decision", values: this.props.decisions}}/>
+                ? <Field<IDecision> key={index}
+                                    id={key}
+                                    label={key}
+                                    type="dropdown"
+                                    dropdown={{
+                                      defaultValue: "Choose decision",
+                                      values: this.props.decisions,
+                                      optionToString: this.decisionDropdownOption}}/>
+                : key === 'hostname'
+                ? <Field<IEdgeHost> key={index}
+                                    id={key}
+                                    label={key}
+                                    type="dropdown"
+                                    dropdown={{
+                                      defaultValue: "Choose host",
+                                      values: this.props.hosts,
+                                      optionToString: this.hostDropdownOption}}/>
                 : <Field key={index}
-                         id={[key]}
+                         id={key}
                          label={key}/>
             )}
           </Form>
@@ -210,6 +250,7 @@ class HostRule extends BaseComponent<Props, State> {
   render() {
     return (
       <MainLayout>
+        {this.shouldShowSaveButton() && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>
@@ -225,30 +266,34 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const name = props.match.params.name;
   const hostRule = isNewRule(name) ? emptyHostRule() : state.entities.rules.hosts.data[name];
   let formHostRule;
-  if (hostRule) {
-    formHostRule = { ...hostRule };
+  formHostRule = { ...hostRule };
+  if (!isNewRule(name)) {
     delete formHostRule["id"];
+    delete formHostRule["conditions"];
     if (formHostRule["hostname"] == null) {
       delete formHostRule["hostname"];
-      delete formHostRule["conditions"];
     }
   }
   const decisions = state.entities.decisions.data
-    && Object.entries(state.entities.decisions.data)
-             .filter(([_, value]) => value.componentType.name.toLowerCase() == 'host')
-             .map(([key, value]) => key);
+                    && Object.values(state.entities.decisions.data)
+                             .filter(decision => decision.componentType.name.toLowerCase() == 'host');
+  const hosts = state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data);
+  //TODO join cloud hostnames
   return  {
     isLoading,
     error,
     hostRule,
     formHostRule,
-    decisions
+    decisions,
+    hosts
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
   loadDecisions,
+  loadEdgeHosts,
+  loadCloudHosts,
   addRuleHostCondition
 };
 

@@ -79,7 +79,7 @@ class Region extends BaseComponent<Props, {}> {
     Object.entries(region).map(([key, value]) => {
       return {
         [key]: {
-          id: [key],
+          id: key,
           label: key,
           validation: { rule: required }
         }
@@ -90,6 +90,9 @@ class Region extends BaseComponent<Props, {}> {
       }
       return fields;
     }, {});
+
+  private isActiveOption = (active: string): string =>
+    active;
 
   private details = () => {
     const {isLoading, error, formRegion, region} = this.props;
@@ -109,13 +112,16 @@ class Region extends BaseComponent<Props, {}> {
                 delete={{url: `regions/${region[regionKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}>
             {Object.keys(formRegion).map((key, index) =>
               key === 'active'
-                ? <Field key={index}
-                         id={[key]}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{defaultValue: "Is region active?", values: ["True", "False"]}}/>
+                ? <Field<string> key={index}
+                                 id={key}
+                                 label={key}
+                                 type="dropdown"
+                                 dropdown={{
+                                   defaultValue: "Is region active?",
+                                   values: ["True", "False"],
+                                   optionToString: this.isActiveOption}}/>
                 : <Field key={index}
-                         id={[key]}
+                         id={key}
                          label={key}/>
             )}
           </Form>

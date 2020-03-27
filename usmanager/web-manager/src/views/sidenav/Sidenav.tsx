@@ -37,7 +37,7 @@ const sidenavLinks = [
     { link: '/hosts', name: 'Hosts' },
     { link: '/apps', name: 'Apps' },
     { link: '/services', name: 'Services' },
-    { link: '/rules', name: 'Rules' },
+    { link: '/rules', name: 'Rules', sub: [{ link: '/conditions', name: 'Conditions' }] },
     { link: '/metrics/simulated', name: 'Simulated metrics' },
     { link: '/eureka', name: 'Eureka servers' },
     { link: '/loadBalancer', name: 'Load balancers' },
@@ -65,6 +65,7 @@ class Sidenav extends React.Component<Props, {}> {
         window.addEventListener('resize', this.handleResize);
         M.Sidenav.init(this.sidenav.current as Element);
         this.scrollbar?.updateScroll();
+        this.handleResize();
     };
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
@@ -78,7 +79,7 @@ class Sidenav extends React.Component<Props, {}> {
     private shouldShowSidenav = () =>
       window.innerWidth > 992;
 
-    private handleResize = (_: any) => {
+    private handleResize = () => {
         let show = this.shouldShowSidenav();
         const {width} = this.props.sidenav;
         if (show !== width) {
@@ -126,9 +127,16 @@ class Sidenav extends React.Component<Props, {}> {
                                 {link.name}
                             </Link>
                         </li>
-                        {index < sidenavLinks.length - 1 && <li>
-                            <div className="divider grey darken-3"/>
-                        </li>}
+                        {link.sub && link.sub.map((sublink, index) =>
+                          <div key={index}>
+                              <li>
+                                  <Link className="white-text sub-link" to={`${link.link}${sublink.link}`} onClick={this.closeSlideSidenav}>
+                                      {sublink.name}
+                                  </Link>
+                              </li>
+                          </div>
+                        )}
+                        {index < sidenavLinks.length - 1 && <li><div className="divider grey darken-3"/></li>}
                     </div>
                   )}
               </ScrollBar>

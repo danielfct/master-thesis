@@ -29,8 +29,7 @@ export default class InputDialog extends BaseComponent<Props, {}> {
       preventScrolling: false,
       startingTop: prevProps.position,
       endingTop: prevProps.position,
-      onOpenStart: this.updateScroll,
-      onOpenEnd: this.updateScroll
+      onOpenEnd: this.onOpenModal
     });
     if (this.props.open) {
       let modal = M.Modal.getInstance(this.modal.current as Element);
@@ -38,8 +37,9 @@ export default class InputDialog extends BaseComponent<Props, {}> {
     }
   }
 
-  private updateScroll = (): void => {
+  private onOpenModal = (): void => {
     this.scrollbar?.updateScroll();
+    M.updateTextFields();
   };
 
   private confirmCallback = (values: IValues): void => {

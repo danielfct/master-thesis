@@ -25,8 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.AddServiceApp;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -44,12 +42,10 @@ public class AppsService {
 
   private final AppRepository apps;
   private final ServicesService services;
-  private final AppRulesService rules;
 
-  public AppsService(AppRepository apps, ServicesService services, AppRulesService rules) {
+  public AppsService(AppRepository apps, ServicesService services) {
     this.apps = apps;
     this.services = services;
-    this.rules = rules;
   }
 
   public Iterable<AppEntity> getApps() {
@@ -123,34 +119,6 @@ public class AppsService {
     log.info("Removing services {}", services);
     app.getAppServices()
         .removeIf(service -> services.contains(service.getService().getServiceName()));
-    apps.save(app);
-  }
-
-  public List<AppRuleEntity> getRules(String appName) {
-    assertAppExists(appName);
-    return apps.getRules(appName);
-  }
-
-  public void addRule(String appName, String ruleName) {
-    var app = getApp(appName);
-    var appRule = rules.getRule(ruleName).toBuilder().app(app).build();
-    app = app.toBuilder().appRule(appRule).build();
-    apps.save(app);
-  }
-
-  public void addRules(String appName, List<String> rules) {
-    rules.forEach(ruleName -> addRule(appName, ruleName));
-  }
-
-  public void removeRule(String appName, String rule) {
-    removeRules(appName, List.of(rule));
-  }
-
-  public void removeRules(String appName, List<String> rules) {
-    var app = getApp(appName);
-    log.info("Removing rules {}", rules);
-    app.getAppRules()
-        .removeIf(rule -> rules.contains(rule.getName()));
     apps.save(app);
   }
 

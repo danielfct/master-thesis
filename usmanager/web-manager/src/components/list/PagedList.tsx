@@ -96,6 +96,10 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
         })
     };
 
+    private pageSizeOption = (option: (number | 'all')): string =>
+      option.toString();
+
+
     render() {
         const {list: l, show, paginate} = this.props;
         const {page = 0, pagesize = l.length} = this.state;
@@ -105,20 +109,23 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
           <div className={'list'}>
               {paginate.pagesize.options && (
                 <div className={'pageSize'}>
-                    <Dropdown
+                    <Dropdown<(number | 'all')>
                       id={'pageSize'}
                       name={'pageSize'}
                       value={this.state.pagesize === Number.MAX_VALUE ? 'all' : this.state.pagesize?.toString()}
                       onChange={this.setPageSize}
-                      dropdown={{defaultValue: 'Page size', values: paginate.pagesize.options}}>
+                      dropdown={{
+                          defaultValue: 'Page size',
+                          values: paginate.pagesize.options,
+                          optionToString: this.pageSizeOption}}>
                     </Dropdown>
                 </div>
               )}
               {this.state.max > 0 && <Pagination max={this.state.max}
-                          page={page}
-                          setPage={this.setPage}
-                          prevPage={this.prevPage}
-                          nextPage={this.nextPage}/>}
+                                                 page={page}
+                                                 setPage={this.setPage}
+                                                 prevPage={this.prevPage}
+                                                 nextPage={this.nextPage}/>}
               <SimpleList<T> {...this.props} list={list} show={show}/>
           </div>
         );

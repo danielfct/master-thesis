@@ -24,8 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleEntity;
-
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -68,11 +66,6 @@ public class AppEntity {
   @JsonIgnore
   @OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<AppServiceEntity> appServices;
-
-  @Singular
-  @JsonIgnore
-  @ManyToMany(mappedBy = "apps", cascade = CascadeType.ALL)
-  private Set<AppRuleEntity> appRules;
 
   @Override
   public boolean equals(Object o) {

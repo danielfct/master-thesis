@@ -19,11 +19,13 @@ import {Link} from "react-router-dom";
 import ControlledList from "../../../components/list/ControlledList";
 import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";
+import {Redirect} from "react-router";
 
 export interface IServiceDependency extends IService {
 }
 
 interface StateToProps {
+  redirect: boolean;
   isLoading: boolean;
   error?: string | null;
   services: { [key: string]: IService },
@@ -31,7 +33,7 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-  loadServices: (name?: string) => any;
+  loadServices: () => void;
   loadServiceDependencies: (serviceName: string) => void;
   removeServiceDependencies: (serviceName: string, dependencies: string[]) => void;
   addServiceDependency: (serviceName: string, dependencyName: string) => void;
@@ -97,6 +99,9 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
   };
 
   render() {
+    if (this.props.redirect) {
+      return <Redirect to='/services'/>;
+    }
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage={`Dependencies list is empty`}
@@ -121,11 +126,11 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceDependencyProps): StateToProps {
-  //FIXME: crashes when not loading from services page
-  const serviceName = ownProps.service.serviceName;
+  const serviceName = ownProps.service && ownProps.service.serviceName;
   const service = serviceName && state.entities.services.data[serviceName];
   const dependencies = service && service.dependencies;
   return {
+    redirect: !ownProps.service,
     isLoading: state.entities.services.isLoadingDependencies,
     error: state.entities.services.loadDependenciesError,
     services: state.entities.services.data,

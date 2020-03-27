@@ -26,7 +26,7 @@ public class ServiceRulesController {
 
   @GetMapping
   public Iterable<ServiceRuleEntity> getRules() {
-    return appRulesService.getRules();
+    return appRulesService.getServiceRules();
   }
 
   @GetMapping("/{ruleName}")
@@ -56,9 +56,14 @@ public class ServiceRulesController {
     return appRulesService.getConditions(ruleName);
   }
 
-  @PostMapping("/{ruleName}/conditions/{conditionName}")
-  public void addRuleCondition(@PathVariable String ruleName, @PathVariable String conditionName) {
-    appRulesService.addCondition(ruleName, conditionName);
+  @PostMapping("/{ruleName}/conditions")
+  public void addRuleConditions(@PathVariable String ruleName, @RequestBody List<String> conditions) {
+    appRulesService.addConditions(ruleName, conditions);
+  }
+
+  @DeleteMapping("/{ruleName}/conditions")
+  public void removeRuleConditions(@PathVariable String ruleName, @RequestBody List<String> conditionNames) {
+    appRulesService.removeConditions(ruleName, conditionNames);
   }
 
   @DeleteMapping("/{ruleName}/conditions/{conditionName}")

@@ -233,6 +233,10 @@ ul.tabs {
     height: 56px;
 }
 
+.sidenav li>a.sub-link {
+    padding: 0 55px;
+}
+
 .ps:hover > .ps__rail-x:hover,
 .ps:hover > .ps__rail-y:hover,
 .ps--scrolling-x:active > .ps__rail-x:active,
@@ -277,6 +281,11 @@ input {
 
 ul.dropdown-content.select-dropdown li span {
     background-color: #282828;
+    padding: 5px 10px;
+}
+
+.dropdown-content li {
+    min-height: unset;
 }
 
 ul.dropdown-content.select-dropdown li span:hover {
@@ -489,6 +498,7 @@ label > span:hover {
 .modal-message {
     color: white;
     font-size: 1.4rem;
+    padding: 15px;
 }
 
 .dialog {

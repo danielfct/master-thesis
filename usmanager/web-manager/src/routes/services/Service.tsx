@@ -299,7 +299,7 @@ class Service extends BaseComponent<Props, State> {
     Object.entries(service).map(([key, value]) => {
       return {
         [key]: {
-          id: [key],
+          id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 0 }
@@ -316,6 +316,9 @@ class Service extends BaseComponent<Props, State> {
   private shouldShowSaveButton = () =>
     !!this.state.newApps.length || !!this.state.newDependencies.length || !!this.state.newDependees.length
     || !!this.state.newPredictions.length || !!this.state.newRules.length;
+
+  private serviceTypeOption = (serviceType: string): string =>
+    serviceType;
 
   private details = () => {
     const {isLoadingServices, loadServicesError, formService, service} = this.props;
@@ -338,12 +341,15 @@ class Service extends BaseComponent<Props, State> {
             {Object.keys(formService).map((key, index) =>
               key === 'serviceType'
                 ? <Field key={index}
-                         id={[key]}
+                         id={key}
                          type="dropdown"
                          label={key}
-                         dropdown={{defaultValue: "Choose service type", values: ["Frontend", "Backend", "Database", "System"]}}/>
+                         dropdown={{
+                           defaultValue: "Choose service type",
+                           values: ["Frontend", "Backend", "Database", "System"],
+                         optionToString: this.serviceTypeOption}}/>
                 : <Field key={index}
-                         id={[key]}
+                         id={key}
                          label={key}/>
             )}
           </Form>
@@ -416,7 +422,7 @@ class Service extends BaseComponent<Props, State> {
   render() {
     return (
       <MainLayout>
-        {this.shouldShowSaveButton() && <UnsavedChanged/>}
+        {this.shouldShowSaveButton() && !isNewService(this.props.match.params.name) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>

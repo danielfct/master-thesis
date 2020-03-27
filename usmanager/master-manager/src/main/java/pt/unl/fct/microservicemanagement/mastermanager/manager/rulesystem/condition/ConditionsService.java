@@ -37,13 +37,7 @@ public class ConditionsService {
 
   public ConditionEntity updateCondition(String conditionName, ConditionEntity newCondition) {
     var condition = getCondition(conditionName);
-    log.debug("Updating condition {} with {}",
-        ToStringBuilder.reflectionToString(condition), ToStringBuilder.reflectionToString(newCondition));
-    log.debug("Condition before copying properties: {}",
-        ToStringBuilder.reflectionToString(condition));
     ObjectUtils.copyValidProperties(newCondition, condition);
-    log.debug("Condition after copying properties: {}",
-        ToStringBuilder.reflectionToString(condition));
     condition = conditions.save(condition);
     return condition;
   }

@@ -73,7 +73,7 @@ class CloudHost extends BaseComponent<Props, {}> {
     Object.entries(emptyCloudHost()).map(([key, value]) => {
       return {
         [key]: {
-          id: [key],
+          id: key,
           label: key,
           validation: { rule: required }
         }
@@ -104,7 +104,7 @@ class CloudHost extends BaseComponent<Props, {}> {
             {/*//TODO instanceType dropdown?*/}
             {Object.keys(cloudHost).map((key, index) =>
               <Field key={index}
-                     id={[key]}
+                     id={key}
                      label={key}/>
             )}
           </Form>

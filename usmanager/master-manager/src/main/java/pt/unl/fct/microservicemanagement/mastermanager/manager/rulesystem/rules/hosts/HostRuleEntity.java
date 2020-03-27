@@ -74,14 +74,14 @@ public class HostRuleEntity {
   //TODO what about cloud instances?
   private String hostname;
 
+  @ManyToOne
+  @JoinColumn(name = "decision_id")
+  private DecisionEntity decision;
+
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = CascadeType.ALL)
   private List<EdgeHostEntity> edgeHosts;
-
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
 
   @Singular
   @JsonIgnore

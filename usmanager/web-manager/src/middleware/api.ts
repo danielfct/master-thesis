@@ -38,9 +38,10 @@ import {ICloudHost} from "../routes/hosts/CloudHost";
 import {IEdgeHost} from "../routes/hosts/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
-import {ICondition, IDecision, IRule} from "../routes/rules/Rule";
+import {IDecision, IField, IOperator, IRule, IValueMode} from "../routes/rules/Rule";
 import {IServiceRule} from "../routes/rules/services/ServiceRule";
 import {IHostRule} from "../routes/rules/hosts/HostRule";
+import {ICondition} from "../routes/rules/conditions/Condition";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -86,6 +87,11 @@ interface ISchemas {
     RULE_SERVICE_ARRAY: schema.Entity<IServiceRule>[];
     RULE_CONDITION: schema.Entity<ICondition>;
     RULE_CONDITION_ARRAY: schema.Entity<ICondition>[];
+    CONDITION: schema.Entity<ICondition>;
+    CONDITION_ARRAY: schema.Entity<ICondition>[];
+    VALUE_MODE_ARRAY: schema.Entity<IValueMode>[];
+    FIELD_ARRAY: schema.Entity<IField>[];
+    OPERATOR_ARRAY: schema.Entity<IOperator>[];
     DECISION: schema.Entity<IDecision>;
     DECISION_ARRAY: schema.Entity<IDecision>[];
     NODE: schema.Entity<INode>;
@@ -98,7 +104,6 @@ interface ISchemas {
     CONTAINER_ARRAY: schema.Entity<IContainer>[];
     LOGS_ARRAY: schema.Entity<ILogs>[];
 }
-
 
 const appServiceSchema: schema.Entity<IAppService> = new schema.Entity('appServices', undefined, {
     idAttribute: (app: IAppService) => app.service.serviceName
@@ -128,7 +133,26 @@ const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predicti
 });
 const predictions = new schema.Array(predictionSchema);
 
-const conditionSchema: schema.Entity<ICondition> = new schema.Entity('conditions', {}, {
+const valueModeSchema: schema.Entity<IValueMode> = new schema.Entity('valueModes', {}, {
+    idAttribute: (valueMode: IValueMode) => valueMode.name
+});
+const valueModes = new schema.Array(valueModeSchema);
+
+const fieldSchema: schema.Entity<IField> = new schema.Entity('fields', {}, {
+    idAttribute: (field: IField) => field.name
+});
+const fields = new schema.Array(fieldSchema);
+
+const operatorSchema: schema.Entity<IOperator> = new schema.Entity('operators', {}, {
+    idAttribute: (operator: IOperator) => operator.name
+});
+const operators = new schema.Array(operatorSchema);
+
+const conditionSchema: schema.Entity<ICondition> = new schema.Entity('conditions', {
+    valueModes,
+    fields,
+    operators,
+}, {
     idAttribute: (condition: ICondition) => condition.name
 });
 const conditions = new schema.Array(conditionSchema);
@@ -209,8 +233,13 @@ export const Schemas: ISchemas = {
     RULE_HOST_ARRAY: [ruleHostSchema],
     RULE_SERVICE: ruleServiceSchema,
     RULE_SERVICE_ARRAY: [ruleServiceSchema],
-    RULE_CONDITION: conditionSchema,
-    RULE_CONDITION_ARRAY: [conditionSchema],
+    RULE_CONDITION: conditionSchema, //TODO check if needed
+    RULE_CONDITION_ARRAY: [conditionSchema], //TODO check if needed
+    CONDITION: conditionSchema,
+    CONDITION_ARRAY: [conditionSchema],
+    VALUE_MODE_ARRAY: [valueModeSchema],
+    FIELD_ARRAY: [fieldSchema],
+    OPERATOR_ARRAY: [operatorSchema],
     DECISION: decisionSchema,
     DECISION_ARRAY: [decisionSchema],
     NODE: nodeSchema,

@@ -1,18 +1,15 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.Condition;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.DroolsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.Rule;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
@@ -20,7 +17,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -32,7 +28,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class HostRulesService {
 
-  private final DecisionsService decisionsService;
   private final ConditionsService conditionsService;
   private final DroolsService droolsService;
 
@@ -41,10 +36,8 @@ public class HostRulesService {
   private final String hostRuleTemplateFile;
   private final AtomicLong lastUpdateHostRules;
 
-  public HostRulesService(@Lazy DecisionsService decisionsService, ConditionsService conditionsService,
-                          DroolsService droolsService, HostRuleRepository rules,
-                          RulesProperties rulesProperties) {
-    this.decisionsService = decisionsService;
+  public HostRulesService(ConditionsService conditionsService, DroolsService droolsService,
+                          HostRuleRepository rules, RulesProperties rulesProperties) {
     this.conditionsService = conditionsService;
     this.droolsService = droolsService;
     this.rules = rules;
@@ -57,11 +50,11 @@ public class HostRulesService {
     lastUpdateHostRules.getAndSet(currentTime);
   }
 
-  public Iterable<HostRuleEntity> getRules() {
+  public Iterable<HostRuleEntity> getHostRules() {
     return rules.findAll();
   }
 
-  public List<HostRuleEntity> getRules(String hostname) {
+  public List<HostRuleEntity> getHostRules(String hostname) {
     return rules.findByHostname(hostname);
   }
 
@@ -81,27 +74,21 @@ public class HostRulesService {
 
   public HostRuleEntity addRule(HostRuleEntity rule) {
     log.debug("Saving rule {}", ToStringBuilder.reflectionToString(rule));
-    HostRuleEntity persistedRule = rules.save(rule);
     setLastUpdateHostRules();
-    return persistedRule;
+    return rules.save(rule);
   }
 
   public HostRuleEntity updateRule(String ruleName, HostRuleEntity newRule) {
+    log.debug("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
     HostRuleEntity rule = getRule(ruleName);
-    log.debug("Updating rule {} with {}",
-        ToStringBuilder.reflectionToString(rule), ToStringBuilder.reflectionToString(newRule));
-    log.debug("Rule before copying properties: {}", ToStringBuilder.reflectionToString(rule));
     ObjectUtils.copyValidProperties(newRule, rule);
-    DecisionEntity decision = decisionsService.getHostPossibleDecision(newRule.getDecision().getName());
-    rule = rule.toBuilder().decision(decision).build();
-    log.debug("Rule after copying properties: {}", ToStringBuilder.reflectionToString(rule));
     rule = rules.save(rule);
-    log.debug("{}", rule.getDecision().getName());
     setLastUpdateHostRules();
     return rule;
   }
 
   public void deleteRule(String ruleName) {
+    log.debug("Deleting rule {}", ruleName);
     HostRuleEntity rule = getRule(ruleName);
     rules.delete(rule);
     setLastUpdateHostRules();
@@ -119,19 +106,18 @@ public class HostRulesService {
   }
 
   public void addCondition(String ruleName, String conditionName) {
-    HostRuleEntity rule = getRule(ruleName);
+    log.debug("Adding condition {} to rule {}", conditionName, ruleName);
     ConditionEntity condition = conditionsService.getCondition(conditionName);
-    HostRuleConditionEntity ruleCondition = HostRuleConditionEntity.builder()
-        .hostRule(rule)
-        .hostCondition(condition)
-        .build();
-    rule = rule.toBuilder().condition(ruleCondition).build();
+    HostRuleEntity rule = getRule(ruleName);
+    HostRuleConditionEntity hostRuleCondition =
+        HostRuleConditionEntity.builder().hostCondition(condition).hostRule(rule).build();
+    rule = rule.toBuilder().condition(hostRuleCondition).build();
     rules.save(rule);
     setLastUpdateHostRules();
   }
 
-  public void addConditions(String ruleName, List<String> conditionNames) {
-    conditionNames.forEach(conditionName -> addCondition(ruleName, conditionName));
+  public void addConditions(String ruleName, List<String> conditions) {
+    conditions.forEach(condition -> addCondition(ruleName, condition));
   }
 
   public void removeCondition(String ruleName, String conditionName) {
@@ -139,8 +125,8 @@ public class HostRulesService {
   }
 
   public void removeConditions(String ruleName, List<String> conditionNames) {
-    var rule = getRule(ruleName);
     log.info("Removing conditions {}", conditionNames);
+    var rule = getRule(ruleName);
     rule.getConditions()
         .removeIf(condition -> conditionNames.contains(condition.getHostCondition().getName()));
     rules.save(rule);
@@ -163,12 +149,12 @@ public class HostRulesService {
   }
 
   private List<Rule> generateHostRules(String hostname) {
-    List<HostRuleEntity> genericHostRulesList = getGenericHostRules();
-    List<HostRuleEntity> hostRulesList = getRules(hostname);
-    var rules = new ArrayList<Rule>(hostRulesList.size() + genericHostRulesList.size());
-    genericHostRulesList.forEach(rule -> rules.add(generateRule(rule)));
-    hostRulesList.forEach(hostRule -> rules.add(generateRule(hostRule)));
+    List<HostRuleEntity> genericHostRules = getGenericHostRules();
+    List<HostRuleEntity> hostRules = getHostRules(hostname);
+    var rules = new ArrayList<Rule>(genericHostRules.size() + hostRules.size());
     log.info("Generating host rules... (count: {})", rules.size());
+    genericHostRules.forEach(rule -> rules.add(generateRule(rule)));
+    hostRules.forEach(hostRule -> rules.add(generateRule(hostRule)));
     return rules;
   }
 

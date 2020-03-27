@@ -131,7 +131,7 @@ class App extends BaseComponent<Props, State> {
     Object.entries(app).map(([key, value]) => {
       return {
         [key]: {
-          id: [key],
+          id: key,
           label: key,
           validation: { rule: required }
         }
@@ -166,7 +166,7 @@ class App extends BaseComponent<Props, State> {
                 saveEntities={this.saveEntities}>
             {Object.keys(formApp).map((key, index) =>
               <Field key={index}
-                     id={[key]}
+                     id={key}
                      label={key}/>
             )}
           </Form>
@@ -205,7 +205,7 @@ class App extends BaseComponent<Props, State> {
   render() {
     return (
       <MainLayout>
-        {this.shouldShowSaveButton() && <UnsavedChanged/>}
+        {this.shouldShowSaveButton() && !isNewApp(this.props.match.params.name) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>

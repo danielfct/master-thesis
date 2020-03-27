@@ -26,7 +26,6 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condi
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
@@ -84,11 +83,6 @@ public class ConditionEntity {
   private OperatorEntity operator;
 
   private double value;
-
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "appCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<AppRuleConditionEntity> appRuleConditions = new HashSet<>();
 
   @Singular
   @JsonIgnore

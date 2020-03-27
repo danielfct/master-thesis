@@ -57,7 +57,7 @@ public final class ObjectUtils {
   private boolean hasInvalidAnnotation(Field field) {
     return field.getAnnotation(OneToMany.class) != null
         || field.getAnnotation(ManyToMany.class) != null
-        || field.getAnnotation(ManyToOne.class) != null
+        /*|| field.getAnnotation(ManyToOne.class) != null*/
         || field.getAnnotation(JsonIgnore.class) != null;
   }
 

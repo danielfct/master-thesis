@@ -1,5 +1,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
@@ -26,7 +27,7 @@ public class HostRulesController {
 
   @GetMapping
   public Iterable<HostRuleEntity> getRules() {
-    return hostRulesService.getRules();
+    return hostRulesService.getHostRules();
   }
 
   @GetMapping("/{ruleName}")
@@ -36,6 +37,7 @@ public class HostRulesController {
 
   @PostMapping
   public HostRuleEntity addRule(@RequestBody HostRuleEntity rule) {
+    System.out.println(ToStringBuilder.reflectionToString(rule));
     Validation.validatePostRequest(rule.getId());
     return hostRulesService.addRule(rule);
   }
@@ -56,9 +58,14 @@ public class HostRulesController {
     return hostRulesService.getConditions(ruleName);
   }
 
-  @PostMapping("/{ruleName}/conditions/{conditionName}")
-  public void addRuleCondition(@PathVariable String ruleName, @PathVariable String conditionName) {
-    hostRulesService.addCondition(ruleName, conditionName);
+  @PostMapping("/{ruleName}/conditions")
+  public void addRuleConditions(@PathVariable String ruleName, @RequestBody List<String> conditions) {
+    hostRulesService.addConditions(ruleName, conditions);
+  }
+
+  @DeleteMapping("/{ruleName}/conditions")
+  public void removeRuleConditions(@PathVariable String ruleName, @RequestBody List<String> conditionNames) {
+    hostRulesService.removeConditions(ruleName, conditionNames);
   }
 
   @DeleteMapping("/{ruleName}/conditions/{conditionName}")

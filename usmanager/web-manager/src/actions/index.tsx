@@ -389,6 +389,77 @@ export function removeRuleServiceConditions(ruleName: string, condition: string[
   }
 }
 
+export const CONDITIONS_REQUEST = 'CONDITIONS_REQUEST';
+export const CONDITIONS_SUCCESS = 'CONDITIONS_SUCCESS';
+export const CONDITIONS_FAILURE = 'CONDITIONS_FAILURE';
+export const CONDITION_REQUEST = 'CONDITION_REQUEST';
+export const CONDITION_SUCCESS = 'CONDITION_SUCCESS';
+export const CONDITION_FAILURE = 'CONDITION_FAILURE';
+export const loadConditions = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchConditions(name));
+};
+const fetchConditions = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ CONDITIONS_REQUEST, CONDITIONS_SUCCESS, CONDITIONS_FAILURE ],
+        endpoint: `rules/conditions`,
+        schema: Schemas.CONDITION_ARRAY,
+        entity: 'conditions'
+      }
+      : {
+        types: [ CONDITION_REQUEST, CONDITION_SUCCESS, CONDITION_FAILURE ],
+        endpoint: `rules/conditions/${name}`,
+        schema: Schemas.CONDITION,
+        entity: 'conditions'
+      }
+});
+
+export const VALUE_MODES_REQUEST = 'VALUE_MODES_REQUEST';
+export const VALUE_MODES_SUCCESS = 'VALUE_MODES_SUCCESS';
+export const VALUE_MODES_FAILURE = 'VALUE_MODES_FAILURE';
+export const loadValueModes = () => (dispatch: any) => {
+  return dispatch(fetchValueModes());
+};
+const fetchValueModes = () => ({
+  [CALL_API]: {
+    types: [ VALUE_MODES_REQUEST, VALUE_MODES_SUCCESS, VALUE_MODES_FAILURE ],
+    endpoint: `value-modes`,
+    schema: Schemas.VALUE_MODE_ARRAY,
+    entity: 'value-modes'
+  }
+});
+
+export const FIELDS_REQUEST = 'FIELDS_REQUEST';
+export const FIELDS_SUCCESS = 'FIELDS_SUCCESS';
+export const FIELDS_FAILURE = 'FIELDS_FAILURE';
+export const loadFields = () => (dispatch: any) => {
+  return dispatch(fetchFields());
+};
+const fetchFields = () => ({
+  [CALL_API]: {
+    types: [ FIELDS_REQUEST, FIELDS_SUCCESS, FIELDS_FAILURE ],
+    endpoint: `fields`,
+    schema: Schemas.FIELD_ARRAY,
+    entity: 'fields'
+  }
+});
+
+export const OPERATORS_REQUEST = 'OPERATORS_REQUEST';
+export const OPERATORS_SUCCESS = 'OPERATORS_SUCCESS';
+export const OPERATORS_FAILURE = 'OPERATORS_FAILURE';
+export const loadOperators = () => (dispatch: any) => {
+  return dispatch(fetchOperators());
+};
+const fetchOperators = () => ({
+  [CALL_API]: {
+    types: [ OPERATORS_REQUEST, OPERATORS_SUCCESS, OPERATORS_FAILURE ],
+    endpoint: `operators`,
+    schema: Schemas.OPERATOR_ARRAY,
+    entity: 'operators'
+  }
+});
+
 export const DECISIONS_REQUEST = 'DECISIONS_REQUEST';
 export const DECISIONS_SUCCESS = 'DECISIONS_SUCCESS';
 export const DECISIONS_FAILURE = 'DECISIONS_FAILURE';

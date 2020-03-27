@@ -841,7 +841,7 @@ public class DatabaseLoader {
           .operator(greaterThan)
           .value(90)
           .build();
-      conditions.save(cpuPercentageOver90);
+      cpuPercentageOver90 = conditions.save(cpuPercentageOver90);
       var ramPercentageOver90 = ConditionEntity.builder()
           .name("ramPercentageOver90")
           .valueMode(effectiveValue)
@@ -849,7 +849,7 @@ public class DatabaseLoader {
           .operator(greaterThan)
           .value(90)
           .build();
-      conditions.save(ramPercentageOver90);
+      ramPercentageOver90 = conditions.save(ramPercentageOver90);
 
       // generic host rules
       var cpuAndRamOver90GenericHostRule = HostRuleEntity.builder()

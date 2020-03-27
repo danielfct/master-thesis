@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.AddServiceApp;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
@@ -98,29 +97,6 @@ public final class AppsController {
   public void removeAppService(@PathVariable String appName,
                                @PathVariable String serviceName) {
     appsService.removeService(appName, serviceName);
-  }
-
-  @GetMapping("/{appName}/rules")
-  public List<AppRuleEntity> getAppRules(@PathVariable String appName) {
-    return appsService.getRules(appName);
-  }
-
-  @PostMapping("/{appName}/rules")
-  public void addAppRules(@PathVariable String appName,
-                          @RequestBody String[] rules) {
-    appsService.addRules(appName, Arrays.asList(rules));
-  }
-
-  @DeleteMapping("/{appName}/rules")
-  public void removeAppRules(@PathVariable String appName,
-                             @RequestBody String[] rules) {
-    appsService.removeRules(appName, Arrays.asList(rules));
-  }
-
-  @DeleteMapping("/{appName}/rules/{ruleName}")
-  public void removeAppRule(@PathVariable String appName,
-                            @PathVariable String ruleName) {
-    appsService.removeRule(appName, ruleName);
   }
 
 }

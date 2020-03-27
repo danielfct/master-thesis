@@ -152,7 +152,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
     const list = this.appServicesList();
     return (
       <>
-        <Field key='launchOrder' id={['launchOrder']} label='launchOrder'/>
+        <Field key='launchOrder' id={'launchOrder'} label='launchOrder'/>
         <Collapsible id={'otherServicesList'}
                      title={'Other services\' launch order'}>
           {list && <OtherServicesList list={list} show={this.appServicesLaunchOrder}/>}
@@ -164,7 +164,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
   private getModalFields = (): IFields => (
     {
       launchOrder: {
-        id: ['launchOrder'],
+        id: 'launchOrder',
         label: 'launchOrder',
         validation: { rule: requiredAndNumberAndMin, args: 0 }
       }

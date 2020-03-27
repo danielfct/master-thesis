@@ -17,23 +17,17 @@ interface IComponentType extends IData {
   name: string;
 }
 
-export interface ICondition extends IData {
-  name: string;
-  valueMode: IValueMode;
-  field: IField;
-  operator: IOperator;
-  value: number;
-}
 
-interface IValueMode extends IData {
+
+export interface IValueMode extends IData {
   name: string;
 }
 
-interface IField extends IData {
+export interface IField extends IData {
   name: string;
 }
 
-interface IOperator extends IData {
+export interface IOperator extends IData {
   name: string;
   symbol: string;
 }

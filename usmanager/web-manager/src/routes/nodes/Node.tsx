@@ -8,9 +8,11 @@ import Field, {getTypeFromValue} from "../../components/form/Field";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {loadNodes} from "../../actions";
+import {loadCloudHosts, loadEdgeHosts, loadNodes} from "../../actions";
 import {connect} from "react-redux";
 import React from "react";
+import {IRegion} from "../region/Region";
+import {IEdgeHost} from "../hosts/EdgeHost";
 
 export interface INode extends IData {
   hostname: string;
@@ -33,10 +35,13 @@ interface StateToProps {
   isLoading: boolean;
   error?: string | null;
   node: Partial<INode>;
+  hosts: IEdgeHost[];
 }
 
 interface DispatchToProps {
   loadNodes: (name: string) => any;
+  loadEdgeHosts: () => any;
+  loadCloudHosts: () => any;
 }
 
 interface MatchParams {
@@ -80,7 +85,7 @@ class Node extends BaseComponent<Props, {}> {
     Object.entries(emptyNode()).map(([key, value]) => {
       return {
         [key]: {
-          id: [key],
+          id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 1 }
@@ -94,52 +99,32 @@ class Node extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
-  private getSelectableHostnames = () =>
-    ['127.0.0.1']; //TODO load hostnames
-
   private getSelectableRoles = () =>
     ['MANAGER', 'WORKER'];
 
-  private getSelectableRegions = () =>
-    []; //TODO
-
-  private getSelectableCountries = () =>
-    []; //TODO
-
-  private getSelectableCities = () =>
-    []; //TODO
+  private hostDropdownOption = (host: IEdgeHost) =>
+    host.hostname;
 
   private formFields = (node: Partial<INode>, isNew: boolean): JSX.Element => {
     return (
       isNew ?
         <>
-          <Field key={'region'}
-                 id={['region']}
-                 label={'region'}
-                 type="dropdown"
-                 dropdown={{defaultValue: "Select region", values: this.getSelectableRegions()}}/>
-          <Field key={'country'}
-                 id={['country']}
-                 label={'country'}
-                 type="dropdown"
-                 dropdown={{defaultValue: "Select country", values: this.getSelectableCountries()}}/>
-          <Field key={'city'}
-                 id={['city']}
-                 label={'city'}
-                 type="dropdown"
-                 dropdown={{defaultValue: "Select city", values: this.getSelectableCities()}}/>
-          <Field key={'hostname'}
-                 id={['hostname']}
-                 label={'hostname'}
-                 type="dropdown"
-                 dropdown={{defaultValue: "Select hostname", values: this.getSelectableHostnames()}}/>
+          <Field<IEdgeHost> key={'hostname'}
+                            id={'hostname'}
+                            label={'hostname'}
+                            type="dropdown"
+                            dropdown={{
+                              defaultValue: "Select hostname",
+                              values: this.props.hosts,
+                              optionToString: this.hostDropdownOption
+                            }}/>
           {/*<Field key={'role'}
                id={'role'}
                label={'role'}
                type="dropdown"
                dropdown={{defaultValue: "Select role", values: this.getSelectableRoles()}}/>*/}
           <Field key={'quantity'}
-                 id={['quantity']}
+                 id={'quantity'}
                  label={'quantity'}
                  type={"numberbox"}/>
         </>
@@ -147,11 +132,13 @@ class Node extends BaseComponent<Props, {}> {
         <>
           {Object.entries(node).map(([key, value], index) =>
             <Field key={index}
-                   id={[key]}
+                   id={key}
                    label={key}/>)}
         </>
     )
   };
+
+  //TODO put={{url: `conditions/${this.state.nodeNad || condition[conditionKey]}` on very class
 
   private details = () => {
     const {isLoading, error, node} = this.props;
@@ -204,15 +191,19 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const error = state.entities.nodes?.error;
   const id = props.match.params.id;
   const node = isNewNode(id) ? emptyNode() : state.entities.nodes.data[id];
+  const hosts = state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data);
   return  {
     isLoading,
     error,
     node,
+    hosts
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadNodes,
+  loadEdgeHosts,
+  loadCloudHosts,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Node);

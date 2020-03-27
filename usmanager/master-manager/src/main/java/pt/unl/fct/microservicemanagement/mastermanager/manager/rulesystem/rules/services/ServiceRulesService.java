@@ -1,6 +1,5 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
@@ -10,12 +9,10 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condit
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.DroolsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.Rule;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.apps.AppRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
@@ -27,6 +24,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -34,7 +32,6 @@ import org.springframework.stereotype.Service;
 public class ServiceRulesService {
 
   private final DecisionsService decisionsService;
-  private final AppRulesService appRulesService;
   private final DroolsService droolsService;
   private final ConditionsService conditionsService;
 
@@ -43,12 +40,10 @@ public class ServiceRulesService {
   private final String serviceRuleTemplateFile;
   private final AtomicLong lastUpdateServiceRules;
 
-  public ServiceRulesService(@Lazy DecisionsService decisionsService, AppRulesService appRulesService,
-                             DroolsService droolsService,
+  public ServiceRulesService(@Lazy DecisionsService decisionsService, DroolsService droolsService,
                              ConditionsService conditionsService, ServiceRuleRepository rules,
                              RulesProperties rulesProperties) {
     this.decisionsService = decisionsService;
-    this.appRulesService = appRulesService;
     this.droolsService = droolsService;
     this.conditionsService = conditionsService;
     this.rules = rules;
@@ -61,11 +56,11 @@ public class ServiceRulesService {
     lastUpdateServiceRules.getAndSet(currentTime);
   }
 
-  public Iterable<ServiceRuleEntity> getRules() {
+  public Iterable<ServiceRuleEntity> getServiceRules() {
     return rules.findAll();
   }
 
-  public List<ServiceRuleEntity> getRulesByServiceName(String serviceName) {
+  public List<ServiceRuleEntity> getServiceRules(String serviceName) {
     return rules.getRulesByServiceName(serviceName);
   }
 
@@ -90,20 +85,16 @@ public class ServiceRulesService {
   }
 
   public ServiceRuleEntity updateRule(String ruleName, ServiceRuleEntity newRule) {
-    var rule = getRule(ruleName);
-    log.debug("Updating rule {} with {}",
-        ToStringBuilder.reflectionToString(rule), ToStringBuilder.reflectionToString(newRule));
-    log.debug("Rule before copying properties: {}", ToStringBuilder.reflectionToString(rule));
+    log.debug("Updating rule {} with {}", ruleName, ToStringBuilder.reflectionToString(newRule));
+    ServiceRuleEntity rule = getRule(ruleName);
     ObjectUtils.copyValidProperties(newRule, rule);
-    DecisionEntity decision = decisionsService.getServicePossibleDecision(newRule.getDecision().getName());
-    rule.setDecision(decision);
-    log.debug("Rule after copying properties: {}", ToStringBuilder.reflectionToString(rule));
     rule = rules.save(rule);
     setLastUpdateServiceRules();
     return rule;
   }
 
   public void deleteRule(String ruleName) {
+    log.debug("Deleting rule {}", ruleName);
     var rule = getRule(ruleName);
     rules.delete(rule);
     setLastUpdateServiceRules();
@@ -121,19 +112,18 @@ public class ServiceRulesService {
   }
 
   public void addCondition(String ruleName, String conditionName) {
-    var rule = getRule(ruleName);
-    var condition = conditionsService.getCondition(conditionName);
-    var ruleCondition = ServiceRuleConditionEntity.builder()
-        .serviceRule(rule)
-        .serviceCondition(condition)
-        .build();
-    rule = rule.toBuilder().condition(ruleCondition).build();
+    log.debug("Adding condition {} to rule {}", conditionName, ruleName);
+    ConditionEntity condition = conditionsService.getCondition(conditionName);
+    ServiceRuleEntity rule = getRule(ruleName);
+    ServiceRuleConditionEntity hostRuleCondition =
+        ServiceRuleConditionEntity.builder().serviceCondition(condition).serviceRule(rule).build();
+    rule = rule.toBuilder().condition(hostRuleCondition).build();
     rules.save(rule);
     setLastUpdateServiceRules();
   }
 
-  public void addConditions(String ruleName, List<String> conditionNames) {
-    conditionNames.forEach(conditionName -> addCondition(ruleName, conditionName));
+  public void addConditions(String ruleName, List<String> conditions) {
+    conditions.forEach(condition -> addCondition(ruleName, condition));
   }
 
   public void removeCondition(String ruleName, String conditionName) {
@@ -141,8 +131,8 @@ public class ServiceRulesService {
   }
 
   public void removeConditions(String ruleName, List<String> conditionNames) {
-    var rule = getRule(ruleName);
     log.info("Removing conditions {}", conditionNames);
+    var rule = getRule(ruleName);
     rule.getConditions()
         .removeIf(condition -> conditionNames.contains(condition.getServiceCondition().getName()));
     rules.save(rule);
@@ -157,9 +147,9 @@ public class ServiceRulesService {
 
   public ServiceDecisionResult processServiceEvent(String appName, String serviceHostname,
                                                    ContainerEvent containerEvent) {
-    final var serviceName = containerEvent.getServiceName();
-    if (droolsService.shouldCreateNewRuleSession(serviceName, lastUpdateServiceRules.get())
-        || droolsService.shouldCreateNewRuleSession(serviceName, appRulesService.getLastUpdateAppRules().get())) {
+    //FIXME: appName and serviceHostname
+    String serviceName = containerEvent.getServiceName();
+    if (droolsService.shouldCreateNewRuleSession(serviceName, lastUpdateServiceRules.get())) {
       List<Rule> rules = generateServiceRules(appName, serviceName);
       Map<Long, String> drools = droolsService.executeDroolsRules(containerEvent, rules, serviceRuleTemplateFile);
       droolsService.createNewServiceRuleSession(serviceName, drools);
@@ -168,33 +158,13 @@ public class ServiceRulesService {
   }
 
   private List<Rule> generateServiceRules(String appName, String serviceName) {
-    List<AppRuleEntity> appRules = appRulesService.getRulesByAppName(appName);
     List<ServiceRuleEntity> genericServiceRules = getGenericServiceRules();
-    List<ServiceRuleEntity> serviceRules = getRulesByServiceName(serviceName);
-    List<Rule> rules = new ArrayList<>(appRules.size() + genericServiceRules.size() + serviceRules.size());
-    log.info("Generating app rules... (count: {})", appRules.size());
-    appRules.forEach(appRule -> rules.add(generateAppRule(appRule)));
-    log.info("Generating generic service rules... (count: {})", genericServiceRules.size());
+    List<ServiceRuleEntity> serviceRules = getServiceRules(serviceName);
+    var rules = new ArrayList<Rule>(genericServiceRules.size() + serviceRules.size());
+    log.info("Generating service rules... (count: {})", rules.size());
     genericServiceRules.forEach(genericServiceRule -> rules.add(generateServiceRule(genericServiceRule)));
-    log.info("Generating service rules... (count: {})", serviceRules.size());
     serviceRules.forEach(serviceRule -> rules.add(generateServiceRule(serviceRule)));
     return rules;
-  }
-
-  //TODO merge 2 methods after doing inheritance from RuleEntity
-
-  private Rule generateAppRule(AppRuleEntity appRule) {
-    Long id = appRule.getId();
-    List<Condition> conditions = getConditions(appRule.getName()).stream().map(condition -> {
-      String fieldName = String.format("%s-%S", condition.getField().getName(),
-          condition.getValueMode().getName());
-      double value = condition.getValue();
-      Operator operator = Operator.fromValue(condition.getOperator().getName());
-      return new Condition(fieldName, value, operator);
-    }).collect(Collectors.toList());
-    RuleDecision decision = RuleDecision.fromValue(appRule.getDecision().getName());
-    int priority = appRule.getPriority();
-    return new Rule(id, conditions, decision, priority);
   }
 
   private Rule generateServiceRule(ServiceRuleEntity serviceRule) {

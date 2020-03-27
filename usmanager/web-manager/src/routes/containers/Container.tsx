@@ -135,7 +135,7 @@ class Container extends BaseComponent<Props, State> {
     Object.entries(emptyContainer()).map(([key, value]) => {
       return {
         [key]: {
-          id: [key],
+          id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 0 }
@@ -166,26 +166,39 @@ class Container extends BaseComponent<Props, State> {
       defaultInternalPort: service.defaultInternalPort});
   };
 
+  private hostnameOption = (hostname: string) =>
+    hostname;
+
+  private serviceOption = (service: string) =>
+    service;
+
   private formFields = (formContainer: Partial<IContainer>, isNew: boolean): JSX.Element => {
     return (
       isNew ?
         <>
           <Field key={'hostname'}
-                 id={['hostname']}
+                 id={'hostname'}
                  label={'hostname'}
                  type={'dropdown'}
-                 dropdown={{defaultValue: "Select hostname", values: this.getSelectableHostnames()}}/>
+                 dropdown={{
+                   defaultValue: "Select hostname",
+                   values: this.getSelectableHostnames(),
+                   optionToString: this.hostnameOption}}/>
           <Field key={'service'}
-                 id={['service']}
+                 id={'service'}
                  label={'service'}
                  type={'dropdown'}
-                 dropdown={{defaultValue: "Select service", values: this.getSelectableServices(), selectCallback: this.setDefaultPorts}}/>
+                 dropdown={{
+                   defaultValue: "Select service",
+                   values: this.getSelectableServices(),
+                   selectCallback: this.setDefaultPorts,
+                   optionToString: this.serviceOption}}/>
           <Field key={'internalPort'}
-                 id={['internalPort']}
+                 id={'internalPort'}
                  label={'internalPort'}
                  type={'numberbox'}/>
           <Field key={'externalPort'}
-                 id={['externalPort']}
+                 id={'externalPort'}
                  label={'externalPort'}
                  type={'numberbox'}/>
         </>
@@ -194,11 +207,11 @@ class Container extends BaseComponent<Props, State> {
           {Object.entries(formContainer).map(([key, value], index) => {
             return key == 'created'
               ? <Field key={index}
-                       id={[key]}
+                       id={key}
                        label={key}
                        type={"datebox"}/>
               : <Field key={index}
-                       id={[key]}
+                       id={key}
                        label={key}/>
           })}
         </>
@@ -303,7 +316,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     formContainer = emptyContainer();
   }
   else {
-    formContainer = { ...state.entities.containers.data[id] };
+    formContainer = { ...container };
     delete formContainer["ports"];
     delete formContainer["labels"];
     delete formContainer["logs"];
