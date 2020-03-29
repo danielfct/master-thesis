@@ -11,8 +11,8 @@ import {loadCloudHosts, loadContainers, loadEdgeHosts, loadServices} from "../..
 import {connect} from "react-redux";
 import React from "react";
 import IData from "../../components/IData";
-import {ICloudHost} from "../hosts/CloudHost";
-import {IEdgeHost} from "../hosts/EdgeHost";
+import {ICloudHost} from "../hosts/cloud/CloudHost";
+import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IService} from "../services/Service";
 import ServiceAppList from "../services/apps/ServiceAppList";
 import PortsList from "./PortsList";

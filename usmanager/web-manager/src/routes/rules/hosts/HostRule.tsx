@@ -30,7 +30,7 @@ import {
 import {postData} from "../../../utils/api";
 import HostRuleConditionList from "./HostRuleConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
-import {IEdgeHost} from "../../hosts/EdgeHost";
+import {IEdgeHost} from "../../hosts/edge/EdgeHost";
 
 export interface IHostRule extends IRule {
   hostname: string
@@ -153,7 +153,7 @@ class HostRule extends BaseComponent<Props, State> {
     super.toast(`Unable to save conditions of rule ${ruleName}`, 10000, reason, true);
 
   private getFields = (hostRule: Partial<IRule>): IFields =>
-    Object.entries(hostRule).map(([key, value]) => {
+    Object.entries(hostRule).map(([key, _]) => {
       return {
         [key]: {
           id: key,

@@ -1,6 +1,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.List;
@@ -49,6 +50,11 @@ public class ServiceRulesController {
   @DeleteMapping("/{ruleName}")
   public void deleteRule(@PathVariable String ruleName) {
     appRulesService.deleteRule(ruleName);
+  }
+
+  @GetMapping("/generic/services")
+  public List<ServiceRuleEntity> getGenericRules() {
+    return appRulesService.getGenericServiceRules();
   }
 
   @GetMapping("/{ruleName}/conditions")

@@ -681,3 +681,7 @@ select.no-validation-field ~ input.select-dropdown {
 .list {
     width: 100%;
 }
+
+.input-field input[type=search]+.label-icon {
+    padding-left: 4px;
+}

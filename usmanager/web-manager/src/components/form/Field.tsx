@@ -40,8 +40,6 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
 
   private onChange = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
                       id: string, formContext: IFormContext): void => {
-    console.log(id);
-    console.log(e.currentTarget.value);
     let value;
     try {
       value = JSON.parse(e.currentTarget.value);
@@ -53,10 +51,6 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
   };
 
   private onSelect = (value: string, id: string, formContext: IFormContext) => {
-    console.log(value);
-    console.log(id);
-   // const values = this.buildValueObjectFromId(id, value);
-    //const values = JSON.parse(value);
     const values = { [id] : value };
     formContext.setValues(values);
     formContext.validate(id);
@@ -70,32 +64,6 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     const date = new Date(value * 1000);
     return `${date.toLocaleDateString("pt")} ${date.toLocaleTimeString("pt") }`
   };
-
-  private buildValueObjectFromId = (id: string[], value: string) => {
-    const reversedIds = [...id].reverse();
-    const values = reversedIds.reduce( ( values: IValues, key, index ) => {
-      if (index == 0) {
-        values[key] = value;
-      }
-      else {
-        values[key] = { [reversedIds[index-1]]: values[reversedIds[index-1]] };
-      }
-      return values;
-    }, {} );
-    const keys = Object.keys(values);
-    for (let i = 0; i < keys.length - 1; i++) {
-      delete values[keys[i]];
-    }
-    return values;
-  };
-
-/*  private getFormValueFromId = (values: IValues, id: string) => {
-    let value;
-    for (let i = 0; i < id.length; i++) {
-      value = i == 0 ? values[id[i]] : value?.[id[i]];
-    }
-    return value;
-  };*/
 
   render() {
     const {id, type, label, dropdown, icon, disabled} = this.props;

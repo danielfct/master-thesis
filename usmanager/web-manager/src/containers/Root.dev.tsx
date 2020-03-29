@@ -30,19 +30,6 @@ import Navbar from "../views/navbar/Navbar";
 import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
-import RulesLandingPage from "../routes/rules/RulesLandingPage";
-import RulePage from "../routes/rules/RulePage";
-import OldConditions from "../routes/rules/OldConditions";
-import ConditionPage from "../routes/rules/ConditionPage";
-import AppRulesPage from "../routes/rules/AppRulesPage";
-import ServicesRulesList from "../routes/rules/ServicesRulesList";
-import ServiceRulesPage from "../routes/rules/ServiceRulesPage";
-import HostsRulesList from "../routes/rules/HostsRulesList";
-import HostRulesPage from "../routes/rules/HostRulesPage";
-import GenericHostsRulesList from "../routes/rules/GenericHostsRulesList";
-import GenericHostRulesPage from "../routes/rules/GenericHostRulesPage";
-import ServiceEventPredictions from "../routes/eventPrediction/ServiceEventPrediction";
-import ServiceEventPredictionDetail from "../routes/eventPrediction/ServiceEventPredictionDetail";
 import EurekaPage from "../routes/eureka/Eureka";
 import LoadBalancerPage from "../routes/loadBalancer/LoadBalancer";
 import SimulatedMetricsLandingPage from "../routes/metrics/SimulatedMetricsLandingPage";
@@ -64,11 +51,11 @@ import Region from "../routes/region/Region";
 import Regions from "../routes/region/Regions";
 import Nodes from "../routes/nodes/Nodes";
 import Node from "../routes/nodes/Node";
-import CloudHost from "../routes/hosts/CloudHost";
-import EdgeHost from "../routes/hosts/EdgeHost";
+import CloudHost from "../routes/hosts/cloud/CloudHost";
+import EdgeHost from "../routes/hosts/edge/EdgeHost";
 import Hosts from "../routes/hosts/Hosts";
-import CloudHosts from "../routes/hosts/CloudHosts";
-import EdgeHosts from "../routes/hosts/EdgeHosts";
+import CloudHosts from "../routes/hosts/cloud/CloudHosts";
+import EdgeHosts from "../routes/hosts/edge/EdgeHosts";
 import Containers from "../routes/containers/Containers";
 import Container from "../routes/containers/Container";
 import Apps from "../routes/apps/Apps";
@@ -108,20 +95,6 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/rules/services/:name": { component: ServiceRule },
     "/rules/conditions": { component: Conditions, search: true },
     "/rules/conditions/:name": { component: Condition },
-    /*"/rules/management": { component: RulesLandingPage, search: true },
-    "/rules/rules/:ruleId?": { title: "",component: RulePage },
-    "/rules/conditions": {  component: OldConditions, search: true },
-    "/rules/conditions/condition/:conditionId?": {  component: ConditionPage },
-    "/rules/apps": {  component: AppsRulesList, search: true },
-    "/rules/apps/app/:appId": { component: AppRulesPage },
-    "/rules/services": { component: ServicesRulesList, search: true },
-    "/rules/services/service/:serviceId": { component: ServiceRulesPage },
-    "/rules/hosts": { component: HostsRulesList, search: true },
-    "/rules/hosts/host/:hostname": { component: HostRulesPage },
-    "/rules/generic/hosts": { component: GenericHostsRulesList, search: true },
-    "/rules/generic/hosts/rule": { component: GenericHostRulesPage },
-    "/rules/serviceEventPredictions": { component: ServiceEventPredictions, search: true },
-    "/rules/serviceEventPredictions/serviceEventPrediction/:id?": { component: ServiceEventPredictionDetail },*/
     "/nodes": { component: Nodes, search: true },
     "/nodes/:id": { component: Node },
     "/eureka": { component: EurekaPage, search: true },

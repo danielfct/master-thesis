@@ -41,8 +41,6 @@ public interface HostRuleRepository extends CrudRepository<HostRuleEntity, Long>
 
   List<HostRuleEntity> findByHostname(@Param("hostname") String hostname);
 
-  HostRuleEntity findByNameAndHostname(@Param("name") String name, @Param("hostname") String hostname);
-
   @Query("select case when count(r) > 0 then true else false end "
       + "from HostRuleEntity r "
       + "where r.name = :ruleName")

@@ -4,8 +4,8 @@ import AddButton from "../../components/form/AddButton";
 import styles from './Hosts.module.css'
 import BaseComponent from "../../components/BaseComponent";
 import M from "materialize-css";
-import CloudHostsList from "./CloudHostsList";
-import EdgeHostsList from "./EdgeHostsList";
+import CloudHostsList from "./cloud/CloudHostsList";
+import EdgeHostsList from "./edge/EdgeHostsList";
 import Collapsible from "../../components/collapsible/Collapsible";
 
 export default class Hosts extends BaseComponent<{}, {}> {

@@ -27,7 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;
@@ -41,11 +41,11 @@ import org.springframework.stereotype.Service;
 public class EdgeHostsService {
 
   private final EdgeHostRepository edgeHosts;
-  private final HostRuleRepository hostRules;
+  private final HostRulesService hostRulesService;
 
-  public EdgeHostsService(EdgeHostRepository edgeHosts, HostRuleRepository hostRules) {
+  public EdgeHostsService(EdgeHostRepository edgeHosts, HostRulesService hostRulesService) {
     this.edgeHosts = edgeHosts;
-    this.hostRules = hostRules;
+    this.hostRulesService = hostRulesService;
   }
 
   public Iterable<EdgeHostEntity> getEdgeHosts() {
@@ -63,16 +63,9 @@ public class EdgeHostsService {
   }
 
   public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {
-    var edgeHost = getEdgeHost(hostname);
-    log.debug("Updating edgeHost {} with {}",
-        ToStringBuilder.reflectionToString(edgeHost), ToStringBuilder.reflectionToString(newEdgeHost));
-    log.debug("EdgeHost before copying properties: {}",
-        ToStringBuilder.reflectionToString(edgeHost));
+    EdgeHostEntity edgeHost = getEdgeHost(hostname);
     ObjectUtils.copyValidProperties(newEdgeHost, edgeHost);
-    log.debug("EdgeHost after copying properties: {}",
-        ToStringBuilder.reflectionToString(edgeHost));
-    edgeHost = edgeHosts.save(edgeHost);
-    return edgeHost;
+    return edgeHosts.save(edgeHost);
   }
 
   public void deleteEdgeHost(String hostname) {
@@ -98,17 +91,19 @@ public class EdgeHostsService {
 
   public List<HostRuleEntity> getRules(String hostname) {
     assertHostExists(hostname);
-    return hostRules.findByHostname(hostname);
+    return edgeHosts.getRules(hostname);
   }
 
   public void addRule(String hostname, String ruleName) {
-    var hostRule = hostRules.findByNameAndHostname(ruleName, hostname).toBuilder().hostname(hostname).build();
-    var host = getEdgeHost(hostname).toBuilder().hostRule(hostRule).build();
-    edgeHosts.save(host);
+    EdgeHostEntity edgeHost = getEdgeHost(hostname);
+    HostRuleEntity rule = hostRulesService.getRule(ruleName);
+    log.info("Adding rule {} to edge host {}", ruleName, hostname);
+    edgeHost = edgeHost.toBuilder().hostRule(rule).build();
+    edgeHosts.save(edgeHost);
   }
 
-  public void addRules(String hostname, List<String> rules) {
-    rules.forEach(ruleName -> addRule(hostname, ruleName));
+  public void addRules(String hostname, List<String> ruleNames) {
+    ruleNames.forEach(ruleName -> addRule(hostname, ruleName));
   }
 
   public void removeRule(String hostname, String rule) {

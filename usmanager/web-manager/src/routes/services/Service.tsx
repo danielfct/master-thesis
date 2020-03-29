@@ -47,6 +47,7 @@ import ServiceDependeeList from "./dependees/ServiceDependeeList";
 import ServicePredictionList, {IPrediction} from "./predictions/ServicePredictionList";
 import ServiceRuleList from "./rules/ServiceRuleList";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
+import GenericServiceRuleList from "./rules/GenericServiceRuleList";
 
 export interface IService extends IData {
   serviceName: string;
@@ -314,8 +315,11 @@ class Service extends BaseComponent<Props, State> {
     }, {});
 
   private shouldShowSaveButton = () =>
-    !!this.state.newApps.length || !!this.state.newDependencies.length || !!this.state.newDependees.length
-    || !!this.state.newPredictions.length || !!this.state.newRules.length;
+    !!this.state.newApps.length
+    || !!this.state.newDependencies.length
+    || !!this.state.newDependees.length
+    || !!this.state.newPredictions.length
+    || !!this.state.newRules.length;
 
   private serviceTypeOption = (serviceType: string): string =>
     serviceType;
@@ -347,7 +351,7 @@ class Service extends BaseComponent<Props, State> {
                          dropdown={{
                            defaultValue: "Choose service type",
                            values: ["Frontend", "Backend", "Database", "System"],
-                         optionToString: this.serviceTypeOption}}/>
+                           optionToString: this.serviceTypeOption}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -386,6 +390,9 @@ class Service extends BaseComponent<Props, State> {
                      onAddServiceRule={this.onAddServiceRule}
                      onRemoveServiceRules={this.onRemoveServiceRules}/>;
 
+  private genericRules = (): JSX.Element =>
+    <GenericServiceRuleList/>;
+
   private tabs: Tab[] = [
     {
       title: 'Service',
@@ -416,6 +423,11 @@ class Service extends BaseComponent<Props, State> {
       title: 'Rules',
       id: 'rules',
       content: () => this.rules()
+    },
+    {
+      title: 'Generic rules',
+      id: 'genericServiceRules',
+      content: () => this.genericRules()
     }
   ];
 

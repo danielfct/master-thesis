@@ -27,9 +27,9 @@ export default class extends React.Component<Props, {}> {
     const {tabs} = this.props;
     return (
       <>
-        <ul className="tabs" ref={this.tabs}>
+        <ul className="tabs tabs-fixed-width" ref={this.tabs}>
           {tabs.map((tab, index) =>
-            <li key={index} className={`tab col s${Math.floor(12/tabs.length)}`} onClick={this.updatePathname}>
+            <li key={index} className="tab" onClick={this.updatePathname}>
               <a href={tabs.length == 1 ? undefined : `#${tab.id}`}>{tab.title}</a>
             </li>
           )}

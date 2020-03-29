@@ -21,9 +21,7 @@ import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
   addRuleServiceCondition,
-  loadCloudHosts,
   loadDecisions,
-  loadEdgeHosts,
   loadRulesService, loadServices
 } from "../../../actions";
 import {connect} from "react-redux";
@@ -31,8 +29,6 @@ import React from "react";
 import {postData} from "../../../utils/api";
 import ServiceRuleConditionList from "./ServiceRuleConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
-import {ICondition} from "../conditions/Condition";
-import {IEdgeHost} from "../../hosts/EdgeHost";
 
 export interface IServiceRule extends IRule {
   service: IService,

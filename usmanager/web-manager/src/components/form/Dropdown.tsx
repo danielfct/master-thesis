@@ -1,6 +1,5 @@
 import React, {createRef} from "react";
 import M from "materialize-css";
-import {capitalize} from "../../utils/text";
 
 interface Props<T> {
   className?: string;
@@ -31,7 +30,6 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
 
   render() {
     const {className, id, name, value, disabled, onChange, onBlur, dropdown} = this.props;
-    console.log(value)
     return (
       <select
         className={className}

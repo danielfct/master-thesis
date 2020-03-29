@@ -301,6 +301,32 @@ const fetchRulesHost = (name?: string) => ({
       }
 });
 
+export const GENERIC_RULES_HOST_REQUEST = 'GENERIC_RULES_HOST_REQUEST';
+export const GENERIC_RULES_HOST_SUCCESS = 'GENERIC_RULES_HOST_SUCCESS';
+export const GENERIC_RULES_HOST_FAILURE = 'GENERIC_RULES_HOST_FAILURE';
+export const GENERIC_RULE_HOST_REQUEST = 'GENERIC_RULE_HOST_REQUEST';
+export const GENERIC_RULE_HOST_SUCCESS = 'GENERIC_RULE_HOST_SUCCESS';
+export const GENERIC_RULE_HOST_FAILURE = 'GENERIC_RULE_HOST_FAILURE';
+export const loadGenericRulesHost = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchGenericRulesHost(name));
+};
+const fetchGenericRulesHost = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ GENERIC_RULES_HOST_REQUEST, GENERIC_RULES_HOST_SUCCESS, GENERIC_RULES_HOST_FAILURE ],
+        endpoint: `rules/generic/hosts`,
+        schema: Schemas.RULE_HOST_ARRAY,
+        entity: 'genericHostRules'
+      }
+      : {
+        types: [ GENERIC_RULE_HOST_REQUEST, GENERIC_RULE_HOST_SUCCESS, GENERIC_RULE_HOST_FAILURE ],
+        endpoint: `rules/generic/hosts/${name}`,
+        schema: Schemas.RULE_HOST,
+        entity: 'genericHostRules'
+      }
+});
+
 export const RULES_SERVICE_REQUEST = 'RULES_SERVICE_REQUEST';
 export const RULES_SERVICE_SUCCESS = 'RULES_SERVICE_SUCCESS';
 export const RULES_SERVICE_FAILURE = 'RULES_SERVICE_FAILURE';
@@ -324,6 +350,32 @@ const fetchRulesService = (name?: string) => ({
         endpoint: `rules/services/${name}`,
         schema: Schemas.RULE_SERVICE,
         entity: 'serviceRules'
+      }
+});
+
+export const GENERIC_RULES_SERVICE_REQUEST = 'GENERIC_RULES_SERVICE_REQUEST';
+export const GENERIC_RULES_SERVICE_SUCCESS = 'GENERIC_RULES_SERVICE_SUCCESS';
+export const GENERIC_RULES_SERVICE_FAILURE = 'GENERIC_RULES_SERVICE_FAILURE';
+export const GENERIC_RULE_SERVICE_REQUEST = 'GENERIC_RULE_SERVICE_REQUEST';
+export const GENERIC_RULE_SERVICE_SUCCESS = 'GENERIC_RULE_SERVICE_SUCCESS';
+export const GENERIC_RULE_SERVICE_FAILURE = 'GENERIC_RULE_SERVICE_FAILURE';
+export const loadGenericRulesService = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchGenericRulesService(name));
+};
+const fetchGenericRulesService = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ GENERIC_RULES_SERVICE_REQUEST, GENERIC_RULES_SERVICE_SUCCESS, GENERIC_RULES_SERVICE_FAILURE ],
+        endpoint: `rules/generic/services`,
+        schema: Schemas.RULE_SERVICE_ARRAY,
+        entity: 'genericServiceRules'
+      }
+      : {
+        types: [ GENERIC_RULE_SERVICE_REQUEST, GENERIC_RULE_SERVICE_SUCCESS, GENERIC_RULE_SERVICE_FAILURE ],
+        endpoint: `rules/generic/services/${name}`,
+        schema: Schemas.RULE_SERVICE,
+        entity: 'genericServiceRules'
       }
 });
 
@@ -537,6 +589,36 @@ const fetchCloudHosts = (instanceId?: string) => ({
         entity: 'cloudHosts'
       }
 });
+export const CLOUD_HOST_RULES_REQUEST = 'CLOUD_HOST_RULES_REQUEST';
+export const CLOUD_HOST_RULES_SUCCESS = 'CLOUD_HOST_RULES_SUCCESS';
+export const CLOUD_HOST_RULES_FAILURE = 'CLOUD_HOST_RULES_FAILURE';
+export const loadCloudHostRules = (instanceId: string) => (dispatch: any) => {
+  return dispatch(fetchCloudHostRules(instanceId));
+};
+const fetchCloudHostRules = (instanceId: string) => ({
+  [CALL_API]: {
+    types: [ CLOUD_HOST_RULES_REQUEST, CLOUD_HOST_RULES_SUCCESS, CLOUD_HOST_RULES_FAILURE ],
+    endpoint: `hosts/cloud/${instanceId}/rules`,
+    schema: Schemas.CLOUD_HOST_RULE_ARRAY,
+    entity: instanceId
+  }
+});
+export const ADD_CLOUD_HOST_RULE = 'ADD_CLOUD_HOST_RULE';
+export function addCloudHostRule(hostname: string, rule: string): EntitiesAction {
+  return {
+    type: ADD_CLOUD_HOST_RULE,
+    entity: hostname,
+    data: { rulesNames: new Array(rule) }
+  }
+}
+export const REMOVE_CLOUD_HOST_RULES = 'REMOVE_CLOUD_HOST_RULES';
+export function removeCloudHostRules(hostname: string, rules: string[]): EntitiesAction {
+  return {
+    type: REMOVE_CLOUD_HOST_RULES,
+    entity: hostname,
+    data: { rulesNames: rules }
+  }
+}
 
 export const EDGE_HOSTS_REQUEST = 'EDGE_HOSTS_REQUEST';
 export const EDGE_HOSTS_SUCCESS = 'EDGE_HOSTS_SUCCESS';
@@ -563,6 +645,37 @@ const fetchEdgeHosts = (hostname?: string) => ({
         entity: 'edgeHosts'
       }
 });
+export const EDGE_HOST_RULES_REQUEST = 'EDGE_HOST_RULES_REQUEST';
+export const EDGE_HOST_RULES_SUCCESS = 'EDGE_HOST_RULES_SUCCESS';
+export const EDGE_HOST_RULES_FAILURE = 'EDGE_HOST_RULES_FAILURE';
+export const loadEdgeHostRules = (hostname: string) => (dispatch: any) => {
+  return dispatch(fetchEdgeHostRules(hostname));
+};
+const fetchEdgeHostRules = (hostname: string) => ({
+  [CALL_API]: {
+    types: [ EDGE_HOST_RULES_REQUEST, EDGE_HOST_RULES_SUCCESS, EDGE_HOST_RULES_FAILURE ],
+    endpoint: `hosts/edge/${hostname}/rules`,
+    schema: Schemas.EDGE_HOST_RULE_ARRAY,
+    entity: hostname
+  }
+});
+export const ADD_EDGE_HOST_RULE = 'ADD_EDGE_HOST_RULE';
+export function addEdgeHostRule(hostname: string, rule: string): EntitiesAction {
+  return {
+    type: ADD_EDGE_HOST_RULE,
+    entity: hostname,
+    data: { rulesNames: new Array(rule) }
+  }
+}
+export const REMOVE_EDGE_HOST_RULES = 'REMOVE_EDGE_HOST_RULES';
+export function removeEdgeHostRules(hostname: string, rules: string[]): EntitiesAction {
+  return {
+    type: REMOVE_EDGE_HOST_RULES,
+    entity: hostname,
+    data: { rulesNames: rules }
+  }
+}
+
 
 export const CONTAINERS_REQUEST = 'CONTAINERS_REQUEST';
 export const CONTAINERS_SUCCESS = 'CONTAINERS_SUCCESS';

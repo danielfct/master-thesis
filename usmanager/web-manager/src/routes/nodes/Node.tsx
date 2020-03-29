@@ -12,7 +12,7 @@ import {loadCloudHosts, loadEdgeHosts, loadNodes} from "../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import {IRegion} from "../region/Region";
-import {IEdgeHost} from "../hosts/EdgeHost";
+import {IEdgeHost} from "../hosts/edge/EdgeHost";
 
 export interface INode extends IData {
   hostname: string;

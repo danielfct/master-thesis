@@ -8,85 +8,70 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IService} from "../Service";
+import BaseComponent from "../../../components/BaseComponent";
 import React from "react";
-import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";
 import {Link} from "react-router-dom";
-import BaseComponent from "../../../components/BaseComponent";
+import List from "../../../components/list/List";
 import {ReduxState} from "../../../reducers";
+import {loadGenericRulesService} from "../../../actions";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import List from "../../../components/list/List";
-import {loadServiceDependees} from "../../../actions";
-
-export interface IDependee extends IService {
-}
+import ListItem from "../../../components/list/ListItem";
 
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  dependeeNames: string[];
+  genericServiceRules: string[];
 }
 
 interface DispatchToProps {
-  loadServiceDependees: (serviceName: string) => void;
+  loadGenericRulesService: () => void;
 }
 
-interface ServiceDependeeListProps {
-  service: IService | Partial<IService>;
-  newDependees: string[];
-}
+type Props = StateToProps & DispatchToProps;
 
-type Props = StateToProps & DispatchToProps & ServiceDependeeListProps;
-
-class ServiceDependeeList extends BaseComponent<Props, {}> {
+class GenericServiceRuleList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    const {serviceName} = this.props.service;
-    if (serviceName) {
-      this.props.loadServiceDependees(serviceName);
-    }
+    this.props.loadGenericRulesService();
   }
 
-  private dependee = (dependee: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index != this.props.dependeeNames.length - 1}>
+  private rule = (rule: string, index: number): JSX.Element =>
+    <ListItem key={index} separate={index != this.props.genericServiceRules.length - 1}>
       <div className={`${styles.linkedItemContent}`}>
-        <span>{dependee}</span>
+        <span>{rule}</span>
       </div>
-      <Link to={`/services/${dependee}`}
+      <Link to={`/rules/services/${rule}`}
             className={`${styles.link} waves-effect`}>
         <i className={`${styles.linkIcon} material-icons right`}>link</i>
       </Link>
     </ListItem>;
 
   render() {
-    const DependeesList = List<string>();
+    const RulesList = List<string>();
     return (
-      <DependeesList isLoading={this.props.isLoading}
-                     error={this.props.error}
-                     emptyMessage={`Dependees list is empty`}
-                     list={this.props.dependeeNames}
-                     show={this.dependee}/>
+      <RulesList isLoading={this.props.isLoading}
+                 error={this.props.error}
+                 emptyMessage={`Generic service rules list is empty`}
+                 list={this.props.genericServiceRules}
+                 show={this.rule}/>
     );
   }
 
 }
 
-function mapStateToProps(state: ReduxState, ownProps: ServiceDependeeListProps): StateToProps {
-  const serviceName = ownProps.service.serviceName;
-  const service = serviceName && state.entities.services.data[serviceName];
-  const serviceDependees = service && service.dependees;
+function mapStateToProps(state: ReduxState): StateToProps {
   return {
-    isLoading: state.entities.services.isLoadingDependees,
-    error: state.entities.services.loadDependeesError,
-    dependeeNames: serviceDependees || [],
+    isLoading: state.entities.rules.services.generic.isLoading,
+    error: state.entities.rules.services.generic.error,
+    genericServiceRules: Object.keys(state.entities.rules.services.generic.data),
   }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
-    loadServiceDependees,
+    loadGenericRulesService,
   }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ServiceDependeeList);
+export default connect(mapStateToProps, mapDispatchToProps)(GenericServiceRuleList);

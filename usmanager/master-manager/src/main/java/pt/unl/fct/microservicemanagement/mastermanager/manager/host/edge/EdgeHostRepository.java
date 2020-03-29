@@ -24,6 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +44,11 @@ public interface EdgeHostRepository extends CrudRepository<EdgeHostEntity, Long>
   List<EdgeHostEntity> findByRegion(@Param("region") String region);
 
   List<EdgeHostEntity> findByCountry(@Param("country") String country);
+
+  @Query("select r "
+      + "from EdgeHostEntity h join h.hostRules r "
+      + "where h.hostname = :hostname")
+  List<HostRuleEntity> getRules(@Param("hostname") String hostname);
 
   @Query("select case when count(h) > 0 then true else false end "
       + "from EdgeHostEntity h "

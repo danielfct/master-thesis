@@ -34,8 +34,8 @@ import {IDependee} from "../routes/services/dependees/ServiceDependeeList";
 import {IPrediction} from "../routes/services/predictions/ServicePredictionList";
 import {IAppService} from "../routes/services/apps/ServiceAppList";
 import {INode} from "../routes/nodes/Node";
-import {ICloudHost} from "../routes/hosts/CloudHost";
-import {IEdgeHost} from "../routes/hosts/EdgeHost";
+import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
+import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
 import {IDecision, IField, IOperator, IRule, IValueMode} from "../routes/rules/Rule";
@@ -74,8 +74,8 @@ interface ISchemas {
     SERVICE_DEPENDEE_ARRAY: schema.Entity<IDependee>[];
     SERVICE_PREDICTION: schema.Entity<IPrediction>;
     SERVICE_PREDICTION_ARRAY: schema.Entity<IPrediction>[];
-    SERVICE_RULE: schema.Entity<IRule>;
-    SERVICE_RULE_ARRAY: schema.Entity<IRule>[];
+    SERVICE_RULE: schema.Entity<IServiceRule>;
+    SERVICE_RULE_ARRAY: schema.Entity<IServiceRule>[];
     APP: schema.Entity<IApp>;
     APP_SERVICE_ARRAY: schema.Entity<IAppService>[];
     APP_ARRAY: schema.Entity<IApp>[];
@@ -98,8 +98,12 @@ interface ISchemas {
     NODE_ARRAY: schema.Entity<INode>[];
     CLOUD_HOST: schema.Entity<ICloudHost>;
     CLOUD_HOST_ARRAY: schema.Entity<ICloudHost>[];
+    CLOUD_HOST_RULE: schema.Entity<IHostRule>;
+    CLOUD_HOST_RULE_ARRAY: schema.Entity<IHostRule>[];
     EDGE_HOST: schema.Entity<IEdgeHost>;
     EDGE_HOST_ARRAY: schema.Entity<IEdgeHost>[];
+    EDGE_HOST_RULE: schema.Entity<IHostRule>;
+    EDGE_HOST_RULE_ARRAY: schema.Entity<IHostRule>[];
     CONTAINER: schema.Entity<IContainer>;
     CONTAINER_ARRAY: schema.Entity<IContainer>[];
     LOGS_ARRAY: schema.Entity<ILogs>[];
@@ -233,8 +237,8 @@ export const Schemas: ISchemas = {
     RULE_HOST_ARRAY: [ruleHostSchema],
     RULE_SERVICE: ruleServiceSchema,
     RULE_SERVICE_ARRAY: [ruleServiceSchema],
-    RULE_CONDITION: conditionSchema, //TODO check if needed
-    RULE_CONDITION_ARRAY: [conditionSchema], //TODO check if needed
+    RULE_CONDITION: conditionSchema,
+    RULE_CONDITION_ARRAY: [conditionSchema],
     CONDITION: conditionSchema,
     CONDITION_ARRAY: [conditionSchema],
     VALUE_MODE_ARRAY: [valueModeSchema],
@@ -246,8 +250,12 @@ export const Schemas: ISchemas = {
     NODE_ARRAY: [nodeSchema],
     CLOUD_HOST: cloudHostSchema,
     CLOUD_HOST_ARRAY: [cloudHostSchema],
+    CLOUD_HOST_RULE: ruleHostSchema,
+    CLOUD_HOST_RULE_ARRAY: [ruleHostSchema],
     EDGE_HOST: edgeHostSchema,
     EDGE_HOST_ARRAY: [edgeHostSchema],
+    EDGE_HOST_RULE: ruleHostSchema,
+    EDGE_HOST_RULE_ARRAY: [ruleHostSchema],
     CONTAINER: containerSchema,
     CONTAINER_ARRAY: [containerSchema],
     LOGS_ARRAY: [logsSchema],
