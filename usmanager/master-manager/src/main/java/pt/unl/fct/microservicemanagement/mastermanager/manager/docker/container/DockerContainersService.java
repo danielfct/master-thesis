@@ -31,7 +31,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProp
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.DockerNodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.load_balancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;

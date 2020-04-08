@@ -129,6 +129,7 @@ class Sidenav extends React.Component<Props, {}> {
                         </li>
                         {link.sub && link.sub.map((sublink, index) =>
                           <div key={index}>
+                              {<li><div className="divider grey darken-4"/></li>}
                               <li>
                                   <Link className="white-text sub-link" to={`${link.link}${sublink.link}`} onClick={this.closeSlideSidenav}>
                                       {sublink.name}

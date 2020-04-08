@@ -72,10 +72,13 @@ const breadcrumbs = (props: Props): IBreadcrumbs => {
                 title = title.substring(0, title.indexOf('#'));
             }
         }
-        title = snakeCaseToCamelCase(title);
-        title = capitalize(title);
+        let formattedTitle = snakeCaseToCamelCase(title);
+        if (formattedTitle !== title) {
+            formattedTitle = camelCaseToSentenceCase(formattedTitle);
+        }
+        formattedTitle = capitalize(formattedTitle);
         return {
-            title,
+            title: formattedTitle,
             link,
         }
     });

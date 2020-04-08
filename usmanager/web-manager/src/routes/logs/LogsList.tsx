@@ -112,8 +112,8 @@ class LogsList extends React.Component<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.logs.isLoading,
-    error: state.entities.logs.error,
+    isLoading: state.entities.logs.isLoadingLogs,
+    error: state.entities.logs.loadLogsError,
     logs: state.entities.logs && Object.values(state.entities.logs.data) || [],
   }
 );

@@ -7,14 +7,15 @@ import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {
-  addRuleServiceCondition, loadConditions,
+  addRuleServiceCondition,
+  loadConditions,
   loadRuleServiceConditions,
   removeRuleServiceConditions
 } from "../../../actions";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
-import {ICondition} from "../conditions/Condition";
 import {Link} from "react-router-dom";
+import {ICondition} from "../conditions/Condition";
 
 interface StateToProps {
   redirect: boolean;
@@ -120,7 +121,7 @@ class ServiceRuleConditionList extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceRuleConditionListProps): StateToProps {
   const ruleName = ownProps.rule && ownProps.rule.name;
-  const rule = ruleName && state.entities.rules.services.data[ruleName];
+  const rule = ruleName && (state.entities.rules.services.data[ruleName] || state.entities.rules.services.generic.data[ruleName]);
   const ruleConditions = rule && rule.conditions;
   return {
     redirect: !ownProps.rule,

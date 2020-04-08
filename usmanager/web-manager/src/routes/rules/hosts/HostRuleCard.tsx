@@ -21,13 +21,14 @@ type Props = HostRuleCardProps;
 
 const HostRuleCard = ({rule}: Props) => (
   <Card<IHostRule> title={rule.name}
-                  link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
-                  height={'120px'}
-                  margin={'10px 0'}
-                  hoverable>
-    <CardItem key={'host'}
-              label={'Host'}
-              value={`${rule.hostname == null ? 'Applied to all hosts' : rule.hostname}`}/>
+                   link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
+                   height={'120px'}
+                   margin={'10px 0'}
+                   hoverable>
+    {rule.hostname != null &&
+     <CardItem key={'host'}
+               label={'Host'}
+               value={`${rule.hostname}`}/>}
     <CardItem key={'priority'}
               label={'Priority'}
               value={`${rule.priority}`}/>

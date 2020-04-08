@@ -528,7 +528,7 @@ const fetchDecisions = (name?: string) => ({
         types: [ DECISIONS_REQUEST, DECISIONS_SUCCESS, DECISIONS_FAILURE ],
         endpoint: `decisions`,
         schema: Schemas.DECISION_ARRAY,
-        entity: 'serviceRules'
+        entity: 'decisions'
       }
       : {
         types: [ DECISION_REQUEST, DECISION_SUCCESS, DECISION_FAILURE ],

@@ -151,8 +151,8 @@ class Region extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.regions.isLoading;
-  const error = state.entities.regions.error;
+  const isLoading = state.entities.regions.isLoadingRegions;
+  const error = state.entities.regions.loadRegionsError;
   const name = props.match.params.name;
   const region = isNewRegion(name) ? emptyRegion() : state.entities.regions.data[name];
   let formRegion;

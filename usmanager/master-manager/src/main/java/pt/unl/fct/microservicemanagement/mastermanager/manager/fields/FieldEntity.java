@@ -24,8 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.fields;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionValueEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.condition.ConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.ServiceDecisionValueEntity;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -34,7 +34,7 @@ export type RestOperation = {
 
 export const API_URL = 'http://localhost:8080';
 /*const API_URL = '/';*/
-const TIMEOUT = 5000;
+const TIMEOUT = 30000;
 
 
 //TODO delete

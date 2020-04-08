@@ -54,8 +54,8 @@ class CloudHostsList extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.hosts.cloud.isLoading,
-    error: state.entities.hosts.cloud.error,
+    isLoading: state.entities.hosts.cloud.isLoadingHosts,
+    error: state.entities.hosts.cloud.loadHostsError,
     cloudHosts: (state.entities.hosts.cloud.data && Object.values(state.entities.hosts.cloud.data)) || [],
   }
 );

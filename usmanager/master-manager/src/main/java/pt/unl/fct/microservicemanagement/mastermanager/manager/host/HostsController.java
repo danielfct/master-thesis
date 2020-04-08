@@ -31,7 +31,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.Aw
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;

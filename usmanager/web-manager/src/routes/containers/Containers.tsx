@@ -56,8 +56,8 @@ class Containers extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.containers.isLoading,
-    error: state.entities.containers.error,
+    isLoading: state.entities.containers.isLoadingContainers,
+    error: state.entities.containers.loadContainersError,
     containers: (state.entities.containers.data && Object.values(state.entities.containers.data)) || [],
   }
 );

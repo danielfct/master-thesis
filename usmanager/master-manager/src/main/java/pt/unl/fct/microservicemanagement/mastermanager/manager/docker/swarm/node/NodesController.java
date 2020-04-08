@@ -24,15 +24,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node;
 
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.util.GenericResponse;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,29 +50,39 @@ public class NodesController {
   }
 
   @GetMapping
-  public List<SimpleNode> getAvailableNodes() {
-    return dockerNodesService.getAvailableNodes();
+  public List<SimpleNode> getNodes() {
+    return dockerNodesService.getNodes();
+  }
+
+  @GetMapping("/{id}")
+  public SimpleNode getNode(@PathVariable("id") String id) {
+    return dockerNodesService.getNode(id);
   }
 
   @PostMapping
-  public List<String> addNode(@RequestBody AddNodeReq addNodeReq) {
-    var response = new ArrayList<String>();
-    int quantity = addNodeReq.getQuantity();
-    String region = addNodeReq.getRegion();
-    String country = addNodeReq.getCountry();
-    String city = addNodeReq.getCity();
-    for (var i = 0; i < quantity; i++) {
-      String hostname = hostsService.addHost(city, country, region);
-      response.add(hostname);
+  public void addNodes(@Json("quantity") Integer quantity, @Json("hostname") String hostname,
+                       @Json("region") String region, @Json("country") String country, @Json("city") String city) {
+    //TODO: return ids?
+    System.out.println(quantity);
+    System.out.println(hostname);
+    System.out.println(region);
+    System.out.println(country);
+    System.out.println(city);
+    if (hostname != null) {
+      for (var i = 0; i < quantity; i++) {
+        hostsService.addHost(hostname);
+      }
+    } else {
+      for (var i = 0; i < quantity; i++) {
+        hostsService.addHost(city, country, region);
+      }
     }
-    return response;
   }
 
-  @DeleteMapping
-  public List<GenericResponse> removeNode(@RequestBody StopNodeReq stopNodeReq) {
-    hostsService.removeHost(stopNodeReq.getHostname());
-    //TODO change return value
-    return List.of(new GenericResponse("success", String.valueOf(true)));
+  @DeleteMapping("/{id}")
+  public void removeNode(@PathVariable("id") String id) {
+    var node = dockerNodesService.getNode(id);
+    hostsService.removeHost(node.getHostname());
   }
 
 }

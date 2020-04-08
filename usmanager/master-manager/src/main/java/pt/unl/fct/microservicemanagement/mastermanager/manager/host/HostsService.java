@@ -232,9 +232,13 @@ public class HostsService {
     return continent;
   }
 
+  public void addHost(String hostname) {
+    setupHost(hostname);
+  }
+
   public String addHost(String region, String country, String city) {
     String hostname = chooseEdgeHost(region, country, city).orElse(chooseCloudHost());
-    setupHost(hostname);
+    addHost(hostname);
     return hostname;
   }
 

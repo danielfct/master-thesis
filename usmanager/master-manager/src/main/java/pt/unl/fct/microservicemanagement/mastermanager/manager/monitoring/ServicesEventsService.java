@@ -25,9 +25,9 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.DecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.DecisionsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.event.ServiceEventEntity;
 
 import java.util.List;
 import java.util.Objects;

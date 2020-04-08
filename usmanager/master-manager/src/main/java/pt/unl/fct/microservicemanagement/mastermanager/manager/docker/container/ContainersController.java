@@ -24,8 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.load_balancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
 

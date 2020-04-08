@@ -63,8 +63,8 @@ class GenericServiceRuleList extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState): StateToProps {
   return {
-    isLoading: state.entities.rules.services.generic.isLoading,
-    error: state.entities.rules.services.generic.error,
+    isLoading: state.entities.rules.services.generic.isLoadingGenericRules,
+    error: state.entities.rules.services.generic.loadGenericRulesError,
     genericServiceRules: Object.keys(state.entities.rules.services.generic.data),
   }
 }

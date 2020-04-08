@@ -8,7 +8,7 @@ import Field, {getTypeFromValue} from "../../components/form/Field";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {loadCloudHosts, loadEdgeHosts, loadNodes} from "../../actions";
+import {loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions} from "../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import {IRegion} from "../region/Region";
@@ -20,11 +20,15 @@ export interface INode extends IData {
   role: string;
 }
 
-const emptyNode = () => ({
+const emptyNodeHost = () => ({
+  hostname: '',
+  quantity: 1
+});
+
+const emptyNodeLocation = () => ({
   region: '',
   country: '',
   city: '',
-  hostname: '',
   quantity: 1
 });
 
@@ -34,14 +38,18 @@ const isNewNode = (name: string) =>
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  node: Partial<INode>;
+  node?: INode;
+  nodeHost: any;
+  nodeLocation: any;
   hosts: IEdgeHost[];
+  regions: IRegion[];
 }
 
 interface DispatchToProps {
   loadNodes: (name: string) => any;
   loadEdgeHosts: () => any;
   loadCloudHosts: () => any;
+  loadRegions: () => any;
 }
 
 interface MatchParams {
@@ -57,21 +65,23 @@ class Node extends BaseComponent<Props, {}> {
     if (nodeId && !isNewNode(nodeId)) {
       this.props.loadNodes(nodeId);
     }
+    this.props.loadEdgeHosts();
+    this.props.loadCloudHosts();
+    this.props.loadRegions();
   };
 
   private onPostSuccess = (reply: any, nodeId: string): void => {
-    super.toast(`Node <b>${nodeId}</b> has now started`);
+    super.toast(`Setup at <b>${nodeId}</b> is done`);
   };
 
-  private onPostFailure = (reason: string, nodeId: string): void =>
-    super.toast(`Unable to save ${nodeId}`, 10000, reason, true);
-
-  private onPutSuccess = (nodeId: string): void => {
-    super.toast(`Changes to node <b>${nodeId}</b> are now saved`);
+  private onPostFailure = (reason: string, nodeId: string | IRegion): void => {
+    if (typeof nodeId === "string") {
+      super.toast(`Unable to start node on ${nodeId}`, 10000, reason, true);
+    }
+    else {
+      super.toast(`Unable to start node at ${nodeId.name}`, 10000, reason, true);
+    }
   };
-
-  private onPutFailure = (reason: string, nodeId: string): void =>
-    super.toast(`Unable to update ${nodeId}`, 10000, reason, true);
 
   private onDeleteSuccess = (nodeId: string): void => {
     super.toast(`Node <b>${nodeId}</b> successfully stopped`);
@@ -81,8 +91,8 @@ class Node extends BaseComponent<Props, {}> {
   private onDeleteFailure = (reason: string, nodeId: string): void =>
     super.toast(`Unable to stop ${nodeId}`, 10000, reason, true);
 
-  private getFields = (): IFields =>
-    Object.entries(emptyNode()).map(([key, value]) => {
+  private getFields = (node: INode): IFields =>
+    Object.entries(node).map(([key, value]) => {
       return {
         [key]: {
           id: key,
@@ -99,51 +109,74 @@ class Node extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
+  private formFields = (): JSX.Element => {
+    const {node} = this.props;
+    return (
+      <>
+        {node && Object.entries(node).map(([key, value], index) =>
+          <Field key={index}
+                 id={key}
+                 label={key}/>)}
+      </>
+    );
+  };
+
   private getSelectableRoles = () =>
     ['MANAGER', 'WORKER'];
 
-  private hostDropdownOption = (host: IEdgeHost) =>
-    host.hostname;
+  private hostnameDropdownOption = (hostname: string) =>
+    hostname;
 
-  private formFields = (node: Partial<INode>, isNew: boolean): JSX.Element => {
-    return (
-      isNew ?
-        <>
-          <Field<IEdgeHost> key={'hostname'}
-                            id={'hostname'}
-                            label={'hostname'}
-                            type="dropdown"
-                            dropdown={{
-                              defaultValue: "Select hostname",
-                              values: this.props.hosts,
-                              optionToString: this.hostDropdownOption
-                            }}/>
-          {/*<Field key={'role'}
+  private formFieldsHost = (): JSX.Element =>
+    <>
+      <Field<string> key={'hostname'}
+                     id={'hostname'}
+                     label={'hostname'}
+                     type="dropdown"
+                     dropdown={{
+                       defaultValue: "Select host",
+                       values: this.props.hosts.map(host => host.hostname),
+                       optionToString: this.hostnameDropdownOption
+                     }}/>
+      {/*<Field key={'role'}
                id={'role'}
                label={'role'}
                type="dropdown"
                dropdown={{defaultValue: "Select role", values: this.getSelectableRoles()}}/>*/}
-          <Field key={'quantity'}
-                 id={'quantity'}
-                 label={'quantity'}
-                 type={"numberbox"}/>
-        </>
-        :
-        <>
-          {Object.entries(node).map(([key, value], index) =>
-            <Field key={index}
-                   id={key}
-                   label={key}/>)}
-        </>
-    )
-  };
+      <Field key={'quantity'}
+             id={'quantity'}
+             label={'quantity'}
+             type={"numberbox"}/>
+    </>;
 
-  //TODO put={{url: `conditions/${this.state.nodeNad || condition[conditionKey]}` on very class
+  private regionDropdownOption = (region: IRegion) =>
+    region.name;
 
-  private details = () => {
-    const {isLoading, error, node} = this.props;
+  private formFieldsLocation = (): JSX.Element =>
+    <>
+      <Field<IRegion> key={'region'}
+                      id={'region'}
+                      label={'region'}
+                      type="dropdown"
+                      dropdown={{
+                        defaultValue: "Select region",
+                        values: this.props.regions,
+                        optionToString: this.regionDropdownOption
+                      }}/>
+      <Field key={'country'}
+             id={'country'}
+             label={'country'}/>
+      <Field key={'city'}
+             id={'city'}
+             label={'city'}/>
+    </>;
+
+  //TODO put={{url: `conditions/${this.state.nodeName || condition[conditionKey]}` on every class
+
+  private details = (node: any, formFields: JSX.Element) => {
+    const {isLoading, error} = this.props;
     // @ts-ignore
-    const nodeKey: (keyof INode) = node && Object.keys(node)[0];
+    const nodeKey: (keyof INode) = Object.keys(node)[0];
     const isNew = isNewNode(this.props.match.params.id);
     return (
       <>
@@ -151,28 +184,41 @@ class Node extends BaseComponent<Props, {}> {
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && node && (
           <Form id={nodeKey}
-                fields={this.getFields()}
+                fields={this.getFields(node)}
                 values={node}
                 isNew={isNew}
                 post={{url: 'nodes', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={{url: `nodes/${node[nodeKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={{url: `nodes/${node[nodeKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
                 editable={false}
                 deletable={node.role !== 'MANAGER'}>
-            {this.formFields(node, isNew)}
+            {formFields}
           </Form>
         )}
       </>
     )
   };
 
-  private tabs: Tab[] = [
-    {
-      title: 'Node',
-      id: 'node',
-      content: () => this.details()
-    },
-  ];
+  private tabs: Tab[] =
+    isNewNode(this.props.match.params.id)
+      ? [
+        {
+          title: 'Host',
+          id: 'nodeOnHost',
+          content: () => this.details(this.props.nodeHost, this.formFieldsHost())
+        },
+        {
+          title: 'Location',
+          id: 'nodeUsingLocation',
+          content: () => this.details(this.props.nodeLocation, this.formFieldsLocation())
+        }
+      ]
+      : [
+        {
+          title: 'Node',
+          id: 'node',
+          content: () => this.details(this.props.node, this.formFields())
+        },
+      ];
 
   render() {
     return (
@@ -187,16 +233,23 @@ class Node extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.nodes?.isLoading;
-  const error = state.entities.nodes?.error;
+  const isLoading = state.entities.nodes.isLoadingNodes;
+  const error = state.entities.nodes.loadNodesError;
   const id = props.match.params.id;
-  const node = isNewNode(id) ? emptyNode() : state.entities.nodes.data[id];
+  const node = isNewNode(id) ? undefined : state.entities.nodes.data[id];
+  const nodeHost = emptyNodeHost();
+  const nodeLocation = emptyNodeLocation();
+  //TODO cloud too
   const hosts = state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data);
+  const regions = state.entities.regions.data && Object.values(state.entities.regions.data);
   return  {
     isLoading,
     error,
     node,
-    hosts
+    nodeHost,
+    nodeLocation,
+    hosts,
+    regions
   }
 }
 
@@ -204,6 +257,7 @@ const mapDispatchToProps: DispatchToProps = {
   loadNodes,
   loadEdgeHosts,
   loadCloudHosts,
+  loadRegions,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Node);

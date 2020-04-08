@@ -1,10 +1,9 @@
 import BaseComponent from "../../components/BaseComponent";
 import ListItem from "../../components/list/ListItem";
 import styles from "../../components/list/ListItem.module.css";
-import {Link} from "react-router-dom";
 import List from "../../components/list/List";
 import React from "react";
-import {IContainer, IContainerPort} from "./Container";
+import {IContainerPort} from "./Container";
 
 interface PortsListProps {
   ports: IContainerPort[];

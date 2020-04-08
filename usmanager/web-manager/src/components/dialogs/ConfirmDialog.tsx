@@ -21,7 +21,7 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
     return (
       <div id="confirm-dialog" className='modal dialog' ref={this.modal}>
         <div className="modal-content">
-          <div className="modal-message">Are you sure you want to <div className={`dialog-message`}>{this.props.message}?</div></div>
+          <div className="modal-message">Are you sure you want to <div className="dialog-message">{this.props.message}?</div></div>
         </div>
         <div className={`modal-footer dialog-footer`}>
           <button className="modal-close waves-effect waves-red btn-flat white-text"

@@ -35,12 +35,12 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostFieldAvg
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionResult;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.DecisionsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.HostDecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.HostDecisionResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.RuleDecision;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.event.HostEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 

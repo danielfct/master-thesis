@@ -102,7 +102,6 @@
 					  LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_SWITCH, LITERAL_SYNCHRONIZED,
 					  LITERAL_TRY, LITERAL_WHILE, STATIC_INIT"/>
 		</module>
-		<module name="EmptyCatchBlock"/>
 		<module name="LeftCurly">
 			<property name="tokens"
 					  value="ANNOTATION_DEF, CLASS_DEF, CTOR_DEF, ENUM_CONSTANT_DEF, ENUM_DEF,

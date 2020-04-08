@@ -63,8 +63,8 @@ class GenericHostRuleList extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState): StateToProps {
   return {
-    isLoading: state.entities.rules.hosts.generic.isLoading,
-    error: state.entities.rules.hosts.generic.error,
+    isLoading: state.entities.rules.hosts.generic.isLoadingGenericRules,
+    error: state.entities.rules.hosts.generic.loadGenericRulesError,
     genericHostRules: Object.keys(state.entities.rules.hosts.generic.data),
   }
 }

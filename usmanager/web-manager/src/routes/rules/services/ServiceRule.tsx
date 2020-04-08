@@ -22,6 +22,7 @@ import {ReduxState} from "../../../reducers";
 import {
   addRuleServiceCondition,
   loadDecisions,
+  loadGenericRulesService,
   loadRulesService, loadServices
 } from "../../../actions";
 import {connect} from "react-redux";
@@ -31,14 +32,14 @@ import ServiceRuleConditionList from "./ServiceRuleConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 
 export interface IServiceRule extends IRule {
-  service: IService,
+  serviceName: string,
 }
 
 const emptyServiceRule = () => ({
   name: '',
   priority: 0,
   decision: undefined,
-  service: undefined,
+  serviceName: undefined,
 });
 
 const isNewRule = (name: string) =>
@@ -55,6 +56,7 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadRulesService: (name: string) => any;
+  loadGenericRulesService: (name: string) => any;
   loadDecisions: () => any;
   loadServices: () => any;
   addRuleServiceCondition: (ruleName: string, condition: string) => void;
@@ -83,6 +85,7 @@ class ServiceRule extends BaseComponent<Props, State> {
     const ruleName = this.props.match.params.name;
     if (ruleName && !isNewRule(ruleName)) {
       this.props.loadRulesService(ruleName);
+      this.props.loadGenericRulesService(ruleName);
     }
   };
 
@@ -154,7 +157,7 @@ class ServiceRule extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: key == 'service'
+          validation: key == 'serviceName'
             ? undefined
             : (key == 'priority'
               ? { rule: requiredAndNumberAndMin, args: 0 }
@@ -174,8 +177,8 @@ class ServiceRule extends BaseComponent<Props, State> {
   private decisionDropdownOption = (decision: IDecision): string =>
     decision.name;
 
-  private serviceDropdownOption = (service: IService): string =>
-    service.serviceName;
+  private serviceDropdownOption = (serviceName: string): string =>
+    serviceName;
 
   private details = () => {
     const {isLoading, error, formServiceRule, serviceRule} = this.props;
@@ -205,15 +208,15 @@ class ServiceRule extends BaseComponent<Props, State> {
                                       defaultValue: "Choose decision",
                                       values: this.props.decisions,
                                       optionToString: this.decisionDropdownOption}}/>
-                : key === 'service'
-                ? <Field key={index}
-                         id={key}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{
-                           defaultValue: "Choose service",
-                           values: this.props.services,
-                           optionToString: this.serviceDropdownOption}}/>
+                : key === 'serviceName'
+                ? <Field<string> key={index}
+                                 id={key}
+                                 label={key}
+                                 type="dropdown"
+                                 dropdown={{
+                                   defaultValue: "Choose service",
+                                   values: this.props.services.map(service => service.serviceName),
+                                   optionToString: this.serviceDropdownOption}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -257,17 +260,23 @@ class ServiceRule extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.rules.services.isLoading;
-  const error = state.entities.rules.services.error;
+  const isLoading = state.entities.rules.services.isLoadingRules || state.entities.rules.services.generic.isLoadingGenericRules;
+  const error = state.entities.rules.services.loadRulesError && state.entities.rules.services.generic.loadGenericRulesError;
   const name = props.match.params.name;
-  const serviceRule = isNewRule(name) ? emptyServiceRule() : state.entities.rules.services.data[name];
+  const isNew = isNewRule(name);
+  console.log(isNew)
+  const serviceRule = isNew
+    ? emptyServiceRule()
+    : state.entities.rules.services.data[name] || state.entities.rules.services.generic.data[name];
   let formServiceRule;
-  formServiceRule = { ...serviceRule };
-  if (!isNewRule(name)) {
-    delete formServiceRule["id"];
-    delete formServiceRule["conditions"];
-    if (formServiceRule["service"] == null) {
-      delete formServiceRule["service"];
+  if (isNew || !isNew && serviceRule) {
+    formServiceRule = { ...serviceRule };
+    if (!isNew) {
+      delete formServiceRule["id"];
+      delete formServiceRule["conditions"];
+      if (formServiceRule["serviceName"] == null) {
+        delete formServiceRule["serviceName"];
+      }
     }
   }
   const decisions = state.entities.decisions.data
@@ -286,6 +295,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesService,
+  loadGenericRulesService,
   loadDecisions,
   loadServices,
   addRuleServiceCondition

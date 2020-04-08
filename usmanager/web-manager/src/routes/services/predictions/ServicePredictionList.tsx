@@ -69,6 +69,8 @@ type Props = StateToProps & DispatchToProps & ServicePredictionListProps;
 
 class ServicePredictionList extends BaseComponent<Props, {}> {
 
+  //TODO show prediction details on click
+
   componentDidMount(): void {
     const {serviceName} = this.props.service;
     if (serviceName) {

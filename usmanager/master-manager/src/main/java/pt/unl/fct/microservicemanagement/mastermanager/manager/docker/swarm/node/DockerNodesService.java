@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
 
 import java.util.List;
@@ -32,7 +32,6 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Node;
@@ -45,11 +44,8 @@ public final class DockerNodesService {
 
   private final DockerSwarmService dockerSwarmService;
 
-  private final String dockerSwarmManagerHostname;
-
-  public DockerNodesService(DockerSwarmService dockerSwarmService, DockerProperties dockerProperties) {
+  public DockerNodesService(DockerSwarmService dockerSwarmService) {
     this.dockerSwarmService = dockerSwarmService;
-    this.dockerSwarmManagerHostname = dockerProperties.getSwarm().getManager();
   }
 
   public List<SimpleNode> getNodes() {
@@ -69,6 +65,12 @@ public final class DockerNodesService {
       e.printStackTrace();
       throw new GetNodesException(e.getMessage());
     }
+  }
+
+  public SimpleNode getNode(String id) {
+    return getNodes(node -> Objects.equals(node.id(), id)).stream()
+        .findFirst()
+        .orElseThrow(() -> new EntityNotFoundException(SimpleNode.class, "id", id));
   }
 
   public List<SimpleNode> getAvailableNodes() {

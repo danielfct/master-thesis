@@ -1,5 +1,4 @@
 import BaseComponent from "../../components/BaseComponent";
-import {IContainer, IContainerLabel, IContainerPort} from "./Container";
 import ListItem from "../../components/list/ListItem";
 import styles from "../../components/list/ListItem.module.css";
 import List from "../../components/list/List";

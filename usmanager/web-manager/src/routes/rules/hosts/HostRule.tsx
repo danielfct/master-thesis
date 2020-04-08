@@ -24,7 +24,7 @@ import {
   addRuleHostCondition,
   loadCloudHosts,
   loadDecisions,
-  loadEdgeHosts,
+  loadEdgeHosts, loadGenericRulesHost,
   loadRulesHost,
 } from "../../../actions";
 import {postData} from "../../../utils/api";
@@ -50,13 +50,14 @@ interface StateToProps {
   isLoading: boolean;
   error?: string | null;
   hostRule: Partial<IHostRule>;
-  formHostRule: Partial<IHostRule>,
+  formHostRule?: Partial<IHostRule>,
   decisions: IDecision[],
   hosts: IEdgeHost[],
 }
 
 interface DispatchToProps {
   loadRulesHost: (name: string) => any;
+  loadGenericRulesHost: (name: string) => any;
   loadDecisions: () => any;
   loadEdgeHosts: () => any;
   loadCloudHosts: () => any;
@@ -87,6 +88,7 @@ class HostRule extends BaseComponent<Props, State> {
     const ruleName = this.props.match.params.name;
     if (ruleName && !isNewRule(ruleName)) {
       this.props.loadRulesHost(ruleName);
+      this.props.loadGenericRulesHost(ruleName);
     }
   };
 
@@ -178,8 +180,8 @@ class HostRule extends BaseComponent<Props, State> {
   private decisionDropdownOption = (decision: IDecision) =>
     decision.name;
 
-  private hostDropdownOption = (host: IEdgeHost) =>
-    host.hostname;
+  private hostDropdownOption = (hostname: string) =>
+    hostname;
 
   private details = () => {
     const {isLoading, error, formHostRule, hostRule} = this.props;
@@ -210,13 +212,13 @@ class HostRule extends BaseComponent<Props, State> {
                                       values: this.props.decisions,
                                       optionToString: this.decisionDropdownOption}}/>
                 : key === 'hostname'
-                ? <Field<IEdgeHost> key={index}
+                ? <Field<string> key={index}
                                     id={key}
                                     label={key}
                                     type="dropdown"
                                     dropdown={{
                                       defaultValue: "Choose host",
-                                      values: this.props.hosts,
+                                      values: this.props.hosts.map(host => host.hostname),
                                       optionToString: this.hostDropdownOption}}/>
                 : <Field key={index}
                          id={key}
@@ -261,17 +263,22 @@ class HostRule extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.rules.hosts.isLoading;
-  const error = state.entities.rules.hosts.error;
+  const isLoading = state.entities.rules.hosts.isLoadingRules || state.entities.rules.hosts.generic.isLoadingGenericRules;
+  const error = state.entities.rules.hosts.loadRulesError && state.entities.rules.hosts.generic.loadGenericRulesError;
   const name = props.match.params.name;
-  const hostRule = isNewRule(name) ? emptyHostRule() : state.entities.rules.hosts.data[name];
+  const isNew = isNewRule(name);
+  const hostRule = isNew
+    ? emptyHostRule()
+    : state.entities.rules.hosts.data[name] || state.entities.rules.hosts.generic.data[name];
   let formHostRule;
-  formHostRule = { ...hostRule };
-  if (!isNewRule(name)) {
-    delete formHostRule["id"];
-    delete formHostRule["conditions"];
-    if (formHostRule["hostname"] == null) {
-      delete formHostRule["hostname"];
+  if (isNew || !isNew && hostRule) {
+    formHostRule = { ...hostRule };
+    if (!isNew) {
+      delete formHostRule["id"];
+      delete formHostRule["conditions"];
+      if (formHostRule["hostname"] == null) {
+        delete formHostRule["hostname"];
+      }
     }
   }
   const decisions = state.entities.decisions.data
@@ -291,6 +298,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
+  loadGenericRulesHost,
   loadDecisions,
   loadEdgeHosts,
   loadCloudHosts,

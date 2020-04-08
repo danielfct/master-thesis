@@ -7,7 +7,6 @@ import ControlledList from "../../components/list/ControlledList";
 import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {
-  addAppService,
   loadAppServices, loadServices, removeAppServices,
 } from "../../actions";
 import {connect} from "react-redux";

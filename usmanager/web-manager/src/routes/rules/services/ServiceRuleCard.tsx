@@ -21,13 +21,14 @@ type Props = ServiceRuleCardProps;
 
 const ServiceRuleCard = ({rule}: Props) => (
   <Card<IServiceRule> title={rule.name}
-                   link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
-                   height={'125px'}
-                   margin={'10px 0'}
-                   hoverable>
-    <CardItem key={'host'}
-              label={'Service'}
-              value={`${rule.service.serviceName}`}/>
+                      link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
+                      height={'125px'}
+                      margin={'10px 0'}
+                      hoverable>
+    {rule.serviceName != null &&
+     <CardItem key={'service'}
+               label={'Service'}
+               value={`${rule.serviceName}`}/>}
     <CardItem key={'priority'}
               label={'Priority'}
               value={`${rule.priority}`}/>

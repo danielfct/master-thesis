@@ -32,7 +32,7 @@ export default class Rules extends BaseComponent<{}, {}> {
         empty: 'No more rules to add',
         data: [
           {text: 'Host', pathname: '/rules/hosts/new_host_rule'},
-          {text: 'Service', pathname: '/rules/services/new_edge_rule'},
+          {text: 'Service', pathname: '/rules/services/new_service_rule'},
         ],
       }}/>
       <div className={`${styles.collapsibleContainer}`}>

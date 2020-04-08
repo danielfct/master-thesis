@@ -191,8 +191,8 @@ class Condition extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.rules.conditions.isLoading;
-  const error = state.entities.rules.conditions.error;
+  const isLoading = state.entities.rules.conditions.isLoadingConditions;
+  const error = state.entities.rules.conditions.loadConditionsError;
   const name = props.match.params.name;
   const condition = isNewCondition(name) ? emptyCondition() : state.entities.rules.conditions.data[name];
   let formCondition;

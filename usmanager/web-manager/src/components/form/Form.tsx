@@ -57,6 +57,7 @@ interface FormPageProps {
   saveEntities?: (args: any) => void;
   editable?: boolean;
   deletable?: boolean;
+  customButtons?: JSX.Element;
 }
 
 type Props = FormPageProps & RouteComponentProps;
@@ -163,6 +164,7 @@ class Form extends React.Component<Props, State> {
                     </button>
                   )}
                   <div className={`${styles.controlButton}`}>
+                    {this.props.customButtons}
                     {(deletable == undefined || deletable) && (
                       <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
                               type="button"

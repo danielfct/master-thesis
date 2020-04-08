@@ -150,7 +150,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     !!this.state.newRules.length;
 
   private getFields = (edgeHost: Partial<IEdgeHost>): IFields =>
-    Object.entries(edgeHost).map(([key, value]) => {
+    Object.entries(edgeHost).map(([key, _]) => {
       return {
         [key]: {
           id: key,
@@ -170,7 +170,6 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private details = () => {
     const {isLoading, error, formEdgeHost, edgeHost} = this.props;
-    console.log(formEdgeHost)
     // @ts-ignore
     const edgeHostKey: (keyof IEdgeHost) = formEdgeHost && Object.keys(formEdgeHost)[0];
     return (
@@ -247,8 +246,8 @@ class EdgeHost extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.hosts.edge.isLoading;
-  const error = state.entities.hosts.edge.error;
+  const isLoading = state.entities.hosts.edge.isLoadingHosts;
+  const error = state.entities.hosts.edge.loadHostsError;
   const hostname = props.match.params.hostname;
   const edgeHost = isNewHost(hostname) ? emptyEdgeHost() : state.entities.hosts.edge.data[hostname];
   let formEdgeHost;

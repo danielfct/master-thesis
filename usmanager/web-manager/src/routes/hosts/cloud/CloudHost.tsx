@@ -80,7 +80,7 @@ class CloudHost extends BaseComponent<Props, {}> {
     super.toast(`Unable to stop cloud host ${cloudHostInstanceId}`, 10000, reason, true);
 
   private getFields = (): IFields =>
-    Object.entries(emptyCloudHost()).map(([key, value]) => {
+    Object.entries(emptyCloudHost()).map(([key, _]) => {
       return {
         [key]: {
           id: key,
@@ -152,8 +152,8 @@ class CloudHost extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.hosts.cloud.isLoading;
-  const error = state.entities.hosts.cloud.error;
+  const isLoading = state.entities.hosts.cloud.isLoadingHosts;
+  const error = state.entities.hosts.cloud.loadHostsError;
   const instanceId = props.match.params.instanceId;
   const cloudHost = isNewHost(instanceId) ? emptyCloudHost() : state.entities.hosts.cloud.data[instanceId];
   return  {

@@ -218,6 +218,18 @@ class Container extends BaseComponent<Props, State> {
     )
   };
 
+  private replicateMigrateButtons = (): JSX.Element =>
+    <>
+      <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
+              type="submit">
+        Replicate
+      </button>
+      <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
+              type="submit">
+        Migrate
+      </button>
+    </>;
+
   private details = () => {
     const {isLoading, error, container, formContainer} = this.props;
     // @ts-ignore
@@ -242,7 +254,8 @@ class Container extends BaseComponent<Props, State> {
                 post={{url: 'containers', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
                 put={container && {url: `containers/${container[containerKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={container && {url: `containers/${container[containerKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
-                editable={false}>
+                editable={false}
+                customButtons={this.replicateMigrateButtons()}>
             {this.formFields(formContainer, isNew)}
           </Form>
         )}
@@ -307,8 +320,8 @@ class Container extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.containers.isLoading;
-  const error = state.entities.containers.error;
+  const isLoading = state.entities.containers.isLoadingContainers;
+  const error = state.entities.containers.loadContainersError;
   const id = props.match.params.id;
   const container = state.entities.containers.data[id];
   let formContainer;

@@ -56,8 +56,8 @@ class Regions extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.regions.isLoading,
-    error: state.entities.regions.error,
+    isLoading: state.entities.regions.isLoadingRegions,
+    error: state.entities.regions.loadRegionsError,
     regions: (state.entities.regions.data && Object.values(state.entities.regions.data)) || [],
   }
 );

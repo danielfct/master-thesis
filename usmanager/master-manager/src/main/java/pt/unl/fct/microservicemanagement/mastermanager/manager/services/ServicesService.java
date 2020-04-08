@@ -30,8 +30,8 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEn
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.services.ServiceRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.services.ServiceRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 

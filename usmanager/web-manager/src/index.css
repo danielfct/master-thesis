@@ -510,6 +510,7 @@ label > span:hover {
 .dialog-message {
     display: inline;
     color: #F44336;
+    word-wrap: break-word;
 }
 
 .dialog-footer {

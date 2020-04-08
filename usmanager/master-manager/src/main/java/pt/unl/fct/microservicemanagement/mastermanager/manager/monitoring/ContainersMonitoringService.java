@@ -33,12 +33,12 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.SimulatedMetricsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.ServiceDecisionResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.DecisionsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.RuleDecision;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.ServiceDecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.event.ServiceEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.services.ServiceRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
 import java.sql.Timestamp;

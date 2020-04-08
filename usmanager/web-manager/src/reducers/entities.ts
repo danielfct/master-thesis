@@ -154,7 +154,9 @@ import {
   GENERIC_RULE_SERVICE_REQUEST,
   GENERIC_RULES_SERVICE_REQUEST,
   GENERIC_RULE_SERVICE_FAILURE,
-  GENERIC_RULES_SERVICE_FAILURE, GENERIC_RULES_SERVICE_SUCCESS, GENERIC_RULE_SERVICE_SUCCESS
+  GENERIC_RULES_SERVICE_FAILURE,
+  GENERIC_RULES_SERVICE_SUCCESS,
+  GENERIC_RULE_SERVICE_SUCCESS
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
@@ -179,112 +181,111 @@ export type EntitiesState = {
   services: {
     data: { [key: string]: IService },
     isLoadingServices: boolean,
-    loadServicesError?: string | null,
+    loadServicesError: string | null,
     isLoadingApps: boolean,
-    loadAppsError?: string | null,
+    loadAppsError: string | null,
     isLoadingDependencies: boolean,
-    loadDependenciesError?: string | null,
+    loadDependenciesError: string | null,
     isLoadingDependees: boolean,
-    loadDependeesError?: string | null,
+    loadDependeesError: string | null,
     isLoadingPredictions: boolean,
-    loadPredictionsError?: string | null,
+    loadPredictionsError: string | null,
     isLoadingRules: boolean,
     loadRulesError?: string | null,
   },
   apps: {
     data: { [key: string]: IApp },
-    isLoading: boolean,
-    error?: string | null,
+    isLoadingApps: boolean,
+    loadAppsError: string | null,
     isLoadingServices: boolean,
-    loadServicesError?: string | null,
+    loadServicesError: string | null,
   },
   regions: {
     data: { [key: string]: IRegion },
-    isLoading: boolean,
-    error?: string | null,
+    isLoadingRegions: boolean,
+    loadRegionsError: string | null,
   },
   rules: {
     hosts: {
       data: { [key: string]: IHostRule },
-      isLoading: boolean,
-      error?: string | null,
-      isLoadingConditions: boolean,
-      loadConditionsError?: string | null,
       generic: {
         data: { [key: string]: IHostRule },
-        isLoading: boolean,
-        error?: string | null,
-      }
+        isLoadingGenericRules: boolean,
+        loadGenericRulesError: string | null,
+      },
+      isLoadingRules: boolean,
+      loadRulesError: string | null,
+      isLoadingConditions: boolean,
+      loadConditionsError: string | null,
     },
     services: {
       data: { [key: string]: IServiceRule },
-      isLoading: boolean,
-      error?: string | null,
-      isLoadingConditions: boolean,
-      loadConditionsError?: string | null,
       generic: {
-        data: { [key: string]: IServiceRule },
-        isLoading: boolean,
-        error?: string | null,
-      }
-
+        data: { [key: string]: IServiceRule }
+        isLoadingGenericRules: boolean,
+        loadGenericRulesError: string | null,
+      },
+      isLoadingRules: boolean,
+      loadRulesError: string | null,
+      isLoadingConditions: boolean,
+      loadConditionsError: string | null,
     },
     conditions: {
       data: { [key: string]: ICondition },
-      isLoading: boolean,
-      error?: string | null,
+      isLoadingConditions: boolean,
+      loadConditionsError: string | null,
     }
   }
   valueModes: {
     data: { [key: string]: IValueMode },
-    isLoading: boolean,
-    error?: string | null,
+    isLoadingValueModes: boolean,
+    loadValueModesError: string | null,
   },
   fields: {
     data: { [key: string]: IField },
-    isLoading: boolean,
-    error?: string | null,
+    isLoadingFields: boolean,
+    loadFieldsError: string | null,
   },
   operators: {
     data: { [key: string]: IOperator },
-    isLoading: boolean,
-    error?: string | null,
+    isLoadingOperators: boolean,
+    loadOperatorsError: string | null,
   }
   decisions: {
     data: { [key: string]: IDecision },
-    isLoading: boolean,
-    error?: string | null,
+    isLoadingDecisions: boolean,
+    loadDecisionsError: string | null,
   },
   nodes: {
     data: { [key: string]: INode },
-    isLoading: boolean,
-    error?: string | null,
+    isLoadingNodes: boolean,
+    loadNodesError: string | null,
   },
   hosts: {
     cloud: {
       data: { [key: string]: ICloudHost },
-      isLoading: boolean,
-      error?: string | null,
+      isLoadingHosts: boolean,
+      loadHostsError: string | null,
       isLoadingRules: false,
       loadRulesError: null,
     },
     edge: {
       data: { [key: string]: IEdgeHost },
-      isLoading: boolean,
-      error?: string | null,
+      isLoadingHosts: boolean,
+      loadHostsError: string | null,
       isLoadingRules: false,
       loadRulesError: null,
     }
   },
   containers: {
     data: { [key: string]: IContainer },
-    isLoading: boolean,
-    error?: string | null,
+    isLoadingContainers: boolean,
+    loadContainersError: string | null,
   },
   logs: {
     data: { [key: number]: ILogs },
-    isLoading: boolean,
-    error?: string | null,
+    isLoadingLogs: boolean,
+    loadLogsError: string | null,
   },
 }
 
@@ -340,97 +341,97 @@ const entities = (state: EntitiesState = {
                     },
                     apps: {
                       data: {},
-                      isLoading: false,
-                      error: null,
+                      isLoadingApps: false,
+                      loadAppsError: null,
                       isLoadingServices: false,
                       loadServicesError: null,
                     },
                     regions: {
                       data: {},
-                      isLoading: false,
-                      error: null
+                      isLoadingRegions: false,
+                      loadRegionsError: null
                     },
                     rules: {
                       hosts: {
                         data: {},
-                        isLoading: false,
-                        error: null,
-                        isLoadingConditions: false,
-                        loadConditionsError: null,
                         generic: {
                           data: {},
-                          isLoading: false,
-                          error: null,
-                        }
+                          isLoadingGenericRules: false,
+                          loadGenericRulesError: null,
+                        },
+                        isLoadingRules: false,
+                        loadRulesError: null,
+                        isLoadingConditions: false,
+                        loadConditionsError: null,
                       },
                       services: {
                         data: {},
-                        isLoading: false,
-                        error: null,
-                        isLoadingConditions: false,
-                        loadConditionsError: null,
                         generic: {
                           data: {},
-                          isLoading: false,
-                          error: null,
-                        }
+                          isLoadingGenericRules: false,
+                          loadGenericRulesError: null,
+                        },
+                        isLoadingRules: false,
+                        loadRulesError: null,
+                        isLoadingConditions: false,
+                        loadConditionsError: null,
                       },
                       conditions: {
                         data: {},
-                        isLoading: false,
-                        error: null
+                        isLoadingConditions: false,
+                        loadConditionsError: null
                       },
                     },
                     valueModes: {
                       data: {},
-                      isLoading: false,
-                      error: null
+                      isLoadingValueModes: false,
+                      loadValueModesError: null
                     },
                     fields: {
                       data: {},
-                      isLoading: false,
-                      error: null
+                      isLoadingFields: false,
+                      loadFieldsError: null
                     },
                     operators: {
                       data: {},
-                      isLoading: false,
-                      error: null
+                      isLoadingOperators: false,
+                      loadOperatorsError: null
                     },
                     decisions: {
                       data: {},
-                      isLoading: false,
-                      error: null
+                      isLoadingDecisions: false,
+                      loadDecisionsError: null
                     },
                     nodes: {
                       data: {},
-                      isLoading: false,
-                      error: null
+                      isLoadingNodes: false,
+                      loadNodesError: null
                     },
                     hosts: {
                       cloud: {
                         data: {},
-                        isLoading: false,
-                        error: null,
+                        isLoadingHosts: false,
+                        loadHostsError: null,
                         isLoadingRules: false,
                         loadRulesError: null,
                       },
                       edge: {
                         data: {},
-                        isLoading: false,
-                        error: null,
+                        isLoadingHosts: false,
+                        loadHostsError: null,
                         isLoadingRules: false,
                         loadRulesError: null,
                       },
                     },
                     containers: {
                       data: {},
-                      isLoading: false,
-                      error: null
+                      isLoadingContainers: false,
+                      loadContainersError: null
                     },
                     logs: {
                       data: {},
-                      isLoading: false,
-                      error: null
+                      isLoadingLogs: false,
+                      loadLogsError: null
                     },
                   },
                   action: EntitiesAction
@@ -653,17 +654,17 @@ const entities = (state: EntitiesState = {
       break;
     case REGION_REQUEST:
     case REGIONS_REQUEST:
-      return merge({}, state, { regions: { isLoading: true, error: null } });
+      return merge({}, state, { regions: { isLoadingRegions: true, loadRegionsError: null } });
     case REGION_FAILURE:
     case REGIONS_FAILURE:
-      return merge({}, state, { regions: { isLoading: false, error: error } });
+      return merge({}, state, { regions: { isLoadingRegions: false, loadRegionsError: error } });
     case REGION_SUCCESS:
       return {
         ...state,
         regions: {
           data: merge({}, state.regions.data, data?.regions),
-          isLoading: false,
-          error: null,
+          isLoadingRegions: false,
+          loadRegionsError: null,
         }
       };
     case REGIONS_SUCCESS:
@@ -672,23 +673,23 @@ const entities = (state: EntitiesState = {
         regions: {
           ...state.regions,
           data: merge({}, pick(state.regions.data, keys(data?.regions)), data?.regions),
-          isLoading: false,
-          error: null,
+          isLoadingRegions: false,
+          loadRegionsError: null,
         }
       };
     case DECISION_REQUEST:
     case DECISIONS_REQUEST:
-      return merge({}, state, { decisions: { isLoading: true, error: null } });
+      return merge({}, state, { decisions: { isLoadingDecisions: true, loadDecisionsError: null } });
     case DECISION_FAILURE:
     case DECISIONS_FAILURE:
-      return merge({}, state, { decisions: { isLoading: false, error: error } });
+      return merge({}, state, { decisions: { isLoadingDecisions: false, loadDecisionsError: error } });
     case DECISION_SUCCESS:
       return {
         ...state,
         decisions: {
           data: merge({}, state.decisions.data, data?.decisions),
-          isLoading: false,
-          error: null,
+          isLoadingDecisions: false,
+          loadDecisionsError: null,
         }
       };
     case DECISIONS_SUCCESS:
@@ -697,23 +698,23 @@ const entities = (state: EntitiesState = {
         decisions: {
           ...state.nodes,
           data: merge({}, pick(state.decisions.data, keys(data?.decisions)), data?.decisions),
-          isLoading: false,
-          error: null,
+          isLoadingDecisions: false,
+          loadDecisionsError: null,
         }
       };
     case NODE_REQUEST:
     case NODES_REQUEST:
-      return merge({}, state, { nodes: { isLoading: true, error: null } });
+      return merge({}, state, { nodes: { isLoadingNodes: true, loadNodesError: null } });
     case NODE_FAILURE:
     case NODES_FAILURE:
-      return merge({}, state, { nodes: { isLoading: false, error: error } });
+      return merge({}, state, { nodes: { isLoadingNodes: false, loadNodesError: error } });
     case NODE_SUCCESS:
       return {
         ...state,
         nodes: {
           data: merge({}, state.nodes.data, data?.nodes),
-          isLoading: false,
-          error: null,
+          isLoadingNodes: false,
+          loadNodesError: null,
         }
       };
     case NODES_SUCCESS:
@@ -722,16 +723,16 @@ const entities = (state: EntitiesState = {
         nodes: {
           ...state.nodes,
           data: merge({}, pick(state.nodes.data, keys(data?.nodes)), data?.nodes),
-          isLoading: false,
-          error: null,
+          isLoadingNodes: false,
+          loadNodesError: null,
         }
       };
     case RULE_HOST_REQUEST:
     case RULES_HOST_REQUEST:
-      return merge({}, state, { rules: { hosts: { isLoading: true, error: null } } });
+      return merge({}, state, { rules: { hosts: { isLoadingRules: true, loadRulesError: null } } });
     case RULE_HOST_FAILURE:
     case RULES_HOST_FAILURE:
-      return merge({}, state, { rules: { hosts: { isLoading: false, error: error } } });
+      return merge({}, state, { rules: { hosts: { isLoadingRules: false, loadRulesError: error } } });
     case RULE_HOST_SUCCESS:
       return {
         ...state,
@@ -740,8 +741,8 @@ const entities = (state: EntitiesState = {
           hosts: {
             ...state.rules.hosts,
             data: merge({}, state.rules.hosts.data, data?.hostRules),
-            isLoading: false,
-            error: null,
+            isLoadingRules: false,
+            loadRulesError: null,
           }
         }
       };
@@ -753,17 +754,17 @@ const entities = (state: EntitiesState = {
           hosts: {
             ...state.rules.hosts,
             data: merge({}, pick(state.rules.hosts.data, keys(data?.hostRules)), data?.hostRules),
-            isLoading: false,
-            error: null,
+            isLoadingRules: false,
+            loadRulesError: null,
           }
         }
       };
     case GENERIC_RULE_HOST_REQUEST:
     case GENERIC_RULES_HOST_REQUEST:
-      return merge({}, state, { rules: { hosts: { generic: { isLoading: true, error: null } } } });
+      return merge({}, state, { rules: { hosts: { generic: { isLoadingGenericRules: true, loadGenericRulesError: null } } } });
     case GENERIC_RULE_HOST_FAILURE:
     case GENERIC_RULES_HOST_FAILURE:
-      return merge({}, state, { rules: { hosts: { generic: { isLoading: false, error: error } } } });
+      return merge({}, state, { rules: { hosts: { generic: { isLoadingGenericRules: false, loadGenericRulesError: error } } } });
     case GENERIC_RULE_HOST_SUCCESS:
       return {
         ...state,
@@ -773,9 +774,9 @@ const entities = (state: EntitiesState = {
             ...state.rules.hosts,
             generic: {
               data: merge({}, state.rules.hosts.generic.data, data?.hostRules),
-              isLoading: false,
-              error: null,
-            }
+              isLoadingGenericRules: false,
+              loadGenericRulesError: null,
+            },
           }
         }
       };
@@ -788,8 +789,8 @@ const entities = (state: EntitiesState = {
             ...state.rules.hosts,
             generic: {
               data: merge({}, pick(state.rules.hosts.generic.data, keys(data?.hostRules)), data?.hostRules),
-              isLoading: false,
-              error: null,
+              isLoadingGenericRules: false,
+              loadGenericRulesError: null,
             }
           }
         }
@@ -800,51 +801,86 @@ const entities = (state: EntitiesState = {
       return merge({}, state, { rules: { hosts: { isLoadingConditions: false, loadConditionsError: error } } });
     case RULE_HOST_CONDITIONS_SUCCESS: {
       const rule = entity && state.rules.hosts.data[entity];
+      const genericRule = entity && state.rules.hosts.generic.data[entity];
       const conditions = { conditions: data?.conditions || [] };
-      const ruleWithConditions = Object.assign(rule ? rule : [entity], conditions);
+      const ruleWithConditions = Object.assign(rule ? rule : (genericRule ? genericRule : [entity]), conditions);
       const normalizedRule = normalize(ruleWithConditions, Schemas.RULE_HOST).entities;
-      return merge({}, state, {
-        rules: {
-          hosts : {
-            data: normalizedRule.hostRules,
-            isLoadingConditions: false,
-            loadConditionsError: null
+      return merge({}, state,
+        rule ? {
+          rules: {
+            ...state.rules,
+            hosts : {
+              ...state.rules.hosts,
+              data: normalizedRule.hostRules,
+              isLoadingConditions: false,
+              loadConditionsError: null,
+            },
           }
-        }
-      });
+        } : {
+          rules: {
+            ...state.rules,
+            hosts : {
+              ...state.rules.hosts,
+              generic : {
+                data: normalizedRule.hostRules,
+              },
+              isLoadingConditions: false,
+              loadConditionsError: null,
+            }
+          }
+        });
     }
     case ADD_RULE_HOST_CONDITION:
-      if (entity) {
+      if (entity && data?.conditionsNames?.length) {
         const rule = state.rules.hosts.data[entity];
-        if (data?.conditionsNames?.length) {
+        const genericRule = state.rules.hosts.generic.data[entity];
+        if (rule) {
           rule.conditions?.unshift(data?.conditionsNames[0]);
           return state = merge({}, state, { rules: { hosts: { data: { [rule.name]: {...rule } } } } });
         }
+        if (genericRule) {
+          genericRule.conditions?.unshift(data?.conditionsNames[0]);
+          return state = merge({}, state, { rules: { hosts: { generic: { data: { [genericRule.name]: {...genericRule } } } } } });
+        }
+        return state;
       }
       break;
     case REMOVE_RULE_HOST_CONDITIONS:
       if (entity) {
         const rule = state.rules.hosts.data[entity];
-        const filteredConditions = rule.conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
-        const ruleWithConditions = Object.assign(rule, { conditions: filteredConditions });
+        const genericRule = state.rules.hosts.generic.data[entity];
+        const filteredConditions = (rule || genericRule).conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
+        const ruleWithConditions = Object.assign(rule || genericRule, { conditions: filteredConditions });
         const normalizeRule = normalize(ruleWithConditions, Schemas.RULE_HOST).entities;
-        return merge({}, state, {
-          rules: {
-            ...state.rules,
-            hosts: {
-              ...state.rules.hosts,
-              data: normalizeRule.hostRules,
+        return merge({}, state,
+          rule ? {
+              rules: {
+                ...state.rules,
+                hosts: {
+                  ...state.rules.hosts,
+                  data: normalizeRule.hostRules,
+                }
+              }
             }
-          }
-        });
+            : {
+              rules: {
+                ...state.rules,
+                hosts: {
+                  ...state.rules.hosts,
+                  generic : {
+                    data: normalizeRule.hostRules,
+                  }
+                }
+              }
+            });
       }
       break;
     case RULE_SERVICE_REQUEST:
     case RULES_SERVICE_REQUEST:
-      return merge({}, state, { rules: { services: { isLoading: true, error: null } } });
+      return merge({}, state, { rules: { services: { isLoadingRules: true, loadRulesError: null } } });
     case RULE_SERVICE_FAILURE:
     case RULES_SERVICE_FAILURE:
-      return merge({}, state, { rules: { services: { isLoading: false, error: error } } });
+      return merge({}, state, { rules: { services: { isLoadingRules: false, loadRulesError: error } } });
     case RULE_SERVICE_SUCCESS:
       return {
         ...state,
@@ -853,8 +889,8 @@ const entities = (state: EntitiesState = {
           services: {
             ...state.rules.services,
             data: merge({}, state.rules.services.data, data?.serviceRules),
-            isLoading: false,
-            error: null,
+            isLoadingRules: false,
+            loadRulesError: null,
           }
         }
       };
@@ -866,17 +902,17 @@ const entities = (state: EntitiesState = {
           services: {
             ...state.rules.services,
             data: merge({}, pick(state.rules.services.data, keys(data?.serviceRules)), data?.serviceRules),
-            isLoading: false,
-            error: null,
+            isLoadingRules: false,
+            loadRulesError: null,
           }
         }
       };
     case GENERIC_RULE_SERVICE_REQUEST:
     case GENERIC_RULES_SERVICE_REQUEST:
-      return merge({}, state, { rules: { services: { generic: { isLoading: true, error: null } } } });
+      return merge({}, state, { rules: { services: { generic: { isLoadingGenericRules: true, loadGenericRulesError: null } } } });
     case GENERIC_RULE_SERVICE_FAILURE:
     case GENERIC_RULES_SERVICE_FAILURE:
-      return merge({}, state, { rules: { services: { generic: { isLoading: false, error: error } } } });
+      return merge({}, state, { rules: { services: { generic: { isLoadingGenericRules: false, loadGenericRulesError: error } } } });
     case GENERIC_RULE_SERVICE_SUCCESS:
       return {
         ...state,
@@ -886,8 +922,8 @@ const entities = (state: EntitiesState = {
             ...state.rules.services,
             generic: {
               data: merge({}, state.rules.services.generic.data, data?.serviceRules),
-              isLoading: false,
-              error: null,
+              isLoadingGenericRules: false,
+              loadGenericRulesError: null,
             }
           }
         }
@@ -900,9 +936,9 @@ const entities = (state: EntitiesState = {
           services: {
             ...state.rules.services,
             generic: {
-              data: merge({}, pick(state.rules.services.generic.data, keys(data?.serviceRules)), data?.hostRules),
-              isLoading: false,
-              error: null,
+              data: merge({}, pick(state.rules.services.generic.data, keys(data?.serviceRules)), data?.serviceRules),
+              isLoadingGenericRules: false,
+              loadGenericRulesError: null,
             }
           }
         }
@@ -913,51 +949,85 @@ const entities = (state: EntitiesState = {
       return merge({}, state, { rules: { services: { isLoadingConditions: false, loadConditionsError: error } } });
     case RULE_SERVICE_CONDITIONS_SUCCESS: {
       const rule = entity && state.rules.services.data[entity];
-      const conditions = { conditions: data?.predictions || [] };
-      const ruleWithConditions = Object.assign(rule ? rule : [entity], conditions);
+      const genericRule = entity && state.rules.services.generic.data[entity];
+      const conditions = { conditions: data?.conditions || [] };
+      const ruleWithConditions = Object.assign(rule ? rule : (genericRule ? genericRule : [entity]), conditions);
       const normalizedRule = normalize(ruleWithConditions, Schemas.RULE_SERVICE).entities;
-      return merge({}, state, {
-        rules: {
-          services : {
-            data: normalizedRule.serviceRules,
-            isLoadingConditions: false,
-            loadConditionsError: null
+      return merge({}, state,
+        rule ? {
+          rules: {
+            ...state.rules,
+            services : {
+              ...state.rules.services,
+              data: normalizedRule.serviceRules,
+              isLoadingConditions: false,
+              loadConditionsError: null,
+            }
           }
-        }
-      });
+        } : {
+          rules: {
+            ...state.rules,
+            services : {
+              ...state.rules.services,
+              generic : {
+                data: normalizedRule.hostRules,
+              },
+              isLoadingConditions: false,
+              loadConditionsError: null,
+            }
+          }
+        });
     }
     case ADD_RULE_SERVICE_CONDITION:
-      if (entity) {
+      if (entity && data?.conditionsNames?.length) {
         const rule = state.rules.services.data[entity];
-        if (data?.conditionsNames?.length) {
+        const genericRule = state.rules.services.generic.data[entity];
+        if (rule) {
           rule.conditions?.unshift(data?.conditionsNames[0]);
           return state = merge({}, state, { rules: { services: { data: { [rule.name]: {...rule } } } } });
+        }
+        if (genericRule) {
+          genericRule.conditions?.unshift(data?.conditionsNames[0]);
+          return state = merge({}, state, { rules: { services: { generic: { data: { [genericRule.name]: {...genericRule } } } } } });
         }
       }
       break;
     case REMOVE_RULE_SERVICE_CONDITIONS:
       if (entity) {
         const rule = state.rules.services.data[entity];
-        const filteredConditions = rule.conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
-        const ruleWithConditions = Object.assign(rule, { conditions: filteredConditions });
+        const genericRule = state.rules.services.generic.data[entity];
+        const filteredConditions = (rule || genericRule).conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
+        const ruleWithConditions = Object.assign(rule || genericRule, { conditions: filteredConditions });
         const normalizeRule = normalize(ruleWithConditions, Schemas.RULE_SERVICE).entities;
-        return merge({}, state, {
-          rules: {
-            ...state.rules,
-            services: {
-              ...state.rules.services,
-              data: normalizeRule.serviceHosts,
+        return merge({}, state,
+          rule ? {
+              rules: {
+                ...state.rules,
+                services: {
+                  ...state.rules.services,
+                  data: normalizeRule.serviceRules,
+                }
+              }
             }
-          }
-        });
+            : {
+              rules: {
+                ...state.rules,
+                services: {
+                  ...state.rules.services,
+                  generic : {
+                    data: normalizeRule.serviceRules,
+                  }
+                }
+              }
+            });
       }
-      break;
+      return state;
     case CONDITION_REQUEST:
     case CONDITIONS_REQUEST:
-      return merge({}, state, { rules: { conditions: { isLoading: true, error: null } } });
+      return merge({}, state, { rules: { conditions: { isLoadingConditions: true, loadConditionsError: null } } });
     case CONDITION_FAILURE:
     case CONDITIONS_FAILURE:
-      return merge({}, state, { rules: { conditions: { isLoading: false, error: error } } });
+      return merge({}, state, { rules: { conditions: { isLoadingConditions: false, loadConditionsError: error } } });
     case CONDITION_SUCCESS:
       return {
         ...state,
@@ -966,8 +1036,8 @@ const entities = (state: EntitiesState = {
           conditions: {
             ...state.rules.conditions,
             data: merge({}, state.rules.conditions.data, data?.conditions),
-            isLoading: false,
-            error: null,
+            isLoadingConditions: false,
+            loadConditionsError: null,
           }
         }
       };
@@ -979,68 +1049,67 @@ const entities = (state: EntitiesState = {
           conditions: {
             ...state.rules.conditions,
             data: merge({}, pick(state.rules.conditions.data, keys(data?.conditions)), data?.conditions),
-            isLoading: false,
-            error: null,
+            isLoadingConditions: false,
+            loadConditionsError: null,
           }
         }
       };
     case VALUE_MODES_REQUEST:
-      return merge({}, state, { valueModes: { isLoading: true, error: null } });
+      return merge({}, state, { valueModes: { isLoadingValueModes: true, loadValueModesError: null } });
     case VALUE_MODES_FAILURE:
-      return merge({}, state, { valueModes: { isLoading: false, error: error } });
+      return merge({}, state, { valueModes: { isLoadingValueModes: false, loadValueModesError: error } });
     case VALUE_MODES_SUCCESS:
       return {
         ...state,
         valueModes: {
           ...state.valueModes,
           data: merge({}, pick(state.valueModes.data, keys(data?.valueModes)), data?.valueModes),
-          isLoading: false,
-          error: null,
+          isLoadingValueModes: false,
+          loadValueModesError: null,
         }
       };
     case FIELDS_REQUEST:
-      return merge({}, state, { fields: { isLoading: true, error: null } });
+      return merge({}, state, { fields: { isLoadingFields: true, loadFieldsError: null } });
     case FIELDS_FAILURE:
-      return merge({}, state, { fields: { isLoading: false, error: error } });
+      return merge({}, state, { fields: { isLoadingFields: false, loadFieldsError: error } });
     case FIELDS_SUCCESS:
       return {
         ...state,
         fields: {
           ...state.fields,
           data: merge({}, pick(state.fields.data, keys(data?.fields)), data?.fields),
-          isLoading: false,
-          error: null,
+          isLoadingFields: false,
+          loadFieldsError: null,
         }
       };
     case OPERATORS_REQUEST:
-      return merge({}, state, { operators: { isLoading: true, error: null } });
+      return merge({}, state, { operators: { isLoadingOperators: true, loadOperatorsError: null } });
     case OPERATORS_FAILURE:
-      return merge({}, state, { operators: { isLoading: false, error: error } });
+      return merge({}, state, { operators: { isLoadingOperators: false, loadOperatorsError: error } });
     case OPERATORS_SUCCESS:
       return {
         ...state,
         operators: {
           ...state.operators,
           data: merge({}, pick(state.operators.data, keys(data?.operators)), data?.operators),
-          isLoading: false,
-          error: null,
+          isLoadingOperators: false,
+          loadOperatorsError: null,
         }
       };
     case APP_REQUEST:
     case APPS_REQUEST:
-      return merge({}, state, { apps: { isLoading: true, error: null } });
+      return merge({}, state, { apps: { isLoadingApps: true, loadAppsError: null } });
     case APP_FAILURE:
     case APPS_FAILURE:
-      return merge({}, state, { apps: { isLoading: false, error: error } });
+      return merge({}, state, { apps: { isLoadingApps: false, loadAppsError: error } });
     case APP_SUCCESS:
       return {
         ...state,
         apps: {
+          ...state.apps,
           data: merge({}, state.apps.data, data?.apps),
-          isLoading: false,
-          error: null,
-          isLoadingServices: state.apps.isLoadingServices,
-          loadServicesError: state.apps.loadServicesError,
+          isLoadingApps: false,
+          loadAppsError: null,
         }
       };
     case APPS_SUCCESS:
@@ -1049,8 +1118,8 @@ const entities = (state: EntitiesState = {
         apps: {
           ...state.apps,
           data: merge({}, pick(state.apps.data, keys(data?.apps)), data?.apps),
-          isLoading: false,
-          error: null,
+          isLoadingApps: false,
+          loadAppsError: null,
         }
       };
     case APP_SERVICES_REQUEST:
@@ -1100,10 +1169,10 @@ const entities = (state: EntitiesState = {
       break;
     case CLOUD_HOST_REQUEST:
     case CLOUD_HOSTS_REQUEST:
-      return merge({}, state, { hosts: { cloud: { isLoading: true, error: null } } });
+      return merge({}, state, { hosts: { cloud: { isLoadingHosts: true, loadHostsError: null } } });
     case CLOUD_HOST_FAILURE:
     case CLOUD_HOSTS_FAILURE:
-      return merge({}, state, { hosts: { cloud: { isLoading: false, error: error } } });
+      return merge({}, state, { hosts: { cloud: { isLoadingHosts: false, loadHostsError: error } } });
     case CLOUD_HOST_SUCCESS:
       return {
         ...state,
@@ -1112,8 +1181,8 @@ const entities = (state: EntitiesState = {
           cloud: {
             ...state.hosts.cloud,
             data: merge({}, state.hosts.cloud.data, data?.cloudHosts),
-            isLoading: false,
-            error: null,
+            isLoadingHosts: false,
+            loadHostsError: null,
           }
         }
       };
@@ -1125,8 +1194,8 @@ const entities = (state: EntitiesState = {
           cloud: {
             ...state.hosts.cloud,
             data: merge({}, pick(state.hosts.cloud.data, keys(data?.cloudHosts)), data?.cloudHosts),
-            isLoading: false,
-            error: null,
+            isLoadingHosts: false,
+            loadHostsError: null,
           }
         }
       };
@@ -1154,10 +1223,10 @@ const entities = (state: EntitiesState = {
     }
     case EDGE_HOST_REQUEST:
     case EDGE_HOSTS_REQUEST:
-      return merge({}, state, { hosts: { edge: { isLoading: true, error: null } } });
+      return merge({}, state, { hosts: { edge: { isLoadingHosts: true, loadHostsError: null } } });
     case EDGE_HOST_FAILURE:
     case EDGE_HOSTS_FAILURE:
-      return merge({}, state, { hosts: { edge: { isLoading: false, error: error } } });
+      return merge({}, state, { hosts: { edge: { isLoadingHosts: false, loadHostsError: error } } });
     case EDGE_HOST_SUCCESS:
       return {
         ...state,
@@ -1166,8 +1235,8 @@ const entities = (state: EntitiesState = {
           edge: {
             ...state.hosts.edge,
             data: merge({}, state.hosts.edge.data, data?.edgeHosts),
-            isLoading: false,
-            error: null,
+            isLoadingHosts: false,
+            loadHostsError: null,
           }
         }
       };
@@ -1179,8 +1248,8 @@ const entities = (state: EntitiesState = {
           edge: {
             ...state.hosts.edge,
             data: merge({}, pick(state.hosts.edge.data, keys(data?.edgeHosts)), data?.edgeHosts),
-            isLoading: false,
-            error: null,
+            isLoadingHosts: false,
+            loadHostsError: null,
           }
         }
       };
@@ -1208,17 +1277,17 @@ const entities = (state: EntitiesState = {
     }
     case CONTAINER_REQUEST:
     case CONTAINERS_REQUEST:
-      return merge({}, state, { containers: { isLoading: true, error: null } });
+      return merge({}, state, { containers: { isLoadingContainers: true, loadContainersError: null } });
     case CONTAINER_FAILURE:
     case CONTAINERS_FAILURE:
-      return merge({}, state, { containers: { isLoading: false, error: error } });
+      return merge({}, state, { containers: { isLoadingContainers: false, loadContainersError: error } });
     case CONTAINER_SUCCESS:
       return {
         ...state,
         containers: {
           data: merge({}, state.containers.data, data?.containers),
-          isLoading: false,
-          error: null,
+          isLoadingContainers: false,
+          loadContainersError: null,
         }
       };
     case CONTAINERS_SUCCESS:
@@ -1227,22 +1296,22 @@ const entities = (state: EntitiesState = {
         containers: {
           ...state.containers,
           data: merge({}, pick(state.containers.data, keys(data?.containers)), data?.containers),
-          isLoading: false,
-          error: null,
+          isLoadingContainers: false,
+          loadContainersError: null,
         }
       };
     case LOGS_REQUEST:
-      return merge({}, state, { logs: { isLoading: true, error: null } });
+      return merge({}, state, { logs: { isLoadingLogs: true, loadLogsError: null } });
     case LOGS_FAILURE:
-      return merge({}, state, { logs: { isLoading: false, error: error } });
+      return merge({}, state, { logs: { isLoadingLogs: false, loadLogsError: error } });
     case LOGS_SUCCESS:
       return {
         ...state,
         logs: {
           ...state.apps,
           data: merge({}, pick(state.logs.data, keys(data?.logs)), data?.logs),
-          isLoading: false,
-          error: null,
+          isLoadingLogs: false,
+          loadLogsError: null,
         }
       };
     default:

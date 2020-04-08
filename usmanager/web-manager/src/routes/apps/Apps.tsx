@@ -52,8 +52,8 @@ class Apps extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.apps.isLoading,
-    error: state.entities.apps.error,
+    isLoading: state.entities.apps.isLoadingApps,
+    error: state.entities.apps.loadAppsError,
     apps: (state.entities.apps.data && Object.values(state.entities.apps.data)) || [],
   }
 );

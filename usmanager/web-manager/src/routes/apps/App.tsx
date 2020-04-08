@@ -1,6 +1,5 @@
 import Data from "../../components/IData";
-import {IAddServiceApp, IAppService} from "../services/apps/ServiceAppList";
-import IData from "../../components/IData";
+import {IAppService} from "../services/apps/ServiceAppList";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
 import Form, {IFields, required} from "../../components/form/Form";
@@ -128,7 +127,7 @@ class App extends BaseComponent<Props, State> {
     super.toast(`Unable to delete ${appName}`, 10000, reason, true);
 
   private getFields = (app: Partial<IApp>): IFields =>
-    Object.entries(app).map(([key, value]) => {
+    Object.entries(app).map(([key, _]) => {
       return {
         [key]: {
           id: key,
@@ -181,9 +180,6 @@ class App extends BaseComponent<Props, State> {
                      onAddAppService={this.onAddAppService}
                      onRemoveAppServices={this.onRemoveAppServices}/>;
 
-  private rules = (): JSX.Element =>
-    <></>; //TODO
-
   private tabs: Tab[] = [
     {
       title: 'App',
@@ -194,11 +190,6 @@ class App extends BaseComponent<Props, State> {
       title: 'Services',
       id: 'services',
       content: () => this.services()
-    },
-    {
-      title: 'Rules',
-      id: 'rules',
-      content: () => this.rules()
     }
   ];
 
@@ -216,8 +207,8 @@ class App extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.apps.isLoading;
-  const error = state.entities.apps.error;
+  const isLoading = state.entities.apps.isLoadingApps;
+  const error = state.entities.apps.loadAppsError;
   const name = props.match.params.name;
   const app = isNewApp(name) ? emptyApp() : state.entities.apps.data[name];
   let formApp;

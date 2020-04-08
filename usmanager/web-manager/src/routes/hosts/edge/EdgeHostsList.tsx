@@ -54,8 +54,8 @@ class EdgeHostsList extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.hosts.edge.isLoading,
-    error: state.entities.hosts.edge.error,
+    isLoading: state.entities.hosts.edge.isLoadingHosts,
+    error: state.entities.hosts.edge.loadHostsError,
     edgeHosts: (state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data)) || [],
   }
 );
