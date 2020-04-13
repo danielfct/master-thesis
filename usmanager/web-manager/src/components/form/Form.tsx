@@ -23,13 +23,21 @@
  */
 
 import React from "react";
-import {deleteData, postData, putData, RestOperation} from "../../utils/api";
+import {deleteData, postData, putData} from "../../utils/api";
 import styles from './Form.module.css';
 import {RouteComponentProps, withRouter} from "react-router";
 import {getTypeFromValue, FieldProps, IValidation} from "./Field";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
-import {isEqualWith, merge} from "lodash";
+import {isEqualWith} from "lodash";
+import ActionProgressBar from "./ActionProgressBar";
+
+export type RestOperation = {
+  textButton?: string,
+  url: string,
+  successCallback: (reply?: any, args?: any) => void,
+  failureCallback: (reason: string, args?: any) => void
+}
 
 export interface IFields {
   [key: string]: FieldProps;
@@ -58,6 +66,7 @@ interface FormPageProps {
   editable?: boolean;
   deletable?: boolean;
   customButtons?: JSX.Element;
+  loading?: boolean;
 }
 
 type Props = FormPageProps & RouteComponentProps;
@@ -68,6 +77,7 @@ interface State {
   errors: IErrors;
   isEditing: boolean;
   saveRequired: boolean;
+  isLoading: boolean;
 }
 
 export interface IFormContext extends State {
@@ -112,6 +122,7 @@ class Form extends React.Component<Props, State> {
     errors: {},
     isEditing: this.props.isNew == undefined || this.props.isNew,
     saveRequired: false,
+    isLoading: !!this.props.loading,
   };
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -130,89 +141,12 @@ class Form extends React.Component<Props, State> {
         return state;
       }, this.state));
     }
-  }
-
-  render() {
-    const context: IFormContext = {
-      ...this.state,
-      setValues: this.setValues,
-      validate: this.validate
-    };
-    const {saveRequired} = this.state;
-    const {id, isNew, values, controlsMode, editable, deletable, children} = this.props;
-    return (
-      <>
-        <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>
-        <form onSubmit={this.handleSubmit} noValidate>
-          {(controlsMode == undefined || controlsMode === 'top') && (
-            <div className={`controlsContainer`}>
-              {isNew
-                ?
-                <button
-                  className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text right slide`}
-                  type="submit">
-                  Save
-                </button>
-                :
-                <div>
-                  {(editable == undefined || editable) && (
-                    <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
-                            data-position="bottom" data-tooltip="Edit"
-                            type="button"
-                            onClick={this.onClickEdit}>
-                      <i className="large material-icons">edit</i>
-                    </button>
-                  )}
-                  <div className={`${styles.controlButton}`}>
-                    {this.props.customButtons}
-                    {(deletable == undefined || deletable) && (
-                      <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
-                              type="button"
-                              data-target="confirm-dialog">
-                        Delete
-                      </button>
-                    )}
-                    <button className={`btn-flat btn-small waves-effect waves-light green-text slide`}
-                            style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
-                            type="submit">
-                      Save
-                    </button>
-                  </div>
-                </div>
-              }
-            </div>
-          )}
-          <div className={`${styles.content}`}>
-            <FormContext.Provider value={context}>
-              {children}
-            </FormContext.Provider>
-          </div>
-          {(controlsMode === 'modal') && (
-            <div className='modal-footer dialog-footer'>
-              <button className="waves-effect waves-light btn-flat red-text left"
-                      type="button"
-                      onClick={this.clearValues}>
-                Clear
-              </button>
-              <button className="modal-close waves-effect waves-light btn-flat red-text"
-                      type="button">
-                Cancel
-              </button>
-              <button className="waves-effect waves-light btn-flat green-text"
-                      type="button"
-                      onClick={this.onModalConfirm}>
-                Confirm
-              </button>
-            </div>
-          )}
-        </form>
-      </>
-    )
+    if (prevProps.loading != this.props.loading) {
+      this.setState({isLoading: !!this.props.loading});
+    }
   }
 
   private saveRequired = () => {
-    console.log(this.state.savedValues);
-    console.log(this.state.values);
     return !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
       ((typeof first == 'boolean' && typeof second == 'string' && first.toString() == second)
       || (typeof first == 'string' && typeof second == 'boolean') && first == second.toString()
@@ -265,20 +199,28 @@ class Form extends React.Component<Props, State> {
       if (post?.url) {
         postData(post.url, this.state.values,
           (reply) => {
-            this.setState({savedValues: this.state.values});
             post.successCallback(reply, args);
+            this.setState({savedValues: this.state.values, isLoading: false});
           },
-          (reply) => post.failureCallback(reply, args));
+          (reply) => {
+            post.failureCallback(reply, args);
+            this.setState({isLoading: false});
+          });
+        this.setState({isLoading: true});
       }
     } else {
       if (put?.url) {
         if (this.saveRequired()) {
           putData(put.url, this.state.values,
             () => {
-              this.setState({savedValues: this.state.values});
-              put.successCallback(args)
+              put.successCallback(args);
+              this.setState({savedValues: this.state.values, isLoading: false});
             },
-            (reply) => put.failureCallback(reply, args));
+            (reply) => {
+              put.failureCallback(reply, args);
+              this.setState({isLoading: false});
+            });
+          this.setState({isLoading: true});
         } else {
           saveEntities?.(args);
         }
@@ -301,6 +243,88 @@ class Form extends React.Component<Props, State> {
 
   private clearValues = () =>
     this.setState({values: this.props.values, errors: {}});
+
+  render() {
+    const context: IFormContext = {
+      ...this.state,
+      setValues: this.setValues,
+      validate: this.validate
+    };
+    const {saveRequired, isLoading} = this.state;
+    const {id, isNew, values, controlsMode, editable, deletable, customButtons, children} = this.props;
+    return (
+      <>
+        <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>
+        <form onSubmit={this.handleSubmit} noValidate>
+          {(controlsMode == undefined || controlsMode === 'top') && (
+            <div>
+              <div className='controlsContainer noBorder'>
+                {isNew
+                  ?
+                  <button
+                    className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text right slide`}
+                    type="submit">
+                    Save
+                  </button>
+                  :
+                  <div>
+                    {(editable == undefined || editable) && (
+                      <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
+                              data-position="bottom" data-tooltip="Edit"
+                              type="button"
+                              onClick={this.onClickEdit}>
+                        <i className="large material-icons">edit</i>
+                      </button>
+                    )}
+                    <div className={`${styles.controlButton}`}>
+                      {customButtons}
+                      {(deletable == undefined || deletable) && (
+                        <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
+                                type="button"
+                                data-target="confirm-dialog">
+                          {this.props.delete?.textButton || 'Delete'}
+                        </button>
+                      )}
+                      <button className={`btn-flat btn-small waves-effect waves-light green-text slide`}
+                              style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                              type="submit">
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+              <ActionProgressBar loading={isLoading}/>
+            </div>
+          )}
+          <div className={`${styles.content}`}>
+            <FormContext.Provider value={context}>
+              {children}
+            </FormContext.Provider>
+          </div>
+          {(controlsMode === 'modal') && (
+            <div className='modal-footer dialog-footer'>
+              <button className="waves-effect waves-light btn-flat red-text left"
+                      type="button"
+                      onClick={this.clearValues}>
+                Clear
+              </button>
+              <button className="modal-close waves-effect waves-light btn-flat red-text"
+                      type="button">
+                Cancel
+              </button>
+              <button className="waves-effect waves-light btn-flat green-text"
+                      type="button"
+                      onClick={this.onModalConfirm}>
+                Confirm
+              </button>
+            </div>
+          )}
+        </form>
+      </>
+    )
+  }
+
 }
 
 export default withRouter(Form);

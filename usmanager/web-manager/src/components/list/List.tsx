@@ -26,7 +26,7 @@ import * as React from 'react';
 import FilteredList from './FilteredList';
 import {PagedList} from "./PagedList";
 import SimpleList from "./SimpleList";
-import LoadingSpinner from "./LoadingSpinner";
+import ListLoadingSpinner from "./ListLoadingSpinner";
 import Error from "../errors/Error";
 import AnimatedList from "./AnimatedList";
 import Empty from "./Empty";
@@ -59,7 +59,7 @@ class GenericList<T> extends React.Component<Props<T>, {}> {
     render() {
         const {isLoading, error, emptyMessage, list, predicate, paginate, animate} = this.props;
         if (isLoading) {
-            return <LoadingSpinner/>;
+            return <ListLoadingSpinner/>;
         }
         if (error) {
             return <Error message={error}/>;

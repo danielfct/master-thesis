@@ -34,17 +34,17 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEn
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.hosts.HostRuleConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.hosts.HostRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.hosts.HostRuleRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRuleConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRuleRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.value_modes.ValueModeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.value_modes.ValueModeRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.component_types.ComponentTypeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.component_types.ComponentTypeRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.condition.ConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.condition.ConditionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.DecisionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.decision.DecisionRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes.ComponentTypeEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes.ComponentTypeRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.condition.ConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.condition.ConditionRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.decision.DecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.decision.DecisionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
@@ -89,7 +89,7 @@ public class DatabaseLoader {
       var frontend = ServiceEntity.builder()
           .serviceName("front-end")
           .dockerRepository("front-end")
-          .defaultExternalPort("8079")
+          .defaultExternalPort("8081")
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
@@ -103,7 +103,7 @@ public class DatabaseLoader {
       var user = ServiceEntity.builder()
           .serviceName("user")
           .dockerRepository("user")
-          .defaultExternalPort("8080")
+          .defaultExternalPort("8082")
           .defaultInternalPort("80")
           .defaultDb("user-db:27017")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${userDatabaseHost}")
@@ -131,7 +131,7 @@ public class DatabaseLoader {
       var catalogue = ServiceEntity.builder()
           .serviceName("catalogue")
           .dockerRepository("catalogue")
-          .defaultExternalPort("8081")
+          .defaultExternalPort("8083")
           .defaultInternalPort("80")
           .defaultDb("catalogue-db:3306")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${catalogueDatabaseHost}")
@@ -159,7 +159,7 @@ public class DatabaseLoader {
       var payment = ServiceEntity.builder()
           .serviceName("payment")
           .dockerRepository("payment")
-          .defaultExternalPort("8082")
+          .defaultExternalPort("8084")
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname}")
@@ -173,7 +173,7 @@ public class DatabaseLoader {
       var carts = ServiceEntity.builder()
           .serviceName("carts")
           .dockerRepository("carts")
-          .defaultExternalPort("8083")
+          .defaultExternalPort("8085")
           .defaultInternalPort("80")
           .defaultDb("carts-db:27017")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${cartsDatabaseHost}")
@@ -201,7 +201,7 @@ public class DatabaseLoader {
       var orders = ServiceEntity.builder()
           .serviceName("orders")
           .dockerRepository("orders")
-          .defaultExternalPort("8084")
+          .defaultExternalPort("8086")
           .defaultInternalPort("80")
           .defaultDb("orders-db:27017")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${ordersDatabaseHost}")
@@ -230,7 +230,7 @@ public class DatabaseLoader {
       var shipping = ServiceEntity.builder()
           .serviceName("shipping")
           .dockerRepository("shipping")
-          .defaultExternalPort("8085")
+          .defaultExternalPort("8087")
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")
@@ -244,7 +244,7 @@ public class DatabaseLoader {
       var queueMaster = ServiceEntity.builder()
           .serviceName("queue-master")
           .dockerRepository("queue-master")
-          .defaultExternalPort("8086")
+          .defaultExternalPort("8088")
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${rabbitmqHost}")

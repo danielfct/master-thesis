@@ -26,7 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.services.ServiceRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;

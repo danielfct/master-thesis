@@ -4,10 +4,10 @@ import List from "./List";
 import styles from "./ControlledList.module.css";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import BaseComponent from "../BaseComponent";
-import {deleteData, RestOperation} from "../../utils/api";
+import {deleteData} from "../../utils/api";
 import {decodeHTML} from "../../utils/text";
 import InputDialog from "../dialogs/InputDialog";
-import {IFields, IValues} from "../form/Form";
+import {IFields, IValues, RestOperation} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
 
 type FormModal = {

@@ -26,15 +26,9 @@ import axios, {AxiosError, AxiosRequestConfig, AxiosResponse, Method} from "axio
 import {isAuthenticated} from "./auth";
 import normalizeUrl from "normalize-url";
 
-export type RestOperation = {
-  url: string,
-  successCallback: (reply?: any, args?: any) => void,
-  failureCallback: (reason: string, args?: any) => void
-}
-
 export const API_URL = 'http://localhost:8080';
 /*const API_URL = '/';*/
-const TIMEOUT = 30000;
+const TIMEOUT = 120000;
 
 
 //TODO delete

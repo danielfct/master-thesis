@@ -13,7 +13,7 @@ import {IService} from "../../services/Service";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {IFields, required, requiredAndNumberAndMin} from "../../../components/form/Form";
-import LoadingSpinner from "../../../components/list/LoadingSpinner";
+import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
@@ -186,7 +186,7 @@ class ServiceRule extends BaseComponent<Props, State> {
     const ruleKey: (keyof IServiceRule) = formServiceRule && Object.keys(formServiceRule)[0];
     return (
       <>
-        {isLoading && <LoadingSpinner/>}
+        {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formServiceRule && (
           <Form id={ruleKey}

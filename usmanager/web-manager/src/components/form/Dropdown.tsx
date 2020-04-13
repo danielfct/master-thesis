@@ -49,7 +49,7 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
             )}
             {dropdown.values.map((option, index) => {
                 return (
-                  <option key={index} value={JSON.stringify(option)}>
+                  <option key={index} value={typeof option !== 'string' ? JSON.stringify(option) : option}>
                     {dropdown.optionToString(option)}
                   </option>
                 );

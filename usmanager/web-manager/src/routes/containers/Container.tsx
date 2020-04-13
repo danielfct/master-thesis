@@ -2,24 +2,27 @@ import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../components/BaseComponent";
 import Form, {IFields, required, requiredAndNumberAndMin} from "../../components/form/Form";
 import Field, {getTypeFromValue} from "../../components/form/Field";
-import LoadingSpinner from "../../components/list/LoadingSpinner";
+import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {loadCloudHosts, loadContainers, loadEdgeHosts, loadServices} from "../../actions";
 import {connect} from "react-redux";
-import React from "react";
+import React, {createRef} from "react";
 import IData from "../../components/IData";
 import {ICloudHost} from "../hosts/cloud/CloudHost";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IService} from "../services/Service";
-import ServiceAppList from "../services/apps/ServiceAppList";
-import PortsList from "./PortsList";
-import LabelsList from "./LabelsList";
-import LogsList from "./LogsList";
-import ListItem from "../../components/list/ListItem";
-import styles from "../../components/list/ListItem.module.css";
+import ContainerPortsList from "./ContainerPortsList";
+import ContainerLabelsList from "./ContainerLabelsList";
+import ContainerLogsList from "./ContainerLogsList";
+import PerfectScrollbar from "react-perfect-scrollbar";
+import ScrollBar from "react-perfect-scrollbar";
+import M from "materialize-css";
+import styles from "../../components/list/ControlledList.module.css";
+import {decodeHTML} from "../../utils/text";
+import {postData} from "../../utils/api";
 
 export interface IContainer extends IData {
   created: number;
@@ -88,13 +91,19 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 interface State {
   defaultInternalPort: number,
   defaultExternalPort: number,
+  isLoading: boolean,
 }
 
 class Container extends BaseComponent<Props, State> {
 
+  private replicateDropdown = createRef<HTMLButtonElement>();
+  private migrateDropdown = createRef<HTMLButtonElement>();
+  private scrollbar: (ScrollBar | null) = null;
+
   state: State = {
     defaultInternalPort: 0,
     defaultExternalPort: 0,
+    isLoading: false,
   };
 
   componentDidMount(): void {
@@ -107,6 +116,24 @@ class Container extends BaseComponent<Props, State> {
     this.props.loadServices();
   };
 
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    this.init();
+  }
+
+  private init = () => {
+    M.Dropdown.init(this.replicateDropdown.current as Element,
+      {
+        onOpenEnd: this.onOpenDropdown
+      });
+    M.Dropdown.init(this.migrateDropdown.current as Element,
+      {
+        onOpenEnd: this.onOpenDropdown
+      });
+  };
+
+  private onOpenDropdown = () =>
+    this.scrollbar?.updateScroll();
+
   private onPostSuccess = (reply: any, containerHostname: string): void => {
     console.log(reply); //TODO show which id it started at
     super.toast(`Container at <b>${containerHostname}</b> has now started on id ...`);
@@ -115,17 +142,9 @@ class Container extends BaseComponent<Props, State> {
   private onPostFailure = (reason: string, containerHostname: string): void =>
     super.toast(`Unable to start container at ${containerHostname}`, 10000, reason, true);
 
-  private onPutSuccess = (nodeId: string): void => {
-    super.toast(`Changes to node <b>${nodeId}</b> are now saved`);
-  };
-//TODO fix messages
-
-  private onPutFailure = (reason: string, nodeId: string): void =>
-    super.toast(`Unable to update ${nodeId}`, 10000, reason, true);
-
-  private onDeleteSuccess = (nodeId: string): void => {
-    super.toast(`Node <b>${nodeId}</b> successfully stopped`);
-    this.props.history.push(`/nodes`)
+  private onDeleteSuccess = (containerId: string): void => {
+    super.toast(`Container <b>${containerId}</b> successfully stopped`);
+    this.props.history.push(`/containers`);
   };
 
   private onDeleteFailure = (reason: string, nodeId: string): void =>
@@ -218,16 +237,82 @@ class Container extends BaseComponent<Props, State> {
     )
   };
 
+  private replicate = (event: any) => {
+    const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
+    this.setState({isLoading: true});
+    postData(`containers/${this.props.container.id}/replicate`, {hostname: hostname},
+      (reply) => this.onReplicateSuccess(reply),
+      (reply) => this.onReplicateFailure(reply));
+  };
+
+  private onReplicateSuccess = (reply: any) => {
+    super.toast(`Replicated ${this.props.container.image.split('/').splice(1)} to container <a href=/containers/${reply.data.id}>${reply.data.id}</a>`, 15000);
+    this.setState({isLoading: false});
+  };
+
+  private onReplicateFailure = (reply: any) => {
+    super.toast(`Unable to replicate container`, 10000, reply, true);
+    this.setState({isLoading: false});
+  };
+
+  private migrate = (event: any) => {
+    const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
+    this.setState({isLoading: true});
+    postData(`containers/${this.props.container.id}/migrate`, { hostname: hostname },
+      (reply) => this.onMigrateSuccess(reply),
+      (reply) => this.onMigrateFailure(reply));
+  };
+
+  private onMigrateSuccess = (reply: any) => {
+    super.toast(`Migrated ${this.props.container.id} to container <a href=/containers/${reply.data.id}>${reply.data.id}</a>`, 15000);
+    this.setState({isLoading: false});
+  };
+
+  private onMigrateFailure = (reply: any) => {
+    super.toast(`Unable to migrate container`, 10000, reply, true);
+    this.setState({isLoading: false});
+  };
+
+  private chooseHostnameDropdown = (id: string, onClick: (event: any) => void) =>
+    <ul id={id}
+        className={`dropdown-content ${styles.dropdown}`}>
+      <li className={`${styles.disabled}`}>
+        <a>
+          Choose hostname
+        </a>
+      </li>
+      <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
+        {Object.values(this.props.cloudHosts).map((data, index) =>
+          <li key={index} onClick={onClick}>
+            <a>
+              {data.publicIpAddress}
+            </a>
+          </li>
+        )}
+        {Object.values(this.props.edgeHosts).map((data, index) =>
+          <li key={index} onClick={onClick}>
+            <a>
+              {data.hostname}
+            </a>
+          </li>
+        )}
+      </PerfectScrollbar>
+    </ul>;
+
   private replicateMigrateButtons = (): JSX.Element =>
     <>
-      <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
-              type="submit">
+      <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger`}
+              data-target={`replicate-dropdown-hostname`}
+              ref={this.replicateDropdown}>
         Replicate
       </button>
-      <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
-              type="submit">
+      {this.chooseHostnameDropdown('replicate-dropdown-hostname', this.replicate)}
+      <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger`}
+              data-target={`migrate-dropdown-hostname`}
+              ref={this.migrateDropdown}>
         Migrate
       </button>
+      {this.chooseHostnameDropdown('migrate-dropdown-hostname', this.migrate)}
     </>;
 
   private details = () => {
@@ -244,18 +329,25 @@ class Container extends BaseComponent<Props, State> {
       : formContainer;
     return (
       <>
-        {isLoading && <LoadingSpinner/>}
+        {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formContainer && (
           <Form id={containerKey}
                 fields={this.getFields()}
                 values={values}
                 isNew={isNew}
-                post={{url: 'containers', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={container && {url: `containers/${container[containerKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={container && {url: `containers/${container[containerKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                post={{
+                  url: 'containers',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure}}
+                delete={container && {
+                  textButton: 'Stop',
+                  url: `containers/${container[containerKey]}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure}}
                 editable={false}
-                customButtons={this.replicateMigrateButtons()}>
+                customButtons={this.replicateMigrateButtons()}
+                loading={this.state.isLoading}>
             {this.formFields(formContainer, isNew)}
           </Form>
         )}
@@ -263,16 +355,49 @@ class Container extends BaseComponent<Props, State> {
     )
   };
 
-  private ports = (): JSX.Element =>
-    <PortsList ports={this.props.container.ports}/>;
+  private ports = (): JSX.Element => {
+    const {isLoading, error, container} = this.props;
+    if (isLoading) {
+      return <ListLoadingSpinner/>;
+    }
+    if (error) {
+      return <Error message={error}/>;
+    }
+    if (container) {
+      return <ContainerPortsList ports={container.ports}/>
+    }
+    return <></>;
+  };
 
-  private labels = (): JSX.Element =>
-    <LabelsList labels={Object.entries(this.props.container.labels).map(([key, value]) => `${key} = ${value}`)}/>;
+  private labels = (): JSX.Element => {
+    const {isLoading, error, container} = this.props;
+    if (isLoading) {
+      return <ListLoadingSpinner/>;
+    }
+    if (error) {
+      return <Error message={error}/>;
+    }
+    if (container) {
+      return <ContainerLabelsList labels={Object.entries(container.labels).map(([key, value]) => `${key} = ${value}`)}/>;
+    }
+    return <></>;
+  };
+
 
   private logs = (): JSX.Element => {
-    const logs = this.props.container.logs.split("\n");
-    logs.pop();
-    return <LogsList logs={logs}/>;
+    const {isLoading, error, container} = this.props;
+    if (isLoading) {
+      return <ListLoadingSpinner/>;
+    }
+    if (error) {
+      return <Error message={error}/>;
+    }
+    if (container) {
+      const logs = container.logs.split("\n");
+      logs.pop();
+      return <ContainerLogsList logs={logs}/>;
+    }
+   return <></>;
   };
 
   private tabs: Tab[] =

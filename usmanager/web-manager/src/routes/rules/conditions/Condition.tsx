@@ -5,7 +5,7 @@ import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {IFields, required, requiredAndNumberAndMin} from "../../../components/form/Form";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
-import LoadingSpinner from "../../../components/list/LoadingSpinner";
+import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
@@ -128,7 +128,7 @@ class Condition extends BaseComponent<Props, State> {
     const isNew = isNewCondition(this.props.match.params.name);
     return (
       <>
-        {isLoading && <LoadingSpinner/>}
+        {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formCondition && (
           <Form id={conditionKey}

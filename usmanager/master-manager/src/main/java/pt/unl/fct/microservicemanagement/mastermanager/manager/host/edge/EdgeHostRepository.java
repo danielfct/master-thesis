@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRuleEntity;
 
 import java.util.List;
 import java.util.Optional;

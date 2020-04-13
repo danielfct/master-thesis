@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
+import org.springframework.stereotype.Service;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
@@ -31,7 +32,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProp
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.DockerNodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.load_balancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.loadBalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -65,7 +66,7 @@ import com.spotify.docker.client.messages.PortBinding;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 
-@org.springframework.stereotype.Service
+@Service
 @Slf4j
 public class DockerContainersService {
 
@@ -101,20 +102,12 @@ public class DockerContainersService {
     this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
   }
 
-  /**
-   * TODO
-   * @param applicationId
-   * @param region
-   * @param country
-   * @param city
-   * @return
-   */
   public Map<String, List<SimpleContainer>> launchMicroserviceApplication(long applicationId, String region,
                                                                           String country, String city) {
     // TODO : review launchMicroserviceApplication
     var serviceContainers = new HashMap<String, List<SimpleContainer>>();
     var dynamicLaunchParams = new HashMap<String, String>();
-    log.info("Launching app '{}' at {}, {}, {}", applicationId, region, country, city);
+    log.info("Launching app {} at {}/{}/{}", applicationId, region, country, city);
     appsService.getServiceByAppId(applicationId).stream()
         .filter(serviceOrder -> !Objects.equals(serviceOrder.getService().getServiceType(), "database"))
         .map(ServiceOrder::getService)
@@ -171,7 +164,7 @@ public class DockerContainersService {
   }
 
   public SimpleContainer launchContainer(String hostname, String serviceName, String internalPort, String externalPort,
-                                Map<String, String> dynamicLaunchParams) {
+                                         Map<String, String> dynamicLaunchParams) {
     ServiceEntity service = serviceService.getService(serviceName).toBuilder()
         .defaultInternalPort(internalPort)
         .defaultExternalPort(externalPort)
@@ -182,7 +175,7 @@ public class DockerContainersService {
   }
 
   public SimpleContainer launchContainer(String hostname, String serviceName, List<String> customEnvs,
-                                Map<String, String> customLabels, Map<String, String> dynamicLaunchParams) {
+                                         Map<String, String> customLabels, Map<String, String> dynamicLaunchParams) {
     ServiceEntity service = serviceService.getService(serviceName);
     return launchContainer(hostname, service, customEnvs, customLabels, dynamicLaunchParams);
   }
@@ -226,7 +219,7 @@ public class DockerContainersService {
         launchCommand = launchCommand.replace(outputLabel, eurekaAddr.get());
       } else {
         //TODO apagar depois de ver se não houver erro
-        log.error("\neureka address at region '{}' not found", region);
+        log.error("eureka address at region '{}' not found", region);
       }
     }
     for (ServiceEntity databaseService : serviceService.getDependenciesByType(serviceId, "database")) {
@@ -276,10 +269,9 @@ public class DockerContainersService {
       ContainerCreation container = dockerClient.createContainer(containerConfig, containerName);
       String containerId = container.id();
       dockerClient.startContainer(containerId);
-      log.info("successfully launched container = '{}'", containerId);
       if (Objects.equals(serviceType, "frontend")) {
-        nginxLoadBalancerService.addToLoadBalancer(hostname, serviceName, serviceAddr, continent,
-            region, country, city);
+        nginxLoadBalancerService.addToLoadBalancer(
+            hostname, serviceName, serviceAddr, continent, region, country, city);
       }
       return getContainer(containerId);
     } catch (DockerException | InterruptedException e) {
@@ -322,12 +314,39 @@ public class DockerContainersService {
         .flatMap(List::stream)
         .map(ContainerPortMapping::getPublicPort)
         .collect(Collectors.toList());
+    System.out.println(usedExternalPorts);
     for (var i = Integer.parseInt(startExternalPort); ; i++) {
+      System.out.println(usedExternalPorts.contains(i));
       if (!usedExternalPorts.contains(i)) {
         return String.valueOf(i);
       }
     }
   }
+
+  /*private String getAvailableExternalPort(DockerClient docker, String startExternalPort) {
+    int externalPort = Integer.valueOf(startExternalPort);
+    boolean foundAvailableExternalPort = false;
+    try {
+      List<Container> containers = docker.listContainers(ListContainersParam.withStatusCreated(),
+          ListContainersParam.withStatusRunning(), ListContainersParam.withStatusExited());
+      Map<Integer, Integer> portsMap = new HashMap<>();
+      for (Container container : containers) {
+        for (PortMapping port : container.ports()) {
+          portsMap.put(port.publicPort(), port.publicPort());
+        }
+      }
+      while (!foundAvailableExternalPort) {
+        if (portsMap.containsKey(externalPort))
+          externalPort++;
+        else
+          foundAvailableExternalPort = true;
+      }
+      return String.valueOf(externalPort);
+    } catch (DockerException | InterruptedException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }*/
 
   /**
    *
@@ -349,41 +368,42 @@ public class DockerContainersService {
         //TODO add timeout?
       } while (databaseContainer.isEmpty());
     }
-    final var serviceAddress = databaseContainer.get().getLabels().get(DockerContainer.Label.SERVICE_ADDRESS);
+    String serviceAddress = databaseContainer.get().getLabels().get(DockerContainer.Label.SERVICE_ADDRESS);
     log.info("Found database '{}' with state '{}'", serviceAddress, databaseContainer.get().getState());
     //TODO make sure container is on state ready?
     return serviceAddress;
   }
 
-  /**
-   *
-   * @param containerId
-   * @param hostname
-   */
-  public void stopContainer(String containerId, String hostname) {
-    ContainerInfo containerInfo = inspectContainer(containerId, hostname);
+  public void stopContainer(String id) {
+    SimpleContainer container = getContainer(id);
+    String hostname = container.getHostname();
+    stopContainer(id, hostname);
+  }
+
+  public void stopContainer(String id, String hostname) {
+    ContainerInfo containerInfo = inspectContainer(id, hostname);
     String serviceType = containerInfo.config().labels().get(DockerContainer.Label.SERVICE_TYPE);
     if (Objects.equals(serviceType, "frontend")) {
-      nginxLoadBalancerService.removeFromLoadBalancer(hostname, containerId);
+      nginxLoadBalancerService.removeFromLoadBalancer(hostname, id);
     }
     try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
       //TODO espera duas vezes no caso de migração!?!?
-      dockerClient.stopContainer(containerId, dockerDelayBeforeStopContainer);
+      dockerClient.stopContainer(id, dockerDelayBeforeStopContainer);
+      log.info("Stopped container '{}' on host '{}'", id, hostname);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new StopContainerException(e.getMessage());
     }
   }
 
-  /**
-   *
-   * @param containerId
-   * @param fromHostname
-   * @param toHostname
-   * @return the id of the container replica
-   */
-  public SimpleContainer replicateContainer(String containerId, String fromHostname, String toHostname) {
-    ContainerInfo fromContainer = inspectContainer(containerId, fromHostname);
+  public SimpleContainer replicateContainer(String id, String toHostname) {
+    SimpleContainer container = getContainer(id);
+    String fromHostname = container.getHostname();
+    return replicateContainer(id, fromHostname, toHostname);
+  }
+
+  public SimpleContainer replicateContainer(String id, String fromHostname, String toHostname) {
+    ContainerInfo fromContainer = inspectContainer(id, fromHostname);
     String serviceName = fromContainer.name().replace("/", "").split("_")[0];
     Map.Entry<String, List<PortBinding>> port = fromContainer.hostConfig().portBindings().entrySet().iterator().next();
     String internalPort = port.getKey();
@@ -410,45 +430,33 @@ public class DockerContainersService {
     return launchContainer(toHostname, service, customEnvs, customLabels, dynamicLaunchParams);
   }
 
-  /**
-   *
-   * @param fromHostname
-   * @param toHostname
-   * @return
-   */
   public List<SimpleContainer> migrateContainers(String fromHostname, String toHostname) {
     List<SimpleContainer> containers = getContainers(fromHostname).stream()
         .filter(c -> List.of("backend", "frontend").contains(c.getLabels().get(DockerContainer.Label.SERVICE_TYPE)))
         .collect(Collectors.toList());
     var migratedContainers = new ArrayList<SimpleContainer>(containers.size());
-    containers.forEach(c -> migratedContainers.add(migrateContainer(c.getId(), fromHostname, toHostname)));
+    containers.forEach(c -> migratedContainers.add(migrateContainer(c.getId(), toHostname)));
     return migratedContainers;
   }
 
-  public SimpleContainer migrateContainer(String containerId, String fromHostname, String toHostname) {
-    //TODO change delay from seconds to milliseconds
-    return migrateContainer(containerId, fromHostname, toHostname, dockerDelayBeforeStopContainer);
-  }
-
-  /**
-   *
-   * @param containerId
-   * @param fromHostname
-   * @param toHostname
-   * @return
-   */
-  public SimpleContainer migrateContainer(String containerId, String fromHostname,
-                                          String toHostname, int secondsBeforeStop) {
-    long delayBeforeStop = secondsBeforeStop < 1 ? dockerDelayBeforeStopContainer : secondsBeforeStop;
-    SimpleContainer replicaContainer = replicateContainer(containerId, fromHostname, toHostname);
+  public SimpleContainer migrateContainer(String containerId, String hostname, String toHostname) {
+    SimpleContainer replicaContainer = replicateContainer(containerId, toHostname);
     new Timer("StopContainerTimer").schedule(new TimerTask() {
       @Override
       public void run() {
-        stopContainer(containerId, fromHostname);
-        log.info("Stopped container '{}' on host '{}'", containerId, fromHostname);
+        if (hostname != null) {
+          stopContainer(containerId, hostname);
+        } else {
+          stopContainer(containerId);
+        }
       }
-    }, TimeUnit.SECONDS.toMillis(delayBeforeStop));
+    }, TimeUnit.SECONDS.toMillis(dockerDelayBeforeStopContainer));
+    //TODO change delay from seconds to milliseconds
     return replicaContainer;
+  }
+
+  public SimpleContainer migrateContainer(String containerId, String toHostname) {
+    return migrateContainer(containerId, null, toHostname);
   }
 
   public List<SimpleContainer> getContainers(DockerClient.ListContainersParam... filter) {
@@ -471,7 +479,7 @@ public class DockerContainersService {
 
   private Optional<SimpleContainer> findContainer(String id) {
     //TODO confirm filter correctness
-    final var idFilter = DockerClient.ListContainersParam.filter("id", id);
+    DockerClient.ListContainersParam idFilter = DockerClient.ListContainersParam.filter("id", id);
     return getContainers(idFilter).stream().findFirst();
   }
 

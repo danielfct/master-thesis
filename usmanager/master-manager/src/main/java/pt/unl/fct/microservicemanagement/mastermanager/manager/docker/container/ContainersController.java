@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.load_balancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.loadBalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
 
@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
 @RestController
 @RequestMapping("/containers")
@@ -71,35 +72,26 @@ public class ContainersController {
     return dockerContainersService.launchContainer(hostname, serviceName, internalPort, externalPort);
   }
 
-  @GetMapping("/{containerId}")
-  public SimpleContainer getContainer(@PathVariable String containerId) {
-    return dockerContainersService.getContainer(containerId);
+  @GetMapping("/{id}")
+  public SimpleContainer getContainer(@PathVariable String id) {
+    return dockerContainersService.getContainer(id);
   }
 
   @DeleteMapping("/{id}")
-  public void stopContainer(@PathVariable String id, @RequestBody SimpleContainer container)
-      {
-    //TODO validate ids => throw new BadRequest when not match
-    final var containerId = container.getId();
-    final var hostname = container.getHostname();
-    dockerContainersService.stopContainer(containerId, hostname);
+  public void stopContainer(@PathVariable String id) {
+    dockerContainersService.stopContainer(id);
   }
 
   @PostMapping("/{id}/replicate")
-  public SimpleContainer replicateContainer(@PathVariable String id,
-                                            @RequestBody ReplicateContainerReq repContainerReq) {
-    final var fromHostname = repContainerReq.getFromHostname();
-    final var toHostname = repContainerReq.getToHostname();
-    return dockerContainersService.replicateContainer(id, fromHostname, toHostname);
+  public SimpleContainer replicateContainer(@PathVariable String id, @Json String hostname) {
+    System.out.println(hostname); //TODO
+    return dockerContainersService.replicateContainer(id, hostname);
   }
 
   @PostMapping("/{id}/migrate")
-  public SimpleContainer migrateContainer(@PathVariable String id,
-                                          @RequestBody MigrateContainerReq migContainerReq) {
-    final var fromHostname = migContainerReq.getFromHostname();
-    final var toHostname = migContainerReq.getToHostname();
-    final var secondsBeforeStop = migContainerReq.getSecondsBeforeStop();
-    return dockerContainersService.migrateContainer(id, fromHostname, toHostname, secondsBeforeStop);
+  public SimpleContainer migrateContainer(@PathVariable String id, @Json String hostname) {
+    System.out.println(hostname); //TODO
+    return dockerContainersService.migrateContainer(id, hostname);
   }
 
   //FIXME add appId to launchAppReq

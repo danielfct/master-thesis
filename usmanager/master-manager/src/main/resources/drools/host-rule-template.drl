@@ -8,9 +8,9 @@ priority
 
 package pt.unl.fct.microservicemanagement.mastermanager;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.RuleDecision;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.RuleDecision;
 
-global pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.RuleDecision hostDecision;
+global pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.RuleDecision hostDecision;
 
 template "host"
 

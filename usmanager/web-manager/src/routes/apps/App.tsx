@@ -4,7 +4,7 @@ import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
 import Form, {IFields, required} from "../../components/form/Form";
 import Field from "../../components/form/Field";
-import LoadingSpinner from "../../components/list/LoadingSpinner";
+import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
 import React from "react";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
@@ -151,7 +151,7 @@ class App extends BaseComponent<Props, State> {
     const appKey: (keyof IApp) = formApp && Object.keys(formApp)[0];
     return (
       <>
-        {isLoading && <LoadingSpinner/>}
+        {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formApp && (
           <Form id={appKey}

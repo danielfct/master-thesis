@@ -26,8 +26,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.hosts.HostRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rule_system.rules.hosts.HostRulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;

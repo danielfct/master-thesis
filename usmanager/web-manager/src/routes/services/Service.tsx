@@ -34,7 +34,7 @@ import IData from "../../components/IData";
 import {addServiceApp, addServiceDependency, addServicePrediction, addServiceRule, loadServices} from "../../actions";
 import {connect} from "react-redux";
 import MainLayout from "../../views/mainLayout/MainLayout";
-import LoadingSpinner from "../../components/list/LoadingSpinner";
+import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {ReduxState} from "../../reducers";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import BaseComponent from "../../components/BaseComponent";
@@ -330,7 +330,7 @@ class Service extends BaseComponent<Props, State> {
     const serviceKey: (keyof IService) = formService && Object.keys(formService)[0];
     return (
       <>
-        {isLoadingServices && <LoadingSpinner/>}
+        {isLoadingServices && <ListLoadingSpinner/>}
         {!isLoadingServices && loadServicesError && <Error message={loadServicesError}/>}
         {!isLoadingServices && !loadServicesError && formService && (
           <Form id={serviceKey}

@@ -2,7 +2,7 @@ import IData from "../../components/IData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../components/BaseComponent";
 import Form, {IFields, required, requiredAndNumberAndMin} from "../../components/form/Form";
-import LoadingSpinner from "../../components/list/LoadingSpinner";
+import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
@@ -180,7 +180,7 @@ class Node extends BaseComponent<Props, {}> {
     const isNew = isNewNode(this.props.match.params.id);
     return (
       <>
-        {isLoading && <LoadingSpinner/>}
+        {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && node && (
           <Form id={nodeKey}

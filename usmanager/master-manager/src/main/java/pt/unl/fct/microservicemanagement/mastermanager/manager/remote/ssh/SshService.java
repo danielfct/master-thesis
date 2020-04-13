@@ -55,7 +55,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SshService {
 
-  private static final int EXEC_COMMAND_TIMEOUT = 30000;
+  private static final int EXEC_COMMAND_TIMEOUT = 120000;
 
   private final EdgeHostsService edgeHostsService;
 

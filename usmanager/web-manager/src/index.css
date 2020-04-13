@@ -462,6 +462,10 @@ textarea.materialize-textarea[readonly="readonly"] {
     overflow: auto;
 }
 
+.noBorder {
+    border: unset;
+}
+
 .gridCard {
     width: auto !important;
     background: #36393F;
@@ -685,4 +689,15 @@ select.no-validation-field ~ input.select-dropdown {
 
 .input-field input[type=search]+.label-icon {
     padding-left: 4px;
+}
+
+.progress {
+    height: 2px;
+    margin: 0;
+    background-color: #36393F;
+}
+
+.progress .indeterminate,
+.progress .determinate {
+    background-color: black;
 }

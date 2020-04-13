@@ -12,7 +12,7 @@ import IData from "../../../components/IData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {IFields, required} from "../../../components/form/Form";
-import LoadingSpinner from "../../../components/list/LoadingSpinner";
+import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
@@ -174,7 +174,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     const edgeHostKey: (keyof IEdgeHost) = formEdgeHost && Object.keys(formEdgeHost)[0];
     return (
       <>
-        {isLoading && <LoadingSpinner/>}
+        {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formEdgeHost && (
           <Form id={edgeHostKey}
