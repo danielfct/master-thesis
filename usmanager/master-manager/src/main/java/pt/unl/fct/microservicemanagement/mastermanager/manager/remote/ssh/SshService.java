@@ -34,12 +34,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.security.Security;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.schmizz.sshj.SSHClient;
@@ -74,7 +71,7 @@ public class SshService {
 
   private SSHClient initClient(String hostname) throws IOException {
     var sshClient = new SSHClient();
-    //TODO try to use another hostkeyverifier
+    //TODO try to use a more secure host key verifier
     sshClient.addHostKeyVerifier(new PromiscuousVerifier());
     sshClient.connect(hostname);
     if (edgeHostsService.hasEdgeHost(hostname)) {
@@ -83,8 +80,7 @@ public class SshService {
       //TODO improve security password
       String password = new String(Base64.getDecoder().decode(edgeHost.getSshPassword()));
       sshClient.authPassword(username, password);
-      log.info("Logged in to edge hostname '{}' with username '{}' and password '{}'",
-          hostname, username, password);
+      log.info("Logged in to edge host: {}, with username: {}", hostname, username);
     } else {
       var keyFile = new PKCS8KeyFile();
       keyFile.init(new File(awsKeyFilePath));
@@ -109,22 +105,29 @@ public class SshService {
     }
   }
 
-  public CommandResult execCommand(String hostname, String name, String command) {
-    try (var sshClient = initClient(hostname);
-         var session = sshClient.startSession()) {
-      log.info("Executing '{}' \non hostname '{}'", command, hostname);
-      Session.Command cmd = session.exec(command);
+  public CommandResult execCommand(String hostname, String commandName, String command) {
+    return execCommand(hostname, commandName, command, false);
+  }
+
+  public CommandResult execCommand(String hostname, String commandName, String command, boolean sudo) {
+    try (SSHClient sshClient = initClient(hostname);
+         Session session = sshClient.startSession()) {
+      String execCommand;
+      if (sudo) {
+        execCommand = edgeHostsService.hasEdgeHost(hostname)
+            ? String.format("echo %s | sudo -S %s", new String(
+                Base64.getDecoder().decode(edgeHostsService.getEdgeHost(hostname).getSshPassword())), command)
+            : String.format("sudo %s", command);
+      } else {
+        execCommand = command;
+      }
+      log.info("Executing: {}\nat host {}", execCommand, hostname);
+      Session.Command cmd = session.exec(execCommand);
       cmd.join(EXEC_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
       int exitStatus = cmd.getExitStatus();
-      String output = Arrays.stream(IOUtils.readFully(cmd.getInputStream()).toString().split("\\n"))
-          .filter(Predicate.not(String::isEmpty))
-          .distinct()
-          .collect(Collectors.joining());
-      String error = Arrays.stream(IOUtils.readFully(cmd.getErrorStream()).toString().split("\\n"))
-          .filter(Predicate.not(String::isEmpty))
-          .distinct()
-          .collect(Collectors.joining());
-      log.info("Command {} exited with status: {}', output: '{}', error: {}", name, exitStatus, output, error);
+      String output = IOUtils.readFully(cmd.getInputStream()).toString();
+      String error = IOUtils.readFully(cmd.getErrorStream()).toString();
+      log.info("Command: {}, exited with status: {}, output: {}, error: {}", commandName, exitStatus, output, error);
       return new CommandResult(exitStatus, command, output, error);
     } catch (IOException e) {
       e.printStackTrace();

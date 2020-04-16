@@ -40,11 +40,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public final class DockerNodesService {
+public final class NodesService {
 
   private final DockerSwarmService dockerSwarmService;
 
-  public DockerNodesService(DockerSwarmService dockerSwarmService) {
+  public NodesService(DockerSwarmService dockerSwarmService) {
     this.dockerSwarmService = dockerSwarmService;
   }
 

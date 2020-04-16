@@ -27,7 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.DockerNodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodeRole;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
@@ -69,7 +69,7 @@ public class HostsMonitoringService {
 
   private final HostMonitoringRepository hostsMonitoring;
 
-  private final DockerNodesService dockerNodesService;
+  private final NodesService nodesService;
   private final DockerContainersService dockerContainersService;
   private final HostRulesService hostRulesService;
   private final HostsService hostsService;
@@ -84,12 +84,12 @@ public class HostsMonitoringService {
   private final int maximumHosts;
   private final int minimumHosts;
 
-  public HostsMonitoringService(HostMonitoringRepository hostsMonitoring, DockerNodesService dockerNodesService,
+  public HostsMonitoringService(HostMonitoringRepository hostsMonitoring, NodesService nodesService,
                                 DockerContainersService dockerContainersService, HostRulesService hostRulesService,
                                 HostsService hostsService, HostMetricsService hostMetricsService,
                                 ServicesService servicesService, HostsEventsService hostsEventsService,
                                 DecisionsService decisionsService, HostProperties hostProperties) {
-    this.dockerNodesService = dockerNodesService;
+    this.nodesService = nodesService;
     this.dockerContainersService = dockerContainersService;
     this.hostRulesService = hostRulesService;
     this.hostsService = hostsService;
@@ -148,7 +148,7 @@ public class HostsMonitoringService {
   private void monitorHostsTask() {
     log.info("Starting host monitoring task...");
     var hostDecisions = new LinkedList<HostDecisionResult>();
-    List<SimpleNode> nodes = dockerNodesService.getAvailableNodes();
+    List<SimpleNode> nodes = nodesService.getAvailableNodes();
     for (SimpleNode node : nodes) {
       log.info("On {}", node);
       String hostname = node.getHostname();

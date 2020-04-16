@@ -33,6 +33,9 @@ const ServiceCard = ({container}: Props) => (
     <CardItem key={'ports'}
               label={'Ports'}
               value={`${container.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+    <CardItem key={'replicable'}
+              label={'Replicable'}
+              value={`${container.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
   </Card>
 );
 

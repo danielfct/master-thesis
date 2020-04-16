@@ -29,10 +29,13 @@ import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundExcept
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.DockerNodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.LaunchDockerApiProxyException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadBalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -51,6 +54,7 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -75,29 +79,32 @@ public class DockerContainersService {
   private static final long CPU_SLEEP = TimeUnit.MILLISECONDS.toMillis(100);
 
   private final DockerCoreService dockerCoreService;
-  private final DockerNodesService dockerNodesService;
+  private final NodesService nodesService;
   private final AppsService appsService;
   private final ServicesService serviceService;
   private final NginxLoadBalancerService nginxLoadBalancerService;
   private final EurekaService eurekaService;
   private final HostsService hostsService;
+  private final SshService sshService;
 
   private final String dockerHubUsername;
   private final int dockerDelayBeforeStopContainer;
 
   //FIXME remove @Lazy
-  public DockerContainersService(DockerCoreService dockerCoreService, DockerNodesService dockerNodesService,
+  public DockerContainersService(DockerCoreService dockerCoreService, NodesService nodesService,
                                  AppsService appsService, ServicesService serviceService,
                                  @Lazy NginxLoadBalancerService nginxLoadBalancerService,
                                  @Lazy EurekaService eurekaService, @Lazy HostsService hostsService,
+                                 SshService sshService,
                                  DockerProperties dockerProperties, ContainerProperties containerProperties) {
     this.dockerCoreService = dockerCoreService;
-    this.dockerNodesService = dockerNodesService;
+    this.nodesService = nodesService;
     this.appsService = appsService;
     this.serviceService = serviceService;
     this.nginxLoadBalancerService = nginxLoadBalancerService;
     this.eurekaService = eurekaService;
     this.hostsService = hostsService;
+    this.sshService = sshService;
     this.dockerHubUsername = dockerProperties.getHub().getUsername();
     this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
   }
@@ -196,7 +203,7 @@ public class DockerContainersService {
     long serviceId = service.getId();
     String serviceType = service.getServiceType();
     String internalPort = service.getDefaultInternalPort();
-    String externalPort = findAvailableExternalPort(service.getDefaultExternalPort());
+    String externalPort = findAvailableExternalPort(hostname, service.getDefaultExternalPort());
     var serviceAddr = String.format("%s:%s", hostname, externalPort);
     var containerName = String.format("%s_%s_%s", serviceName, hostname, externalPort);
     var dockerRepository = String.format("%s/%s", dockerHubUsername, service.getDockerRepository());
@@ -301,22 +308,19 @@ public class DockerContainersService {
     return container;
   }
 
-  /**
-   *
-   * @param startExternalPort
-   * @return a number for the external port that is not already in use
-   */
-  private String findAvailableExternalPort(String startExternalPort) {
-    List<SimpleContainer> containers = getContainers(DockerClient.ListContainersParam.withStatusCreated(),
-        DockerClient.ListContainersParam.withStatusRunning(), DockerClient.ListContainersParam.withStatusExited());
-    List<Integer> usedExternalPorts = containers.stream()
-        .map(SimpleContainer::getPorts)
-        .flatMap(List::stream)
-        .map(ContainerPortMapping::getPublicPort)
+  private String findAvailableExternalPort(String hostname, String startExternalPort) {
+    var command = "lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
+    CommandResult commandResult = sshService.execCommand(hostname, "findAvailableExternalPort", command, true);
+    if (!commandResult.isSuccessful()) {
+      throw new LaunchDockerApiProxyException("Unable to find currently used external ports at %s: %s ", hostname,
+          commandResult.getError());
+    }
+    Pattern isNumberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+    List<Integer> usedExternalPorts = Arrays.stream(commandResult.getOutput().split("\n"))
+        .filter(v -> isNumberPattern.matcher(v).matches())
+        .map(Integer::parseInt)
         .collect(Collectors.toList());
-    System.out.println(usedExternalPorts);
     for (var i = Integer.parseInt(startExternalPort); ; i++) {
-      System.out.println(usedExternalPorts.contains(i));
       if (!usedExternalPorts.contains(i)) {
         return String.valueOf(i);
       }
@@ -484,7 +488,7 @@ public class DockerContainersService {
   }
 
   private List<SimpleContainer> getAllContainers(DockerClient.ListContainersParam... filter) {
-    return dockerNodesService.getAvailableNodes().stream()
+    return nodesService.getAvailableNodes().stream()
         .map(node -> getContainers(node.getHostname(), filter))
         .flatMap(List::stream)
         .collect(Collectors.toList());

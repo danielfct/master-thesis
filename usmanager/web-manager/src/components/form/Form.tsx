@@ -183,8 +183,15 @@ class Form extends React.Component<Props, State> {
     const args = this.state.values[this.props.id];
     if (this.props.delete) {
       deleteData(this.props.delete.url,
-        () => this.props.delete?.successCallback(args),
-        (reply) => this.props.delete?.failureCallback(reply, args));
+        () => {
+          this.props.delete?.successCallback(args);
+          this.setState({isLoading: false});
+        },
+        (reply) => {
+          this.props.delete?.failureCallback(reply, args);
+          this.setState({isLoading: false});
+        });
+      this.setState({isLoading: true});
     }
   };
 
@@ -264,7 +271,7 @@ class Form extends React.Component<Props, State> {
                   <button
                     className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text right slide`}
                     type="submit">
-                    Save
+                    {this.props.post?.textButton || 'Save'}
                   </button>
                   :
                   <div>

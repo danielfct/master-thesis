@@ -26,7 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.location;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.DockerNodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
@@ -59,7 +59,7 @@ public class LocationRequestService {
   public static final String REQUEST_LOCATION_MONITOR = "request-location-monitor";
   private static final double PERCENT = 0.01;
 
-  private final DockerNodesService dockerNodesService;
+  private final NodesService nodesService;
   private final DockerContainersService dockerContainersService;
   private final RegionsService regionsService;
   private final HostsService hostsService;
@@ -69,10 +69,10 @@ public class LocationRequestService {
   private final RestTemplate restTemplate;
   private final HttpHeaders headers;
 
-  public LocationRequestService(DockerContainersService dockerContainersService, DockerNodesService dockerNodesService,
+  public LocationRequestService(DockerContainersService dockerContainersService, NodesService nodesService,
                                 RegionsService regionsService, HostsService hostsService,
                                 LocationRequestProperties locationRequestProperties) {
-    this.dockerNodesService = dockerNodesService;
+    this.nodesService = nodesService;
     this.dockerContainersService = dockerContainersService;
     this.regionsService = regionsService;
     this.hostsService = hostsService;
@@ -125,7 +125,7 @@ public class LocationRequestService {
   }
 
   private Pair<Map<String, Map<String, Integer>>, Map<String, Integer>> getLocationMonitoring(int seconds) {
-    List<SimpleNode> nodes = dockerNodesService.getAvailableNodes();
+    List<SimpleNode> nodes = nodesService.getAvailableNodes();
     Map<String, Map<String, Integer>> serviceCountLocations = new HashMap<>();
     Map<String, Integer> serviceTotalRequestCount = new HashMap<>();
     List<LocationMonitoringResp> allLocationMonitoringData = new ArrayList<>();

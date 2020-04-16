@@ -17,9 +17,14 @@ import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {loadCloudHosts} from "../../../actions";
+import {addCloudHostRule, addEdgeHostRule, loadCloudHosts} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
+import {IEdgeHost} from "../edge/EdgeHost";
+import {postData} from "../../../utils/api";
+import EdgeHostRuleList from "../edge/EdgeHostRuleList";
+import GenericHostRuleList from "../GenericHostRuleList";
+import CloudHostRuleList from "./CloudHostRuleList";
 
 export interface ICloudHost {
   instanceId: string;
@@ -28,6 +33,7 @@ export interface ICloudHost {
   state: { code: number, name: string }
   publicDnsName: string;
   publicIpAddress: string;
+  rules: string[];
 }
 
 const emptyCloudHost = (): Partial<ICloudHost> => ({
@@ -43,10 +49,12 @@ interface StateToProps {
   isLoading: boolean;
   error?: string | null;
   cloudHost: Partial<ICloudHost>;
+  formCloudHost?: Partial<ICloudHost>;
 }
 
 interface DispatchToProps {
   loadCloudHosts: (instanceId: string) => any;
+  addCloudHostRule: (hostname: string, ruleName: string) => void;
 }
 
 interface MatchParams {
@@ -55,7 +63,16 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
+type State = {
+  newRules: string[],
+  instanceId?: string,
+}
+
 class CloudHost extends BaseComponent<Props, {}> {
+
+  state: State = {
+    newRules: [],
+  };
 
   componentDidMount(): void {
     const cloudHostInstanceId = this.props.match.params.instanceId;
@@ -64,12 +81,26 @@ class CloudHost extends BaseComponent<Props, {}> {
     }
   };
 
-  private onPostSuccess = (reply: any, cloudHostInstanceId: string): void => {
-    super.toast(`Cloud host <b>${cloudHostInstanceId}</b> has now started`);
+  private saveEntities = (hostname: string) => {
+    this.saveCloudHostRules(hostname);
   };
 
+  private onPostSuccess = (reply: any, instanceId: string): void => {
+    super.toast(`Cloud host <b>${instanceId}</b> has now started`);
+  };
+
+  private onPutSuccess = (instanceId: string): void => {
+    super.toast(`Changes to host <b>${instanceId}</b> are now saved`);
+    this.setState({instanceId: instanceId});
+    this.saveEntities(instanceId);
+  };
+
+  private onPutFailure = (reason: string, instanceId: string): void =>
+    super.toast(`Unable to update ${instanceId}`, 10000, reason, true);
+
+
   private onPostFailure = (reason: string, cloudHostInstanceId: string): void =>
-    super.toast(`Unable to save ${cloudHostInstanceId}`, 10000, reason, true);
+    super.toast(`Unable to update ${cloudHostInstanceId}`, 10000, reason, true);
 
   private onDeleteSuccess = (cloudHostInstanceId: string): void => {
     super.toast(`Cloud host <b>${cloudHostInstanceId}</b> successfully stopped`);
@@ -77,10 +108,46 @@ class CloudHost extends BaseComponent<Props, {}> {
   };
 
   private onDeleteFailure = (reason: string, cloudHostInstanceId: string): void =>
-    super.toast(`Unable to stop cloud host ${cloudHostInstanceId}`, 10000, reason, true);
+    super.toast(`Unable to remove cloud host ${cloudHostInstanceId}`, 10000, reason, true);
 
-  private getFields = (): IFields =>
-    Object.entries(emptyCloudHost()).map(([key, _]) => {
+  private onAddCloudHostRule = (rule: string): void => {
+    this.setState({
+      newRules: this.state.newRules.concat(rule)
+    });
+  };
+
+  private onRemoveCloudHostRules = (rules: string[]): void => {
+    this.setState({
+      newRules: this.state.newRules.filter(rule => !rules.includes(rule))
+    });
+  };
+
+  private saveCloudHostRules = (instanceId: string): void => {
+    const {newRules} = this.state;
+    if (newRules.length) {
+      postData(`hosts/cloud/${instanceId}/rules`, newRules,
+        () => this.onSaveRulesSuccess(instanceId),
+        (reason) => this.onSaveRulesFailure(instanceId, reason));
+    }
+  };
+
+  private onSaveRulesSuccess = (instanceId: string): void => {
+    if (!isNewHost(this.props.match.params.instanceId)) {
+      this.state.newRules.forEach(rule =>
+        this.props.addCloudHostRule(instanceId, rule)
+      );
+    }
+    this.setState({ newRules: [] });
+  };
+
+  private onSaveRulesFailure = (instanceId: string, reason: string): void =>
+    super.toast(`Unable to save rules of host ${instanceId}`, 10000, reason, true);
+
+  private shouldShowSaveButton = () =>
+    !!this.state.newRules.length;
+
+  private getFields = (cloudHost: Partial<ICloudHost>): IFields =>
+    Object.entries(cloudHost).map(([key, _]) => {
       return {
         [key]: {
           id: key,
@@ -96,20 +163,31 @@ class CloudHost extends BaseComponent<Props, {}> {
     }, {});
 
   private details = () => {
-    const {isLoading, error, cloudHost} = this.props;
+    const {isLoading, error, formCloudHost, cloudHost} = this.props;
     // @ts-ignore
     const cloudHostKey: (keyof ICloudHost) = cloudHost && Object.keys(cloudHost)[0];
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && cloudHost && (
+        {!isLoading && !error && formCloudHost && (
           <Form id={cloudHostKey}
-                fields={this.getFields()}
+                fields={this.getFields(formCloudHost)}
                 values={cloudHost}
                 isNew={isNewHost(this.props.match.params.instanceId)}
-                post={{url: 'hosts/cloud', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                delete={{url: `hosts/cloud/${cloudHost[cloudHostKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                showSaveButton={this.shouldShowSaveButton()}
+                post={{
+                  url: 'hosts/cloud',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure}}
+                put={{
+                  url: `hosts/cloud/${this.state.instanceId || cloudHost[cloudHostKey]}`,
+                  successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
+                delete={{
+                  url: `hosts/cloud/${cloudHost[cloudHostKey]}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure}}
+                saveEntities={this.saveEntities}
                 editable={false}>
             {/*//TODO instanceType dropdown?*/}
             {Object.keys(cloudHost).map((key, index) =>
@@ -124,7 +202,13 @@ class CloudHost extends BaseComponent<Props, {}> {
   };
 
   private rules = (): JSX.Element =>
-    <></>; //TODO
+    <CloudHostRuleList host={this.props.cloudHost}
+                       newRules={this.state.newRules}
+                       onAddHostRule={this.onAddCloudHostRule}
+                       onRemoveHostRules={this.onRemoveCloudHostRules}/>;
+
+  private genericRules = (): JSX.Element =>
+    <GenericHostRuleList/>;
 
   private tabs: Tab[] = [
     {
@@ -136,6 +220,11 @@ class CloudHost extends BaseComponent<Props, {}> {
       title: 'Rules',
       id: 'rules',
       content: () => this.rules()
+    },
+    {
+      title: 'Generic rules',
+      id: 'genericEdgeRules',
+      content: () => this.genericRules()
     },
   ];
 
@@ -156,15 +245,21 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const error = state.entities.hosts.cloud.loadHostsError;
   const instanceId = props.match.params.instanceId;
   const cloudHost = isNewHost(instanceId) ? emptyCloudHost() : state.entities.hosts.cloud.data[instanceId];
+  let formCloudHost;
+  if (cloudHost) {
+    formCloudHost = {...cloudHost};
+  }
   return  {
     isLoading,
     error,
     cloudHost,
+    formCloudHost
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadCloudHosts,
+  addCloudHostRule
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CloudHost);

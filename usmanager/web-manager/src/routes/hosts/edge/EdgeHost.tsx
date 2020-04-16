@@ -182,9 +182,18 @@ class EdgeHost extends BaseComponent<Props, State> {
                 values={edgeHost}
                 isNew={isNewHost(this.props.match.params.hostname)}
                 showSaveButton={this.shouldShowSaveButton()}
-                post={{url: 'hosts/edge', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={{url: `hosts/edge/${this.state.hostname || edgeHost[edgeHostKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={{url: `hosts/edge/${this.state.hostname || edgeHost[edgeHostKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                post={{
+                  url: 'hosts/edge',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure}}
+                put={{
+                  url: `hosts/edge/${this.state.hostname || edgeHost[edgeHostKey]}`,
+                  successCallback: this.onPutSuccess,
+                  failureCallback: this.onPutFailure}}
+                delete={{
+                  url: `hosts/edge/${this.state.hostname || edgeHost[edgeHostKey]}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure}}
                 saveEntities={this.saveEntities}>
             {Object.keys(formEdgeHost).map((key, index) =>
               key === 'local'

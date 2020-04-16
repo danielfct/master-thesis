@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node;
 
 public enum NodeRole {
+
   MANAGER, WORKER;
 
   static NodeRole from(String role) {

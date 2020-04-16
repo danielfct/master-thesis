@@ -46,6 +46,7 @@ public final class DockerContainer {
     public static final String SERVICE_COUNTRY = "serviceCountry";
     public static final String SERVICE_CITY = "serviceCity";
     public static final String FOR_SERVICE = "forService";
+    public static final String IS_REPLICABLE = "isReplicable";
   }
 
 }

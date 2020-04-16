@@ -29,7 +29,8 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.DockerNodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodeRole;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsInstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsProperties;
@@ -60,7 +61,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class HostsService {
 
-  private final DockerNodesService dockerNodesService;
+  private final NodesService nodesService;
   private final DockerContainersService dockerContainersService;
   private final DockerSwarmService dockerSwarmService;
   private final EdgeHostsService edgeHostsService;
@@ -74,14 +75,14 @@ public class HostsService {
   private final int maxWorkers;
   private final int maxInstances;
 
-  public HostsService(DockerNodesService dockerNodesService, DockerContainersService dockerContainersService,
+  public HostsService(NodesService nodesService, DockerContainersService dockerContainersService,
                       DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
                       AwsService awsService, SshService sshService, HostMetricsService hostMetricsService,
                       //TODO fix lazy
                       PrometheusService prometheusService, @Lazy LocationRequestService locationRequestService,
                       DockerApiProxyService dockerApiProxyService, DockerProperties dockerProperties,
                       AwsProperties awsProperties) {
-    this.dockerNodesService = dockerNodesService;
+    this.nodesService = nodesService;
     this.dockerContainersService = dockerContainersService;
     this.dockerSwarmService = dockerSwarmService;
     this.edgeHostsService = edgeHostsService;
@@ -124,12 +125,12 @@ public class HostsService {
     var sameRegionHosts = new LinkedList<String>();
     var sameCountryHosts = new LinkedList<String>();
     var sameCityHosts = new LinkedList<String>();
-    List<SimpleNode> nodes = dockerNodesService.getAvailableNodes();
+    List<SimpleNode> nodes = nodesService.getAvailableNodes();
     nodes.stream()
         .map(SimpleNode::getHostname)
         .filter(hostname -> hostMetricsService.nodeHasAvailableResources(hostname, avgContainerMem))
         .forEach(hostname -> {
-          final var hostDetails = getHostDetails(hostname);
+          HostDetails hostDetails = getHostDetails(hostname);
           if (Objects.equals(hostDetails.getRegion(), region)) {
             sameRegionHosts.add(hostname);
             /*if (hostDetails instanceof EdgeHostDetails) {
@@ -155,7 +156,7 @@ public class HostsService {
     log.info("Found hosts {} on same country", sameCountryHosts.toString());
     log.info("Found hosts {} on same region", sameRegionHosts.toString());
     log.info("Found hosts {} on other regions", otherRegionsHosts.toString());
-    final var random = new Random();
+    var random = new Random();
     if (!sameCityHosts.isEmpty()) {
       return sameCityHosts.get(random.nextInt(sameCityHosts.size()));
     } else if (!sameCountryHosts.isEmpty()) {
@@ -168,7 +169,7 @@ public class HostsService {
       return otherRegionsHosts.get(random.nextInt(otherRegionsHosts.size()));
     } else {
       log.info("Didn't find any available node");
-      return addHost(region, country, city);
+      return addHost(NodeRole.WORKER, region, country, city);
     }
   }
 
@@ -232,13 +233,13 @@ public class HostsService {
     return continent;
   }
 
-  public void addHost(String hostname) {
-    setupHost(hostname);
+  public void addHost(NodeRole role, String hostname) {
+    setupHost(role, hostname);
   }
 
-  public String addHost(String region, String country, String city) {
+  public String addHost(NodeRole role, String region, String country, String city) {
     String hostname = chooseEdgeHost(region, country, city).orElse(chooseCloudHost());
-    addHost(hostname);
+    addHost(role, hostname);
     return hostname;
   }
 
@@ -252,7 +253,7 @@ public class HostsService {
     dockerSwarmService.leaveSwarm(hostname);
     //TODO porquê 5 segundos?
     //Timing.sleep(5, TimeUnit.SECONDS);
-    dockerNodesService.deleteHostNodes(hostname);
+    nodesService.deleteHostNodes(hostname);
     if (!edgeHostsService.hasEdgeHost(hostname)) {
       awsService.stopInstance(hostname);
     }
@@ -275,16 +276,23 @@ public class HostsService {
       }
     }
     log.info("Clustering hosts into the swarm...");
-    hostnames.forEach(this::setupHost);
+    hostnames.forEach(hostname ->
+        this.setupHost(Objects.equals(hostname, managerHostname) ? NodeRole.MANAGER : NodeRole.WORKER, hostname));
   }
 
-  private void setupHost(String hostname) {
-    log.info("Setting up host '{}'", hostname);
+  //TODO make sure there is an odd number of master docker nodes
+  private void setupHost(NodeRole role, String hostname) {
+    log.info("Setting up host {}", hostname);
     dockerApiProxyService.launchDockerApiProxy(hostname);
-    if (Objects.equals(hostname, managerHostname)) {
-      setupManager(hostname);
-    } else {
-      setupWorker(hostname);
+    switch (role) {
+      case MANAGER:
+        setupManager(hostname);
+        break;
+      case WORKER:
+        setupWorker(hostname);
+        break;
+      default:
+        return;
     }
     prometheusService.launchPrometheus(hostname);
     locationRequestService.launchRequestLocationMonitor(hostname);
@@ -297,7 +305,7 @@ public class HostsService {
       log.info("Manager {} is already a swarm manager", managerHostname);
     }
     // TODO why now?
-    dockerNodesService.deleteUnresponsiveNodes();
+    nodesService.deleteUnresponsiveNodes();
   }
 
   private void setupWorker(String workerHostname) {
@@ -305,7 +313,7 @@ public class HostsService {
   }
 
   private List<String> getWorkerAwsNodes() {
-    int presentWorkers = dockerNodesService.getAvailableNodes().size() - 1;
+    int presentWorkers = nodesService.getAvailableNodes().size() - 1;
     int maxInitialWorkers = Math.max(0, maxInstances - 1);
     int workersToAdd = maxInitialWorkers - presentWorkers;
     List<String> hostnames = new ArrayList<>(workersToAdd);
@@ -345,7 +353,7 @@ public class HostsService {
     return edgeHosts.stream()
         .filter(edgeHost -> Text.isNullOrEmpty(city) || Objects.equals(edgeHost.getCity(), city))
         .map(EdgeHostEntity::getHostname)
-        .filter(Predicate.not(dockerNodesService::isNode))
+        .filter(Predicate.not(nodesService::isNode))
         .filter(this::isHostRunning)
         .findFirst();
   }
@@ -355,7 +363,7 @@ public class HostsService {
       int stateCode = instance.getState().getCode();
       if (stateCode == AwsInstanceState.RUNNING.getCode()) {
         String hostname = instance.getPublicIpAddress();
-        if (!dockerNodesService.isNode(hostname)) {
+        if (!nodesService.isNode(hostname)) {
           return hostname;
         }
       } else if (stateCode == AwsInstanceState.STOPPED.getCode()) {

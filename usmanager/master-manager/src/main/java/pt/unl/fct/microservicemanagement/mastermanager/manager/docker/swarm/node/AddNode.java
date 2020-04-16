@@ -22,18 +22,22 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node;
+
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-final class MigrateContainerReq {
+final class AddNode {
 
-  private final String containerId;
-  private final String fromHostname;
-  private final String toHostname;
-  private final int secondsBeforeStop;
+  private final String hostname;
+  private final int quantity;
+  private final RegionEntity region;
+  private final String country;
+  private final String city;
+  private final NodeRole role;
 
 }

@@ -337,6 +337,7 @@ class Container extends BaseComponent<Props, State> {
                 values={values}
                 isNew={isNew}
                 post={{
+                  textButton: 'Launch',
                   url: 'containers',
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure}}
@@ -346,8 +347,11 @@ class Container extends BaseComponent<Props, State> {
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure}}
                 editable={false}
-                customButtons={this.replicateMigrateButtons()}
-                loading={this.state.isLoading}>
+                customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
+                  ? this.replicateMigrateButtons()
+                  : undefined}
+                loading={this.state.isLoading}
+                deletable={container && (!container.labels['isStoppable'] || container.labels['isStoppable'] === 'true')}>
             {this.formFields(formContainer, isNew)}
           </Form>
         )}
@@ -397,7 +401,7 @@ class Container extends BaseComponent<Props, State> {
       logs.pop();
       return <ContainerLogsList logs={logs}/>;
     }
-   return <></>;
+    return <></>;
   };
 
   private tabs: Tab[] =

@@ -25,7 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
 import java.util.List;
 
@@ -41,47 +40,46 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/nodes")
 public class NodesController {
 
-  private final DockerNodesService dockerNodesService;
+  private final NodesService nodesService;
   private final HostsService hostsService;
 
-  public NodesController(DockerNodesService dockerNodesService, HostsService hostsService) {
-    this.dockerNodesService = dockerNodesService;
+  public NodesController(NodesService nodesService, HostsService hostsService) {
+    this.nodesService = nodesService;
     this.hostsService = hostsService;
   }
 
   @GetMapping
   public List<SimpleNode> getNodes() {
-    return dockerNodesService.getNodes();
+    return nodesService.getNodes();
   }
 
   @GetMapping("/{id}")
   public SimpleNode getNode(@PathVariable("id") String id) {
-    return dockerNodesService.getNode(id);
+    return nodesService.getNode(id);
   }
 
   @PostMapping
-  public void addNodes(@Json("quantity") Integer quantity, @Json("hostname") String hostname,
-                       @Json("region") String region, @Json("country") String country, @Json("city") String city) {
-    //TODO: return ids?
-    System.out.println(quantity);
-    System.out.println(hostname);
-    System.out.println(region);
-    System.out.println(country);
-    System.out.println(city);
+  public void addNodes(@RequestBody AddNode addNode) {
+    String hostname = addNode.getHostname();
+    int quantity = addNode.getQuantity();
+    String region = addNode.getRegion().getName();
+    String country = addNode.getCountry();
+    String city = addNode.getCity();
+    NodeRole role = addNode.getRole();
     if (hostname != null) {
       for (var i = 0; i < quantity; i++) {
-        hostsService.addHost(hostname);
+        hostsService.addHost(role, hostname);
       }
     } else {
       for (var i = 0; i < quantity; i++) {
-        hostsService.addHost(city, country, region);
+        hostsService.addHost(role, region, city, country);
       }
     }
   }
 
   @DeleteMapping("/{id}")
   public void removeNode(@PathVariable("id") String id) {
-    var node = dockerNodesService.getNode(id);
+    var node = nodesService.getNode(id);
     hostsService.removeHost(node.getHostname());
   }
 

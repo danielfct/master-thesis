@@ -187,8 +187,8 @@ class Node extends BaseComponent<Props, {}> {
                 fields={this.getFields(node)}
                 values={node}
                 isNew={isNew}
-                post={{url: 'nodes', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                delete={{url: `nodes/${node[nodeKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                post={{textButton: 'Start', url: 'nodes', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
+                delete={{textButton: 'Remove', url: `nodes/${node[nodeKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
                 editable={false}
                 deletable={node.role !== 'MANAGER'}>
             {formFields}
