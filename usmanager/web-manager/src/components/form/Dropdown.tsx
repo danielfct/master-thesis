@@ -5,7 +5,7 @@ interface Props<T> {
   className?: string;
   id: string;
   name: string;
-  value: string;
+  value: any;
   disabled?: boolean;
   dropdown: {defaultValue?: string | number, values: T[], optionToString: (v: T) => string};
   onChange: (e: React.FormEvent<HTMLSelectElement>) => void;
@@ -35,28 +35,26 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
         className={className}
         id={id}
         name={name}
-        value={!value ? '' : JSON.stringify(value)}
+        value={typeof value !== 'string' ? JSON.stringify(value) : value}
         disabled={disabled}
         onChange={onChange}
         onBlur={onBlur}
         ref={this.dropdown}>
-        {
-          <>
-            {dropdown.defaultValue && (
-              <option key={dropdown.defaultValue} value="" disabled hidden>
-                {dropdown.defaultValue}
-              </option>
-            )}
-            {dropdown.values.map((option, index) => {
-                return (
-                  <option key={index} value={typeof option !== 'string' ? JSON.stringify(option) : option}>
-                    {dropdown.optionToString(option)}
-                  </option>
-                );
-              }
-            )}
-          </>
-        }
+        {<>
+          {dropdown.defaultValue && (
+            <option key={dropdown.defaultValue} value="" disabled hidden>
+              {dropdown.defaultValue}
+            </option>
+          )}
+          {dropdown.values.map((option, index) => {
+              return (
+                <option key={index} value={typeof option !== 'string' ? JSON.stringify(option) : option}>
+                  {dropdown.optionToString(option)}
+                </option>
+              );
+            }
+          )}
+        </>}
       </select>
     )
   }

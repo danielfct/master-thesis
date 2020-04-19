@@ -32,11 +32,7 @@ import List from "../../../components/list/List";
 import M from "materialize-css";
 import Collapsible from "../../../components/collapsible/Collapsible";
 import {IApp} from "../../apps/App";
-
-export interface IAppService extends Data {
-  service: IService;
-  launchOrder: number;
-}
+import {IAppService} from "../../apps/AppServicesList";
 
 export interface IAddServiceApp {
   name: string;
@@ -185,8 +181,9 @@ class ServiceAppList extends BaseComponent<Props, State> {
   render() {
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
-                           emptyMessage={`Apps list is empty`}
+                           emptyMessage='Apps list is empty'
                            data={this.props.serviceApps}
+                           dataKey='name'
                            dropdown={{
                              id: 'apps',
                              title: 'Add app',
@@ -194,7 +191,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
                              data: this.getSelectableAppsNames(),
                              formModal: {
                                id: 'serviceApp',
-                               dataKey: 'name',
                                fields: this.getModalFields(),
                                values: this.getModalValues(),
                                content: this.addModal,

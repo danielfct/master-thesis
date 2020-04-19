@@ -43,7 +43,7 @@ const emptyEdgeHost = (): Partial<IEdgeHost> => ({
   region: '',
   country: '',
   city: '',
-  local: false,
+  local: undefined,
 });
 
 const isNewHost = (edgeHostHostname: string) =>
@@ -165,8 +165,8 @@ class EdgeHost extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private isLocalOption = (isLocal: string): string =>
-    isLocal;
+  private isLocalOption = (isLocal: boolean): string =>
+    isLocal.toString();
 
   private details = () => {
     const {isLoading, error, formEdgeHost, edgeHost} = this.props;
@@ -197,13 +197,13 @@ class EdgeHost extends BaseComponent<Props, State> {
                 saveEntities={this.saveEntities}>
             {Object.keys(formEdgeHost).map((key, index) =>
               key === 'local'
-                ? <Field key={index}
+                ? <Field<boolean> key={index}
                          id={key}
                          type="dropdown"
                          label={key}
                          dropdown={{
                            defaultValue: "Is a local machine?",
-                           values: ["True", "False"], //TODO fix option
+                           values: [true, false],
                            optionToString: this.isLocalOption}}/>
                 : <Field key={index}
                          id={key}

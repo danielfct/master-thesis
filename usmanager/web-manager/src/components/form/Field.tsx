@@ -5,10 +5,10 @@ import M from "materialize-css";
 import {FormContext, IErrors, IFormContext, IValues} from "./Form";
 import {TextBox} from "./TextBox";
 import {MultilineTextBox} from "./MultilineTextBox";
-import {Dropdown} from "./Dropdown";
 import {Datepicker} from "./Datepicker";
 import {Timepicker} from "./Timepicker";
 import {NumberBox} from "./NumberBox";
+import {Dropdown} from "./Dropdown";
 
 export interface IValidation {
   rule: (values: IValues, fieldName: string, args: any) => string;
@@ -30,12 +30,15 @@ export const getTypeFromValue = (value: any): string =>
 
 export default class Field<T> extends React.Component<FieldProps<T>> {
 
-  componentDidMount(): void {
+  private updateField = () =>
     M.updateTextFields();
+
+  componentDidMount(): void {
+    this.updateField();
   }
 
   public componentDidUpdate(prevProps: Readonly<FieldProps<T>>, prevState: Readonly<{}>, snapshot?: any): void {
-    M.updateTextFields();
+    this.updateField();
   }
 
   private onChange = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,

@@ -44,15 +44,7 @@ export default class AddButton extends React.Component<Props, {}> {
   private dropdown = createRef<HTMLDivElement>();
   private scrollbar: (ScrollBar | null) = null;
 
-  componentDidMount(): void {
-    this.init();
-  }
-
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    this.init();
-  }
-
-  private init = () => {
+  private initDropdown = () => {
     M.Dropdown.init(this.dropdown.current as Element,
       {
         onOpenEnd: this.onOpenDropdown
@@ -61,6 +53,14 @@ export default class AddButton extends React.Component<Props, {}> {
 
   private onOpenDropdown = () =>
     this.scrollbar?.updateScroll();
+
+  componentDidMount(): void {
+    this.initDropdown();
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+    this.initDropdown();
+  }
 
   render = () => {
     const {tooltip, pathname, dropdown} = this.props;
@@ -80,7 +80,7 @@ export default class AddButton extends React.Component<Props, {}> {
                  data-position="left"
                  data-tooltip={tooltip}
                  data-target={`dropdown-${dropdown.id}`}
-              /*ref={this.dropdown}*/>
+                 ref={this.dropdown}>
               <i className="large material-icons">add</i>
             </div>
             <ul id={`dropdown-${dropdown.id}`}

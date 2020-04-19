@@ -29,6 +29,8 @@ import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,7 +86,9 @@ public final class AppsController {
   @PostMapping("/{appName}/services")
   public void addAppServices(@PathVariable String appName,
                              @RequestBody AddServiceApp[] services) {
-    appsService.addServices(appName, Arrays.asList(services));
+    Map<String, Integer> serviceOrders = Arrays.stream(services).collect(
+        Collectors.toMap(AddServiceApp::getName, AddServiceApp::getLaunchOrder));
+    appsService.addServices(appName, serviceOrders);
   }
 
   @DeleteMapping("/{appName}/services")

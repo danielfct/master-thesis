@@ -3,7 +3,6 @@ import React, {createRef} from "react";
 import M from "materialize-css";
 import Form, {IFields, IValues} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
-import ResizeObserver from 'react-resize-observer';
 
 interface InputDialogProps {
   id: string;
@@ -20,17 +19,23 @@ type Props = InputDialogProps;
 export default class InputDialog extends BaseComponent<Props, {}> {
 
   private scrollMaxHeight = document.body.clientHeight * 0.7;
-
   private scrollbar: (ScrollBar | null) = null;
   private modal = createRef<HTMLDivElement>();
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+  private initModal = (position?: string) =>
     M.Modal.init(this.modal.current as Element, {
       preventScrolling: false,
-      startingTop: prevProps.position,
-      endingTop: prevProps.position,
+      startingTop: position,
+      endingTop: position,
       onOpenEnd: this.onOpenModal
     });
+
+  componentDidMount(): void {
+    this.initModal(this.props.position);
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+    this.initModal(prevProps.position);
     if (this.props.open) {
       let modal = M.Modal.getInstance(this.modal.current as Element);
       modal.open();

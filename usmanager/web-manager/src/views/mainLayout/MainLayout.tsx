@@ -37,6 +37,10 @@ type Props = StateToProps;
 
 class MainLayout extends React.Component<Props, {}> {
 
+  componentDidMount(): void {
+    M.AutoInit();
+  }
+
   render = () =>
     <div>
       <Sidenav/>

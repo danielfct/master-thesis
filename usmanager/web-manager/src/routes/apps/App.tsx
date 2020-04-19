@@ -1,5 +1,4 @@
 import Data from "../../components/IData";
-import {IAppService} from "../services/apps/ServiceAppList";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
 import Form, {IFields, required} from "../../components/form/Form";
@@ -12,7 +11,7 @@ import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {addAppService, loadApps} from "../../actions";
 import {connect} from "react-redux";
-import AppServicesList from "./AppServicesList";
+import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
 import {postData} from "../../utils/api";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
 
@@ -47,7 +46,7 @@ interface MatchParams {
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
-  newServices: string[],
+  newServices: IAddAppService[],
   appName?: string,
 }
 
@@ -64,7 +63,7 @@ class App extends BaseComponent<Props, State> {
     }
   };
 
-  private onAddAppService = (service: string): void => {
+  private onAddAppService = (service: IAddAppService): void => {
     this.setState({
       newServices: this.state.newServices.concat(service)
     });
@@ -72,7 +71,7 @@ class App extends BaseComponent<Props, State> {
 
   private onRemoveAppServices = (services: string[]): void => {
     this.setState({
-      newServices: this.state.newServices.filter(service => !services.includes(service))
+      newServices: this.state.newServices.filter(service => !services.includes(service.name))
     });
   };
 
@@ -88,7 +87,7 @@ class App extends BaseComponent<Props, State> {
   private onSaveServicesSuccess = (appName: string): void => {
     if (!isNewApp(this.props.match.params.name)) {
       this.state.newServices.forEach(service =>
-        this.props.addAppService(appName, service)
+        this.props.addAppService(appName, service.name)
       );
     }
     this.setState({ newServices: [] });

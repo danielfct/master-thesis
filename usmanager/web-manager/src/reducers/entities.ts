@@ -164,7 +164,6 @@ import {IService} from "../routes/services/Service";
 import {merge, pick, keys } from 'lodash';
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
-import {IAppService} from "../routes/services/apps/ServiceAppList";
 import {IPrediction} from "../routes/services/predictions/ServicePredictionList";
 import {IDependee} from "../routes/services/dependees/ServiceDependeeList";
 import {INode} from "../routes/nodes/Node";
@@ -176,6 +175,7 @@ import {IDecision, IField, IOperator, IRule, IValueMode} from "../routes/rules/R
 import {IHostRule} from "../routes/rules/hosts/HostRule";
 import {IServiceRule} from "../routes/rules/services/ServiceRule";
 import {ICondition} from "../routes/rules/conditions/Condition";
+import {IAppService} from "../routes/apps/AppServicesList";
 
 export type EntitiesState = {
   services: {

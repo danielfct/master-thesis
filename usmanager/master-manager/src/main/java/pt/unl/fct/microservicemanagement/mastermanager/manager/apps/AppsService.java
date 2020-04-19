@@ -31,6 +31,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.services.Services
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -94,20 +95,20 @@ public class AppsService {
     return apps.getServiceOrderByService(appId);
   }
 
-  public void addService(String appName, AddServiceApp addServiceApp) {
+  public void addService(String appName, String serviceName, int order) {
     var app = getApp(appName);
-    var service = services.getService(addServiceApp.getName());
+    var service = services.getService(serviceName);
     var appService = AppServiceEntity.builder()
         .app(app)
         .service(service)
-        .launchOrder(addServiceApp.getLaunchOrder())
+        .launchOrder(order)
         .build();
     app = app.toBuilder().appService(appService).build();
     apps.save(app);
   }
 
-  public void addServices(String appName, List<AddServiceApp> addServiceApps) {
-    addServiceApps.forEach(serviceApp -> addService(appName, serviceApp));
+  public void addServices(String appName, Map<String, Integer> services) {
+    services.forEach((service, launchOrder) -> addService(appName, service, launchOrder));
   }
 
   public void removeService(String appName, String service) {

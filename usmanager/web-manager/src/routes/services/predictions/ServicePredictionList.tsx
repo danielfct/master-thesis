@@ -149,11 +149,11 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
   render() {
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
-                           emptyMessage={`Predictions list is empty`}
+                           emptyMessage='Predictions list is empty'
                            data={this.props.predictions}
+                           dataKey='name'
                            formModal={{
                              id: 'servicePrediction',
-                             dataKey: 'name',
                              title: 'Add prediction',
                              fields: this.getFields(),
                              values: emptyPrediction(),

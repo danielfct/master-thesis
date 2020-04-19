@@ -32,7 +32,6 @@ import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
 import {IDependee} from "../routes/services/dependees/ServiceDependeeList";
 import {IPrediction} from "../routes/services/predictions/ServicePredictionList";
-import {IAppService} from "../routes/services/apps/ServiceAppList";
 import {INode} from "../routes/nodes/Node";
 import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
@@ -42,6 +41,7 @@ import {IDecision, IField, IOperator, IRule, IValueMode} from "../routes/rules/R
 import {IServiceRule} from "../routes/rules/services/ServiceRule";
 import {IHostRule} from "../routes/rules/hosts/HostRule";
 import {ICondition} from "../routes/rules/conditions/Condition";
+import {IAppService} from "../routes/apps/AppServicesList";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
