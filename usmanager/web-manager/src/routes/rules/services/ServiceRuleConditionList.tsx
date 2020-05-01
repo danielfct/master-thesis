@@ -101,6 +101,7 @@ class ServiceRuleConditionList extends BaseComponent<Props, {}> {
                            error={this.props.error}
                            emptyMessage={`Conditions list is empty`}
                            data={this.props.ruleConditions}
+                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'conditions',
                              title: 'Add condition',

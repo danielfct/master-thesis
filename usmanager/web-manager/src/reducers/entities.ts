@@ -156,7 +156,7 @@ import {
   GENERIC_RULE_SERVICE_FAILURE,
   GENERIC_RULES_SERVICE_FAILURE,
   GENERIC_RULES_SERVICE_SUCCESS,
-  GENERIC_RULE_SERVICE_SUCCESS
+  GENERIC_RULE_SERVICE_SUCCESS,
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
@@ -175,7 +175,7 @@ import {IDecision, IField, IOperator, IRule, IValueMode} from "../routes/rules/R
 import {IHostRule} from "../routes/rules/hosts/HostRule";
 import {IServiceRule} from "../routes/rules/services/ServiceRule";
 import {ICondition} from "../routes/rules/conditions/Condition";
-import {IAppService} from "../routes/apps/AppServicesList";
+import {IAddAppService, IAppService} from "../routes/apps/AppServicesList";
 
 export type EntitiesState = {
   services: {
@@ -299,6 +299,7 @@ export type EntitiesAction = {
     serviceNames?: string[]
     apps?: IApp[],
     appServices?: IAppService[],
+    addAppServices?: IAddAppService[],
     appsNames?: string[],
     dependencies?: IService[],
     dependenciesNames?: string[],
@@ -536,9 +537,7 @@ const entities = (state: EntitiesState = {
       const service = entity && state.services.data[entity];
       const predictions = { predictions: data?.predictions || [] };
       const serviceWithPredictions = Object.assign(service ? service : [entity], predictions);
-      console.log(serviceWithPredictions)
       const normalizedService = normalize(serviceWithPredictions, Schemas.SERVICE).entities;
-      console.log(normalizedService.services)
       return merge({}, state, {
         services: {
           data: normalizedService.services,
@@ -581,8 +580,11 @@ const entities = (state: EntitiesState = {
     case ADD_SERVICE_PREDICTION:
       if (entity) {
         const service = state.services.data[entity];
-        if (data?.predictionsNames?.length) {
-          service.predictions?.unshift(data?.predictionsNames[0]);
+        if (data?.predictions?.length) {
+          const newPrediction = data?.predictions[0];
+          const predictionName = newPrediction.name;
+          const prediction = { id: 0, ... newPrediction };
+          service.predictions = { ... service.predictions, [predictionName]: prediction };
           return state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
       }
@@ -627,8 +629,9 @@ const entities = (state: EntitiesState = {
     case REMOVE_SERVICE_PREDICTIONS:
       if (entity) {
         const service = state.services.data[entity];
-        const filteredPredictions = service.predictions?.filter(prediction => !data?.predictionsNames?.includes(prediction));
-        const serviceWithPredictions = Object.assign(service, { predictions: filteredPredictions });
+        const filteredPredictions = Object.values(service.predictions)
+                                       .filter(prediction => !data?.predictionsNames?.includes(prediction.name));
+        const serviceWithPredictions = Object.assign(service, !Object.keys(filteredPredictions).length ? { predictions: {} } : filteredPredictions);
         const normalizeService = normalize(serviceWithPredictions, Schemas.SERVICE).entities;
         return merge({}, state, {
           services: {
@@ -1128,7 +1131,7 @@ const entities = (state: EntitiesState = {
       return merge({}, state, { apps: { isLoadingServices: false, loadServicesError: error } });
     case APP_SERVICES_SUCCESS:
       const app = entity && state.apps.data[entity];
-      const services = { services: data?.appServices || [] };
+      const services = { services: data?.services || [] };
       const appWithServices = Object.assign(app ? app : [entity], services);
       const normalizedApp = normalize(appWithServices, Schemas.APP).entities;
       return merge({}, state, {
@@ -1141,11 +1144,14 @@ const entities = (state: EntitiesState = {
     case ADD_APP_SERVICE:
       if (entity) {
         const app = state.apps.data[entity];
-        if (data?.serviceNames?.length) {
-          //TODO confirm correctness
-          const appService = app.services?.find(service => service.service.serviceName == data?.serviceNames?.[0]);
-          if (appService) {
-            app.services?.unshift(appService);
+        if (data?.addAppServices?.length) {
+          const addAppService = data?.addAppServices[0];
+          const serviceName = addAppService.service;
+          const service = state.services.data[serviceName];
+          const launchOrder = addAppService.launchOrder;
+          const appService = { id: 0, service, launchOrder };
+          if (service) {
+            app.services = { ... app.services, [serviceName]: appService };
             return state = merge({}, state, { apps: { data: { [app.name]: {...app } } } });
           }
         }
@@ -1154,10 +1160,10 @@ const entities = (state: EntitiesState = {
     case REMOVE_APP_SERVICES:
       if (entity) {
         const app = state.apps.data[entity];
-        const filteredServices = Object.entries(app.services)
-                                       .filter(([serviceName, _]) => !data?.serviceNames?.includes(serviceName))
-                                       .map(([serviceName, service]) => ({[serviceName]: service}));
-        const appWithServices = Object.assign(app, { services: filteredServices });
+        const filteredServices = Object.values(app.services)
+                                       .filter(appService => !data?.serviceNames?.includes(appService.service.serviceName));
+        const normalizedServices = normalize(filteredServices, Schemas.APP_SERVICE_ARRAY).entities;
+        const appWithServices = Object.assign(app, !Object.keys(normalizedServices).length ? { services: {} } : normalizedServices);
         const normalizedApp = normalize(appWithServices, Schemas.APP).entities;
         return merge({}, state, {
           apps: {

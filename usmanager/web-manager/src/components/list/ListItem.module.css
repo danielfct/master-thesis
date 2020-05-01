@@ -57,3 +57,15 @@
     margin: 5px 5px 0 0;
     display: none;
 }
+
+.newItem {
+    color: #F44336;
+}
+
+.end {
+    display: flex;
+}
+
+.small {
+    font-size: 0.9rem;
+}

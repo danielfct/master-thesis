@@ -25,7 +25,6 @@ import {
   removeServiceApps
 } from "../../../actions";
 import {connect} from "react-redux";
-import Data from "../../../components/IData";
 import Field from "../../../components/form/Field";
 import {IFields, IValues, required, requiredAndNumberAndMin} from "../../../components/form/Form";
 import List from "../../../components/list/List";
@@ -179,11 +178,12 @@ class ServiceAppList extends BaseComponent<Props, State> {
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
+    console.log(this.props.serviceApps)
+    return <ControlledList<string> isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage='Apps list is empty'
                            data={this.props.serviceApps}
-                           dataKey='name'
+                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'apps',
                              title: 'Add app',

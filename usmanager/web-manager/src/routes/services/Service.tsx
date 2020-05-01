@@ -61,11 +61,11 @@ export interface IService extends IData {
   outputLabel: string;
   serviceType: string;
   expectedMemoryConsumption: number;
-  apps?: string[];
-  dependencies?: string[];
-  dependees?: string[];
-  predictions?: string[];
-  rules?: string[];
+  apps: string[];
+  dependencies: string[];
+  dependees: string[];
+  predictions: { [key: string]: IPrediction };
+  rules: string[];
 }
 
 const emptyService = (): Partial<IService> => ({
@@ -96,7 +96,7 @@ interface DispatchToProps {
   loadServices: (name: string) => any;
   addServiceApp: (serviceName: string, appName: string) => void;
   addServiceDependency: (serviceName: string, dependencyName: string) => void;
-  addServicePrediction: (serviceName: string, predictionName: string) => void;
+  addServicePrediction: (serviceName: string, prediction: IPrediction) => void;
   addServiceRule: (serviceName: string, ruleName: string) => void;
 }
 
@@ -222,7 +222,7 @@ class Service extends BaseComponent<Props, State> {
   private onSavePredictionsSuccess = (serviceName: string): void => {
     if (!isNewService(this.props.match.params.name)) {
       this.state.newPredictions.forEach(prediction =>
-        this.props.addServicePrediction(serviceName, prediction.name)
+        this.props.addServicePrediction(serviceName, prediction)
       );
     }
     this.setState({ newPredictions: [] });

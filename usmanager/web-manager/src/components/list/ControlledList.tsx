@@ -22,7 +22,7 @@ type FormModal = {
 };
 
 interface ControlledListProps<T> {
-  dataKey?: string,
+  dataKey: string[],
   isLoading: boolean;
   error?: string | null;
   emptyMessage: string;
@@ -39,8 +39,10 @@ interface ControlledListProps<T> {
 
 type Props<T> = ControlledListProps<T>;
 
+type DataState<T> = { value: T, isChecked: boolean, isNew: boolean } | undefined;
+
 interface State<T> {
-  [key: string]: { value: T, isChecked: boolean, isNew: boolean } | undefined;
+  [key: string]: DataState<T>;
 }
 
 export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>> {
@@ -63,12 +65,9 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                                                   .every(checked => checked);
     }
     if (prevProps.data !== this.props.data) {
-      console.log(Object.values(this.props.data))
-      this.setState(Object.values(this.props.data).reduce((state: State<T>, data: T) => {
-        if (typeof data == 'string' || this.props.dataKey) {
-          // @ts-ignore
-          state[typeof data == 'string' ? data : data[this.props.dataKey]] = { value: data, isChecked: false, isNew: false };
-        }
+      this.setState(this.props.data.reduce((state: State<T>, data) => {
+        const dataStateKey = this.getDataStateKey(data);
+        state[dataStateKey] = { value: data, isChecked: false, isNew: false };
         return state;
       }, {}));
     }
@@ -103,10 +102,33 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     }
   };
 
+  private getDataStateKey = (data: T): string => {
+    if (typeof data == 'string') {
+      return data;
+    }
+    const key = this.props.dataKey;
+    // @ts-ignore
+    let stateKey = data[key[0]];
+    for (let i = 1; i < key.length; i++) {
+      // @ts-ignore
+      let currentKey = key[i];
+      if (!stateKey[currentKey]) {
+        return stateKey;
+      }
+      stateKey = stateKey[currentKey];
+    }
+    return stateKey;
+  };
+
+  private getDataState = (data: T): DataState<T> => {
+    const dataKey = this.getDataStateKey(data);
+    return this.state[dataKey];
+  };
+
   private show = (data: T, index: number): JSX.Element => {
-    /*const checked = this.state[data]?.isChecked || false;*/
     const separate = index != Object.entries(this.state).filter(([_, data]) => data).length - 1;
-    return this.props.show(index, data, separate, true, this.handleCheckbox)
+    const checked = this.getDataState(data)?.isChecked || false;
+    return this.props.show(index, data, separate, checked, this.handleCheckbox)
   };
 
   private onAdd = (event: React.MouseEvent<HTMLLIElement>): void => {
@@ -117,16 +139,16 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   };
 
   private onAddDropdownModalInput = (input: any): void => {
-    if (this.selected && this.props.dropdown?.formModal && this.props.dataKey) {
-      input = { [this.props.dataKey]: this.selected, ...input };
+    if (this.selected && this.props.dropdown?.formModal) {
+      input = { [this.props.dataKey ? this.props.dataKey[0] : this.selected]: this.selected, ...input };
       this.setState({ [this.selected]: { value: input, isChecked: false, isNew: true } });
       this.props.onAddInput?.(input);
     }
   };
 
   private onAddFormModalInput = (input: any): void => {
-    const key = this.props.dataKey && input[this.props.dataKey];
-    this.setState({ [key]: {value: input, isChecked: false, isNew: true } });
+    const key = this.getDataStateKey(input);
+    this.setState({ [key]: { value: input, isChecked: false, isNew: true } });
     this.props.onAddInput?.(input);
   };
 
@@ -223,7 +245,6 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                   )}
                 </PerfectScrollbar>
               </ul>
-              {console.log(dropdown?.formModal)}
               {dropdown?.formModal && this.inputDialog(dropdown?.formModal, true)}
             </>
           )}
@@ -239,7 +260,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
           )}
           <button className="btn-flat btn-small waves-effect waves-light red-text right"
                   style={Object.values(this.state)
-                               .map(dependency => dependency?.isChecked || false)
+                               .map(item => item?.isChecked || false)
                                .some(checked => checked)
                     ? {transform: "scale(1)"}
                     : {transform: "scale(0)"}}

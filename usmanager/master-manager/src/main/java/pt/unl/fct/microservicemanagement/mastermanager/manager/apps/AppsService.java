@@ -25,7 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.AddServiceApp;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;

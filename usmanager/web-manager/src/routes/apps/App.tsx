@@ -14,10 +14,11 @@ import {connect} from "react-redux";
 import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
 import {postData} from "../../utils/api";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
+import {IService} from "../services/Service";
 
 export interface IApp extends Data {
   name: string;
-  services: IAppService[]
+  services: { [key: string]: IAppService }
 }
 
 const emptyApp = (): Partial<IApp> => ({
@@ -36,7 +37,7 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadApps: (name: string) => any;
-  addAppService: (appName: string, service: string) => void;
+  addAppService: (appName: string, appService: IAddAppService) => void;
 }
 
 interface MatchParams {
@@ -46,14 +47,14 @@ interface MatchParams {
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
-  newServices: IAddAppService[],
+  unsavedServices: IAddAppService[],
   appName?: string,
 }
 
 class App extends BaseComponent<Props, State> {
 
   state: State = {
-    newServices: []
+    unsavedServices: []
   };
 
   componentDidMount(): void {
@@ -65,32 +66,28 @@ class App extends BaseComponent<Props, State> {
 
   private onAddAppService = (service: IAddAppService): void => {
     this.setState({
-      newServices: this.state.newServices.concat(service)
+      unsavedServices: this.state.unsavedServices.concat(service)
     });
   };
 
   private onRemoveAppServices = (services: string[]): void => {
     this.setState({
-      newServices: this.state.newServices.filter(service => !services.includes(service.name))
+      unsavedServices: this.state.unsavedServices.filter(service => !services.includes(service.service))
     });
   };
 
   private saveAppServices = (appName: string): void => {
-    const {newServices} = this.state;
-    if (newServices.length) {
-      postData(`apps/${appName}/services`, newServices,
+    const {unsavedServices} = this.state;
+    if (unsavedServices.length) {
+      postData(`apps/${appName}/services`, unsavedServices,
         () => this.onSaveServicesSuccess(appName),
         (reason) => this.onSaveServicesFailure(appName, reason));
     }
   };
 
   private onSaveServicesSuccess = (appName: string): void => {
-    if (!isNewApp(this.props.match.params.name)) {
-      this.state.newServices.forEach(service =>
-        this.props.addAppService(appName, service.name)
-      );
-    }
-    this.setState({ newServices: [] });
+    this.state.unsavedServices.forEach(service => this.props.addAppService(appName, service));
+    this.setState({ unsavedServices: [] });
   };
 
   private onSaveServicesFailure = (appName: string, reason: string): void =>
@@ -142,7 +139,7 @@ class App extends BaseComponent<Props, State> {
     }, {});
 
   private shouldShowSaveButton = () =>
-    !!this.state.newServices.length;
+    !!this.state.unsavedServices.length;
 
   private details = () => {
     const {isLoading, error, formApp, app} = this.props;
@@ -175,7 +172,7 @@ class App extends BaseComponent<Props, State> {
 
   private services = (): JSX.Element =>
     <AppServicesList app={this.props.app}
-                     newServices={this.state.newServices}
+                     unsavedServices={this.state.unsavedServices}
                      onAddAppService={this.onAddAppService}
                      onRemoveAppServices={this.onRemoveAppServices}/>;
 

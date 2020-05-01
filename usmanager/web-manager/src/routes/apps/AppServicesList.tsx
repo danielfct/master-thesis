@@ -13,7 +13,13 @@ import {connect} from "react-redux";
 import {IApp} from "./App";
 import {IService} from "../services/Service";
 import Field from "../../components/form/Field";
-import {IFields, IValues, requiredAndNumberAndMin} from "../../components/form/Form";
+import {
+  IFields,
+  IValues,
+  min,
+  requiredAndNumberAndMin,
+  requiredAndNumberAndMinAndMax
+} from "../../components/form/Form";
 import Data from "../../components/IData";
 
 export interface IAppService extends Data {
@@ -22,7 +28,7 @@ export interface IAppService extends Data {
 }
 
 export interface IAddAppService {
-  name: string;
+  service: string;
   launchOrder: number;
 }
 
@@ -41,7 +47,7 @@ interface DispatchToProps {
 
 interface ServiceAppListProps {
   app: IApp | Partial<IApp>;
-  newServices: IAddAppService[];
+  unsavedServices: IAddAppService[];
   onAddAppService: (service: IAddAppService) => void;
   onRemoveAppServices: (services: string[]) => void;
 }
@@ -50,11 +56,14 @@ type Props = StateToProps & DispatchToProps & ServiceAppListProps;
 
 type State = {
   selectedService?: string,
+  newServices: IAddAppService[],
 }
 
 class ServiceAppList extends BaseComponent<Props, State> {
 
-  state: State = {};
+  state: State = {
+    newServices: [],
+  };
 
   componentDidMount(): void {
     const {name} = this.props.app;
@@ -64,31 +73,48 @@ class ServiceAppList extends BaseComponent<Props, State> {
     this.props.loadServices();
   }
 
-  private service = (index: number, service: IAppService, separate: boolean, checked: boolean,
-                     handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={`${listItemStyles.linkedItemContent}`}>
-        <label>
-          <input id={service.service.serviceName}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{service.launchOrder}. {service.service.serviceName}</span>
-        </label>
-      </div>
-      <Link to={`/services/${service.service.serviceName}`}
-            className={`${listItemStyles.link} waves-effect`}>
-        <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+  private service = (index: number, service: IAppService | IAddAppService, separate: boolean, checked: boolean,
+                     handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const serviceName = typeof service.service == 'string' ? service.service : service.service.serviceName;
+    const isNew = this.props.unsavedServices.map(newService => newService.service).includes(service.service.toString());
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={`${listItemStyles.linkedItemContent}`}>
+          <label>
+            <input id={serviceName}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+              <div className={isNew ? listItemStyles.newItem : undefined}>
+                {service.launchOrder}. {serviceName}
+              </div>
+            </span>
+          </label>
+        </div>
+        <Link to={`/services/${serviceName}`}
+              className={`${listItemStyles.link} waves-effect`}>
+          <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
+        </Link>
+      </ListItem>
+    );
+  };
 
   private onAdd = (service: IValues): void => {
     this.props.onAddAppService(service as IAddAppService);
+    this.setState({
+      newServices: this.state.newServices.concat(service as IAddAppService)
+    });
     this.setState({selectedService: undefined});
   };
 
-  private onRemove = (services: string[]): void =>
+  private onRemove = (services: string[]): void => {
     this.props.onRemoveAppServices(services);
+    this.setState({
+      newServices: this.state.newServices.filter(service => !services.includes(service.service))
+    });
+  };
+
 
   private onDeleteSuccess = (services: string[]): void => {
     const {name} = this.props.app;
@@ -101,17 +127,19 @@ class ServiceAppList extends BaseComponent<Props, State> {
     super.toast(`Unable to delete service`, 10000, reason, true);
 
   private getSelectableServicesNames = () => {
-    const {appServices, services, newServices} = this.props;
+    const {appServices, services} = this.props;
+    const {newServices} = this.state;
     const nonSystemServices = Object.entries(services)
                                     .filter(([_, value]) => value.serviceType !== 'system')
                                     .map(([key, _]) => key);
-    const newServicesNames = newServices.map(service => service.name);
-    return nonSystemServices.filter(name => /*!appServices.includes(name) &&*/ !newServicesNames.includes(name));
+    const serviceNames = appServices.map(appService => appService.service.serviceName);
+    const newServicesNames = newServices.map(service => service.service);
+    return nonSystemServices.filter(name => !serviceNames.includes(name) && !newServicesNames.includes(name));
   };
 
   private addModal = () =>
     <>
-      <Field key='launchOrder' id={'launchOrder'} label='launchOrder'/>
+      <Field key='launchOrder' id={'launchOrder'} label='launchOrder' type={'numberbox'} number={{min: 0, max: 2147483647}}/>
     </>;
 
   private getModalFields = (): IFields => (
@@ -119,7 +147,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
       launchOrder: {
         id: 'launchOrder',
         label: 'launchOrder',
-        validation: { rule: requiredAndNumberAndMin, args: 0 }
+        validation: { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
       }
     }
   );
@@ -140,7 +168,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
       error={this.props.error}
       emptyMessage={`Services list is empty`}
       data={this.props.appServices}
-      dataKey='name'
+      dataKey={['service', 'serviceName']}
       dropdown={{
         id: 'appServices',
         title: 'Add service',
@@ -175,7 +203,7 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceAppListProps): Stat
   return {
     isLoading: state.entities.apps.isLoadingServices,
     error: state.entities.apps.loadServicesError,
-    appServices: appServices || [],
+    appServices: appServices && Object.values(appServices).sort((a, b) => a.launchOrder - b.launchOrder) || [],
     services: state.entities.services.data,
   }
 }

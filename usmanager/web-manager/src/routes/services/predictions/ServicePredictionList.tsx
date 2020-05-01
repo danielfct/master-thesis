@@ -49,13 +49,13 @@ const emptyPrediction = (): Partial<IPrediction> => ({
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  predictions: string[];
+  predictions: IPrediction[];
 }
 
 interface DispatchToProps {
   loadServicePredictions: (serviceName: string) => void;
   removeServicePredictions: (serviceName: string, predictions: string[]) => void;
-  addServicePrediction: (serviceName: string, prediction: string) => void;
+  addServicePrediction: (serviceName: string, prediction: IPrediction) => void;
 }
 
 interface ServicePredictionListProps {
@@ -78,16 +78,20 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
     }
   }
 
-  private prediction = (index: number, prediction: string, separate: boolean, checked: boolean,
+  private prediction = (index: number, prediction: IPrediction, separate: boolean, checked: boolean,
                         handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
     <ListItem key={index} separate={separate}>
+      {console.log(prediction)}
       <div className={`${styles.itemContent}`}>
         <label>
-          <input id={prediction}
+          <input id={prediction.name}
                  type="checkbox"
                  onChange={handleCheckbox}
                  checked={checked}/>
-          <span id={'checkbox'}>{prediction}</span>
+          <span id={'checkbox'}>{prediction.name}
+            <div className={`${styles.end} ${styles.small}`}>{prediction.startDate} {prediction.startTime}</div>
+            <div className={`${styles.end} ${styles.small}`}>{prediction.endDate} {prediction.endDate}</div>
+          </span>
         </label>
       </div>
     </ListItem>;
@@ -147,11 +151,11 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
     </div>;
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
+    return <ControlledList<IPrediction> isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage='Predictions list is empty'
                            data={this.props.predictions}
-                           dataKey='name'
+                           dataKey={['name']}
                            formModal={{
                              id: 'servicePrediction',
                              title: 'Add prediction',
@@ -180,7 +184,7 @@ function mapStateToProps(state: ReduxState, ownProps: ServicePredictionListProps
   return {
     isLoading: state.entities.services.isLoadingPredictions,
     error: state.entities.services.loadPredictionsError,
-    predictions: predictions || [],
+    predictions: predictions && Object.values(predictions) || [],
   }
 }
 

@@ -106,6 +106,7 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
                            error={this.props.error}
                            emptyMessage={`Dependencies list is empty`}
                            data={this.props.dependencies}
+                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'dependencies',
                              title: 'Add dependency',

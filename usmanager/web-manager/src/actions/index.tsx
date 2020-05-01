@@ -27,6 +27,8 @@ import {IBreadcrumbs} from "../components/breadcrumbs/Breadcrumbs";
 import {IService} from "../routes/services/Service";
 import {IServiceDependency} from "../routes/services/dependencies/ServiceDependencyList";
 import {EntitiesAction, EntitiesState} from "../reducers/entities";
+import {IAddAppService} from "../routes/apps/AppServicesList";
+import {IPrediction} from "../routes/services/predictions/ServicePredictionList";
 
 export const SERVICES_REQUEST = 'SERVICES_REQUEST';
 export const SERVICES_SUCCESS = 'SERVICES_SUCCESS';
@@ -146,11 +148,11 @@ const fetchServicePredictions = (serviceName: string) => ({
   }
 });
 export const ADD_SERVICE_PREDICTION = 'ADD_SERVICE_PREDICTION';
-export function addServicePrediction(serviceName: string, prediction: string): EntitiesAction {
+export function addServicePrediction(serviceName: string, prediction: IPrediction): EntitiesAction {
   return {
     type: ADD_SERVICE_PREDICTION,
     entity: serviceName,
-    data: { predictionsNames: new Array(prediction) }
+    data: { predictions: new Array(prediction) }
   }
 }
 export const REMOVE_SERVICE_PREDICTIONS = 'REMOVE_SERVICE_PREDICTIONS';
@@ -233,11 +235,11 @@ const fetchAppServices = (appName: string) => ({
   }
 });
 export const ADD_APP_SERVICE = 'ADD_APP_SERVICE';
-export function addAppService(appName: string, serviceName: string): EntitiesAction {
+export function addAppService(appName: string, addAppService: IAddAppService): EntitiesAction {
   return {
     type: ADD_APP_SERVICE,
     entity: appName,
-    data: { serviceNames: new Array(serviceName) }
+    data: { addAppServices: new Array(addAppService) }
   }
 }
 export const REMOVE_APP_SERVICES = 'REMOVE_APP_SERVICES';

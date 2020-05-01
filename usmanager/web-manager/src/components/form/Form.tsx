@@ -103,6 +103,11 @@ export const min = (values: IValues, fieldName: string, args: any): string =>
     ? `Required minimum value of ${args}`
     : "";
 
+export const max = (values: IValues, fieldName: string, args: any): string =>
+  values[fieldName] > args
+    ? `Required maximum value of ${args}`
+    : "";
+
 export const number = (values: IValues, fieldName: string): string =>
   getTypeFromValue(values[fieldName]) !== 'number'
     ? `${camelCaseToSentenceCase(fieldName)} is a number`
@@ -113,6 +118,12 @@ export const requiredAndNotAllowed = (values: IValues, fieldName: string, args: 
 
 export const requiredAndNumberAndMin = (values: IValues, fieldName: string, args: any) =>
   required(values, fieldName) || number(values, fieldName) || min(values, fieldName, args);
+
+export const requiredAndNumberAndMax = (values: IValues, fieldName: string, args: any) =>
+  required(values, fieldName) || number(values, fieldName) || max(values, fieldName, args);
+
+export const requiredAndNumberAndMinAndMax = (values: IValues, fieldName: string, args: any) =>
+  required(values, fieldName) || number(values, fieldName) || min(values, fieldName, args[0]) || max(values, fieldName, args[1]);
 
 class Form extends React.Component<Props, State> {
 

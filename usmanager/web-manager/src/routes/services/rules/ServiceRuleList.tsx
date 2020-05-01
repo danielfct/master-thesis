@@ -103,6 +103,7 @@ class ServiceRuleList extends BaseComponent<Props, {}> {
                            error={this.props.error}
                            emptyMessage={`Rules list is empty`}
                            data={this.props.rulesName}
+                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'rules',
                              title: 'Add rule',

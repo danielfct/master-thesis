@@ -77,8 +77,9 @@ interface ISchemas {
     SERVICE_RULE: schema.Entity<IServiceRule>;
     SERVICE_RULE_ARRAY: schema.Entity<IServiceRule>[];
     APP: schema.Entity<IApp>;
-    APP_SERVICE_ARRAY: schema.Entity<IAppService>[];
     APP_ARRAY: schema.Entity<IApp>[];
+    APP_SERVICE: schema.Entity<IAppService>;
+    APP_SERVICE_ARRAY: schema.Entity<IAppService>[];
     REGION: schema.Entity<IRegion>;
     REGION_ARRAY: schema.Entity<IRegion>[];
     RULE_HOST: schema.Entity<IHostRule>;
@@ -109,8 +110,8 @@ interface ISchemas {
     LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
-const appServiceSchema: schema.Entity<IAppService> = new schema.Entity('appServices', undefined, {
-    idAttribute: (app: IAppService) => app.service.serviceName
+const appServiceSchema: schema.Entity<IAppService> = new schema.Entity('services', undefined, {
+    idAttribute: (service: IAppService) => service.service.serviceName
 });
 const appServices = new schema.Array(appServiceSchema);
 const appSchema: schema.Entity<IApp> = new schema.Entity('apps',
@@ -132,7 +133,7 @@ const dependeeSchema: schema.Entity<IDependee> = new schema.Entity('dependees', 
 });
 const dependees = new schema.Array(dependeeSchema);
 
-const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predictions', {}, {
+const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predictions', undefined, {
     idAttribute: (prediction: IPrediction) => prediction.name
 });
 const predictions = new schema.Array(predictionSchema);
@@ -188,12 +189,12 @@ const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {
     apps,
     dependencies,
     dependees,
-    predictions,
+    //predictions,
     rulesService
 }, {
     idAttribute: (service: IService) => service.serviceName
 });
-//const services = new schema.Array(serviceSchema);
+const services = new schema.Array(serviceSchema);
 
 const regionSchema: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
     idAttribute: (region: IRegion) => region.name
@@ -230,6 +231,7 @@ export const Schemas: ISchemas = {
     SERVICE_RULE_ARRAY: [ruleServiceSchema],
     APP: appSchema,
     APP_ARRAY: [appSchema],
+    APP_SERVICE: appServiceSchema,
     APP_SERVICE_ARRAY: [appServiceSchema],
     REGION: regionSchema,
     REGION_ARRAY: [regionSchema],

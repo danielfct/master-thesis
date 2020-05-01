@@ -85,9 +85,9 @@ public final class AppsController {
 
   @PostMapping("/{appName}/services")
   public void addAppServices(@PathVariable String appName,
-                             @RequestBody AddServiceApp[] services) {
+                             @RequestBody AddAppService[] services) {
     Map<String, Integer> serviceOrders = Arrays.stream(services).collect(
-        Collectors.toMap(AddServiceApp::getName, AddServiceApp::getLaunchOrder));
+        Collectors.toMap(AddAppService::getService, AddAppService::getLaunchOrder));
     appsService.addServices(appName, serviceOrders);
   }
 
