@@ -24,6 +24,7 @@ import React from "react";
 import EdgeHostRuleList from "./EdgeHostRuleList";
 import {postData} from "../../../utils/api";
 import GenericHostRuleList from "../GenericHostRuleList";
+import UnsavedChanged from "../../../components/form/UnsavedChanges";
 
 export interface IEdgeHost extends IData {
   hostname: string;
@@ -217,7 +218,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private rules = (): JSX.Element =>
     <EdgeHostRuleList host={this.props.edgeHost}
-                      newRules={this.state.newRules}
+                      unsavedRules={this.state.newRules}
                       onAddHostRule={this.onAddEdgeHostRule}
                       onRemoveHostRules={this.onRemoveEdgeHostRules}/>;
 
@@ -245,6 +246,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   render() {
     return (
       <MainLayout>
+        {this.shouldShowSaveButton() && !isNewHost(this.props.match.params.hostname) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>

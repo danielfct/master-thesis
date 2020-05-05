@@ -17,8 +17,6 @@ interface IComponentType extends IData {
   name: string;
 }
 
-
-
 export interface IValueMode extends IData {
   name: string;
 }

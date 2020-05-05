@@ -31,7 +31,7 @@ import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
 import EurekaPage from "../routes/eureka/Eureka";
-import LoadBalancerPage from "../routes/loadBalancer/LoadBalancer";
+import LoadBalancerPage from "../routes/loadBalancer/OldLoadBalancer";
 import SimulatedMetricsLandingPage from "../routes/metrics/SimulatedMetricsLandingPage";
 import ServiceSimulatedMetrics from "../routes/metrics/ServiceSimulatedMetrics";
 import ServiceSimulatedMetricsDetail from "../routes/metrics/SimulatedMetrics";
@@ -76,18 +76,20 @@ type Props = RootContainerProps;
 
 export const authenticatedRoutes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
     "/home": { title: 'Microservices dynamic system management', component: Landing },
+    "/apps": { component: Apps, search: true },
+    "/apps/:name": { component: App },
     "/services": { component: Services, search: true },
     "/services/:name": { component: Service },
     "/services/service": { component: Service },
-    "/apps": { component: Apps, search: true },
-    "/apps/:name": { component: App },
+    "/containers": { component: Containers, search: true },
+    "/containers/:id": { component: Container },
     "/hosts": { component: Hosts, search: true },
     "/hosts/cloud": { component: CloudHosts },
     "/hosts/cloud/:instanceId": { component: CloudHost },
     "/hosts/edge": { component: EdgeHosts },
     "/hosts/edge/:hostname": { component: EdgeHost },
-    "/containers": { component: Containers, search: true },
-    "/containers/:id": { component: Container },
+    "/nodes": { component: Nodes, search: true },
+    "/nodes/:id": { component: Node },
     "/rules": { component: Rules, search: true },
     "/rules/hosts": { component: HostRules, search: true },
     "/rules/hosts/:name": { component: HostRule },
@@ -95,10 +97,6 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/rules/services/:name": { component: ServiceRule },
     "/rules/conditions": { component: Conditions, search: true },
     "/rules/conditions/:name": { component: Condition },
-    "/nodes": { component: Nodes, search: true },
-    "/nodes/:id": { component: Node },
-    "/eureka": { component: EurekaPage, search: true },
-    "/loadbalancer": { component: LoadBalancerPage, search: true },
     "/metrics/simulated": { component: SimulatedMetricsLandingPage, search: true },
     "/metrics/simulated/services": { component: ServiceSimulatedMetrics, search: true },
     "/metrics/simulated/services/service/:id?": { component: ServiceSimulatedMetricsDetail },
@@ -110,6 +108,8 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/metrics/simulated/hosts/specific/metric/:id?": { component: SpecificHostSimulatedMetricsDetail },
     "/regions": { component: Regions, search: true },
     "/regions/:name": { component: Region },
+    "/eureka": { component: EurekaPage, search: true },
+    "/loadbalancer": { component: LoadBalancerPage, search: true },
     "/logs": { component: Logs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };

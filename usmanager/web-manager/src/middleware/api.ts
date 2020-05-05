@@ -138,6 +138,16 @@ const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predicti
 });
 const predictions = new schema.Array(predictionSchema);
 
+const cloudHostSchema: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', {}, {
+    idAttribute: (host: ICloudHost) => host.instanceId
+});
+const cloudHosts = new schema.Array(cloudHostSchema);
+
+const edgeHostSchema: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', {}, {
+    idAttribute: (host: IEdgeHost) => host.hostname
+});
+const edgeHosts = new schema.Array(edgeHostSchema);
+
 const valueModeSchema: schema.Entity<IValueMode> = new schema.Entity('valueModes', {}, {
     idAttribute: (valueMode: IValueMode) => valueMode.name
 });
@@ -163,11 +173,14 @@ const conditionSchema: schema.Entity<ICondition> = new schema.Entity('conditions
 const conditions = new schema.Array(conditionSchema);
 
 const ruleHostSchema: schema.Entity<IHostRule> = new schema.Entity('hostRules', {
-    conditions
+    conditions,
+    cloudHosts,
+    edgeHosts,
 }, {
     idAttribute: (hostRule: IHostRule) => hostRule.name
 });
 const rulesHost = new schema.Array(ruleHostSchema);
+
 const ruleServiceSchema: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', {
     conditions
 }, {
@@ -198,14 +211,6 @@ const services = new schema.Array(serviceSchema);
 
 const regionSchema: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
     idAttribute: (region: IRegion) => region.name
-});
-
-const cloudHostSchema: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', {}, {
-    idAttribute: (host: ICloudHost) => host.instanceId
-});
-
-const edgeHostSchema: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', {}, {
-    idAttribute: (host: IEdgeHost) => host.hostname
 });
 
 const containerSchema: schema.Entity<IContainer> = new schema.Entity('containers', {}, {

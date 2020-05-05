@@ -19,7 +19,11 @@ import {connect} from "react-redux";
 import {IHostRule} from "../../rules/hosts/HostRule";
 import {Link} from "react-router-dom";
 import {IEdgeHost} from "./EdgeHost";
-import {addEdgeHostRule, loadEdgeHostRules, loadRulesHost, removeEdgeHostRules} from "../../../actions";
+import {
+  loadEdgeHostRules,
+  loadRulesHost,
+  removeEdgeHostRules
+} from "../../../actions";
 
 interface StateToProps {
   isLoading: boolean;
@@ -32,12 +36,11 @@ interface DispatchToProps {
   loadRulesHost: (name?: string) => any;
   loadEdgeHostRules: (hostname: string) => void;
   removeEdgeHostRules: (hostname: string, rules: string[]) => void;
-  addEdgeHostRule: (hostname: string, rule: string) => void;
 }
 
 interface HostRuleListProps {
   host: IEdgeHost | Partial<IEdgeHost>;
-  newRules: string[];
+  unsavedRules: string[];
   onAddHostRule: (rule: string) => void;
   onRemoveHostRules: (rule: string[]) => void;
 }
@@ -55,22 +58,31 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
   }
 
   private rule = (index: number, rule: string, separate: boolean, checked: boolean,
-                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={`${styles.linkedItemContent}`}>
-        <label>
-          <input id={rule}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{rule}</span>
-        </label>
-      </div>
-      <Link to={`/rules/hosts/${rule}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const unsaved = this.props.unsavedRules.map(newRule => newRule).includes(rule);
+    //TODO do unsaved color on all lists
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={`${styles.linkedItemContent}`}>
+          <label>
+            <input id={rule}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+               <div className={unsaved ? styles.unsavedItem : undefined}>
+                 {rule}
+               </div>
+            </span>
+          </label>
+        </div>
+        <Link to={`/rules/hosts/${rule}`}
+              className={`${styles.link} waves-effect`}>
+          <i className={`${styles.linkIcon} material-icons right`}>link</i>
+        </Link>
+      </ListItem>
+    );
+  };
 
   private onAdd = (rule: string): void =>
     this.props.onAddHostRule(rule);
@@ -89,8 +101,8 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
     super.toast(`Unable to delete rule`, 10000, reason, true);
 
   private getSelectableRules = () => {
-    const {rules, rulesName, newRules} = this.props;
-    return Object.keys(rules).filter(name => !rulesName.includes(name) && !newRules.includes(name));
+    const {rules, rulesName, unsavedRules} = this.props;
+    return Object.keys(rules).filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
   };
 
   render() {
@@ -109,7 +121,7 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `hosts/${this.props.host.hostname}/rules`,
+                             url: `rules/hosts/%d/cloudHosts`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;
@@ -133,7 +145,6 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
     loadRulesHost,
     loadEdgeHostRules,
-    addEdgeHostRule,
     removeEdgeHostRules,
   }, dispatch);
 

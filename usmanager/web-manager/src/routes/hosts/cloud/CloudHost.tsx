@@ -17,14 +17,13 @@ import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addCloudHostRule, addEdgeHostRule, loadCloudHosts} from "../../../actions";
+import {addCloudHostRule, loadCloudHosts} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
-import {IEdgeHost} from "../edge/EdgeHost";
 import {postData} from "../../../utils/api";
-import EdgeHostRuleList from "../edge/EdgeHostRuleList";
 import GenericHostRuleList from "../GenericHostRuleList";
 import CloudHostRuleList from "./CloudHostRuleList";
+import UnsavedChanged from "../../../components/form/UnsavedChanges";
 
 export interface ICloudHost {
   instanceId: string;
@@ -97,7 +96,6 @@ class CloudHost extends BaseComponent<Props, {}> {
 
   private onPutFailure = (reason: string, instanceId: string): void =>
     super.toast(`Unable to update ${instanceId}`, 10000, reason, true);
-
 
   private onPostFailure = (reason: string, cloudHostInstanceId: string): void =>
     super.toast(`Unable to update ${cloudHostInstanceId}`, 10000, reason, true);
@@ -184,6 +182,7 @@ class CloudHost extends BaseComponent<Props, {}> {
                   url: `hosts/cloud/${this.state.instanceId || cloudHost[cloudHostKey]}`,
                   successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={{
+                  textButton: 'Stop',
                   url: `hosts/cloud/${cloudHost[cloudHostKey]}`,
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure}}
@@ -203,7 +202,7 @@ class CloudHost extends BaseComponent<Props, {}> {
 
   private rules = (): JSX.Element =>
     <CloudHostRuleList host={this.props.cloudHost}
-                       newRules={this.state.newRules}
+                       unsavedRules={this.state.newRules}
                        onAddHostRule={this.onAddCloudHostRule}
                        onRemoveHostRules={this.onRemoveCloudHostRules}/>;
 
@@ -231,6 +230,7 @@ class CloudHost extends BaseComponent<Props, {}> {
   render() {
     return (
       <MainLayout>
+        {this.shouldShowSaveButton() && !isNewHost(this.props.match.params.instanceId) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>

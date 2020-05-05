@@ -32,16 +32,16 @@ import {ReduxState} from "../../reducers";
 import ScrollBar from "react-perfect-scrollbar";
 
 const sidenavLinks = [
-    { link: '/containers', name: 'Containers' },
-    { link: '/nodes', name: 'Nodes' },
-    { link: '/hosts', name: 'Hosts' },
     { link: '/apps', name: 'Apps' },
     { link: '/services', name: 'Services' },
+    { link: '/containers', name: 'Containers' },
+    { link: '/hosts', name: 'Hosts' },
+    { link: '/nodes', name: 'Nodes' },
     { link: '/rules', name: 'Rules', sub: [{ link: '/conditions', name: 'Conditions' }] },
     { link: '/metrics/simulated', name: 'Simulated metrics' },
+    { link: '/regions', name: 'Regions' },
     { link: '/eureka', name: 'Eureka servers' },
     { link: '/loadBalancer', name: 'Load balancers' },
-    { link: '/regions', name: 'Regions' },
     { link: '/logs', name: 'Logs'}
 ];
 

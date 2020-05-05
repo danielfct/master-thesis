@@ -21,26 +21,30 @@ import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
 import React from "react";
 import {
-  addRuleHostCondition,
-  loadCloudHosts,
+  addRuleHostCloudHosts,
+  addRuleHostConditions,
+  addRuleHostEdgeHosts,
   loadDecisions,
-  loadEdgeHosts, loadGenericRulesHost,
+  loadGenericRulesHost,
   loadRulesHost,
 } from "../../../actions";
 import {postData} from "../../../utils/api";
 import HostRuleConditionList from "./HostRuleConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
-import {IEdgeHost} from "../../hosts/edge/EdgeHost";
+import HostRuleCloudHostsList from "./HostRuleCloudHostsList";
+import HostRuleEdgeHostsList from "./HostRuleEdgeHostsList";
 
 export interface IHostRule extends IRule {
-  hostname: string
+  hostname: string,
+  cloudHosts: string[],
+  edgeHosts: string[],
 }
 
 const emptyHostRule = () => ({
   name: '',
-  priority: 0,
+  priority: undefined,
   decision: undefined,
-  hostname: undefined,
+  generic: undefined,
 });
 
 const isNewRule = (name: string) =>
@@ -52,16 +56,15 @@ interface StateToProps {
   hostRule: Partial<IHostRule>;
   formHostRule?: Partial<IHostRule>,
   decisions: IDecision[],
-  hosts: IEdgeHost[],
 }
 
 interface DispatchToProps {
   loadRulesHost: (name: string) => any;
   loadGenericRulesHost: (name: string) => any;
   loadDecisions: () => any;
-  loadEdgeHosts: () => any;
-  loadCloudHosts: () => any;
-  addRuleHostCondition: (ruleName: string, condition: string) => void;
+  addRuleHostConditions: (ruleName: string, conditions: string[]) => void;
+  addRuleHostCloudHosts: (ruleName: string, cloudHosts: string[]) => void;
+  addRuleHostEdgeHosts: (ruleName: string, edgeHosts: string[]) => void;
 }
 
 interface MatchParams {
@@ -72,6 +75,8 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
   newConditions: string[],
+  newCloudHosts: string[],
+  newEdgeHosts: string[],
   ruleName?: string,
 }
 
@@ -79,12 +84,12 @@ class HostRule extends BaseComponent<Props, State> {
 
   state: State = {
     newConditions: [],
+    newCloudHosts: [],
+    newEdgeHosts: [],
   };
 
   componentDidMount(): void {
     this.props.loadDecisions();
-    this.props.loadEdgeHosts();
-    this.props.loadCloudHosts();
     const ruleName = this.props.match.params.name;
     if (ruleName && !isNewRule(ruleName)) {
       this.props.loadRulesHost(ruleName);
@@ -94,6 +99,8 @@ class HostRule extends BaseComponent<Props, State> {
 
   private saveEntities = (ruleName: string) => {
     this.saveRuleConditions(ruleName);
+    this.saveRuleCloudHosts(ruleName);
+    this.saveRuleEdgeHosts(ruleName);
   };
 
   private onPostSuccess = (reply: any, ruleName: string): void => {
@@ -144,9 +151,7 @@ class HostRule extends BaseComponent<Props, State> {
 
   private onSaveConditionsSuccess = (ruleName: string): void => {
     if (!isNewRule(this.props.match.params.name)) {
-      this.state.newConditions.forEach(condition =>
-        this.props.addRuleHostCondition(ruleName, condition)
-      );
+      this.props.addRuleHostConditions(ruleName, this.state.newConditions)
     }
     this.setState({ newConditions: [] });
   };
@@ -154,17 +159,77 @@ class HostRule extends BaseComponent<Props, State> {
   private onSaveConditionsFailure = (ruleName: string, reason: string): void =>
     super.toast(`Unable to save conditions of rule ${ruleName}`, 10000, reason, true);
 
+  private onAddRuleCloudHost = (cloudHosts: string): void =>
+    this.setState({
+      newCloudHosts: this.state.newCloudHosts.concat(cloudHosts)
+    });
+
+  private onRemoveRuleCloudHosts = (cloudHosts: string[]): void => {
+    this.setState({
+      newCloudHosts: this.state.newCloudHosts.filter(cloudHost => !cloudHosts.includes(cloudHost))
+    });
+  };
+
+  private saveRuleCloudHosts = (ruleName: string): void => {
+    const {newCloudHosts} = this.state;
+    if (newCloudHosts.length) {
+      postData(`rules/hosts/${ruleName}/cloudHosts`, newCloudHosts,
+        () => this.onSaveCloudHostsSuccess(ruleName),
+        (reason) => this.onSaveCloudHostsFailure(ruleName, reason));
+    }
+  };
+
+  private onSaveCloudHostsSuccess = (ruleName: string): void => {
+    if (!isNewRule(this.props.match.params.name)) {
+      this.props.addRuleHostCloudHosts(ruleName, this.state.newCloudHosts)
+    }
+    this.setState({ newCloudHosts: [] });
+  };
+
+  private onSaveCloudHostsFailure = (ruleName: string, reason: string): void =>
+    super.toast(`Unable to save cloud hosts of rule ${ruleName}`, 10000, reason, true);
+
+  private onAddRuleEdgeHost = (edgeHosts: string): void =>
+    this.setState({
+      newEdgeHosts: this.state.newEdgeHosts.concat(edgeHosts)
+    });
+
+  private onRemoveRuleEdgeHosts = (edgeHosts: string[]): void => {
+    this.setState({
+      newEdgeHosts: this.state.newEdgeHosts.filter(edgeHost => !edgeHosts.includes(edgeHost))
+    });
+  };
+
+  private saveRuleEdgeHosts = (ruleName: string): void => {
+    const {newEdgeHosts} = this.state;
+    if (newEdgeHosts.length) {
+      postData(`rules/hosts/${ruleName}/edgeHosts`, newEdgeHosts,
+        () => this.onSaveEdgeHostsSuccess(ruleName),
+        (reason) => this.onSaveEdgeHostsFailure(ruleName, reason));
+    }
+  };
+
+  private onSaveEdgeHostsSuccess = (ruleName: string): void => {
+    if (!isNewRule(this.props.match.params.name)) {
+      this.props.addRuleHostEdgeHosts(ruleName, this.state.newEdgeHosts)
+    }
+    this.setState({ newEdgeHosts: [] });
+  };
+
+  private onSaveEdgeHostsFailure = (ruleName: string, reason: string): void =>
+    super.toast(`Unable to save edge hosts of rule ${ruleName}`, 10000, reason, true);
+
+
   private getFields = (hostRule: Partial<IRule>): IFields =>
     Object.entries(hostRule).map(([key, _]) => {
       return {
         [key]: {
           id: key,
           label: key,
-          validation: key == 'hostname'
-            ? undefined
-            : (key == 'priority'
+          validation:
+            key == 'priority'
               ? { rule: requiredAndNumberAndMin, args: 0 }
-              : { rule: required })
+              : { rule: required }
         }
       };
     }).reduce((fields, field) => {
@@ -175,13 +240,10 @@ class HostRule extends BaseComponent<Props, State> {
     }, {});
 
   private shouldShowSaveButton = () =>
-    !isNewRule(this.props.match.params.name) && !!this.state.newConditions.length;
+    !isNewRule(this.props.match.params.name) && Object.values(this.state).some(newValues => newValues?.length);
 
   private decisionDropdownOption = (decision: IDecision) =>
     decision.name;
-
-  private hostDropdownOption = (hostname: string) =>
-    hostname;
 
   private details = () => {
     const {isLoading, error, formHostRule, hostRule} = this.props;
@@ -211,15 +273,14 @@ class HostRule extends BaseComponent<Props, State> {
                                       defaultValue: "Choose decision",
                                       values: this.props.decisions,
                                       optionToString: this.decisionDropdownOption}}/>
-                : key === 'hostname'
-                ? <Field<string> key={index}
-                                    id={key}
-                                    label={key}
-                                    type="dropdown"
-                                    dropdown={{
-                                      defaultValue: "Choose host",
-                                      values: this.props.hosts.map(host => host.hostname),
-                                      optionToString: this.hostDropdownOption}}/>
+                : key === 'generic'
+                ? <Field<boolean> key={index}
+                                 id={key}
+                                 label={key}
+                                 type="dropdown"
+                                 dropdown={{
+                                   defaultValue: "Apply to all hosts?",
+                                   values: [true, false]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -236,6 +297,18 @@ class HostRule extends BaseComponent<Props, State> {
                            onAddRuleCondition={this.onAddRuleCondition}
                            onRemoveRuleConditions={this.onRemoveRuleConditions}/>;
 
+  private cloudHosts = (): JSX.Element =>
+    <HostRuleCloudHostsList rule={this.props.hostRule}
+                            newCloudHosts={this.state.newCloudHosts}
+                            onAddRuleCloudHost={this.onAddRuleCloudHost}
+                            onRemoveRuleCloudHosts={this.onRemoveRuleCloudHosts}/>;
+
+  private edgeHosts = (): JSX.Element =>
+    <HostRuleEdgeHostsList rule={this.props.hostRule}
+                           newEdgeHosts={this.state.newEdgeHosts}
+                           onAddRuleEdgeHost={this.onAddRuleEdgeHost}
+                           onRemoveRuleEdgeHosts={this.onRemoveRuleEdgeHosts}/>;
+
   private tabs: Tab[] = [
     {
       title: 'Host rule',
@@ -246,13 +319,23 @@ class HostRule extends BaseComponent<Props, State> {
       title: 'Conditions',
       id: 'hostRuleConditions',
       content: () => this.conditions(),
+    },
+    {
+      title: 'Cloud hosts',
+      id: 'cloudHosts',
+      content: () => this.cloudHosts(),
+    },
+    {
+      title: 'Edge hosts',
+      id: 'edgeHosts',
+      content: () => this.edgeHosts(),
     }
   ];
 
   render() {
     return (
       <MainLayout>
-        {this.shouldShowSaveButton() && <UnsavedChanged/>}
+        {this.shouldShowSaveButton() && !isNewRule(this.props.match.params.name) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>
@@ -276,23 +359,19 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     if (!isNew) {
       delete formHostRule["id"];
       delete formHostRule["conditions"];
-      if (formHostRule["hostname"] == null) {
-        delete formHostRule["hostname"];
-      }
+      delete formHostRule["cloudHosts"];
+      delete formHostRule["edgeHosts"];
     }
   }
   const decisions = state.entities.decisions.data
                     && Object.values(state.entities.decisions.data)
                              .filter(decision => decision.componentType.name.toLowerCase() == 'host');
-  const hosts = state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data);
-  //TODO join cloud hostnames
   return  {
     isLoading,
     error,
     hostRule,
     formHostRule,
     decisions,
-    hosts
   }
 }
 
@@ -300,9 +379,9 @@ const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
   loadGenericRulesHost,
   loadDecisions,
-  loadEdgeHosts,
-  loadCloudHosts,
-  addRuleHostCondition
+  addRuleHostConditions,
+  addRuleHostCloudHosts,
+  addRuleHostEdgeHosts
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HostRule);

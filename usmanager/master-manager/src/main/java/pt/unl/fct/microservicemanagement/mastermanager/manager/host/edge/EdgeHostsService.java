@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRuleEntity;
@@ -43,7 +44,7 @@ public class EdgeHostsService {
   private final EdgeHostRepository edgeHosts;
   private final HostRulesService hostRulesService;
 
-  public EdgeHostsService(EdgeHostRepository edgeHosts, HostRulesService hostRulesService) {
+  public EdgeHostsService(EdgeHostRepository edgeHosts, @Lazy HostRulesService hostRulesService) {
     this.edgeHosts = edgeHosts;
     this.hostRulesService = hostRulesService;
   }

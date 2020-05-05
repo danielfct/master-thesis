@@ -25,6 +25,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.CloudHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
 
 import java.util.ArrayList;
@@ -59,7 +61,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AwsService {
 
-  //TODO put constants into AwsProperties
+  //TODO put constants into AwsProperties?
 
   //private static final String DEFAULT_INSTANCE_AMI = "ami-0e02218c08bb8ffd5";
   private static final String DEFAULT_INSTANCE_AMI = "ami-0e02218c08bb8ffd5";
@@ -71,10 +73,13 @@ public class AwsService {
   private static final long STOP_INSTANCE_TIMEOUT = TimeUnit.SECONDS.toMillis(60);
   private static final String MASTER_MANAGER = "master-manager";
 
+  private final CloudHostsService cloudHostsService;
   private final AmazonEC2 ec2;
   private final String awsInstanceType;
 
-  public AwsService(AwsProperties awsProperties) {
+  public AwsService(CloudHostsService cloudHostsService, AwsProperties awsProperties) {
+    //TODO populate cloud hosts repository?
+    this.cloudHostsService = cloudHostsService;
     String awsAccessKey = awsProperties.getAccess().getKey();
     String awsSecretAccessKey = awsProperties.getAccess().getSecretKey();
     var awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretAccessKey);
@@ -183,6 +188,7 @@ public class AwsService {
     } catch (TimeoutException e) {
       throw new StopInstanceException(e.getMessage());
     }
+    cloudHostsService.deleteCloudHost(instanceId);
     log.info("Stopped instance {} successfully", instanceId);
   }
 
@@ -197,7 +203,8 @@ public class AwsService {
     var createTagsRequest = new CreateTagsRequest().withResources(instanceId)
         .withTags(new Tag("Name", instanceName), new Tag(MASTER_MANAGER, "true"));
     ec2.createTags(createTagsRequest);
-    return instance.getInstanceId();
+    cloudHostsService.addCloudHost(CloudHostEntity.builder().instanceId(instanceId).build());
+    return instanceId;
   }
 
   public String createNewAwsInstance() {
@@ -220,4 +227,5 @@ public class AwsService {
     return instance.getTags().stream().anyMatch(tag ->
         Objects.equals(tag.getKey(), MASTER_MANAGER) && Objects.equals(tag.getValue(), "true"));
   }
+
 }

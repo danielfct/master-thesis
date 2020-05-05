@@ -24,6 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.CloudHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.condition.ConditionEntity;
 
 import java.util.List;
@@ -39,26 +41,29 @@ public interface HostRuleRepository extends CrudRepository<HostRuleEntity, Long>
 
   @Query("select r "
       + "from HostRuleEntity r "
-      + "where r.hostname is not null")
-  List<HostRuleEntity> findHostRules();
-
-  @Query("select r "
-      + "from HostRuleEntity r "
-      + "where r.hostname is not null and r.name = :ruleName")
+      + "where r.name = :ruleName")
   Optional<HostRuleEntity> findHostRule(@Param("ruleName") String ruleName);
 
   Optional<HostRuleEntity> findByNameIgnoreCase(@Param("name") String name);
 
-  List<HostRuleEntity> findByHostname(@Param("hostname") String hostname);
+  @Query("select r "
+      + "from HostRuleEntity r join r.cloudHosts h "
+      + "where h.instanceId = :instanceId")
+  List<HostRuleEntity> findByCloudInstanceId(@Param("instanceId") String instanceId);
+
+  @Query("select r "
+      + "from HostRuleEntity r join r.edgeHosts h "
+      + "where h.hostname = :hostname")
+  List<HostRuleEntity> findByEdgeHostname(@Param("hostname") String hostname);
 
   @Query("select r "
       + "from HostRuleEntity r "
-      + "where r.hostname is null")
+      + "where r.generic = true")
   List<HostRuleEntity> findGenericHostRules();
 
   @Query("select r "
       + "from HostRuleEntity r "
-      + "where r.hostname is null and r.name = :ruleName")
+      + "where r.generic = true and r.name = :ruleName")
   Optional<HostRuleEntity> findGenericHostRule(@Param("ruleName") String ruleName);
 
   @Query("select case when count(r) > 0 then true else false end "
@@ -76,5 +81,25 @@ public interface HostRuleRepository extends CrudRepository<HostRuleEntity, Long>
       + "where r.name = :ruleName and rc.hostCondition.name = :conditionName")
   Optional<ConditionEntity> getCondition(@Param("ruleName") String ruleName,
                                          @Param("conditionName") String conditionName);
+
+  @Query("select h "
+      + "from HostRuleEntity r join r.cloudHosts h "
+      + "where r.name = :ruleName")
+  List<CloudHostEntity> getCloudHosts(@Param("ruleName") String ruleName);
+
+  @Query("select h "
+      + "from HostRuleEntity r join r.cloudHosts h "
+      + "where r.name = :ruleName and h.instanceId = :instanceId")
+  Optional<CloudHostEntity> getCloudHost(@Param("ruleName") String ruleName, @Param("instanceId") String instanceId);
+
+  @Query("select h "
+      + "from HostRuleEntity r join r.edgeHosts h "
+      + "where r.name = :ruleName")
+  List<EdgeHostEntity> getEdgeHosts(@Param("ruleName") String ruleName);
+
+  @Query("select h "
+      + "from HostRuleEntity r join r.edgeHosts h "
+      + "where r.name = :ruleName and h.hostname = :hostname")
+  Optional<EdgeHostEntity> getEdgeHost(@Param("ruleName") String ruleName, @Param("hostname") String hostname);
 
 }

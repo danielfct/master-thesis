@@ -13,7 +13,7 @@ import {connect} from "react-redux";
 import {ReduxState} from "../../../reducers";
 import CardList from "../../../components/list/CardList";
 import BaseComponent from "../../../components/BaseComponent";
-import {loadCloudHosts, loadEdgeHosts} from "../../../actions";
+import {loadCloudHosts} from "../../../actions";
 import {ICloudHost} from "./CloudHost";
 import CloudHostCard from "./CloudHostCard";
 
@@ -39,7 +39,7 @@ class CloudHostsList extends BaseComponent<Props, {}> {
     <CloudHostCard key={host.instanceId} cloudHost={host}/>;
 
   private predicate = (host: ICloudHost, search: string): boolean =>
-    host.publicIpAddress.toLowerCase().includes(search);
+    (host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search)) || host.instanceId.includes(search);
 
   render = () =>
     <CardList<ICloudHost>

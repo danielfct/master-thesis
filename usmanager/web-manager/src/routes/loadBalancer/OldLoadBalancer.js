@@ -64,7 +64,7 @@ export default class LoadBalancerPage extends React.Component {
     );
   };
 
-  addRegion = (regionId, event) => {
+  addRegion = (regionId, regionName, event) => {
     function getIndex (regionId, regions) {
       let i;
       for (i = 0; i < regions.length; i++) {
@@ -78,7 +78,7 @@ export default class LoadBalancerPage extends React.Component {
     newAvailableRegions.splice(index, 1);
     this.setState({ loading: true });
     getData(
-      `http://localhost:8080/regions/${regionId}`,
+      `http://localhost:8080/regions/${regionName}`,
       data => {
         const newChosenRegions = this.state.chosenRegions;
         newChosenRegions.push(data);
@@ -86,7 +86,7 @@ export default class LoadBalancerPage extends React.Component {
       });
   };
 
-  onRemoveRegion = (regionId, event) => {
+  onRemoveRegion = (regionId, regionName, event) => {
     function getIndex (regionId, regions) {
       let i;
       for (i = 0; i < regions.length; i++) {
@@ -100,7 +100,7 @@ export default class LoadBalancerPage extends React.Component {
     newChosenRegions.splice(index, 1);
     this.setState({ loading: true });
     getData(
-      `http://localhost:8080/regions/${regionId}`,
+      `http://localhost:8080/regions/${regionName}`,
       data => {
         const newAvailableRegions = this.state.availableRegions;
         newAvailableRegions.push(data);
@@ -143,10 +143,11 @@ export default class LoadBalancerPage extends React.Component {
     if (this.state.chosenRegions) {
       regionsNodes = this.state.chosenRegions.map(region => (
         <li key={region.id} className="collection-item">
+          {console.log(region)}
           <div>
-            {region.regionName + ' (' + region.regionDescription + ')'}
+            {region.name + ' (' + region.description + ')'}
             <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-               onClick={(e) => this.onRemoveRegion(region.id, e)}>
+               onClick={(e) => this.onRemoveRegion(region.id, region.name, e)}>
               <i className="material-icons">clear</i>
             </a>
           </div>
@@ -163,9 +164,9 @@ export default class LoadBalancerPage extends React.Component {
       regionsNodes = this.state.availableRegions.map(region => (
         <li key={region.id} className="collection-item">
           <div>
-            {region.regionName + ' (' + region.regionDescription + ')'}
+            {region.name + ' (' + region.description + ')'}
             <a style={style} className="secondary-content btn-floating btn-small waves-effect waves-light"
-               onClick={(e) => this.addRegion(region.id, e)}>
+               onClick={(e) => this.addRegion(region.id, region.name, e)}>
               <i className="material-icons">add</i>
             </a>
           </div>

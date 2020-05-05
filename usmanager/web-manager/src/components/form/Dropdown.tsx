@@ -7,7 +7,7 @@ interface Props<T> {
   name: string;
   value: any;
   disabled?: boolean;
-  dropdown: {defaultValue?: string | number, values: T[], optionToString: (v: T) => string};
+  dropdown: {defaultValue?: string | number, values: T[], optionToString?: (v: T) => string};
   onChange: (e: React.FormEvent<HTMLSelectElement>) => void;
   onBlur?: (e: React.FormEvent<HTMLSelectElement>) => void;
 }
@@ -30,12 +30,14 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
 
   render() {
     const {className, id, name, value, disabled, onChange, onBlur, dropdown} = this.props;
+    let valueString = value == undefined ? "" : value;
+    valueString = typeof valueString == 'object' ? JSON.stringify(valueString) : valueString.toString();
     return (
       <select
         className={className}
         id={id}
         name={name}
-        value={typeof value !== 'string' ? JSON.stringify(value) : value}
+        value={valueString}
         disabled={disabled}
         onChange={onChange}
         onBlur={onBlur}
@@ -47,9 +49,14 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
             </option>
           )}
           {dropdown.values.map((option, index) => {
-              return (
-                <option key={index} value={typeof option !== 'string' ? JSON.stringify(option) : option}>
-                  {dropdown.optionToString(option)}
+
+            return (
+                <option key={index} value={typeof option !== 'string' || typeof option !== 'boolean' ? JSON.stringify(option) : option}>
+                  {typeof option == 'object'
+                    // @ts-ignore force error if optionToString is not provided when options are of type object
+                    ? dropdown.optionToString(option)
+                    // @ts-ignore
+                    : option.toString()}
                 </option>
               );
             }

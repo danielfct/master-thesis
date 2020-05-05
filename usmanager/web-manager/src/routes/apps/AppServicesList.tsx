@@ -76,7 +76,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
   private service = (index: number, service: IAppService | IAddAppService, separate: boolean, checked: boolean,
                      handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
     const serviceName = typeof service.service == 'string' ? service.service : service.service.serviceName;
-    const isNew = this.props.unsavedServices.map(newService => newService.service).includes(service.service.toString());
+    const unsaved = this.props.unsavedServices.map(service => service.service).includes(service.service.toString());
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${listItemStyles.linkedItemContent}`}>
@@ -86,7 +86,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
-              <div className={isNew ? listItemStyles.newItem : undefined}>
+              <div className={unsaved ? listItemStyles.unsavedItem : undefined}>
                 {service.launchOrder}. {serviceName}
               </div>
             </span>

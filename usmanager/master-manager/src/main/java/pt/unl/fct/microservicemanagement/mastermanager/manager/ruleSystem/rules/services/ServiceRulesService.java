@@ -145,7 +145,7 @@ public class ServiceRulesService {
 
   private void assertRuleExists(String ruleName) {
     if (!rules.hasRule(ruleName)) {
-      throw new EntityNotFoundException(ServiceEntity.class, "ruleName", ruleName);
+      throw new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName);
     }
   }
 

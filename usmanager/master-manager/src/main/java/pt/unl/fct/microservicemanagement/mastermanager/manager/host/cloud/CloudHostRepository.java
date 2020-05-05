@@ -22,52 +22,31 @@
  * SOFTWARE.
  */
 
-.item {
-    display: flex;
-    word-break: break-word;
-}
+package pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud;
 
-.itemContent {
-    padding: 15px 40px;
-    font-size: 1.1rem;
-    width: 100%;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-content: center;
-    align-items: center;
-}
+import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRuleEntity;
 
-.linkedItemContent {
-    padding: 15px 40px;
-    width: 75%;
-    font-size: 1.1rem;
-    color: white;
-}
+import java.util.List;
+import java.util.Optional;
 
-.link {
-    cursor: pointer;
-    width: 25%;
-    margin: 0;
-}
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-.link:hover > .linkIcon {
-    display: block;
-}
+@Repository
+public interface CloudHostRepository extends CrudRepository<CloudHostEntity, Long> {
 
-.linkIcon {
-    color: white;
-    height: 100%;
-    font-size: 15px;
-    margin: 5px 5px 0 0;
-    display: none;
-}
+  Optional<CloudHostEntity> findByInstanceId(@Param("instanceId") String instanceId);
 
-.unsavedItem {
-    color: #F44336;
-}
+  @Query("select r "
+      + "from CloudHostEntity h join h.hostRules r "
+      + "where h.instanceId = :instanceId")
+  List<HostRuleEntity> getRules(@Param("instanceId") String instanceId);
 
-.irrelevant {
-    font-size: 0.9rem;
-    color: #9e9e9e;
+  @Query("select case when count(h) > 0 then true else false end "
+      + "from CloudHostEntity h "
+      + "where h.instanceId = :instanceId")
+  boolean hasCloudHost(@Param("instanceId") String instanceId);
+
 }

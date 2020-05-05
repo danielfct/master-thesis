@@ -154,7 +154,9 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
 
   private onRemove = (): void => {
     const checkedData = Object.entries(this.state).filter(([_, data]) => data?.isChecked);
+    console.log(checkedData)
     const unpersistedData = checkedData.filter(([_, data]) => data?.isNew).map(([name, _]) => name);
+    console.log(unpersistedData)
     if (unpersistedData.length) {
       this.invalidateStateData(unpersistedData);
       this.props.onRemove(unpersistedData);

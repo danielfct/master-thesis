@@ -20,6 +20,7 @@ export default class extends React.Component<Props, {}> {
   }
 
   updatePathname = (event: any) => {
+    //TODO not working?
     this.props.history.push(`#${event.target.id}`);
   };
 

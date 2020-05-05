@@ -81,7 +81,6 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
   private prediction = (index: number, prediction: IPrediction, separate: boolean, checked: boolean,
                         handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
     <ListItem key={index} separate={separate}>
-      {console.log(prediction)}
       <div className={`${styles.itemContent}`}>
         <label>
           <input id={prediction.name}
@@ -89,10 +88,12 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
                  onChange={handleCheckbox}
                  checked={checked}/>
           <span id={'checkbox'}>{prediction.name}
-            <div className={`${styles.end} ${styles.small}`}>{prediction.startDate} {prediction.startTime}</div>
-            <div className={`${styles.end} ${styles.small}`}>{prediction.endDate} {prediction.endDate}</div>
           </span>
         </label>
+        <div className={`${styles.irrelevant}`}>
+          <div>{prediction.startDate} {prediction.startTime}</div>
+          <div>{prediction.endDate} {prediction.endTime}</div>
+        </div>
       </div>
     </ListItem>;
 
@@ -152,26 +153,26 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
 
   render() {
     return <ControlledList<IPrediction> isLoading={this.props.isLoading}
-                           error={this.props.error}
-                           emptyMessage='Predictions list is empty'
-                           data={this.props.predictions}
-                           dataKey={['name']}
-                           formModal={{
-                             id: 'servicePrediction',
-                             title: 'Add prediction',
-                             fields: this.getFields(),
-                             values: emptyPrediction(),
-                             content: this.addModal,
-                             position: '15%'
-                           }}
-                           show={this.prediction}
-                           onAddInput={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `services/${this.props.service.serviceName}/predictions`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}/>;
+                                        error={this.props.error}
+                                        emptyMessage='Predictions list is empty'
+                                        data={this.props.predictions}
+                                        dataKey={['name']}
+                                        formModal={{
+                                          id: 'servicePrediction',
+                                          title: 'Add prediction',
+                                          fields: this.getFields(),
+                                          values: emptyPrediction(),
+                                          content: this.addModal,
+                                          position: '15%'
+                                        }}
+                                        show={this.prediction}
+                                        onAddInput={this.onAdd}
+                                        onRemove={this.onRemove}
+                                        onDelete={{
+                                          url: `services/${this.props.service.serviceName}/predictions`,
+                                          successCallback: this.onDeleteSuccess,
+                                          failureCallback: this.onDeleteFailure
+                                        }}/>;
 
   }
 

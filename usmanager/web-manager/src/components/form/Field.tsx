@@ -19,7 +19,7 @@ export interface FieldProps<T = string> {
   id: string;
   type?: "textbox" | "datebox" | "numberbox" | "multilinetextbox" | "collapsible" | "dropdown" | "datepicker" | "timepicker";
   label?: string;
-  dropdown?: { defaultValue: string, values: T[], optionToString: (v: T) => string, selectCallback?: (value: any) => void };
+  dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
   number?: { min: number, max: number };
   validation?: IValidation;
   icon?: boolean;
@@ -104,7 +104,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                 <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
                          id={id}
                          name={id}
-                         value={formContext.values[id].toString()}
+                         value={formContext.values[id] && formContext.values[id].toString() || ''}
                          disabled={disabled || !formContext.isEditing}
                          onChange={e => this.onChange(e, id, formContext)}
                          onBlur={e => this.onBlur(e, id, formContext)}/>

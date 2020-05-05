@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.host;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsLaunchServiceReq;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsSimpleInstance;
@@ -53,18 +54,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class HostsController {
 
   private final AwsService aws;
+  private final CloudHostsService cloudHostsService;
   private final EdgeHostsService edgeHostsService;
   private final DockerContainersService dockerContainersService;
 
-  public HostsController(AwsService aws, EdgeHostsService edgeHostsService,
+  public HostsController(AwsService aws, CloudHostsService cloudHostsService, EdgeHostsService edgeHostsService,
                          DockerContainersService dockerContainersService) {
     this.aws = aws;
+    this.cloudHostsService = cloudHostsService;
     this.edgeHostsService = edgeHostsService;
     this.dockerContainersService = dockerContainersService;
   }
 
   @GetMapping("/cloud")
   public List<AwsSimpleInstance> getEC2Instances() {
+    //TODO get cloud instances from repository instead
     return aws.getSimpleInstances();
   }
 
@@ -97,6 +101,26 @@ public class HostsController {
         String.format("${%sDatabaseHost}", serviceName), launchServiceReq.getDatabase());
     return dockerContainersService.launchContainer(ec2PublicIp, serviceName, internalPort, externalPort,
         dynamicLaunchParams);
+  }
+
+  @GetMapping("/cloud/{instanceId}/rules")
+  public List<HostRuleEntity> getCloudHostRules(@PathVariable String instanceId) {
+    return cloudHostsService.getRules(instanceId);
+  }
+
+  @PostMapping("/cloud/{instanceId}/rules")
+  public void addCloudHostRules(@PathVariable String instanceId, @RequestBody String[] rules) {
+    cloudHostsService.addRules(instanceId, Arrays.asList(rules));
+  }
+
+  @DeleteMapping("/cloud/{instanceId}/rules")
+  public void removeCloudHostRules(@PathVariable String instanceId, @RequestBody String[] rules) {
+    cloudHostsService.removeRules(instanceId, Arrays.asList(rules));
+  }
+
+  @DeleteMapping("/cloud/{instanceId}/rules/{ruleName}")
+  public void removeCloudHostRule(@PathVariable String instanceId, @PathVariable String ruleName) {
+    cloudHostsService.removeRule(instanceId, ruleName);
   }
 
   @GetMapping("/edge")
@@ -132,20 +156,17 @@ public class HostsController {
   }
 
   @PostMapping("/edge/{hostname}/rules")
-  public void addEdgeHostRules(@PathVariable String hostname,
-                               @RequestBody String[] rules) {
+  public void addEdgeHostRules(@PathVariable String hostname, @RequestBody String[] rules) {
     edgeHostsService.addRules(hostname, Arrays.asList(rules));
   }
 
   @DeleteMapping("/edge/{hostname}/rules")
-  public void removeEdgeHostRules(@PathVariable String hostname,
-                                  @RequestBody String[] rules) {
+  public void removeEdgeHostRules(@PathVariable String hostname, @RequestBody String[] rules) {
     edgeHostsService.removeRules(hostname, Arrays.asList(rules));
   }
 
   @DeleteMapping("/edge/{hostname}/rules/{ruleName}")
-  public void removeEdgeHostRule(@PathVariable String hostname,
-                                 @PathVariable String ruleName) {
+  public void removeEdgeHostRule(@PathVariable String hostname, @PathVariable String ruleName) {
     edgeHostsService.removeRule(hostname, ruleName);
   }
 

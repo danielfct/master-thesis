@@ -14,7 +14,6 @@ import {connect} from "react-redux";
 import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
 import {postData} from "../../utils/api";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
-import {IService} from "../services/Service";
 
 export interface IApp extends Data {
   name: string;

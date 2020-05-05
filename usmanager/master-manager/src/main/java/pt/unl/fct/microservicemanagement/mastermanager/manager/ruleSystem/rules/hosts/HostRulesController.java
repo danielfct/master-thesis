@@ -1,5 +1,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.CloudHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
@@ -20,8 +22,8 @@ public class HostRulesController {
   
   private final HostRulesService hostRulesService;
 
-  public HostRulesController(HostRulesService appRulesService) {
-    this.hostRulesService = appRulesService;
+  public HostRulesController(HostRulesService hostRulesService) {
+    this.hostRulesService = hostRulesService;
   }
 
   @GetMapping("/hosts")
@@ -80,5 +82,45 @@ public class HostRulesController {
   public void removeRuleCondition(@PathVariable String ruleName, @PathVariable String conditionName) {
     hostRulesService.removeCondition(ruleName, conditionName);
   }
-  
+
+  @GetMapping("/hosts/{ruleName}/cloudHosts")
+  public List<CloudHostEntity> getRuleCloudHosts(@PathVariable String ruleName) {
+    return hostRulesService.getCloudHosts(ruleName);
+  }
+
+  @PostMapping("/hosts/{ruleName}/cloudHosts")
+  public void addRuleCloudHosts(@PathVariable String ruleName, @RequestBody List<String> cloudHosts) {
+    hostRulesService.addCloudHosts(ruleName, cloudHosts);
+  }
+
+  @DeleteMapping("/hosts/{ruleName}/cloudHosts")
+  public void removeRuleCloudHosts(@PathVariable String ruleName, @RequestBody List<String> instanceIds) {
+    hostRulesService.removeCloudHosts(ruleName, instanceIds);
+  }
+
+  @DeleteMapping("/hosts/{ruleName}/cloudHosts/{instanceId}")
+  public void removeRuleCloudHost(@PathVariable String ruleName, @PathVariable String instanceId) {
+    hostRulesService.removeCloudHost(ruleName, instanceId);
+  }
+
+  @GetMapping("/hosts/{ruleName}/edgeHosts")
+  public List<EdgeHostEntity> getRuleEdgeHosts(@PathVariable String ruleName) {
+    return hostRulesService.getEdgeHosts(ruleName);
+  }
+
+  @PostMapping("/hosts/{ruleName}/edgeHosts")
+  public void addRuleEdgeHosts(@PathVariable String ruleName, @RequestBody List<String> edgeHosts) {
+    hostRulesService.addEdgeHosts(ruleName, edgeHosts);
+  }
+
+  @DeleteMapping("/hosts/{ruleName}/edgeHosts")
+  public void removeRuleEdgeHosts(@PathVariable String ruleName, @RequestBody List<String> edgeHosts) {
+    hostRulesService.removeEdgeHosts(ruleName, edgeHosts);
+  }
+
+  @DeleteMapping("/hosts/{ruleName}/edgeHosts/{instanceId}")
+  public void removeRuleEdgeHosts(@PathVariable String ruleName, @PathVariable String instanceId) {
+    hostRulesService.removeEdgeHost(ruleName, instanceId);
+  }
+
 }
