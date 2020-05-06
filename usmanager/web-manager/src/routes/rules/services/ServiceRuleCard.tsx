@@ -25,13 +25,12 @@ const ServiceRuleCard = ({rule}: Props) => (
                       height={'125px'}
                       margin={'10px 0'}
                       hoverable>
-    {rule.serviceName != null &&
-     <CardItem key={'service'}
-               label={'Service'}
-               value={`${rule.serviceName}`}/>}
     <CardItem key={'priority'}
               label={'Priority'}
               value={`${rule.priority}`}/>
+    <CardItem key={'generic'}
+              label={'Generic'}
+              value={`${rule.generic}`}/>
     <CardItem key={'decision'}
               label={'Decision'}
               value={`${rule.decision.name}`}/>

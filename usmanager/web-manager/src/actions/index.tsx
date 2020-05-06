@@ -300,9 +300,9 @@ const fetchRulesHost = (name?: string) => ({
       }
 });
 
-export const GENERIC_RULES_HOST_REQUEST = 'GENERIC_RULES_HOST_REQUEST';
-export const GENERIC_RULES_HOST_SUCCESS = 'GENERIC_RULES_HOST_SUCCESS';
-export const GENERIC_RULES_HOST_FAILURE = 'GENERIC_RULES_HOST_FAILURE';
+export const GENERIC_HOST_RULES_REQUEST = 'GENERIC_HOST_RULES_REQUEST';
+export const GENERIC_HOST_RULES_SUCCESS = 'GENERIC_HOST_RULES_SUCCESS';
+export const GENERIC_HOST_RULES_FAILURE = 'GENERIC_HOST_RULES_FAILURE';
 export const GENERIC_HOST_RULE_REQUEST = 'GENERIC_HOST_RULE_REQUEST';
 export const GENERIC_HOST_RULE_SUCCESS = 'GENERIC_HOST_RULE_SUCCESS';
 export const GENERIC_HOST_RULE_FAILURE = 'GENERIC_HOST_RULE_FAILURE';
@@ -313,7 +313,7 @@ const fetchGenericRulesHost = (name?: string) => ({
   [CALL_API]:
     !name
       ? {
-        types: [ GENERIC_RULES_HOST_REQUEST, GENERIC_RULES_HOST_SUCCESS, GENERIC_RULES_HOST_FAILURE ],
+        types: [ GENERIC_HOST_RULES_REQUEST, GENERIC_HOST_RULES_SUCCESS, GENERIC_HOST_RULES_FAILURE ],
         endpoint: `rules/generic/hosts`,
         schema: Schemas.RULE_HOST_ARRAY,
         entity: 'genericHostRules'
@@ -432,7 +432,7 @@ const fetchRuleHostCloudHosts = (ruleName: string) => ({
   }
 });
 export const ADD_HOST_RULE_CLOUD_HOSTS = 'ADD_HOST_RULE_CLOUD_HOSTS';
-export function addRuleHostCloudHosts(ruleName: string, cloudHosts: string[]): EntitiesAction {
+export function addRuleCloudHosts(ruleName: string, cloudHosts: string[]): EntitiesAction {
   return {
     type: ADD_HOST_RULE_CLOUD_HOSTS,
     entity: ruleName,
@@ -463,7 +463,7 @@ const fetchRuleHostEdgeHosts = (ruleName: string) => ({
   }
 });
 export const ADD_HOST_RULE_EDGE_HOSTS = 'ADD_HOST_RULE_EDGE_HOSTS';
-export function addRuleHostEdgeHosts(ruleName: string, edgeHosts: string[]): EntitiesAction {
+export function addRuleEdgeHosts(ruleName: string, edgeHosts: string[]): EntitiesAction {
   return {
     type: ADD_HOST_RULE_EDGE_HOSTS,
     entity: ruleName,
@@ -507,6 +507,36 @@ export function removeRuleServiceConditions(ruleName: string, condition: string[
     type: REMOVE_RULE_SERVICE_CONDITIONS,
     entity: ruleName,
     data: { conditionsNames: condition }
+  }
+}
+export const SERVICE_RULE_SERVICES_REQUEST = 'SERVICE_RULE_SERVICES_REQUEST';
+export const SERVICE_RULE_SERVICES_SUCCESS = 'SERVICE_RULE_SERVICES_SUCCESS';
+export const SERVICE_RULE_SERVICES_FAILURE = 'SERVICE_RULE_SERVICES_FAILURE';
+export const loadRuleServices = (ruleName: string) => (dispatch: any) => {
+  return dispatch(fetchRuleServices(ruleName));
+};
+const fetchRuleServices = (ruleName: string) => ({
+  [CALL_API]: {
+    types: [ SERVICE_RULE_SERVICES_REQUEST, SERVICE_RULE_SERVICES_SUCCESS, SERVICE_RULE_SERVICES_FAILURE ],
+    endpoint: `rules/services/${ruleName}/services`,
+    schema: Schemas.SERVICE_ARRAY,
+    entity: ruleName
+  }
+});
+export const ADD_SERVICE_RULE_SERVICES = 'ADD_SERVICE_RULE_SERVICES';
+export function addRuleServices(ruleName: string, services: string[]): EntitiesAction {
+  return {
+    type: ADD_SERVICE_RULE_SERVICES,
+    entity: ruleName,
+    data: { serviceNames: services }
+  }
+}
+export const REMOVE_SERVICE_RULE_SERVICES = 'REMOVE_SERVICE_RULE_SERVICES';
+export function removeRuleServices(ruleName: string, services: string[]): EntitiesAction {
+  return {
+    type: REMOVE_SERVICE_RULE_SERVICES,
+    entity: ruleName,
+    data: { serviceNames: services }
   }
 }
 

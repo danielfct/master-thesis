@@ -25,13 +25,12 @@ const HostRuleCard = ({rule}: Props) => (
                    height={'120px'}
                    margin={'10px 0'}
                    hoverable>
-    {rule.hostname != null &&
-     <CardItem key={'host'}
-               label={'Host'}
-               value={`${rule.hostname}`}/>}
     <CardItem key={'priority'}
               label={'Priority'}
               value={`${rule.priority}`}/>
+    <CardItem key={'generic'}
+              label={'Generic'}
+              value={`${rule.generic}`}/>
     <CardItem key={'decision'}
               label={'Decision'}
               value={`${rule.decision.name}`}/>

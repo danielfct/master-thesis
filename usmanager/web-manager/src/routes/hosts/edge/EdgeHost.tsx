@@ -34,7 +34,7 @@ export interface IEdgeHost extends IData {
   country: string;
   city: string;
   local: boolean;
-  rules: string[];
+  hostRules: string[];
 }
 
 const emptyEdgeHost = (): Partial<IEdgeHost> => ({
@@ -265,7 +265,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   if (edgeHost) {
     formEdgeHost = { ...edgeHost };
     delete formEdgeHost["id"];
-    delete formEdgeHost["rules"];
+    delete formEdgeHost["hostRules"];
   }
   return  {
     isLoading,

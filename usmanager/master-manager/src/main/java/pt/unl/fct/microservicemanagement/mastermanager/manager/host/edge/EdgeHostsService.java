@@ -26,9 +26,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge;
 
 import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;
@@ -65,6 +64,9 @@ public class EdgeHostsService {
 
   public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {
     EdgeHostEntity edgeHost = getEdgeHost(hostname);
+    log.debug("Updating edgeHost {} with {}",
+        ToStringBuilder.reflectionToString(edgeHost),
+        ToStringBuilder.reflectionToString(newEdgeHost));
     ObjectUtils.copyValidProperties(newEdgeHost, edgeHost);
     return edgeHosts.save(edgeHost);
   }
@@ -96,32 +98,28 @@ public class EdgeHostsService {
   }
 
   public void addRule(String hostname, String ruleName) {
-    EdgeHostEntity edgeHost = getEdgeHost(hostname);
-    HostRuleEntity rule = hostRulesService.getRule(ruleName);
-    log.info("Adding rule {} to edge host {}", ruleName, hostname);
-    edgeHost = edgeHost.toBuilder().hostRule(rule).build();
-    edgeHosts.save(edgeHost);
+    assertHostExists(hostname);
+    hostRulesService.addEdgeHost(ruleName, hostname);
   }
 
   public void addRules(String hostname, List<String> ruleNames) {
-    ruleNames.forEach(ruleName -> addRule(hostname, ruleName));
+    assertHostExists(hostname);
+    ruleNames.forEach(rule -> hostRulesService.addEdgeHost(rule, hostname));
   }
 
-  public void removeRule(String hostname, String rule) {
-    removeRules(hostname, List.of(rule));
+  public void removeRule(String hostname, String ruleName) {
+    assertHostExists(hostname);
+    hostRulesService.removeEdgeHost(ruleName, hostname);
   }
 
-  public void removeRules(String hostname, List<String> rules) {
-    var host = getEdgeHost(hostname);
-    log.info("Removing rules {}", rules);
-    host.getHostRules()
-        .removeIf(rule -> rules.contains(rule.getName()));
-    edgeHosts.save(host);
+  public void removeRules(String hostname, List<String> ruleNames) {
+    assertHostExists(hostname);
+    ruleNames.forEach(rule -> hostRulesService.removeEdgeHost(rule, hostname));
   }
 
   private void assertHostExists(String hostname) {
-    if (!edgeHosts.hasEdgeHost(hostname)) {
-      throw new EntityNotFoundException(AppEntity.class, "hostname", hostname);
+    if (!hasEdgeHost(hostname)) {
+      throw new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname);
     }
   }
 

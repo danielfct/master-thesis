@@ -102,14 +102,14 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
 
   private getSelectableRules = () => {
     const {rules, rulesName, unsavedRules} = this.props;
-    return Object.keys(rules).filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
+    return []/*Object.keys(rules).filter(name => !rulesName.includes(name) && !unsavedRules.includes(name))*/;
   };
 
   render() {
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage={`Rules list is empty`}
-                           data={this.props.rulesName}
+                           data={[]/*this.props.rulesName*/}
                            dataKey={['hostname']}
                            dropdown={{
                              id: 'rules',
@@ -132,7 +132,7 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
 function mapStateToProps(state: ReduxState, ownProps: HostRuleListProps): StateToProps {
   const hostname = ownProps.host.hostname;
   const host = hostname && state.entities.hosts.edge.data[hostname];
-  const rulesName = host && host.rules;
+  const rulesName = host && host.hostRules;
   return {
     isLoading: state.entities.hosts.edge.isLoadingRules,
     error: state.entities.hosts.edge.loadRulesError,

@@ -128,7 +128,7 @@ class CloudHostRuleList extends BaseComponent<Props, {}> {
 function mapStateToProps(state: ReduxState, ownProps: HostRuleListProps): StateToProps {
   const instanceId = ownProps.host.instanceId;
   const host = instanceId && state.entities.hosts.cloud.data[instanceId];
-  const rulesName = host && host.rules;
+  const rulesName = host && host.hostRules;
   return {
     isLoading: state.entities.hosts.cloud.isLoadingRules,
     error: state.entities.hosts.cloud.loadRulesError,

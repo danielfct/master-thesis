@@ -32,7 +32,7 @@ export interface ICloudHost {
   state: { code: number, name: string }
   publicDnsName: string;
   publicIpAddress: string;
-  rules: string[];
+  hostRules: string[];
 }
 
 const emptyCloudHost = (): Partial<ICloudHost> => ({
@@ -248,6 +248,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   let formCloudHost;
   if (cloudHost) {
     formCloudHost = {...cloudHost};
+    delete formCloudHost["hostRules"];
   }
   return  {
     isLoading,

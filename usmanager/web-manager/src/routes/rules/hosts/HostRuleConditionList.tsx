@@ -83,7 +83,7 @@ class HostRuleConditionList extends BaseComponent<Props, {}> {
   };
 
   private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to delete condition`, 10000, reason, true);
+    super.toast(`Unable to remove condition`, 10000, reason, true);
 
   private getSelectableConditionNames = () => {
     const {conditions, ruleConditions, newConditions} = this.props;

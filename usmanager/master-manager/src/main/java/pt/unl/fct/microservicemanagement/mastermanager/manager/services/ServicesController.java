@@ -26,7 +26,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.services.ServiceRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
@@ -150,27 +151,25 @@ public class ServicesController {
     servicesService.removePrediction(serviceName, predictionName);
   }
 
+
   @GetMapping("/{serviceName}/rules")
   public Iterable<ServiceRuleEntity> getServiceRules(@PathVariable String serviceName) {
     return servicesService.getRules(serviceName);
   }
 
-  @DeleteMapping("/{serviceName}/rules/{ruleName}")
-  public void removeServiceRule(@PathVariable String serviceName,
-                                @PathVariable String ruleName) {
-    servicesService.removeRule(serviceName, ruleName);
-  }
-
   @PostMapping("/{serviceName}/rules")
-  public void addServiceRules(@PathVariable String serviceName,
-                              @RequestBody String[] rules) {
+  public void addServiceRules(@PathVariable String serviceName, @RequestBody String[] rules) {
     servicesService.addRules(serviceName, Arrays.asList(rules));
   }
 
   @DeleteMapping("/{serviceName}/rules")
-  public void removeServiceRules(@PathVariable String serviceName,
-                                 @RequestBody String[] rules) {
+  public void removeServiceRules(@PathVariable String serviceName, @RequestBody String[] rules) {
     servicesService.removeRules(serviceName, Arrays.asList(rules));
+  }
+
+  @DeleteMapping("/{serviceName}/rules/{ruleName}")
+  public void removeServiceRule(@PathVariable String serviceName, @PathVariable String ruleName) {
+    servicesService.removeRule(serviceName, ruleName);
   }
 
   //TODO change to ?search=

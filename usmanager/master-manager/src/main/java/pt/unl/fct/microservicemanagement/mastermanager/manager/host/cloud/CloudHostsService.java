@@ -24,17 +24,16 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.hosts.HostRulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -84,32 +83,28 @@ public class CloudHostsService {
   }
 
   public void addRule(String instanceId, String ruleName) {
-    CloudHostEntity cloudHost = getCloudHost(instanceId);
-    HostRuleEntity rule = hostRulesService.getRule(ruleName);
-    log.info("Adding rule {} to cloud host {}", ruleName, instanceId);
-    cloudHost = cloudHost.toBuilder().hostRule(rule).build();
-    cloudHosts.save(cloudHost);
+    assertHostExists(instanceId);
+    hostRulesService.addCloudHost(ruleName, instanceId);
   }
 
   public void addRules(String instanceId, List<String> ruleNames) {
-    ruleNames.forEach(ruleName -> addRule(instanceId, ruleName));
+    assertHostExists(instanceId);
+    ruleNames.forEach(rule -> hostRulesService.addCloudHost(rule, instanceId));
   }
 
-  public void removeRule(String instanceId, String rule) {
-    removeRules(instanceId, List.of(rule));
+  public void removeRule(String instanceId, String ruleName) {
+    assertHostExists(instanceId);
+    hostRulesService.removeCloudHost(ruleName, instanceId);
   }
 
-  public void removeRules(String instanceId, List<String> rules) {
-    var host = getCloudHost(instanceId);
-    log.info("Removing rules {}", rules);
-    host.getHostRules()
-        .removeIf(rule -> rules.contains(rule.getName()));
-    cloudHosts.save(host);
+  public void removeRules(String hostname, List<String> ruleNames) {
+    assertHostExists(hostname);
+    ruleNames.forEach(rule -> hostRulesService.removeCloudHost(rule, hostname));
   }
 
   private void assertHostExists(String instanceId) {
-    if (!cloudHosts.hasCloudHost(instanceId)) {
-      throw new EntityNotFoundException(AppEntity.class, "instanceId", instanceId);
+    if (!hasCloudHost(instanceId)) {
+      throw new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId);
     }
   }
 

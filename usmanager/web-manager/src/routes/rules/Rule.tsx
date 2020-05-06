@@ -4,6 +4,7 @@ import IData from "../../components/IData";
 export interface IRule extends IData {
   name: string;
   priority: number;
+  generic: boolean;
   decision: IDecision;
   conditions: string[];
 }

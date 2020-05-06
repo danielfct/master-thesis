@@ -124,7 +124,7 @@ public class AppsService {
 
   private void assertAppExists(String appName) {
     if (!apps.hasApp(appName)) {
-      throw new EntityNotFoundException(AppEntity.class, "appName", appName.toString());
+      throw new EntityNotFoundException(AppEntity.class, "appName", appName);
     }
   }
 

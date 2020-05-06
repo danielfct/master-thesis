@@ -21,9 +21,9 @@ import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
 import React from "react";
 import {
-  addRuleHostCloudHosts,
+  addRuleCloudHosts,
   addRuleHostConditions,
-  addRuleHostEdgeHosts,
+  addRuleEdgeHosts,
   loadDecisions,
   loadGenericRulesHost,
   loadRulesHost,
@@ -35,16 +35,15 @@ import HostRuleCloudHostsList from "./HostRuleCloudHostsList";
 import HostRuleEdgeHostsList from "./HostRuleEdgeHostsList";
 
 export interface IHostRule extends IRule {
-  hostname: string,
   cloudHosts: string[],
   edgeHosts: string[],
 }
 
 const emptyHostRule = () => ({
   name: '',
-  priority: undefined,
-  decision: undefined,
+  priority: 0,
   generic: undefined,
+  decision: undefined,
 });
 
 const isNewRule = (name: string) =>
@@ -63,8 +62,8 @@ interface DispatchToProps {
   loadGenericRulesHost: (name: string) => any;
   loadDecisions: () => any;
   addRuleHostConditions: (ruleName: string, conditions: string[]) => void;
-  addRuleHostCloudHosts: (ruleName: string, cloudHosts: string[]) => void;
-  addRuleHostEdgeHosts: (ruleName: string, edgeHosts: string[]) => void;
+  addRuleCloudHosts: (ruleName: string, cloudHosts: string[]) => void;
+  addRuleEdgeHosts: (ruleName: string, edgeHosts: string[]) => void;
 }
 
 interface MatchParams {
@@ -159,9 +158,9 @@ class HostRule extends BaseComponent<Props, State> {
   private onSaveConditionsFailure = (ruleName: string, reason: string): void =>
     super.toast(`Unable to save conditions of rule ${ruleName}`, 10000, reason, true);
 
-  private onAddRuleCloudHost = (cloudHosts: string): void =>
+  private onAddRuleCloudHost = (cloudHost: string): void =>
     this.setState({
-      newCloudHosts: this.state.newCloudHosts.concat(cloudHosts)
+      newCloudHosts: this.state.newCloudHosts.concat(cloudHost)
     });
 
   private onRemoveRuleCloudHosts = (cloudHosts: string[]): void => {
@@ -181,7 +180,7 @@ class HostRule extends BaseComponent<Props, State> {
 
   private onSaveCloudHostsSuccess = (ruleName: string): void => {
     if (!isNewRule(this.props.match.params.name)) {
-      this.props.addRuleHostCloudHosts(ruleName, this.state.newCloudHosts)
+      this.props.addRuleCloudHosts(ruleName, this.state.newCloudHosts)
     }
     this.setState({ newCloudHosts: [] });
   };
@@ -189,9 +188,9 @@ class HostRule extends BaseComponent<Props, State> {
   private onSaveCloudHostsFailure = (ruleName: string, reason: string): void =>
     super.toast(`Unable to save cloud hosts of rule ${ruleName}`, 10000, reason, true);
 
-  private onAddRuleEdgeHost = (edgeHosts: string): void =>
+  private onAddRuleEdgeHost = (edgeHost: string): void =>
     this.setState({
-      newEdgeHosts: this.state.newEdgeHosts.concat(edgeHosts)
+      newEdgeHosts: this.state.newEdgeHosts.concat(edgeHost)
     });
 
   private onRemoveRuleEdgeHosts = (edgeHosts: string[]): void => {
@@ -211,7 +210,7 @@ class HostRule extends BaseComponent<Props, State> {
 
   private onSaveEdgeHostsSuccess = (ruleName: string): void => {
     if (!isNewRule(this.props.match.params.name)) {
-      this.props.addRuleHostEdgeHosts(ruleName, this.state.newEdgeHosts)
+      this.props.addRuleEdgeHosts(ruleName, this.state.newEdgeHosts)
     }
     this.setState({ newEdgeHosts: [] });
   };
@@ -380,8 +379,8 @@ const mapDispatchToProps: DispatchToProps = {
   loadGenericRulesHost,
   loadDecisions,
   addRuleHostConditions,
-  addRuleHostCloudHosts,
-  addRuleHostEdgeHosts
+  addRuleCloudHosts,
+  addRuleEdgeHosts
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HostRule);

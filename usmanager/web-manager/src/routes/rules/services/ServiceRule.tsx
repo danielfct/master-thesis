@@ -20,7 +20,8 @@ import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
-  addRuleServiceCondition,
+  addRuleCloudHosts,
+  addRuleServiceCondition, addRuleServices,
   loadDecisions,
   loadGenericRulesService,
   loadRulesService, loadServices
@@ -30,16 +31,18 @@ import React from "react";
 import {postData} from "../../../utils/api";
 import ServiceRuleConditionList from "./ServiceRuleConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
+import HostRuleCloudHostsList from "../hosts/HostRuleCloudHostsList";
+import ServiceRuleServicesList from "./ServiceRuleServicesList";
 
 export interface IServiceRule extends IRule {
-  serviceName: string,
+  services: string[]
 }
 
 const emptyServiceRule = () => ({
   name: '',
   priority: 0,
+  generic: undefined,
   decision: undefined,
-  serviceName: undefined,
 });
 
 const isNewRule = (name: string) =>
@@ -51,15 +54,14 @@ interface StateToProps {
   serviceRule: Partial<IServiceRule>;
   formServiceRule?: Partial<IServiceRule>,
   decisions: IDecision[],
-  services: IService[],
 }
 
 interface DispatchToProps {
   loadRulesService: (name: string) => any;
   loadGenericRulesService: (name: string) => any;
   loadDecisions: () => any;
-  loadServices: () => any;
   addRuleServiceCondition: (ruleName: string, condition: string) => void;
+  addRuleServices: (ruleName: string, services: string[]) => void;
 }
 
 interface MatchParams {
@@ -70,6 +72,7 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
   newConditions: string[],
+  newServices: string[],
   ruleName?: string,
 }
 
@@ -77,11 +80,11 @@ class ServiceRule extends BaseComponent<Props, State> {
 
   state: State = {
     newConditions: [],
+    newServices: [],
   };
 
   componentDidMount(): void {
     this.props.loadDecisions();
-    this.props.loadServices();
     const ruleName = this.props.match.params.name;
     if (ruleName && !isNewRule(ruleName)) {
       this.props.loadRulesService(ruleName);
@@ -91,15 +94,17 @@ class ServiceRule extends BaseComponent<Props, State> {
 
   private saveEntities = (ruleName: string) => {
     this.saveRuleConditions(ruleName);
+    this.saveRuleServices(ruleName);
   };
 
   private onPostSuccess = (reply: any, ruleName: string): void => {
     super.toast(`Service rule <b>${ruleName}</b> saved`);
+    this.setState({ruleName: ruleName});
     this.saveEntities(ruleName);
   };
 
   private onPostFailure = (reason: string, ruleName: string): void =>
-    super.toast(`Unable to save ${ruleName}`, 10000, reason, true);
+    super.toast(`Unable to update ${ruleName}`, 10000, reason, true);
 
   private onPutSuccess = (ruleName: string): void => {
     super.toast(`Changes to service rule <b>${ruleName}</b> are now saved`);
@@ -151,17 +156,49 @@ class ServiceRule extends BaseComponent<Props, State> {
   private onSaveConditionsFailure = (ruleName: string, reason: string): void =>
     super.toast(`Unable to save conditions of rule ${ruleName}`, 10000, reason, true);
 
+
+
+
+  private onAddRuleService = (service: string): void =>
+    this.setState({
+      newServices: this.state.newServices.concat(service)
+    });
+
+  private onRemoveRuleServices = (services: string[]): void => {
+    this.setState({
+      newServices: this.state.newServices.filter(service => !services.includes(service))
+    });
+  };
+
+  private saveRuleServices = (ruleName: string): void => {
+    const {newServices} = this.state;
+    if (newServices.length) {
+      postData(`rules/services/${ruleName}/services`, newServices,
+        () => this.onSaveServicesSuccess(ruleName),
+        (reason) => this.onSaveServicesFailure(ruleName, reason));
+    }
+  };
+
+  private onSaveServicesSuccess = (ruleName: string): void => {
+    if (!isNewRule(this.props.match.params.name)) {
+      this.props.addRuleServices(ruleName, this.state.newServices)
+    }
+    this.setState({ newServices: [] });
+  };
+
+  private onSaveServicesFailure = (ruleName: string, reason: string): void =>
+    super.toast(`Unable to save services of rule ${ruleName}`, 10000, reason, true);
+
   private getFields = (serviceRule: Partial<IRule>): IFields =>
     Object.entries(serviceRule).map(([key, _]) => {
       return {
         [key]: {
           id: key,
           label: key,
-          validation: key == 'serviceName'
-            ? undefined
-            : (key == 'priority'
+          validation:
+            key == 'priority'
               ? { rule: requiredAndNumberAndMin, args: 0 }
-              : { rule: required })
+              : { rule: required }
         }
       };
     }).reduce((fields, field) => {
@@ -172,13 +209,10 @@ class ServiceRule extends BaseComponent<Props, State> {
     }, {});
 
   private shouldShowSaveButton = () =>
-    !isNewRule(this.props.match.params.name) && !!this.state.newConditions.length;
+    !isNewRule(this.props.match.params.name) && Object.values(this.state).some(newValues => newValues?.length);
 
   private decisionDropdownOption = (decision: IDecision): string =>
     decision.name;
-
-  private serviceDropdownOption = (serviceName: string): string =>
-    serviceName;
 
   private details = () => {
     const {isLoading, error, formServiceRule, serviceRule} = this.props;
@@ -208,15 +242,14 @@ class ServiceRule extends BaseComponent<Props, State> {
                                       defaultValue: "Choose decision",
                                       values: this.props.decisions,
                                       optionToString: this.decisionDropdownOption}}/>
-                : key === 'serviceName'
-                ? <Field<string> key={index}
-                                 id={key}
-                                 label={key}
-                                 type="dropdown"
-                                 dropdown={{
-                                   defaultValue: "Choose service",
-                                   values: this.props.services.map(service => service.serviceName),
-                                   optionToString: this.serviceDropdownOption}}/>
+                : key === 'generic'
+                ? <Field<boolean> key={index}
+                                  id={key}
+                                  label={key}
+                                  type="dropdown"
+                                  dropdown={{
+                                    defaultValue: "Apply to all services?",
+                                    values: [true, false]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -233,6 +266,12 @@ class ServiceRule extends BaseComponent<Props, State> {
                               onAddRuleCondition={this.onAddRuleCondition}
                               onRemoveRuleConditions={this.onRemoveRuleConditions}/>;
 
+  private services = (): JSX.Element =>
+    <ServiceRuleServicesList rule={this.props.serviceRule}
+                            newServices={this.state.newServices}
+                            onAddRuleService={this.onAddRuleService}
+                            onRemoveRuleServices={this.onRemoveRuleServices}/>;
+
   private tabs: Tab[] = [
     {
       title: 'Service rule',
@@ -244,6 +283,11 @@ class ServiceRule extends BaseComponent<Props, State> {
       id: 'serviceRuleConditions',
       content: () => this.conditions(),
     },
+    {
+      title: 'Services',
+      id: 'services',
+      content: () => this.services(),
+    }
   ];
 
   render() {
@@ -264,7 +308,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const error = state.entities.rules.services.loadRulesError && state.entities.rules.services.generic.loadGenericRulesError;
   const name = props.match.params.name;
   const isNew = isNewRule(name);
-  console.log(isNew)
   const serviceRule = isNew
     ? emptyServiceRule()
     : state.entities.rules.services.data[name] || state.entities.rules.services.generic.data[name];
@@ -274,22 +317,18 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     if (!isNew) {
       delete formServiceRule["id"];
       delete formServiceRule["conditions"];
-      if (formServiceRule["serviceName"] == null) {
-        delete formServiceRule["serviceName"];
-      }
+      delete formServiceRule["services"];
     }
   }
   const decisions = state.entities.decisions.data
                     && Object.values(state.entities.decisions.data)
                              .filter(decision => decision.componentType.name.toLowerCase() == 'service');
-  const services = state.entities.services.data && Object.values(state.entities.services.data);
   return  {
     isLoading,
     error,
     serviceRule,
     formServiceRule,
     decisions,
-    services
   }
 }
 
@@ -297,8 +336,8 @@ const mapDispatchToProps: DispatchToProps = {
   loadRulesService,
   loadGenericRulesService,
   loadDecisions,
-  loadServices,
-  addRuleServiceCondition
+  addRuleServiceCondition,
+  addRuleServices,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceRule);

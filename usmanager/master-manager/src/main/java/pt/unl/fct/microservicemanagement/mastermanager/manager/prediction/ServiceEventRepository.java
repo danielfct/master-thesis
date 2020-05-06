@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.event.ServiceEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
 
 import java.util.List;
 

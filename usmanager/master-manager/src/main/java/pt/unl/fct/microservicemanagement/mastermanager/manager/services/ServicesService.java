@@ -30,8 +30,8 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEn
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.services.ServiceRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.rules.services.ServiceRulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
@@ -105,7 +105,7 @@ public class ServicesService {
   public AppEntity getApp(String serviceName, String appName) {
     assertServiceExists(serviceName);
     return services.getApp(serviceName, appName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceEntity.class, "appName", appName));
+        new EntityNotFoundException(AppEntity.class, "appName", appName));
   }
 
   public List<AppEntity> getApps(String serviceName) {
@@ -219,11 +219,17 @@ public class ServicesService {
   public ServiceEventPredictionEntity getEventPrediction(Long serviceId, Long eventPredictionId) {
     assertServiceExists(serviceId);
     return services.getPrediction(serviceId, eventPredictionId).orElseThrow(() ->
-        new EntityNotFoundException(ServiceEventPredictionEntity.class, "eventPredictionId", eventPredictionId.toString())
+        new EntityNotFoundException(
+            ServiceEventPredictionEntity.class, "eventPredictionId", eventPredictionId.toString())
     );
   }
 
-  public Iterable<ServiceRuleEntity> getRules(String serviceName) {
+  public void deleteServiceEventPrediction(Long serviceId, Long serviceEventPredictionId) {
+    var serviceEventPrediction = getEventPrediction(serviceId, serviceEventPredictionId);
+    serviceEventPredictions.delete(serviceEventPrediction);
+  }
+
+  public List<ServiceRuleEntity> getRules(String serviceName) {
     assertServiceExists(serviceName);
     return services.getRules(serviceName);
   }
@@ -231,37 +237,28 @@ public class ServicesService {
   public ServiceRuleEntity getRule(String serviceName, String ruleName) {
     assertServiceExists(serviceName);
     return services.getRule(serviceName, ruleName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceRuleEntity.class, "name", ruleName)
+        new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName)
     );
   }
 
   public void addRule(String serviceName, String ruleName) {
-    var service = getService(serviceName);
-    var rule = serviceRulesService.getRule(ruleName);
-    log.info("Adding rule {}", ruleName);
-    service = service.toBuilder().rule(rule).build();
-    services.save(service);
+    assertServiceExists(serviceName);
+    serviceRulesService.addService(ruleName, serviceName);
   }
 
   public void addRules(String serviceName, List<String> ruleNames) {
-    ruleNames.forEach(ruleName -> addRule(serviceName, ruleName));
+    assertServiceExists(serviceName);
+    ruleNames.forEach(rule -> serviceRulesService.addService(rule, serviceName));
   }
 
   public void removeRule(String serviceName, String ruleName) {
-    removeRules(serviceName, List.of(ruleName));
+    assertServiceExists(serviceName);
+    serviceRulesService.removeService(ruleName, serviceName);
   }
 
-  public void removeRules(String serviceName, List<String> rulesName) {
-    var service = getService(serviceName);
-    log.info("Removing rules {}", rulesName);
-    service.getRules()
-        .removeIf(rule -> rulesName.contains(rule.getName()));
-    services.save(service);
-  }
-
-  public void deleteServiceEventPrediction(Long serviceId, Long serviceEventPredictionId) {
-    var serviceEventPrediction = getEventPrediction(serviceId, serviceEventPredictionId);
-    serviceEventPredictions.delete(serviceEventPrediction);
+  public void removeRules(String serviceName, List<String> ruleNames) {
+    assertServiceExists(serviceName);
+    ruleNames.forEach(rule -> serviceRulesService.removeService(rule, serviceName));
   }
 
   public int getMinReplicasByServiceName(String serviceName) {

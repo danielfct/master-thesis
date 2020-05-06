@@ -138,16 +138,6 @@ const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predicti
 });
 const predictions = new schema.Array(predictionSchema);
 
-const cloudHostSchema: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', {}, {
-    idAttribute: (host: ICloudHost) => host.instanceId
-});
-const cloudHosts = new schema.Array(cloudHostSchema);
-
-const edgeHostSchema: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', {}, {
-    idAttribute: (host: IEdgeHost) => host.hostname
-});
-const edgeHosts = new schema.Array(edgeHostSchema);
-
 const valueModeSchema: schema.Entity<IValueMode> = new schema.Entity('valueModes', {}, {
     idAttribute: (valueMode: IValueMode) => valueMode.name
 });
@@ -174,12 +164,25 @@ const conditions = new schema.Array(conditionSchema);
 
 const ruleHostSchema: schema.Entity<IHostRule> = new schema.Entity('hostRules', {
     conditions,
-    cloudHosts,
-    edgeHosts,
 }, {
     idAttribute: (hostRule: IHostRule) => hostRule.name
 });
 const rulesHost = new schema.Array(ruleHostSchema);
+
+const cloudHostSchema: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', {
+    rulesHost,
+}, {
+    idAttribute: (host: ICloudHost) => host.instanceId
+});
+const cloudHosts = new schema.Array(cloudHostSchema);
+
+const edgeHostSchema: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', {
+    rulesHost,
+}, {
+    idAttribute: (host: IEdgeHost) => host.hostname
+});
+const edgeHosts = new schema.Array(edgeHostSchema);
+
 
 const ruleServiceSchema: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', {
     conditions
@@ -202,7 +205,6 @@ const serviceSchema: schema.Entity<IService> = new schema.Entity('services', {
     apps,
     dependencies,
     dependees,
-    //predictions,
     rulesService
 }, {
     idAttribute: (service: IService) => service.serviceName

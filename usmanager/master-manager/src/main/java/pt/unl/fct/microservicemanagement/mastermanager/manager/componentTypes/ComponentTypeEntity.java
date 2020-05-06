@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.decision.DecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
 import java.util.Set;

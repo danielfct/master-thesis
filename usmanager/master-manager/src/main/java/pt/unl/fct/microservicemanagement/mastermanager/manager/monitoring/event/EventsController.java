@@ -26,8 +26,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.HostsEventsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.ServicesEventsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.event.HostEventEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.ruleSystem.event.ServiceEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
 
 import java.util.List;
 
