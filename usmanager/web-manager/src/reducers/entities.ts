@@ -33,7 +33,7 @@ import {
   SERVICE_DEPENDENCIES_REQUEST,
   SERVICE_DEPENDENCIES_FAILURE,
   REMOVE_SERVICE_DEPENDENCIES,
-  ADD_SERVICE_DEPENDENCY,
+  ADD_SERVICE_DEPENDENCIES,
   LOGS_REQUEST,
   LOGS_FAILURE,
   LOGS_SUCCESS,
@@ -50,11 +50,11 @@ import {
   SERVICE_DEPENDEES_FAILURE,
   SERVICE_DEPENDEES_REQUEST,
   SERVICE_DEPENDEES_SUCCESS,
-  ADD_SERVICE_APP,
+  ADD_SERVICE_APPS,
   REMOVE_SERVICE_APPS,
-  ADD_SERVICE_PREDICTION,
+  ADD_SERVICE_PREDICTIONS,
   REMOVE_SERVICE_PREDICTIONS,
-  ADD_SERVICE_RULE,
+  ADD_SERVICE_RULES,
   REMOVE_SERVICE_RULES,
   SERVICE_PREDICTIONS_SUCCESS,
   SERVICE_RULES_SUCCESS,
@@ -114,8 +114,7 @@ import {
   DECISIONS_FAILURE,
   DECISION_SUCCESS,
   DECISIONS_SUCCESS,
-  ADD_HOST_RULE_CONDITION,
-  ADD_RULE_SERVICE_CONDITION,
+  ADD_RULE_SERVICE_CONDITIONS,
   REMOVE_HOST_RULE_CONDITIONS,
   REMOVE_RULE_SERVICE_CONDITIONS,
   HOST_RULE_CONDITIONS_REQUEST,
@@ -170,7 +169,7 @@ import {
   ADD_SERVICE_RULE_SERVICES,
   SERVICE_RULE_SERVICES_REQUEST,
   SERVICE_RULE_SERVICES_FAILURE,
-  SERVICE_RULE_SERVICES_SUCCESS, REMOVE_SERVICE_RULE_SERVICES,
+  SERVICE_RULE_SERVICES_SUCCESS, REMOVE_SERVICE_RULE_SERVICES, ADD_HOST_RULE_CONDITIONS,
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
@@ -587,41 +586,39 @@ const entities = (state: EntitiesState = {
         }
       });
     }
-    case ADD_SERVICE_APP:
+    case ADD_SERVICE_APPS:
       if (entity) {
         const service = state.services.data[entity];
         if (data?.appsNames?.length) {
-          service.apps?.unshift(data?.appsNames[0]);
+          service.apps?.unshift(...data?.appsNames);
           return state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
       }
       break;
-    case ADD_SERVICE_DEPENDENCY:
+    case ADD_SERVICE_DEPENDENCIES:
       if (entity) {
         const service = state.services.data[entity];
         if (data?.dependenciesNames?.length) {
-          service.dependencies?.unshift(data?.dependenciesNames[0]);
+          service.dependencies?.unshift(...data?.dependenciesNames);
           return state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
       }
       break;
-    case ADD_SERVICE_PREDICTION:
+    case ADD_SERVICE_PREDICTIONS:
       if (entity) {
         const service = state.services.data[entity];
         if (data?.predictions?.length) {
-          const newPrediction = data?.predictions[0];
-          const predictionName = newPrediction.name;
-          const prediction = { id: 0, ... newPrediction };
-          service.predictions = { ... service.predictions, [predictionName]: prediction };
+          const newPredictions = data?.predictions.map(prediction => ({[prediction.name]: { id: 0, ... prediction }}));
+          service.predictions = merge({}, service.predictions, newPredictions);
           return state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
       }
       break;
-    case ADD_SERVICE_RULE:
+    case ADD_SERVICE_RULES:
       if (entity) {
         const service = state.services.data[entity];
         if (data?.rulesNames?.length) {
-          service.rules?.unshift(data?.rulesNames[0]);
+          service.rules?.unshift(...data?.rulesNames);
           return state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
       }
@@ -862,16 +859,16 @@ const entities = (state: EntitiesState = {
           }
         });
     }
-    case ADD_HOST_RULE_CONDITION:
+    case ADD_HOST_RULE_CONDITIONS:
       if (entity && data?.conditionsNames?.length) {
         const rule = state.rules.hosts.data[entity];
         const genericRule = state.rules.hosts.generic.data[entity];
         if (rule) {
-          rule.conditions?.unshift(data?.conditionsNames[0]);
+          rule.conditions?.unshift(...data?.conditionsNames);
           return state = merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
         if (genericRule) {
-          genericRule.conditions?.unshift(data?.conditionsNames[0]);
+          genericRule.conditions?.unshift(...data?.conditionsNames);
           return state = merge({}, state, { rules: { hosts: { generic: { data: { [genericRule.name]: { ...genericRule } } } } } });
         }
         return state;
@@ -932,7 +929,7 @@ const entities = (state: EntitiesState = {
       if (entity && data?.cloudHostsId?.length) {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
-          rule.cloudHosts?.unshift(data?.cloudHostsId[0]);
+          rule.cloudHosts?.unshift(...data?.cloudHostsId);
           return state = merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
@@ -980,7 +977,7 @@ const entities = (state: EntitiesState = {
       if (entity && data?.edgeHostsHostname?.length) {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
-          rule.edgeHosts?.unshift(data?.edgeHostsHostname[0]);
+          rule.edgeHosts?.unshift(...data?.edgeHostsHostname);
           return state = merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
@@ -1106,16 +1103,16 @@ const entities = (state: EntitiesState = {
           }
         });
     }
-    case ADD_RULE_SERVICE_CONDITION:
+    case ADD_RULE_SERVICE_CONDITIONS:
       if (entity && data?.conditionsNames?.length) {
         const rule = state.rules.services.data[entity];
         const genericRule = state.rules.services.generic.data[entity];
         if (rule) {
-          rule.conditions?.unshift(data?.conditionsNames[0]);
+          rule.conditions?.unshift(...data?.conditionsNames);
           return state = merge({}, state, { rules: { services: { data: { [rule.name]: {...rule } } } } });
         }
         if (genericRule) {
-          genericRule.conditions?.unshift(data?.conditionsNames[0]);
+          genericRule.conditions?.unshift(...data?.conditionsNames);
           return state = merge({}, state, { rules: { services: { generic: { data: { [genericRule.name]: {...genericRule } } } } } });
         }
       }
@@ -1150,11 +1147,6 @@ const entities = (state: EntitiesState = {
             });
       }
       return state;
-
-
-
-
-
     case SERVICE_RULE_SERVICES_REQUEST:
       return merge({}, state, { rules: { services: { isLoadingServices: true, loadServicesError: null } } });
     case SERVICE_RULE_SERVICES_FAILURE:
@@ -1180,7 +1172,7 @@ const entities = (state: EntitiesState = {
       if (entity && data?.serviceNames?.length) {
         const rule = state.rules.services.data[entity];
         if (rule) {
-          rule.services?.unshift(data?.serviceNames[0]);
+          rule.services?.unshift(...data?.serviceNames);
           return state = merge({}, state, { rules: { services: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;

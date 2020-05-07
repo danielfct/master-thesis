@@ -130,8 +130,10 @@ class ServiceRuleServicesList extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceRuleServicesListProps): StateToProps {
   const ruleName = ownProps.rule && ownProps.rule.name;
+  console.log(ruleName)
   const rule = ruleName && (state.entities.rules.services.data[ruleName] || state.entities.rules.services.generic.data[ruleName]);
   const ruleServices = rule && rule.services;
+  console.log(state.entities.rules.services.loadServicesError)
   return {
     redirect: !ownProps.rule,
     isLoading: state.entities.rules.services.isLoadingServices,

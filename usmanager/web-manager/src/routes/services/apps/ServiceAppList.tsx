@@ -19,14 +19,14 @@ import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {
-  addServiceApp,
-  loadApps, loadAppServices,
+  loadApps,
+  loadAppServices,
   loadServiceApps,
   removeServiceApps
 } from "../../../actions";
 import {connect} from "react-redux";
 import Field from "../../../components/form/Field";
-import {IFields, IValues, required, requiredAndNumberAndMin} from "../../../components/form/Form";
+import {IFields, IValues, requiredAndNumberAndMin} from "../../../components/form/Form";
 import List from "../../../components/list/List";
 import M from "materialize-css";
 import Collapsible from "../../../components/collapsible/Collapsible";
@@ -50,8 +50,7 @@ interface DispatchToProps {
   loadApps: (name?: string) => any;
   loadServiceApps: (serviceName: string) => void;
   loadAppServices: (appName: string) => void;
-  removeServiceApps: (serviceName: string, apps: string[]) => void;
-  addServiceApp: (serviceName: string, app: string) => void;
+  removeServiceApps: (serviceName: string, apps: string[]) => void
 }
 
 interface ServiceAppListProps {
@@ -178,7 +177,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
   };
 
   render() {
-    console.log(this.props.serviceApps)
     return <ControlledList<string> isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage='Apps list is empty'
@@ -231,7 +229,6 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
     loadServiceApps,
     loadAppServices,
     removeServiceApps,
-    addServiceApp
   }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceAppList);

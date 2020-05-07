@@ -18,7 +18,6 @@ import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {
-  addServicePrediction,
   loadServicePredictions,
   removeServicePredictions
 } from "../../../actions";
@@ -55,7 +54,6 @@ interface StateToProps {
 interface DispatchToProps {
   loadServicePredictions: (serviceName: string) => void;
   removeServicePredictions: (serviceName: string, predictions: string[]) => void;
-  addServicePrediction: (serviceName: string, prediction: IPrediction) => void;
 }
 
 interface ServicePredictionListProps {
@@ -192,7 +190,6 @@ function mapStateToProps(state: ReduxState, ownProps: ServicePredictionListProps
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
     loadServicePredictions,
-    addServicePrediction,
     removeServicePredictions,
   }, dispatch);
 

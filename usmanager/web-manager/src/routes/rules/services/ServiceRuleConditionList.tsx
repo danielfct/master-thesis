@@ -7,7 +7,6 @@ import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {
-  addRuleServiceCondition,
   loadConditions,
   loadRuleServiceConditions,
   removeRuleServiceConditions
@@ -29,7 +28,6 @@ interface DispatchToProps {
   loadConditions: () => void;
   loadRuleServiceConditions: (ruleName: string) => void;
   removeRuleServiceConditions: (ruleName: string, conditions: string[]) => void;
-  addRuleServiceCondition: (ruleName: string, condition: string) => void;
 }
 
 interface ServiceRuleConditionListProps {
@@ -136,7 +134,6 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceRuleConditionListPr
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
     loadRuleServiceConditions,
-    addRuleServiceCondition,
     removeRuleServiceConditions,
     loadConditions,
   }, dispatch);

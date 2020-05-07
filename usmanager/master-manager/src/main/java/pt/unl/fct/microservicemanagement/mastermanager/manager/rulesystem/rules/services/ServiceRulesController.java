@@ -82,34 +82,24 @@ public class ServiceRulesController {
     serviceRulesService.removeCondition(ruleName, conditionName);
   }
 
-
-
-
-
   @GetMapping("/services/{ruleName}/services")
   public List<ServiceEntity> getRuleServices(@PathVariable String ruleName) {
     return serviceRulesService.getServices(ruleName);
   }
 
-  @PostMapping("/services/{ruleName}/cloudHosts")
-  public void addRuleServices(@PathVariable String ruleName, @RequestBody List<String> cloudHosts) {
-    hostRulesService.addCloudHosts(ruleName, cloudHosts);
+  @PostMapping("/services/{ruleName}/services")
+  public void addRuleServices(@PathVariable String ruleName, @RequestBody List<String> services) {
+    serviceRulesService.addServices(ruleName, services);
   }
 
-  @DeleteMapping("/services/{ruleName}/cloudHosts")
-  public void removeRuleCloudHosts(@PathVariable String ruleName, @RequestBody List<String> instanceIds) {
-    hostRulesService.removeCloudHosts(ruleName, instanceIds);
+  @DeleteMapping("/services/{ruleName}/services")
+  public void removeRuleServices(@PathVariable String ruleName, @RequestBody List<String> services) {
+    serviceRulesService.removeServices(ruleName, services);
   }
 
-  @DeleteMapping("/services/{ruleName}/cloudHosts/{instanceId}")
-  public void removeRuleCloudHost(@PathVariable String ruleName, @PathVariable String instanceId) {
-    hostRulesService.removeCloudHost(ruleName, instanceId);
+  @DeleteMapping("/services/{ruleName}/services/{serviceName}")
+  public void removeRuleService(@PathVariable String ruleName, @PathVariable String serviceName) {
+    serviceRulesService.removeService(ruleName, serviceName);
   }
-
-
-
-
-
-
 
 }

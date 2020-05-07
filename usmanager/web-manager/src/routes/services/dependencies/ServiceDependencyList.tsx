@@ -13,7 +13,11 @@ import {ReduxState} from "../../../reducers";
 import {IService} from "../Service";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {addServiceDependency, loadServiceDependencies, loadServices, removeServiceDependencies} from "../../../actions";
+import {
+  addServiceDependencies,
+  loadServiceDependencies,
+  loadServices,
+  removeServiceDependencies} from "../../../actions";
 import BaseComponent from "../../../components/BaseComponent";
 import {Link} from "react-router-dom";
 import ControlledList from "../../../components/list/ControlledList";
@@ -36,7 +40,6 @@ interface DispatchToProps {
   loadServices: () => void;
   loadServiceDependencies: (serviceName: string) => void;
   removeServiceDependencies: (serviceName: string, dependencies: string[]) => void;
-  addServiceDependency: (serviceName: string, dependencyName: string) => void;
 }
 
 interface ServiceDependencyProps {
@@ -143,7 +146,7 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
     loadServices,
     loadServiceDependencies,
-    addServiceDependency,
+    addServiceDependencies,
     removeServiceDependencies,
   }, dispatch);
 

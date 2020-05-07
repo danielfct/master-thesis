@@ -67,12 +67,12 @@ const fetchServiceApps = (serviceName: string) => ({
     entity: serviceName
   }
 });
-export const ADD_SERVICE_APP = 'ADD_SERVICE_APP';
-export function addServiceApp(serviceName: string, app: string): EntitiesAction {
+export const ADD_SERVICE_APPS = 'ADD_SERVICE_APPS';
+export function addServiceApps(serviceName: string, apps: string[]): EntitiesAction {
   return {
-    type: ADD_SERVICE_APP,
+    type: ADD_SERVICE_APPS,
     entity: serviceName,
-    data: { appsNames: new Array(app) }
+    data: { appsNames: apps }
   }
 }
 export const REMOVE_SERVICE_APPS = 'REMOVE_SERVICE_APPS';
@@ -98,12 +98,12 @@ const fetchServiceDependencies = (serviceName: string) => ({
     entity: serviceName
   }
 });
-export const ADD_SERVICE_DEPENDENCY = 'ADD_SERVICE_DEPENDENCY';
-export function addServiceDependency(serviceName: string, dependency: string): EntitiesAction {
+export const ADD_SERVICE_DEPENDENCIES = 'ADD_SERVICE_DEPENDENCIES';
+export function addServiceDependencies(serviceName: string, dependencies: string[]): EntitiesAction {
   return {
-    type: ADD_SERVICE_DEPENDENCY,
+    type: ADD_SERVICE_DEPENDENCIES,
     entity: serviceName,
-    data: { dependenciesNames: new Array(dependency) }
+    data: { dependenciesNames: dependencies }
   }
 }
 export const REMOVE_SERVICE_DEPENDENCIES = 'REMOVE_SERVICE_DEPENDENCY';
@@ -144,12 +144,12 @@ const fetchServicePredictions = (serviceName: string) => ({
     entity: serviceName
   }
 });
-export const ADD_SERVICE_PREDICTION = 'ADD_SERVICE_PREDICTION';
-export function addServicePrediction(serviceName: string, prediction: IPrediction): EntitiesAction {
+export const ADD_SERVICE_PREDICTIONS = 'ADD_SERVICE_PREDICTIONS';
+export function addServicePredictions(serviceName: string, predictions: IPrediction[]): EntitiesAction {
   return {
-    type: ADD_SERVICE_PREDICTION,
+    type: ADD_SERVICE_PREDICTIONS,
     entity: serviceName,
-    data: { predictions: new Array(prediction) }
+    data: { predictions: predictions }
   }
 }
 export const REMOVE_SERVICE_PREDICTIONS = 'REMOVE_SERVICE_PREDICTIONS';
@@ -175,12 +175,12 @@ const fetchServiceRules = (serviceName: string) => ({
     entity: serviceName
   }
 });
-export const ADD_SERVICE_RULE = 'ADD_SERVICE_RULE';
-export function addServiceRule(serviceName: string, rule: string): EntitiesAction {
+export const ADD_SERVICE_RULES = 'ADD_SERVICE_RULES';
+export function addServiceRules(serviceName: string, rules: string[]): EntitiesAction {
   return {
-    type: ADD_SERVICE_RULE,
+    type: ADD_SERVICE_RULES,
     entity: serviceName,
-    data: { rulesNames: new Array(rule) }
+    data: { rulesNames: rules }
   }
 }
 export const REMOVE_SERVICE_RULES = 'REMOVE_SERVICE_RULES';
@@ -392,14 +392,6 @@ const fetchRuleHostConditions = (ruleName: string) => ({
     entity: ruleName
   }
 });
-export const ADD_HOST_RULE_CONDITION = 'ADD_HOST_RULE_CONDITION';
-export function addRuleHostCondition(ruleName: string, condition: string): EntitiesAction {
-  return {
-    type: ADD_HOST_RULE_CONDITION,
-    entity: ruleName,
-    data: { conditionsNames: new Array(condition) }
-  }
-}
 export const ADD_HOST_RULE_CONDITIONS = 'ADD_HOST_RULE_CONDITIONS';
 export function addRuleHostConditions(ruleName: string, conditions: string[]): EntitiesAction {
   return {
@@ -493,12 +485,12 @@ const fetchRuleServiceConditions = (ruleName: string) => ({
     entity: ruleName
   }
 });
-export const ADD_RULE_SERVICE_CONDITION = 'ADD_RULE_SERVICE_CONDITION';
-export function addRuleServiceCondition(ruleName: string, condition: string): EntitiesAction {
+export const ADD_RULE_SERVICE_CONDITIONS = 'ADD_RULE_SERVICE_CONDITIONS';
+export function addRuleServiceConditions(ruleName: string, conditions: string[]): EntitiesAction {
   return {
-    type: ADD_RULE_SERVICE_CONDITION,
+    type: ADD_RULE_SERVICE_CONDITIONS,
     entity: ruleName,
-    data: { conditionsNames: new Array(condition) }
+    data: { conditionsNames: conditions }
   }
 }
 export const REMOVE_RULE_SERVICE_CONDITIONS = 'REMOVE_RULE_SERVICE_CONDITIONS';

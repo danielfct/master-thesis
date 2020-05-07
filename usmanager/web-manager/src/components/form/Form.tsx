@@ -211,8 +211,8 @@ class Form extends React.Component<Props, State> {
     if (!this.validateForm()) {
       return;
     }
-    const {id, isNew, post, put, saveEntities} = this.props;
-    const args = this.state.values[id];
+    const {isNew, post, put, saveEntities} = this.props;
+    const args = this.state.values;
     if (isNew) {
       if (post?.url) {
         postData(post.url, this.state.values,

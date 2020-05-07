@@ -31,7 +31,7 @@ import Form, {
   requiredAndNumberAndMin
 } from "../../components/form/Form"
 import IData from "../../components/IData";
-import {addServiceApp, addServiceDependency, addServicePrediction, addServiceRule, loadServices} from "../../actions";
+import {addServiceApps, addServiceDependencies, addServicePredictions, addServiceRules, loadServices} from "../../actions";
 import {connect} from "react-redux";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
@@ -94,10 +94,10 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadServices: (name: string) => any;
-  addServiceApp: (serviceName: string, appName: string) => void;
-  addServiceDependency: (serviceName: string, dependencyName: string) => void;
-  addServicePrediction: (serviceName: string, prediction: IPrediction) => void;
-  addServiceRule: (serviceName: string, ruleName: string) => void;
+  addServiceApps: (serviceName: string, apps: string[]) => void;
+  addServiceDependencies: (serviceName: string, dependencies: string[]) => void;
+  addServicePredictions: (serviceName: string, predictions: IPrediction[]) => void;
+  addServiceRules: (serviceName: string, rules: string[]) => void;
 }
 
 interface MatchParams {
@@ -155,9 +155,7 @@ class Service extends BaseComponent<Props, State> {
 
   private onSaveAppsSuccess = (serviceName: string): void => {
     if (!isNewService(this.props.match.params.name)) {
-      this.state.newApps.forEach(app =>
-        this.props.addServiceApp(serviceName, app.name)
-      );
+      this.props.addServiceApps(serviceName, this.state.newApps.map(app => app.name));
     }
     this.setState({ newApps: [] });
   };
@@ -188,9 +186,7 @@ class Service extends BaseComponent<Props, State> {
 
   private onSaveDependenciesSuccess = (serviceName: string): void => {
     if (!isNewService(this.props.match.params.name)) {
-      this.state.newDependencies.forEach(dependencyName =>
-        this.props.addServiceDependency(serviceName, dependencyName)
-      );
+      this.props.addServiceDependencies(serviceName, this.state.newDependencies)
     }
     this.setState({ newDependencies: [] });
   };
@@ -221,9 +217,7 @@ class Service extends BaseComponent<Props, State> {
 
   private onSavePredictionsSuccess = (serviceName: string): void => {
     if (!isNewService(this.props.match.params.name)) {
-      this.state.newPredictions.forEach(prediction =>
-        this.props.addServicePrediction(serviceName, prediction)
-      );
+      this.props.addServicePredictions(serviceName, this.state.newPredictions);
     }
     this.setState({ newPredictions: [] });
   };
@@ -254,9 +248,7 @@ class Service extends BaseComponent<Props, State> {
 
   private onSaveRulesSuccess = (serviceName: string): void => {
     if (!isNewService(this.props.match.params.name)) {
-      this.state.newRules.forEach(rule =>
-        this.props.addServiceRule(serviceName, rule)
-      );
+      this.props.addServiceRules(serviceName, this.state.newRules)
     }
     this.setState({ newRules: [] });
   };
@@ -469,10 +461,10 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadServices,
-  addServiceApp,
-  addServiceDependency,
-  addServicePrediction,
-  addServiceRule,
+  addServiceApps,
+  addServiceDependencies,
+  addServicePredictions,
+  addServiceRules,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Service);

@@ -269,6 +269,11 @@ ul.tabs {
     background: red;
 }
 
+.tabs .tab.disabled a, .tabs .tab.disabled a:hover {
+    background-color: transparent;
+    color: rgb(75, 75, 75);
+}
+
 input {
     color: white;
 }

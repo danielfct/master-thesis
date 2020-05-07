@@ -15,7 +15,7 @@ import Form, {IFields, required, requiredAndNumberAndMin} from "../../../compone
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs, {Tab} from "../../../components/tabs/Tabs";
+import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
@@ -41,7 +41,7 @@ export interface IHostRule extends IRule {
 
 const emptyHostRule = () => ({
   name: '',
-  priority: 0,
+  priority: undefined,
   generic: undefined,
   decision: undefined,
 });
@@ -77,6 +77,7 @@ type State = {
   newCloudHosts: string[],
   newEdgeHosts: string[],
   ruleName?: string,
+  isGeneric: boolean,
 }
 
 class HostRule extends BaseComponent<Props, State> {
@@ -85,6 +86,7 @@ class HostRule extends BaseComponent<Props, State> {
     newConditions: [],
     newCloudHosts: [],
     newEdgeHosts: [],
+    isGeneric: false,
   };
 
   componentDidMount(): void {
@@ -96,24 +98,24 @@ class HostRule extends BaseComponent<Props, State> {
     }
   };
 
-  private saveEntities = (ruleName: string) => {
-    this.saveRuleConditions(ruleName);
-    this.saveRuleCloudHosts(ruleName);
-    this.saveRuleEdgeHosts(ruleName);
+  private saveEntities = (rule: IHostRule) => {
+    this.saveRuleConditions(rule);
+    this.saveRuleCloudHosts(rule);
+    this.saveRuleEdgeHosts(rule);
   };
 
-  private onPostSuccess = (reply: any, ruleName: string): void => {
-    super.toast(`Host rule <b>${ruleName}</b> saved`);
-    this.saveEntities(ruleName);
+  private onPostSuccess = (reply: any, rule: IHostRule): void => {
+    super.toast(`Host rule <b>${rule.name}</b> saved`);
+    this.saveEntities(rule);
   };
 
-  private onPostFailure = (reason: string, ruleName: string): void =>
-    super.toast(`Unable to save ${ruleName}`, 10000, reason, true);
+  private onPostFailure = (reason: string, rule: IHostRule): void =>
+    super.toast(`Unable to save ${rule}`, 10000, reason, true);
 
-  private onPutSuccess = (ruleName: string): void => {
-    super.toast(`Changes to host rule <b>${ruleName}</b> are now saved`);
-    this.setState({ruleName: ruleName});
-    this.saveEntities(ruleName);
+  private onPutSuccess = (rule: IHostRule): void => {
+    super.toast(`Changes to host rule <b>${rule.name}</b> are now saved`);
+    this.setState({ruleName: rule.name});
+    this.saveEntities(rule);
   };
 
   private onPutFailure = (reason: string, ruleName: string): void =>
@@ -139,24 +141,24 @@ class HostRule extends BaseComponent<Props, State> {
     });
   };
 
-  private saveRuleConditions = (ruleName: string): void => {
+  private saveRuleConditions = (rule: IHostRule): void => {
     const {newConditions} = this.state;
     if (newConditions.length) {
-      postData(`rules/hosts/${ruleName}/conditions`, newConditions,
-        () => this.onSaveConditionsSuccess(ruleName),
-        (reason) => this.onSaveConditionsFailure(ruleName, reason));
+      postData(`rules/hosts/${rule.name}/conditions`, newConditions,
+        () => this.onSaveConditionsSuccess(rule),
+        (reason) => this.onSaveConditionsFailure(rule, reason));
     }
   };
 
-  private onSaveConditionsSuccess = (ruleName: string): void => {
+  private onSaveConditionsSuccess = (rule: IHostRule): void => {
     if (!isNewRule(this.props.match.params.name)) {
-      this.props.addRuleHostConditions(ruleName, this.state.newConditions)
+      this.props.addRuleHostConditions(rule.name, this.state.newConditions)
     }
     this.setState({ newConditions: [] });
   };
 
-  private onSaveConditionsFailure = (ruleName: string, reason: string): void =>
-    super.toast(`Unable to save conditions of rule ${ruleName}`, 10000, reason, true);
+  private onSaveConditionsFailure = (rule: IHostRule, reason: string): void =>
+    super.toast(`Unable to save conditions of rule ${rule.name}`, 10000, reason, true);
 
   private onAddRuleCloudHost = (cloudHost: string): void =>
     this.setState({
@@ -169,12 +171,12 @@ class HostRule extends BaseComponent<Props, State> {
     });
   };
 
-  private saveRuleCloudHosts = (ruleName: string): void => {
+  private saveRuleCloudHosts = (rule: IHostRule): void => {
     const {newCloudHosts} = this.state;
     if (newCloudHosts.length) {
-      postData(`rules/hosts/${ruleName}/cloudHosts`, newCloudHosts,
-        () => this.onSaveCloudHostsSuccess(ruleName),
-        (reason) => this.onSaveCloudHostsFailure(ruleName, reason));
+      postData(`rules/hosts/${rule.name}/cloudHosts`, newCloudHosts,
+        () => this.onSaveCloudHostsSuccess(rule.name),
+        (reason) => this.onSaveCloudHostsFailure(rule.name, reason));
     }
   };
 
@@ -199,24 +201,24 @@ class HostRule extends BaseComponent<Props, State> {
     });
   };
 
-  private saveRuleEdgeHosts = (ruleName: string): void => {
+  private saveRuleEdgeHosts = (rule: IHostRule): void => {
     const {newEdgeHosts} = this.state;
     if (newEdgeHosts.length) {
-      postData(`rules/hosts/${ruleName}/edgeHosts`, newEdgeHosts,
-        () => this.onSaveEdgeHostsSuccess(ruleName),
-        (reason) => this.onSaveEdgeHostsFailure(ruleName, reason));
+      postData(`rules/hosts/${rule.name}/edgeHosts`, newEdgeHosts,
+        () => this.onSaveEdgeHostsSuccess(rule),
+        (reason) => this.onSaveEdgeHostsFailure(rule, reason));
     }
   };
 
-  private onSaveEdgeHostsSuccess = (ruleName: string): void => {
+  private onSaveEdgeHostsSuccess = (rule: IHostRule): void => {
     if (!isNewRule(this.props.match.params.name)) {
-      this.props.addRuleEdgeHosts(ruleName, this.state.newEdgeHosts)
+      this.props.addRuleEdgeHosts(rule.name, this.state.newEdgeHosts)
     }
     this.setState({ newEdgeHosts: [] });
   };
 
-  private onSaveEdgeHostsFailure = (ruleName: string, reason: string): void =>
-    super.toast(`Unable to save edge hosts of rule ${ruleName}`, 10000, reason, true);
+  private onSaveEdgeHostsFailure = (rule: IHostRule, reason: string): void =>
+    super.toast(`Unable to save edge hosts of rule ${rule.name}`, 10000, reason, true);
 
 
   private getFields = (hostRule: Partial<IRule>): IFields =>
@@ -238,11 +240,15 @@ class HostRule extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private shouldShowSaveButton = () =>
-    !isNewRule(this.props.match.params.name) && Object.values(this.state).some(newValues => newValues?.length);
+  private shouldShowSaveButton = ():boolean =>
+    !isNewRule(this.props.match.params.name) &&
+    (!!this.state.newConditions.length || !!this.state.newCloudHosts.length || !!this.state.newEdgeHosts.length);
 
   private decisionDropdownOption = (decision: IDecision) =>
     decision.name;
+
+  private isGenericSelected = (value: string) =>
+    this.setState({isGeneric: value === 'true'});
 
   private details = () => {
     const {isLoading, error, formHostRule, hostRule} = this.props;
@@ -274,15 +280,17 @@ class HostRule extends BaseComponent<Props, State> {
                                       optionToString: this.decisionDropdownOption}}/>
                 : key === 'generic'
                 ? <Field<boolean> key={index}
-                                 id={key}
-                                 label={key}
-                                 type="dropdown"
-                                 dropdown={{
-                                   defaultValue: "Apply to all hosts?",
-                                   values: [true, false]}}/>
+                                  id={key}
+                                  label={key}
+                                  type="dropdown"
+                                  dropdown={{
+                                    selectCallback: this.isGenericSelected,
+                                    defaultValue: "Apply to all hosts?",
+                                    values: [true, false]}}/>
                 : <Field key={index}
                          id={key}
-                         label={key}/>
+                         label={key}
+                         type={key == 'priority' ? 'numberbox' : undefined}/>
             )}
           </Form>
         )}
@@ -308,7 +316,7 @@ class HostRule extends BaseComponent<Props, State> {
                            onAddRuleEdgeHost={this.onAddRuleEdgeHost}
                            onRemoveRuleEdgeHosts={this.onRemoveRuleEdgeHosts}/>;
 
-  private tabs: Tab[] = [
+  private tabs = () => [
     {
       title: 'Host rule',
       id: 'hostRule',
@@ -323,11 +331,13 @@ class HostRule extends BaseComponent<Props, State> {
       title: 'Cloud hosts',
       id: 'cloudHosts',
       content: () => this.cloudHosts(),
+      disabled: this.state.isGeneric,
     },
     {
       title: 'Edge hosts',
       id: 'edgeHosts',
       content: () => this.edgeHosts(),
+      disabled: this.state.isGeneric
     }
   ];
 
@@ -336,7 +346,7 @@ class HostRule extends BaseComponent<Props, State> {
       <MainLayout>
         {this.shouldShowSaveButton() && !isNewRule(this.props.match.params.name) && <UnsavedChanged/>}
         <div className="container">
-          <Tabs {...this.props} tabs={this.tabs}/>
+          <Tabs {...this.props} tabs={this.tabs()}/>
         </div>
       </MainLayout>
     );
