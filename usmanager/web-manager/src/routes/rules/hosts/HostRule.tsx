@@ -25,7 +25,6 @@ import {
   addRuleHostConditions,
   addRuleEdgeHosts,
   loadDecisions,
-  loadGenericRulesHost,
   loadRulesHost,
 } from "../../../actions";
 import {postData} from "../../../utils/api";
@@ -35,8 +34,8 @@ import HostRuleCloudHostsList from "./HostRuleCloudHostsList";
 import HostRuleEdgeHostsList from "./HostRuleEdgeHostsList";
 
 export interface IHostRule extends IRule {
-  cloudHosts: string[],
-  edgeHosts: string[],
+  cloudHosts?: string[],
+  edgeHosts?: string[],
 }
 
 const emptyHostRule = () => ({
@@ -59,7 +58,6 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadRulesHost: (name: string) => any;
-  loadGenericRulesHost: (name: string) => any;
   loadDecisions: () => any;
   addRuleHostConditions: (ruleName: string, conditions: string[]) => void;
   addRuleCloudHosts: (ruleName: string, cloudHosts: string[]) => void;
@@ -86,7 +84,7 @@ class HostRule extends BaseComponent<Props, State> {
     newConditions: [],
     newCloudHosts: [],
     newEdgeHosts: [],
-    isGeneric: false,
+    isGeneric: this.props.hostRule?.generic || false,
   };
 
   componentDidMount(): void {
@@ -94,7 +92,6 @@ class HostRule extends BaseComponent<Props, State> {
     const ruleName = this.props.match.params.name;
     if (ruleName && !isNewRule(ruleName)) {
       this.props.loadRulesHost(ruleName);
-      this.props.loadGenericRulesHost(ruleName);
     }
   };
 
@@ -355,13 +352,11 @@ class HostRule extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.rules.hosts.isLoadingRules || state.entities.rules.hosts.generic.isLoadingGenericRules;
-  const error = state.entities.rules.hosts.loadRulesError && state.entities.rules.hosts.generic.loadGenericRulesError;
+  const isLoading = state.entities.rules.hosts.isLoadingRules;
+  const error = state.entities.rules.hosts.loadRulesError;
   const name = props.match.params.name;
   const isNew = isNewRule(name);
-  const hostRule = isNew
-    ? emptyHostRule()
-    : state.entities.rules.hosts.data[name] || state.entities.rules.hosts.generic.data[name];
+  const hostRule = isNew ? emptyHostRule() : state.entities.rules.hosts.data[name];
   let formHostRule;
   if (isNew || !isNew && hostRule) {
     formHostRule = { ...hostRule };
@@ -386,7 +381,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
-  loadGenericRulesHost,
   loadDecisions,
   addRuleHostConditions,
   addRuleCloudHosts,

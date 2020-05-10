@@ -50,10 +50,10 @@ class Pagination extends React.Component<Props, {}> {
           {beforeEllipsis.map((pageNumber, index) =>
             <PageNumber key={index} page={pageNumber} active={index === page} setPage={setPage}/>
           )}
-          {beforeEllipsis.length == 1 && (
+          {beforeEllipsis.length === 1 && (
             <>
               <i className={`material-icons white-text bottom ${styles.threeDotsIcon}`}>more_horiz</i>
-              {afterEllipsis.length == 1 && (
+              {afterEllipsis.length === 1 && (
                 betweenEllipsis.map((pageNumber, index) =>
                   <PageNumber key={index} page={pageNumber} active={true}
                               setPage={setPage}/>
@@ -61,7 +61,7 @@ class Pagination extends React.Component<Props, {}> {
               )}
             </>
           )}
-          {afterEllipsis.length == 1 && (
+          {afterEllipsis.length === 1 && (
             <i className={`material-icons white-text bottom ${styles.threeDotsIcon}`}>more_horiz</i>
           )}
           {afterEllipsis.map((pageNumber, index) =>

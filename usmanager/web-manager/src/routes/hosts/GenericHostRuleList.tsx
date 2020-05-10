@@ -17,7 +17,7 @@ import List from "../../components/list/List";
 import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {loadGenericRulesHost} from "../../actions";
+import {loadRulesHost} from "../../actions";
 
 interface StateToProps {
   isLoading: boolean;
@@ -26,7 +26,7 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-  loadGenericRulesHost: () => void;
+  loadRulesHost: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -34,11 +34,11 @@ type Props = StateToProps & DispatchToProps;
 class GenericHostRuleList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    this.props.loadGenericRulesHost();
+    this.props.loadRulesHost();
   }
 
   private rule = (rule: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index != this.props.genericHostRules.length - 1}>
+    <ListItem key={index} separate={index !== this.props.genericHostRules.length - 1}>
       <div className={`${styles.linkedItemContent}`}>
         <span>{rule}</span>
       </div>
@@ -63,15 +63,17 @@ class GenericHostRuleList extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState): StateToProps {
   return {
-    isLoading: state.entities.rules.hosts.generic.isLoadingGenericRules,
-    error: state.entities.rules.hosts.generic.loadGenericRulesError,
-    genericHostRules: Object.keys(state.entities.rules.hosts.generic.data),
+    isLoading: state.entities.rules.hosts.isLoadingRules,
+    error: state.entities.rules.hosts.loadRulesError,
+    genericHostRules: Object.entries(state.entities.rules.hosts.data)
+                            .filter(([_, rule]) => rule.generic)
+                            .map(([ruleName, _]) => ruleName)
   }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
-    loadGenericRulesHost,
+    loadRulesHost,
   }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(GenericHostRuleList);

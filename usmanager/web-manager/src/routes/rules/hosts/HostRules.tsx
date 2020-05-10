@@ -18,7 +18,7 @@ import styles from './HostRules.module.css';
 import CardList from "../../../components/list/CardList";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
-import {loadGenericRulesHost, loadRulesHost} from "../../../actions";
+import {loadRulesHost} from "../../../actions";
 
 interface StateToProps {
   isLoading: boolean
@@ -28,7 +28,6 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadRulesHost: () => any;
-  loadGenericRulesHost: () => any;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -37,7 +36,6 @@ class HostRules extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     this.props.loadRulesHost();
-    this.props.loadGenericRulesHost();
   }
 
   private rule = (rule: IHostRule): JSX.Element =>
@@ -67,15 +65,14 @@ class HostRules extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.rules.hosts.isLoadingRules || state.entities.rules.hosts.generic.isLoadingGenericRules,
-    error: state.entities.rules.hosts.loadRulesError && state.entities.rules.hosts.generic.loadGenericRulesError,
-    hostRules: Object.values(state.entities.rules.hosts.generic.data).concat(Object.values(state.entities.rules.hosts.data))
+    isLoading: state.entities.rules.hosts.isLoadingRules,
+    error: state.entities.rules.hosts.loadRulesError,
+    hostRules: Object.values(state.entities.rules.hosts.data)
   }
 );
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
-  loadGenericRulesHost
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HostRules);

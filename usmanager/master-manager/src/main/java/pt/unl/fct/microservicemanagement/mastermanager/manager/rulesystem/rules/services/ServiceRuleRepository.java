@@ -47,18 +47,13 @@ public interface ServiceRuleRepository extends CrudRepository<ServiceRuleEntity,
 
   @Query("select r "
       + "from ServiceRuleEntity r join r.services s "
-      + "where s.serviceName = :serviceName")
+      + "where r.generic = false and s.serviceName = :serviceName")
   List<ServiceRuleEntity> findByServiceName(@Param("serviceName") String serviceName);
 
   @Query("select r "
       + "from ServiceRuleEntity r "
       + "where r.generic = true")
   List<ServiceRuleEntity> findGenericServiceRules();
-
-  @Query("select r "
-      + "from ServiceRuleEntity r "
-      + "where r.generic = true and r.name = :ruleName")
-  Optional<ServiceRuleEntity> findGenericServiceRule(@Param("ruleName") String ruleName);
 
   @Query("select case when count(r) > 0 then true else false end "
       + "from ServiceRuleEntity r "

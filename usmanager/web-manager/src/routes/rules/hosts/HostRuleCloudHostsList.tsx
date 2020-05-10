@@ -130,7 +130,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleCloudHostListProps): StateToProps {
   const ruleName = ownProps.rule && ownProps.rule.name;
-  const rule = ruleName && (state.entities.rules.hosts.data[ruleName] || state.entities.rules.hosts.generic.data[ruleName]);
+  const rule = ruleName && state.entities.rules.hosts.data[ruleName];
   const ruleCloudHosts = rule && rule.cloudHosts;
   return {
     redirect: !ownProps.rule,

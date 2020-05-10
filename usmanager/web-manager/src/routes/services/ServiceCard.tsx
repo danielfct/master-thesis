@@ -34,10 +34,10 @@ interface ServiceCardProps {
 type Props = ServiceCardProps;
 
 const getReplicasMessage = (minReplicas: number, maxReplicas: number): string => {
-  if (minReplicas == maxReplicas) {
+  if (minReplicas === maxReplicas) {
     return `${minReplicas}`;
   }
-  else if (maxReplicas == 0) {
+  else if (maxReplicas === 0) {
     return `At least ${minReplicas}`
   }
   else {
@@ -60,14 +60,14 @@ const ServiceCard = ({service}: Props) => (
     <CardItem key={'ports'}
               label={'Ports'}
               value={`${service.defaultExternalPort}:${service.defaultInternalPort}`}/>
-    {service.launchCommand != '' &&
+    {service.launchCommand !== '' &&
     <CardItem key={'launchCommand'}
               label={'Launch command'}
               value={service.launchCommand}/>}
     <CardItem key={'outputLabel'}
               label={'Output label'}
               value={`${service.outputLabel}`}/>
-    {service.defaultDb != 'NOT_APPLICABLE' &&
+    {service.defaultDb !== 'NOT_APPLICABLE' &&
     <CardItem key={'database'}
               label={'Database'}
               value={service.defaultDb}/>}

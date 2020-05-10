@@ -8,30 +8,30 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import BaseComponent from "../../../components/BaseComponent";
+import BaseComponent from "../../components/BaseComponent";
 import React, {createRef} from "react";
-import {IService} from "../Service";
-import ListItem from "../../../components/list/ListItem";
-import listItemStyles from "../../../components/list/ListItem.module.css";
+import {IService} from "./Service";
+import ListItem from "../../components/list/ListItem";
+import listItemStyles from "../../components/list/ListItem.module.css";
 import appServiceStyles from "./ServiceAppList.module.css";
 import {Link} from "react-router-dom";
-import ControlledList from "../../../components/list/ControlledList";
-import {ReduxState} from "../../../reducers";
+import ControlledList from "../../components/list/ControlledList";
+import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {
   loadApps,
   loadAppServices,
   loadServiceApps,
   removeServiceApps
-} from "../../../actions";
+} from "../../actions";
 import {connect} from "react-redux";
-import Field from "../../../components/form/Field";
-import {IFields, IValues, requiredAndNumberAndMin} from "../../../components/form/Form";
-import List from "../../../components/list/List";
+import Field from "../../components/form/Field";
+import {IFields, IValues, requiredAndNumberAndMin} from "../../components/form/Form";
+import List from "../../components/list/List";
 import M from "materialize-css";
-import Collapsible from "../../../components/collapsible/Collapsible";
-import {IApp} from "../../apps/App";
-import {IAppService} from "../../apps/AppServicesList";
+import Collapsible from "../../components/collapsible/Collapsible";
+import {IApp} from "../apps/App";
+import {IAppService} from "../apps/AppServicesList";
 
 export interface IAddServiceApp {
   name: string;

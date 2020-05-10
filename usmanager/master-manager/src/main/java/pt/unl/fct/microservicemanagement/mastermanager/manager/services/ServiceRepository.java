@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +35,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 
 @Repository
 public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
@@ -60,12 +60,12 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
 
   @Query("select r "
       + "from ServiceEntity s join s.rules r "
-      + "where s.serviceName = :serviceName")
+      + "where r.generic = false and s.serviceName = :serviceName")
   List<ServiceRuleEntity> getRules(@Param("serviceName") String serviceName);
 
   @Query("select r "
       + "from ServiceEntity s join s.rules r "
-      + "where s.serviceName = :serviceName and r.name = :ruleName")
+      + "where r.generic = false and s.serviceName = :serviceName and r.name = :ruleName")
   Optional<ServiceRuleEntity> getRule(@Param("serviceName") String serviceName, @Param("ruleName") String ruleName);
 
   @Query("select case when count(s) > 0 then true else false end "
@@ -88,10 +88,6 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
       + "where s.serviceName = :serviceName and d.dependency.serviceName = :dependencyName")
   Optional<ServiceEntity> getDependency(@Param("serviceName") String serviceName,
                                         @Param("dependencyName") String dependencyName);
-
-  /*@Query("delete from Service s join s.dependencies d "
-          + "where s.id = :serviceId and d.id = :dependencyId")
-  void removeDependency(@Param("serviceId") long serviceId, @Param("dependencyId") long dependencyId);*/
 
   @Query("select case when count(d) > 0 then true else false end "
       + "from ServiceEntity s join s.dependencies d "

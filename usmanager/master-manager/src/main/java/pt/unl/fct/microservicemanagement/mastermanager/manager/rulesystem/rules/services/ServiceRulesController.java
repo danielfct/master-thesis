@@ -52,16 +52,6 @@ public class ServiceRulesController {
     serviceRulesService.deleteRule(ruleName);
   }
 
-  @GetMapping("/generic/services")
-  public List<ServiceRuleEntity> getGenericRules() {
-    return serviceRulesService.getGenericServiceRules();
-  }
-
-  @GetMapping("/generic/services/{ruleName}")
-  public ServiceRuleEntity getGenericRule(@PathVariable String ruleName) {
-    return serviceRulesService.getGenericServiceRule(ruleName);
-  }
-
   @GetMapping("/services/{ruleName}/conditions")
   public List<ConditionEntity> getRuleConditions(@PathVariable String ruleName) {
     return serviceRulesService.getConditions(ruleName);

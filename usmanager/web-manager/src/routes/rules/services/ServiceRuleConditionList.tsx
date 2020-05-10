@@ -120,7 +120,7 @@ class ServiceRuleConditionList extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceRuleConditionListProps): StateToProps {
   const ruleName = ownProps.rule && ownProps.rule.name;
-  const rule = ruleName && (state.entities.rules.services.data[ruleName] || state.entities.rules.services.generic.data[ruleName]);
+  const rule = ruleName && state.entities.rules.services.data[ruleName];
   const ruleConditions = rule && rule.conditions;
   return {
     redirect: !ownProps.rule,

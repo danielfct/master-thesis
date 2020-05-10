@@ -53,16 +53,6 @@ public class HostRulesController {
     hostRulesService.deleteRule(ruleName);
   }
 
-  @GetMapping("/generic/hosts")
-  public List<HostRuleEntity> getGenericRules() {
-    return hostRulesService.getGenericHostRules();
-  }
-
-  @GetMapping("/generic/hosts/{ruleName}")
-  public HostRuleEntity getGenericRule(@PathVariable String ruleName) {
-    return hostRulesService.getGenericHostRule(ruleName);
-  }
-
   @GetMapping("/hosts/{ruleName}/conditions")
   public List<ConditionEntity> getRuleConditions(@PathVariable String ruleName) {
     return hostRulesService.getConditions(ruleName);

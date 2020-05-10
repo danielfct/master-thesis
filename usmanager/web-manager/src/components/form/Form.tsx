@@ -94,7 +94,7 @@ export const required = (values: IValues, fieldName: string): string =>
     : "";
 
 export const notAllowed = (values: IValues, fieldName: string, args: any[]): string =>
-  args.indexOf(values[fieldName].toLowerCase()) != -1
+  args.indexOf(values[fieldName].toLowerCase()) !== -1
     ? `${values[fieldName]} is not allowed`
     : "";
 
@@ -131,20 +131,20 @@ class Form extends React.Component<Props, State> {
     values: this.props.values,
     savedValues: this.props.values,
     errors: {},
-    isEditing: this.props.isNew == undefined || this.props.isNew,
+    isEditing: this.props.isNew === undefined || this.props.isNew,
     saveRequired: false,
     isLoading: !!this.props.loading,
   };
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (prevProps.showSaveButton != this.props.showSaveButton
-        || prevState.values != this.state.values
-        || prevState.savedValues != this.state.savedValues) {
+    if (prevProps.showSaveButton !== this.props.showSaveButton
+        || prevState.values !== this.state.values
+        || prevState.savedValues !== this.state.savedValues) {
       this.setState({
         saveRequired: this.props.showSaveButton || this.props.isNew || this.saveRequired()
       })
     }
-    if (prevProps.values != this.props.values) {
+    if (prevProps.values !== this.props.values) {
       this.setState(Object.keys(this.props.values).reduce((state: State, data: string) => {
         if (!!this.props.values[data]) {
           state.values[data] = this.props.values[data];
@@ -152,17 +152,17 @@ class Form extends React.Component<Props, State> {
         return state;
       }, this.state));
     }
-    if (prevProps.loading != this.props.loading) {
+    if (prevProps.loading !== this.props.loading) {
       this.setState({isLoading: !!this.props.loading});
     }
   }
 
   private saveRequired = () => {
     return !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
-      ((typeof first == 'boolean' && typeof second == 'string' && first.toString() == second)
-      || (typeof first == 'string' && typeof second == 'boolean') && first == second.toString()
-      || (typeof first == 'number' && typeof second == 'string') && first.toString() == second
-      || (typeof first == 'string' && typeof second == 'number') && first == second.toString()) || undefined);
+      ((typeof first === 'boolean' && typeof second === 'string' && first.toString() === second)
+      || (typeof first === 'string' && typeof second === 'boolean') && first === second.toString()
+      || (typeof first === 'number' && typeof second === 'string') && first.toString() === second
+      || (typeof first === 'string' && typeof second === 'number') && first === second.toString()) || undefined);
   };
 
   private validate = (fieldName: string): string => {
@@ -274,19 +274,19 @@ class Form extends React.Component<Props, State> {
       <>
         <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>
         <form onSubmit={this.handleSubmit} noValidate>
-          {(controlsMode == undefined || controlsMode === 'top') && (
+          {(controlsMode === undefined || controlsMode === 'top') && (
             <div>
               <div className='controlsContainer noBorder'>
                 {isNew
                   ?
                   <button
-                    className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text right slide`}
+                    className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}
                     type="submit">
                     {this.props.post?.textButton || 'Save'}
                   </button>
                   :
                   <div>
-                    {(editable == undefined || editable) && (
+                    {(editable === undefined || editable) && (
                       <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
                               data-position="bottom" data-tooltip="Edit"
                               type="button"
@@ -296,7 +296,7 @@ class Form extends React.Component<Props, State> {
                     )}
                     <div className={`${styles.controlButton}`}>
                       {customButtons}
-                      {(deletable == undefined || deletable) && (
+                      {(deletable === undefined || deletable) && (
                         <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
                                 type="button"
                                 data-target="confirm-dialog">

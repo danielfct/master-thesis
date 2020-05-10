@@ -41,7 +41,7 @@ public interface CloudHostRepository extends CrudRepository<CloudHostEntity, Lon
 
   @Query("select r "
       + "from CloudHostEntity h join h.hostRules r "
-      + "where h.instanceId = :instanceId")
+      + "where r.generic = false and h.instanceId = :instanceId")
   List<HostRuleEntity> getRules(@Param("instanceId") String instanceId);
 
   @Query("select case when count(h) > 0 then true else false end "

@@ -39,7 +39,7 @@ interface State {
 type Props = RouteProps & RouteComponentProps;
 
 const breadcrumbs = (props: Props): IBreadcrumbs => {
-    let path = props.location && props.location.pathname || '';
+    let path = (props.location && props.location.pathname) || '';
     // remove the extra '/' at the end
     if (path !== '/' && path.endsWith('/')) {
         path = path.substr(0, path.length - 1);
@@ -50,11 +50,11 @@ const breadcrumbs = (props: Props): IBreadcrumbs => {
         path = path.substring(0, path.lastIndexOf('/'))
     }
     links = links.reverse();
-    const breadcrumbs = links.map(link => {
+    return links.map(link => {
         let path = link;
         let url = props.match.url;
         if (url.endsWith('/')) {
-            url = url.substr(0, url.length-1);
+            url = url.substr(0, url.length - 1);
         }
         if (path === url) {
             path = path.replace(path, props.match.path);
@@ -82,8 +82,6 @@ const breadcrumbs = (props: Props): IBreadcrumbs => {
             link,
         }
     });
-    // console.log(breadcrumbs)
-    return breadcrumbs;
 };
 
 class Breadcrumbs extends React.Component<Props, State> {

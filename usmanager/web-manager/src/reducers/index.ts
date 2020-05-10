@@ -25,7 +25,6 @@
 import { combineReducers } from 'redux'
 import entities, {EntitiesState} from "./entities";
 import {loadingBar, search, sidenav, UIState} from "./ui";
-import {IService} from "../routes/services/Service";
 
 export interface ReduxState {
     ui: UIState;
@@ -91,7 +90,7 @@ interface IState {
     cloud: IListState,
     apps: IListState,
     services: IListState,
-    rules: IListState,
+    serviceRules: IListState,
     metrics: IListState,
     eureka: IListState,
     loadbalancer: IListState,

@@ -9,21 +9,21 @@
  */
 
 import React from "react";
-import {IService} from "../Service";
-import Data from "../../../components/IData";
-import BaseComponent from "../../../components/BaseComponent";
-import ListItem from "../../../components/list/ListItem";
-import styles from "../../../components/list/ListItem.module.css";
-import ControlledList from "../../../components/list/ControlledList";
-import {ReduxState} from "../../../reducers";
+import {IService} from "./Service";
+import Data from "../../components/IData";
+import BaseComponent from "../../components/BaseComponent";
+import ListItem from "../../components/list/ListItem";
+import styles from "../../components/list/ListItem.module.css";
+import ControlledList from "../../components/list/ControlledList";
+import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {
   loadServicePredictions,
   removeServicePredictions
-} from "../../../actions";
+} from "../../actions";
 import {connect} from "react-redux";
-import {IFields, IValues, required, requiredAndNumberAndMin} from "../../../components/form/Form";
-import Field, {getTypeFromValue} from "../../../components/form/Field";
+import {IFields, IValues, required, requiredAndNumberAndMin} from "../../components/form/Form";
+import Field, {getTypeFromValue} from "../../components/form/Field";
 
 export interface IPrediction extends Data {
   name: string;

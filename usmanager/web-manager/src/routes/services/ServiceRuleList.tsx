@@ -9,20 +9,20 @@
  */
 
 import React from "react";
-import {IService} from "../Service";
-import BaseComponent from "../../../components/BaseComponent";
-import ListItem from "../../../components/list/ListItem";
-import styles from "../../../components/list/ListItem.module.css";
-import ControlledList from "../../../components/list/ControlledList";
-import {ReduxState} from "../../../reducers";
+import {IService} from "./Service";
+import BaseComponent from "../../components/BaseComponent";
+import ListItem from "../../components/list/ListItem";
+import styles from "../../components/list/ListItem.module.css";
+import ControlledList from "../../components/list/ControlledList";
+import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {
   loadRulesService,
   loadServiceRules,
   removeServiceRules
-} from "../../../actions";
+} from "../../actions";
 import {connect} from "react-redux";
-import {IServiceRule} from "../../rules/services/ServiceRule";
+import {IServiceRule} from "../rules/services/ServiceRule";
 import {Link} from "react-router-dom";
 
 interface StateToProps {
@@ -123,11 +123,19 @@ class ServiceRuleList extends BaseComponent<Props, {}> {
 function mapStateToProps(state: ReduxState, ownProps: ServiceRuleListProps): StateToProps {
   const serviceName = ownProps.service.serviceName;
   const service = serviceName && state.entities.services.data[serviceName];
-  const rulesName = service && service.rules;
+  const rulesName = service && service.serviceRules;
   return {
     isLoading: state.entities.services.isLoadingRules,
     error: state.entities.services.loadRulesError,
-    rules: state.entities.rules.services.data,
+    rules: Object.entries(state.entities.rules.services.data)
+                 .filter(([_, rule]) => !rule.generic)
+                 .map(([key, value]) => ({[key]: value}))
+                 .reduce((fields, field) => {
+                   for (let key in field) {
+                     fields[key] = field[key];
+                   }
+                   return fields;
+                 }, {}),
     rulesName: rulesName || [],
   }
 }

@@ -31,7 +31,7 @@ export default class extends React.Component<Props, {}> {
         <ul className="tabs tabs-fixed-width" ref={this.tabs}>
           {tabs.map((tab, index) =>
             <li key={index} className={`tab ${tab.disabled ? 'disabled' : ''}`} onClick={this.updatePathname}>
-              <a href={tabs.length == 1 ? undefined : `#${tab.id}`}>{tab.title}</a>
+              <a href={tabs.length === 1 ? undefined : `#${tab.id}`}>{tab.title}</a>
             </li>
           )}
         </ul>

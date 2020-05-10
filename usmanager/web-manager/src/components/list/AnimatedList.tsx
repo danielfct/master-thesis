@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTransition, animated } from 'react-spring';
-import shuffle from 'lodash/shuffle'
+//import shuffle from 'lodash/shuffle'
 
 interface AnimatedListProps<T> {
   list: T[];
@@ -13,7 +13,7 @@ export default function AnimatedList<T>(props: AnimatedListProps<T>) {
   const keyedList = list.map((item, index) => ({key: index, item}));
   const [rows, setList] = useState(keyedList);
 
-  useEffect(() => setList(keyedList),[list]);
+  useEffect(() => setList(keyedList),[list, keyedList]);
   /*useEffect(() => void setInterval(() => setList(shuffle), 2000), [])*/
 
   let height = 0;

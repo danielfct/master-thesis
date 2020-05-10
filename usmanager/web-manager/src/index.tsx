@@ -30,12 +30,9 @@ import * as serviceWorker from './serviceWorker';
 import Root from "./containers/Root";
 import {BrowserRouter} from "react-router-dom";
 import configureStore from "./store/configureStore";
-import Footer from "./views/footer/Footer";
 import {saveState} from "./store/localStorage";
 
 // TODO implement labelToIcon function
-//TODO migrate/replicate buttons on containerform
-
 
 const store = configureStore();
 

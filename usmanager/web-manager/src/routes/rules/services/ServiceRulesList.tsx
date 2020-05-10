@@ -15,7 +15,7 @@ import ServiceRuleCard from "./ServiceRuleCard";
 import CardList from "../../../components/list/CardList";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
-import {loadGenericRulesService, loadRulesService} from "../../../actions";
+import {loadRulesService} from "../../../actions";
 
 interface StateToProps {
   isLoading: boolean
@@ -25,7 +25,6 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadRulesService: () => any;
-  loadGenericRulesService: () => any;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -34,7 +33,6 @@ class ServiceRules extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     this.props.loadRulesService();
-    this.props.loadGenericRulesService();
   }
 
   private rule = (rule: IServiceRule): JSX.Element =>
@@ -59,15 +57,14 @@ class ServiceRules extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.rules.services.isLoadingRules || state.entities.rules.services.generic.isLoadingGenericRules,
-    error: state.entities.rules.services.loadRulesError || state.entities.rules.services.generic.loadGenericRulesError,
-    serviceRules: Object.values(state.entities.rules.services.generic.data).concat(Object.values(state.entities.rules.services.data))
+    isLoading: state.entities.rules.services.isLoadingRules,
+    error: state.entities.rules.services.loadRulesError,
+    serviceRules: Object.values(state.entities.rules.services.data)
   }
 );
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesService,
-  loadGenericRulesService
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceRules);

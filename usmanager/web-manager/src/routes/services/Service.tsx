@@ -31,7 +31,13 @@ import Form, {
   requiredAndNumberAndMin
 } from "../../components/form/Form"
 import IData from "../../components/IData";
-import {addServiceApps, addServiceDependencies, addServicePredictions, addServiceRules, loadServices} from "../../actions";
+import {
+  addServiceApps,
+  addServiceDependencies,
+  addServicePredictions,
+  addServiceRules,
+  loadServices
+} from "../../actions";
 import {connect} from "react-redux";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
@@ -41,13 +47,13 @@ import BaseComponent from "../../components/BaseComponent";
 import Error from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import {postData} from "../../utils/api";
-import ServiceAppList, {IAddServiceApp} from "./apps/ServiceAppList";
-import ServiceDependencyList from "./dependencies/ServiceDependencyList";
-import ServiceDependeeList from "./dependees/ServiceDependeeList";
-import ServicePredictionList, {IPrediction} from "./predictions/ServicePredictionList";
-import ServiceRuleList from "./rules/ServiceRuleList";
+import ServiceAppList, {IAddServiceApp} from "./ServiceAppList";
+import ServiceDependencyList from "./ServiceDependencyList";
+import ServiceDependeeList from "./ServiceDependeeList";
+import ServicePredictionList, {IPrediction} from "./ServicePredictionList";
+import ServiceRuleList from "./ServiceRuleList";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
-import GenericServiceRuleList from "./rules/GenericServiceRuleList";
+import GenericServiceRuleList from "./GenericServiceRuleList";
 
 export interface IService extends IData {
   serviceName: string;
@@ -61,11 +67,11 @@ export interface IService extends IData {
   outputLabel: string;
   serviceType: string;
   expectedMemoryConsumption: number;
-  apps: string[];
-  dependencies: string[];
-  dependees: string[];
-  predictions: { [key: string]: IPrediction };
-  rules: string[];
+  apps?: string[];
+  dependencies?: string[];
+  dependees?: string[];
+  predictions?: { [key: string]: IPrediction };
+  serviceRules?: string[];
 }
 
 const emptyService = (): Partial<IService> => ({
@@ -413,12 +419,12 @@ class Service extends BaseComponent<Props, State> {
     },
     {
       title: 'Rules',
-      id: 'rules',
+      id: 'serviceRules',
       content: () => this.rules()
     },
     {
       title: 'Generic rules',
-      id: 'genericServiceRules',
+      id: 'genericRules',
       content: () => this.genericRules()
     }
   ];
@@ -447,7 +453,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     delete formService["dependencies"];
     delete formService["dependees"];
     delete formService["predictions"];
-    delete formService["rules"];
+    delete formService["serviceRules"];
   }
   const isLoadingServices = state.entities.services?.isLoadingServices;
   const loadServicesError = state.entities.services?.loadServicesError;

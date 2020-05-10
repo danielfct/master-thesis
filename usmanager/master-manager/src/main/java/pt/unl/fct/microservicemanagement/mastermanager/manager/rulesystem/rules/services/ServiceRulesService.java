@@ -56,7 +56,6 @@ public class ServiceRulesService {
   }
 
   public Iterable<ServiceRuleEntity> getServiceRules() {
-    //TODO generic too?
     return rules.findAll();
   }
 
@@ -105,10 +104,6 @@ public class ServiceRulesService {
     return rules.findGenericServiceRules();
   }
 
-  public ServiceRuleEntity getGenericServiceRule(String ruleName) {
-    return rules.findGenericServiceRule(ruleName).orElseThrow(() ->
-        new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName));
-  }
 
   public ConditionEntity getCondition(String ruleName, String conditionName) {
     assertRuleExists(ruleName);

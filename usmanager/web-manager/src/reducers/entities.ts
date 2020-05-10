@@ -96,33 +96,49 @@ import {
   CONTAINERS_SUCCESS,
   ADD_APP_SERVICE,
   REMOVE_APP_SERVICES,
-  HOST_RULE_REQUEST,
+  RULE_HOST_REQUEST,
   RULES_HOST_REQUEST,
-  HOST_RULE_FAILURE,
+  RULE_HOST_FAILURE,
   RULES_HOST_FAILURE,
-  HOST_RULE_SUCCESS,
+  RULE_HOST_SUCCESS,
   RULES_HOST_SUCCESS,
+  RULE_HOST_CONDITIONS_REQUEST,
+  RULE_HOST_CONDITIONS_FAILURE,
+  RULE_HOST_CONDITIONS_SUCCESS,
+  REMOVE_RULE_HOST_CONDITIONS,
+  ADD_RULE_HOST_CONDITIONS,
+  RULE_HOST_CLOUD_HOSTS_REQUEST,
+  RULE_HOST_CLOUD_HOSTS_FAILURE,
+  RULE_HOST_CLOUD_HOSTS_SUCCESS,
+  ADD_RULE_HOST_CLOUD_HOSTS,
+  REMOVE_RULE_HOST_CLOUD_HOSTS,
+  RULE_HOST_EDGE_HOSTS_REQUEST,
+  RULE_HOST_EDGE_HOSTS_FAILURE,
+  RULE_HOST_EDGE_HOSTS_SUCCESS,
+  ADD_RULE_HOST_EDGE_HOSTS,
+  REMOVE_RULE_HOST_EDGE_HOSTS,
   RULE_SERVICE_REQUEST,
   RULES_SERVICE_REQUEST,
   RULE_SERVICE_FAILURE,
   RULES_SERVICE_FAILURE,
   RULE_SERVICE_SUCCESS,
   RULES_SERVICE_SUCCESS,
+  RULE_SERVICE_CONDITIONS_REQUEST,
+  RULE_SERVICE_CONDITIONS_FAILURE,
+  RULE_SERVICE_CONDITIONS_SUCCESS,
+  ADD_RULE_SERVICE_CONDITIONS,
+  REMOVE_RULE_SERVICE_CONDITIONS,
+  RULE_SERVICE_SERVICES_REQUEST,
+  RULE_SERVICE_SERVICES_FAILURE,
+  RULE_SERVICE_SERVICES_SUCCESS,
+  ADD_RULE_SERVICE_SERVICES,
+  REMOVE_RULE_SERVICE_SERVICES,
   DECISION_REQUEST,
   DECISIONS_REQUEST,
   DECISION_FAILURE,
   DECISIONS_FAILURE,
   DECISION_SUCCESS,
   DECISIONS_SUCCESS,
-  ADD_RULE_SERVICE_CONDITIONS,
-  REMOVE_HOST_RULE_CONDITIONS,
-  REMOVE_RULE_SERVICE_CONDITIONS,
-  HOST_RULE_CONDITIONS_REQUEST,
-  HOST_RULE_CONDITIONS_FAILURE,
-  HOST_RULE_CONDITIONS_SUCCESS,
-  RULE_SERVICE_CONDITIONS_REQUEST,
-  RULE_SERVICE_CONDITIONS_FAILURE,
-  RULE_SERVICE_CONDITIONS_SUCCESS,
   VALUE_MODES_REQUEST,
   VALUE_MODES_FAILURE,
   VALUE_MODES_SUCCESS,
@@ -144,32 +160,6 @@ import {
   EDGE_HOST_RULES_REQUEST,
   EDGE_HOST_RULES_FAILURE,
   EDGE_HOST_RULES_SUCCESS,
-  GENERIC_HOST_RULE_REQUEST,
-  GENERIC_HOST_RULES_REQUEST,
-  GENERIC_HOST_RULE_FAILURE,
-  GENERIC_HOST_RULES_FAILURE,
-  GENERIC_HOST_RULE_SUCCESS,
-  GENERIC_HOST_RULES_SUCCESS,
-  GENERIC_RULE_SERVICE_REQUEST,
-  GENERIC_RULES_SERVICE_REQUEST,
-  GENERIC_RULE_SERVICE_FAILURE,
-  GENERIC_RULES_SERVICE_FAILURE,
-  GENERIC_RULES_SERVICE_SUCCESS,
-  GENERIC_RULE_SERVICE_SUCCESS,
-  HOST_RULE_CLOUD_HOSTS_REQUEST,
-  HOST_RULE_CLOUD_HOSTS_FAILURE,
-  HOST_RULE_CLOUD_HOSTS_SUCCESS,
-  ADD_HOST_RULE_CLOUD_HOSTS,
-  REMOVE_HOST_RULE_CLOUD_HOSTS,
-  HOST_RULE_EDGE_HOSTS_REQUEST,
-  HOST_RULE_EDGE_HOSTS_FAILURE,
-  HOST_RULE_EDGE_HOSTS_SUCCESS,
-  ADD_HOST_RULE_EDGE_HOSTS,
-  REMOVE_HOST_RULE_EDGE_HOSTS,
-  ADD_SERVICE_RULE_SERVICES,
-  SERVICE_RULE_SERVICES_REQUEST,
-  SERVICE_RULE_SERVICES_FAILURE,
-  SERVICE_RULE_SERVICES_SUCCESS, REMOVE_SERVICE_RULE_SERVICES, ADD_HOST_RULE_CONDITIONS,
 } from "../actions";
 import {normalize} from "normalizr";
 import {Schemas} from "../middleware/api";
@@ -177,8 +167,8 @@ import {IService} from "../routes/services/Service";
 import {merge, pick, keys } from 'lodash';
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
-import {IPrediction} from "../routes/services/predictions/ServicePredictionList";
-import {IDependee} from "../routes/services/dependees/ServiceDependeeList";
+import {IPrediction} from "../routes/services/ServicePredictionList";
+import {IDependee} from "../routes/services/ServiceDependeeList";
 import {INode} from "../routes/nodes/Node";
 import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
@@ -221,11 +211,6 @@ export type EntitiesState = {
   rules: {
     hosts: {
       data: { [key: string]: IHostRule },
-      generic: {
-        data: { [key: string]: IHostRule },
-        isLoadingGenericRules: boolean,
-        loadGenericRulesError: string | null,
-      },
       isLoadingRules: boolean,
       loadRulesError: string | null,
       isLoadingConditions: boolean,
@@ -237,11 +222,6 @@ export type EntitiesState = {
     },
     services: {
       data: { [key: string]: IServiceRule },
-      generic: {
-        data: { [key: string]: IServiceRule }
-        isLoadingGenericRules: boolean,
-        loadGenericRulesError: string | null,
-      },
       isLoadingRules: boolean,
       loadRulesError: string | null,
       isLoadingConditions: boolean,
@@ -376,11 +356,6 @@ const entities = (state: EntitiesState = {
                     rules: {
                       hosts: {
                         data: {},
-                        generic: {
-                          data: {},
-                          isLoadingGenericRules: false,
-                          loadGenericRulesError: null,
-                        },
                         isLoadingRules: false,
                         loadRulesError: null,
                         isLoadingConditions: false,
@@ -392,11 +367,6 @@ const entities = (state: EntitiesState = {
                       },
                       services: {
                         data: {},
-                        generic: {
-                          data: {},
-                          isLoadingGenericRules: false,
-                          loadGenericRulesError: null,
-                        },
                         isLoadingRules: false,
                         loadRulesError: null,
                         isLoadingConditions: false,
@@ -575,7 +545,7 @@ const entities = (state: EntitiesState = {
     }
     case SERVICE_RULES_SUCCESS: {
       const service = entity && state.services.data[entity];
-      const rules = { rules: data?.serviceRules || [] };
+      const rules = { serviceRules: data?.serviceRules || [] };
       const serviceWithRules = Object.assign(service ? service : [entity], rules);
       const normalizedService = normalize(serviceWithRules, Schemas.SERVICE).entities;
       return merge({}, state, {
@@ -608,9 +578,9 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         if (data?.predictions?.length) {
-          const newPredictions = data?.predictions.map(prediction => ({[prediction.name]: { id: 0, ... prediction }}));
+          const newPredictions = data?.predictions.map(prediction => ({[prediction.name]: { id: 0, ...prediction }}));
           service.predictions = merge({}, service.predictions, newPredictions);
-          return state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
+          return state = merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
         }
       }
       break;
@@ -618,8 +588,8 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         if (data?.rulesNames?.length) {
-          service.rules?.unshift(...data?.rulesNames);
-          return state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
+          service.serviceRules?.unshift(...data?.rulesNames);
+          return state = merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
         }
       }
       break;
@@ -654,7 +624,7 @@ const entities = (state: EntitiesState = {
     case REMOVE_SERVICE_PREDICTIONS:
       if (entity) {
         const service = state.services.data[entity];
-        const filteredPredictions = Object.values(service.predictions)
+        const filteredPredictions = Object.values(service.predictions || {})
                                           .filter(prediction => !data?.predictionsNames?.includes(prediction.name));
         const normalizedPredictions = normalize(filteredPredictions, Schemas.SERVICE_PREDICTION_ARRAY).entities;
         const serviceWithPredictions = Object.assign(service, !Object.keys(normalizedPredictions).length ? { predictions: {} } : normalizedPredictions);
@@ -670,7 +640,7 @@ const entities = (state: EntitiesState = {
     case REMOVE_SERVICE_RULES:
       if (entity) {
         const service = state.services.data[entity];
-        const filteredRules = service.rules?.filter(rule => !data?.rulesNames?.includes(rule));
+        const filteredRules = service.serviceRules?.filter(rule => !data?.rulesNames?.includes(rule));
         const serviceWithRules = Object.assign(service, { rules: filteredRules });
         const normalizeService = normalize(serviceWithRules, Schemas.SERVICE).entities;
         return merge({}, state, {
@@ -756,13 +726,13 @@ const entities = (state: EntitiesState = {
           loadNodesError: null,
         }
       };
-    case HOST_RULE_REQUEST:
+    case RULE_HOST_REQUEST:
     case RULES_HOST_REQUEST:
       return merge({}, state, { rules: { hosts: { isLoadingRules: true, loadRulesError: null } } });
-    case HOST_RULE_FAILURE:
+    case RULE_HOST_FAILURE:
     case RULES_HOST_FAILURE:
       return merge({}, state, { rules: { hosts: { isLoadingRules: false, loadRulesError: error } } });
-    case HOST_RULE_SUCCESS:
+    case RULE_HOST_SUCCESS:
       return {
         ...state,
         rules: {
@@ -788,127 +758,59 @@ const entities = (state: EntitiesState = {
           }
         }
       };
-    case GENERIC_HOST_RULE_REQUEST:
-    case GENERIC_HOST_RULES_REQUEST:
-      return merge({}, state, { rules: { hosts: { generic: { isLoadingGenericRules: true, loadGenericRulesError: null } } } });
-    case GENERIC_HOST_RULE_FAILURE:
-    case GENERIC_HOST_RULES_FAILURE:
-      return merge({}, state, { rules: { hosts: { generic: { isLoadingGenericRules: false, loadGenericRulesError: error } } } });
-    case GENERIC_HOST_RULE_SUCCESS:
-      return {
-        ...state,
-        rules: {
-          ...state.rules,
-          hosts: {
-            ...state.rules.hosts,
-            generic: {
-              data: merge({}, state.rules.hosts.generic.data, data?.hostRules),
-              isLoadingGenericRules: false,
-              loadGenericRulesError: null,
-            },
-          }
-        }
-      };
-    case GENERIC_HOST_RULES_SUCCESS:
-      return {
-        ...state,
-        rules: {
-          ...state.rules,
-          hosts: {
-            ...state.rules.hosts,
-            generic: {
-              data: merge({}, pick(state.rules.hosts.generic.data, keys(data?.hostRules)), data?.hostRules),
-              isLoadingGenericRules: false,
-              loadGenericRulesError: null,
-            }
-          }
-        }
-      };
-    case HOST_RULE_CONDITIONS_REQUEST:
+    case RULE_HOST_CONDITIONS_REQUEST:
       return merge({}, state, { rules: { hosts: { isLoadingConditions: true, loadConditionsError: null } } });
-    case HOST_RULE_CONDITIONS_FAILURE:
+    case RULE_HOST_CONDITIONS_FAILURE:
       return merge({}, state, { rules: { hosts: { isLoadingConditions: false, loadConditionsError: error } } });
-    case HOST_RULE_CONDITIONS_SUCCESS: {
+    case RULE_HOST_CONDITIONS_SUCCESS: {
       const rule = entity && state.rules.hosts.data[entity];
-      const genericRule = entity && state.rules.hosts.generic.data[entity];
       const conditions = { conditions: data?.conditions || [] };
-      const ruleWithConditions = Object.assign(rule ? rule : (genericRule ? genericRule : [entity]), conditions);
+      const ruleWithConditions = Object.assign(rule ? rule : [entity], conditions);
       const normalizedRule = normalize(ruleWithConditions, Schemas.RULE_HOST).entities;
-      return merge({}, state,
-        rule ? {
-          rules: {
-            ...state.rules,
-            hosts : {
-              ...state.rules.hosts,
-              data: normalizedRule.hostRules,
-              isLoadingConditions: false,
-              loadConditionsError: null,
-            },
-          }
-        } : {
-          rules: {
-            ...state.rules,
-            hosts : {
-              ...state.rules.hosts,
-              generic : {
-                data: normalizedRule.hostRules,
-              },
-              isLoadingConditions: false,
-              loadConditionsError: null,
-            }
-          }
-        });
+      return merge({}, state, {
+        rules: {
+          ...state.rules,
+          hosts : {
+            ...state.rules.hosts,
+            data: normalizedRule.hostRules,
+            isLoadingConditions: false,
+            loadConditionsError: null,
+          },
+        }
+      });
     }
-    case ADD_HOST_RULE_CONDITIONS:
+    case ADD_RULE_HOST_CONDITIONS:
       if (entity && data?.conditionsNames?.length) {
         const rule = state.rules.hosts.data[entity];
-        const genericRule = state.rules.hosts.generic.data[entity];
         if (rule) {
           rule.conditions?.unshift(...data?.conditionsNames);
           return state = merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
-        if (genericRule) {
-          genericRule.conditions?.unshift(...data?.conditionsNames);
-          return state = merge({}, state, { rules: { hosts: { generic: { data: { [genericRule.name]: { ...genericRule } } } } } });
-        }
         return state;
       }
       break;
-    case REMOVE_HOST_RULE_CONDITIONS:
+    case REMOVE_RULE_HOST_CONDITIONS:
       if (entity) {
         const rule = state.rules.hosts.data[entity];
-        const genericRule = state.rules.hosts.generic.data[entity];
-        const filteredConditions = (rule || genericRule).conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
-        const ruleWithConditions = Object.assign(rule || genericRule, { conditions: filteredConditions });
+        const filteredConditions = rule.conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
+        const ruleWithConditions = Object.assign(rule, { conditions: filteredConditions });
         const normalizeRule = normalize(ruleWithConditions, Schemas.RULE_HOST).entities;
-        return merge({}, state,
-          rule ? {
-              rules: {
-                ...state.rules,
-                hosts: {
-                  ...state.rules.hosts,
-                  data: normalizeRule.hostRules,
-                }
-              }
+        return merge({}, state, {
+          rules: {
+            ...state.rules,
+            hosts: {
+              ...state.rules.hosts,
+              data: normalizeRule.hostRules,
             }
-            : {
-              rules: {
-                ...state.rules,
-                hosts: {
-                  ...state.rules.hosts,
-                  generic : {
-                    data: normalizeRule.hostRules,
-                  }
-                }
-              }
-            });
+          }
+        });
       }
       break;
-    case HOST_RULE_CLOUD_HOSTS_REQUEST:
+    case RULE_HOST_CLOUD_HOSTS_REQUEST:
       return merge({}, state, { rules: { hosts: { isLoadingCloudHosts: true, loadCloudHostsError: null } } });
-    case HOST_RULE_CLOUD_HOSTS_FAILURE:
+    case RULE_HOST_CLOUD_HOSTS_FAILURE:
       return merge({}, state, { rules: { hosts: { isLoadingCloudHosts: false, loadCloudHostsError: error } } });
-    case HOST_RULE_CLOUD_HOSTS_SUCCESS: {
+    case RULE_HOST_CLOUD_HOSTS_SUCCESS: {
       const rule = entity && state.rules.hosts.data[entity];
       const cloudHosts = { cloudHosts: data?.cloudHosts || [] };
       const ruleWithCloudHosts = Object.assign(rule ? rule : [entity], cloudHosts);
@@ -925,7 +827,7 @@ const entities = (state: EntitiesState = {
         }
       });
     }
-    case ADD_HOST_RULE_CLOUD_HOSTS:
+    case ADD_RULE_HOST_CLOUD_HOSTS:
       if (entity && data?.cloudHostsId?.length) {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
@@ -935,7 +837,7 @@ const entities = (state: EntitiesState = {
         return state;
       }
       break;
-    case REMOVE_HOST_RULE_CLOUD_HOSTS:
+    case REMOVE_RULE_HOST_CLOUD_HOSTS:
       if (entity) {
         const rule = state.rules.hosts.data[entity];
         const filteredCloudHosts = rule.cloudHosts?.filter(cloudHost => !data?.cloudHostsId?.includes(cloudHost));
@@ -952,11 +854,11 @@ const entities = (state: EntitiesState = {
         });
       }
       break;
-    case HOST_RULE_EDGE_HOSTS_REQUEST:
+    case RULE_HOST_EDGE_HOSTS_REQUEST:
       return merge({}, state, { rules: { hosts: { isLoadingEdgeHosts: true, loadEdgeHostsError: null } } });
-    case HOST_RULE_EDGE_HOSTS_FAILURE:
+    case RULE_HOST_EDGE_HOSTS_FAILURE:
       return merge({}, state, { rules: { hosts: { isLoadingEdgeHosts: false, loadEdgeHostsError: error } } });
-    case HOST_RULE_EDGE_HOSTS_SUCCESS: {
+    case RULE_HOST_EDGE_HOSTS_SUCCESS: {
       const rule = entity && state.rules.hosts.data[entity];
       const edgeHosts = { edgeHosts: data?.edgeHosts || [] };
       const ruleWithEdgeHosts = Object.assign(rule ? rule : [entity], edgeHosts);
@@ -973,7 +875,7 @@ const entities = (state: EntitiesState = {
         }
       });
     }
-    case ADD_HOST_RULE_EDGE_HOSTS:
+    case ADD_RULE_HOST_EDGE_HOSTS:
       if (entity && data?.edgeHostsHostname?.length) {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
@@ -983,7 +885,7 @@ const entities = (state: EntitiesState = {
         return state;
       }
       break;
-    case REMOVE_HOST_RULE_EDGE_HOSTS:
+    case REMOVE_RULE_HOST_EDGE_HOSTS:
       if (entity) {
         const rule = state.rules.hosts.data[entity];
         const filteredEdgeHosts = rule.edgeHosts?.filter(edgeHost => !data?.edgeHostsHostname?.includes(edgeHost));
@@ -1032,130 +934,62 @@ const entities = (state: EntitiesState = {
           }
         }
       };
-    case GENERIC_RULE_SERVICE_REQUEST:
-    case GENERIC_RULES_SERVICE_REQUEST:
-      return merge({}, state, { rules: { services: { generic: { isLoadingGenericRules: true, loadGenericRulesError: null } } } });
-    case GENERIC_RULE_SERVICE_FAILURE:
-    case GENERIC_RULES_SERVICE_FAILURE:
-      return merge({}, state, { rules: { services: { generic: { isLoadingGenericRules: false, loadGenericRulesError: error } } } });
-    case GENERIC_RULE_SERVICE_SUCCESS:
-      return {
-        ...state,
-        rules: {
-          ...state.rules,
-          services: {
-            ...state.rules.services,
-            generic: {
-              data: merge({}, state.rules.services.generic.data, data?.serviceRules),
-              isLoadingGenericRules: false,
-              loadGenericRulesError: null,
-            }
-          }
-        }
-      };
-    case GENERIC_RULES_SERVICE_SUCCESS:
-      return {
-        ...state,
-        rules: {
-          ...state.rules,
-          services: {
-            ...state.rules.services,
-            generic: {
-              data: merge({}, pick(state.rules.services.generic.data, keys(data?.serviceRules)), data?.serviceRules),
-              isLoadingGenericRules: false,
-              loadGenericRulesError: null,
-            }
-          }
-        }
-      };
     case RULE_SERVICE_CONDITIONS_REQUEST:
       return merge({}, state, { rules: { services: { isLoadingConditions: true, loadConditionsError: null } } });
     case RULE_SERVICE_CONDITIONS_FAILURE:
       return merge({}, state, { rules: { services: { isLoadingConditions: false, loadConditionsError: error } } });
     case RULE_SERVICE_CONDITIONS_SUCCESS: {
       const rule = entity && state.rules.services.data[entity];
-      const genericRule = entity && state.rules.services.generic.data[entity];
       const conditions = { conditions: data?.conditions || [] };
-      const ruleWithConditions = Object.assign(rule ? rule : (genericRule ? genericRule : [entity]), conditions);
+      const ruleWithConditions = Object.assign(rule ? rule : [entity], conditions);
       const normalizedRule = normalize(ruleWithConditions, Schemas.RULE_SERVICE).entities;
-      return merge({}, state,
-        rule ? {
-          rules: {
-            ...state.rules,
-            services : {
-              ...state.rules.services,
-              data: normalizedRule.serviceRules,
-              isLoadingConditions: false,
-              loadConditionsError: null,
-            }
+      return merge({}, state, {
+        rules: {
+          ...state.rules,
+          services : {
+            ...state.rules.services,
+            data: normalizedRule.serviceRules,
+            isLoadingConditions: false,
+            loadConditionsError: null,
           }
-        } : {
-          rules: {
-            ...state.rules,
-            services : {
-              ...state.rules.services,
-              generic : {
-                data: normalizedRule.hostRules,
-              },
-              isLoadingConditions: false,
-              loadConditionsError: null,
-            }
-          }
-        });
+        }
+      });
     }
     case ADD_RULE_SERVICE_CONDITIONS:
       if (entity && data?.conditionsNames?.length) {
         const rule = state.rules.services.data[entity];
-        const genericRule = state.rules.services.generic.data[entity];
         if (rule) {
           rule.conditions?.unshift(...data?.conditionsNames);
           return state = merge({}, state, { rules: { services: { data: { [rule.name]: {...rule } } } } });
-        }
-        if (genericRule) {
-          genericRule.conditions?.unshift(...data?.conditionsNames);
-          return state = merge({}, state, { rules: { services: { generic: { data: { [genericRule.name]: {...genericRule } } } } } });
         }
       }
       break;
     case REMOVE_RULE_SERVICE_CONDITIONS:
       if (entity) {
         const rule = state.rules.services.data[entity];
-        const genericRule = state.rules.services.generic.data[entity];
-        const filteredConditions = (rule || genericRule).conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
-        const ruleWithConditions = Object.assign(rule || genericRule, { conditions: filteredConditions });
+        const filteredConditions = rule.conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
+        const ruleWithConditions = Object.assign(rule, { conditions: filteredConditions });
         const normalizeRule = normalize(ruleWithConditions, Schemas.RULE_SERVICE).entities;
-        return merge({}, state,
-          rule ? {
-              rules: {
-                ...state.rules,
-                services: {
-                  ...state.rules.services,
-                  data: normalizeRule.serviceRules,
-                }
-              }
+        return merge({}, state, {
+          rules: {
+            ...state.rules,
+            services: {
+              ...state.rules.services,
+              data: normalizeRule.serviceRules,
             }
-            : {
-              rules: {
-                ...state.rules,
-                services: {
-                  ...state.rules.services,
-                  generic : {
-                    data: normalizeRule.serviceRules,
-                  }
-                }
-              }
-            });
+          }
+        });
       }
       return state;
-    case SERVICE_RULE_SERVICES_REQUEST:
+    case RULE_SERVICE_SERVICES_REQUEST:
       return merge({}, state, { rules: { services: { isLoadingServices: true, loadServicesError: null } } });
-    case SERVICE_RULE_SERVICES_FAILURE:
+    case RULE_SERVICE_SERVICES_FAILURE:
       return merge({}, state, { rules: { services: { isLoadingServices: false, loadServicesError: error } } });
-    case SERVICE_RULE_SERVICES_SUCCESS: {
+    case RULE_SERVICE_SERVICES_SUCCESS: {
       const rule = entity && state.rules.services.data[entity];
-      const services = { services: data?.serviceNames || [] };
+      const services = { services: data?.services || [] };
       const ruleWithServices = Object.assign(rule ? rule : [entity], services);
-      const normalizedRule = normalize(ruleWithServices, Schemas.RULE_SERVICE).entities; //TODO _ARRAY?
+      const normalizedRule = normalize(ruleWithServices, Schemas.RULE_SERVICE).entities;
       return merge({}, state, {
         rules: {
           ...state.rules,
@@ -1168,7 +1002,7 @@ const entities = (state: EntitiesState = {
         }
       });
     }
-    case ADD_SERVICE_RULE_SERVICES:
+    case ADD_RULE_SERVICE_SERVICES:
       if (entity && data?.serviceNames?.length) {
         const rule = state.rules.services.data[entity];
         if (rule) {
@@ -1178,12 +1012,12 @@ const entities = (state: EntitiesState = {
         return state;
       }
       break;
-    case REMOVE_SERVICE_RULE_SERVICES:
+    case REMOVE_RULE_SERVICE_SERVICES:
       if (entity) {
         const rule = state.rules.services.data[entity];
         const filteredServices = rule.services?.filter(service => !data?.serviceNames?.includes(service));
         const ruleWithServices = Object.assign(rule, { services: filteredServices });
-        const normalizeRule = normalize(ruleWithServices, Schemas.RULE_SERVICE).entities; //TODO _array?
+        const normalizeRule = normalize(ruleWithServices, Schemas.RULE_SERVICE).entities;
         return merge({}, state, {
           rules: {
             ...state.rules,
@@ -1195,14 +1029,6 @@ const entities = (state: EntitiesState = {
         });
       }
       break;
-
-
-
-
-
-
-
-
     case CONDITION_REQUEST:
     case CONDITIONS_REQUEST:
       return merge({}, state, { rules: { conditions: { isLoadingConditions: true, loadConditionsError: null } } });
@@ -1329,7 +1155,7 @@ const entities = (state: EntitiesState = {
           const launchOrder = addAppService.launchOrder;
           const appService = { id: 0, service, launchOrder };
           if (service) {
-            app.services = { ... app.services, [serviceName]: appService };
+            app.services = { ...app.services, [serviceName]: appService };
             return state = merge({}, state, { apps: { data: { [app.name]: {...app } } } });
           }
         }
@@ -1445,9 +1271,7 @@ const entities = (state: EntitiesState = {
       const host = entity && state.hosts.edge.data[entity];
       const rules = { hostRules: data?.hostRules || [] };
       const hostWithRules = Object.assign(host ? host : [entity], rules);
-      console.log(hostWithRules)
       const normalizedHost = normalize(hostWithRules, Schemas.EDGE_HOST).entities;
-      console.log(normalizedHost)
       return {
         ...state,
         hosts: {

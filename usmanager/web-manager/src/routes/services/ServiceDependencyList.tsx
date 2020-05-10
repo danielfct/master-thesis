@@ -9,20 +9,20 @@
  */
 
 import React from "react";
-import {ReduxState} from "../../../reducers";
-import {IService} from "../Service";
+import {ReduxState} from "../../reducers";
+import {IService} from "./Service";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {
   addServiceDependencies,
   loadServiceDependencies,
   loadServices,
-  removeServiceDependencies} from "../../../actions";
-import BaseComponent from "../../../components/BaseComponent";
+  removeServiceDependencies} from "../../actions";
+import BaseComponent from "../../components/BaseComponent";
 import {Link} from "react-router-dom";
-import ControlledList from "../../../components/list/ControlledList";
-import ListItem from "../../../components/list/ListItem";
-import styles from "../../../components/list/ListItem.module.css";
+import ControlledList from "../../components/list/ControlledList";
+import ListItem from "../../components/list/ListItem";
+import styles from "../../components/list/ListItem.module.css";
 import {Redirect} from "react-router";
 
 export interface IServiceDependency extends IService {

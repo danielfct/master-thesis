@@ -24,7 +24,6 @@
 
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {isAuthenticated} from "./auth";
-import normalizeUrl from "normalize-url";
 
 export const API_URL = 'http://localhost:8080';
 /*const API_URL = '/';*/

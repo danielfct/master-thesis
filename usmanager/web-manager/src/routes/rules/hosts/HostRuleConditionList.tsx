@@ -120,7 +120,7 @@ class HostRuleConditionList extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleConditionListProps): StateToProps {
   const ruleName = ownProps.rule && ownProps.rule.name;
-  const rule = ruleName && (state.entities.rules.hosts.data[ruleName] || state.entities.rules.hosts.generic.data[ruleName]);
+  const rule = ruleName && state.entities.rules.hosts.data[ruleName];
   const ruleConditions = rule && rule.conditions;
   return {
     redirect: !ownProps.rule,

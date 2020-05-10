@@ -15,14 +15,13 @@ import Form, {IFields, required, requiredAndNumberAndMin} from "../../../compone
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs, {Tab} from "../../../components/tabs/Tabs";
+import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
   addRuleServiceConditions,
   addRuleServices,
   loadDecisions,
-  loadGenericRulesService,
   loadRulesService,
 } from "../../../actions";
 import {connect} from "react-redux";
@@ -33,7 +32,7 @@ import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import ServiceRuleServicesList from "./ServiceRuleServicesList";
 
 export interface IServiceRule extends IRule {
-  services: string[]
+  services?: string[]
 }
 
 const emptyServiceRule = () => ({
@@ -56,7 +55,6 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadRulesService: (name: string) => any;
-  loadGenericRulesService: (name: string) => any;
   loadDecisions: () => any;
   addRuleServiceConditions: (ruleName: string, conditions: string[]) => void;
   addRuleServices: (ruleName: string, services: string[]) => void;
@@ -80,7 +78,7 @@ class ServiceRule extends BaseComponent<Props, State> {
   state: State = {
     newConditions: [],
     newServices: [],
-    isGeneric: this.props.serviceRule.generic || false,
+    isGeneric: this.props.serviceRule?.generic || false,
   };
 
   componentDidMount(): void {
@@ -88,7 +86,6 @@ class ServiceRule extends BaseComponent<Props, State> {
     const ruleName = this.props.match.params.name;
     if (ruleName && !isNewRule(ruleName)) {
       this.props.loadRulesService(ruleName);
-      this.props.loadGenericRulesService(ruleName);
     }
   };
 
@@ -306,13 +303,13 @@ class ServiceRule extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = state.entities.rules.services.isLoadingRules || state.entities.rules.services.generic.isLoadingGenericRules;
-  const error = state.entities.rules.services.loadRulesError && state.entities.rules.services.generic.loadGenericRulesError;
+  const isLoading = state.entities.rules.services.isLoadingRules;
+  const error = state.entities.rules.services.loadRulesError;
   const name = props.match.params.name;
   const isNew = isNewRule(name);
   const serviceRule = isNew
     ? emptyServiceRule()
-    : state.entities.rules.services.data[name] || state.entities.rules.services.generic.data[name];
+    : state.entities.rules.services.data[name];
   let formServiceRule;
   if (isNew || !isNew && serviceRule) {
     formServiceRule = { ...serviceRule };
@@ -336,7 +333,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesService,
-  loadGenericRulesService,
   loadDecisions,
   addRuleServiceConditions,
   addRuleServices,

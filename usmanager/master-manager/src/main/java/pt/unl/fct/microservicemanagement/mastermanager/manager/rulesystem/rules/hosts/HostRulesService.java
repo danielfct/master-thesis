@@ -59,7 +59,6 @@ public class HostRulesService {
   }
 
   public Iterable<HostRuleEntity> getHostRules() {
-    //TODO generic too?
     return rules.findAll();
   }
 

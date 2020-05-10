@@ -47,7 +47,7 @@ public interface EdgeHostRepository extends CrudRepository<EdgeHostEntity, Long>
 
   @Query("select r "
       + "from EdgeHostEntity h join h.hostRules r "
-      + "where h.hostname = :hostname")
+      + "where r.generic = false and h.hostname = :hostname")
   List<HostRuleEntity> getRules(@Param("hostname") String hostname);
 
   @Query("select case when count(h) > 0 then true else false end "

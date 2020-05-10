@@ -8,17 +8,17 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IService} from "../Service";
+import {IService} from "./Service";
 import React from "react";
-import ListItem from "../../../components/list/ListItem";
-import styles from "../../../components/list/ListItem.module.css";
+import ListItem from "../../components/list/ListItem";
+import styles from "../../components/list/ListItem.module.css";
 import {Link} from "react-router-dom";
-import BaseComponent from "../../../components/BaseComponent";
-import {ReduxState} from "../../../reducers";
+import BaseComponent from "../../components/BaseComponent";
+import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import List from "../../../components/list/List";
-import {loadServiceDependees} from "../../../actions";
+import List from "../../components/list/List";
+import {loadServiceDependees} from "../../actions";
 
 export interface IDependee extends IService {
 }
@@ -50,7 +50,7 @@ class ServiceDependeeList extends BaseComponent<Props, {}> {
   }
 
   private dependee = (dependee: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index != this.props.dependeeNames.length - 1}>
+    <ListItem key={index} separate={index !== this.props.dependeeNames.length - 1}>
       <div className={`${styles.linkedItemContent}`}>
         <span>{dependee}</span>
       </div>

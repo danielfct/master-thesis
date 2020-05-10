@@ -8,16 +8,16 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import BaseComponent from "../../../components/BaseComponent";
+import BaseComponent from "../../components/BaseComponent";
 import React from "react";
-import styles from "../../../components/list/ListItem.module.css";
+import styles from "../../components/list/ListItem.module.css";
 import {Link} from "react-router-dom";
-import List from "../../../components/list/List";
-import {ReduxState} from "../../../reducers";
-import {loadGenericRulesService} from "../../../actions";
+import List from "../../components/list/List";
+import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import ListItem from "../../../components/list/ListItem";
+import ListItem from "../../components/list/ListItem";
+import {loadRulesService} from "../../actions";
 
 interface StateToProps {
   isLoading: boolean;
@@ -26,7 +26,7 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-  loadGenericRulesService: () => void;
+  loadRulesService: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -34,11 +34,11 @@ type Props = StateToProps & DispatchToProps;
 class GenericServiceRuleList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    this.props.loadGenericRulesService();
+    this.props.loadRulesService();
   }
 
   private rule = (rule: string, index: number): JSX.Element =>
-    <ListItem key={index} separate={index != this.props.genericServiceRules.length - 1}>
+    <ListItem key={index} separate={index !== this.props.genericServiceRules.length - 1}>
       <div className={`${styles.linkedItemContent}`}>
         <span>{rule}</span>
       </div>
@@ -63,15 +63,17 @@ class GenericServiceRuleList extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState): StateToProps {
   return {
-    isLoading: state.entities.rules.services.generic.isLoadingGenericRules,
-    error: state.entities.rules.services.generic.loadGenericRulesError,
-    genericServiceRules: Object.keys(state.entities.rules.services.generic.data),
+    isLoading: state.entities.rules.services.isLoadingRules,
+    error: state.entities.rules.services.loadRulesError,
+    genericServiceRules: Object.entries(state.entities.rules.services.data)
+                               .filter(([_, rule]) => rule.generic)
+                               .map(([ruleName, _]) => ruleName)
   }
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
-    loadGenericRulesService,
+    loadRulesService,
   }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(GenericServiceRuleList);

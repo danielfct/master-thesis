@@ -49,7 +49,7 @@ export default class Card<T> extends React.Component<Props<T>, {}> {
     const childrenCount = this.getChildrenCount();
     return (
       <div className={hoverable ? 'hoverable' : undefined}
-           style={childrenCount == 0 ? {borderBottom: '1px black solid'} : undefined}>
+           style={childrenCount === 0 ? {borderBottom: '1px black solid'} : undefined}>
         {title && <CardTitle title={title}/>}
         {childrenCount > 0 && (
           <div className={`card gridCard`}

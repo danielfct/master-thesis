@@ -90,10 +90,10 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
           formContext && (
             <div key={id}
                  className={`input-field col s12`}
-                 style={icon != undefined && !icon ? {marginLeft: '10px'} : undefined}>
+                 style={icon !== undefined && !icon ? {marginLeft: '10px'} : undefined}>
               {label && (
                 <>
-                  {(icon == undefined || icon) &&
+                  {(icon === undefined || icon) &&
                   <i className="material-icons prefix">{mapLabelToIcon(label)}</i>}
                   <label className="active" htmlFor={id}>
                     {camelCaseToSentenceCase(label)}
@@ -104,7 +104,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                 <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
                          id={id}
                          name={id}
-                         value={formContext.values[id] && formContext.values[id].toString() || ''}
+                         value={(formContext.values[id] && formContext.values[id].toString()) || ''}
                          disabled={disabled || !formContext.isEditing}
                          onChange={e => this.onChange(e, id, formContext)}
                          onBlur={e => this.onBlur(e, id, formContext)}/>

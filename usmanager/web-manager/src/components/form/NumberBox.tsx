@@ -1,5 +1,4 @@
 import React from "react";
-import {getTypeFromValue} from "./Field";
 
 interface NumberBoxProps {
   className: string;
@@ -17,7 +16,6 @@ export class NumberBox extends React.Component<NumberBoxProps, any> {
 
   render(): any {
     const {className, id, name, min, max, value, disabled, onChange, onBlur} = this.props;
-    console.log(value)
     return (
       <input
         className={className}

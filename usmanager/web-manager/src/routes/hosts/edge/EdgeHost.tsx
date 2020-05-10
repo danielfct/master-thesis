@@ -34,7 +34,7 @@ export interface IEdgeHost extends IData {
   country: string;
   city: string;
   local: boolean;
-  hostRules: string[];
+  hostRules?: string[];
 }
 
 const emptyEdgeHost = (): Partial<IEdgeHost> => ({

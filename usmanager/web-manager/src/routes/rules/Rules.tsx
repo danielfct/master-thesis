@@ -29,7 +29,7 @@ export default class Rules extends BaseComponent<{}, {}> {
       <AddButton tooltip={'Add rule'} dropdown={{
         id: 'addRules',
         title: 'Rule type',
-        empty: 'No more rules to add',
+        empty: 'No more service rules to add',
         data: [
           {text: 'Host', pathname: '/rules/hosts/new_host_rule'},
           {text: 'Service', pathname: '/rules/services/new_service_rule'},

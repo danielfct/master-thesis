@@ -32,7 +32,7 @@ export interface ICloudHost {
   state: { code: number, name: string }
   publicDnsName: string;
   publicIpAddress: string;
-  hostRules: string[];
+  hostRules?: string[];
 }
 
 const emptyCloudHost = (): Partial<ICloudHost> => ({
@@ -217,7 +217,7 @@ class CloudHost extends BaseComponent<Props, {}> {
     },
     {
       title: 'Rules',
-      id: 'rules',
+      id: 'cloudRules',
       content: () => this.rules()
     },
     {
