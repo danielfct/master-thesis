@@ -26,8 +26,12 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container
 
 final class LaunchContainerException extends RuntimeException {
 
+  LaunchContainerException(String s) {
+    super(s);
+  }
+
   LaunchContainerException(String s, Object... args) {
-    super(String.format(s, args));
+    this(String.format(s, args));
   }
 
 }

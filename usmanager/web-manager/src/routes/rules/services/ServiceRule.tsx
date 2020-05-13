@@ -210,7 +210,7 @@ class ServiceRule extends BaseComponent<Props, State> {
   private isGenericSelected = (value: string) =>
     this.setState({isGeneric: value === 'true'});
 
-  private details = () => {
+  private serviceRule = () => {
     const {isLoading, error, formServiceRule, serviceRule} = this.props;
     // @ts-ignore
     const ruleKey: (keyof IServiceRule) = formServiceRule && Object.keys(formServiceRule)[0];
@@ -274,7 +274,7 @@ class ServiceRule extends BaseComponent<Props, State> {
     {
       title: 'Service rule',
       id: 'serviceRule',
-      content: () => this.details()
+      content: () => this.serviceRule()
     },
     {
       title: 'Conditions',

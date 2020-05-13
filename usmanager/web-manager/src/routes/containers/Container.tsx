@@ -315,7 +315,7 @@ class Container extends BaseComponent<Props, State> {
       {this.chooseHostnameDropdown('migrate-dropdown-hostname', this.migrate)}
     </>;
 
-  private details = () => {
+  private container = () => {
     const {isLoading, error, container, formContainer} = this.props;
     // @ts-ignore
     const containerKey: (keyof IContainer) = container && Object.keys(container)[0];
@@ -410,14 +410,14 @@ class Container extends BaseComponent<Props, State> {
         {
           title: 'Container',
           id: 'container',
-          content: () => this.details()
+          content: () => this.container()
         },
       ]
       : [
         {
           title: 'Container',
           id: 'container',
-          content: () => this.details()
+          content: () => this.container()
         },
         {
           title: 'Ports',

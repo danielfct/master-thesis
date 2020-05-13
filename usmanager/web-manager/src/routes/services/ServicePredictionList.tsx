@@ -79,7 +79,7 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
   private prediction = (index: number, prediction: IPrediction, separate: boolean, checked: boolean,
                         handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
     <ListItem key={index} separate={separate}>
-      <div className={`${styles.itemContent}`}>
+      <div className={`${styles.listItemContent}`}>
         <label>
           <input id={prediction.name}
                  type="checkbox"

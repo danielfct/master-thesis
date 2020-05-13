@@ -27,8 +27,19 @@
     word-break: break-word;
 }
 
-.itemContent {
+.listItemContent {
     padding: 15px 40px;
+    font-size: 1.1rem;
+    width: 100%;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+}
+
+.nonListContent {
+    padding: 7px 5px;
     font-size: 1.1rem;
     width: 100%;
     color: white;

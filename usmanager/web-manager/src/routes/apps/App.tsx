@@ -140,7 +140,7 @@ class App extends BaseComponent<Props, State> {
   private shouldShowSaveButton = () =>
     !!this.state.unsavedServices.length;
 
-  private details = () => {
+  private app = () => {
     const {isLoading, error, formApp, app} = this.props;
     // @ts-ignore
     const appKey: (keyof IApp) = formApp && Object.keys(formApp)[0];
@@ -179,7 +179,7 @@ class App extends BaseComponent<Props, State> {
     {
       title: 'App',
       id: 'app',
-      content: () => this.details()
+      content: () => this.app()
     },
     {
       title: 'Services',

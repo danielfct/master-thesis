@@ -169,7 +169,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   private isLocalOption = (isLocal: boolean): string =>
     isLocal.toString();
 
-  private details = () => {
+  private edgeHost = () => {
     const {isLoading, error, formEdgeHost, edgeHost} = this.props;
     // @ts-ignore
     const edgeHostKey: (keyof IEdgeHost) = formEdgeHost && Object.keys(formEdgeHost)[0];
@@ -229,7 +229,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     {
       title: 'Edge host',
       id: 'edgeHost',
-      content: () => this.details()
+      content: () => this.edgeHost()
     },
     {
       title: 'Rules',

@@ -40,8 +40,8 @@ const sidenavLinks = [
     { link: '/rules', name: 'Rules', sub: [{ link: '/conditions', name: 'Conditions' }] },
     { link: '/metrics/simulated', name: 'Simulated metrics' },
     { link: '/regions', name: 'Regions' },
+    { link: '/load-balancers', name: 'Load balancers' },
     { link: '/eureka', name: 'Eureka servers' },
-    { link: '/loadBalancer', name: 'Load balancers' },
     { link: '/logs', name: 'Logs'}
 ];
 

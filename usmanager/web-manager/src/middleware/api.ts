@@ -42,6 +42,7 @@ import {IServiceRule} from "../routes/rules/services/ServiceRule";
 import {IHostRule} from "../routes/rules/hosts/HostRule";
 import {ICondition} from "../routes/rules/conditions/Condition";
 import {IAppService} from "../routes/apps/AppServicesList";
+import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -107,6 +108,7 @@ interface ISchemas {
     EDGE_HOST_RULE_ARRAY: schema.Entity<IHostRule>[];
     CONTAINER: schema.Entity<IContainer>;
     CONTAINER_ARRAY: schema.Entity<IContainer>[];
+    LOAD_BALANCER_ARRAY: schema.Entity<ILoadBalancer>[];
     LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
@@ -194,6 +196,10 @@ const containerSchema: schema.Entity<IContainer> = new schema.Entity('containers
     idAttribute: (container: IContainer) => container.id.toString()
 });
 
+const loadBalancerSchema: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalancers', undefined, {
+    idAttribute: (loadBalancer: ILoadBalancer) => '' //TODO
+});
+
 const logsSchema: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
     idAttribute: (logs: ILogs) => logs.eventId.toString()
 });
@@ -256,6 +262,7 @@ export const Schemas: ISchemas = {
     EDGE_HOST_RULE_ARRAY: [ruleHostSchema],
     CONTAINER: containerSchema,
     CONTAINER_ARRAY: [containerSchema],
+    LOAD_BALANCER_ARRAY: [loadBalancerSchema],
     LOGS_ARRAY: [logsSchema],
 };
 

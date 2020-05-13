@@ -322,7 +322,7 @@ class Service extends BaseComponent<Props, State> {
   private serviceTypeOption = (serviceType: string): string =>
     serviceType;
 
-  private details = () => {
+  private service = () => {
     const {isLoadingServices, loadServicesError, formService, service} = this.props;
     // @ts-ignore
     const serviceKey: (keyof IService) = formService && Object.keys(formService)[0];
@@ -395,7 +395,7 @@ class Service extends BaseComponent<Props, State> {
     {
       title: 'Service',
       id: 'service',
-      content: () => this.details()
+      content: () => this.service()
     },
     {
       title: 'Apps',

@@ -247,7 +247,7 @@ class HostRule extends BaseComponent<Props, State> {
   private isGenericSelected = (value: string) =>
     this.setState({isGeneric: value === 'true'});
 
-  private details = () => {
+  private hostRule = () => {
     const {isLoading, error, formHostRule, hostRule} = this.props;
     // @ts-ignore
     const ruleKey: (keyof IHostRule) = formHostRule && Object.keys(formHostRule)[0];
@@ -317,7 +317,7 @@ class HostRule extends BaseComponent<Props, State> {
     {
       title: 'Host rule',
       id: 'hostRule',
-      content: () => this.details(),
+      content: () => this.hostRule(),
     },
     {
       title: 'Conditions',

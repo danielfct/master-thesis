@@ -121,7 +121,7 @@ class Condition extends BaseComponent<Props, State> {
   private valueModeOption = (valueMode: IValueMode): string =>
     valueMode.name;
 
-  private details = () => {
+  private condition = () => {
     const {isLoading, error, condition, formCondition} = this.props;
     // @ts-ignore
     const conditionKey: (keyof ICondition) = formCondition && Object.keys(formCondition)[0];
@@ -174,7 +174,7 @@ class Condition extends BaseComponent<Props, State> {
     {
       title: 'Condition',
       id: 'condition',
-      content: () => this.details()
+      content: () => this.condition()
     },
   ];
 

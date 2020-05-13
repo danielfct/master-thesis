@@ -7,34 +7,23 @@ import BaseComponent from "../BaseComponent";
 import {deleteData} from "../../utils/api";
 import {decodeHTML} from "../../utils/text";
 import InputDialog from "../dialogs/InputDialog";
-import {IFields, IValues, RestOperation} from "../form/Form";
+import {IFormModal, IValues, RestOperation} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
-
-type FormModal = {
-  id: string,
-  title?: string,
-  fields: IFields,
-  values: IValues,
-  position?: string,
-  content: () => JSX.Element,
-  onOpen?: (selected: any) => void,
-  open?: boolean,
-};
 
 interface ControlledListProps<T> {
   dataKey: string[],
-  isLoading: boolean;
+  isLoading?: boolean;
   error?: string | null;
-  emptyMessage: string;
-  data: T[];
-  dropdown?: { id: string, title: string, empty: string, data: string[], formModal?: FormModal};
-  formModal?: FormModal;
+  emptyMessage?: string;
+  data?: T[];
+  dropdown?: { id: string, title: string, empty: string, data: string[], formModal?: IFormModal};
+  formModal?: IFormModal;
   show: (index: number, element: T, separate: boolean, checked: boolean,
          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void) => JSX.Element;
   onAdd?: (data: string) => void;
   onAddInput?: (input: IValues) => void;
-  onRemove: (data: string[]) => void;
-  onDelete: RestOperation;
+  onRemove?: (data: string[]) => void;
+  onDelete?: RestOperation;
 }
 
 type Props<T> = ControlledListProps<T>;
@@ -55,7 +44,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   state: State<T> = {};
 
   componentDidMount(): void {
-    this.init()
+    this.initDropdown();
   }
 
   componentDidUpdate(prevProps: Readonly<Props<T>>, prevState: Readonly<State<T>>, snapshot?: any): void {
@@ -65,16 +54,16 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                                                   .every(checked => checked);
     }
     if (prevProps.data !== this.props.data) {
-      this.setState(this.props.data.reduce((state: State<T>, data) => {
+      this.setState((this.props.data || []).reduce((state: State<T>, data) => {
         const dataStateKey = this.getDataStateKey(data);
         state[dataStateKey] = { value: data, isChecked: false, isNew: false };
         return state;
       }, {}));
     }
-    this.init();
+    this.initDropdown();
   }
 
-  private init = () =>
+  private initDropdown = () =>
     M.Dropdown.init(this.dropdown.current as Element,
       {
         onOpenEnd: this.onOpenDropdown
@@ -153,13 +142,14 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   };
 
   private onRemove = (): void => {
+    if (!this.props.onDelete) {
+      return console.error('onDelete not defined');
+    }
     const checkedData = Object.entries(this.state).filter(([_, data]) => data?.isChecked);
-    console.log(checkedData)
     const unpersistedData = checkedData.filter(([_, data]) => data?.isNew).map(([name, _]) => name);
-    console.log(unpersistedData)
     if (unpersistedData.length) {
       this.invalidateStateData(unpersistedData);
-      this.props.onRemove(unpersistedData);
+      this.props.onRemove?.(unpersistedData);
     }
     const persistedData = checkedData.filter(([_, data]) => !data?.isNew).map(([name, _]) => name);
     if (persistedData.length) {
@@ -175,7 +165,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
 
   private onDeleteSuccess = (data: string[]): void => {
     this.invalidateStateData(data);
-    this.props.onDelete.successCallback(data);
+    this.props.onDelete?.successCallback(data);
   };
 
   private invalidateStateData = (data: string[]): void =>
@@ -185,9 +175,9 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     }, {}));
 
   private onDeleteFailure = (reason: string): void =>
-    this.props.onDelete.failureCallback(reason);
+    this.props.onDelete?.failureCallback(reason);
 
-  private inputDialog = (formModal: FormModal, preSelected?: boolean): JSX.Element => {
+  private inputDialog = (formModal: IFormModal, preSelected?: boolean): JSX.Element => {
     return <InputDialog id={formModal.id}
                         title={formModal.title}
                         fields={formModal.fields}

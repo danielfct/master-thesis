@@ -94,7 +94,7 @@ class Region extends BaseComponent<Props, {}> {
   private isActiveOption = (active: string): string =>
     active;
 
-  private details = () => {
+  private region = () => {
     const {isLoading, error, formRegion, region} = this.props;
     // @ts-ignore
     const regionKey: (keyof IRegion) = formRegion && Object.keys(formRegion)[0];
@@ -134,7 +134,7 @@ class Region extends BaseComponent<Props, {}> {
     {
       title: 'Region',
       id: 'region',
-      content: () => this.details()
+      content: () => this.region()
     },
   ];
 

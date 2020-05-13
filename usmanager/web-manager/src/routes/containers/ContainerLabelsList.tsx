@@ -14,7 +14,7 @@ export default class ContainerLabelsList extends BaseComponent<Props, {}> {
 
   private label = (label: string, index: number): JSX.Element =>
     <ListItem key={index} separate={index != this.props.labels.length - 1}>
-      <div className={`${styles.itemContent}`}>
+      <div className={`${styles.listItemContent}`}>
         <span>{label}</span>
       </div>
     </ListItem>;

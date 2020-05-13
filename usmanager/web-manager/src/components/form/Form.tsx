@@ -22,19 +22,23 @@
  * SOFTWARE.
  */
 
-import React from "react";
+import React, {createRef} from "react";
 import {deleteData, postData, putData} from "../../utils/api";
 import styles from './Form.module.css';
 import {RouteComponentProps, withRouter} from "react-router";
 import {getTypeFromValue, FieldProps, IValidation} from "./Field";
-import {camelCaseToSentenceCase} from "../../utils/text";
+import {camelCaseToSentenceCase, decodeHTML} from "../../utils/text";
 import ConfirmDialog from "../dialogs/ConfirmDialog";
 import {isEqualWith} from "lodash";
 import ActionProgressBar from "./ActionProgressBar";
+import PerfectScrollbar from "react-perfect-scrollbar";
+import ScrollBar from "react-perfect-scrollbar";
+import M from "materialize-css";
 
 export type RestOperation = {
   textButton?: string,
   url: string,
+  beforeCallback?: () => boolean,
   successCallback: (reply?: any, args?: any) => void,
   failureCallback: (reason: string, args?: any) => void
 }
@@ -51,7 +55,18 @@ export interface IErrors {
   [key: string]: string;
 }
 
-interface FormPageProps {
+export interface IFormModal {
+  id: string,
+  title?: string,
+  fields: IFields,
+  values: IValues,
+  position?: string,
+  content: () => JSX.Element,
+  onOpen?: (selected: any) => void,
+  open?: boolean,
+}
+
+interface FormProps {
   id: string;
   fields: IFields;
   values: IValues;
@@ -62,6 +77,7 @@ interface FormPageProps {
   delete?: RestOperation;
   controlsMode?: 'top' | 'modal';
   onModalConfirm?: (values: IValues) => void;
+  dropdown?: { id: string, title: string, empty: string, data: string[]};
   saveEntities?: (args: any) => void;
   editable?: boolean;
   deletable?: boolean;
@@ -69,7 +85,7 @@ interface FormPageProps {
   loading?: boolean;
 }
 
-type Props = FormPageProps & RouteComponentProps;
+type Props = FormProps & RouteComponentProps;
 
 interface State {
   values: IValues;
@@ -127,6 +143,9 @@ export const requiredAndNumberAndMinAndMax = (values: IValues, fieldName: string
 
 class Form extends React.Component<Props, State> {
 
+  private dropdown = createRef<HTMLButtonElement>();
+  private scrollbar: (ScrollBar | null) = null;
+
   state: State = {
     values: this.props.values,
     savedValues: this.props.values,
@@ -135,6 +154,10 @@ class Form extends React.Component<Props, State> {
     saveRequired: false,
     isLoading: !!this.props.loading,
   };
+
+  componentDidMount(): void {
+    this.initDropdown();
+  }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if (prevProps.showSaveButton !== this.props.showSaveButton
@@ -155,7 +178,18 @@ class Form extends React.Component<Props, State> {
     if (prevProps.loading !== this.props.loading) {
       this.setState({isLoading: !!this.props.loading});
     }
+
+    this.initDropdown();
   }
+
+  private initDropdown = () =>
+    M.Dropdown.init(this.dropdown.current as Element,
+      {
+        onOpenEnd: this.onOpenDropdown
+      });
+
+  private onOpenDropdown = () =>
+    this.scrollbar?.updateScroll();
 
   private saveRequired = () => {
     return !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
@@ -206,41 +240,55 @@ class Form extends React.Component<Props, State> {
     }
   };
 
-  private handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
-    if (!this.validateForm()) {
-      return;
+  private handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {id, checked} = event.target;
+    const stateValue = Object.values(this.state.values).find((region: any) => region.name === id);
+    if (stateValue) {
+      stateValue.checked = checked;
     }
+    //this.setState({regions: this.state.regions, displayNoRegionsError: false});
+  };
+
+  private handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+   Object.values(this.state.values).find((region: any) => console.log(region));
+    event.preventDefault();
+    const validate = this.validateForm();
     const {isNew, post, put, saveEntities} = this.props;
     const args = this.state.values;
     if (isNew) {
       if (post?.url) {
-        postData(post.url, this.state.values,
-          (reply) => {
-            post.successCallback(reply, args);
-            this.setState({savedValues: this.state.values, isLoading: false});
-          },
-          (reply) => {
-            post.failureCallback(reply, args);
-            this.setState({isLoading: false});
-          });
-        this.setState({isLoading: true});
-      }
-    } else {
-      if (put?.url) {
-        if (this.saveRequired()) {
-          putData(put.url, this.state.values,
-            () => {
-              put.successCallback(args);
+        const beforeSubmit = post.beforeCallback?.();
+        if (validate && beforeSubmit) {
+          postData(post.url, this.state.values,
+            (reply) => {
+              post.successCallback(reply, args);
               this.setState({savedValues: this.state.values, isLoading: false});
             },
             (reply) => {
-              put.failureCallback(reply, args);
+              post.failureCallback(reply, args);
               this.setState({isLoading: false});
             });
           this.setState({isLoading: true});
-        } else {
-          saveEntities?.(args);
+        }
+      }
+    } else {
+      if (put?.url) {
+        const beforeSubmit = put.beforeCallback?.();
+        if (validate && beforeSubmit) {
+          if (this.saveRequired()) {
+            putData(put.url, this.state.values,
+              () => {
+                put.successCallback(args);
+                this.setState({savedValues: this.state.values, isLoading: false});
+              },
+              (reply) => {
+                put.failureCallback(reply, args);
+                this.setState({isLoading: false});
+              });
+            this.setState({isLoading: true});
+          } else {
+            saveEntities?.(args);
+          }
         }
       }
     }
@@ -262,6 +310,13 @@ class Form extends React.Component<Props, State> {
   private clearValues = () =>
     this.setState({values: this.props.values, errors: {}});
 
+  private onAdd = (event: React.MouseEvent<HTMLLIElement>): void => {
+    const data = decodeHTML((event.target as HTMLLIElement).innerHTML);
+    // @ts-ignore
+    this.setState({ [data]: { value: data, isChecked: false, isNew: true } });
+    //TODO this.props.onAdd?.(data);
+  };
+
   render() {
     const context: IFormContext = {
       ...this.state,
@@ -269,7 +324,7 @@ class Form extends React.Component<Props, State> {
       validate: this.validate
     };
     const {saveRequired, isLoading} = this.state;
-    const {id, isNew, values, controlsMode, editable, deletable, customButtons, children} = this.props;
+    const {id, isNew, values, controlsMode, editable, deletable, customButtons, dropdown, children} = this.props;
     return (
       <>
         <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>
@@ -311,6 +366,33 @@ class Form extends React.Component<Props, State> {
                     </div>
                   </div>
                 }
+                {dropdown && (
+                  <>
+                    <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                            data-position="bottom" data-tooltip={dropdown.title}
+                            data-target={`dropdown-${dropdown.id}`}
+                            ref={this.dropdown}>
+                      <i className="material-icons">add</i>
+                    </button>
+                    <ul id={`dropdown-${dropdown.id}`}
+                        className={`dropdown-content ${styles.dropdown}`}>
+                      <li className={`${styles.disabled}`}>
+                        <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : undefined}`}>
+                          {dropdown.data.length ? dropdown.title : dropdown.empty}
+                        </a>
+                      </li>
+                      <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
+                        {dropdown.data.map((data, index) =>
+                          <li key={index} onClick={this.onAdd}>
+                            <a>
+                              {data}
+                            </a>
+                          </li>
+                        )}
+                      </PerfectScrollbar>
+                    </ul>
+                  </>
+                )}
               </div>
               <ActionProgressBar loading={isLoading}/>
             </div>

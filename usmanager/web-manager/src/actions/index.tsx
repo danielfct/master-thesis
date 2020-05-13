@@ -742,6 +742,21 @@ const fetchContainers = (id?: string) => ({
       }
 });
 
+
+export const LOAD_BALANCERS_REQUEST = 'LOAD_BALANCERS_REQUEST';
+export const LOAD_BALANCERS_SUCCESS = 'LOAD_BALANCERS_SUCCESS';
+export const LOAD_BALANCERS_FAILURE = 'LOAD_BALANCERS_FAILURE';
+export const loadLoadBalancers = () => (dispatch: any) => {
+  return dispatch(fetchLoadBalancers());
+};
+const fetchLoadBalancers = () => ({
+  [CALL_API]: {
+    types: [ LOAD_BALANCERS_REQUEST, LOAD_BALANCERS_SUCCESS, LOAD_BALANCERS_FAILURE ],
+    endpoint: `load-balancer`,
+    schema: Schemas.LOAD_BALANCER_ARRAY,
+  }
+});
+
 export const LOGS_REQUEST = 'LOGS_REQUEST';
 export const LOGS_SUCCESS = 'LOGS_SUCCESS';
 export const LOGS_FAILURE = 'LOGS_FAILURE';

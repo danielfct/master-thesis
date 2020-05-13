@@ -160,7 +160,7 @@ class CloudHost extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
-  private details = () => {
+  private cloudHost = () => {
     const {isLoading, error, formCloudHost, cloudHost} = this.props;
     // @ts-ignore
     const cloudHostKey: (keyof ICloudHost) = cloudHost && Object.keys(cloudHost)[0];
@@ -213,7 +213,7 @@ class CloudHost extends BaseComponent<Props, {}> {
     {
       title: 'Cloud host',
       id: 'cloudHost',
-      content: () => this.details()
+      content: () => this.cloudHost()
     },
     {
       title: 'Rules',

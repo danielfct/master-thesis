@@ -173,7 +173,7 @@ class Node extends BaseComponent<Props, {}> {
 
   //TODO put={{url: `conditions/${this.state.nodeName || condition[conditionKey]}` on every class
 
-  private details = (node: any, formFields: JSX.Element) => {
+  private node = (node: any, formFields: JSX.Element) => {
     const {isLoading, error} = this.props;
     // @ts-ignore
     const nodeKey: (keyof INode) = Object.keys(node)[0];
@@ -204,19 +204,19 @@ class Node extends BaseComponent<Props, {}> {
         {
           title: 'Host',
           id: 'nodeOnHost',
-          content: () => this.details(this.props.nodeHost, this.formFieldsHost())
+          content: () => this.node(this.props.nodeHost, this.formFieldsHost())
         },
         {
           title: 'Location',
           id: 'nodeUsingLocation',
-          content: () => this.details(this.props.nodeLocation, this.formFieldsLocation())
+          content: () => this.node(this.props.nodeLocation, this.formFieldsLocation())
         }
       ]
       : [
         {
           title: 'Node',
           id: 'node',
-          content: () => this.details(this.props.node, this.formFields())
+          content: () => this.node(this.props.node, this.formFields())
         },
       ];
 

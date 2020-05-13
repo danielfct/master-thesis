@@ -67,6 +67,8 @@ import ServiceRule from "../routes/rules/services/ServiceRule";
 import Rules from "../routes/rules/Rules";
 import Conditions from "../routes/rules/conditions/Conditions";
 import Condition from "../routes/rules/conditions/Condition";
+import LoadBalancers from "../routes/loadBalancer/LoadBalancers";
+import LoadBalancer from "../routes/loadBalancer/LoadBalancer";
 
 interface RootContainerProps {
     store: any;
@@ -108,8 +110,9 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/metrics/simulated/hosts/specific/metric/:id?": { component: SpecificHostSimulatedMetricsDetail },
     "/regions": { component: Regions, search: true },
     "/regions/:name": { component: Region },
+    "/load-balancers": { component: LoadBalancers, search: true },
+    "/load-balancers/:id": { component: LoadBalancer, search: true },
     "/eureka": { component: EurekaPage, search: true },
-    "/loadbalancer": { component: LoadBalancerPage, search: true },
     "/logs": { component: Logs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };

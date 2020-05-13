@@ -17,7 +17,8 @@ export interface IValidation {
 
 export interface FieldProps<T = string> {
   id: string;
-  type?: "textbox" | "datebox" | "numberbox" | "multilinetextbox" | "collapsible" | "dropdown" | "datepicker" | "timepicker";
+  type?: "textbox" | "datebox" | "numberbox" | "multilinetextbox" | "collapsible" | "dropdown" | "datepicker"
+    | "timepicker";
   label?: string;
   dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
   number?: { min: number, max: number };
@@ -94,7 +95,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
               {label && (
                 <>
                   {(icon === undefined || icon) &&
-                  <i className="material-icons prefix">{mapLabelToIcon(label)}</i>}
+                   <i className="material-icons prefix">{mapLabelToIcon(label)}</i>}
                   <label className="active" htmlFor={id}>
                     {camelCaseToSentenceCase(label)}
                   </label>
