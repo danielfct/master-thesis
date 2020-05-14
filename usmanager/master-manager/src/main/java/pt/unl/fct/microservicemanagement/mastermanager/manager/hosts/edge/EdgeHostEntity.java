@@ -22,25 +22,16 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -53,14 +44,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 
+import java.util.Set;
+
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "host_rules")
-public class HostRuleEntity {
+@Table(name = "edge_hosts")
+public class EdgeHostEntity {
 
   @Id
   @GeneratedValue
@@ -68,40 +61,35 @@ public class HostRuleEntity {
 
   @NotNull
   @Column(unique = true)
-  private String name;
+  private String hostname;
 
-  private int priority;
+  private String sshUsername;
 
-  private boolean generic;
+  // Base64 format
+  private String sshPassword;
 
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
+  private String region;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
-  private List<EdgeHostEntity> edgeHosts;
+  private String country;
 
-  @Singular
-  @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
-  private List<CloudHostEntity> cloudHosts;
+  private String city;
+
+  private boolean isLocal;
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<HostRuleConditionEntity> conditions = new HashSet<>();
+  @ManyToMany(mappedBy = "edgeHosts", cascade = CascadeType.ALL)
+  private Set<HostRuleEntity> hostRules;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof HostRuleEntity)) {
+    if (!(o instanceof EdgeHostEntity)) {
       return false;
     }
-    HostRuleEntity other = (HostRuleEntity) o;
+    EdgeHostEntity other = (EdgeHostEntity) o;
     return id != null && id.equals(other.getId());
   }
 

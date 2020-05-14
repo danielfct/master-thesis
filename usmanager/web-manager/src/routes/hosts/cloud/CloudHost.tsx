@@ -106,7 +106,7 @@ class CloudHost extends BaseComponent<Props, {}> {
   };
 
   private onDeleteFailure = (reason: string, cloudHostInstanceId: string): void =>
-    super.toast(`Unable to remove cloud host ${cloudHostInstanceId}`, 10000, reason, true);
+    super.toast(`Unable to ${this.props.cloudHost.state?.name.includes('stopped') ? 'terminate' : 'stop'} cloud host ${cloudHostInstanceId}`, 10000, reason, true);
 
   private onAddCloudHostRule = (rule: string): void => {
     this.setState({
@@ -160,10 +160,34 @@ class CloudHost extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
+  private startButton = () =>
+    <button className={`btn-flat btn-small waves-effect waves-light blue-text`} onClick={this.startCloudHost}>
+      Start
+    </button>;
+
+  private startCloudHost = () => {
+    this.setState({isLoading: true});
+    postData(`hosts/cloud`, undefined,
+      (reply) => this.onStartSuccess(reply),
+      (reply) => this.onStartFailure(reply));
+  };
+
+  private onStartSuccess = (reply: any) => {
+    super.toast(`Successfully started cloud host ${this.props.cloudHost.instanceId}`, 15000);
+    this.setState({isLoading: false});
+  };
+
+  private onStartFailure = (reply: any) => {
+    super.toast(`Failed to start cloud host ${this.props.cloudHost.instanceId}`, 10000, reply, true);
+    this.setState({isLoading: false});
+  };
+
   private cloudHost = () => {
     const {isLoading, error, formCloudHost, cloudHost} = this.props;
     // @ts-ignore
     const cloudHostKey: (keyof ICloudHost) = cloudHost && Object.keys(cloudHost)[0];
+    const isNew = isNewHost(this.props.match.params.instanceId);
+    const cloudHostState = cloudHost.state?.name;
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
@@ -172,7 +196,7 @@ class CloudHost extends BaseComponent<Props, {}> {
           <Form id={cloudHostKey}
                 fields={this.getFields(formCloudHost)}
                 values={cloudHost}
-                isNew={isNewHost(this.props.match.params.instanceId)}
+                isNew={isNew}
                 showSaveButton={this.shouldShowSaveButton()}
                 post={{
                   url: 'hosts/cloud',
@@ -182,10 +206,12 @@ class CloudHost extends BaseComponent<Props, {}> {
                   url: `hosts/cloud/${this.state.instanceId || cloudHost[cloudHostKey]}`,
                   successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={{
-                  textButton: 'Stop',
-                  url: `hosts/cloud/${cloudHost[cloudHostKey]}`,
+                  textButton: cloudHostState?.includes('stopped') ? 'Terminate' : 'Stop',
+                  url: `hosts/cloud/${cloudHost[cloudHostKey]}/${cloudHostState?.includes('stopped') ? 'terminate' : 'stop'}`,
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure}}
+                deletable={cloudHostState !== 'terminated'}
+                customButtons={cloudHostState?.includes('stopped') ? this.startButton() : undefined}
                 saveEntities={this.saveEntities}
                 editable={false}>
             {/*//TODO instanceType dropdown?*/}
@@ -245,6 +271,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const error = state.entities.hosts.cloud.loadHostsError;
   const instanceId = props.match.params.instanceId;
   const cloudHost = isNewHost(instanceId) ? emptyCloudHost() : state.entities.hosts.cloud.data[instanceId];
+  console.log(cloudHost)
   let formCloudHost;
   if (cloudHost) {
     formCloudHost = {...cloudHost};

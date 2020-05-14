@@ -43,6 +43,7 @@ interface Props<T> {
             index?: number,
             last?: boolean
         },
+        position?: 'top' | 'bottom' | 'top-bottom';
     };
 }
 

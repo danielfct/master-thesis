@@ -1,10 +1,10 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.CloudHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.CloudHostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.Condition;

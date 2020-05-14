@@ -22,48 +22,27 @@
  * SOFTWARE.
  */
 
-.list {
-}
+package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-.pagination {
-    width: 100%;
-    text-align: center;
-    margin: 5px 0;
-    right: 0;
-}
+@NoArgsConstructor
+@Getter
+@Setter
+@Configuration
+@ConfigurationProperties("host")
+public class HostProperties {
 
+  private long monitorPeriod;
+  private int startHostOnEventsCount;
+  private int stopHostOnEventsCount;
+  private int minimumHosts;
+  private int maximumHosts;
+  private double maximumRamPercentage;
+  private double maximumCpuPercentage;
 
-.pagination > li > a {
-    cursor: pointer;
-    color: white;
-    font-size: 1rem;
-}
-
-.pagination li {
-    border: 1px solid transparent;
-}
-
-.pagination li.active {
-    background-color: #1F1F1F;
-    border: 1px solid black;
-}
-
-.pagination li.disabled {
-    opacity: 0.25;
-}
-
-.pageSize {
-    position: absolute;
-    top: 65px;
-    right: 100px;
-    color: white;
-    display: inline;
-    width: 150px;
-}
-
-@media only screen and (max-width: 760px) {
-    .pageSize {
-        visibility: hidden;
-    }
 }

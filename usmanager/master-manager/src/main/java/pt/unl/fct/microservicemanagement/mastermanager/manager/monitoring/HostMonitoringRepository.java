@@ -31,7 +31,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostFieldAvg;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostFieldAvg;
 
 @Repository
 public interface HostMonitoringRepository extends CrudRepository<HostMonitoringEntity, Long> {
@@ -54,14 +54,14 @@ public interface HostMonitoringRepository extends CrudRepository<HostMonitoringE
 
   //TODO fix path
 
-  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostFieldAvg(monitoring.hostname, "
+  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostFieldAvg(monitoring.hostname, "
       + "monitoring.field, monitoring.sumValue / monitoring.count, monitoring.count) "
       + "from HostMonitoringEntity monitoring "
       + "where monitoring.hostname = :hostname and monitoring.field = :field")
   HostFieldAvg getAvgHostField(@Param("hostname") String hostname, @Param("field") String field);
 
   //TODO fix path
-  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostFieldAvg(monitoring.hostname, "
+  @Query("select new pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostFieldAvg(monitoring.hostname, "
       + "monitoring.field, monitoring.sumValue / monitoring.count, monitoring.count) "
       + "from HostMonitoringEntity monitoring "
       + "where monitoring.hostname = :hostname")

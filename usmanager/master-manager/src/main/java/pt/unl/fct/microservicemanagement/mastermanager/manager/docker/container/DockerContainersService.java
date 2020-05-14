@@ -31,9 +31,9 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCore
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.LaunchDockerApiProxyException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.loadBalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;

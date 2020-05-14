@@ -1,4 +1,8 @@
 .listItemContent {
-    padding: 3px 20px;
+    margin: 3px;
     color: white;
+}
+
+.logsListContainer {
+    padding: 10px 30px;
 }

@@ -22,14 +22,11 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
+import com.amazonaws.services.ec2.model.InstanceState;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -37,10 +34,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -59,8 +53,8 @@ import lombok.Singular;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "host_rules")
-public class HostRuleEntity {
+@Table(name = "cloud_hosts")
+public class CloudHostEntity {
 
   @Id
   @GeneratedValue
@@ -68,40 +62,28 @@ public class HostRuleEntity {
 
   @NotNull
   @Column(unique = true)
-  private String name;
+  private String instanceId;
 
-  private int priority;
+  @Column(unique = true)
+  private String publicIpAddress;
 
-  private boolean generic;
-
-  @ManyToOne
-  @JoinColumn(name = "decision_id")
-  private DecisionEntity decision;
+  @NotNull
+  private InstanceState state;
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
-  private List<EdgeHostEntity> edgeHosts;
-
-  @Singular
-  @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
-  private List<CloudHostEntity> cloudHosts;
-
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<HostRuleConditionEntity> conditions = new HashSet<>();
+  @ManyToMany(mappedBy = "cloudHosts", cascade = CascadeType.ALL)
+  private Set<HostRuleEntity> hostRules;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof HostRuleEntity)) {
+    if (!(o instanceof CloudHostEntity)) {
       return false;
     }
-    HostRuleEntity other = (HostRuleEntity) o;
+    CloudHostEntity other = (CloudHostEntity) o;
     return id != null && id.equals(other.getId());
   }
 

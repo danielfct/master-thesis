@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.ContainersMonitoringService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.HostsMonitoringService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.MasterManagerMonitoringService;

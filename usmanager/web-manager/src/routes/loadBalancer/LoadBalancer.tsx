@@ -65,14 +65,6 @@ class LoadBalancer extends BaseComponent<Props, {}> {
     this.props.loadRegions();
   }
 
-  /*  private checkRegions = (): boolean => {
-      const someChecked = this.state.regions.some(region => region.checked);
-      if (!someChecked) {
-        this.setState({displayNoRegionsError: true});
-      }
-      return someChecked;TODO
-    };*/
-
   private onPostSuccess = (reply: any): void => {
     console.log(reply); //TODO show which id it started at
     //super.toast(`Load balancer Edge host <b>${edgeHostHostname}</b> is now saved`);
@@ -126,7 +118,7 @@ class LoadBalancer extends BaseComponent<Props, {}> {
                 isNew={isLaunchLoadBalancer(this.props.match.params.id)}
                 post={{
                   textButton: 'launch',
-                  url: 'loadBalancers',
+                  url: 'containers/loadBalancer',
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure}}
                 delete={{
@@ -154,16 +146,7 @@ class LoadBalancer extends BaseComponent<Props, {}> {
                              id={key}
                              label={key}/>
             ))}
-            {/*<div className='input-field'>
-              <h6 className={'white-text'}>Regions</h6>
-              {this.state.displayNoRegionsError && (
-                <span className='helper-text red-text darken-3'>At least one region is required</span>)}
-            </div>
-            {regions.map((region, index) =>
-              this.region(index, region.name, region.checked)
-            )}*/}
           </Form>
-
         )}
       </>
     )

@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.SimulatedMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus.PrometheusService;
 

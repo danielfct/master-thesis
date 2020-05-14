@@ -22,48 +22,29 @@
  * SOFTWARE.
  */
 
-.list {
-}
+package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceState;
+import lombok.Data;
 
-.pagination {
-    width: 100%;
-    text-align: center;
-    margin: 5px 0;
-    right: 0;
-}
+@Data
+public final class AwsSimpleInstance {
 
+  private final String instanceId;
+  private final String imageId;
+  private final String instanceType;
+  private final InstanceState state;
+  private final String publicDnsName;
+  private final String publicIpAddress;
 
-.pagination > li > a {
-    cursor: pointer;
-    color: white;
-    font-size: 1rem;
-}
+  AwsSimpleInstance(Instance instance) {
+    this.instanceId = instance.getInstanceId();
+    this.imageId = instance.getImageId();
+    this.instanceType = instance.getInstanceType();
+    this.state = instance.getState();
+    this.publicDnsName = instance.getPublicDnsName();
+    this.publicIpAddress = instance.getPublicIpAddress();
+  }
 
-.pagination li {
-    border: 1px solid transparent;
-}
-
-.pagination li.active {
-    background-color: #1F1F1F;
-    border: 1px solid black;
-}
-
-.pagination li.disabled {
-    opacity: 0.25;
-}
-
-.pageSize {
-    position: absolute;
-    top: 65px;
-    right: 100px;
-    color: white;
-    display: inline;
-    width: 150px;
-}
-
-@media only screen and (max-width: 760px) {
-    .pageSize {
-        visibility: hidden;
-    }
 }

@@ -1,7 +1,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.CloudHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 

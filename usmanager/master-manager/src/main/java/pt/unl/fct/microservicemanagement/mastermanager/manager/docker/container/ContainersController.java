@@ -24,12 +24,15 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.loadBalancer.nginx.NginxLoadBalancerService;
+import net.minidev.json.JSONArray;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +41,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
 @RestController
 @RequestMapping("/containers")
@@ -63,18 +65,15 @@ public class ContainersController {
     return dockerContainersService.getContainers();
   }
 
-  @PostMapping
-  public SimpleContainer launchContainer(@RequestBody LaunchServiceReq launchServiceReq) {
-    String hostname = launchServiceReq.getHostname();
-    String serviceName = launchServiceReq.getService();
-    String internalPort = launchServiceReq.getInternalPort();
-    String externalPort = launchServiceReq.getExternalPort();
-    return dockerContainersService.launchContainer(hostname, serviceName, internalPort, externalPort);
-  }
-
   @GetMapping("/{id}")
   public SimpleContainer getContainer(@PathVariable String id) {
     return dockerContainersService.getContainer(id);
+  }
+
+  @PostMapping
+  public SimpleContainer launchContainer(@Json String hostname, @Json String service,
+                                         @Json String internalPort, @Json String externalPort) {
+    return dockerContainersService.launchContainer(hostname, service, internalPort, externalPort);
   }
 
   @DeleteMapping("/{id}")
@@ -84,13 +83,11 @@ public class ContainersController {
 
   @PostMapping("/{id}/replicate")
   public SimpleContainer replicateContainer(@PathVariable String id, @Json String hostname) {
-    System.out.println(hostname); //TODO
     return dockerContainersService.replicateContainer(id, hostname);
   }
 
   @PostMapping("/{id}/migrate")
   public SimpleContainer migrateContainer(@PathVariable String id, @Json String hostname) {
-    System.out.println(hostname); //TODO
     return dockerContainersService.migrateContainer(id, hostname);
   }
 
@@ -104,16 +101,14 @@ public class ContainersController {
     return dockerContainersService.launchMicroserviceApplication(appId, region, country, city);
   }
 
+  @PostMapping("/loadBalancer")
+  public List<String> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
+    return nginxLoadBalancerService.launchLoadBalancers(service, regions.toArray(new String[0]));
+  }
+
   @PostMapping("/eureka")
   public List<SimpleContainer> launchEureka(@RequestBody List<RegionEntity> regions) {
     return eurekaService.launchEurekaServers(regions);
-  }
-
-  @PostMapping("/loadBalancer")
-  public List<String> launchLoadBalancer(@RequestBody LaunchLoadBalacerReq loadBalancerReq) {
-    final var serviceName = loadBalancerReq.getServiceName();
-    final var regions = loadBalancerReq.getRegions();
-    return nginxLoadBalancerService.launchLoadBalancers(serviceName, regions);
   }
 
 }

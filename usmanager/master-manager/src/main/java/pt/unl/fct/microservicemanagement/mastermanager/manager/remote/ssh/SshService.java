@@ -26,9 +26,9 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.cloud.aws.AwsProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.edge.EdgeHostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 
 import java.io.File;
 import java.io.IOException;

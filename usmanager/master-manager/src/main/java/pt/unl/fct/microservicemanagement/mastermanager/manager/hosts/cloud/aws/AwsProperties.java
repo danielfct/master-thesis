@@ -22,48 +22,49 @@
  * SOFTWARE.
  */
 
-.list {
-}
+package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-.pagination {
-    width: 100%;
-    text-align: center;
-    margin: 5px 0;
-    right: 0;
-}
+@Getter
+@Configuration
+@ConfigurationProperties("aws")
+public class AwsProperties {
 
+  private final AwsProperties.Access access;
+  private final AwsProperties.Instance instance;
 
-.pagination > li > a {
-    cursor: pointer;
-    color: white;
-    font-size: 1rem;
-}
+  public AwsProperties() {
+    this.access = new Access();
+    this.instance = new Instance();
+  }
 
-.pagination li {
-    border: 1px solid transparent;
-}
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  @Getter
+  @Setter
+  public static final class Access {
 
-.pagination li.active {
-    background-color: #1F1F1F;
-    border: 1px solid black;
-}
+    private String keyFilePath;
+    private String username;
+    private String key;
+    private String secretKey;
 
-.pagination li.disabled {
-    opacity: 0.25;
-}
+  }
 
-.pageSize {
-    position: absolute;
-    top: 65px;
-    right: 100px;
-    color: white;
-    display: inline;
-    width: 150px;
-}
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  @Getter
+  @Setter
+  public static final class Instance {
 
-@media only screen and (max-width: 760px) {
-    .pageSize {
-        visibility: hidden;
-    }
+    private int initialMaxInstances;
+    private String type;
+    private int delay;
+
+  }
+
 }

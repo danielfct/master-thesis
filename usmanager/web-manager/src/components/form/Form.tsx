@@ -336,7 +336,8 @@ class Form extends React.Component<Props, State> {
     const {id, isNew, values, controlsMode, editable, deletable, customButtons, dropdown, children} = this.props;
     return (
       <>
-        <ConfirmDialog message={`delete ${values[id]}`} confirmCallback={this.onClickDelete}/>
+        <ConfirmDialog message={`${this.props.delete?.textButton?.toLowerCase() || 'delete'} ${values[id]}`}
+                       confirmCallback={this.onClickDelete}/>
         <form onSubmit={this.handleSubmit} noValidate>
           {(controlsMode === undefined || controlsMode === 'top') && (
             <div>

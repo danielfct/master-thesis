@@ -26,7 +26,6 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
@@ -91,8 +90,7 @@ public class ServicesController {
   }
 
   @DeleteMapping("/{serviceName}/apps")
-  public void removeServiceApps(@PathVariable String serviceName,
-                                @RequestBody String[] apps) {
+  public void removeServiceApps(@PathVariable String serviceName, @RequestBody String[] apps) {
     servicesService.removeApps(serviceName, Arrays.asList(apps));
   }
 
@@ -107,14 +105,12 @@ public class ServicesController {
   }
 
   @PostMapping("/{serviceName}/dependencies")
-  public void addServiceDependencies(@PathVariable String serviceName,
-                                     @RequestBody String[] dependencies) {
+  public void addServiceDependencies(@PathVariable String serviceName, @RequestBody String[] dependencies) {
     servicesService.addDependencies(serviceName, Arrays.asList(dependencies));
   }
 
   @DeleteMapping("/{serviceName}/dependencies")
-  public void removeServiceDependencies(@PathVariable String serviceName,
-                                        @RequestBody String[] dependencies) {
+  public void removeServiceDependencies(@PathVariable String serviceName, @RequestBody String[] dependencies) {
     servicesService.removeDependencies(serviceName, Arrays.asList(dependencies));
   }
 
@@ -170,18 +166,6 @@ public class ServicesController {
   @DeleteMapping("/{serviceName}/rules/{ruleName}")
   public void removeServiceRule(@PathVariable String serviceName, @PathVariable String ruleName) {
     servicesService.removeRule(serviceName, ruleName);
-  }
-
-  //TODO change to ?search=
-  @PostMapping("/search/dockerRepo")
-  public List<ServiceEntity> getServiceByDockerRepo(@RequestBody SearchDockerRepository searchDockerRepository) {
-    return servicesService.getServicesByDockerRepository(searchDockerRepository.getDockerRepo());
-  }
-
-  //TODO change to ?search=
-  @GetMapping("/search/name/{serviceName}")
-  public ServiceEntity getServiceByDockerRepo(@PathVariable String serviceName) {
-    return servicesService.getService(serviceName);
   }
 
 }

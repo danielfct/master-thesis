@@ -14,7 +14,7 @@ export default class ContainerLogsList extends BaseComponent<Props, {}> {
 
   private logs = (logs: string, index: number): JSX.Element =>
     <ListItem key={index}>
-      <div className={styles.itemContent}>
+      <div className={styles.listItemContent}>
         <span>{logs}</span>
       </div>
     </ListItem>;
@@ -22,9 +22,12 @@ export default class ContainerLogsList extends BaseComponent<Props, {}> {
   render() {
     const LogsList = List<string>();
     return (
-      <LogsList emptyMessage={`No logs available`}
-                 list={this.props.logs}
-                 show={this.logs}/>
+      <div className={styles.logsListContainer}>
+        <LogsList emptyMessage={`No logs available`}
+                  list={this.props.logs}
+                  show={this.logs}
+                  paginate={{pagesize: {initial: 50}, position: 'top-bottom'}}/>
+      </div>
     );
   }
 

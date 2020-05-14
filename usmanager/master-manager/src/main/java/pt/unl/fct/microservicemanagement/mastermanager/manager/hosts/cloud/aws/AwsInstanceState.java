@@ -22,48 +22,29 @@
  * SOFTWARE.
  */
 
-.list {
-}
+package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
+public enum AwsInstanceState {
+  PENDING("pending", 0),
+  RUNNING("running", 16),
+  SHUTTING_DOWN("shutting_down", 32),
+  TERMINATED("terminated", 48),
+  STOPPING("stopping", 64),
+  STOPPED("stopped", 80);
 
-.pagination {
-    width: 100%;
-    text-align: center;
-    margin: 5px 0;
-    right: 0;
-}
+  private final String name;
+  private final int code;
 
+  AwsInstanceState(String name, int code) {
+    this.name = name;
+    this.code = code;
+  }
 
-.pagination > li > a {
-    cursor: pointer;
-    color: white;
-    font-size: 1rem;
-}
+  public String getName() {
+    return name;
+  }
 
-.pagination li {
-    border: 1px solid transparent;
-}
-
-.pagination li.active {
-    background-color: #1F1F1F;
-    border: 1px solid black;
-}
-
-.pagination li.disabled {
-    opacity: 0.25;
-}
-
-.pageSize {
-    position: absolute;
-    top: 65px;
-    right: 100px;
-    color: white;
-    display: inline;
-    width: 150px;
-}
-
-@media only screen and (max-width: 760px) {
-    .pageSize {
-        visibility: hidden;
-    }
+  public int getCode() {
+    return code;
+  }
 }

@@ -14,6 +14,7 @@ import {connect} from "react-redux";
 import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
 import {postData} from "../../utils/api";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
+import {decodeHTML} from "../../utils/text";
 
 export interface IApp extends Data {
   name: string;
@@ -48,12 +49,14 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 type State = {
   unsavedServices: IAddAppService[],
   appName?: string,
+  isLoading: boolean,
 }
 
 class App extends BaseComponent<Props, State> {
 
   state: State = {
-    unsavedServices: []
+    unsavedServices: [],
+    isLoading: false,
   };
 
   componentDidMount(): void {
@@ -140,10 +143,33 @@ class App extends BaseComponent<Props, State> {
   private shouldShowSaveButton = () =>
     !!this.state.unsavedServices.length;
 
+  private launchButton = () =>
+    <button className={`btn-flat btn-small waves-effect waves-light blue-text`} onClick={this.launchApp}>
+      Launch
+    </button>;
+
+  private launchApp = () => {
+    this.setState({isLoading: true});
+    postData(`apps/${this.props.app.name}/launch`, undefined,
+      (reply) => this.onLaunchSuccess(reply),
+      (reply) => this.onLaunchFailure(reply));
+  };
+
+  private onLaunchSuccess = (reply: any) => {
+    super.toast(`Successfully launched ${this.props.app.name}`, 15000);
+    this.setState({isLoading: false});
+  };
+
+  private onLaunchFailure = (reply: any) => {
+    super.toast(`Failed to launch ${this.props.app.name}`, 10000, reply, true);
+    this.setState({isLoading: false});
+  };
+
   private app = () => {
     const {isLoading, error, formApp, app} = this.props;
     // @ts-ignore
     const appKey: (keyof IApp) = formApp && Object.keys(formApp)[0];
+    const isNew = isNewApp(this.props.match.params.name);
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
@@ -152,12 +178,14 @@ class App extends BaseComponent<Props, State> {
           <Form id={appKey}
                 fields={this.getFields(formApp)}
                 values={app}
-                isNew={isNewApp(this.props.match.params.name)}
+                isNew={isNew}
                 showSaveButton={this.shouldShowSaveButton()}
                 post={{url: 'apps', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
                 put={{url: `apps/${this.state.appName || app[appKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={{url: `apps/${this.state.appName || app[appKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
-                saveEntities={this.saveEntities}>
+                customButtons={!isNew ? this.launchButton() : undefined}
+                saveEntities={this.saveEntities}
+                loading={this.state.isLoading}>
             {Object.keys(formApp).map((key, index) =>
               <Field key={index}
                      id={key}

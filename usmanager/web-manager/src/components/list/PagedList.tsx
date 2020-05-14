@@ -39,7 +39,8 @@ export interface IPagedList<T> {
         page?: {
             index?: number,
             last?: boolean
-        }
+        },
+        position?: 'top' | 'bottom' | 'top-bottom';
     };
 }
 
@@ -68,6 +69,7 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
             page: state.page === undefined ? 0 : Math.max(0, pageIndex),
             max: Math.max(0, Math.ceil(this.props.list.length / this.state.pagesize) - 1)
         }));
+        window.scrollTo(0, 0);
     };
 
     private prevPage = (): void => {
@@ -104,6 +106,11 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
         const {list: l, show, paginate} = this.props;
         const {page = 0, pagesize = l.length} = this.state;
         const list = l.slice(page * pagesize, page * pagesize + pagesize);
+        const pagination = <Pagination max={this.state.max}
+                                       page={page}
+                                       setPage={this.setPage}
+                                       prevPage={this.prevPage}
+                                       nextPage={this.nextPage}/>;
         // TODO: page transition. e.g. slide to the left while new page comes from the right. Using react spring
         return (
           <div className={'list'}>
@@ -121,12 +128,11 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
                     </Dropdown>
                 </div>
               )}
-              {this.state.max > 0 && <Pagination max={this.state.max}
-                                                 page={page}
-                                                 setPage={this.setPage}
-                                                 prevPage={this.prevPage}
-                                                 nextPage={this.nextPage}/>}
+              {(paginate.position === undefined || paginate.position === 'top' || paginate.position === 'top-bottom')
+               && this.state.max > 0 && pagination}
               <SimpleList<T> {...this.props} list={list} show={show}/>
+              {(paginate.position === 'bottom' || paginate.position === 'top-bottom')
+               && this.state.max > 0 && pagination}
           </div>
         );
     }

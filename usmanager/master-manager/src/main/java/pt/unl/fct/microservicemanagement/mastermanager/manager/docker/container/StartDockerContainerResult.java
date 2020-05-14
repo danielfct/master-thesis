@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostDetails;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -47,6 +47,7 @@ interface ListProps<T> {
             index?: number,
             last?: boolean
         },
+        position?: 'top' | 'bottom' | 'top-bottom';
     };
     animate?: boolean;
     header?: () => JSX.Element;

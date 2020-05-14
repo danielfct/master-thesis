@@ -24,8 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.host.HostFieldAvg;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostFieldAvg;
 
 import java.util.List;
 
