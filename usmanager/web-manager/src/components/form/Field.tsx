@@ -9,17 +9,20 @@ import {Datepicker} from "./Datepicker";
 import {Timepicker} from "./Timepicker";
 import {NumberBox} from "./NumberBox";
 import {Dropdown} from "./Dropdown";
+import {CheckboxList} from "./CheckboxList";
+import checkboxListStyles from "./CheckboxList.module.css";
 
 export interface IValidation {
-  rule: (values: IValues, fieldName: string, args: any) => string;
+  rule: (values: IValues, id: keyof IValues, args: any) => string;
   args?: any;
 }
 
 export interface FieldProps<T = string> {
   id: string;
   type?: "textbox" | "datebox" | "numberbox" | "multilinetextbox" | "collapsible" | "dropdown" | "datepicker"
-    | "timepicker";
+    | "timepicker" | "list";
   label?: string;
+  value?: any;
   dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
   number?: { min: number, max: number };
   validation?: IValidation;
@@ -51,19 +54,25 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     } catch (_) {
       value = e.currentTarget.value;
     }
-    const values = { [id] : value };
-    formContext.setValues(values);
+    formContext.setValue(id, value);
   };
 
   private onSelect = (value: string, id: string, formContext: IFormContext) => {
-    const values = { [id] : value };
-    formContext.setValues(values);
-    formContext.validate(id);
+    formContext.setValue(id, value);
   };
 
   private onBlur = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
                     id: string, formContext: IFormContext): void =>
     formContext.validate(id);
+
+  private onCheck = (listId: keyof IValues, itemId: string, checked: boolean, formContext: IFormContext) => {
+    if (checked) {
+      formContext.addValue(listId, itemId);
+    }
+    else {
+      formContext.removeValue(listId, itemId);
+    }
+  };
 
   private getDateStringFromTimestamp = (value: number) => {
     const date = new Date(value * 1000);
@@ -90,9 +99,9 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
         {(formContext: IFormContext | null) => (
           formContext && (
             <div key={id}
-                 className={`input-field col s12`}
+                 className={type !== 'list' ? `input-field col s12` : `input-field col s12 ${checkboxListStyles.listWrapper}`}
                  style={icon !== undefined && !icon ? {marginLeft: '10px'} : undefined}>
-              {label && (
+              {label && type !== "list" && (
                 <>
                   {(icon === undefined || icon) &&
                    <i className="material-icons prefix">{mapLabelToIcon(label)}</i>}
@@ -164,6 +173,13 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                             value={formContext.values[id]}
                             disabled={disabled || !formContext?.isEditing}
                             onSelect={value => this.onSelect(value, id, formContext)}/>
+              )}
+              {(type && type.toLowerCase() === "list") && (
+                <CheckboxList id={id}
+                              name={id}
+                              values={this.props.value}
+                              disabled={disabled || !formContext?.isEditing}
+                              onCheck={(listId, itemId, checked) => this.onCheck(listId, itemId, checked, formContext)}/>
               )}
               {getError(formContext.errors) && (
                 <span className={"helper-text red-text darken-3"}>

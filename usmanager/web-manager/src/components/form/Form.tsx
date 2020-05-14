@@ -38,7 +38,6 @@ import M from "materialize-css";
 export type RestOperation = {
   textButton?: string,
   url: string,
-  beforeCallback?: () => boolean,
   successCallback: (reply?: any, args?: any) => void,
   failureCallback: (reason: string, args?: any) => void
 }
@@ -97,49 +96,51 @@ interface State {
 }
 
 export interface IFormContext extends State {
-  setValues: (values: IValues) => void;
-  validate: (fieldName: string) => void;
+  setValue: (id: keyof IValues, value: any) => void;
+  addValue: (id: keyof IValues, value: any) => void;
+  removeValue: (id: keyof IValues, value: any) => void;
+  validate: (id: keyof IValues) => void;
 }
 
 export const FormContext =
   React.createContext<IFormContext | null>(null);
 
-export const required = (values: IValues, fieldName: string): string =>
-  values[fieldName] === undefined || values[fieldName] === null || values[fieldName] === ""
-    ? `${camelCaseToSentenceCase(fieldName)} is required`
+export const required = (values: IValues, id: keyof IValues): string =>
+  values[id] === undefined || values[id] === null || values[id] === ""
+    ? `${camelCaseToSentenceCase(id as string)} is required`
     : "";
 
-export const notAllowed = (values: IValues, fieldName: string, args: any[]): string =>
-  args.indexOf(values[fieldName].toLowerCase()) !== -1
-    ? `${values[fieldName]} is not allowed`
+export const notAllowed = (values: IValues, id: keyof IValues, args: any[]): string =>
+  args.indexOf(values[id].toLowerCase()) !== -1
+    ? `${values[id]} is not allowed`
     : "";
 
-export const min = (values: IValues, fieldName: string, args: any): string =>
-  values[fieldName] < args
+export const min = (values: IValues, id: keyof IValues, args: any): string =>
+  values[id] < args
     ? `Required minimum value of ${args}`
     : "";
 
-export const max = (values: IValues, fieldName: string, args: any): string =>
-  values[fieldName] > args
+export const max = (values: IValues, id: keyof IValues, args: any): string =>
+  values[id] > args
     ? `Required maximum value of ${args}`
     : "";
 
-export const number = (values: IValues, fieldName: string): string =>
-  getTypeFromValue(values[fieldName]) !== 'number'
-    ? `${camelCaseToSentenceCase(fieldName)} is a number`
+export const number = (values: IValues, id: keyof IValues): string =>
+  getTypeFromValue(values[id]) !== 'number'
+    ? `${camelCaseToSentenceCase(id as string)} is a number`
     : "";
 
-export const requiredAndNotAllowed = (values: IValues, fieldName: string, args: any[]) =>
-  required(values, fieldName) || notAllowed(values, fieldName, args);
+export const requiredAndNotAllowed = (values: IValues, id: keyof IValues, args: any[]) =>
+  required(values, id) || notAllowed(values, id, args);
 
-export const requiredAndNumberAndMin = (values: IValues, fieldName: string, args: any) =>
-  required(values, fieldName) || number(values, fieldName) || min(values, fieldName, args);
+export const requiredAndNumberAndMin = (values: IValues, id: keyof IValues, args: any) =>
+  required(values, id) || number(values, id) || min(values, id, args);
 
-export const requiredAndNumberAndMax = (values: IValues, fieldName: string, args: any) =>
-  required(values, fieldName) || number(values, fieldName) || max(values, fieldName, args);
+export const requiredAndNumberAndMax = (values: IValues, id: keyof IValues, args: any) =>
+  required(values, id) || number(values, id) || max(values, id, args);
 
-export const requiredAndNumberAndMinAndMax = (values: IValues, fieldName: string, args: any) =>
-  required(values, fieldName) || number(values, fieldName) || min(values, fieldName, args[0]) || max(values, fieldName, args[1]);
+export const requiredAndNumberAndMinAndMax = (values: IValues, id: keyof IValues, args: any) =>
+  required(values, id) || number(values, id) || min(values, id, args[0]) || max(values, id, args[1]);
 
 class Form extends React.Component<Props, State> {
 
@@ -199,12 +200,12 @@ class Form extends React.Component<Props, State> {
       || (typeof first === 'string' && typeof second === 'number') && first === second.toString()) || undefined);
   };
 
-  private validate = (fieldName: string): string => {
+  private validate = (id: keyof IValues): string => {
     const {fields} = this.props;
-    const field: FieldProps | undefined = fields[fieldName];
+    const field: FieldProps | undefined = fields[id];
     const validation: IValidation | undefined = field!.validation;
-    const newError: string = validation ? validation.rule(this.state.values, fieldName, validation.args) : "";
-    this.setState({errors: {...this.state.errors, [fieldName]: newError}});
+    const newError: string = validation ? validation.rule(this.state.values, id, validation.args) : "";
+    this.setState({errors: {...this.state.errors, [id]: newError}});
     return newError;
   };
 
@@ -240,25 +241,14 @@ class Form extends React.Component<Props, State> {
     }
   };
 
-  private handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {id, checked} = event.target;
-    const stateValue = Object.values(this.state.values).find((region: any) => region.name === id);
-    if (stateValue) {
-      stateValue.checked = checked;
-    }
-    //this.setState({regions: this.state.regions, displayNoRegionsError: false});
-  };
-
   private handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-   Object.values(this.state.values).find((region: any) => console.log(region));
     event.preventDefault();
     const validate = this.validateForm();
     const {isNew, post, put, saveEntities} = this.props;
     const args = this.state.values;
     if (isNew) {
       if (post?.url) {
-        const beforeSubmit = post.beforeCallback?.();
-        if (validate && beforeSubmit) {
+        if (validate) {
           postData(post.url, this.state.values,
             (reply) => {
               post.successCallback(reply, args);
@@ -271,10 +261,10 @@ class Form extends React.Component<Props, State> {
           this.setState({isLoading: true});
         }
       }
-    } else {
+    }
+    else {
       if (put?.url) {
-        const beforeSubmit = put.beforeCallback?.();
-        if (validate && beforeSubmit) {
+        if (validate) {
           if (this.saveRequired()) {
             putData(put.url, this.state.values,
               () => {
@@ -294,8 +284,25 @@ class Form extends React.Component<Props, State> {
     }
   };
 
-  private setValues = (values: IValues) => {
-    this.setState({ values: { ...this.state.values, ...values } });
+  private setValue = (id: keyof IValues, value: IValues, validate?: boolean) => {
+    const values = { [id] : value };
+    if (validate === undefined || validate) {
+      this.setState({ values: { ...this.state.values, ...values } }, () => this.validate(id as string));
+    }
+    else {
+      this.setState({ values: { ...this.state.values, ...values } });
+    }
+  };
+
+  private addValue = (id: keyof IValues, value: any) =>
+    this.setValue(id, this.state.values[id] ? this.state.values[id].concat(value) : [value]);
+
+  private removeValue = (id: keyof IValues, value: any) => {
+    let values = this.state.values[id].filter((v: any) => v !== value);
+    if (!values.length) {
+      values = undefined;
+    }
+    this.setValue(id, values, false);
   };
 
   private onModalConfirm = (event: React.FormEvent<HTMLButtonElement>) => {
@@ -320,7 +327,9 @@ class Form extends React.Component<Props, State> {
   render() {
     const context: IFormContext = {
       ...this.state,
-      setValues: this.setValues,
+      setValue: this.setValue,
+      addValue: this.addValue,
+      removeValue: this.removeValue,
       validate: this.validate
     };
     const {saveRequired, isLoading} = this.state;

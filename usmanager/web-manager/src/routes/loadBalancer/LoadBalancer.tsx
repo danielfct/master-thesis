@@ -30,7 +30,6 @@ export interface ILoadBalancer {
 
 const emptyLoadBalancer = (): Partial<ILoadBalancer> => ({
   service: undefined,
-  regions: [],
 });
 
 const isLaunchLoadBalancer = (id: string) =>
@@ -58,30 +57,21 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-type State = {
-  regions: {name: string, checked: boolean}[],
-  displayNoRegionsError: boolean,
-}
 
-class LoadBalancer extends BaseComponent<Props, State> {
-
-  state: State = {
-    regions: Object.keys(this.props.regions).map(region => ({name: region, checked: false})),
-    displayNoRegionsError: false
-  };
+class LoadBalancer extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     this.props.loadServices();
     this.props.loadRegions();
   }
 
-  private checkRegions = (): boolean => {
-    const someChecked = this.state.regions.some(region => region.checked);
-    if (!someChecked) {
-      this.setState({displayNoRegionsError: true});
-    }
-    return someChecked;
-  };
+  /*  private checkRegions = (): boolean => {
+      const someChecked = this.state.regions.some(region => region.checked);
+      if (!someChecked) {
+        this.setState({displayNoRegionsError: true});
+      }
+      return someChecked;TODO
+    };*/
 
   private onPostSuccess = (reply: any): void => {
     console.log(reply); //TODO show which id it started at
@@ -121,37 +111,8 @@ class LoadBalancer extends BaseComponent<Props, State> {
   private getSelectableServices = () =>
     this.props.services && Object.keys(this.props.services);
 
-  private region = (index: number, region: string, checked: boolean): JSX.Element => {
-    return (
-      <ListItem key={index}>
-        <div className={`${styles.nonListContent}`}>
-          <label>
-            <input id={region}
-                   type="checkbox"
-                   onChange={this.handleCheckbox}
-                   checked={checked}/>
-            <span id={'checkbox'}>
-                 {region}
-            </span>
-          </label>
-        </div>
-      </ListItem>
-    );
-  };
-
-  //TODO put this login Form
-  private handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {id, checked} = event.target;
-    const stateRegion = this.state.regions.find(region => region.name === id);
-    if (stateRegion) {
-      stateRegion.checked = checked;
-    }
-    this.setState({regions: this.state.regions, displayNoRegionsError: false});
-  };
-
   private loadBalancer = () => {
     const {isLoading, error, formLoadBalancer, loadBalancer} = this.props;
-    const {regions} = this.state;
     // @ts-ignore
     const loadBalancerKey: (keyof ILoadBalancer) = formLoadBalancer && Object.keys(formLoadBalancer)[0];
     return (
@@ -166,51 +127,47 @@ class LoadBalancer extends BaseComponent<Props, State> {
                 post={{
                   textButton: 'launch',
                   url: 'loadBalancers',
-                  beforeCallback: this.checkRegions,
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure}}
                 delete={{
                   url: `loadBalancers/${loadBalancer[loadBalancerKey]}`,
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure}}>
-            {Object.keys(formLoadBalancer).map((key, index) =>
-              key === 'service'
-                ? <Field key={'service'}
-                         id={'service'}
-                         label={'service'}
-                         type={'dropdown'}
-                         dropdown={{
-                           defaultValue: "Select service",
-                           values: this.getSelectableServices(),
-                           optionToString: this.serviceOption}}/>
-                : <Field key={index}
-                         id={key}
-                         label={key}/>
-            )}
-            <div className='input-field'>
+            {Object.entries(formLoadBalancer).map((([key, value], index) =>
+                key === 'service'
+                  ? <Field key={index}
+                           id={key}
+                           label={key}
+                           type={'dropdown'}
+                           dropdown={{
+                             defaultValue: "Select service",
+                             values: this.getSelectableServices(),
+                             optionToString: this.serviceOption}}/>
+                  :
+                  key === 'regions'
+                    ? <Field key={index}
+                             id={key}
+                             label={key}
+                             type={'list'}
+                             value={value}/>
+                    : <Field key={index}
+                             id={key}
+                             label={key}/>
+            ))}
+            {/*<div className='input-field'>
               <h6 className={'white-text'}>Regions</h6>
               {this.state.displayNoRegionsError && (
                 <span className='helper-text red-text darken-3'>At least one region is required</span>)}
             </div>
             {regions.map((region, index) =>
               this.region(index, region.name, region.checked)
-            )}
+            )}*/}
           </Form>
 
         )}
       </>
     )
   };
-  /*<LoadBalancerRegionsList regions={this.state.regions}
-                                       onAddRegion={this.onAddRegion}
-                                       onRemoveRegion={this.onRemoveRegion}>
-
-              </LoadBalancerRegionsList>*/
-  /* private rules = (): JSX.Element =>
-     <EdgeHostRuleList host={this.props.edgeHost}
-                       unsavedRules={this.state.newRules}
-                       onAddHostRule={this.onAddEdgeHostRule}
-                       onRemoveHostRules={this.onRemoveEdgeHostRules}/>;*/
 
   private tabs: Tab[] = [
     {
@@ -233,16 +190,16 @@ class LoadBalancer extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const isLoading = false //state.entities.loadBalancers.isLoading;
-  const error = null //state.entities.loadBalancers.loadError;
+  const regions = state.entities.regions.data;
+  const isLoading = false; //state.entities.loadBalancers.isLoading;
+  const error = null; //state.entities.loadBalancers.loadError;
   const id = props.match.params.id;
-  const loadBalancer = isLaunchLoadBalancer(id) ? emptyLoadBalancer() : {} //state.entities.loadBalancers.data[id];
+  const loadBalancer = isLaunchLoadBalancer(id) ? emptyLoadBalancer() : {}; //state.entities.loadBalancers.data[id];
   let formLoadBalancer;
   if (loadBalancer) {
-    formLoadBalancer = { ...loadBalancer };
+    formLoadBalancer = { ...loadBalancer, regions: Object.keys(regions) };
   }
   const services = state.entities.services.data;
-  const regions = state.entities.regions.data;
   return  {
     isLoading,
     error,

@@ -471,6 +471,10 @@ textarea.materialize-textarea[readonly="readonly"] {
     border: unset;
 }
 
+.noMargin {
+    margin: unset;
+}
+
 .gridCard {
     width: auto !important;
     background: #36393F;
