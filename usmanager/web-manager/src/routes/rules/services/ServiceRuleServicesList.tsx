@@ -27,7 +27,6 @@ import {IService} from "../../services/Service";
 import {IServiceRule} from "./ServiceRule";
 
 interface StateToProps {
-  redirect: boolean;
   isLoading: boolean;
   error?: string | null;
   ruleServices: string[];
@@ -102,9 +101,6 @@ class ServiceRuleServicesList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    if (this.props.redirect) {
-      return <Redirect to='/rules'/>;
-    }
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage={`Services list is empty`}
@@ -133,7 +129,6 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceRuleServicesListPro
   const rule = ruleName && state.entities.rules.services.data[ruleName];
   const ruleServices = rule && rule.services;
   return {
-    redirect: !ownProps.rule,
     isLoading: state.entities.rules.services.isLoadingServices,
     error: state.entities.rules.services.loadServicesError,
     ruleServices: ruleServices || [],

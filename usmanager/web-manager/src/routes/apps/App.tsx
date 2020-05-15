@@ -12,9 +12,8 @@ import {ReduxState} from "../../reducers";
 import {addAppService, loadApps} from "../../actions";
 import {connect} from "react-redux";
 import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
-import {postData} from "../../utils/api";
+import {IReply, postData} from "../../utils/api";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
-import {decodeHTML} from "../../utils/text";
 
 export interface IApp extends Data {
   name: string;
@@ -78,43 +77,43 @@ class App extends BaseComponent<Props, State> {
     });
   };
 
-  private saveAppServices = (appName: string): void => {
+  private saveAppServices = (app: IApp): void => {
     const {unsavedServices} = this.state;
     if (unsavedServices.length) {
-      postData(`apps/${appName}/services`, unsavedServices,
-        () => this.onSaveServicesSuccess(appName),
-        (reason) => this.onSaveServicesFailure(appName, reason));
+      postData(`apps/${app.name}/services`, unsavedServices,
+        () => this.onSaveServicesSuccess(app),
+        (reason) => this.onSaveServicesFailure(app, reason));
     }
   };
 
-  private onSaveServicesSuccess = (appName: string): void => {
-    this.state.unsavedServices.forEach(service => this.props.addAppService(appName, service));
+  private onSaveServicesSuccess = (app: IApp): void => {
+    this.state.unsavedServices.forEach(service => this.props.addAppService(app.name, service));
     this.setState({ unsavedServices: [] });
   };
 
-  private onSaveServicesFailure = (appName: string, reason: string): void =>
-    super.toast(`Unable to save services of app ${appName}`, 10000, reason, true);
+  private onSaveServicesFailure = (app: IApp, reason: string): void =>
+    super.toast(`Unable to save services of app ${app.name}`, 10000, reason, true);
 
-  private saveEntities = (appName: string) => {
-    this.saveAppServices(appName);
+  private saveEntities = (app: IApp) => {
+    this.saveAppServices(app);
   };
 
-  private onPostSuccess = (reply: any, appName: string): void => {
-    super.toast(`App <b>${appName}</b> saved`);
-    this.saveEntities(appName);
+  private onPostSuccess = (reply: IReply<IApp>): void => {
+    super.toast(`App <b>${reply.data.name}</b> saved`);
+    this.saveEntities(reply.data);
   };
 
   private onPostFailure = (reason: string, appName: string): void =>
     super.toast(`Unable to save ${appName}`, 10000, reason, true);
 
-  private onPutSuccess = (appName: string): void => {
-    super.toast(`Changes to app <b>${appName}</b> are now saved`);
-    this.setState({appName: appName});
-    this.saveEntities(appName);
+  private onPutSuccess = (reply: IReply<IApp>): void => {
+    super.toast(`Changes to app <b>${reply.data.name}</b> are now saved`);
+    this.setState({appName: reply.data.name});
+    this.saveEntities(reply.data);
   };
 
-  private onPutFailure = (reason: string, appName: string): void =>
-    super.toast(`Unable to update ${appName}`, 10000, reason, true);
+  private onPutFailure = (reason: string, app: IApp): void =>
+    super.toast(`Unable to update ${app.name}`, 10000, reason, true);
 
   private onDeleteSuccess = (appName: string): void => {
     super.toast(`App <b>${appName}</b> successfully removed`);
@@ -151,17 +150,17 @@ class App extends BaseComponent<Props, State> {
   private launchApp = () => {
     this.setState({isLoading: true});
     postData(`apps/${this.props.app.name}/launch`, undefined,
-      (reply) => this.onLaunchSuccess(reply),
-      (reply) => this.onLaunchFailure(reply));
+      (reply: IReply<IApp>) => this.onLaunchSuccess(reply),
+      (reply: string) => this.onLaunchFailure(reply));
   };
 
-  private onLaunchSuccess = (reply: any) => {
-    super.toast(`Successfully launched ${this.props.app.name}`, 15000);
+  private onLaunchSuccess = (reply: IReply<IApp>) => {
+    super.toast(`Successfully launched ${reply.data.name}`, 15000);
     this.setState({isLoading: false});
   };
 
-  private onLaunchFailure = (reply: any) => {
-    super.toast(`Failed to launch ${this.props.app.name}`, 10000, reply, true);
+  private onLaunchFailure = (reason: string) => {
+    super.toast(`Failed to launch ${this.props.app.name}`, 10000, reason, true);
     this.setState({isLoading: false});
   };
 
@@ -197,11 +196,25 @@ class App extends BaseComponent<Props, State> {
     )
   };
 
+  private entitiesList = (element: JSX.Element) => {
+    const {isLoading, error, app} = this.props;
+    if (isLoading) {
+      return <ListLoadingSpinner/>;
+    }
+    if (error) {
+      return <Error message={error}/>;
+    }
+    if (app) {
+      return element;
+    }
+    return <></>;
+  };
+
   private services = (): JSX.Element =>
-    <AppServicesList app={this.props.app}
-                     unsavedServices={this.state.unsavedServices}
-                     onAddAppService={this.onAddAppService}
-                     onRemoveAppServices={this.onRemoveAppServices}/>;
+    this.entitiesList(<AppServicesList app={this.props.app}
+                                       unsavedServices={this.state.unsavedServices}
+                                       onAddAppService={this.onAddAppService}
+                                       onRemoveAppServices={this.onRemoveAppServices}/>);
 
   private tabs: Tab[] = [
     {

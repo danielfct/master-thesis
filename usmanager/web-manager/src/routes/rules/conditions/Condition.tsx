@@ -12,6 +12,7 @@ import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {loadConditions, loadFields, loadOperators, loadValueModes} from "../../../actions";
 import {connect} from "react-redux";
+import {IReply} from "../../../utils/api";
 
 export interface ICondition extends IData {
   name: string;
@@ -71,8 +72,8 @@ class Condition extends BaseComponent<Props, State> {
     this.props.loadOperators();
   };
 
-  private onPostSuccess = (reply: any, conditionName: string): void => {
-    super.toast(`Condition <b>${conditionName}</b> is now created`);
+  private onPostSuccess = (reply: IReply<ICondition>): void => {
+    super.toast(`Condition <b>${reply.data.name}</b> is now created`);
   };
 
   private onPostFailure = (reason: string, conditionName: string): void =>

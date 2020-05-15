@@ -46,7 +46,7 @@ import Field, {getTypeFromValue} from "../../components/form/Field";
 import BaseComponent from "../../components/BaseComponent";
 import Error from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
-import {postData} from "../../utils/api";
+import {IReply, postData} from "../../utils/api";
 import ServiceAppList, {IAddServiceApp} from "./ServiceAppList";
 import ServiceDependencyList from "./ServiceDependencyList";
 import ServiceDependeeList from "./ServiceDependeeList";
@@ -54,6 +54,7 @@ import ServicePredictionList, {IPrediction} from "./ServicePredictionList";
 import ServiceRuleList from "./ServiceRuleList";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
 import GenericServiceRuleList from "./GenericServiceRuleList";
+import ServiceRuleServicesList from "../rules/services/ServiceRuleServicesList";
 
 export interface IService extends IData {
   serviceName: string;
@@ -92,8 +93,8 @@ const isNewService = (name: string) =>
   name === 'new_service';
 
 interface StateToProps {
-  isLoadingServices: boolean;
-  loadServicesError?: string | null;
+  isLoading: boolean;
+  error?: string | null;
   service: Partial<IService>;
   formService?: Partial<IService>,
 }
@@ -269,9 +270,9 @@ class Service extends BaseComponent<Props, State> {
     this.saveServiceRules(serviceName);
   };
 
-  private onPostSuccess = (reply: any, serviceName: string): void => {
-    super.toast(`Service <b>${serviceName}</b> saved`);
-    this.saveEntities(serviceName);
+  private onPostSuccess = (reply: IReply<IService>): void => {
+    super.toast(`Service <b>${reply.data.serviceName}</b> saved`);
+    this.saveEntities(reply.data.serviceName);
   };
 
   private onPostFailure = (reason: string, serviceName: string): void =>
@@ -323,14 +324,14 @@ class Service extends BaseComponent<Props, State> {
     serviceType;
 
   private service = () => {
-    const {isLoadingServices, loadServicesError, formService, service} = this.props;
+    const {isLoading, error, formService, service} = this.props;
     // @ts-ignore
     const serviceKey: (keyof IService) = formService && Object.keys(formService)[0];
     return (
       <>
-        {isLoadingServices && <ListLoadingSpinner/>}
-        {!isLoadingServices && loadServicesError && <Error message={loadServicesError}/>}
-        {!isLoadingServices && !loadServicesError && formService && (
+        {isLoading && <ListLoadingSpinner/>}
+        {!isLoading && error && <Error message={error}/>}
+        {!isLoading && !error && formService && (
           <Form id={serviceKey}
                 fields={this.getFields(formService)}
                 values={service}
@@ -360,36 +361,50 @@ class Service extends BaseComponent<Props, State> {
     )
   };
 
+  private entitiesList = (element: JSX.Element) => {
+    const {isLoading, error, service} = this.props;
+    if (isLoading) {
+      return <ListLoadingSpinner/>;
+    }
+    if (error) {
+      return <Error message={error}/>;
+    }
+    if (service) {
+      return element;
+    }
+    return <></>;
+  };
+
   private apps = (): JSX.Element =>
-    <ServiceAppList service={this.props.service}
-                    newApps={this.state.newApps}
-                    onAddServiceApp={this.onAddServiceApp}
-                    onRemoveServiceApps={this.onRemoveServiceApps}/>;
+    this.entitiesList(<ServiceAppList service={this.props.service}
+                              newApps={this.state.newApps}
+                              onAddServiceApp={this.onAddServiceApp}
+                              onRemoveServiceApps={this.onRemoveServiceApps}/>);
 
   private dependencies = (): JSX.Element =>
-    <ServiceDependencyList service={this.props.service}
-                           newDependencies={this.state.newDependencies}
-                           onAddServiceDependency={this.onAddServiceDependency}
-                           onRemoveServiceDependencies={this.onRemoveServiceDependencies}/>;
+    this.entitiesList(<ServiceDependencyList service={this.props.service}
+                                     newDependencies={this.state.newDependencies}
+                                     onAddServiceDependency={this.onAddServiceDependency}
+                                     onRemoveServiceDependencies={this.onRemoveServiceDependencies}/>);
 
   private dependees = (): JSX.Element =>
-    <ServiceDependeeList service={this.props.service}
-                         newDependees={this.state.newDependees}/>;
+    this.entitiesList(<ServiceDependeeList service={this.props.service}
+                                   newDependees={this.state.newDependees}/>);
 
   private predictions = (): JSX.Element =>
-    <ServicePredictionList service={this.props.service}
-                           newPredictions={this.state.newPredictions}
-                           onAddServicePrediction={this.onAddServicePrediction}
-                           onRemoveServicePredictions={this.onRemoveServicePredictions}/>;
+    this.entitiesList(<ServicePredictionList service={this.props.service}
+                                     newPredictions={this.state.newPredictions}
+                                     onAddServicePrediction={this.onAddServicePrediction}
+                                     onRemoveServicePredictions={this.onRemoveServicePredictions}/>);
 
   private rules = (): JSX.Element =>
-    <ServiceRuleList service={this.props.service}
-                     newRules={this.state.newRules}
-                     onAddServiceRule={this.onAddServiceRule}
-                     onRemoveServiceRules={this.onRemoveServiceRules}/>;
+    this.entitiesList(<ServiceRuleList service={this.props.service}
+                               newRules={this.state.newRules}
+                               onAddServiceRule={this.onAddServiceRule}
+                               onRemoveServiceRules={this.onRemoveServiceRules}/>);
 
   private genericRules = (): JSX.Element =>
-    <GenericServiceRuleList/>;
+    this.entitiesList(<GenericServiceRuleList/>);
 
   private tabs: Tab[] = [
     {
@@ -455,11 +470,11 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     delete formService["predictions"];
     delete formService["serviceRules"];
   }
-  const isLoadingServices = state.entities.services?.isLoadingServices;
-  const loadServicesError = state.entities.services?.loadServicesError;
+  const isLoading = state.entities.services?.isLoadingServices;
+  const error = state.entities.services?.loadServicesError;
   return  {
-    isLoadingServices,
-    loadServicesError,
+    isLoading,
+    error,
     service,
     formService,
   }

@@ -16,8 +16,6 @@ import Field from "../../components/form/Field";
 import {
   IFields,
   IValues,
-  min,
-  requiredAndNumberAndMin,
   requiredAndNumberAndMinAndMax
 } from "../../components/form/Form";
 import Data from "../../components/IData";

@@ -17,7 +17,6 @@ import {Link} from "react-router-dom";
 import {ICondition} from "../conditions/Condition";
 
 interface StateToProps {
-  redirect: boolean;
   isLoading: boolean;
   error?: string | null;
   ruleConditions: string[];
@@ -92,9 +91,6 @@ class ServiceRuleConditionList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    if (this.props.redirect) {
-      return <Redirect to='/rules'/>;
-    }
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage={`Conditions list is empty`}
@@ -123,7 +119,6 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceRuleConditionListPr
   const rule = ruleName && state.entities.rules.services.data[ruleName];
   const ruleConditions = rule && rule.conditions;
   return {
-    redirect: !ownProps.rule,
     isLoading: state.entities.rules.services.isLoadingConditions,
     error: state.entities.rules.services.loadConditionsError,
     ruleConditions: ruleConditions || [],

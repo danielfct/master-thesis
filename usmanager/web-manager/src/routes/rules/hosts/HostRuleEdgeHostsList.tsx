@@ -32,12 +32,10 @@ import {
   removeRuleHostEdgeHosts,
 } from "../../../actions";
 import {connect} from "react-redux";
-import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import {IEdgeHost} from "../../hosts/edge/EdgeHost";
 
 interface StateToProps {
-  redirect: boolean;
   isLoading: boolean;
   error?: string | null;
   ruleEdgeHosts: string[];
@@ -112,9 +110,6 @@ class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    if (this.props.redirect) {
-      return <Redirect to='/rules'/>;
-    }
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage={`Edge hosts list is empty`}
@@ -143,7 +138,6 @@ function mapStateToProps(state: ReduxState, ownProps: HostRuleEdgeHostListProps)
   const rule = ruleName && state.entities.rules.hosts.data[ruleName];
   const ruleEdgeHosts = rule && rule.edgeHosts;
   return {
-    redirect: !ownProps.rule,
     isLoading: state.entities.rules.hosts.isLoadingEdgeHosts,
     error: state.entities.rules.hosts.loadEdgeHostsError,
     ruleEdgeHosts: ruleEdgeHosts || [],

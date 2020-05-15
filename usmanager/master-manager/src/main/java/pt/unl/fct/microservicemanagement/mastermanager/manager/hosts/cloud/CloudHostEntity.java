@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
-import com.amazonaws.services.ec2.model.InstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
 import java.util.Set;
@@ -38,6 +37,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.amazonaws.services.ec2.model.InstanceState;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -64,11 +64,20 @@ public class CloudHostEntity {
   @Column(unique = true)
   private String instanceId;
 
-  @Column(unique = true)
-  private String publicIpAddress;
+  @NotNull
+  private String instanceType;
 
   @NotNull
   private InstanceState state;
+
+  @NotNull
+  private String imageId;
+
+  @Column(unique = true)
+  private String publicDnsName;
+
+  @Column(unique = true)
+  private String publicIpAddress;
 
   @Singular
   @JsonIgnore

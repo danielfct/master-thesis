@@ -24,22 +24,18 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsLaunchServiceReq;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import com.amazonaws.services.ec2.model.Instance;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,36 +49,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/hosts")
 public class HostsController {
 
-  private final AwsService aws;
   private final CloudHostsService cloudHostsService;
   private final EdgeHostsService edgeHostsService;
-  private final DockerContainersService dockerContainersService;
 
-  public HostsController(AwsService aws, CloudHostsService cloudHostsService, EdgeHostsService edgeHostsService,
-                         DockerContainersService dockerContainersService) {
-    this.aws = aws;
+  public HostsController(CloudHostsService cloudHostsService, EdgeHostsService edgeHostsService) {
     this.cloudHostsService = cloudHostsService;
     this.edgeHostsService = edgeHostsService;
-    this.dockerContainersService = dockerContainersService;
   }
 
-  @GetMapping("/cloud")
+  /*@GetMapping("/cloud/aws")
   public List<AwsSimpleInstance> getEC2Instances() {
-    //TODO get cloud instances from repository instead
     return aws.getSimpleInstances();
   }
 
-  @PostMapping("/cloud")
+  @PostMapping("/cloud/aws")
   public Instance createEC2Instance() {
     return aws.createInstance();
   }
 
-  @GetMapping("/cloud/{id}")
+  @GetMapping("/cloud/aws/{id}")
   public Instance getEC2Instance(@PathVariable String id) {
     return aws.getInstance(id);
   }
 
-  @GetMapping("/cloud/{id}/simple")
+  @GetMapping("/cloud/aws/simple/{id}")
   public AwsSimpleInstance getEC2SimpleInstance(@PathVariable String id) {
     return aws.getSimpleInstance(id);
   }
@@ -101,19 +91,31 @@ public class HostsController {
         String.format("${%sDatabaseHost}", serviceName), launchServiceReq.getDatabase());
     return dockerContainersService.launchContainer(ec2PublicIp, serviceName, internalPort, externalPort,
         dynamicLaunchParams);
+  }*/
+
+  @GetMapping("/cloud")
+  public Iterable<CloudHostEntity> getCloudHosts() {
+    return cloudHostsService.getCloudHosts();
   }
 
-  @PostMapping("/cloud/{instanceId}/start")
-  public void startCloudInstance(@PathVariable String instanceId) {
-    cloudHostsService.startCloudHost(instanceId);
+  @GetMapping("/cloud/{id}")
+  public CloudHostEntity getCloudHost(@PathVariable String id) {
+    return cloudHostsService.getCloudHost(id);
   }
 
-  @DeleteMapping("/cloud/{instanceId}/stop")
-  public void stopCloudInstance(@PathVariable String instanceId) {
-    cloudHostsService.stopCloudHost(instanceId);
+  @PostMapping("/cloud/{instanceId}/state")
+  public CloudHostEntity changeCloudHostState(@PathVariable String instanceId, @RequestBody String action) {
+    switch (action) {
+      case "start":
+        return cloudHostsService.startCloudHost(instanceId);
+      case "stop":
+        return cloudHostsService.stopCloudHost(instanceId);
+      default:
+        throw new BadRequestException("Expected one of 'start' or 'stop'");
+    }
   }
 
-  @DeleteMapping("/cloud/{instanceId}/terminate")
+  @DeleteMapping("/cloud/{instanceId}")
   public void terminateCloudInstance(@PathVariable String instanceId) {
     cloudHostsService.terminateCloudHost(instanceId);
   }

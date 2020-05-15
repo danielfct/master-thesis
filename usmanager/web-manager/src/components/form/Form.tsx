@@ -78,8 +78,6 @@ interface FormProps {
   onModalConfirm?: (values: IValues) => void;
   dropdown?: { id: string, title: string, empty: string, data: string[]};
   saveEntities?: (args: any) => void;
-  editable?: boolean;
-  deletable?: boolean;
   customButtons?: JSX.Element;
   loading?: boolean;
 }
@@ -250,7 +248,7 @@ class Form extends React.Component<Props, State> {
       if (post?.url) {
         if (validate) {
           postData(post.url, this.state.values,
-            (reply) => {
+            (reply, ) => {
               post.successCallback(reply, args);
               this.setState({savedValues: this.state.values, isLoading: false});
             },
@@ -267,12 +265,12 @@ class Form extends React.Component<Props, State> {
         if (validate) {
           if (this.saveRequired()) {
             putData(put.url, this.state.values,
-              () => {
-                put.successCallback(args);
+              (reply) => {
+                put.successCallback(reply, args);
                 this.setState({savedValues: this.state.values, isLoading: false});
               },
-              (reply) => {
-                put.failureCallback(reply, args);
+              (reason) => {
+                put.failureCallback(reason, args);
                 this.setState({isLoading: false});
               });
             this.setState({isLoading: true});
@@ -333,7 +331,7 @@ class Form extends React.Component<Props, State> {
       validate: this.validate
     };
     const {saveRequired, isLoading} = this.state;
-    const {id, isNew, values, controlsMode, editable, deletable, customButtons, dropdown, children} = this.props;
+    const {id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, children} = this.props;
     return (
       <>
         <ConfirmDialog message={`${this.props.delete?.textButton?.toLowerCase() || 'delete'} ${values[id]}`}
@@ -351,24 +349,23 @@ class Form extends React.Component<Props, State> {
                   </button>
                   :
                   <div>
-                    {(editable === undefined || editable) && (
+                    {editable !== undefined && (
                       <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
-                              data-position="bottom" data-tooltip="Edit"
+                              data-position="bottom"
+                              data-tooltip="Edit"
                               type="button"
                               onClick={this.onClickEdit}>
                         <i className="large material-icons">edit</i>
-                      </button>
-                    )}
+                      </button>)}
                     <div className={`${styles.controlButton}`}>
                       {customButtons}
-                      {(deletable === undefined || deletable) && (
-                        <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text`}
+                      {deletable !== undefined && (
+                        <button className='modal-trigger btn-flat btn-small waves-effect waves-light red-text'
                                 type="button"
                                 data-target="confirm-dialog">
                           {this.props.delete?.textButton || 'Delete'}
-                        </button>
-                      )}
-                      <button className={`btn-flat btn-small waves-effect waves-light green-text slide`}
+                        </button>)}
+                      <button className='btn-flat btn-small waves-effect waves-light green-text slide'
                               style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
                               type="submit">
                         Save

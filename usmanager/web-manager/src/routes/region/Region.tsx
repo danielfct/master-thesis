@@ -11,6 +11,7 @@ import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {loadRegions} from "../../actions";
 import {connect} from "react-redux";
+import {IReply} from "../../utils/api";
 
 export interface IRegion extends IData {
   name: string;
@@ -53,8 +54,8 @@ class Region extends BaseComponent<Props, {}> {
     }
   };
 
-  private onPostSuccess = (reply: any, regionName: string): void => {
-    super.toast(`Region <b>${regionName}</b> saved`);
+  private onPostSuccess = (reply: IReply<IRegion>): void => {
+    super.toast(`Region <b>${reply.data.name}</b> saved`);
   };
 
   private onPostFailure = (reason: string, regionName: string): void =>

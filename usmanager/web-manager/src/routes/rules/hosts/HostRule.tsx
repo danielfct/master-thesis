@@ -27,11 +27,12 @@ import {
   loadDecisions,
   loadRulesHost,
 } from "../../../actions";
-import {postData} from "../../../utils/api";
+import {IReply, postData} from "../../../utils/api";
 import HostRuleConditionList from "./HostRuleConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import HostRuleCloudHostsList from "./HostRuleCloudHostsList";
 import HostRuleEdgeHostsList from "./HostRuleEdgeHostsList";
+import EdgeHostRuleList from "../../hosts/edge/EdgeHostRuleList";
 
 export interface IHostRule extends IRule {
   cloudHosts?: string[],
@@ -101,9 +102,9 @@ class HostRule extends BaseComponent<Props, State> {
     this.saveRuleEdgeHosts(rule);
   };
 
-  private onPostSuccess = (reply: any, rule: IHostRule): void => {
-    super.toast(`Host rule <b>${rule.name}</b> saved`);
-    this.saveEntities(rule);
+  private onPostSuccess = (reply: IReply<IHostRule>): void => {
+    super.toast(`Host rule <b>${reply.data.name}</b> saved`);
+    this.saveEntities(reply.data);
   };
 
   private onPostFailure = (reason: string, rule: IHostRule): void =>
@@ -295,23 +296,38 @@ class HostRule extends BaseComponent<Props, State> {
     )
   };
 
+  private entitiesList = (element: JSX.Element) => {
+    const {isLoading, error, hostRule} = this.props;
+    if (isLoading) {
+      return <ListLoadingSpinner/>;
+    }
+    if (error) {
+      return <Error message={error}/>;
+    }
+    if (hostRule) {
+      return element;
+    }
+    return <></>;
+  };
+
   private conditions = (): JSX.Element =>
-    <HostRuleConditionList rule={this.props.hostRule}
-                           newConditions={this.state.newConditions}
-                           onAddRuleCondition={this.onAddRuleCondition}
-                           onRemoveRuleConditions={this.onRemoveRuleConditions}/>;
+    this.entitiesList(<HostRuleConditionList rule={this.props.hostRule}
+                                             newConditions={this.state.newConditions}
+                                             onAddRuleCondition={this.onAddRuleCondition}
+                                             onRemoveRuleConditions={this.onRemoveRuleConditions}/>);
 
   private cloudHosts = (): JSX.Element =>
-    <HostRuleCloudHostsList rule={this.props.hostRule}
-                            newCloudHosts={this.state.newCloudHosts}
-                            onAddRuleCloudHost={this.onAddRuleCloudHost}
-                            onRemoveRuleCloudHosts={this.onRemoveRuleCloudHosts}/>;
+    this.entitiesList(<HostRuleCloudHostsList rule={this.props.hostRule}
+                                              newCloudHosts={this.state.newCloudHosts}
+                                              onAddRuleCloudHost={this.onAddRuleCloudHost}
+                                              onRemoveRuleCloudHosts={this.onRemoveRuleCloudHosts}/>);
+
 
   private edgeHosts = (): JSX.Element =>
-    <HostRuleEdgeHostsList rule={this.props.hostRule}
-                           newEdgeHosts={this.state.newEdgeHosts}
-                           onAddRuleEdgeHost={this.onAddRuleEdgeHost}
-                           onRemoveRuleEdgeHosts={this.onRemoveRuleEdgeHosts}/>;
+    this.entitiesList(<HostRuleEdgeHostsList rule={this.props.hostRule}
+                                             newEdgeHosts={this.state.newEdgeHosts}
+                                             onAddRuleEdgeHost={this.onAddRuleEdgeHost}
+                                             onRemoveRuleEdgeHosts={this.onRemoveRuleEdgeHosts}/>);
 
   private tabs = () => [
     {

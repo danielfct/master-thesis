@@ -27,7 +27,6 @@ import {Link} from "react-router-dom";
 import {ICloudHost} from "../../hosts/cloud/CloudHost";
 
 interface StateToProps {
-  redirect: boolean;
   isLoading: boolean;
   error?: string | null;
   ruleCloudHosts: string[];
@@ -102,9 +101,6 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    if (this.props.redirect) {
-      return <Redirect to='/rules'/>;
-    }
     return <ControlledList isLoading={this.props.isLoading}
                            error={this.props.error}
                            emptyMessage={`Cloud hosts list is empty`}
@@ -133,7 +129,6 @@ function mapStateToProps(state: ReduxState, ownProps: HostRuleCloudHostListProps
   const rule = ruleName && state.entities.rules.hosts.data[ruleName];
   const ruleCloudHosts = rule && rule.cloudHosts;
   return {
-    redirect: !ownProps.rule,
     isLoading: state.entities.rules.hosts.isLoadingCloudHosts,
     error: state.entities.rules.hosts.loadCloudHostsError,
     ruleCloudHosts: ruleCloudHosts || [],

@@ -86,18 +86,25 @@ public class CloudHostsService {
   }
 
   public CloudHostEntity startCloudHost(String instanceId) {
-    Instance instance = awsService.startInstance(instanceId);
-    return addCloudHostFromInstance(instance);
+    var cloudHost = getCloudHost(instanceId);
+    awsService.startInstance(instanceId);
+    InstanceState state = new InstanceState();
+    state.setName(AwsInstanceState.RUNNING.getName());
+    state.setCode(AwsInstanceState.RUNNING.getCode());
+    cloudHost = cloudHost.toBuilder().state(state).build();
+    saveCloudHost(cloudHost);
+    return cloudHost;
   }
 
-  public void stopCloudHost(String instanceId) {
+  public CloudHostEntity stopCloudHost(String instanceId) {
+    var cloudHost = getCloudHost(instanceId);
     awsService.stopInstance(instanceId);
-    var cloudHost = getCloudHost(instanceId); //TODO put before stopInstance
     InstanceState state = new InstanceState();
     state.setName(AwsInstanceState.STOPPED.getName());
     state.setCode(AwsInstanceState.STOPPED.getCode());
     cloudHost = cloudHost.toBuilder().state(state).build();
     saveCloudHost(cloudHost);
+    return cloudHost;
   }
 
   public void terminateCloudHost(String instanceId) {

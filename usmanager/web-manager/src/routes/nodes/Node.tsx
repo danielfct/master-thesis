@@ -13,6 +13,7 @@ import {connect} from "react-redux";
 import React from "react";
 import {IRegion} from "../region/Region";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
+import {IReply} from "../../utils/api";
 
 export interface INode extends IData {
   hostname: string;
@@ -70,8 +71,8 @@ class Node extends BaseComponent<Props, {}> {
     this.props.loadRegions();
   };
 
-  private onPostSuccess = (reply: any, nodeId: string): void => {
-    super.toast(`Setup at <b>${nodeId}</b> is done`);
+  private onPostSuccess = (reply: IReply<INode>): void => {
+    super.toast(`Setup at <b>${reply.data.hostname}</b> is done`);
   };
 
   private onPostFailure = (reason: string, nodeId: string | IRegion): void => {
@@ -188,9 +189,9 @@ class Node extends BaseComponent<Props, {}> {
                 values={node}
                 isNew={isNew}
                 post={{textButton: 'Start', url: 'nodes', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                delete={{textButton: 'Remove', url: `nodes/${node[nodeKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
-                editable={false}
-                deletable={node.role !== 'MANAGER'}>
+                delete={node.role !== 'MANAGER'
+                  ? {textButton: 'Remove', url: `nodes/${node[nodeKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}
+                  : undefined}>
             {formFields}
           </Form>
         )}

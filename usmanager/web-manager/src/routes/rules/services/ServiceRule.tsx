@@ -26,10 +26,11 @@ import {
 } from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
-import {postData} from "../../../utils/api";
+import {IReply, postData} from "../../../utils/api";
 import ServiceRuleConditionList from "./ServiceRuleConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import ServiceRuleServicesList from "./ServiceRuleServicesList";
+import HostRuleEdgeHostsList from "../hosts/HostRuleEdgeHostsList";
 
 export interface IServiceRule extends IRule {
   services?: string[]
@@ -94,10 +95,10 @@ class ServiceRule extends BaseComponent<Props, State> {
     this.saveRuleServices(rule);
   };
 
-  private onPostSuccess = (reply: any, rule: IServiceRule): void => {
-    super.toast(`Service rule <b>${rule.name}</b> saved`);
-    this.setState({ruleName: rule.name});
-    this.saveEntities(rule);
+  private onPostSuccess = (reply: IReply<IServiceRule>): void => {
+    super.toast(`Service rule <b>${reply.data.name}</b> saved`);
+    this.setState({ruleName: reply.data.name});
+    this.saveEntities(reply.data);
   };
 
   private onPostFailure = (reason: string, rule: IServiceRule): void =>
@@ -258,17 +259,31 @@ class ServiceRule extends BaseComponent<Props, State> {
     )
   };
 
+  private entitiesList = (element: JSX.Element) => {
+    const {isLoading, error, serviceRule} = this.props;
+    if (isLoading) {
+      return <ListLoadingSpinner/>;
+    }
+    if (error) {
+      return <Error message={error}/>;
+    }
+    if (serviceRule) {
+      return element;
+    }
+    return <></>;
+  };
+
   private conditions = (): JSX.Element =>
-    <ServiceRuleConditionList rule={this.props.serviceRule}
-                              newConditions={this.state.newConditions}
-                              onAddRuleCondition={this.onAddRuleCondition}
-                              onRemoveRuleConditions={this.onRemoveRuleConditions}/>;
+    this.entitiesList(<ServiceRuleConditionList rule={this.props.serviceRule}
+                                        newConditions={this.state.newConditions}
+                                        onAddRuleCondition={this.onAddRuleCondition}
+                                        onRemoveRuleConditions={this.onRemoveRuleConditions}/>);
 
   private services = (): JSX.Element =>
-    <ServiceRuleServicesList rule={this.props.serviceRule}
-                             newServices={this.state.newServices}
-                             onAddRuleService={this.onAddRuleService}
-                             onRemoveRuleServices={this.onRemoveRuleServices}/>;
+    this.entitiesList(<ServiceRuleServicesList rule={this.props.serviceRule}
+                                       newServices={this.state.newServices}
+                                       onAddRuleService={this.onAddRuleService}
+                                       onRemoveRuleServices={this.onRemoveRuleServices}/>);
 
   private tabs = () => [
     {

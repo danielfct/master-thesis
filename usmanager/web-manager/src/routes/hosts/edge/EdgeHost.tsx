@@ -22,9 +22,10 @@ import {addEdgeHostRule, loadEdgeHosts} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import EdgeHostRuleList from "./EdgeHostRuleList";
-import {postData} from "../../../utils/api";
+import {IReply, postData} from "../../../utils/api";
 import GenericHostRuleList from "../GenericHostRuleList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
+import CloudHostRuleList from "../cloud/CloudHostRuleList";
 
 export interface IEdgeHost extends IData {
   hostname: string;
@@ -90,8 +91,8 @@ class EdgeHost extends BaseComponent<Props, State> {
     this.saveEdgeHostRules(hostname);
   };
 
-  private onPostSuccess = (reply: any, edgeHostHostname: string): void => {
-    super.toast(`Edge host <b>${edgeHostHostname}</b> is now saved`);
+  private onPostSuccess = (reply: IReply<IEdgeHost>): void => {
+    super.toast(`Edge host <b>${reply.data.hostname}</b> is now saved`);
   };
 
   private onPostFailure = (reason: string, edgeHostHostname: string): void =>
@@ -166,8 +167,8 @@ class EdgeHost extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private isLocalOption = (isLocal: boolean): string =>
-    isLocal.toString();
+  private isLocalOption = (isLocal: string): string =>
+    isLocal;
 
   private edgeHost = () => {
     const {isLoading, error, formEdgeHost, edgeHost} = this.props;
@@ -198,14 +199,14 @@ class EdgeHost extends BaseComponent<Props, State> {
                 saveEntities={this.saveEntities}>
             {Object.keys(formEdgeHost).map((key, index) =>
               key === 'local'
-                ? <Field<boolean> key={index}
-                         id={key}
-                         type="dropdown"
-                         label={key}
-                         dropdown={{
-                           defaultValue: "Is a local machine?",
-                           values: [true, false],
-                           optionToString: this.isLocalOption}}/>
+                ? <Field<string> key={index}
+                                  id={key}
+                                  type="dropdown"
+                                  label={key}
+                                  dropdown={{
+                                    defaultValue: "Is a local machine?",
+                                    values: ["True", "False"],
+                                    optionToString: this.isLocalOption}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -216,14 +217,28 @@ class EdgeHost extends BaseComponent<Props, State> {
     )
   };
 
+  private entitiesList = (element: JSX.Element) => {
+    const {isLoading, error, edgeHost} = this.props;
+    if (isLoading) {
+      return <ListLoadingSpinner/>;
+    }
+    if (error) {
+      return <Error message={error}/>;
+    }
+    if (edgeHost) {
+      return element;
+    }
+    return <></>;
+  };
+
   private rules = (): JSX.Element =>
-    <EdgeHostRuleList host={this.props.edgeHost}
-                      unsavedRules={this.state.newRules}
-                      onAddHostRule={this.onAddEdgeHostRule}
-                      onRemoveHostRules={this.onRemoveEdgeHostRules}/>;
+    this.entitiesList(<EdgeHostRuleList host={this.props.edgeHost}
+                                        unsavedRules={this.state.newRules}
+                                        onAddHostRule={this.onAddEdgeHostRule}
+                                        onRemoveHostRules={this.onRemoveEdgeHostRules}/>);
 
   private genericRules = (): JSX.Element =>
-    <GenericHostRuleList/>;
+    this.entitiesList(<GenericHostRuleList/>);
 
   private tabs: Tab[] = [
     {

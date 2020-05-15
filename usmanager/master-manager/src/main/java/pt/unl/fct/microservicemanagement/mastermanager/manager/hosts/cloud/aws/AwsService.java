@@ -133,11 +133,11 @@ public class AwsService {
   }
 
   public Instance createInstance() {
-    log.info("Creating new Aws instance...");
+    log.info("Creating new aws instance...");
     String instanceId = createEC2();
     Instance instance = waitInstanceState(instanceId, AwsInstanceState.RUNNING);
     String publicIpAddress = instance.getPublicIpAddress();
-    log.info("New Aws instance created: instanceId = {}, publicIp = {}", instanceId, publicIpAddress);
+    log.info("New aws instance created: instanceId = {}, publicIp = {}", instanceId, publicIpAddress);
     return instance;
   }
 
@@ -226,10 +226,10 @@ public class AwsService {
             throw new UnsupportedOperationException();
         }
         instance = waitInstanceState(instanceId, state);
-        log.info("Successfully set instance {} to state {}", instanceId, state.getName());
+        log.info("Successfully set instance {} to {} state", instanceId, state.getName());
         return instance;
       } catch (SetInstanceStateException e) {
-        log.info("Failed to set instance {} to state {}: {}", instanceId, state.getName(), e.getMessage());
+        log.info("Failed to set instance {} to {} state: {}", instanceId, state.getName(), e.getMessage());
       }
       Timing.sleep(DELAY_BETWEEN_INSTANCE_OPERATION_TRIES, TimeUnit.MILLISECONDS);
     }

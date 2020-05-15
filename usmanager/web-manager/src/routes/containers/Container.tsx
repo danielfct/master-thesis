@@ -22,7 +22,7 @@ import ScrollBar from "react-perfect-scrollbar";
 import M from "materialize-css";
 import styles from "../../components/list/ControlledList.module.css";
 import {decodeHTML} from "../../utils/text";
-import {postData} from "../../utils/api";
+import {IReply, postData} from "../../utils/api";
 
 export interface IContainer extends IData {
   created: number;
@@ -134,9 +134,8 @@ class Container extends BaseComponent<Props, State> {
   private onOpenDropdown = () =>
     this.scrollbar?.updateScroll();
 
-  private onPostSuccess = (reply: any, containerHostname: string): void => {
-    console.log(reply); //TODO show which id it started at
-    super.toast(`Container at <b>${containerHostname}</b> has now started on id ...`);
+  private onPostSuccess = (reply: IReply<IContainer>): void => {
+    super.toast(`Container at <b>${reply.data.hostname}</b> has now started on id ${reply.data.id}`);
   };
 
   private onPostFailure = (reason: string, containerHostname: string): void =>
@@ -241,16 +240,16 @@ class Container extends BaseComponent<Props, State> {
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
     this.setState({isLoading: true});
     postData(`containers/${this.props.container.id}/replicate`, {hostname: hostname},
-      (reply) => this.onReplicateSuccess(reply),
-      (reply) => this.onReplicateFailure(reply));
+      (reply: IReply<IContainer>) => this.onReplicateSuccess(reply),
+      (reply: string) => this.onReplicateFailure(reply));
   };
 
-  private onReplicateSuccess = (reply: any) => {
+  private onReplicateSuccess = (reply: IReply<IContainer>) => {
     super.toast(`Replicated ${this.props.container.image.split('/').splice(1)} to container <a href=/containers/${reply.data.id}>${reply.data.id}</a>`, 15000);
     this.setState({isLoading: false});
   };
 
-  private onReplicateFailure = (reply: any) => {
+  private onReplicateFailure = (reply: string) => {
     super.toast(`Unable to replicate container`, 10000, reply, true);
     this.setState({isLoading: false});
   };
@@ -259,16 +258,16 @@ class Container extends BaseComponent<Props, State> {
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
     this.setState({isLoading: true});
     postData(`containers/${this.props.container.id}/migrate`, { hostname: hostname },
-      (reply) => this.onMigrateSuccess(reply),
+      (reply: IReply<IContainer>) => this.onMigrateSuccess(reply),
       (reply) => this.onMigrateFailure(reply));
   };
 
-  private onMigrateSuccess = (reply: any) => {
+  private onMigrateSuccess = (reply: IReply<IContainer>) => {
     super.toast(`Migrated ${this.props.container.id} to container <a href=/containers/${reply.data.id}>${reply.data.id}</a>`, 15000);
     this.setState({isLoading: false});
   };
 
-  private onMigrateFailure = (reply: any) => {
+  private onMigrateFailure = (reply: string) => {
     super.toast(`Unable to migrate container`, 10000, reply, true);
     this.setState({isLoading: false});
   };
@@ -341,17 +340,16 @@ class Container extends BaseComponent<Props, State> {
                   url: 'containers',
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure}}
-                delete={container && {
-                  textButton: 'Stop',
-                  url: `containers/${container[containerKey]}`,
-                  successCallback: this.onDeleteSuccess,
-                  failureCallback: this.onDeleteFailure}}
-                editable={false}
+                delete={container && (!container.labels['isStoppable'] || container.labels['isStoppable'] === 'true')
+                  ? {textButton: 'Stop',
+                    url: `containers/${container[containerKey]}`,
+                    successCallback: this.onDeleteSuccess,
+                    failureCallback: this.onDeleteFailure}
+                  : undefined}
                 customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
                   ? this.replicateMigrateButtons()
                   : undefined}
-                loading={this.state.isLoading}
-                deletable={container && (!container.labels['isStoppable'] || container.labels['isStoppable'] === 'true')}>
+                loading={this.state.isLoading}>
             {this.formFields(formContainer, isNew)}
           </Form>
         )}
@@ -359,7 +357,7 @@ class Container extends BaseComponent<Props, State> {
     )
   };
 
-  private ports = (): JSX.Element => {
+  private entitiesList = (element: JSX.Element) => {
     const {isLoading, error, container} = this.props;
     if (isLoading) {
       return <ListLoadingSpinner/>;
@@ -368,25 +366,18 @@ class Container extends BaseComponent<Props, State> {
       return <Error message={error}/>;
     }
     if (container) {
-      return <ContainerPortsList ports={container.ports}/>
+      return element;
     }
     return <></>;
   };
 
-  private labels = (): JSX.Element => {
-    const {isLoading, error, container} = this.props;
-    if (isLoading) {
-      return <ListLoadingSpinner/>;
-    }
-    if (error) {
-      return <Error message={error}/>;
-    }
-    if (container) {
-      return <ContainerLabelsList labels={Object.entries(container.labels).map(([key, value]) => `${key} = ${value}`)}/>;
-    }
-    return <></>;
-  };
+  private ports = (): JSX.Element =>
+    this.entitiesList(<ContainerPortsList ports={this.props.container.ports}/>);
 
+  private labels = (): JSX.Element =>
+    this.entitiesList(
+      <ContainerLabelsList
+      labels={Object.entries(this.props.container.labels).map(([key, value]) => `${key} = ${value}`)}/>);
 
   private logs = (): JSX.Element => {
     const {isLoading, error, container} = this.props;

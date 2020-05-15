@@ -24,6 +24,12 @@
 
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {isAuthenticated} from "./auth";
+import {camelCaseToSentenceCase, capitalize, snakeCaseToCamelCase} from "./text";
+
+
+export interface IReply<T> extends AxiosResponse<T> {
+
+}
 
 export const API_URL = 'http://localhost:8080';
 /*const API_URL = '/';*/
@@ -31,7 +37,7 @@ const TIMEOUT = 120000;
 
 
 //TODO delete
-export function getData(url: string, callback: (data: any) => void): any {
+export function getData<T>(url: string, callback: (data: T) => void): any {
   fetch(url, {
     method: 'GET',
     headers: new Headers({
@@ -51,27 +57,27 @@ export function getData(url: string, callback: (data: any) => void): any {
   });
 }
 
-export function postData(url: string, requestBody: any,
-                         successCallback: (response: any) => void, failureCallback: (reason: string) => void): void {
+export function postData<T>(url: string, requestBody: any,
+                            successCallback: (response: IReply<T>) => void, failureCallback: (reason: string) => void): void {
   sendData(url, 'POST', requestBody, successCallback, failureCallback);
 }
 
-export function putData(url: string, requestBody: any,
-                        successCallback: (response: any) => void, failureCallback: (reason: string) => void): void {
-  sendData(url, 'PUT', requestBody, successCallback, failureCallback);
+export function putData<T>(url: string, requestBody: any,
+                           successCallback: (response: any) => void, failureCallback: (reason: string) => void): void {
+  sendData<T>(url, 'PUT', requestBody, successCallback, failureCallback);
 }
 
-export function patchData(url: string, requestBody: any,
-                          successCallback: (response: any) => void, failureCallback: (reason: string) => void,
-                          action?: "post" | "delete", ): void {
+export function patchData<T>(url: string, requestBody: any,
+                             successCallback: (response: IReply<T>) => void, failureCallback: (reason: string) => void,
+                             action?: "post" | "delete", ): void {
   if (action) {
     requestBody = { request: action.toUpperCase(), body: requestBody };
   }
-  sendData(url, 'PATCH', requestBody, successCallback, failureCallback);
+  sendData<T>(url, 'PATCH', requestBody, successCallback, failureCallback);
 }
 
-const sendData = (endpoint: string, method: Method, data: any,
-                  successCallback: (response: any) => void, failureCallback: (reason: string) => void) => {
+function sendData<T>(endpoint: string, method: Method, data: any,
+                     successCallback: (response: IReply<T>) => void, failureCallback: (reason: string) => void) {
   const url = new URL(endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`);
   console.log(`${method} ${url} ${JSON.stringify(data)}`);
   axios(url.href, {
@@ -88,10 +94,16 @@ const sendData = (endpoint: string, method: Method, data: any,
     console.log(response);
     successCallback(response)
   }).catch((error: AxiosError) => {
-    console.error(error);
-    failureCallback(error.message);
+    console.log(error);
+    console.log(error.message)
+    const statusCode = error.response?.status || '';
+    const statusMessage = error.response?.data.apierror.status
+      ? camelCaseToSentenceCase(snakeCaseToCamelCase(error.response?.data.apierror.status.toLowerCase())) + ' -'
+      : '';
+    const replyMessage = error.response?.data.apierror.message || error.message;
+    failureCallback(`${statusCode} ${statusMessage} ${replyMessage}`);
   })
-};
+}
 
 export function deleteData(endpoint: string,
                            successCallback: () => void,

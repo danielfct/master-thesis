@@ -35,7 +35,7 @@ const sidenavLinks = [
     { link: '/apps', name: 'Apps' },
     { link: '/services', name: 'Services' },
     { link: '/containers', name: 'Containers' },
-    { link: '/hosts', name: 'Hosts' },
+    { link: '/hosts', name: 'Hosts', sub: [{ link: '/cloud', name: 'Cloud' }, { link: '/edge', name: 'Edge' }] },
     { link: '/nodes', name: 'Nodes' },
     { link: '/rules', name: 'Rules', sub: [{ link: '/conditions', name: 'Conditions' }] },
     { link: '/metrics/simulated', name: 'Simulated metrics' },
@@ -66,6 +66,7 @@ class Sidenav extends React.Component<Props, {}> {
         M.Sidenav.init(this.sidenav.current as Element);
         this.scrollbar?.updateScroll();
         this.handleResize();
+        this.blockBodyScroll();
     };
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
@@ -75,6 +76,10 @@ class Sidenav extends React.Component<Props, {}> {
     componentWillUnmount(): void {
         window.removeEventListener('resize', this.handleResize);
     }
+
+    private blockBodyScroll = () => {
+        this.sidenav.current?.addEventListener('wheel', event => event.preventDefault())
+    };
 
     private shouldShowSidenav = () =>
       window.innerWidth > 992;

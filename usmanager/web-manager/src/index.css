@@ -233,7 +233,7 @@ ul.tabs {
     height: 56px;
 }
 
-.sidenav li>a.sub-link {
+.sidenav li > a.sub-link {
     padding: 0 55px;
 }
 
@@ -710,3 +710,4 @@ select.no-validation-field ~ input.select-dropdown {
 .progress .determinate {
     background-color: black;
 }
+

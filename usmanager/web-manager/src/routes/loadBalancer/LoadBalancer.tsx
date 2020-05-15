@@ -22,8 +22,7 @@ import {loadRegions, loadServices} from "../../actions";
 import {connect} from "react-redux";
 import {IService} from "../services/Service";
 import {IRegion} from "../region/Region";
-import ListItem from "../../components/list/ListItem";
-import styles from "../../components/list/ListItem.module.css";
+import {IReply} from "../../utils/api";
 
 export interface ILoadBalancer {
 }
@@ -65,8 +64,7 @@ class LoadBalancer extends BaseComponent<Props, {}> {
     this.props.loadRegions();
   }
 
-  private onPostSuccess = (reply: any): void => {
-    console.log(reply); //TODO show which id it started at
+  private onPostSuccess = (reply: IReply<ILoadBalancer>): void => {
     //super.toast(`Load balancer Edge host <b>${edgeHostHostname}</b> is now saved`);
   };
 
@@ -175,7 +173,7 @@ class LoadBalancer extends BaseComponent<Props, {}> {
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const regions = state.entities.regions.data;
   const isLoading = false; //state.entities.loadBalancers.isLoading;
-  const error = null; //state.entities.loadBalancers.loadError;
+  const error = null; //state.entities.loadBalancers.error;
   const id = props.match.params.id;
   const loadBalancer = isLaunchLoadBalancer(id) ? emptyLoadBalancer() : {}; //state.entities.loadBalancers.data[id];
   let formLoadBalancer;
