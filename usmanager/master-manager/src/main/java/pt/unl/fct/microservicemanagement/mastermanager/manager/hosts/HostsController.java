@@ -30,7 +30,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.Cloud
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
@@ -62,11 +61,6 @@ public class HostsController {
     return aws.getSimpleInstances();
   }
 
-  @PostMapping("/cloud/aws")
-  public Instance createEC2Instance() {
-    return aws.createInstance();
-  }
-
   @GetMapping("/cloud/aws/{id}")
   public Instance getEC2Instance(@PathVariable String id) {
     return aws.getInstance(id);
@@ -92,6 +86,11 @@ public class HostsController {
     return dockerContainersService.launchContainer(ec2PublicIp, serviceName, internalPort, externalPort,
         dynamicLaunchParams);
   }*/
+
+  @PostMapping("/cloud")
+  public CloudHostEntity startCloudHost() {
+    return cloudHostsService.startCloudHost();
+  }
 
   @GetMapping("/cloud")
   public Iterable<CloudHostEntity> getCloudHosts() {

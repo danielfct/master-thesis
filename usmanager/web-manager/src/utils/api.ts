@@ -33,7 +33,7 @@ export interface IReply<T> extends AxiosResponse<T> {
 
 export const API_URL = 'http://localhost:8080';
 /*const API_URL = '/';*/
-const TIMEOUT = 120000;
+const TIMEOUT = 300000;
 
 
 //TODO delete
@@ -94,14 +94,9 @@ function sendData<T>(endpoint: string, method: Method, data: any,
     console.log(response);
     successCallback(response)
   }).catch((error: AxiosError) => {
-    console.log(error);
-    console.log(error.message)
-    const statusCode = error.response?.status || '';
-    const statusMessage = error.response?.data.apierror.status
-      ? camelCaseToSentenceCase(snakeCaseToCamelCase(error.response?.data.apierror.status.toLowerCase())) + ' -'
-      : '';
-    const replyMessage = error.response?.data.apierror.message || error.message;
-    failureCallback(`${statusCode} ${statusMessage} ${replyMessage}`);
+    const reason = buildErrorMessage(error);
+    console.error(reason);
+    failureCallback(reason);
   })
 }
 
@@ -124,9 +119,20 @@ export function deleteData(endpoint: string,
     console.log(response);
     successCallback();
   }).catch((error: AxiosError) => {
-    console.log(error);
-    failureCallback(error.message);
+    const reason = buildErrorMessage(error);
+    console.error(reason);
+    failureCallback(reason);
   })
+}
+
+function buildErrorMessage(error: AxiosError): string {
+  let responseMessage = error.response?.data.apierror?.message;
+  if (!responseMessage) {
+    return error.message;
+  }
+  const responseStatusCode = error.response?.status;
+  const responseStatusMessage = camelCaseToSentenceCase(snakeCaseToCamelCase(error.response?.data.apierror.status.toLowerCase()));
+  return `${responseStatusCode} ${responseStatusMessage} - ${responseMessage}`;
 }
 
 export const setupAxiosInterceptors = (token: string): void => {

@@ -61,12 +61,12 @@ import Container from "../routes/containers/Container";
 import Apps from "../routes/apps/Apps";
 import App from "../routes/apps/App";
 import Rules from "../routes/rules/Rules";
-import HostRules from "../routes/rules/hosts/HostRules";
-import HostRule from "../routes/rules/hosts/HostRule";
-import ServiceRules from "../routes/rules/services/ServiceRules";
-import ServiceRule from "../routes/rules/services/ServiceRule";
-import Conditions from "../routes/rules/conditions/Conditions";
-import Condition from "../routes/rules/conditions/Condition";
+import HostRules from "../routes/rules/hosts/RulesHost";
+import HostRule from "../routes/rules/hosts/RuleHost";
+import ServiceRules from "../routes/rules/services/RulesService";
+import ServiceRule from "../routes/rules/services/RuleService";
+import Conditions from "../routes/rules/conditions/RuleConditionsList";
+import Condition from "../routes/rules/conditions/RuleCondition";
 
 
 interface RootContainerProps {

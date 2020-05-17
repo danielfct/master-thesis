@@ -9,22 +9,22 @@
  */
 
 import React from "react";
-import {IHostRule} from "./HostRule";
+import {IServiceRule} from "./RuleService";
 import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 
-interface HostRuleCardProps {
-  rule: IHostRule;
+interface ServiceRuleCardProps {
+  rule: IServiceRule;
 }
 
-type Props = HostRuleCardProps;
+type Props = ServiceRuleCardProps;
 
-const HostRuleCard = ({rule}: Props) => (
-  <Card<IHostRule> title={rule.name}
-                   link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
-                   height={'120px'}
-                   margin={'10px 0'}
-                   hoverable>
+const RuleServiceCard = ({rule}: Props) => (
+  <Card<IServiceRule> title={rule.name}
+                      link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
+                      height={'125px'}
+                      margin={'10px 0'}
+                      hoverable>
     <CardItem key={'priority'}
               label={'Priority'}
               value={`${rule.priority}`}/>
@@ -37,4 +37,4 @@ const HostRuleCard = ({rule}: Props) => (
   </Card>
 );
 
-export default HostRuleCard;
+export default RuleServiceCard;

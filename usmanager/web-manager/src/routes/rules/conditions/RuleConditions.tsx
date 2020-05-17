@@ -11,15 +11,15 @@
 import React from "react";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import AddButton from "../../../components/form/AddButton";
-import styles from '../edge/EdgeHosts.module.css'
-import CloudHostsList from "./CloudHostsList";
+import styles from "../hosts/RulesHost.module.css";
+import RuleConditionsList from "./RuleConditionsList";
 
-const CloudHosts: React.FC = () =>
+const RuleConditions: React.FC = () =>
   <MainLayout>
-    <AddButton tooltip={'Add cloud host'} pathname={'/hosts/cloud/new_instance'}/>
+    <AddButton tooltip={'Add rule condition'} pathname={'/rules/conditions/new_condition'}/>
     <div className={`${styles.container}`}>
-      <CloudHostsList/>
+      <RuleConditionsList/>
     </div>
   </MainLayout>;
 
-export default CloudHosts;
+export default RuleConditions;

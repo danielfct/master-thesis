@@ -1,4 +1,4 @@
-import {IServiceRule} from "./ServiceRule";
+import {IServiceRule} from "./RuleService";
 import BaseComponent from "../../../components/BaseComponent";
 import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";
@@ -14,7 +14,7 @@ import {
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
-import {ICondition} from "../conditions/Condition";
+import {ICondition} from "../conditions/RuleCondition";
 
 interface StateToProps {
   isLoading: boolean;
@@ -38,7 +38,7 @@ interface ServiceRuleConditionListProps {
 
 type Props = StateToProps & DispatchToProps & ServiceRuleConditionListProps
 
-class ServiceRuleConditionList extends BaseComponent<Props, {}> {
+class RuleServiceConditionList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     if (this.props.rule) {
@@ -133,4 +133,4 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
     loadConditions,
   }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ServiceRuleConditionList);
+export default connect(mapStateToProps, mapDispatchToProps)(RuleServiceConditionList);

@@ -73,7 +73,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   private service = (index: number, service: IAppService | IAddAppService, separate: boolean, checked: boolean,
                      handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const serviceName = typeof service.service == 'string' ? service.service : service.service.serviceName;
+    const serviceName = typeof service.service === 'string' ? service.service : service.service.serviceName;
     const unsaved = this.props.unsavedServices.map(service => service.service).includes(service.service.toString());
     return (
       <ListItem key={index} separate={separate}>

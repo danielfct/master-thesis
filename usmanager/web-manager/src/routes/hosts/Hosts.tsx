@@ -28,7 +28,7 @@ export default class Hosts extends BaseComponent<{}, {}> {
         id: 'addHosts',
         title: 'Host type',
         empty: 'No more apps to add',
-        data: [{text: 'Cloud', pathname: '/hosts/cloud/new_host'}, {text: 'Edge', pathname: '/hosts/edge/new_host'}],
+        data: [{text: 'Cloud', pathname: '/hosts/cloud/new_instance'}, {text: 'Edge', pathname: '/hosts/edge/new_host'}],
       }}/>
       <div className={`${styles.container}`}>
         <Collapsible id={"cloudHostsCollapsible"}

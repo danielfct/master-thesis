@@ -34,12 +34,14 @@ import ActionProgressBar from "./ActionProgressBar";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
 import M from "materialize-css";
+import {normalize, schema} from "normalizr";
 
 export type RestOperation = {
   textButton?: string,
   url: string,
   successCallback: (reply?: any, args?: any) => void,
-  failureCallback: (reason: string, args?: any) => void
+  failureCallback: (reason: string, args?: any) => void,
+  schema?: schema.Entity,
 }
 
 export interface IFields {
@@ -78,9 +80,11 @@ interface FormProps {
   onModalConfirm?: (values: IValues) => void;
   dropdown?: { id: string, title: string, empty: string, data: string[]};
   saveEntities?: (args: any) => void;
-  customButtons?: JSX.Element;
+  customButtons?: ICustomButton[];
   loading?: boolean;
 }
+
+export type ICustomButton = { text: string, color?: 'blue' | 'green' | 'red', onClick: () => void, confirm?: { id: string, message: string } };
 
 type Props = FormProps & RouteComponentProps;
 
@@ -248,7 +252,12 @@ class Form extends React.Component<Props, State> {
       if (post?.url) {
         if (validate) {
           postData(post.url, this.state.values,
-            (reply, ) => {
+            (reply) => {
+              if (post.schema) {
+                const normalizedReply = normalize(reply.data, post.schema).entities;
+                console.log(normalizedReply)
+                //TODO
+              }
               post.successCallback(reply, args);
               this.setState({savedValues: this.state.values, isLoading: false});
             },
@@ -261,23 +270,23 @@ class Form extends React.Component<Props, State> {
       }
     }
     else {
-      if (put?.url) {
-        if (validate) {
-          if (this.saveRequired()) {
-            putData(put.url, this.state.values,
-              (reply) => {
-                put.successCallback(reply, args);
-                this.setState({savedValues: this.state.values, isLoading: false});
-              },
-              (reason) => {
-                put.failureCallback(reason, args);
-                this.setState({isLoading: false});
-              });
-            this.setState({isLoading: true});
-          } else {
-            saveEntities?.(args);
-          }
+      const saveRequired = this.saveRequired();
+      if (saveRequired) {
+        if (put?.url && validate) {
+          putData(put.url, this.state.values,
+            (reply) => {
+              put.successCallback(reply, args);
+              this.setState({savedValues: this.state.values, isLoading: false});
+            },
+            (reason) => {
+              put.failureCallback(reason, args);
+              this.setState({isLoading: false});
+            });
+          this.setState({isLoading: true});
         }
+      }
+      else {
+        saveEntities?.(args);
       }
     }
   };
@@ -334,8 +343,10 @@ class Form extends React.Component<Props, State> {
     const {id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, children} = this.props;
     return (
       <>
-        <ConfirmDialog message={`${this.props.delete?.textButton?.toLowerCase() || 'delete'} ${values[id]}`}
-                       confirmCallback={this.onClickDelete}/>
+        {this.props.delete && (
+          <ConfirmDialog id={id}
+                         message={`${this.props.delete?.textButton?.toLowerCase() || 'delete'} ${values[id]}`}
+                         confirmCallback={this.onClickDelete}/>)}
         <form onSubmit={this.handleSubmit} noValidate>
           {(controlsMode === undefined || controlsMode === 'top') && (
             <div>
@@ -358,11 +369,25 @@ class Form extends React.Component<Props, State> {
                         <i className="large material-icons">edit</i>
                       </button>)}
                     <div className={`${styles.controlButton}`}>
-                      {customButtons}
+                      {customButtons?.map((button, index) => (
+                        <>
+                          {button.confirm && (
+                            <ConfirmDialog key={button.confirm.id}
+                                           id={button.confirm.id}
+                                           message={button.confirm?.message}
+                                           confirmCallback={button.onClick}/>)}
+                          <button key={index} //TODO
+                                  className={`${button.confirm ? 'modal-trigger' : undefined} btn-flat btn-small waves-effect waves-light ${button.color || 'blue'}-text`}
+                                  data-target={button.confirm?.id}
+                                  onClick={!button.confirm ? button.onClick : undefined}>
+                            {button.text}
+                          </button>
+                        </>
+                      ))}
                       {deletable !== undefined && (
                         <button className='modal-trigger btn-flat btn-small waves-effect waves-light red-text'
                                 type="button"
-                                data-target="confirm-dialog">
+                                data-target={id}>
                           {this.props.delete?.textButton || 'Delete'}
                         </button>)}
                       <button className='btn-flat btn-small waves-effect waves-light green-text slide'
@@ -404,7 +429,7 @@ class Form extends React.Component<Props, State> {
               <ActionProgressBar loading={isLoading}/>
             </div>
           )}
-          <div className={`${styles.content}`}>
+          <div className={`${React.Children.count(children) == 0 ? styles.emptyContent : styles.content}`}>
             <FormContext.Provider value={context}>
               {children}
             </FormContext.Provider>

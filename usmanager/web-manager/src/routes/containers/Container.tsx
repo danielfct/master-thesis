@@ -346,9 +346,9 @@ class Container extends BaseComponent<Props, State> {
                     successCallback: this.onDeleteSuccess,
                     failureCallback: this.onDeleteFailure}
                   : undefined}
-                customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
+                /*customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
                   ? this.replicateMigrateButtons()
-                  : undefined}
+                  : undefined}TODO*/
                 loading={this.state.isLoading}>
             {this.formFields(formContainer, isNew)}
           </Form>

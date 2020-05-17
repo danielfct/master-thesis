@@ -1,13 +1,10 @@
 import React from 'react';
-import {ICondition} from "./Condition";
+import {ICondition} from "./RuleCondition";
 import BaseComponent from "../../../components/BaseComponent";
-import MainLayout from "../../../views/mainLayout/MainLayout";
-import AddButton from "../../../components/form/AddButton";
 import CardList from "../../../components/list/CardList";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
-import ConditionCard from "./ConditionCard";
-import styles from "./Conditions.module.css";
+import RuleConditionCard from "./RuleConditionCard";
 import {loadConditions} from "../../../actions";
 
 interface StateToProps {
@@ -22,31 +19,29 @@ interface DispatchToProps {
 
 type Props = StateToProps & DispatchToProps;
 
-class Conditions extends BaseComponent<Props, {}> {
+class RuleConditionsList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     this.props.loadConditions();
   }
 
   private condition = (condition: ICondition): JSX.Element =>
-    <ConditionCard key={condition.id} condition={condition}/>;
+    <RuleConditionCard key={condition.id} condition={condition}/>;
 
   private predicate = (condition: ICondition, search: string): boolean =>
     condition.name.toString().toLowerCase().includes(search);
 
-  render = () =>
-    <MainLayout>
-      <AddButton tooltip={'Add condition'} pathname={'/rules/conditions/new_condition'}/>
-      <div className={`${styles.container}`}>
-        <CardList<ICondition>
-          isLoading={this.props.isLoading}
-          error={this.props.error}
-          emptyMessage={"No conditions to display"}
-          list={this.props.conditions}
-          card={this.condition}
-          predicate={this.predicate}/>
-      </div>
-    </MainLayout>
+  render() {
+    return (
+      <CardList<ICondition>
+        isLoading={this.props.isLoading}
+        error={this.props.error}
+        emptyMessage={"No conditions to display"}
+        list={this.props.conditions}
+        card={this.condition}
+        predicate={this.predicate}/>
+    )
+  }
 
 }
 
@@ -62,4 +57,4 @@ const mapDispatchToProps: DispatchToProps = {
   loadConditions,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Conditions);
+export default connect(mapStateToProps, mapDispatchToProps)(RuleConditionsList);

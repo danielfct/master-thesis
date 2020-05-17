@@ -35,9 +35,16 @@ const sidenavLinks = [
     { link: '/apps', name: 'Apps' },
     { link: '/services', name: 'Services' },
     { link: '/containers', name: 'Containers' },
-    { link: '/hosts', name: 'Hosts', sub: [{ link: '/cloud', name: 'Cloud' }, { link: '/edge', name: 'Edge' }] },
+    { link: '/hosts', name: 'Hosts', sub: [
+            { link: '/cloud', name: 'Cloud instances' },
+            { link: '/edge', name: 'Edge hosts' }
+        ] },
     { link: '/nodes', name: 'Nodes' },
-    { link: '/rules', name: 'Rules', sub: [{ link: '/conditions', name: 'Conditions' }] },
+    { link: '/rules', name: 'Rules', sub: [
+            { link: '/hosts', name: 'Host rules' },
+            { link: '/services', name: 'Service rules' },
+            { link: '/conditions', name: 'Conditions' }
+        ] },
     { link: '/metrics/simulated', name: 'Simulated metrics' },
     { link: '/regions', name: 'Regions' },
     { link: '/load-balancers', name: 'Load balancers' },

@@ -27,10 +27,10 @@ import {
 import {connect} from "react-redux";
 import React from "react";
 import {IReply, postData} from "../../../utils/api";
-import ServiceRuleConditionList from "./ServiceRuleConditionList";
+import ServiceRuleConditionList from "./RuleServiceConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
-import ServiceRuleServicesList from "./ServiceRuleServicesList";
-import HostRuleEdgeHostsList from "../hosts/HostRuleEdgeHostsList";
+import ServiceRuleServicesList from "./RuleServiceServicesList";
+import HostRuleEdgeHostsList from "../hosts/RuleHostEdgeHostsList";
 
 export interface IServiceRule extends IRule {
   services?: string[]
@@ -74,7 +74,7 @@ type State = {
   isGeneric: boolean,
 }
 
-class ServiceRule extends BaseComponent<Props, State> {
+class RuleService extends BaseComponent<Props, State> {
 
   state: State = {
     newConditions: [],
@@ -353,4 +353,4 @@ const mapDispatchToProps: DispatchToProps = {
   addRuleServices,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ServiceRule);
+export default connect(mapStateToProps, mapDispatchToProps)(RuleService);

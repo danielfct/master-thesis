@@ -22,7 +22,7 @@ import {
   removeServiceRules
 } from "../../actions";
 import {connect} from "react-redux";
-import {IServiceRule} from "../rules/services/ServiceRule";
+import {IServiceRule} from "../rules/services/RuleService";
 import {Link} from "react-router-dom";
 
 interface StateToProps {

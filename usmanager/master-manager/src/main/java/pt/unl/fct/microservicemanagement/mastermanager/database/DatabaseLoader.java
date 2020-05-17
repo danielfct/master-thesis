@@ -647,15 +647,17 @@ public class DatabaseLoader {
 
       // cloud hosts
       awsService.getSimpleInstances().forEach(instance -> {
-        var cloudHost = CloudHostEntity.builder()
-            .instanceId(instance.getInstanceId())
-            .imageId(instance.getImageId())
-            .instanceType(instance.getInstanceType())
-            .state(instance.getState())
-            .publicDnsName(instance.getPublicDnsName())
-            .publicIpAddress(instance.getPublicIpAddress())
-            .build();
-        cloudHosts.save(cloudHost);
+        if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()) {
+          var cloudHost = CloudHostEntity.builder()
+              .instanceId(instance.getInstanceId())
+              .imageId(instance.getImageId())
+              .instanceType(instance.getInstanceType())
+              .state(instance.getState())
+              .publicDnsName(instance.getPublicDnsName())
+              .publicIpAddress(instance.getPublicIpAddress())
+              .build();
+          cloudHosts.save(cloudHost);
+        }
       });
 
       // edge hosts

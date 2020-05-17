@@ -9,32 +9,17 @@
  */
 
 import React from "react";
-import {IServiceRule} from "./ServiceRule";
-import Card from "../../../components/cards/Card";
-import CardItem from "../../../components/list/CardItem";
+import MainLayout from "../../../views/mainLayout/MainLayout";
+import AddButton from "../../../components/form/AddButton";
+import styles from './RulesService.module.css';
+import RulesServiceList from "./RulesServiceList";
 
-interface ServiceRuleCardProps {
-  rule: IServiceRule;
-}
+const RulesService: React.FC = () =>
+  <MainLayout>
+    <AddButton tooltip={'Add service rule'} pathname={'/rules/services/new_service_rule'}/>
+    <div className={`${styles.container}`}>
+      <RulesServiceList/>
+    </div>
+  </MainLayout>;
 
-type Props = ServiceRuleCardProps;
-
-const ServiceRuleCard = ({rule}: Props) => (
-  <Card<IServiceRule> title={rule.name}
-                      link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
-                      height={'125px'}
-                      margin={'10px 0'}
-                      hoverable>
-    <CardItem key={'priority'}
-              label={'Priority'}
-              value={`${rule.priority}`}/>
-    <CardItem key={'generic'}
-              label={'Generic'}
-              value={`${rule.generic}`}/>
-    <CardItem key={'decision'}
-              label={'Decision'}
-              value={`${rule.decision.name}`}/>
-  </Card>
-);
-
-export default ServiceRuleCard;
+export default RulesService;

@@ -16,7 +16,7 @@ import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {IHostRule} from "../../rules/hosts/HostRule";
+import {IHostRule} from "../../rules/hosts/RuleHost";
 import {Link} from "react-router-dom";
 import {ICloudHost} from "./CloudHost";
 import {addCloudHostRule, loadCloudHostRules, loadRulesHost, removeCloudHostRules} from "../../../actions";
@@ -56,6 +56,7 @@ class CloudHostRuleList extends BaseComponent<Props, {}> {
 
   private rule = (index: number, rule: string, separate: boolean, checked: boolean,
                   handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.props.host.instanceId === undefined; //TODO do this on all lists
     const unsaved = this.props.unsavedRules.map(newRule => newRule).includes(rule);
     return (
       <ListItem key={index} separate={separate}>
@@ -66,7 +67,7 @@ class CloudHostRuleList extends BaseComponent<Props, {}> {
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
-            <div className={unsaved ? styles.unsavedItem : undefined}>
+            <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
               {rule}
             </div>
             </span>
@@ -117,7 +118,7 @@ class CloudHostRuleList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `hosts/${this.props.host.instanceId}/rules`,
+                             url: `hosts/cloud/${this.props.host.instanceId}/rules`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;

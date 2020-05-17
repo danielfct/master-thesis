@@ -28,11 +28,10 @@ import {
   loadRulesHost,
 } from "../../../actions";
 import {IReply, postData} from "../../../utils/api";
-import HostRuleConditionList from "./HostRuleConditionList";
+import HostRuleConditionList from "./RuleHostConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
-import HostRuleCloudHostsList from "./HostRuleCloudHostsList";
-import HostRuleEdgeHostsList from "./HostRuleEdgeHostsList";
-import EdgeHostRuleList from "../../hosts/edge/EdgeHostRuleList";
+import HostRuleCloudHostsList from "./RuleHostCloudHostsList";
+import HostRuleEdgeHostsList from "./RuleHostEdgeHostsList";
 
 export interface IHostRule extends IRule {
   cloudHosts?: string[],
@@ -79,7 +78,7 @@ type State = {
   isGeneric: boolean,
 }
 
-class HostRule extends BaseComponent<Props, State> {
+class RuleHost extends BaseComponent<Props, State> {
 
   state: State = {
     newConditions: [],
@@ -403,4 +402,4 @@ const mapDispatchToProps: DispatchToProps = {
   addRuleEdgeHosts
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HostRule);
+export default connect(mapStateToProps, mapDispatchToProps)(RuleHost);

@@ -182,7 +182,7 @@ class App extends BaseComponent<Props, State> {
                 post={{url: 'apps', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
                 put={{url: `apps/${this.state.appName || app[appKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={{url: `apps/${this.state.appName || app[appKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
-                customButtons={!isNew ? this.launchButton() : undefined}
+                /*customButtons={!isNew ? this.launchButton() : undefined}TODO*/
                 saveEntities={this.saveEntities}
                 loading={this.state.isLoading}>
             {Object.keys(formApp).map((key, index) =>

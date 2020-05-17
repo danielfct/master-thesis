@@ -137,14 +137,18 @@ public class AwsService {
     String instanceId = createEC2();
     Instance instance = waitInstanceState(instanceId, AwsInstanceState.RUNNING);
     String publicIpAddress = instance.getPublicIpAddress();
-    log.info("New aws instance created: instanceId = {}, publicIp = {}", instanceId, publicIpAddress);
+    log.info("New aws instance created: instanceId = {}, publicIpAddress = {}", instanceId, publicIpAddress);
     return instance;
   }
 
   private String createEC2() {
-    var runInstancesRequest = new RunInstancesRequest();
-    runInstancesRequest.withImageId(DEFAULT_INSTANCE_AMI).withInstanceType(awsInstanceType).withMinCount(1)
-        .withMaxCount(1).withSecurityGroups(DEFAULT_INSTANCE_SECURITY_GROUP).withKeyName(DEFAULT_INSTANCE_KEY_PAIR);
+    var runInstancesRequest = new RunInstancesRequest()
+        .withImageId(DEFAULT_INSTANCE_AMI)
+        .withInstanceType(awsInstanceType)
+        .withMinCount(1)
+        .withMaxCount(1)
+        .withSecurityGroups(DEFAULT_INSTANCE_SECURITY_GROUP)
+        .withKeyName(DEFAULT_INSTANCE_KEY_PAIR);
     RunInstancesResult result = ec2.runInstances(runInstancesRequest);
     Instance instance = result.getReservation().getInstances().get(0);
     String instanceId = instance.getInstanceId();
@@ -226,7 +230,7 @@ public class AwsService {
             throw new UnsupportedOperationException();
         }
         instance = waitInstanceState(instanceId, state);
-        log.info("Successfully set instance {} to {} state", instanceId, state.getName());
+        log.info("Setting instance {} to {} state", instanceId, state.getName());
         return instance;
       } catch (SetInstanceStateException e) {
         log.info("Failed to set instance {} to {} state: {}", instanceId, state.getName(), e.getMessage());

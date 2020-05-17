@@ -60,13 +60,13 @@ import Containers from "../routes/containers/Containers";
 import Container from "../routes/containers/Container";
 import Apps from "../routes/apps/Apps";
 import App from "../routes/apps/App";
-import HostRules from "../routes/rules/hosts/HostRules";
-import HostRule from "../routes/rules/hosts/HostRule";
-import ServiceRules from "../routes/rules/services/ServiceRules";
-import ServiceRule from "../routes/rules/services/ServiceRule";
+import RulesHost from "../routes/rules/hosts/RulesHost";
+import HostRule from "../routes/rules/hosts/RuleHost";
+import RulesService from "../routes/rules/services/RulesService";
+import ServiceRule from "../routes/rules/services/RuleService";
 import Rules from "../routes/rules/Rules";
-import Conditions from "../routes/rules/conditions/Conditions";
-import Condition from "../routes/rules/conditions/Condition";
+import RuleConditions from "../routes/rules/conditions/RuleConditions";
+import Condition from "../routes/rules/conditions/RuleCondition";
 import LoadBalancers from "../routes/loadBalancer/LoadBalancers";
 import LoadBalancer from "../routes/loadBalancer/LoadBalancer";
 
@@ -93,11 +93,11 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/nodes": { component: Nodes, search: true },
     "/nodes/:id": { component: Node },
     "/rules": { component: Rules, search: true },
-    "/rules/hosts": { component: HostRules, search: true },
+    "/rules/hosts": { component: RulesHost, search: true },
     "/rules/hosts/:name": { component: HostRule },
-    "/rules/services": { component: ServiceRules, search: true },
+    "/rules/services": { component: RulesService, search: true },
     "/rules/services/:name": { component: ServiceRule },
-    "/rules/conditions": { component: Conditions, search: true },
+    "/rules/conditions": { component: RuleConditions, search: true },
     "/rules/conditions/:name": { component: Condition },
     "/metrics/simulated": { component: SimulatedMetricsLandingPage, search: true },
     "/metrics/simulated/services": { component: ServiceSimulatedMetrics, search: true },

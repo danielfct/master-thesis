@@ -2,6 +2,7 @@ import React, {createRef} from "react";
 import M from "materialize-css";
 
 interface Props {
+  id: string;
   message: string;
   cancel?: boolean;
   cancelCallback?: () => void;
@@ -26,7 +27,7 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
 
   render() {
     return (
-      <div id="confirm-dialog" className='modal dialog' ref={this.modal}>
+      <div id={this.props.id} className='modal dialog' ref={this.modal}>
         <div className="modal-content">
           <div className="modal-message">Are you sure you want to <div className="dialog-message">{this.props.message}</div>?</div>
         </div>

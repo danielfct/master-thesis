@@ -73,10 +73,8 @@ public class CloudHostEntity {
   @NotNull
   private String imageId;
 
-  @Column(unique = true)
   private String publicDnsName;
 
-  @Column(unique = true)
   private String publicIpAddress;
 
   @Singular

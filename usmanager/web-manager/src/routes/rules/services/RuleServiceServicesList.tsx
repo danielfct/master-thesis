@@ -24,7 +24,7 @@ import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import {IService} from "../../services/Service";
-import {IServiceRule} from "./ServiceRule";
+import {IServiceRule} from "./RuleService";
 
 interface StateToProps {
   isLoading: boolean;
@@ -48,7 +48,7 @@ interface ServiceRuleServicesListProps {
 
 type Props = StateToProps & DispatchToProps & ServiceRuleServicesListProps
 
-class ServiceRuleServicesList extends BaseComponent<Props, {}> {
+class RuleServiceServicesList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     if (this.props.rule) {
@@ -143,4 +143,4 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
     loadServices,
   }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ServiceRuleServicesList);
+export default connect(mapStateToProps, mapDispatchToProps)(RuleServiceServicesList);

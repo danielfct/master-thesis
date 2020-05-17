@@ -1,7 +1,7 @@
 import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 import React from "react";
-import {ICondition} from "./Condition";
+import {ICondition} from "./RuleCondition";
 
 interface ConditionCardProps {
   condition: ICondition;
@@ -9,7 +9,7 @@ interface ConditionCardProps {
 
 type Props = ConditionCardProps;
 
-const ConditionCard = ({condition}: Props) => (
+const RuleConditionCard = ({condition}: Props) => (
   <Card<ICondition> title={condition.name.toString()}
                link={{to: {pathname: `conditions/${condition.name}`, state: condition}}}
                height={'150px'}
@@ -30,4 +30,4 @@ const ConditionCard = ({condition}: Props) => (
   </Card>
 );
 
-export default ConditionCard;
+export default RuleConditionCard;

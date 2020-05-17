@@ -68,48 +68,58 @@ public class CloudHostsService {
     return cloudHosts.save(cloudHost);
   }
 
-  private CloudHostEntity addCloudHostFromInstance(Instance instance) {
-    InstanceState state = new InstanceState();
-    state.setName(AwsInstanceState.RUNNING.getName());
-    state.setCode(AwsInstanceState.RUNNING.getCode());
+  private CloudHostEntity saveCloudHostFromInstance(Long id, Instance instance) {
     CloudHostEntity cloudHost = CloudHostEntity.builder()
+        .id(id)
         .instanceId(instance.getInstanceId())
+        .instanceType(instance.getInstanceType())
+        .state(instance.getState())
+        .imageId(instance.getImageId())
+        .publicDnsName(instance.getPublicDnsName())
         .publicIpAddress(instance.getPublicIpAddress())
-        .state(state)
         .build();
     return saveCloudHost(cloudHost);
   }
 
+  private CloudHostEntity saveCloudHostFromInstance(Instance instance) {
+    return saveCloudHostFromInstance(0L, instance);
+  }
+
   public CloudHostEntity startCloudHost() {
     Instance instance = awsService.createInstance();
-    return addCloudHostFromInstance(instance);
+    return saveCloudHostFromInstance(instance);
   }
 
   public CloudHostEntity startCloudHost(String instanceId) {
-    var cloudHost = getCloudHost(instanceId);
-    awsService.startInstance(instanceId);
-    InstanceState state = new InstanceState();
-    state.setName(AwsInstanceState.RUNNING.getName());
-    state.setCode(AwsInstanceState.RUNNING.getCode());
-    cloudHost = cloudHost.toBuilder().state(state).build();
-    saveCloudHost(cloudHost);
-    return cloudHost;
+    CloudHostEntity cloudHost = getCloudHost(instanceId);
+    InstanceState state = new InstanceState()
+        .withCode(AwsInstanceState.PENDING.getCode())
+        .withName(AwsInstanceState.PENDING.getName());
+    cloudHost.setState(state);
+    cloudHost = cloudHosts.save(cloudHost);
+    Instance instance = awsService.startInstance(instanceId);
+    return saveCloudHostFromInstance(cloudHost.getId(), instance);
   }
 
   public CloudHostEntity stopCloudHost(String instanceId) {
-    var cloudHost = getCloudHost(instanceId);
-    awsService.stopInstance(instanceId);
-    InstanceState state = new InstanceState();
-    state.setName(AwsInstanceState.STOPPED.getName());
-    state.setCode(AwsInstanceState.STOPPED.getCode());
-    cloudHost = cloudHost.toBuilder().state(state).build();
-    saveCloudHost(cloudHost);
-    return cloudHost;
+    CloudHostEntity cloudHost = getCloudHost(instanceId);
+    InstanceState state = new InstanceState()
+        .withCode(AwsInstanceState.STOPPING.getCode())
+        .withName(AwsInstanceState.STOPPING.getName());
+    cloudHost.setState(state);
+    cloudHost = cloudHosts.save(cloudHost);
+    Instance instance = awsService.stopInstance(instanceId);
+    return saveCloudHostFromInstance(cloudHost.getId(), instance);
   }
 
   public void terminateCloudHost(String instanceId) {
+    CloudHostEntity cloudHost = getCloudHost(instanceId);
+    InstanceState state = new InstanceState()
+        .withCode(AwsInstanceState.PENDING.getCode())
+        .withName(AwsInstanceState.PENDING.getName());
+    cloudHost.setState(state);
+    cloudHost = cloudHosts.save(cloudHost);
     awsService.terminateInstance(instanceId);
-    var cloudHost = getCloudHost(instanceId);
     cloudHosts.delete(cloudHost);
   }
 

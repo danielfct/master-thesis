@@ -175,9 +175,9 @@ import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
 import {IDecision, IField, IOperator, IValueMode} from "../routes/rules/Rule";
-import {IHostRule} from "../routes/rules/hosts/HostRule";
-import {IServiceRule} from "../routes/rules/services/ServiceRule";
-import {ICondition} from "../routes/rules/conditions/Condition";
+import {IHostRule} from "../routes/rules/hosts/RuleHost";
+import {IServiceRule} from "../routes/rules/services/RuleService";
+import {ICondition} from "../routes/rules/conditions/RuleCondition";
 import {IAddAppService, IAppService} from "../routes/apps/AppServicesList";
 
 export type EntitiesState = {

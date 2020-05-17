@@ -8,56 +8,48 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IServiceRule} from "./ServiceRule";
+import {IHostRule} from "./RuleHost";
 import BaseComponent from "../../../components/BaseComponent";
 import React from "react";
-import MainLayout from "../../../views/mainLayout/MainLayout";
-import AddButton from "../../../components/form/AddButton";
-import ServiceRuleCard from "./ServiceRuleCard";
-import styles from './ServiceRules.module.css';
+import RuleHostCard from "./RuleHostCard";
 import CardList from "../../../components/list/CardList";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
-import {loadRulesService} from "../../../actions";
+import {loadRulesHost} from "../../../actions";
 
 interface StateToProps {
   isLoading: boolean
   error?: string | null;
-  serviceRules: IServiceRule[];
+  hostRules: IHostRule[];
 }
 
 interface DispatchToProps {
-  loadRulesService: () => any;
+  loadRulesHost: () => any;
 }
 
 type Props = StateToProps & DispatchToProps;
 
-class ServiceRules extends BaseComponent<Props, {}> {
+class RulesHostList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    this.props.loadRulesService();
+    this.props.loadRulesHost();
   }
 
-  private rule = (rule: IServiceRule): JSX.Element =>
-    <ServiceRuleCard key={rule.id} rule={rule}/>;
+  private rule = (rule: IHostRule): JSX.Element =>
+    <RuleHostCard key={rule.id} rule={rule}/>;
 
-  private predicate = (rule: IServiceRule, search: string): boolean =>
+  private predicate = (rule: IHostRule, search: string): boolean =>
     rule.name.toLowerCase().includes(search);
 
   render() {
     return (
-      <MainLayout>
-        <AddButton tooltip={'Add service rule'} pathname={'/rules/services/new_service_rule'}/>
-        <div className={`${styles.container}`}>
-          <CardList<IServiceRule>
-            isLoading={this.props.isLoading}
-            error={this.props.error}
-            emptyMessage={"No service rules to display"}
-            list={this.props.serviceRules}
-            card={this.rule}
-            predicate={this.predicate}/>
-        </div>
-      </MainLayout>
+        <CardList<IHostRule>
+          isLoading={this.props.isLoading}
+          error={this.props.error}
+          emptyMessage={"No host rules to display"}
+          list={this.props.hostRules}
+          card={this.rule}
+          predicate={this.predicate}/>
     );
   }
 
@@ -65,14 +57,14 @@ class ServiceRules extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: state.entities.rules.services.isLoadingRules,
-    error: state.entities.rules.services.loadRulesError,
-    serviceRules: Object.values(state.entities.rules.services.data)
+    isLoading: state.entities.rules.hosts.isLoadingRules,
+    error: state.entities.rules.hosts.loadRulesError,
+    hostRules: Object.values(state.entities.rules.hosts.data)
   }
 );
 
 const mapDispatchToProps: DispatchToProps = {
-  loadRulesService,
+  loadRulesHost,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ServiceRules);
+export default connect(mapStateToProps, mapDispatchToProps)(RulesHostList);

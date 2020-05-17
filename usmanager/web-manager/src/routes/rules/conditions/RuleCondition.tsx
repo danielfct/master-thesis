@@ -60,7 +60,7 @@ type State = {
   conditionName?: string;
 }
 
-class Condition extends BaseComponent<Props, State> {
+class RuleCondition extends BaseComponent<Props, State> {
 
   componentDidMount(): void {
     const conditionName = this.props.match.params.name;
@@ -217,4 +217,4 @@ const mapDispatchToProps: DispatchToProps = {
   loadOperators,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Condition);
+export default connect(mapStateToProps, mapDispatchToProps)(RuleCondition);

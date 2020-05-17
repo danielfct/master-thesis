@@ -1,4 +1,4 @@
-import {IHostRule} from "./HostRule";
+import {IHostRule} from "./RuleHost";
 import BaseComponent from "../../../components/BaseComponent";
 import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";
@@ -14,7 +14,7 @@ import {
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
-import {ICondition} from "../conditions/Condition";
+import {ICondition} from "../conditions/RuleCondition";
 
 interface StateToProps {
   isLoading: boolean;
@@ -38,7 +38,7 @@ interface HostRuleConditionListProps {
 
 type Props = StateToProps & DispatchToProps & HostRuleConditionListProps
 
-class HostRuleConditionList extends BaseComponent<Props, {}> {
+class RuleHostConditionList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     if (this.props.rule) { //TODO do this on all classes
@@ -133,4 +133,4 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
     loadConditions,
   }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(HostRuleConditionList);
+export default connect(mapStateToProps, mapDispatchToProps)(RuleHostConditionList);

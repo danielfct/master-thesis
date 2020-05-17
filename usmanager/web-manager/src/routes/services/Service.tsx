@@ -54,7 +54,7 @@ import ServicePredictionList, {IPrediction} from "./ServicePredictionList";
 import ServiceRuleList from "./ServiceRuleList";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
 import GenericServiceRuleList from "./GenericServiceRuleList";
-import ServiceRuleServicesList from "../rules/services/ServiceRuleServicesList";
+import ServiceRuleServicesList from "../rules/services/RuleServiceServicesList";
 
 export interface IService extends IData {
   serviceName: string;

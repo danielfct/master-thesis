@@ -33,14 +33,14 @@ import {IRegion} from "../routes/region/Region";
 import {IDependee} from "../routes/services/ServiceDependeeList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {INode} from "../routes/nodes/Node";
-import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
+import {ICloudHost, IState} from "../routes/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
 import {IDecision, IField, IOperator, IRule, IValueMode} from "../routes/rules/Rule";
-import {IServiceRule} from "../routes/rules/services/ServiceRule";
-import {IHostRule} from "../routes/rules/hosts/HostRule";
-import {ICondition} from "../routes/rules/conditions/Condition";
+import {IServiceRule} from "../routes/rules/services/RuleService";
+import {IHostRule} from "../routes/rules/hosts/RuleHost";
+import {ICondition} from "../routes/rules/conditions/RuleCondition";
 import {IAppService} from "../routes/apps/AppServicesList";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 
@@ -112,96 +112,100 @@ interface ISchemas {
     LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
-const appServiceSchema: schema.Entity<IAppService> = new schema.Entity('services', undefined, {
+const appService: schema.Entity<IAppService> = new schema.Entity('services', undefined, {
     idAttribute: (service: IAppService) => service.service.serviceName
 });
-const appServices = new schema.Array(appServiceSchema);
-const appSchema: schema.Entity<IApp> = new schema.Entity('apps', undefined, {
+const appServices = new schema.Array(appService);
+const app: schema.Entity<IApp> = new schema.Entity('apps', undefined, {
     idAttribute: (app: IApp) => app.name
 });
-const apps = new schema.Array(appSchema);
+const apps = new schema.Array(app);
 
-const dependencySchema: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', undefined, {
+const dependency: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', undefined, {
     idAttribute: (dependency: IServiceDependency) => dependency.serviceName
 });
-const dependencies = new schema.Array(dependencySchema);
+const dependencies = new schema.Array(dependency);
 
-const dependeeSchema: schema.Entity<IDependee> = new schema.Entity('dependees', undefined, {
+const dependee: schema.Entity<IDependee> = new schema.Entity('dependees', undefined, {
     idAttribute: (dependee: IDependee) => dependee.serviceName
 });
-const dependees = new schema.Array(dependeeSchema);
+const dependees = new schema.Array(dependee);
 
-const predictionSchema: schema.Entity<IPrediction> = new schema.Entity('predictions', undefined, {
+const prediction: schema.Entity<IPrediction> = new schema.Entity('predictions', undefined, {
     idAttribute: (prediction: IPrediction) => prediction.name
 });
 
-const valueModeSchema: schema.Entity<IValueMode> = new schema.Entity('valueModes', undefined, {
+const valueMode: schema.Entity<IValueMode> = new schema.Entity('valueModes', undefined, {
     idAttribute: (valueMode: IValueMode) => valueMode.name
 });
-const valueModes = new schema.Array(valueModeSchema);
+const valueModes = new schema.Array(valueMode);
 
-const fieldSchema: schema.Entity<IField> = new schema.Entity('fields', undefined, {
+const field: schema.Entity<IField> = new schema.Entity('fields', undefined, {
     idAttribute: (field: IField) => field.name
 });
-const fields = new schema.Array(fieldSchema);
+const fields = new schema.Array(field);
 
-const operatorSchema: schema.Entity<IOperator> = new schema.Entity('operators', undefined, {
+const operator: schema.Entity<IOperator> = new schema.Entity('operators', undefined, {
     idAttribute: (operator: IOperator) => operator.name
 });
-const operators = new schema.Array(operatorSchema);
+const operators = new schema.Array(operator);
 
-const conditionSchema: schema.Entity<ICondition> = new schema.Entity('conditions', undefined, {
+const condition: schema.Entity<ICondition> = new schema.Entity('conditions', undefined, {
     idAttribute: (condition: ICondition) => condition.name
 });
-const conditions = new schema.Array(conditionSchema);
+const conditions = new schema.Array(condition);
 
-const ruleHostSchema: schema.Entity<IHostRule> = new schema.Entity('hostRules', undefined, {
+const ruleHost: schema.Entity<IHostRule> = new schema.Entity('hostRules', undefined, {
     idAttribute: (hostRule: IHostRule) => hostRule.name
 });
-const hostRules = new schema.Array(ruleHostSchema);
+const hostRules = new schema.Array(ruleHost);
 
-const cloudHostSchema: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', undefined, {
+const cloudHost: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', undefined, {
     idAttribute: (host: ICloudHost) => host.instanceId
 });
-const cloudHosts = new schema.Array(cloudHostSchema);
+const cloudHosts = new schema.Array(cloudHost);
 
-const edgeHostSchema: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefined, {
+const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefined, {
     idAttribute: (host: IEdgeHost) => host.hostname
 });
-const edgeHosts = new schema.Array(edgeHostSchema);
+const edgeHosts = new schema.Array(edgeHost);
 
-const ruleServiceSchema: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', undefined, {
+const ruleService: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', undefined, {
     idAttribute: (serviceRule: IServiceRule) => serviceRule.name
 });
-const serviceRules = new schema.Array(ruleServiceSchema);
+const serviceRules = new schema.Array(ruleService);
 
-const decisionSchema: schema.Entity<IDecision> = new schema.Entity('decisions', undefined, {
+const decision: schema.Entity<IDecision> = new schema.Entity('decisions', undefined, {
     idAttribute: (decision: IDecision) => decision.name
 });
 
-const nodeSchema: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
+const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
     idAttribute: (node: INode) => node.id.toString()
 });
 
-const serviceSchema: schema.Entity<IService> = new schema.Entity('services', undefined, {
+const service: schema.Entity<IService> = new schema.Entity('services', undefined, {
     idAttribute: (service: IService) => service.serviceName
 });
-const services = new schema.Array(serviceSchema);
+const services = new schema.Array(service);
 
-const regionSchema: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
+const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
     idAttribute: (region: IRegion) => region.name
 });
 
-const containerSchema: schema.Entity<IContainer> = new schema.Entity('containers', undefined, {
+const container: schema.Entity<IContainer> = new schema.Entity('containers', undefined, {
     idAttribute: (container: IContainer) => container.id.toString()
 });
 
-const loadBalancerSchema: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalancers', undefined, {
+const loadBalancer: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalancers', undefined, {
     idAttribute: (loadBalancer: ILoadBalancer) => '' //TODO
 });
 
-const logsSchema: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
+const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
     idAttribute: (logs: ILogs) => logs.eventId.toString()
+});
+
+const state: schema.Entity<IState> = new schema.Entity('state', undefined, {
+    idAttribute: (state: IState) => state.name
 });
 
 /*const repositorySchema = new schema.Entity('repositories', {
@@ -210,60 +214,60 @@ const logsSchema: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
     idAttribute: repository => repository.fullName.toLowerCase()
 })*/
 
-appSchema.define({ appServices });
-edgeHostSchema.define({ hostRules });
-cloudHostSchema.define({ hostRules });
-serviceSchema.define({ apps, dependencies, dependees, serviceRules });
-conditionSchema.define({ valueModes, fields, operators });
-ruleHostSchema.define({ conditions, edgeHosts, cloudHosts });
-ruleServiceSchema.define({ conditions, services });
+app.define({ appServices });
+edgeHost.define({ hostRules });
+cloudHost.define({ hostRules, state });
+service.define({ apps, dependencies, dependees, serviceRules });
+condition.define({ valueModes, fields, operators });
+ruleHost.define({ conditions, edgeHosts, cloudHosts });
+ruleService.define({ conditions, services });
 
 export const Schemas: ISchemas = {
-    SERVICE: serviceSchema,
-    SERVICE_ARRAY: [serviceSchema],
-    SERVICE_APP: appSchema,
-    SERVICE_APP_ARRAY: [appSchema],
-    SERVICE_DEPENDENCY: dependencySchema,
-    SERVICE_DEPENDENCY_ARRAY: [dependencySchema],
-    SERVICE_DEPENDEE: dependeeSchema,
-    SERVICE_DEPENDEE_ARRAY: [dependeeSchema],
-    SERVICE_PREDICTION: predictionSchema,
-    SERVICE_PREDICTION_ARRAY: [predictionSchema],
-    SERVICE_RULE: ruleServiceSchema,
-    SERVICE_RULE_ARRAY: [ruleServiceSchema],
-    APP: appSchema,
-    APP_ARRAY: [appSchema],
-    APP_SERVICE: appServiceSchema,
-    APP_SERVICE_ARRAY: [appServiceSchema],
-    REGION: regionSchema,
-    REGION_ARRAY: [regionSchema],
-    RULE_HOST: ruleHostSchema,
-    RULE_HOST_ARRAY: [ruleHostSchema],
-    RULE_SERVICE: ruleServiceSchema,
-    RULE_SERVICE_ARRAY: [ruleServiceSchema],
-    RULE_CONDITION: conditionSchema,
-    RULE_CONDITION_ARRAY: [conditionSchema],
-    CONDITION: conditionSchema,
-    CONDITION_ARRAY: [conditionSchema],
-    VALUE_MODE_ARRAY: [valueModeSchema],
-    FIELD_ARRAY: [fieldSchema],
-    OPERATOR_ARRAY: [operatorSchema],
-    DECISION: decisionSchema,
-    DECISION_ARRAY: [decisionSchema],
-    NODE: nodeSchema,
-    NODE_ARRAY: [nodeSchema],
-    CLOUD_HOST: cloudHostSchema,
-    CLOUD_HOST_ARRAY: [cloudHostSchema],
-    CLOUD_HOST_RULE: ruleHostSchema,
-    CLOUD_HOST_RULE_ARRAY: [ruleHostSchema],
-    EDGE_HOST: edgeHostSchema,
-    EDGE_HOST_ARRAY: [edgeHostSchema],
-    EDGE_HOST_RULE: ruleHostSchema,
-    EDGE_HOST_RULE_ARRAY: [ruleHostSchema],
-    CONTAINER: containerSchema,
-    CONTAINER_ARRAY: [containerSchema],
-    LOAD_BALANCER_ARRAY: [loadBalancerSchema],
-    LOGS_ARRAY: [logsSchema],
+    SERVICE: service,
+    SERVICE_ARRAY: [service],
+    SERVICE_APP: app,
+    SERVICE_APP_ARRAY: [app],
+    SERVICE_DEPENDENCY: dependency,
+    SERVICE_DEPENDENCY_ARRAY: [dependency],
+    SERVICE_DEPENDEE: dependee,
+    SERVICE_DEPENDEE_ARRAY: [dependee],
+    SERVICE_PREDICTION: prediction,
+    SERVICE_PREDICTION_ARRAY: [prediction],
+    SERVICE_RULE: ruleService,
+    SERVICE_RULE_ARRAY: [ruleService],
+    APP: app,
+    APP_ARRAY: [app],
+    APP_SERVICE: appService,
+    APP_SERVICE_ARRAY: [appService],
+    REGION: region,
+    REGION_ARRAY: [region],
+    RULE_HOST: ruleHost,
+    RULE_HOST_ARRAY: [ruleHost],
+    RULE_SERVICE: ruleService,
+    RULE_SERVICE_ARRAY: [ruleService],
+    RULE_CONDITION: condition,
+    RULE_CONDITION_ARRAY: [condition],
+    CONDITION: condition,
+    CONDITION_ARRAY: [condition],
+    VALUE_MODE_ARRAY: [valueMode],
+    FIELD_ARRAY: [field],
+    OPERATOR_ARRAY: [operator],
+    DECISION: decision,
+    DECISION_ARRAY: [decision],
+    NODE: node,
+    NODE_ARRAY: [node],
+    CLOUD_HOST: cloudHost,
+    CLOUD_HOST_ARRAY: [cloudHost],
+    CLOUD_HOST_RULE: ruleHost,
+    CLOUD_HOST_RULE_ARRAY: [ruleHost],
+    EDGE_HOST: edgeHost,
+    EDGE_HOST_ARRAY: [edgeHost],
+    EDGE_HOST_RULE: ruleHost,
+    EDGE_HOST_RULE_ARRAY: [ruleHost],
+    CONTAINER: container,
+    CONTAINER_ARRAY: [container],
+    LOAD_BALANCER_ARRAY: [loadBalancer],
+    LOGS_ARRAY: [logs],
 };
 
 export const CALL_API = 'Call API';

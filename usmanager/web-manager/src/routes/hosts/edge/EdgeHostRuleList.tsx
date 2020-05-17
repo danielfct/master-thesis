@@ -16,7 +16,7 @@ import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {IHostRule} from "../../rules/hosts/HostRule";
+import {IHostRule} from "../../rules/hosts/RuleHost";
 import {Link} from "react-router-dom";
 import {IEdgeHost} from "./EdgeHost";
 import {
@@ -121,7 +121,7 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/hosts/%d/cloudHosts`,
+                             url: `rules/hosts/edge/${this.props.host.hostname}`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;

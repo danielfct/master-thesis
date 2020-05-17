@@ -8,39 +8,33 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import React from "react";
+import {IHostRule} from "./RuleHost";
 import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
-import React from "react";
-import {ICloudHost} from "./CloudHost";
 
-interface CloudHostCardProps {
-  cloudHost: ICloudHost;
+interface HostRuleCardProps {
+  rule: IHostRule;
 }
 
-type Props = CloudHostCardProps;
+type Props = HostRuleCardProps;
 
-const CloudHostCard = ({cloudHost}: Props) => (
-  <Card<ICloudHost> title={cloudHost.instanceId}
-                    link={{ to: { pathname: `/hosts/cloud/${cloudHost.instanceId }`, state: cloudHost } }}
-                    height={'185px'}
-                    margin={'10px 0'}
-                    hoverable>
-    <CardItem key={'imageId'}
-              label={'imageId'}
-              value={`${cloudHost.imageId}`}/>
-    <CardItem key={'instanceType'}
-              label={'instanceType'}
-              value={`${cloudHost.instanceType}`}/>
-    <CardItem key={'state'}
-              label={'state'}
-              value={`${cloudHost.state}`}/>
-    <CardItem key={'publicDnsName'}
-              label={'publicDnsName'}
-              value={`${cloudHost.publicDnsName}`}/>
-    <CardItem key={'publicIpAddress'}
-              label={'publicIpAddress'}
-              value={`${cloudHost.publicIpAddress}`}/>
+const RuleHostCard = ({rule}: Props) => (
+  <Card<IHostRule> title={rule.name}
+                   link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
+                   height={'120px'}
+                   margin={'10px 0'}
+                   hoverable>
+    <CardItem key={'priority'}
+              label={'Priority'}
+              value={`${rule.priority}`}/>
+    <CardItem key={'generic'}
+              label={'Generic'}
+              value={`${rule.generic}`}/>
+    <CardItem key={'decision'}
+              label={'Decision'}
+              value={`${rule.decision.name}`}/>
   </Card>
 );
 
-export default CloudHostCard;
+export default RuleHostCard;
