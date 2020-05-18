@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.AddServiceApp;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
@@ -74,8 +73,8 @@ public final class AppsController {
   }
 
   @DeleteMapping("/{appName}")
-  public void deleteApp(@PathVariable String serviceName) {
-    appsService.deleteApp(serviceName);
+  public void deleteApp(@PathVariable String appName) {
+    appsService.deleteApp(appName);
   }
 
   @GetMapping("/{appName}/services")

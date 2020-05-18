@@ -1,7 +1,7 @@
 import Data from "../../components/IData";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import Form, {IFields, required} from "../../components/form/Form";
+import Form, {ICustomButton, IFields, required} from "../../components/form/Form";
 import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
@@ -9,11 +9,13 @@ import React from "react";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {addAppService, loadApps} from "../../actions";
+import {addApp, addAppService, loadApps} from "../../actions";
 import {connect} from "react-redux";
 import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
 import {IReply, postData} from "../../utils/api";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
+import {normalize} from "normalizr";
+import {Schemas} from "../../middleware/api";
 
 export interface IApp extends Data {
   name: string;
@@ -30,12 +32,13 @@ const isNewApp = (name: string) =>
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  formApp?: Partial<IApp>;
   app: Partial<IApp>;
+  formApp?: Partial<IApp>;
 }
 
 interface DispatchToProps {
-  loadApps: (name: string) => any;
+  loadApps: (name: string) => void;
+  addApp: (app: IApp) => void;
   addAppService: (appName: string, appService: IAddAppService) => void;
 }
 
@@ -46,12 +49,15 @@ interface MatchParams {
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
+  app?: IApp,
+  formApp?: IApp,
   unsavedServices: IAddAppService[],
-  appName?: string,
   isLoading: boolean,
 }
 
 class App extends BaseComponent<Props, State> {
+
+  private mounted = false;
 
   state: State = {
     unsavedServices: [],
@@ -59,19 +65,76 @@ class App extends BaseComponent<Props, State> {
   };
 
   componentDidMount(): void {
+    this.loadApp();
+    this.mounted = true;
+  };
+
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadApp = () => {
     const appName = this.props.match.params.name;
     if (appName && !isNewApp(appName)) {
       this.props.loadApps(appName);
     }
   };
 
-  private onAddAppService = (service: IAddAppService): void => {
+  private getApp = () =>
+    this.state.app || this.props.app;
+
+  private getFormApp = () =>
+    this.state.formApp || this.props.formApp;
+
+  private onPostSuccess = (reply: IReply<IApp>): void => {
+    const app = reply.data;
+    this.props.addApp(app);
+    this.saveEntities(app);
+    if (this.mounted) {
+      this.updateApp(app);
+      this.props.history.replace(app.name);
+    }
+    super.toast(`App <b>${app.name}</b> saved`);
+
+  };
+
+  private onPostFailure = (reason: string, appName: string): void =>
+    super.toast(`Unable to save ${appName}`, 10000, reason, true);
+
+  private onPutSuccess = (reply: IReply<IApp>): void => {
+    const app = reply.data;
+    this.updateApp(app);
+    this.saveEntities(app);
+    super.toast(`Changes to app <b>${app.name}</b> are now saved`);
+  };
+
+  private onPutFailure = (reason: string, app: IApp): void =>
+    super.toast(`Unable to update ${app.name}`, 10000, reason, true);
+
+  private shouldShowSaveButton = () =>
+    !!this.state.unsavedServices.length;
+
+  private saveEntities = (app: IApp) => {
+    this.saveAppServices(app);
+  };
+
+  private onDeleteSuccess = (app: IApp): void => {
+    super.toast(`App <b>${app.name}</b> successfully removed`);
+    if (this.mounted) {
+      this.props.history.push(`/apps`);
+    }
+  };
+
+  private onDeleteFailure = (reason: string, app: IApp): void =>
+    super.toast(`Unable to delete ${app.name}`, 10000, reason, true);
+
+  private addAppService = (service: IAddAppService): void => {
     this.setState({
       unsavedServices: this.state.unsavedServices.concat(service)
     });
   };
 
-  private onRemoveAppServices = (services: string[]): void => {
+  private removeAppServices = (services: string[]): void => {
     this.setState({
       unsavedServices: this.state.unsavedServices.filter(service => !services.includes(service.service))
     });
@@ -88,40 +151,50 @@ class App extends BaseComponent<Props, State> {
 
   private onSaveServicesSuccess = (app: IApp): void => {
     this.state.unsavedServices.forEach(service => this.props.addAppService(app.name, service));
-    this.setState({ unsavedServices: [] });
+    if (this.mounted) {
+      this.setState({ unsavedServices: [] });
+    }
   };
 
   private onSaveServicesFailure = (app: IApp, reason: string): void =>
     super.toast(`Unable to save services of app ${app.name}`, 10000, reason, true);
 
-  private saveEntities = (app: IApp) => {
-    this.saveAppServices(app);
+  private launchButton = (): ICustomButton[] => {
+    const buttons: ICustomButton[] = [];
+    if (!isNewApp(this.props.match.params.name)) {
+      buttons.push({text: 'Launch', onClick: this.launchApp});
+    }
+    return buttons;
   };
 
-  private onPostSuccess = (reply: IReply<IApp>): void => {
-    super.toast(`App <b>${reply.data.name}</b> saved`);
-    this.saveEntities(reply.data);
+  private launchApp = () => {
+    const app = this.getApp();
+    this.setState({isLoading: true});
+    postData(`apps/${app.name}/launch`, undefined,
+      (reply: IReply<IApp>) => this.onLaunchSuccess(reply.data),
+      (reason: string) => this.onLaunchFailure(reason, app));
   };
 
-  private onPostFailure = (reason: string, appName: string): void =>
-    super.toast(`Unable to save ${appName}`, 10000, reason, true);
-
-  private onPutSuccess = (reply: IReply<IApp>): void => {
-    super.toast(`Changes to app <b>${reply.data.name}</b> are now saved`);
-    this.setState({appName: reply.data.name});
-    this.saveEntities(reply.data);
+  private onLaunchSuccess = (app: IApp) => {
+    super.toast(`Successfully launched ${app.name}`, 15000);
+    if (this.mounted) {
+      this.updateApp(app);
+    }
   };
 
-  private onPutFailure = (reason: string, app: IApp): void =>
-    super.toast(`Unable to update ${app.name}`, 10000, reason, true);
-
-  private onDeleteSuccess = (appName: string): void => {
-    super.toast(`App <b>${appName}</b> successfully removed`);
-    this.props.history.push(`/apps`);
+  private onLaunchFailure = (reason: string, app: Partial<IApp>) => {
+    super.toast(`Failed to launch ${app.name}`, 10000, reason, true);
+    if (this.mounted) {
+      this.setState({isLoading: false});
+    }
   };
 
-  private onDeleteFailure = (reason: string, appName: string): void =>
-    super.toast(`Unable to delete ${appName}`, 10000, reason, true);
+  private updateApp = (app: IApp) => {
+    app = Object.values(normalize(app, Schemas.APP).entities.apps || {})[0];
+    const formApp = { ...app };
+    removeFields(formApp);
+    this.setState({app: app, formApp: formApp, isLoading: false});
+  };
 
   private getFields = (app: Partial<IApp>): IFields =>
     Object.entries(app).map(([key, _]) => {
@@ -139,36 +212,12 @@ class App extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private shouldShowSaveButton = () =>
-    !!this.state.unsavedServices.length;
-
-  private launchButton = () =>
-    <button className={`btn-flat btn-small waves-effect waves-light blue-text`} onClick={this.launchApp}>
-      Launch
-    </button>;
-
-  private launchApp = () => {
-    this.setState({isLoading: true});
-    postData(`apps/${this.props.app.name}/launch`, undefined,
-      (reply: IReply<IApp>) => this.onLaunchSuccess(reply),
-      (reply: string) => this.onLaunchFailure(reply));
-  };
-
-  private onLaunchSuccess = (reply: IReply<IApp>) => {
-    super.toast(`Successfully launched ${reply.data.name}`, 15000);
-    this.setState({isLoading: false});
-  };
-
-  private onLaunchFailure = (reason: string) => {
-    super.toast(`Failed to launch ${this.props.app.name}`, 10000, reason, true);
-    this.setState({isLoading: false});
-  };
-
   private app = () => {
-    const {isLoading, error, formApp, app} = this.props;
+    const {isLoading, error} = this.props;
+    const app = this.getApp();
+    const formApp = this.getFormApp();
     // @ts-ignore
     const appKey: (keyof IApp) = formApp && Object.keys(formApp)[0];
-    const isNew = isNewApp(this.props.match.params.name);
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
@@ -177,12 +226,24 @@ class App extends BaseComponent<Props, State> {
           <Form id={appKey}
                 fields={this.getFields(formApp)}
                 values={app}
-                isNew={isNew}
+                isNew={isNewApp(this.props.match.params.name)}
                 showSaveButton={this.shouldShowSaveButton()}
-                post={{url: 'apps', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={{url: `apps/${this.state.appName || app[appKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={{url: `apps/${this.state.appName || app[appKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
-                /*customButtons={!isNew ? this.launchButton() : undefined}TODO*/
+                post={{
+                  url: 'apps',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure
+                }}
+                put={{
+                  url: `apps/${app.name}`,
+                  successCallback: this.onPutSuccess,
+                  failureCallback: this.onPutFailure
+                }}
+                delete={{
+                  url: `apps/${app.name}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure
+                }}
+                customButtons={this.launchButton()}
                 saveEntities={this.saveEntities}
                 loading={this.state.isLoading}>
             {Object.keys(formApp).map((key, index) =>
@@ -197,7 +258,8 @@ class App extends BaseComponent<Props, State> {
   };
 
   private entitiesList = (element: JSX.Element) => {
-    const {isLoading, error, app} = this.props;
+    const {isLoading, error} = this.props;
+    const app = this.getApp();
     if (isLoading) {
       return <ListLoadingSpinner/>;
     }
@@ -211,10 +273,10 @@ class App extends BaseComponent<Props, State> {
   };
 
   private services = (): JSX.Element =>
-    this.entitiesList(<AppServicesList app={this.props.app}
+    this.entitiesList(<AppServicesList app={this.getApp()}
                                        unsavedServices={this.state.unsavedServices}
-                                       onAddAppService={this.onAddAppService}
-                                       onRemoveAppServices={this.onRemoveAppServices}/>);
+                                       onAddAppService={this.addAppService}
+                                       onRemoveAppServices={this.removeAppServices}/>);
 
   private tabs: Tab[] = [
     {
@@ -242,6 +304,11 @@ class App extends BaseComponent<Props, State> {
 
 }
 
+function removeFields(app: Partial<IApp>) {
+  delete app["id"];
+  delete app["services"];
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.apps.isLoadingApps;
   const error = state.entities.apps.loadAppsError;
@@ -250,8 +317,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   let formApp;
   if (app) {
     formApp = { ...app };
-    delete formApp["id"];
-    delete formApp["services"];
+    removeFields(formApp);
   }
   return  {
     isLoading,
@@ -263,6 +329,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadApps,
+  addApp,
   addAppService
 };
 

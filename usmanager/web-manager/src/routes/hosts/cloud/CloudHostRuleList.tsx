@@ -71,7 +71,7 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
 
   private rule = (index: number, rule: string, separate: boolean, checked: boolean,
                   handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.props.host.instanceId === undefined; //TODO do this on all lists
+    const isNew = this.props.host.instanceId === undefined;
     const unsaved = this.props.unsavedRules.map(newRule => newRule).includes(rule);
     return (
       <ListItem key={index} separate={separate}>
@@ -96,10 +96,8 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
     );
   };
 
-  private onAdd = (rule: string): void => {
+  private onAdd = (rule: string): void =>
     this.props.onAddHostRule(rule);
-  }
-
 
   private onRemove = (rules: string[]) =>
     this.props.onRemoveHostRules(rules);
@@ -116,11 +114,7 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
 
   private getSelectableRules = () => {
     const {rules, rulesName, unsavedRules} = this.props;
-    console.log(rulesName);
-    console.log(unsavedRules);
-    const a = Object.keys(rules).filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
-    console.log(a);
-    return a;
+    return Object.keys(rules).filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
   };
 
   render() {

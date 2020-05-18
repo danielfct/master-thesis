@@ -34,14 +34,12 @@ import ActionProgressBar from "./ActionProgressBar";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
 import M from "materialize-css";
-import {normalize, schema} from "normalizr";
 
 export type RestOperation = {
   textButton?: string,
   url: string,
   successCallback: (reply?: any, args?: any) => void,
   failureCallback: (reason: string, args?: any) => void,
-  schema?: schema.Entity,
 }
 
 export interface IFields {
@@ -146,6 +144,7 @@ export const requiredAndNumberAndMinAndMax = (values: IValues, id: keyof IValues
 
 class Form extends React.Component<Props, State> {
 
+  private mounted = false;
   private dropdown = createRef<HTMLButtonElement>();
   private scrollbar: (ScrollBar | null) = null;
 
@@ -160,6 +159,7 @@ class Form extends React.Component<Props, State> {
 
   componentDidMount(): void {
     this.initDropdown();
+    this.mounted = true;
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -193,6 +193,10 @@ class Form extends React.Component<Props, State> {
 
   private onOpenDropdown = () =>
     this.scrollbar?.updateScroll();
+
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
 
   private saveRequired = () => {
     return !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
@@ -228,16 +232,20 @@ class Form extends React.Component<Props, State> {
   };
 
   private onClickDelete = (): void => {
-    const args = this.state.values[this.props.id];
     if (this.props.delete) {
+      const args = this.state.values;
       deleteData(this.props.delete.url,
         () => {
           this.props.delete?.successCallback(args);
-          this.setState({isLoading: false});
+          if (this.mounted) {
+            this.setState({isLoading: false});
+          }
         },
         (reply) => {
           this.props.delete?.failureCallback(reply, args);
-          this.setState({isLoading: false});
+          if (this.mounted) {
+            this.setState({isLoading: false});
+          }
         });
       this.setState({isLoading: true});
     }
@@ -251,19 +259,18 @@ class Form extends React.Component<Props, State> {
     if (isNew) {
       if (post?.url) {
         if (validate) {
-          postData(post.url, this.state.values,
+          postData(post.url, args,
             (reply) => {
-              if (post.schema) {
-                const normalizedReply = normalize(reply.data, post.schema).entities;
-                console.log(normalizedReply)
-                //TODO
-              }
               post.successCallback(reply, args);
-              this.setState({savedValues: this.state.values, isLoading: false});
+              if (this.mounted) {
+                this.setState({savedValues: args, isLoading: false});
+              }
             },
             (reply) => {
               post.failureCallback(reply, args);
-              this.setState({isLoading: false});
+              if (this.mounted) {
+                this.setState({isLoading: false});
+              }
             });
           this.setState({isLoading: true});
         }
@@ -273,14 +280,18 @@ class Form extends React.Component<Props, State> {
       const saveRequired = this.saveRequired();
       if (saveRequired) {
         if (put?.url && validate) {
-          putData(put.url, this.state.values,
+          putData(put.url, args,
             (reply) => {
               put.successCallback(reply, args);
-              this.setState({savedValues: this.state.values, isLoading: false});
+              if (this.mounted) {
+                this.setState({savedValues: args, isLoading: false});
+              }
             },
             (reason) => {
               put.failureCallback(reason, args);
-              this.setState({isLoading: false});
+              if (this.mounted) {
+                this.setState({isLoading: false});
+              }
             });
           this.setState({isLoading: true});
         }
