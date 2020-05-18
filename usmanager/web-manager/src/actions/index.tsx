@@ -24,8 +24,86 @@
 
 import {CALL_API, Schemas} from "../middleware/api";
 import {EntitiesAction} from "../reducers/entities";
+import {IApp} from "../routes/apps/App";
 import {IAddAppService} from "../routes/apps/AppServicesList";
+import {IService} from "../routes/services/Service";
 import {IPrediction} from "../routes/services/ServicePredictionList";
+import {IContainer} from "../routes/containers/Container";
+import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
+import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
+import {INode} from "../routes/nodes/Node";
+import {IHostRule} from "../routes/rules/hosts/RuleHost";
+import {IServiceRule} from "../routes/rules/services/RuleService";
+import {ICondition} from "../routes/rules/conditions/RuleCondition";
+//import {ISimulatedMetric} from "../routes/simulatedMetrics/SimulatedMetric"; TODO
+import {IRegion} from "../routes/region/Region";
+import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
+//import {IEurekaServer} from "../routes/eurekaServer/EurekaServer"; TODO
+
+
+export const APPS_REQUEST = 'APPS_REQUEST';
+export const APPS_SUCCESS = 'APPS_SUCCESS';
+export const APPS_FAILURE = 'APPS_FAILURE';
+export const APP_REQUEST = 'APP_REQUEST';
+export const APP_SUCCESS = 'APP_SUCCESS';
+export const APP_FAILURE = 'APP_FAILURE';
+export const loadApps = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchApps(name));
+};
+const fetchApps = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ APPS_REQUEST, APPS_SUCCESS, APPS_FAILURE ],
+        endpoint: `apps`,
+        schema: Schemas.APP_ARRAY,
+        entity: 'apps'
+      }
+      : {
+        types: [ APP_REQUEST, APP_SUCCESS, APP_FAILURE ],
+        endpoint: `apps/${name}`,
+        schema: Schemas.APP,
+        entity: 'apps'
+      }
+});
+export const ADD_APP = 'ADD_APP';
+export function addApp(app: IApp): EntitiesAction {
+  return {
+    type: ADD_APP,
+    data: { apps: new Array(app) }
+  }
+}
+
+export const APP_SERVICES_REQUEST = 'APP_SERVICES_REQUEST';
+export const APP_SERVICES_SUCCESS = 'APP_SERVICES_SUCCESS';
+export const APP_SERVICES_FAILURE = 'APP_SERVICES_FAILURE';
+export const loadAppServices = (appName: string) => (dispatch: any) => {
+  return dispatch(fetchAppServices(appName));
+};
+const fetchAppServices = (appName: string) => ({
+  [CALL_API]: {
+    types: [ APP_SERVICES_REQUEST, APP_SERVICES_SUCCESS, APP_SERVICES_FAILURE ],
+    endpoint: `apps/${appName}/services`,
+    schema: Schemas.APP_SERVICE_ARRAY,
+    entity: appName
+  }
+});
+export const ADD_APP_SERVICE = 'ADD_APP_SERVICE';
+export function addAppService(appName: string, addAppService: IAddAppService): EntitiesAction {
+  return {
+    type: ADD_APP_SERVICE,
+    entity: appName,
+    data: { addAppServices: new Array(addAppService) }
+  }
+}
+export const REMOVE_APP_SERVICES = 'REMOVE_APP_SERVICES';
+export function removeAppServices(appName: string, serviceNames: string[]): EntitiesAction {
+  return {
+    type: REMOVE_APP_SERVICES,
+    entity: appName,
+    data: { serviceNames: serviceNames }
+  }
+}
 
 export const SERVICES_REQUEST = 'SERVICES_REQUEST';
 export const SERVICES_SUCCESS = 'SERVICES_SUCCESS';
@@ -52,6 +130,13 @@ const fetchServices = (name?: string) => ({
         entity: 'services'
       }
 });
+export const ADD_SERVICE = 'ADD_SERVICE';
+export function addService(service: IService): EntitiesAction {
+  return {
+    type: ADD_SERVICE,
+    data: { services: new Array(service) }
+  }
+}
 
 export const SERVICE_APPS_REQUEST = 'SERVICE_APPS_REQUEST';
 export const SERVICE_APPS_SUCCESS = 'SERVICE_APPS_SUCCESS';
@@ -192,87 +277,199 @@ export function removeServiceRules(serviceName: string, rules: string[]): Entiti
   }
 }
 
-export const APPS_REQUEST = 'APPS_REQUEST';
-export const APPS_SUCCESS = 'APPS_SUCCESS';
-export const APPS_FAILURE = 'APPS_FAILURE';
-export const APP_REQUEST = 'APP_REQUEST';
-export const APP_SUCCESS = 'APP_SUCCESS';
-export const APP_FAILURE = 'APP_FAILURE';
-export const loadApps = (name?: string) => (dispatch: any) => {
-  return dispatch(fetchApps(name));
+export const CONTAINERS_REQUEST = 'CONTAINERS_REQUEST';
+export const CONTAINERS_SUCCESS = 'CONTAINERS_SUCCESS';
+export const CONTAINERS_FAILURE = 'CONTAINERS_FAILURE';
+export const CONTAINER_REQUEST = 'CONTAINER_REQUEST';
+export const CONTAINER_SUCCESS = 'CONTAINER_SUCCESS';
+export const CONTAINER_FAILURE = 'CONTAINER_FAILURE';
+export const loadContainers = (id?: string) => (dispatch: any) => {
+  return dispatch(fetchContainers(id));
 };
-const fetchApps = (name?: string) => ({
+const fetchContainers = (id?: string) => ({
   [CALL_API]:
-    !name
+    !id
       ? {
-        types: [ APPS_REQUEST, APPS_SUCCESS, APPS_FAILURE ],
-        endpoint: `apps`,
-        schema: Schemas.APP_ARRAY,
-        entity: 'apps'
+        types: [ CONTAINERS_REQUEST, CONTAINERS_SUCCESS, CONTAINERS_FAILURE ],
+        endpoint: `containers`,
+        schema: Schemas.CONTAINER_ARRAY,
+        entity: 'containers'
       }
       : {
-        types: [ APP_REQUEST, APP_SUCCESS, APP_FAILURE ],
-        endpoint: `apps/${name}`,
-        schema: Schemas.APP,
-        entity: 'apps'
+        types: [ CONTAINER_REQUEST, CONTAINER_SUCCESS, CONTAINER_FAILURE ],
+        endpoint: `containers/${id}`,
+        schema: Schemas.CONTAINER,
+        entity: 'containers'
       }
 });
-export const APP_SERVICES_REQUEST = 'APP_SERVICES_REQUEST';
-export const APP_SERVICES_SUCCESS = 'APP_SERVICES_SUCCESS';
-export const APP_SERVICES_FAILURE = 'APP_SERVICES_FAILURE';
-export const loadAppServices = (appName: string) => (dispatch: any) => {
-  return dispatch(fetchAppServices(appName));
-};
-const fetchAppServices = (appName: string) => ({
-  [CALL_API]: {
-    types: [ APP_SERVICES_REQUEST, APP_SERVICES_SUCCESS, APP_SERVICES_FAILURE ],
-    endpoint: `apps/${appName}/services`,
-    schema: Schemas.APP_SERVICE_ARRAY,
-    entity: appName
-  }
-});
-export const ADD_APP_SERVICE = 'ADD_APP_SERVICE';
-export function addAppService(appName: string, addAppService: IAddAppService): EntitiesAction {
+export const ADD_CONTAINER = 'ADD_CONTAINER';
+export function addContainer(container: IContainer): EntitiesAction {
   return {
-    type: ADD_APP_SERVICE,
-    entity: appName,
-    data: { addAppServices: new Array(addAppService) }
-  }
-}
-export const REMOVE_APP_SERVICES = 'REMOVE_APP_SERVICES';
-export function removeAppServices(appName: string, serviceNames: string[]): EntitiesAction {
-  return {
-    type: REMOVE_APP_SERVICES,
-    entity: appName,
-    data: { serviceNames: serviceNames }
+    type: ADD_CONTAINER,
+    data: { containers: new Array(container) }
   }
 }
 
-export const REGIONS_REQUEST = 'REGIONS_REQUEST';
-export const REGIONS_SUCCESS = 'REGIONS_SUCCESS';
-export const REGIONS_FAILURE = 'REGIONS_FAILURE';
-export const REGION_REQUEST = 'REGION_REQUEST';
-export const REGION_SUCCESS = 'REGION_SUCCESS';
-export const REGION_FAILURE = 'REGION_FAILURE';
-export const loadRegions = (name?: string) => (dispatch: any) => {
-  return dispatch(fetchRegions(name));
+export const CLOUD_HOSTS_REQUEST = 'CLOUD_HOSTS_REQUEST';
+export const CLOUD_HOSTS_SUCCESS = 'CLOUD_HOSTS_SUCCESS';
+export const CLOUD_HOSTS_FAILURE = 'CLOUD_HOSTS_FAILURE';
+export const CLOUD_HOST_REQUEST = 'CLOUD_HOST_REQUEST';
+export const CLOUD_HOST_SUCCESS = 'CLOUD_HOST_SUCCESS';
+export const CLOUD_HOST_FAILURE = 'CLOUD_HOST_FAILURE';
+export const loadCloudHosts = (instanceId?: string) => (dispatch: any) => {
+  return dispatch(fetchCloudHosts(instanceId));
 };
-const fetchRegions = (name?: string) => ({
+const fetchCloudHosts = (instanceId?: string) => ({
   [CALL_API]:
-    !name
+    !instanceId
       ? {
-        types: [ REGIONS_REQUEST, REGIONS_SUCCESS, REGIONS_FAILURE ],
-        endpoint: `regions`,
-        schema: Schemas.REGION_ARRAY,
-        entity: 'regions'
+        types: [ CLOUD_HOSTS_REQUEST, CLOUD_HOSTS_SUCCESS, CLOUD_HOSTS_FAILURE ],
+        endpoint: `hosts/cloud`,
+        schema: Schemas.CLOUD_HOST_ARRAY,
+        entity: 'cloudHosts'
       }
       : {
-        types: [ REGION_REQUEST, REGION_SUCCESS, REGION_FAILURE ],
-        endpoint: `regions/${name}`,
-        schema: Schemas.REGION,
-        entity: 'regions'
+        types: [ CLOUD_HOST_REQUEST, CLOUD_HOST_SUCCESS, CLOUD_HOST_FAILURE ],
+        endpoint: `hosts/cloud/${instanceId}`,
+        schema: Schemas.CLOUD_HOST,
+        entity: 'cloudHosts'
       }
 });
+export const ADD_CLOUD_HOST = 'ADD_CLOUD_HOST';
+export function addCloudHost(cloudHost: ICloudHost): EntitiesAction {
+  return {
+    type: ADD_CLOUD_HOST,
+    data: { cloudHosts: new Array(cloudHost) }
+  }
+}
+
+export const CLOUD_HOST_RULES_REQUEST = 'CLOUD_HOST_RULES_REQUEST';
+export const CLOUD_HOST_RULES_SUCCESS = 'CLOUD_HOST_RULES_SUCCESS';
+export const CLOUD_HOST_RULES_FAILURE = 'CLOUD_HOST_RULES_FAILURE';
+export const loadCloudHostRules = (instanceId: string) => (dispatch: any) => {
+  return dispatch(fetchCloudHostRules(instanceId));
+};
+const fetchCloudHostRules = (instanceId: string) => ({
+  [CALL_API]: {
+    types: [ CLOUD_HOST_RULES_REQUEST, CLOUD_HOST_RULES_SUCCESS, CLOUD_HOST_RULES_FAILURE ],
+    endpoint: `hosts/cloud/${instanceId}/rules`,
+    schema: Schemas.CLOUD_HOST_RULE_ARRAY,
+    entity: instanceId
+  }
+});
+export const ADD_CLOUD_HOST_RULE = 'ADD_CLOUD_HOST_RULE';
+export function addCloudHostRule(instanceId: string, rule: string): EntitiesAction {
+  return {
+    type: ADD_CLOUD_HOST_RULE,
+    entity: instanceId,
+    data: { rulesNames: new Array(rule) }
+  }
+}
+export const REMOVE_CLOUD_HOST_RULES = 'REMOVE_CLOUD_HOST_RULES';
+export function removeCloudHostRules(instanceId: string, rules: string[]): EntitiesAction {
+  return {
+    type: REMOVE_CLOUD_HOST_RULES,
+    entity: instanceId,
+    data: { rulesNames: rules }
+  }
+}
+
+export const EDGE_HOSTS_REQUEST = 'EDGE_HOSTS_REQUEST';
+export const EDGE_HOSTS_SUCCESS = 'EDGE_HOSTS_SUCCESS';
+export const EDGE_HOSTS_FAILURE = 'EDGE_HOSTS_FAILURE';
+export const EDGE_HOST_REQUEST = 'EDGE_HOST_REQUEST';
+export const EDGE_HOST_SUCCESS = 'EDGE_HOST_SUCCESS';
+export const EDGE_HOST_FAILURE = 'EDGE_HOST_FAILURE';
+export const loadEdgeHosts = (hostname?: string) => (dispatch: any) => {
+  return dispatch(fetchEdgeHosts(hostname));
+};
+const fetchEdgeHosts = (hostname?: string) => ({
+  [CALL_API]:
+    !hostname
+      ? {
+        types: [ EDGE_HOSTS_REQUEST, EDGE_HOSTS_SUCCESS, EDGE_HOSTS_FAILURE ],
+        endpoint: `hosts/edge`,
+        schema: Schemas.EDGE_HOST_ARRAY,
+        entity: 'edgeHosts'
+      }
+      : {
+        types: [ EDGE_HOST_REQUEST, EDGE_HOST_SUCCESS, EDGE_HOST_FAILURE ],
+        endpoint: `hosts/edge/${hostname}`,
+        schema: Schemas.EDGE_HOST,
+        entity: 'edgeHosts'
+      }
+});
+export const ADD_EDGE_HOST = 'ADD_EDGE_HOST';
+export function addEdgeHost(edgeHost: IEdgeHost): EntitiesAction {
+  return {
+    type: ADD_EDGE_HOST,
+    data: { edgeHosts: new Array(edgeHost) }
+  }
+}
+
+export const EDGE_HOST_RULES_REQUEST = 'EDGE_HOST_RULES_REQUEST';
+export const EDGE_HOST_RULES_SUCCESS = 'EDGE_HOST_RULES_SUCCESS';
+export const EDGE_HOST_RULES_FAILURE = 'EDGE_HOST_RULES_FAILURE';
+export const loadEdgeHostRules = (hostname: string) => (dispatch: any) => {
+  return dispatch(fetchEdgeHostRules(hostname));
+};
+const fetchEdgeHostRules = (hostname: string) => ({
+  [CALL_API]: {
+    types: [ EDGE_HOST_RULES_REQUEST, EDGE_HOST_RULES_SUCCESS, EDGE_HOST_RULES_FAILURE ],
+    endpoint: `hosts/edge/${hostname}/rules`,
+    schema: Schemas.EDGE_HOST_RULE_ARRAY,
+    entity: hostname
+  }
+});
+export const ADD_EDGE_HOST_RULE = 'ADD_EDGE_HOST_RULE';
+export function addEdgeHostRule(hostname: string, rule: string): EntitiesAction {
+  return {
+    type: ADD_EDGE_HOST_RULE,
+    entity: hostname,
+    data: { rulesNames: new Array(rule) }
+  }
+}
+export const REMOVE_EDGE_HOST_RULES = 'REMOVE_EDGE_HOST_RULES';
+export function removeEdgeHostRules(hostname: string, rules: string[]): EntitiesAction {
+  return {
+    type: REMOVE_EDGE_HOST_RULES,
+    entity: hostname,
+    data: { rulesNames: rules }
+  }
+}
+
+export const NODES_REQUEST = 'NODES_REQUEST';
+export const NODES_SUCCESS = 'NODES_SUCCESS';
+export const NODES_FAILURE = 'NODES_FAILURE';
+export const NODE_REQUEST = 'NODE_REQUEST';
+export const NODE_SUCCESS = 'NODE_SUCCESS';
+export const NODE_FAILURE = 'NODE_FAILURE';
+export const loadNodes = (id?: string) => (dispatch: any) => {
+  return dispatch(fetchNodes(id));
+};
+const fetchNodes = (id?: string) => ({
+  [CALL_API]:
+    !id
+      ? {
+        types: [ NODES_REQUEST, NODES_SUCCESS, NODES_FAILURE ],
+        endpoint: `nodes`,
+        schema: Schemas.NODE_ARRAY,
+        entity: 'nodes'
+      }
+      : {
+        types: [ NODE_REQUEST, NODE_SUCCESS, NODE_FAILURE ],
+        endpoint: `nodes/${id}`,
+        schema: Schemas.NODE,
+        entity: 'nodes'
+      }
+});
+export const ADD_NODE = 'ADD_NODE';
+export function addNode(node: INode): EntitiesAction {
+  return {
+    type: ADD_NODE,
+    data: { nodes: new Array(node) }
+  }
+}
 
 export const RULES_HOST_REQUEST = 'RULES_HOST_REQUEST';
 export const RULES_HOST_SUCCESS = 'RULES_HOST_SUCCESS';
@@ -299,32 +496,13 @@ const fetchRulesHost = (name?: string) => ({
         entity: 'hostRules'
       }
 });
-
-export const RULES_SERVICE_REQUEST = 'RULES_SERVICE_REQUEST';
-export const RULES_SERVICE_SUCCESS = 'RULES_SERVICE_SUCCESS';
-export const RULES_SERVICE_FAILURE = 'RULES_SERVICE_FAILURE';
-export const RULE_SERVICE_REQUEST = 'RULE_SERVICE_REQUEST';
-export const RULE_SERVICE_SUCCESS = 'RULE_SERVICE_SUCCESS';
-export const RULE_SERVICE_FAILURE = 'RULE_SERVICE_FAILURE';
-export const loadRulesService = (name?: string) => (dispatch: any) => {
-  return dispatch(fetchRulesService(name));
-};
-const fetchRulesService = (name?: string) => ({
-  [CALL_API]:
-    !name
-      ? {
-        types: [ RULES_SERVICE_REQUEST, RULES_SERVICE_SUCCESS, RULES_SERVICE_FAILURE ],
-        endpoint: `rules/services`,
-        schema: Schemas.RULE_SERVICE_ARRAY,
-        entity: 'rules'
-      }
-      : {
-        types: [ RULE_SERVICE_REQUEST, RULE_SERVICE_SUCCESS, RULE_SERVICE_FAILURE ],
-        endpoint: `rules/services/${name}`,
-        schema: Schemas.RULE_SERVICE,
-        entity: 'rules'
-      }
-});
+export const ADD_RULE_HOST = 'ADD_RULE_HOST';
+export function addRuleHost(ruleHost: IHostRule): EntitiesAction {
+  return {
+    type: ADD_RULE_HOST,
+    data: { hostRules: new Array(ruleHost) }
+  }
+}
 
 export const RULE_HOST_CONDITIONS_REQUEST = 'RULE_HOST_CONDITIONS_REQUEST';
 export const RULE_HOST_CONDITIONS_SUCCESS = 'RULE_HOST_CONDITIONS_SUCCESS';
@@ -419,6 +597,40 @@ export function removeRuleHostEdgeHosts(ruleName: string, edgeHosts: string[]): 
   }
 }
 
+export const RULES_SERVICE_REQUEST = 'RULES_SERVICE_REQUEST';
+export const RULES_SERVICE_SUCCESS = 'RULES_SERVICE_SUCCESS';
+export const RULES_SERVICE_FAILURE = 'RULES_SERVICE_FAILURE';
+export const RULE_SERVICE_REQUEST = 'RULE_SERVICE_REQUEST';
+export const RULE_SERVICE_SUCCESS = 'RULE_SERVICE_SUCCESS';
+export const RULE_SERVICE_FAILURE = 'RULE_SERVICE_FAILURE';
+export const loadRulesService = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchRulesService(name));
+};
+const fetchRulesService = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ RULES_SERVICE_REQUEST, RULES_SERVICE_SUCCESS, RULES_SERVICE_FAILURE ],
+        endpoint: `rules/services`,
+        schema: Schemas.RULE_SERVICE_ARRAY,
+        entity: 'rules'
+      }
+      : {
+        types: [ RULE_SERVICE_REQUEST, RULE_SERVICE_SUCCESS, RULE_SERVICE_FAILURE ],
+        endpoint: `rules/services/${name}`,
+        schema: Schemas.RULE_SERVICE,
+        entity: 'rules'
+      }
+});
+export const ADD_RULE_SERVICE = 'ADD_RULE_SERVICE';
+export function addRuleService(ruleService: IServiceRule): EntitiesAction {
+  return {
+    type: ADD_RULE_SERVICE,
+    data: { hostRules: new Array(ruleService) }
+  }
+}
+
+
 export const RULE_SERVICE_CONDITIONS_REQUEST = 'RULE_SERVICE_CONDITIONS_REQUEST';
 export const RULE_SERVICE_CONDITIONS_SUCCESS = 'RULE_SERVICE_CONDITIONS_SUCCESS';
 export const RULE_SERVICE_CONDITIONS_FAILURE = 'RULE_SERVICE_CONDITIONS_FAILURE';
@@ -449,6 +661,7 @@ export function removeRuleServiceConditions(ruleName: string, condition: string[
     data: { conditionsNames: condition }
   }
 }
+
 export const RULE_SERVICE_SERVICES_REQUEST = 'RULE_SERVICE_SERVICES_REQUEST';
 export const RULE_SERVICE_SERVICES_SUCCESS = 'RULE_SERVICE_SERVICES_SUCCESS';
 export const RULE_SERVICE_SERVICES_FAILURE = 'RULE_SERVICE_SERVICES_FAILURE';
@@ -495,16 +708,23 @@ const fetchConditions = (name?: string) => ({
       ? {
         types: [ CONDITIONS_REQUEST, CONDITIONS_SUCCESS, CONDITIONS_FAILURE ],
         endpoint: `rules/conditions`,
-        schema: Schemas.CONDITION_ARRAY,
+        schema: Schemas.RULE_CONDITION_ARRAY,
         entity: 'conditions'
       }
       : {
         types: [ CONDITION_REQUEST, CONDITION_SUCCESS, CONDITION_FAILURE ],
         endpoint: `rules/conditions/${name}`,
-        schema: Schemas.CONDITION,
+        schema: Schemas.RULE_CONDITION,
         entity: 'conditions'
       }
 });
+export const ADD_CONDITION = 'ADD_CONDITION';
+export function addCondition(condition: ICondition): EntitiesAction {
+  return {
+    type: ADD_CONDITION,
+    data: { conditions: new Array(condition) }
+  }
+}
 
 export const VALUE_MODES_REQUEST = 'VALUE_MODES_REQUEST';
 export const VALUE_MODES_SUCCESS = 'VALUE_MODES_SUCCESS';
@@ -577,171 +797,47 @@ const fetchDecisions = (name?: string) => ({
       }
 });
 
-export const NODES_REQUEST = 'NODES_REQUEST';
-export const NODES_SUCCESS = 'NODES_SUCCESS';
-export const NODES_FAILURE = 'NODES_FAILURE';
-export const NODE_REQUEST = 'NODE_REQUEST';
-export const NODE_SUCCESS = 'NODE_SUCCESS';
-export const NODE_FAILURE = 'NODE_FAILURE';
-export const loadNodes = (id?: string) => (dispatch: any) => {
-  return dispatch(fetchNodes(id));
+//TODO
+export const SIMULATED_METRICS_REQUEST = 'SIMULATED_METRICS_REQUEST';
+export const SIMULATED_METRICS_SUCCESS = 'SIMULATED_METRICS_SUCCESS';
+export const SIMULATED_METRICS_FAILURE = 'SIMULATED_METRICS_FAILURE';
+export const SIMULATED_METRIC_REQUEST = 'SIMULATED_METRIC_REQUEST';
+export const SIMULATED_METRIC_SUCCESS = 'SIMULATED_METRIC_SUCCESS';
+export const SIMULATED_METRIC_FAILURE = 'SIMULATED_METRIC_FAILURE';
+
+
+export const REGIONS_REQUEST = 'REGIONS_REQUEST';
+export const REGIONS_SUCCESS = 'REGIONS_SUCCESS';
+export const REGIONS_FAILURE = 'REGIONS_FAILURE';
+export const REGION_REQUEST = 'REGION_REQUEST';
+export const REGION_SUCCESS = 'REGION_SUCCESS';
+export const REGION_FAILURE = 'REGION_FAILURE';
+export const loadRegions = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchRegions(name));
 };
-const fetchNodes = (id?: string) => ({
+const fetchRegions = (name?: string) => ({
   [CALL_API]:
-    !id
+    !name
       ? {
-        types: [ NODES_REQUEST, NODES_SUCCESS, NODES_FAILURE ],
-        endpoint: `nodes`,
-        schema: Schemas.NODE_ARRAY,
-        entity: 'nodes'
+        types: [ REGIONS_REQUEST, REGIONS_SUCCESS, REGIONS_FAILURE ],
+        endpoint: `regions`,
+        schema: Schemas.REGION_ARRAY,
+        entity: 'regions'
       }
       : {
-        types: [ NODE_REQUEST, NODE_SUCCESS, NODE_FAILURE ],
-        endpoint: `nodes/${id}`,
-        schema: Schemas.NODE,
-        entity: 'nodes'
+        types: [ REGION_REQUEST, REGION_SUCCESS, REGION_FAILURE ],
+        endpoint: `regions/${name}`,
+        schema: Schemas.REGION,
+        entity: 'regions'
       }
 });
-
-export const CLOUD_HOSTS_REQUEST = 'CLOUD_HOSTS_REQUEST';
-export const CLOUD_HOSTS_SUCCESS = 'CLOUD_HOSTS_SUCCESS';
-export const CLOUD_HOSTS_FAILURE = 'CLOUD_HOSTS_FAILURE';
-export const CLOUD_HOST_REQUEST = 'CLOUD_HOST_REQUEST';
-export const CLOUD_HOST_SUCCESS = 'CLOUD_HOST_SUCCESS';
-export const CLOUD_HOST_FAILURE = 'CLOUD_HOST_FAILURE';
-export const loadCloudHosts = (instanceId?: string) => (dispatch: any) => {
-  return dispatch(fetchCloudHosts(instanceId));
-};
-const fetchCloudHosts = (instanceId?: string) => ({
-  [CALL_API]:
-    !instanceId
-      ? {
-        types: [ CLOUD_HOSTS_REQUEST, CLOUD_HOSTS_SUCCESS, CLOUD_HOSTS_FAILURE ],
-        endpoint: `hosts/cloud`,
-        schema: Schemas.CLOUD_HOST_ARRAY,
-        entity: 'cloudHosts'
-      }
-      : {
-        types: [ CLOUD_HOST_REQUEST, CLOUD_HOST_SUCCESS, CLOUD_HOST_FAILURE ],
-        endpoint: `hosts/cloud/${instanceId}`,
-        schema: Schemas.CLOUD_HOST,
-        entity: 'cloudHosts'
-      }
-});
-export const CLOUD_HOST_RULES_REQUEST = 'CLOUD_HOST_RULES_REQUEST';
-export const CLOUD_HOST_RULES_SUCCESS = 'CLOUD_HOST_RULES_SUCCESS';
-export const CLOUD_HOST_RULES_FAILURE = 'CLOUD_HOST_RULES_FAILURE';
-export const loadCloudHostRules = (instanceId: string) => (dispatch: any) => {
-  return dispatch(fetchCloudHostRules(instanceId));
-};
-const fetchCloudHostRules = (instanceId: string) => ({
-  [CALL_API]: {
-    types: [ CLOUD_HOST_RULES_REQUEST, CLOUD_HOST_RULES_SUCCESS, CLOUD_HOST_RULES_FAILURE ],
-    endpoint: `hosts/cloud/${instanceId}/rules`,
-    schema: Schemas.CLOUD_HOST_RULE_ARRAY,
-    entity: instanceId
-  }
-});
-export const ADD_CLOUD_HOST_RULE = 'ADD_CLOUD_HOST_RULE';
-export function addCloudHostRule(hostname: string, rule: string): EntitiesAction {
+export const ADD_REGION = 'ADD_REGION';
+export function addRegion(region: IRegion): EntitiesAction {
   return {
-    type: ADD_CLOUD_HOST_RULE,
-    entity: hostname,
-    data: { rulesNames: new Array(rule) }
+    type: ADD_REGION,
+    data: { regions: new Array(region) }
   }
 }
-export const REMOVE_CLOUD_HOST_RULES = 'REMOVE_CLOUD_HOST_RULES';
-export function removeCloudHostRules(hostname: string, rules: string[]): EntitiesAction {
-  return {
-    type: REMOVE_CLOUD_HOST_RULES,
-    entity: hostname,
-    data: { rulesNames: rules }
-  }
-}
-
-export const EDGE_HOSTS_REQUEST = 'EDGE_HOSTS_REQUEST';
-export const EDGE_HOSTS_SUCCESS = 'EDGE_HOSTS_SUCCESS';
-export const EDGE_HOSTS_FAILURE = 'EDGE_HOSTS_FAILURE';
-export const EDGE_HOST_REQUEST = 'EDGE_HOST_REQUEST';
-export const EDGE_HOST_SUCCESS = 'EDGE_HOST_SUCCESS';
-export const EDGE_HOST_FAILURE = 'EDGE_HOST_FAILURE';
-export const loadEdgeHosts = (hostname?: string) => (dispatch: any) => {
-  return dispatch(fetchEdgeHosts(hostname));
-};
-const fetchEdgeHosts = (hostname?: string) => ({
-  [CALL_API]:
-    !hostname
-      ? {
-        types: [ EDGE_HOSTS_REQUEST, EDGE_HOSTS_SUCCESS, EDGE_HOSTS_FAILURE ],
-        endpoint: `hosts/edge`,
-        schema: Schemas.EDGE_HOST_ARRAY,
-        entity: 'edgeHosts'
-      }
-      : {
-        types: [ EDGE_HOST_REQUEST, EDGE_HOST_SUCCESS, EDGE_HOST_FAILURE ],
-        endpoint: `hosts/edge/${hostname}`,
-        schema: Schemas.EDGE_HOST,
-        entity: 'edgeHosts'
-      }
-});
-export const EDGE_HOST_RULES_REQUEST = 'EDGE_HOST_RULES_REQUEST';
-export const EDGE_HOST_RULES_SUCCESS = 'EDGE_HOST_RULES_SUCCESS';
-export const EDGE_HOST_RULES_FAILURE = 'EDGE_HOST_RULES_FAILURE';
-export const loadEdgeHostRules = (hostname: string) => (dispatch: any) => {
-  return dispatch(fetchEdgeHostRules(hostname));
-};
-const fetchEdgeHostRules = (hostname: string) => ({
-  [CALL_API]: {
-    types: [ EDGE_HOST_RULES_REQUEST, EDGE_HOST_RULES_SUCCESS, EDGE_HOST_RULES_FAILURE ],
-    endpoint: `hosts/edge/${hostname}/rules`,
-    schema: Schemas.EDGE_HOST_RULE_ARRAY,
-    entity: hostname
-  }
-});
-export const ADD_EDGE_HOST_RULE = 'ADD_EDGE_HOST_RULE';
-export function addEdgeHostRule(hostname: string, rule: string): EntitiesAction {
-  return {
-    type: ADD_EDGE_HOST_RULE,
-    entity: hostname,
-    data: { rulesNames: new Array(rule) }
-  }
-}
-export const REMOVE_EDGE_HOST_RULES = 'REMOVE_EDGE_HOST_RULES';
-export function removeEdgeHostRules(hostname: string, rules: string[]): EntitiesAction {
-  return {
-    type: REMOVE_EDGE_HOST_RULES,
-    entity: hostname,
-    data: { rulesNames: rules }
-  }
-}
-
-
-export const CONTAINERS_REQUEST = 'CONTAINERS_REQUEST';
-export const CONTAINERS_SUCCESS = 'CONTAINERS_SUCCESS';
-export const CONTAINERS_FAILURE = 'CONTAINERS_FAILURE';
-export const CONTAINER_REQUEST = 'CONTAINER_REQUEST';
-export const CONTAINER_SUCCESS = 'CONTAINER_SUCCESS';
-export const CONTAINER_FAILURE = 'CONTAINER_FAILURE';
-export const loadContainers = (id?: string) => (dispatch: any) => {
-  return dispatch(fetchContainers(id));
-};
-const fetchContainers = (id?: string) => ({
-  [CALL_API]:
-    !id
-      ? {
-        types: [ CONTAINERS_REQUEST, CONTAINERS_SUCCESS, CONTAINERS_FAILURE ],
-        endpoint: `containers`,
-        schema: Schemas.CONTAINER_ARRAY,
-        entity: 'containers'
-      }
-      : {
-        types: [ CONTAINER_REQUEST, CONTAINER_SUCCESS, CONTAINER_FAILURE ],
-        endpoint: `containers/${id}`,
-        schema: Schemas.CONTAINER,
-        entity: 'containers'
-      }
-});
-
 
 export const LOAD_BALANCERS_REQUEST = 'LOAD_BALANCERS_REQUEST';
 export const LOAD_BALANCERS_SUCCESS = 'LOAD_BALANCERS_SUCCESS';
@@ -756,6 +852,18 @@ const fetchLoadBalancers = () => ({
     schema: Schemas.LOAD_BALANCER_ARRAY,
   }
 });
+export const ADD_LOAD_BALANCER = 'ADD_LOAD_BALANCER';
+export function addLoadBalancer(loadBalancer: ILoadBalancer): EntitiesAction {
+  return {
+    type: ADD_LOAD_BALANCER,
+    data: { loadBalancers: new Array(loadBalancer) }
+  }
+}
+
+//TODO
+export const EUREKA_SERVERS_REQUEST = 'EUREKA_SERVERS_REQUEST';
+export const EUREKA_SERVERS_SUCCESS = 'EUREKA_SERVERS_SUCCESS';
+export const EUREKA_SERVERS_FAILURE = 'EUREKA_SERVERS_FAILURE';
 
 export const LOGS_REQUEST = 'LOGS_REQUEST';
 export const LOGS_SUCCESS = 'LOGS_SUCCESS';
@@ -772,7 +880,6 @@ const fetchLogs = () => ({
 });
 
 export const SIDENAV_SHOW_USER = 'SIDENAV_SHOW_USER';
-
 export const showSidenavByUser = (value: boolean) => (
   {
     type: SIDENAV_SHOW_USER,
@@ -781,7 +888,6 @@ export const showSidenavByUser = (value: boolean) => (
 );
 
 export const SIDENAV_SHOW_WIDTH = 'SIDENAV_SHOW_WIDTH';
-
 export const showSidenavByWidth = (value: boolean) => (
   {
     type: SIDENAV_SHOW_WIDTH,
@@ -790,7 +896,6 @@ export const showSidenavByWidth = (value: boolean) => (
 );
 
 export const SEARCH_UPDATE = 'SEARCH_UPDATE';
-
 export const updateSearch = (search: string) => (
   {
     type: SEARCH_UPDATE,

@@ -16,7 +16,7 @@ import CloudHostsList from "./CloudHostsList";
 
 const CloudHosts: React.FC = () =>
   <MainLayout>
-    <AddButton tooltip={'Add cloud host'} pathname={'/hosts/cloud/new_instance'}/>
+    <AddButton tooltip={'Start cloud instance'} pathname={'/hosts/cloud/new_instance'}/>
     <div className={`${styles.container}`}>
       <CloudHostsList/>
     </div>

@@ -45,7 +45,7 @@ class CloudHostsList extends BaseComponent<Props, {}> {
     <CardList<ICloudHost>
       isLoading={this.props.isLoading}
       error={this.props.error}
-      emptyMessage={"No cloud hosts to display"}
+      emptyMessage={"No cloud instances to display"}
       list={this.props.cloudHosts}
       card={this.cloudHost}
       predicate={this.predicate}/>

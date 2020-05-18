@@ -18,7 +18,7 @@ import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addCloudHostRule, loadCloudHosts} from "../../../actions";
+import {addCloudHost, addCloudHostRule, loadCloudHosts} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import {deleteData, IReply, postData} from "../../../utils/api";
@@ -59,7 +59,8 @@ interface StateToProps {
 
 interface DispatchToProps {
   loadCloudHosts: (instanceId: string) => any;
-  addCloudHostRule: (hostname: string, ruleName: string) => void;
+  addCloudHost: (instance: ICloudHost) => void;
+  addCloudHostRule: (instanceId: string, ruleName: string) => void;
 }
 
 interface MatchParams {
@@ -106,12 +107,13 @@ class CloudHost extends BaseComponent<Props, {}> {
 
   private onPostSuccess = (reply: IReply<ICloudHost>): void => {
     const cloudHost = reply.data;
-    super.toast(`Cloud host <b>${cloudHost.instanceId}</b> has now started`);
+    this.props.addCloudHost(cloudHost);
+    this.saveEntities(cloudHost);
     if (this.mounted) {
       this.updateCloudHost(cloudHost);
       this.props.history.replace(cloudHost.instanceId);
     }
-    this.saveEntities(cloudHost);
+    super.toast(`Cloud host <b>${cloudHost.instanceId}</b> has now started`);
   };
 
   private onPostFailure = (reason: string): void =>
@@ -139,9 +141,7 @@ class CloudHost extends BaseComponent<Props, {}> {
   };
 
   private onSaveRulesSuccess = (instanceId: string): void => {
-    if (!isNewHost(this.props.match.params.instanceId)) {
-      this.state.newRules.forEach(rule => this.props.addCloudHostRule(instanceId, rule));
-    }
+    this.state.newRules.forEach(rule => this.props.addCloudHostRule(instanceId, rule));
     if (this.mounted) {
       this.setState({ newRules: [] });
     }
@@ -252,8 +252,6 @@ class CloudHost extends BaseComponent<Props, {}> {
   };
 
   private updateCloudHost = (cloudHost: ICloudHost) => {
-    //TODO add rules from this.props.cloudHost
-    console.log(this.props.cloudHost)
     cloudHost = Object.values(normalize(cloudHost, Schemas.CLOUD_HOST).entities.cloudHosts || {})[0];
     const formCloudHost = { ...cloudHost };
     removeFields(formCloudHost);
@@ -388,6 +386,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadCloudHosts,
+  addCloudHost,
   addCloudHostRule
 };
 

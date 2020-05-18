@@ -115,8 +115,8 @@ public class CloudHostsService {
   public void terminateCloudHost(String instanceId) {
     CloudHostEntity cloudHost = getCloudHost(instanceId);
     InstanceState state = new InstanceState()
-        .withCode(AwsInstanceState.PENDING.getCode())
-        .withName(AwsInstanceState.PENDING.getName());
+        .withCode(AwsInstanceState.SHUTTING_DOWN.getCode())
+        .withName(AwsInstanceState.SHUTTING_DOWN.getName());
     cloudHost.setState(state);
     cloudHost = cloudHosts.save(cloudHost);
     awsService.terminateInstance(instanceId);
@@ -147,9 +147,9 @@ public class CloudHostsService {
     hostRulesService.removeCloudHost(ruleName, instanceId);
   }
 
-  public void removeRules(String hostname, List<String> ruleNames) {
-    assertHostExists(hostname);
-    ruleNames.forEach(rule -> hostRulesService.removeCloudHost(rule, hostname));
+  public void removeRules(String instanceId, List<String> ruleNames) {
+    assertHostExists(instanceId);
+    ruleNames.forEach(rule -> hostRulesService.removeCloudHost(rule, instanceId));
   }
 
   private void assertHostExists(String instanceId) {

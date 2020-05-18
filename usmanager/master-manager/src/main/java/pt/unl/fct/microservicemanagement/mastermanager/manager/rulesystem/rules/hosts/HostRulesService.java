@@ -164,12 +164,14 @@ public class HostRulesService {
   }
 
   public void addCloudHost(String ruleName, String instanceId) {
-    log.debug("Adding cloud host {} to rule {}", instanceId, ruleName);
     CloudHostEntity cloudHost = cloudHostsService.getCloudHost(instanceId);
     HostRuleEntity rule = getRule(ruleName);
-    rule = rule.toBuilder().cloudHost(cloudHost).build();
-    rules.save(rule);
-    setLastUpdateHostRules();
+    if (!cloudHost.getHostRules().contains(rule)) {
+      log.debug("Adding cloud host {} to rule {}", instanceId, ruleName);
+      rule = rule.toBuilder().cloudHost(cloudHost).build();
+      rules.save(rule);
+      setLastUpdateHostRules();
+    }
   }
 
   public void addCloudHosts(String ruleName, List<String> instanceIds) {
@@ -201,12 +203,14 @@ public class HostRulesService {
   }
 
   public void addEdgeHost(String ruleName, String hostname) {
-    log.debug("Adding edge host {} to rule {}", hostname, ruleName);
     EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
     HostRuleEntity rule = getRule(ruleName);
-    rule = rule.toBuilder().edgeHost(edgeHost).build();
-    rules.save(rule);
-    setLastUpdateHostRules();
+    if (!edgeHost.getHostRules().contains(rule)) {
+      log.debug("Adding edge host {} to rule {}", hostname, ruleName);
+      rule = rule.toBuilder().edgeHost(edgeHost).build();
+      rules.save(rule);
+      setLastUpdateHostRules();
+    }
   }
 
   public void addEdgeHosts(String ruleName, List<String> hostnames) {

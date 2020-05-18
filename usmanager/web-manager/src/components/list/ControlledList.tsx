@@ -24,6 +24,7 @@ interface ControlledListProps<T> {
   onAddInput?: (input: IValues) => void;
   onRemove?: (data: string[]) => void;
   onDelete?: RestOperation;
+  entitySaved?: boolean
 }
 
 type Props<T> = ControlledListProps<T>;
@@ -53,7 +54,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                                                   .map(data => !data || data.isChecked)
                                                   .every(checked => checked);
     }
-    if (prevProps.data !== this.props.data) {
+    if (prevProps.data !== this.props.data || prevProps.entitySaved !== this.props.entitySaved) {
       this.setState((this.props.data || []).reduce((state: State<T>, data) => {
         const dataStateKey = this.getDataStateKey(data);
         state[dataStateKey] = { value: data, isChecked: false, isNew: false };

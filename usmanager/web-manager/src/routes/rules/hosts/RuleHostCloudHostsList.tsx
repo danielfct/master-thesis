@@ -108,8 +108,8 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
                            dataKey={[]} //TODO
                            dropdown={{
                              id: 'cloudHosts',
-                             title: 'Add cloud host',
-                             empty: 'No more cloudHosts to add',
+                             title: 'Add cloud instance',
+                             empty: 'No more cloud instances to add',
                              data: this.getSelectableCloudHostNames()
                            }}
                            show={this.cloudHost}

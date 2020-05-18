@@ -65,6 +65,10 @@ const callApi = (endpoint: string, schema: any) => {
 };
 
 interface ISchemas {
+    APP: schema.Entity<IApp>;
+    APP_ARRAY: schema.Entity<IApp>[];
+    APP_SERVICE: schema.Entity<IAppService>;
+    APP_SERVICE_ARRAY: schema.Entity<IAppService>[];
     SERVICE: schema.Entity<IService>;
     SERVICE_ARRAY: schema.Entity<IService>[];
     SERVICE_APP: schema.Entity<IApp>;
@@ -77,27 +81,8 @@ interface ISchemas {
     SERVICE_PREDICTION_ARRAY: schema.Entity<IPrediction>[];
     SERVICE_RULE: schema.Entity<IServiceRule>;
     SERVICE_RULE_ARRAY: schema.Entity<IServiceRule>[];
-    APP: schema.Entity<IApp>;
-    APP_ARRAY: schema.Entity<IApp>[];
-    APP_SERVICE: schema.Entity<IAppService>;
-    APP_SERVICE_ARRAY: schema.Entity<IAppService>[];
-    REGION: schema.Entity<IRegion>;
-    REGION_ARRAY: schema.Entity<IRegion>[];
-    RULE_HOST: schema.Entity<IHostRule>;
-    RULE_HOST_ARRAY: schema.Entity<IHostRule>[];
-    RULE_SERVICE: schema.Entity<IServiceRule>;
-    RULE_SERVICE_ARRAY: schema.Entity<IServiceRule>[];
-    RULE_CONDITION: schema.Entity<ICondition>;
-    RULE_CONDITION_ARRAY: schema.Entity<ICondition>[];
-    CONDITION: schema.Entity<ICondition>;
-    CONDITION_ARRAY: schema.Entity<ICondition>[];
-    VALUE_MODE_ARRAY: schema.Entity<IValueMode>[];
-    FIELD_ARRAY: schema.Entity<IField>[];
-    OPERATOR_ARRAY: schema.Entity<IOperator>[];
-    DECISION: schema.Entity<IDecision>;
-    DECISION_ARRAY: schema.Entity<IDecision>[];
-    NODE: schema.Entity<INode>;
-    NODE_ARRAY: schema.Entity<INode>[];
+    CONTAINER: schema.Entity<IContainer>;
+    CONTAINER_ARRAY: schema.Entity<IContainer>[];
     CLOUD_HOST: schema.Entity<ICloudHost>;
     CLOUD_HOST_ARRAY: schema.Entity<ICloudHost>[];
     CLOUD_HOST_RULE: schema.Entity<IHostRule>;
@@ -106,20 +91,44 @@ interface ISchemas {
     EDGE_HOST_ARRAY: schema.Entity<IEdgeHost>[];
     EDGE_HOST_RULE: schema.Entity<IHostRule>;
     EDGE_HOST_RULE_ARRAY: schema.Entity<IHostRule>[];
-    CONTAINER: schema.Entity<IContainer>;
-    CONTAINER_ARRAY: schema.Entity<IContainer>[];
+    NODE: schema.Entity<INode>;
+    NODE_ARRAY: schema.Entity<INode>[];
+    RULE_HOST: schema.Entity<IHostRule>;
+    RULE_HOST_ARRAY: schema.Entity<IHostRule>[];
+    RULE_SERVICE: schema.Entity<IServiceRule>;
+    RULE_SERVICE_ARRAY: schema.Entity<IServiceRule>[];
+    RULE_CONDITION: schema.Entity<ICondition>;
+    RULE_CONDITION_ARRAY: schema.Entity<ICondition>[];
+    VALUE_MODE_ARRAY: schema.Entity<IValueMode>[];
+    FIELD_ARRAY: schema.Entity<IField>[];
+    OPERATOR_ARRAY: schema.Entity<IOperator>[];
+    DECISION: schema.Entity<IDecision>;
+    DECISION_ARRAY: schema.Entity<IDecision>[];
+    //SIMULATED_METRIC: schema.Entity<ISimulatedMetric>; TODO
+    //SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedMetric>[]; TODO
+    REGION: schema.Entity<IRegion>;
+    REGION_ARRAY: schema.Entity<IRegion>[];
+    LOAD_BALANCER: schema.Entity<ILoadBalancer>;
     LOAD_BALANCER_ARRAY: schema.Entity<ILoadBalancer>[];
+    //EUREKA_SERVICE: schema.Entity<IEurekaServer>; TODO
+    //EUREKA_SERVICE_ARRAY: schema.Entity<IEurekaServer>[]; TODO
     LOGS_ARRAY: schema.Entity<ILogs>[];
 }
+
+const app: schema.Entity<IApp> = new schema.Entity('apps', undefined, {
+    idAttribute: (app: IApp) => app.name
+});
+const apps = new schema.Array(app);
 
 const appService: schema.Entity<IAppService> = new schema.Entity('services', undefined, {
     idAttribute: (service: IAppService) => service.service.serviceName
 });
 const appServices = new schema.Array(appService);
-const app: schema.Entity<IApp> = new schema.Entity('apps', undefined, {
-    idAttribute: (app: IApp) => app.name
+
+const service: schema.Entity<IService> = new schema.Entity('services', undefined, {
+    idAttribute: (service: IService) => service.serviceName
 });
-const apps = new schema.Array(app);
+const services = new schema.Array(service);
 
 const dependency: schema.Entity<IServiceDependency> = new schema.Entity('dependencies', undefined, {
     idAttribute: (dependency: IServiceDependency) => dependency.serviceName
@@ -134,6 +143,38 @@ const dependees = new schema.Array(dependee);
 const prediction: schema.Entity<IPrediction> = new schema.Entity('predictions', undefined, {
     idAttribute: (prediction: IPrediction) => prediction.name
 });
+
+const container: schema.Entity<IContainer> = new schema.Entity('containers', undefined, {
+    idAttribute: (container: IContainer) => container.id.toString()
+});
+
+const cloudHost: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', undefined, {
+    idAttribute: (host: ICloudHost) => host.instanceId
+});
+const cloudHosts = new schema.Array(cloudHost);
+
+const state: schema.Entity<IState> = new schema.Entity('state', undefined, {
+    idAttribute: (state: IState) => state.name
+});
+
+const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefined, {
+    idAttribute: (host: IEdgeHost) => host.hostname
+});
+const edgeHosts = new schema.Array(edgeHost);
+
+const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
+    idAttribute: (node: INode) => node.id.toString()
+});
+
+const ruleHost: schema.Entity<IHostRule> = new schema.Entity('hostRules', undefined, {
+    idAttribute: (hostRule: IHostRule) => hostRule.name
+});
+const hostRules = new schema.Array(ruleHost);
+
+const ruleService: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', undefined, {
+    idAttribute: (serviceRule: IServiceRule) => serviceRule.name
+});
+const serviceRules = new schema.Array(ruleService);
 
 const valueMode: schema.Entity<IValueMode> = new schema.Entity('valueModes', undefined, {
     idAttribute: (valueMode: IValueMode) => valueMode.name
@@ -155,74 +196,40 @@ const condition: schema.Entity<ICondition> = new schema.Entity('conditions', und
 });
 const conditions = new schema.Array(condition);
 
-const ruleHost: schema.Entity<IHostRule> = new schema.Entity('hostRules', undefined, {
-    idAttribute: (hostRule: IHostRule) => hostRule.name
-});
-const hostRules = new schema.Array(ruleHost);
-
-const cloudHost: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', undefined, {
-    idAttribute: (host: ICloudHost) => host.instanceId
-});
-const cloudHosts = new schema.Array(cloudHost);
-
-const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefined, {
-    idAttribute: (host: IEdgeHost) => host.hostname
-});
-const edgeHosts = new schema.Array(edgeHost);
-
-const ruleService: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', undefined, {
-    idAttribute: (serviceRule: IServiceRule) => serviceRule.name
-});
-const serviceRules = new schema.Array(ruleService);
-
 const decision: schema.Entity<IDecision> = new schema.Entity('decisions', undefined, {
     idAttribute: (decision: IDecision) => decision.name
 });
 
-const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
-    idAttribute: (node: INode) => node.id.toString()
-});
-
-const service: schema.Entity<IService> = new schema.Entity('services', undefined, {
-    idAttribute: (service: IService) => service.serviceName
-});
-const services = new schema.Array(service);
+// TODO simulated metrics
 
 const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
     idAttribute: (region: IRegion) => region.name
-});
-
-const container: schema.Entity<IContainer> = new schema.Entity('containers', undefined, {
-    idAttribute: (container: IContainer) => container.id.toString()
 });
 
 const loadBalancer: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalancers', undefined, {
     idAttribute: (loadBalancer: ILoadBalancer) => '' //TODO
 });
 
+//TODO eurekaServers
+
 const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
     idAttribute: (logs: ILogs) => logs.eventId.toString()
 });
 
-const state: schema.Entity<IState> = new schema.Entity('state', undefined, {
-    idAttribute: (state: IState) => state.name
-});
-
-/*const repositorySchema = new schema.Entity('repositories', {
-    owner: userSchema
-}, {
-    idAttribute: repository => repository.fullName.toLowerCase()
-})*/
 
 app.define({ appServices });
-edgeHost.define({ hostRules });
-cloudHost.define({ hostRules, state });
 service.define({ apps, dependencies, dependees, serviceRules });
-condition.define({ valueModes, fields, operators });
+cloudHost.define({ hostRules, state });
+edgeHost.define({ hostRules });
 ruleHost.define({ conditions, edgeHosts, cloudHosts });
 ruleService.define({ conditions, services });
+condition.define({ valueModes, fields, operators });
 
 export const Schemas: ISchemas = {
+    APP: app,
+    APP_ARRAY: [app],
+    APP_SERVICE: appService,
+    APP_SERVICE_ARRAY: [appService],
     SERVICE: service,
     SERVICE_ARRAY: [service],
     SERVICE_APP: app,
@@ -235,27 +242,8 @@ export const Schemas: ISchemas = {
     SERVICE_PREDICTION_ARRAY: [prediction],
     SERVICE_RULE: ruleService,
     SERVICE_RULE_ARRAY: [ruleService],
-    APP: app,
-    APP_ARRAY: [app],
-    APP_SERVICE: appService,
-    APP_SERVICE_ARRAY: [appService],
-    REGION: region,
-    REGION_ARRAY: [region],
-    RULE_HOST: ruleHost,
-    RULE_HOST_ARRAY: [ruleHost],
-    RULE_SERVICE: ruleService,
-    RULE_SERVICE_ARRAY: [ruleService],
-    RULE_CONDITION: condition,
-    RULE_CONDITION_ARRAY: [condition],
-    CONDITION: condition,
-    CONDITION_ARRAY: [condition],
-    VALUE_MODE_ARRAY: [valueMode],
-    FIELD_ARRAY: [field],
-    OPERATOR_ARRAY: [operator],
-    DECISION: decision,
-    DECISION_ARRAY: [decision],
-    NODE: node,
-    NODE_ARRAY: [node],
+    CONTAINER: container,
+    CONTAINER_ARRAY: [container],
     CLOUD_HOST: cloudHost,
     CLOUD_HOST_ARRAY: [cloudHost],
     CLOUD_HOST_RULE: ruleHost,
@@ -264,9 +252,25 @@ export const Schemas: ISchemas = {
     EDGE_HOST_ARRAY: [edgeHost],
     EDGE_HOST_RULE: ruleHost,
     EDGE_HOST_RULE_ARRAY: [ruleHost],
-    CONTAINER: container,
-    CONTAINER_ARRAY: [container],
+    NODE: node,
+    NODE_ARRAY: [node],
+    RULE_HOST: ruleHost,
+    RULE_HOST_ARRAY: [ruleHost],
+    RULE_SERVICE: ruleService,
+    RULE_SERVICE_ARRAY: [ruleService],
+    RULE_CONDITION: condition,
+    RULE_CONDITION_ARRAY: [condition],
+    VALUE_MODE_ARRAY: [valueMode],
+    FIELD_ARRAY: [field],
+    OPERATOR_ARRAY: [operator],
+    DECISION: decision,
+    DECISION_ARRAY: [decision],
+    //TODO simulatedMetrics
+    REGION: region,
+    REGION_ARRAY: [region],
+    LOAD_BALANCER: loadBalancer,
     LOAD_BALANCER_ARRAY: [loadBalancer],
+    //TODO eureka
     LOGS_ARRAY: [logs],
 };
 

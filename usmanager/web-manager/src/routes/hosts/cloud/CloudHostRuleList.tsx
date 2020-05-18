@@ -44,13 +44,28 @@ interface HostRuleListProps {
 
 type Props = StateToProps & DispatchToProps & HostRuleListProps;
 
-class CloudHostRuleList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
+
+
+class CloudHostRuleList extends BaseComponent<Props, State> {
+
+  state: State = {
+    entitySaved: !!this.props.host.instanceId
+  };
 
   componentDidMount(): void {
     this.props.loadRulesHost();
     const {instanceId} = this.props.host;
     if (instanceId) {
       this.props.loadCloudHostRules(instanceId);
+    }
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+    if (!prevProps.host.instanceId && this.props.host.instanceId) {
+      this.setState({entitySaved: true});
     }
   }
 
@@ -81,8 +96,10 @@ class CloudHostRuleList extends BaseComponent<Props, {}> {
     );
   };
 
-  private onAdd = (rule: string): void =>
+  private onAdd = (rule: string): void => {
     this.props.onAddHostRule(rule);
+  }
+
 
   private onRemove = (rules: string[]) =>
     this.props.onRemoveHostRules(rules);
@@ -99,7 +116,11 @@ class CloudHostRuleList extends BaseComponent<Props, {}> {
 
   private getSelectableRules = () => {
     const {rules, rulesName, unsavedRules} = this.props;
-    return Object.keys(rules).filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
+    console.log(rulesName);
+    console.log(unsavedRules);
+    const a = Object.keys(rules).filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
+    console.log(a);
+    return a;
   };
 
   render() {
@@ -121,7 +142,8 @@ class CloudHostRuleList extends BaseComponent<Props, {}> {
                              url: `hosts/cloud/${this.props.host.instanceId}/rules`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }
