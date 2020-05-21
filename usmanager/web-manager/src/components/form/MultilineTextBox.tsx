@@ -12,6 +12,10 @@ interface Props {
 
 export class MultilineTextBox extends React.Component<Props, {}> {
 
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+    M.updateTextFields();
+  }
+
   render(): any {
     const {className, id, name, value, disabled, onChange, onBlur} = this.props;
     return (

@@ -1,4 +1,4 @@
-import {IHostRule} from "./RuleHost";
+import {IRuleHost} from "./RuleHost";
 import BaseComponent from "../../../components/BaseComponent";
 import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";
@@ -12,7 +12,6 @@ import {
   removeRuleHostConditions
 } from "../../../actions";
 import {connect} from "react-redux";
-import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import {ICondition} from "../conditions/RuleCondition";
 
@@ -30,7 +29,9 @@ interface DispatchToProps {
 }
 
 interface HostRuleConditionListProps {
-  rule: IHostRule | Partial<IHostRule>;
+  isLoadingHostRule: boolean;
+  loadHostRuleError?: string | null;
+  ruleHost: IRuleHost | Partial<IRuleHost> | null;
   newConditions: string[];
   onAddRuleCondition: (condition: string) => void;
   onRemoveRuleConditions: (condition: string[]) => void;
@@ -41,12 +42,10 @@ type Props = StateToProps & DispatchToProps & HostRuleConditionListProps
 class RuleHostConditionList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    if (this.props.rule) { //TODO do this on all classes
-      const {name} = this.props.rule;
-      if (name) {
-        this.props.loadRuleHostConditions(name);
-      }
-      this.props.loadConditions();
+    this.props.loadConditions();
+    if (this.props.ruleHost?.name) {
+      const {name} = this.props.ruleHost;
+      this.props.loadRuleHostConditions(name);
     }
   }
 
@@ -75,8 +74,8 @@ class RuleHostConditionList extends BaseComponent<Props, {}> {
     this.props.onRemoveRuleConditions(conditions);
 
   private onDeleteSuccess = (conditions: string[]): void => {
-    const {name} = this.props.rule;
-    if (name) {
+    if (this.props.ruleHost?.name) {
+      const {name} = this.props.ruleHost;
       this.props.removeRuleHostConditions(name, conditions);
     }
   };
@@ -91,8 +90,8 @@ class RuleHostConditionList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
-                           error={this.props.error}
+    return <ControlledList isLoading={this.props.isLoadingHostRule || this.props.isLoading}
+                           error={this.props.loadHostRuleError || this.props.error}
                            emptyMessage={`Conditions list is empty`}
                            data={this.props.ruleConditions}
                            dataKey={[]} //TODO
@@ -106,7 +105,7 @@ class RuleHostConditionList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/hosts/${this.props.rule.name}/conditions`,
+                             url: `rules/hosts/${this.props.ruleHost?.name}/conditions`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;
@@ -115,7 +114,7 @@ class RuleHostConditionList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleConditionListProps): StateToProps {
-  const ruleName = ownProps.rule && ownProps.rule.name;
+  const ruleName = ownProps.ruleHost?.name;
   const rule = ruleName && state.entities.rules.hosts.data[ruleName];
   const ruleConditions = rule && rule.conditions;
   return {

@@ -42,6 +42,7 @@ button {
 
 .controlButton {
     float: left;
+    max-width: 80%;
 }
 
 .invalidateField {

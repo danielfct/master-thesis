@@ -33,6 +33,7 @@ import configureStore from "./store/configureStore";
 import {saveState} from "./store/localStorage";
 
 // TODO implement labelToIcon function
+// TODO start with specific icons, like name === 'thing', then to general icons with name.contains('thing'), then 1 generic at the end
 
 const store = configureStore();
 

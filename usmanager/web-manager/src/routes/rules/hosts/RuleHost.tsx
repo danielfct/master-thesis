@@ -11,7 +11,11 @@
 import {IDecision, IRule} from "../Rule";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
-import Form, {IFields, required, requiredAndNumberAndMin} from "../../../components/form/Form";
+import Form, {
+  IFields,
+  requiredAndNumberAndMinAndMax,
+  requiredAndTrimmed
+} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
@@ -25,40 +29,42 @@ import {
   addRuleHostConditions,
   addRuleEdgeHosts,
   loadDecisions,
-  loadRulesHost,
+  loadRulesHost, addRuleHost,
 } from "../../../actions";
 import {IReply, postData} from "../../../utils/api";
 import HostRuleConditionList from "./RuleHostConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import HostRuleCloudHostsList from "./RuleHostCloudHostsList";
 import HostRuleEdgeHostsList from "./RuleHostEdgeHostsList";
+import {isNew} from "../../../utils/router";
+import {normalize} from "normalizr";
+import {Schemas} from "../../../middleware/api";
 
-export interface IHostRule extends IRule {
+export interface IRuleHost extends IRule {
   cloudHosts?: string[],
   edgeHosts?: string[],
 }
 
-const emptyHostRule = () => ({
+const buildNewHostRule = () => ({
   name: '',
   priority: undefined,
   generic: undefined,
   decision: undefined,
 });
 
-const isNewRule = (name: string) =>
-  name === 'new_host_rule';
-
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  hostRule: Partial<IHostRule>;
-  formHostRule?: Partial<IHostRule>,
-  decisions: IDecision[],
+  ruleHost: Partial<IRuleHost>;
+  formRuleHost?: Partial<IRuleHost>,
+  decisions: { [key: string]: IDecision },
 }
 
 interface DispatchToProps {
-  loadRulesHost: (name: string) => any;
-  loadDecisions: () => any;
+  loadRulesHost: (name: string) => void;
+  addRuleHost: (ruleHost: IRuleHost) => void;
+  //TODO updateRuleHost: (previousRuleHost: Partial<IRuleHost>, ruleHost: IRuleHost) => void;
+  loadDecisions: () => void;
   addRuleHostConditions: (ruleName: string, conditions: string[]) => void;
   addRuleCloudHosts: (ruleName: string, cloudHosts: string[]) => void;
   addRuleEdgeHosts: (ruleName: string, edgeHosts: string[]) => void;
@@ -71,154 +77,197 @@ interface MatchParams {
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
-  newConditions: string[],
-  newCloudHosts: string[],
-  newEdgeHosts: string[],
-  ruleName?: string,
+  ruleHost?: IRuleHost,
+  formRuleHost?: IRuleHost,
+  unsavedConditions: string[],
+  unsavedCloudHosts: string[],
+  unsavedEdgeHosts: string[],
   isGeneric: boolean,
 }
 
 class RuleHost extends BaseComponent<Props, State> {
 
+  private mounted = false;
+
   state: State = {
-    newConditions: [],
-    newCloudHosts: [],
-    newEdgeHosts: [],
-    isGeneric: this.props.hostRule?.generic || false,
+    unsavedConditions: [],
+    unsavedCloudHosts: [],
+    unsavedEdgeHosts: [],
+    isGeneric: this.props.ruleHost?.generic || false,
   };
 
   componentDidMount(): void {
+    this.loadRuleHost();
     this.props.loadDecisions();
-    const ruleName = this.props.match.params.name;
-    if (ruleName && !isNewRule(ruleName)) {
+    this.mounted = true;
+  };
+
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadRuleHost = () => {
+    if (!isNew(this.props.location.search)) {
+      const ruleName = this.props.match.params.name;
       this.props.loadRulesHost(ruleName);
     }
   };
 
-  private saveEntities = (rule: IHostRule) => {
+  private getRuleHost = () =>
+    this.state.ruleHost || this.props.ruleHost;
+
+  private getFormRuleHost = () =>
+    this.state.formRuleHost || this.props.formRuleHost;
+
+  private onPostSuccess = (reply: IReply<IRuleHost>): void => {
+    const ruleHost = reply.data;
+    super.toast(`<span class="green-text">Host rule ${ruleHost.name} saved</span>`);
+    this.props.addRuleHost(ruleHost);
+    this.saveEntities(reply.data);
+    if (this.mounted) {
+      this.updateRuleHost(ruleHost);
+      this.props.history.replace(ruleHost.name);
+    }
+  };
+
+  private onPostFailure = (reason: string, rule: IRuleHost): void =>
+    super.toast(`Unable to save ${rule.name}`, 10000, reason, true);
+
+  private onPutSuccess = (reply: IReply<IRuleHost>): void => {
+    const ruleHost = reply.data;
+    super.toast(`<span class="green-text">Changes to host rule ${ruleHost.name} have been saved</span>`);
+    this.saveEntities(ruleHost);
+    if (this.mounted) {
+      this.updateRuleHost(ruleHost);
+      this.props.history.replace(ruleHost.name);
+    }
+  };
+
+  private onPutFailure = (reason: string, rule: IRuleHost): void =>
+    super.toast(`Unable to update ${rule.name}`, 10000, reason, true);
+
+  private onDeleteSuccess = (rule: IRuleHost): void => {
+    super.toast(`<span class="green-text">Host rule ${rule.name} successfully removed</span>`);
+    if (this.mounted) {
+      this.props.history.push(`/rules/hosts`)
+    }
+  };
+
+  private onDeleteFailure = (reason: string, ruleHost: IRuleHost): void =>
+    super.toast(`Unable to delete ${ruleHost.name}`, 10000, reason, true);
+
+  private shouldShowSaveButton = ():boolean =>
+    !!this.state.unsavedConditions.length
+    || !!this.state.unsavedCloudHosts.length
+    || !!this.state.unsavedEdgeHosts.length;
+
+  private saveEntities = (rule: IRuleHost) => {
     this.saveRuleConditions(rule);
     this.saveRuleCloudHosts(rule);
     this.saveRuleEdgeHosts(rule);
   };
 
-  private onPostSuccess = (reply: IReply<IHostRule>): void => {
-    super.toast(`Host rule <b>${reply.data.name}</b> saved`);
-    this.saveEntities(reply.data);
-  };
-
-  private onPostFailure = (reason: string, rule: IHostRule): void =>
-    super.toast(`Unable to save ${rule}`, 10000, reason, true);
-
-  private onPutSuccess = (rule: IHostRule): void => {
-    super.toast(`Changes to host rule <b>${rule.name}</b> are now saved`);
-    this.setState({ruleName: rule.name});
-    this.saveEntities(rule);
-  };
-
-  private onPutFailure = (reason: string, ruleName: string): void =>
-    super.toast(`Unable to update ${ruleName}`, 10000, reason, true);
-
-  private onDeleteSuccess = (ruleName: string): void => {
-    super.toast(`Host rule <b>${ruleName}</b> successfully removed`);
-    this.props.history.push(`/rules`)
-  };
-
-  private onDeleteFailure = (reason: string, ruleName: string): void =>
-    super.toast(`Unable to delete ${ruleName}`, 10000, reason, true);
-
-  private onAddRuleCondition = (condition: string): void => {
+  private addRuleCondition = (condition: string): void => {
     this.setState({
-      newConditions: this.state.newConditions.concat(condition)
+      unsavedConditions: this.state.unsavedConditions.concat(condition)
     });
   };
 
-  private onRemoveRuleConditions = (conditions: string[]): void => {
+  private removeRuleConditions = (conditions: string[]): void => {
     this.setState({
-      newConditions: this.state.newConditions.filter(condition => !conditions.includes(condition))
+      unsavedConditions: this.state.unsavedConditions.filter(condition => !conditions.includes(condition))
     });
   };
 
-  private saveRuleConditions = (rule: IHostRule): void => {
-    const {newConditions} = this.state;
-    if (newConditions.length) {
-      postData(`rules/hosts/${rule.name}/conditions`, newConditions,
+  private saveRuleConditions = (rule: IRuleHost): void => {
+    const {unsavedConditions} = this.state;
+    if (unsavedConditions.length) {
+      postData(`rules/hosts/${rule.name}/conditions`, unsavedConditions,
         () => this.onSaveConditionsSuccess(rule),
         (reason) => this.onSaveConditionsFailure(rule, reason));
     }
   };
 
-  private onSaveConditionsSuccess = (rule: IHostRule): void => {
-    if (!isNewRule(this.props.match.params.name)) {
-      this.props.addRuleHostConditions(rule.name, this.state.newConditions)
+  private onSaveConditionsSuccess = (rule: IRuleHost): void => {
+    this.props.addRuleHostConditions(rule.name, this.state.unsavedConditions);
+    if (this.mounted) {
+      this.setState({ unsavedConditions: [] });
     }
-    this.setState({ newConditions: [] });
   };
 
-  private onSaveConditionsFailure = (rule: IHostRule, reason: string): void =>
+  private onSaveConditionsFailure = (rule: IRuleHost, reason: string): void =>
     super.toast(`Unable to save conditions of rule ${rule.name}`, 10000, reason, true);
 
-  private onAddRuleCloudHost = (cloudHost: string): void =>
+  private addRuleCloudHost = (cloudHost: string): void =>
     this.setState({
-      newCloudHosts: this.state.newCloudHosts.concat(cloudHost)
+      unsavedCloudHosts: this.state.unsavedCloudHosts.concat(cloudHost)
     });
 
-  private onRemoveRuleCloudHosts = (cloudHosts: string[]): void => {
+  private removeRuleCloudHosts = (cloudHosts: string[]): void => {
     this.setState({
-      newCloudHosts: this.state.newCloudHosts.filter(cloudHost => !cloudHosts.includes(cloudHost))
+      unsavedCloudHosts: this.state.unsavedCloudHosts.filter(cloudHost => !cloudHosts.includes(cloudHost))
     });
   };
 
-  private saveRuleCloudHosts = (rule: IHostRule): void => {
-    const {newCloudHosts} = this.state;
-    if (newCloudHosts.length) {
-      postData(`rules/hosts/${rule.name}/cloudHosts`, newCloudHosts,
-        () => this.onSaveCloudHostsSuccess(rule.name),
-        (reason) => this.onSaveCloudHostsFailure(rule.name, reason));
+  private saveRuleCloudHosts = (rule: IRuleHost): void => {
+    const {unsavedCloudHosts} = this.state;
+    if (unsavedCloudHosts.length) {
+      postData(`rules/hosts/${rule.name}/cloudHosts`, unsavedCloudHosts,
+        () => this.onSaveCloudHostsSuccess(rule),
+        (reason) => this.onSaveCloudHostsFailure(rule, reason));
     }
   };
 
-  private onSaveCloudHostsSuccess = (ruleName: string): void => {
-    if (!isNewRule(this.props.match.params.name)) {
-      this.props.addRuleCloudHosts(ruleName, this.state.newCloudHosts)
+  private onSaveCloudHostsSuccess = (rule: IRuleHost): void => {
+    this.props.addRuleCloudHosts(rule.name, this.state.unsavedCloudHosts);
+    if (this.mounted) {
+      this.setState({ unsavedCloudHosts: [] });
     }
-    this.setState({ newCloudHosts: [] });
   };
 
-  private onSaveCloudHostsFailure = (ruleName: string, reason: string): void =>
-    super.toast(`Unable to save cloud hosts of rule ${ruleName}`, 10000, reason, true);
+  private onSaveCloudHostsFailure = (rule: IRuleHost, reason: string): void =>
+    super.toast(`Unable to save cloud hosts of rule ${rule.name}`, 10000, reason, true);
 
-  private onAddRuleEdgeHost = (edgeHost: string): void =>
+  private addRuleEdgeHost = (edgeHost: string): void =>
     this.setState({
-      newEdgeHosts: this.state.newEdgeHosts.concat(edgeHost)
+      unsavedEdgeHosts: this.state.unsavedEdgeHosts.concat(edgeHost)
     });
 
-  private onRemoveRuleEdgeHosts = (edgeHosts: string[]): void => {
+  private removeRuleEdgeHosts = (edgeHosts: string[]): void => {
     this.setState({
-      newEdgeHosts: this.state.newEdgeHosts.filter(edgeHost => !edgeHosts.includes(edgeHost))
+      unsavedEdgeHosts: this.state.unsavedEdgeHosts.filter(edgeHost => !edgeHosts.includes(edgeHost))
     });
   };
 
-  private saveRuleEdgeHosts = (rule: IHostRule): void => {
-    const {newEdgeHosts} = this.state;
-    if (newEdgeHosts.length) {
-      postData(`rules/hosts/${rule.name}/edgeHosts`, newEdgeHosts,
+  private saveRuleEdgeHosts = (rule: IRuleHost): void => {
+    const {unsavedEdgeHosts} = this.state;
+    if (unsavedEdgeHosts.length) {
+      postData(`rules/hosts/${rule.name}/edgeHosts`, unsavedEdgeHosts,
         () => this.onSaveEdgeHostsSuccess(rule),
         (reason) => this.onSaveEdgeHostsFailure(rule, reason));
     }
   };
 
-  private onSaveEdgeHostsSuccess = (rule: IHostRule): void => {
-    if (!isNewRule(this.props.match.params.name)) {
-      this.props.addRuleEdgeHosts(rule.name, this.state.newEdgeHosts)
+  private onSaveEdgeHostsSuccess = (rule: IRuleHost): void => {
+    this.props.addRuleEdgeHosts(rule.name, this.state.unsavedEdgeHosts);
+    if (this.mounted) {
+      this.setState({ unsavedEdgeHosts: [] });
     }
-    this.setState({ newEdgeHosts: [] });
   };
 
-  private onSaveEdgeHostsFailure = (rule: IHostRule, reason: string): void =>
+  private onSaveEdgeHostsFailure = (rule: IRuleHost, reason: string): void =>
     super.toast(`Unable to save edge hosts of rule ${rule.name}`, 10000, reason, true);
 
+  private updateRuleHost = (ruleHost: IRuleHost) => {
+    //const previousRuleHost = this.getRuleHost();
+    ruleHost = Object.values(normalize(ruleHost, Schemas.RULE_HOST).entities.hostRules || {})[0];
+    //TODO this.props.updateRuleHost(previousRuleHost, ruleHost);
+    const formRuleHost = { ...ruleHost };
+    removeFields(formRuleHost);
+    this.setState({ruleHost: ruleHost, formRuleHost: formRuleHost});
+  };
 
-  private getFields = (hostRule: Partial<IRule>): IFields =>
+  private getFields = (hostRule: Partial<IRuleHost>): IFields =>
     Object.entries(hostRule).map(([key, _]) => {
       return {
         [key]: {
@@ -226,8 +275,8 @@ class RuleHost extends BaseComponent<Props, State> {
           label: key,
           validation:
             key == 'priority'
-              ? { rule: requiredAndNumberAndMin, args: 0 }
-              : { rule: required }
+              ? { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
+              : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -237,35 +286,48 @@ class RuleHost extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private shouldShowSaveButton = ():boolean =>
-    !isNewRule(this.props.match.params.name) &&
-    (!!this.state.newConditions.length || !!this.state.newCloudHosts.length || !!this.state.newEdgeHosts.length);
-
   private decisionDropdownOption = (decision: IDecision) =>
     decision.name;
 
   private isGenericSelected = (value: string) =>
     this.setState({isGeneric: value === 'true'});
 
+  private getSelectableDecisions = () =>
+    Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() == 'host');
+
   private hostRule = () => {
-    const {isLoading, error, formHostRule, hostRule} = this.props;
+    const {isLoading, error} = this.props;
+    const ruleHost = this.getRuleHost();
+    const formRuleHost = this.getFormRuleHost();
     // @ts-ignore
-    const ruleKey: (keyof IHostRule) = formHostRule && Object.keys(formHostRule)[0];
+    const ruleKey: (keyof IRuleHost) = formRuleHost && Object.keys(formRuleHost)[0];
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formHostRule && (
+        {!isLoading && !error && formRuleHost && (
           <Form id={ruleKey}
-                fields={this.getFields(formHostRule)}
-                values={hostRule}
-                isNew={isNewRule(this.props.match.params.name)}
+                fields={this.getFields(formRuleHost)}
+                values={ruleHost}
+                isNew={isNew(this.props.location.search)}
                 showSaveButton={this.shouldShowSaveButton()}
-                post={{url: 'rules/hosts', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={{url: `rules/hosts/${this.state.ruleName || hostRule[ruleKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={{url: `rules/hosts/${this.state.ruleName || hostRule[ruleKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                post={{
+                  url: 'rules/hosts',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure
+                }}
+                put={{
+                  url: `rules/hosts/${ruleHost.name}`,
+                  successCallback: this.onPutSuccess,
+                  failureCallback: this.onPutFailure
+                }}
+                delete={{
+                  url: `rules/hosts/${ruleHost.name}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure
+                }}
                 saveEntities={this.saveEntities}>
-            {Object.keys(formHostRule).map((key, index) =>
+            {Object.keys(formRuleHost).map((key, index) =>
               key === 'decision'
                 ? <Field<IDecision> key={index}
                                     id={key}
@@ -273,17 +335,17 @@ class RuleHost extends BaseComponent<Props, State> {
                                     type="dropdown"
                                     dropdown={{
                                       defaultValue: "Choose decision",
-                                      values: this.props.decisions,
+                                      values: this.getSelectableDecisions(),
                                       optionToString: this.decisionDropdownOption}}/>
                 : key === 'generic'
-                ? <Field<boolean> key={index}
-                                  id={key}
-                                  label={key}
-                                  type="dropdown"
-                                  dropdown={{
-                                    selectCallback: this.isGenericSelected,
-                                    defaultValue: "Apply to all hosts?",
-                                    values: [true, false]}}/>
+                ? <Field key={index}
+                         id={key}
+                         label={key}
+                         type="dropdown"
+                         dropdown={{
+                           selectCallback: this.isGenericSelected,
+                           defaultValue: "Apply to all hosts?",
+                           values: ['True', 'False']}}/>
                 : <Field key={index}
                          id={key}
                          label={key}
@@ -295,38 +357,29 @@ class RuleHost extends BaseComponent<Props, State> {
     )
   };
 
-  private entitiesList = (element: JSX.Element) => {
-    const {isLoading, error, hostRule} = this.props;
-    if (isLoading) {
-      return <ListLoadingSpinner/>;
-    }
-    if (error) {
-      return <Error message={error}/>;
-    }
-    if (hostRule) {
-      return element;
-    }
-    return <></>;
-  };
-
   private conditions = (): JSX.Element =>
-    this.entitiesList(<HostRuleConditionList rule={this.props.hostRule}
-                                             newConditions={this.state.newConditions}
-                                             onAddRuleCondition={this.onAddRuleCondition}
-                                             onRemoveRuleConditions={this.onRemoveRuleConditions}/>);
+    <HostRuleConditionList isLoadingHostRule={this.props.isLoading}
+                           loadHostRuleError={this.props.error}
+                           ruleHost={this.props.ruleHost}
+                           newConditions={this.state.unsavedConditions}
+                           onAddRuleCondition={this.addRuleCondition}
+                           onRemoveRuleConditions={this.removeRuleConditions}/>;
 
   private cloudHosts = (): JSX.Element =>
-    this.entitiesList(<HostRuleCloudHostsList rule={this.props.hostRule}
-                                              newCloudHosts={this.state.newCloudHosts}
-                                              onAddRuleCloudHost={this.onAddRuleCloudHost}
-                                              onRemoveRuleCloudHosts={this.onRemoveRuleCloudHosts}/>);
-
+    <HostRuleCloudHostsList isLoadingHostRule={this.props.isLoading}
+                            loadHostRuleError={this.props.error}
+                            ruleHost={this.props.ruleHost}
+                            newCloudHosts={this.state.unsavedCloudHosts}
+                            onAddRuleCloudHost={this.addRuleCloudHost}
+                            onRemoveRuleCloudHosts={this.removeRuleCloudHosts}/>;
 
   private edgeHosts = (): JSX.Element =>
-    this.entitiesList(<HostRuleEdgeHostsList rule={this.props.hostRule}
-                                             newEdgeHosts={this.state.newEdgeHosts}
-                                             onAddRuleEdgeHost={this.onAddRuleEdgeHost}
-                                             onRemoveRuleEdgeHosts={this.onRemoveRuleEdgeHosts}/>);
+    <HostRuleEdgeHostsList isLoadingHostRule={this.props.isLoading}
+                           loadHostRuleError={this.props.error}
+                           ruleHost={this.props.ruleHost}
+                           newEdgeHosts={this.state.unsavedEdgeHosts}
+                           onAddRuleEdgeHost={this.addRuleEdgeHost}
+                           onRemoveRuleEdgeHosts={this.removeRuleEdgeHosts}/>;
 
   private tabs = () => [
     {
@@ -336,7 +389,7 @@ class RuleHost extends BaseComponent<Props, State> {
     },
     {
       title: 'Conditions',
-      id: 'hostRuleConditions',
+      id: 'ruleConditions',
       content: () => this.conditions(),
     },
     {
@@ -356,7 +409,7 @@ class RuleHost extends BaseComponent<Props, State> {
   render() {
     return (
       <MainLayout>
-        {this.shouldShowSaveButton() && !isNewRule(this.props.match.params.name) && <UnsavedChanged/>}
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs()}/>
         </div>
@@ -366,36 +419,37 @@ class RuleHost extends BaseComponent<Props, State> {
 
 }
 
+function removeFields(ruleHost: Partial<IRuleHost>) {
+  delete ruleHost["id"];
+  delete ruleHost["conditions"];
+  delete ruleHost["cloudHosts"];
+  delete ruleHost["edgeHosts"];
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.rules.hosts.isLoadingRules;
   const error = state.entities.rules.hosts.loadRulesError;
   const name = props.match.params.name;
-  const isNew = isNewRule(name);
-  const hostRule = isNew ? emptyHostRule() : state.entities.rules.hosts.data[name];
-  let formHostRule;
-  if (isNew || !isNew && hostRule) {
-    formHostRule = { ...hostRule };
-    if (!isNew) {
-      delete formHostRule["id"];
-      delete formHostRule["conditions"];
-      delete formHostRule["cloudHosts"];
-      delete formHostRule["edgeHosts"];
-    }
+  const ruleHost = isNew(props.location.search) ? buildNewHostRule() : state.entities.rules.hosts.data[name];
+  let formRuleHost;
+  if (ruleHost) {
+    formRuleHost = { ...ruleHost };
+    removeFields(formRuleHost);
   }
-  const decisions = state.entities.decisions.data
-                    && Object.values(state.entities.decisions.data)
-                             .filter(decision => decision.componentType.name.toLowerCase() == 'host');
+  const decisions = state.entities.decisions.data;
   return  {
     isLoading,
     error,
-    hostRule,
-    formHostRule,
+    ruleHost,
+    formRuleHost,
     decisions,
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
+  addRuleHost,
+  //TODO updateRulehost,
   loadDecisions,
   addRuleHostConditions,
   addRuleCloudHosts,

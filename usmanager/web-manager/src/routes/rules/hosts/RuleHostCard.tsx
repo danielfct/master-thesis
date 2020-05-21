@@ -9,18 +9,18 @@
  */
 
 import React from "react";
-import {IHostRule} from "./RuleHost";
+import {IRuleHost} from "./RuleHost";
 import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 
 interface HostRuleCardProps {
-  rule: IHostRule;
+  rule: IRuleHost;
 }
 
 type Props = HostRuleCardProps;
 
 const RuleHostCard = ({rule}: Props) => (
-  <Card<IHostRule> title={rule.name}
+  <Card<IRuleHost> title={rule.name}
                    link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
                    height={'120px'}
                    margin={'10px 0'}

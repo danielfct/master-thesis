@@ -1,4 +1,4 @@
-import {IServiceRule} from "./RuleService";
+import {IRuleService} from "./RuleService";
 import BaseComponent from "../../../components/BaseComponent";
 import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";
@@ -12,7 +12,6 @@ import {
   removeRuleServiceConditions
 } from "../../../actions";
 import {connect} from "react-redux";
-import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import {ICondition} from "../conditions/RuleCondition";
 
@@ -30,7 +29,9 @@ interface DispatchToProps {
 }
 
 interface ServiceRuleConditionListProps {
-  rule: IServiceRule | Partial<IServiceRule>;
+  isLoadingRuleService: boolean;
+  loadRuleServiceError?: string | null;
+  ruleService: IRuleService | Partial<IRuleService> | null;
   newConditions: string[];
   onAddRuleCondition: (condition: string) => void;
   onRemoveRuleConditions: (condition: string[]) => void;
@@ -41,12 +42,10 @@ type Props = StateToProps & DispatchToProps & ServiceRuleConditionListProps
 class RuleServiceConditionList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    if (this.props.rule) {
-      const {name} = this.props.rule;
-      if (name) {
-        this.props.loadRuleServiceConditions(name);
-      }
-      this.props.loadConditions();
+    this.props.loadConditions();
+    if (this.props.ruleService?.name) {
+      const {name} = this.props.ruleService;
+      this.props.loadRuleServiceConditions(name);
     }
   }
 
@@ -75,8 +74,8 @@ class RuleServiceConditionList extends BaseComponent<Props, {}> {
     this.props.onRemoveRuleConditions(conditions);
 
   private onDeleteSuccess = (conditions: string[]): void => {
-    const {name} = this.props.rule;
-    if (name) {
+    if (this.props.ruleService?.name) {
+      const {name} = this.props.ruleService;
       this.props.removeRuleServiceConditions(name, conditions);
     }
   };
@@ -91,8 +90,8 @@ class RuleServiceConditionList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
-                           error={this.props.error}
+    return <ControlledList isLoading={this.props.isLoadingRuleService || this.props.isLoading}
+                           error={this.props.loadRuleServiceError || this.props.error}
                            emptyMessage={`Conditions list is empty`}
                            data={this.props.ruleConditions}
                            dataKey={[]} //TODO
@@ -106,7 +105,7 @@ class RuleServiceConditionList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/services/${this.props.rule.name}/conditions`,
+                             url: `rules/services/${this.props.ruleService?.name}/conditions`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;
@@ -115,7 +114,7 @@ class RuleServiceConditionList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceRuleConditionListProps): StateToProps {
-  const ruleName = ownProps.rule && ownProps.rule.name;
+  const ruleName = ownProps.ruleService?.name;
   const rule = ruleName && state.entities.rules.services.data[ruleName];
   const ruleConditions = rule && rule.conditions;
   return {

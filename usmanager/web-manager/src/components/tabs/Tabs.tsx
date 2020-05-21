@@ -19,18 +19,13 @@ export default class extends React.Component<Props, {}> {
     M.Tabs.init(this.tabs.current as Element);
   }
 
-  updatePathname = (event: any) => {
-    //TODO not working?
-    this.props.history.push(`#${event.target.id}`);
-  };
-
   render() {
     const {tabs} = this.props;
     return (
       <>
         <ul className="tabs tabs-fixed-width" ref={this.tabs}>
           {tabs.map((tab, index) =>
-            <li key={index} className={`tab ${tab.disabled ? 'disabled' : ''}`} onClick={this.updatePathname}>
+            <li key={index} className={`tab ${tab.disabled ? 'disabled' : ''}`}>
               <a href={tabs.length === 1 ? undefined : `#${tab.id}`}>{tab.title}</a>
             </li>
           )}

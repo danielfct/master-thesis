@@ -25,10 +25,10 @@ export default class Hosts extends BaseComponent<{}, {}> {
   render = () =>
     <MainLayout>
       <AddButton tooltip={'Add host'} dropdown={{
-        id: 'addHosts',
+        id: 'hosts',
         title: 'Host type',
         empty: 'No more apps to add',
-        data: [{text: 'Cloud', pathname: '/hosts/cloud/new_instance'}, {text: 'Edge', pathname: '/hosts/edge/new_host'}],
+        data: [{text: 'Cloud', pathname: '/hosts/cloud/new_instance?new=true'}, {text: 'Edge', pathname: '/hosts/edge/add_machine?new=true'}],
       }}/>
       <div className={`${styles.container}`}>
         <Collapsible id={"cloudHostsCollapsible"}

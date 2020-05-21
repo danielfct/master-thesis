@@ -1,9 +1,9 @@
 import React from "react";
 import {IField, IOperator, IValueMode} from "../Rule";
-import IData from "../../../components/IData";
+import IDatabaseData from "../../../components/IDatabaseData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
-import Form, {IFields, required, requiredAndNumberAndMin} from "../../../components/form/Form";
+import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../components/form/Form";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
@@ -13,8 +13,9 @@ import {ReduxState} from "../../../reducers";
 import {loadConditions, loadFields, loadOperators, loadValueModes} from "../../../actions";
 import {connect} from "react-redux";
 import {IReply} from "../../../utils/api";
+import {isNew} from "../../../utils/router";
 
-export interface ICondition extends IData {
+export interface ICondition extends IDatabaseData {
   name: string;
   valueMode: IValueMode;
   field: IField;
@@ -22,16 +23,13 @@ export interface ICondition extends IData {
   value: number;
 }
 
-const emptyCondition = () => ({
+const buildNewCondition = () => ({
   name: '',
   valueMode: undefined,
   field: undefined,
   operator: undefined,
   value: 0
 });
-
-const isNewCondition = (name: string) =>
-  name === 'new_condition';
 
 interface StateToProps {
   isLoading: boolean;
@@ -63,8 +61,8 @@ type State = {
 class RuleCondition extends BaseComponent<Props, State> {
 
   componentDidMount(): void {
-    const conditionName = this.props.match.params.name;
-    if (conditionName && !isNewCondition(conditionName)) {
+    if (!isNew(this.props.location.search)) {
+      const conditionName = this.props.match.params.name;
       this.props.loadConditions(conditionName);
     }
     this.props.loadValueModes();
@@ -73,14 +71,14 @@ class RuleCondition extends BaseComponent<Props, State> {
   };
 
   private onPostSuccess = (reply: IReply<ICondition>): void => {
-    super.toast(`Condition <b>${reply.data.name}</b> is now created`);
+    super.toast(`<span class="green-text">Condition ${reply.data.name} is now created</span>`);
   };
 
   private onPostFailure = (reason: string, conditionName: string): void =>
     super.toast(`Unable to save ${conditionName}`, 10000, reason, true);
 
   private onPutSuccess = (conditionName: string): void => {
-    super.toast(`Changes to condition <b>${conditionName}</b> are now saved`);
+    super.toast(`<span class="green-text">Changes to condition ${conditionName} have been saved</span>`);
     this.setState({conditionName: conditionName});
   };
 
@@ -88,7 +86,7 @@ class RuleCondition extends BaseComponent<Props, State> {
     super.toast(`Unable to update ${conditionName}`, 10000, reason, true);
 
   private onDeleteSuccess = (conditionName: string): void => {
-    super.toast(`Condition <b>${conditionName}</b> successfully removed`);
+    super.toast(`<span class="green-text">Condition ${conditionName} successfully removed</span>`);
     this.props.history.push(`/rules/conditions`)
   };
 
@@ -96,14 +94,14 @@ class RuleCondition extends BaseComponent<Props, State> {
     super.toast(`Unable to remove ${conditionName}`, 10000, reason, true);
 
   private getFields = (): IFields =>
-    Object.entries(emptyCondition()).map(([key, value]) => {
+    Object.entries(buildNewCondition()/*this.getCondition()TODO*/).map(([key, value]) => {
       return {
         [key]: {
           id: key,
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 0 }
-            : { rule: required }
+            : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -126,7 +124,6 @@ class RuleCondition extends BaseComponent<Props, State> {
     const {isLoading, error, condition, formCondition} = this.props;
     // @ts-ignore
     const conditionKey: (keyof ICondition) = formCondition && Object.keys(formCondition)[0];
-    const isNew = isNewCondition(this.props.match.params.name);
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
@@ -135,7 +132,7 @@ class RuleCondition extends BaseComponent<Props, State> {
           <Form id={conditionKey}
                 fields={this.getFields()}
                 values={condition}
-                isNew={isNew}
+                isNew={isNew(this.props.location.search)}
                 post={{url: 'rules/conditions', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
                 put={{url: `rules/conditions/${this.state?.conditionName || condition[conditionKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
                 delete={{url: `rules/conditions/${this.state?.conditionName || condition[conditionKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}>
@@ -195,7 +192,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.rules.conditions.isLoadingConditions;
   const error = state.entities.rules.conditions.loadConditionsError;
   const name = props.match.params.name;
-  const condition = isNewCondition(name) ? emptyCondition() : state.entities.rules.conditions.data[name];
+  const condition = isNew(props.location.search) ? buildNewCondition() : state.entities.rules.conditions.data[name];
   let formCondition;
   formCondition = { ...condition };
   delete formCondition['id'];

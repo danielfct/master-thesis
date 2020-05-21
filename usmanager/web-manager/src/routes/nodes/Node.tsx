@@ -1,56 +1,71 @@
-import IData from "../../components/IData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../components/BaseComponent";
-import Form, {IFields, required, requiredAndNumberAndMin} from "../../components/form/Form";
+import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../components/form/Form";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions} from "../../actions";
+import {addNode, loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions} from "../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import {IRegion} from "../region/Region";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IReply} from "../../utils/api";
+import {isNew} from "../../utils/router";
+import {normalize} from "normalizr";
+import {Schemas} from "../../middleware/api";
+import {ICloudHost} from "../hosts/cloud/CloudHost";
 
-export interface INode extends IData {
-  hostname: string;
+export interface INode {
+  id: string;
+  hostname: string; //TODO what about cloud?
   state: string;
   role: string;
 }
 
-const emptyNodeHost = () => ({
-  hostname: '',
-  quantity: 1
+interface INewNodeHost {
+  host: string;
+  quantity: number;
+}
+
+interface INewNodeLocation {
+  region: string,
+  country: string,
+  city: string,
+  quantity: number,
+}
+
+const buildNewNodeHost = (): INewNodeHost => ({
+  host: '',
+  quantity: 1,
 });
 
-const emptyNodeLocation = () => ({
+const buildNewNodeLocation = (): INewNodeLocation => ({
   region: '',
   country: '',
   city: '',
-  quantity: 1
+  quantity: 1,
 });
-
-const isNewNode = (name: string) =>
-  name === 'new_node';
 
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
+  newNodeHost?: INewNodeHost;
+  newNodeLocation?: INewNodeLocation;
   node?: INode;
-  nodeHost: any;
-  nodeLocation: any;
-  hosts: IEdgeHost[];
-  regions: IRegion[];
+  edgeHosts: { [key: string]: IEdgeHost };
+  cloudHosts: { [key: string]: ICloudHost };
+  regions: { [key: string]: IRegion };
 }
 
 interface DispatchToProps {
-  loadNodes: (name: string) => any;
-  loadEdgeHosts: () => any;
-  loadCloudHosts: () => any;
-  loadRegions: () => any;
+  loadNodes: (name: string) => void;
+  loadEdgeHosts: () => void;
+  loadCloudHosts: () => void;
+  loadRegions: () => void;
+  addNode: (node: INode) => void;
 }
 
 interface MatchParams {
@@ -59,22 +74,51 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-class Node extends BaseComponent<Props, {}> {
+interface State {
+  node?: INode,
+  currentForm: 'On host' | 'On location',
+}
+
+class Node extends BaseComponent<Props, State> {
+
+  state: State = {
+    currentForm: 'On host'
+  };
+
+  private mounted = false;
 
   componentDidMount(): void {
-    const nodeId = this.props.match.params.id;
-    if (nodeId && !isNewNode(nodeId)) {
-      this.props.loadNodes(nodeId);
-    }
+    this.loadNode();
     this.props.loadEdgeHosts();
     this.props.loadCloudHosts();
     this.props.loadRegions();
   };
 
-  private onPostSuccess = (reply: IReply<INode>): void => {
-    super.toast(`Setup at <b>${reply.data.hostname}</b> is done`);
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadNode = () => {
+    if (!isNew(this.props.location.search)) {
+      const nodeId = this.props.match.params.id;
+      this.props.loadNodes(nodeId);
+    }
   };
 
+  private getNode = () =>
+    this.state.node || this.props.node;
+
+  private onPostSuccess = (reply: IReply<INode>): void => {
+    const node = reply.data;
+    super.toast(`<span class="green-text">Started node ${node.id} at ${node.hostname}</span>`);
+    this.props.addNode(node);
+    if (this.mounted) {
+      this.updateNode(node);
+      this.props.history.replace(node.id);
+    }
+  };
+
+  //TODO
   private onPostFailure = (reason: string, nodeId: string | IRegion): void => {
     if (typeof nodeId === "string") {
       super.toast(`Unable to start node on ${nodeId}`, 10000, reason, true);
@@ -84,15 +128,24 @@ class Node extends BaseComponent<Props, {}> {
     }
   };
 
-  private onDeleteSuccess = (nodeId: string): void => {
-    super.toast(`Node <b>${nodeId}</b> successfully stopped`);
-    this.props.history.push(`/nodes`)
+  private onDeleteSuccess = (node: INode): void => {
+    super.toast(`<span class="green-text">Node ${node.id} successfully stopped</span>`);
+    if (this.mounted) {
+      this.props.history.push(`/nodes`)
+    }
   };
 
-  private onDeleteFailure = (reason: string, nodeId: string): void =>
-    super.toast(`Unable to stop ${nodeId}`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, node: INode): void =>
+    super.toast(`Unable to stop ${node.id}`, 10000, reason, true);
 
-  private getFields = (node: INode): IFields =>
+  private updateNode = (node: INode) => {
+    //const previousNode = this.getNode();
+    node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
+    //TODO this.props.updateNode(previousNode, node);
+    this.setState({node: node});
+  };
+
+  private getFields = (node: INewNodeHost | INewNodeLocation | INode): IFields =>
     Object.entries(node).map(([key, value]) => {
       return {
         [key]: {
@@ -100,7 +153,7 @@ class Node extends BaseComponent<Props, {}> {
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 1 }
-            : { rule: required }
+            : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -110,75 +163,85 @@ class Node extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
-  private formFields = (): JSX.Element => {
-    const {node} = this.props;
-    return (
-      <>
-        {node && Object.entries(node).map(([key, value], index) =>
-          <Field key={index}
-                 id={key}
-                 label={key}/>)}
-      </>
-    );
+  private getSelectableHosts = () => {
+    const cloudHosts = Object.keys(this.props.cloudHosts);
+    const edgeHosts = Object.keys(this.props.edgeHosts);
+    return cloudHosts.concat(edgeHosts);
   };
-
-  private getSelectableRoles = () =>
-    ['MANAGER', 'WORKER'];
-
-  private hostnameDropdownOption = (hostname: string) =>
-    hostname;
-
-  private formFieldsHost = (): JSX.Element =>
-    <>
-      <Field<string> key={'hostname'}
-                     id={'hostname'}
-                     label={'hostname'}
-                     type="dropdown"
-                     dropdown={{
-                       defaultValue: "Select host",
-                       values: this.props.hosts.map(host => host.hostname),
-                       optionToString: this.hostnameDropdownOption
-                     }}/>
-      {/*<Field key={'role'}
-               id={'role'}
-               label={'role'}
-               type="dropdown"
-               dropdown={{defaultValue: "Select role", values: this.getSelectableRoles()}}/>*/}
-      <Field key={'quantity'}
-             id={'quantity'}
-             label={'quantity'}
-             type={"numberbox"}/>
-    </>;
 
   private regionDropdownOption = (region: IRegion) =>
     region.name;
 
-  private formFieldsLocation = (): JSX.Element =>
-    <>
-      <Field<IRegion> key={'region'}
-                      id={'region'}
-                      label={'region'}
-                      type="dropdown"
-                      dropdown={{
-                        defaultValue: "Select region",
-                        values: this.props.regions,
-                        optionToString: this.regionDropdownOption
-                      }}/>
-      <Field key={'country'}
-             id={'country'}
-             label={'country'}/>
-      <Field key={'city'}
-             id={'city'}
-             label={'city'}/>
-    </>;
+  private formFields = (isNew: boolean) => {
+    const node = this.getNode();
+    const {currentForm} = this.state;
+    return (
+      isNew ?
+        currentForm === 'On host'
+          ?
+          <>
+            <Field<string> key={'host'} //TODO change server to accept 'host' instead of 'hostname'
+                           id={'host'}
+                           label={'host'}
+                           type="dropdown"
+                           dropdown={{
+                             defaultValue: "Select host",
+                             values: this.getSelectableHosts()
+                           }}/>
+            {/*<Field key={'role'}
+             id={'role'}
+             label={'role'}
+             type="dropdown"
+             dropdown={{
+               defaultValue: "Select role",
+               values: ['MANAGER', 'WORKER']
+             }}/>*/}
+            <Field key={'quantity'}
+                   id={'quantity'}
+                   label={'quantity'}
+                   type={"numberbox"}/>
+          </>
+          :
+          <>
+            <Field<IRegion> key={'region'}
+                            id={'region'}
+                            label={'region'}
+                            type="dropdown"
+                            dropdown={{
+                              defaultValue: "Select region",
+                              values: Object.values(this.props.regions),
+                              optionToString: this.regionDropdownOption
+                            }}/>
+            <Field key={'country'}
+                   id={'country'}
+                   label={'country'}/>
+            <Field key={'city'}
+                   id={'city'}
+                   label={'city'}/>
+            <Field key={'quantity'}
+                   id={'quantity'}
+                   label={'quantity'}
+                   type={"numberbox"}/>
+          </>
+        :
+        node && Object.entries(node).map(([key, value], index) =>
+               <Field key={index}
+                      id={key}
+                      label={key}/>)
+    );
+  };
 
-  //TODO put={{url: `conditions/${this.state.nodeName || condition[conditionKey]}` on every class
+  private switchForm = (formId: 'On host' | 'On location') =>
+    this.setState({currentForm: formId});
 
-  private node = (node: any, formFields: JSX.Element) => {
-    const {isLoading, error} = this.props;
+  private node = () => {
+    const {isLoading, error, newNodeHost, newNodeLocation} = this.props;
+    const {currentForm} = this.state;
+    const isNewNode = isNew(this.props.location.search);
+    const node = isNewNode ? (currentForm === 'On host' ? newNodeHost : newNodeLocation) : this.getNode();
     // @ts-ignore
-    const nodeKey: (keyof INode) = Object.keys(node)[0];
-    const isNew = isNewNode(this.props.match.params.id);
+    const nodeKey: (keyof INode) = node && Object.keys(node)[0];
+    console.log(node && this.getFields(node));
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
@@ -187,12 +250,22 @@ class Node extends BaseComponent<Props, {}> {
           <Form id={nodeKey}
                 fields={this.getFields(node)}
                 values={node}
-                isNew={isNew}
-                post={{textButton: 'Start', url: 'nodes', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                delete={node.role !== 'MANAGER'
-                  ? {textButton: 'Remove', url: `nodes/${node[nodeKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}
-                  : undefined}>
-            {formFields}
+                isNew={isNewNode}
+                post={{
+                  textButton: 'Start',
+                  url: 'nodes',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure
+                }}
+            // delete button is never present on new nodes, so a type cast is safe
+                delete={(node as INode).role !== 'MANAGER'
+                  ? {textButton: 'Remove',
+                    url: `nodes/${(node as INode).id}`,
+                    successCallback: this.onDeleteSuccess,
+                    failureCallback: this.onDeleteFailure}
+                  : undefined}
+                switchDropdown={isNewNode ? {options: ['On host', 'On location'], onSwitch: this.switchForm} : undefined}>
+            {this.formFields(isNewNode)}
           </Form>
         )}
       </>
@@ -200,26 +273,11 @@ class Node extends BaseComponent<Props, {}> {
   };
 
   private tabs: Tab[] =
-    isNewNode(this.props.match.params.id)
-      ? [
-        {
-          title: 'Host',
-          id: 'nodeOnHost',
-          content: () => this.node(this.props.nodeHost, this.formFieldsHost())
-        },
-        {
-          title: 'Location',
-          id: 'nodeUsingLocation',
-          content: () => this.node(this.props.nodeLocation, this.formFieldsLocation())
-        }
-      ]
-      : [
-        {
-          title: 'Node',
-          id: 'node',
-          content: () => this.node(this.props.node, this.formFields())
-        },
-      ];
+    [{
+      title: 'Node',
+      id: 'node',
+      content: () => this.node()
+    }];
 
   render() {
     return (
@@ -233,29 +291,32 @@ class Node extends BaseComponent<Props, {}> {
 
 }
 
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.nodes.isLoadingNodes;
   const error = state.entities.nodes.loadNodesError;
   const id = props.match.params.id;
-  const node = isNewNode(id) ? undefined : state.entities.nodes.data[id];
-  const nodeHost = emptyNodeHost();
-  const nodeLocation = emptyNodeLocation();
-  //TODO cloud too
-  const hosts = state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data);
-  const regions = state.entities.regions.data && Object.values(state.entities.regions.data);
+  const newNodeHost = isNew(props.location.search) ? buildNewNodeHost() : undefined;
+  const newNodeLocation = isNew(props.location.search) ? buildNewNodeLocation() : undefined;
+  const node = !isNew(props.location.search) ? state.entities.nodes.data[id] : undefined;
+  const cloudHosts = state.entities.hosts.cloud.data;
+  const edgeHosts = state.entities.hosts.edge.data;
+  const regions = state.entities.regions.data;
   return  {
     isLoading,
     error,
+    newNodeHost,
+    newNodeLocation,
     node,
-    nodeHost,
-    nodeLocation,
-    hosts,
+    cloudHosts,
+    edgeHosts,
     regions
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadNodes,
+  addNode,
   loadEdgeHosts,
   loadCloudHosts,
   loadRegions,

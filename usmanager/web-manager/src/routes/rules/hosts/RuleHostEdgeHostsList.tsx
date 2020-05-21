@@ -18,7 +18,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IHostRule} from "./RuleHost";
+import {IRuleHost} from "./RuleHost";
 import BaseComponent from "../../../components/BaseComponent";
 import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";
@@ -49,7 +49,9 @@ interface DispatchToProps {
 }
 
 interface HostRuleEdgeHostListProps {
-  rule: IHostRule | Partial<IHostRule>;
+  isLoadingHostRule: boolean;
+  loadHostRuleError?: string | null;
+  ruleHost: IRuleHost | Partial<IRuleHost> | null;
   newEdgeHosts: string[];
   onAddRuleEdgeHost: (edgeHost: string) => void;
   onRemoveRuleEdgeHosts: (edgeHost: string[]) => void;
@@ -60,12 +62,10 @@ type Props = StateToProps & DispatchToProps & HostRuleEdgeHostListProps
 class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    if (this.props.rule) {
-      const {name} = this.props.rule;
-      if (name) {
-        this.props.loadRuleHostEdgeHosts(name);
-      }
-      this.props.loadEdgeHosts();
+    this.props.loadEdgeHosts();
+    if (this.props.ruleHost?.name) {
+      const {name} = this.props.ruleHost;
+      this.props.loadRuleHostEdgeHosts(name);
     }
   }
 
@@ -94,8 +94,8 @@ class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
     this.props.onRemoveRuleEdgeHosts(edgeHosts);
 
   private onDeleteSuccess = (edgeHosts: string[]): void => {
-    const {name} = this.props.rule;
-    if (name) {
+    if (this.props.ruleHost?.name) {
+      const {name} = this.props.ruleHost;
       this.props.removeRuleHostEdgeHosts(name, edgeHosts);
     }
   };
@@ -110,8 +110,8 @@ class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
-                           error={this.props.error}
+    return <ControlledList isLoading={this.props.isLoadingHostRule || this.props.isLoading}
+                           error={this.props.loadHostRuleError || this.props.error}
                            emptyMessage={`Edge hosts list is empty`}
                            data={this.props.ruleEdgeHosts}
                            dataKey={[]} //TODO
@@ -125,7 +125,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/hosts/${this.props.rule.name}/edgeHosts`,
+                             url: `rules/hosts/${this.props.ruleHost?.name}/edgeHosts`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;
@@ -134,7 +134,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleEdgeHostListProps): StateToProps {
-  const ruleName = ownProps.rule && ownProps.rule.name;
+  const ruleName = ownProps.ruleHost?.name;
   const rule = ruleName && state.entities.rules.hosts.data[ruleName];
   const ruleEdgeHosts = rule && rule.edgeHosts;
   return {

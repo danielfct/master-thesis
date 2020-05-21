@@ -10,7 +10,7 @@
 
 import React from "react";
 import {IService} from "./Service";
-import Data from "../../components/IData";
+import IDatabaseData from "../../components/IDatabaseData";
 import BaseComponent from "../../components/BaseComponent";
 import ListItem from "../../components/list/ListItem";
 import styles from "../../components/list/ListItem.module.css";
@@ -22,10 +22,15 @@ import {
   removeServicePredictions
 } from "../../actions";
 import {connect} from "react-redux";
-import {IFields, IValues, required, requiredAndNumberAndMin} from "../../components/form/Form";
+import {
+  IFields,
+  IValues,
+  requiredAndNumberAndMin,
+  requiredAndTrimmed
+} from "../../components/form/Form";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 
-export interface IPrediction extends Data {
+export interface IPrediction extends IDatabaseData {
   name: string;
   description: string;
   startDate: string;
@@ -57,7 +62,9 @@ interface DispatchToProps {
 }
 
 interface ServicePredictionListProps {
-  service: IService | Partial<IService>;
+  isLoadingService: boolean;
+  loadServiceError?: string | null;
+  service: IService | Partial<IService> | null;
   newPredictions: IPrediction[];
   onAddServicePrediction: (prediction: IPrediction) => void;
   onRemoveServicePredictions: (prediction: string[]) => void;
@@ -70,8 +77,8 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
   //TODO show prediction details on click
 
   componentDidMount(): void {
-    const {serviceName} = this.props.service;
-    if (serviceName) {
+    if (this.props.service?.serviceName) {
+      const {serviceName} = this.props.service;
       this.props.loadServicePredictions(serviceName);
     }
   }
@@ -103,8 +110,8 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
     this.props.onRemoveServicePredictions(predictions);
 
   private onDeleteSuccess = (predictions: string[]): void => {
-    const {serviceName} = this.props.service;
-    if (serviceName) {
+    if (this.props.service?.serviceName) {
+      const {serviceName} = this.props.service;
       this.props.removeServicePredictions(serviceName, predictions);
     }
   };
@@ -120,7 +127,7 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 0 }
-            : { rule: required }
+            : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -150,8 +157,8 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
     </div>;
 
   render() {
-    return <ControlledList<IPrediction> isLoading={this.props.isLoading}
-                                        error={this.props.error}
+    return <ControlledList<IPrediction> isLoading={this.props.isLoadingService || this.props.isLoading}
+                                        error={this.props.loadServiceError || this.props.error}
                                         emptyMessage='Predictions list is empty'
                                         data={this.props.predictions}
                                         dataKey={['name']}
@@ -167,7 +174,7 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
                                         onAddInput={this.onAdd}
                                         onRemove={this.onRemove}
                                         onDelete={{
-                                          url: `services/${this.props.service.serviceName}/predictions`,
+                                          url: `services/${this.props.service?.serviceName}/predictions`,
                                           successCallback: this.onDeleteSuccess,
                                           failureCallback: this.onDeleteFailure
                                         }}/>;
@@ -177,7 +184,7 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServicePredictionListProps): StateToProps {
-  const serviceName = ownProps.service.serviceName;
+  const serviceName = ownProps.service?.serviceName;
   const service = serviceName && state.entities.services.data[serviceName];
   const predictions = service && service.predictions;
   return {

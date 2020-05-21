@@ -68,7 +68,6 @@ import ServiceRule from "../routes/rules/services/RuleService";
 import Conditions from "../routes/rules/conditions/RuleConditionsList";
 import Condition from "../routes/rules/conditions/RuleCondition";
 
-
 interface RootContainerProps {
     store: any;
 }

@@ -24,17 +24,14 @@
 
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {isAuthenticated} from "./auth";
-import {camelCaseToSentenceCase, capitalize, snakeCaseToCamelCase} from "./text";
-
+import {camelCaseToSentenceCase, snakeCaseToCamelCase} from "./text";
 
 export interface IReply<T> extends AxiosResponse<T> {
 
 }
 
 export const API_URL = 'http://localhost:8080';
-/*const API_URL = '/';*/
-const TIMEOUT = 300000;
-
+export const REQUEST_TIMEOUT = 300000;
 
 //TODO delete
 export function getData<T>(url: string, callback: (data: T) => void): any {
@@ -44,7 +41,7 @@ export function getData<T>(url: string, callback: (data: T) => void): any {
       'Authorization': 'Basic YWRtaW46YWRtaW4=',
       'Content-type': 'application/json;charset=UTF-8',
       'Accept': 'application/json;charset=UTF-8',
-    })
+    }),
   }).then(response => {
     if (response.ok) {
       return response.json();
@@ -76,6 +73,9 @@ export function patchData<T>(url: string, requestBody: any,
   sendData<T>(url, 'PATCH', requestBody, successCallback, failureCallback);
 }
 
+const CancelToken = axios.CancelToken;
+export const cancelRequest = CancelToken.source();
+
 function sendData<T>(endpoint: string, method: Method, data: any,
                      successCallback: (response: IReply<T>) => void, failureCallback: (reason: string) => void) {
   const url = new URL(endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`);
@@ -89,14 +89,20 @@ function sendData<T>(endpoint: string, method: Method, data: any,
       'Accept': 'application/json;charset=UTF-8',
     },
     data,
-    timeout: TIMEOUT,
+    timeout: REQUEST_TIMEOUT,
+    cancelToken: cancelRequest.token
   }).then((response: AxiosResponse) => {
     console.log(response);
     successCallback(response)
   }).catch((error: AxiosError) => {
-    const reason = buildErrorMessage(error);
-    console.error(reason);
-    failureCallback(reason);
+    if (axios.isCancel(error)) {
+      console.log(error.message || 'Request canceled');
+    }
+    else {
+      const reason = buildErrorMessage(error);
+      console.error(reason);
+      failureCallback(reason);
+    }
   })
 }
 
@@ -114,14 +120,20 @@ export function deleteData(endpoint: string,
       'Accept': 'application/json;charset=UTF-8',
     },
     data,
-    timeout: TIMEOUT,
+    timeout: REQUEST_TIMEOUT,
+    cancelToken: cancelRequest.token
   }).then((response: AxiosResponse) => {
     console.log(response);
     successCallback();
   }).catch((error: AxiosError) => {
-    const reason = buildErrorMessage(error);
-    console.error(reason);
-    failureCallback(reason);
+    if (axios.isCancel(error)) {
+      console.log(error.message || 'Request canceled');
+    }
+    else {
+      const reason = buildErrorMessage(error);
+      console.error(reason);
+      failureCallback(reason);
+    }
   })
 }
 
@@ -143,7 +155,8 @@ export const setupAxiosInterceptors = (token: string): void => {
       }
       config.headers['Content-Type'] = 'application/json;charset=UTF-8';
       config.headers['Accept'] = 'application/json;charset=UTF-8';
-      config.timeout = TIMEOUT;
+      config.timeout = REQUEST_TIMEOUT;
+      config.cancelToken = cancelRequest.token;
       return config
     }
   )

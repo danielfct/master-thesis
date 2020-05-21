@@ -10,7 +10,7 @@ export default class BaseComponent<P, S> extends React.Component<P, S> {
   }
 
   toast(message: string, displayLength: number = 4000, error?: string, instance?: boolean): void {
-    const html = `<div>${message}` + (error ? `: <b class="red-text">${error}</b></div>` : '</div>');
+    const html = `<div>${message}${error ? `: <b class="red-text">${error}</b>` : ''}</div>`;
     const toast = M.toast({ html , displayLength });
     if (instance) {
       this.toasts.push(toast);

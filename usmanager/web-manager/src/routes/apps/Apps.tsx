@@ -36,7 +36,7 @@ class Apps extends BaseComponent<Props, {}> {
 
   render = () =>
     <MainLayout>
-      <AddButton tooltip={'Add app'} pathname={'/apps/new_app'}/>
+      <AddButton tooltip={'Add app'} pathname={'/apps/new_app?new=true'}/>
       <div className={`${styles.container}`}>
         <CardList<IApp>
           isLoading={this.props.isLoading}

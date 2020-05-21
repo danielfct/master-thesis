@@ -202,7 +202,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     const DataList = List<T>();
     return (
       <div>
-        <div className={`controlsContainer`}>
+        <div className='controlsContainer'>
           {data.length > 0 && (
             <p className={`${styles.nolabelCheckbox}`}>
               <label>

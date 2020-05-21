@@ -36,11 +36,11 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
 
   private loadBalancer = (loadBalancer: ILoadBalancer): JSX.Element =>
     <div></div>
-    //<EdgeHostCard key={host.id} edgeHost={host}/>;
+    //<EdgeHostCard key={cloudHost.id} edgeHost={cloudHost}/>;
 
   private predicate = (loadBalancer: ILoadBalancer, search: string): boolean =>
     true
-    //host.hostname.toLowerCase().includes(search);
+    //cloudHost.hostname.toLowerCase().includes(search);
 
   render = () =>
     <CardList<ILoadBalancer>

@@ -21,10 +21,9 @@ import {
   removeRuleServices,
 } from "../../../actions";
 import {connect} from "react-redux";
-import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import {IService} from "../../services/Service";
-import {IServiceRule} from "./RuleService";
+import {IRuleService} from "./RuleService";
 
 interface StateToProps {
   isLoading: boolean;
@@ -40,7 +39,9 @@ interface DispatchToProps {
 }
 
 interface ServiceRuleServicesListProps {
-  rule: IServiceRule | Partial<IServiceRule>;
+  isLoadingRuleService: boolean;
+  loadRuleServiceError?: string | null;
+  ruleService: IRuleService | Partial<IRuleService> | null;
   newServices: string[];
   onAddRuleService: (service: string) => void;
   onRemoveRuleServices: (services: string[]) => void;
@@ -51,12 +52,10 @@ type Props = StateToProps & DispatchToProps & ServiceRuleServicesListProps
 class RuleServiceServicesList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    if (this.props.rule) {
-      const {name} = this.props.rule;
-      if (name) {
-        this.props.loadRuleServices(name);
-      }
-      this.props.loadServices();
+    this.props.loadServices();
+    if (this.props.ruleService?.name) {
+      const {name} = this.props.ruleService;
+      this.props.loadRuleServices(name);
     }
   }
 
@@ -85,8 +84,8 @@ class RuleServiceServicesList extends BaseComponent<Props, {}> {
     this.props.onRemoveRuleServices(services);
 
   private onDeleteSuccess = (services: string[]): void => {
-    const {name} = this.props.rule;
-    if (name) {
+    if (this.props.ruleService?.name) {
+      const {name} = this.props.ruleService;
       this.props.removeRuleServices(name, services);
     }
   };
@@ -101,8 +100,8 @@ class RuleServiceServicesList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
-                           error={this.props.error}
+    return <ControlledList isLoading={this.props.isLoadingRuleService || this.props.isLoading}
+                           error={this.props.loadRuleServiceError || this.props.error}
                            emptyMessage={`Services list is empty`}
                            data={this.props.ruleServices}
                            dataKey={[]} //TODO
@@ -116,7 +115,7 @@ class RuleServiceServicesList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/services/${this.props.rule.name}/services`,
+                             url: `rules/services/${this.props.ruleService?.name}/services`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;
@@ -125,7 +124,7 @@ class RuleServiceServicesList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceRuleServicesListProps): StateToProps {
-  const ruleName = ownProps.rule && ownProps.rule.name;
+  const ruleName = ownProps.ruleService?.name;
   const rule = ruleName && state.entities.rules.services.data[ruleName];
   const ruleServices = rule && rule.services;
   return {

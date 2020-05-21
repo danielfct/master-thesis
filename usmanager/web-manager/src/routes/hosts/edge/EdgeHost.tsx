@@ -8,26 +8,29 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import IData from "../../../components/IData";
+import IDatabaseData from "../../../components/IDatabaseData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
-import Form, {IFields, required} from "../../../components/form/Form";
+import Form, {IFields, requiredAndTrimmed} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addEdgeHostRule, loadEdgeHosts} from "../../../actions";
+import {addEdgeHost, addEdgeHostRules, loadEdgeHosts} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import EdgeHostRuleList from "./EdgeHostRuleList";
 import {IReply, postData} from "../../../utils/api";
 import GenericHostRuleList from "../GenericHostRuleList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
-import CloudHostRuleList from "../cloud/CloudHostRuleList";
+import {isNew} from "../../../utils/router";
+import {normalize} from "normalizr";
+import {Schemas} from "../../../middleware/api";
+import {IApp} from "../../apps/App";
 
-export interface IEdgeHost extends IData {
+export interface IEdgeHost extends IDatabaseData {
   hostname: string;
   sshUsername: string;
   sshPassword: string;
@@ -38,7 +41,7 @@ export interface IEdgeHost extends IData {
   hostRules?: string[];
 }
 
-const emptyEdgeHost = (): Partial<IEdgeHost> => ({
+const buildNewEdgeHost = (): Partial<IEdgeHost> => ({
   hostname: '',
   sshUsername: '',
   sshPassword: '',
@@ -48,9 +51,6 @@ const emptyEdgeHost = (): Partial<IEdgeHost> => ({
   local: undefined,
 });
 
-const isNewHost = (edgeHostHostname: string) =>
-  edgeHostHostname === 'new_host';
-
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
@@ -59,8 +59,10 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-  loadEdgeHosts: (hostname: string) => any;
-  addEdgeHostRule: (hostname: string, ruleName: string) => void;
+  loadEdgeHosts: (hostname: string) => void;
+  addEdgeHost: (edgeHost: IEdgeHost) => void;
+  //TODO updateEdgeHost: (previousEdgeHost: Partial<IEdgeHost>, edgeHost: IEdgeHost) => void;
+  addEdgeHostRules: (hostname: string, rules: string[]) => void;
 }
 
 interface MatchParams {
@@ -69,87 +71,125 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-type State = {
-  newRules: string[],
+interface State {
+  edgeHost?: IEdgeHost,
+  formEdgeHost?: IEdgeHost,
+  unsavedRules: string[],
   hostname?: string,
 }
 
 class EdgeHost extends BaseComponent<Props, State> {
 
+  private mounted = false;
+
   state: State = {
-    newRules: [],
+    unsavedRules: [],
   };
 
   componentDidMount(): void {
-    const edgeHostHostname = this.props.match.params.hostname;
-    if (edgeHostHostname && !isNewHost(edgeHostHostname)) {
-      this.props.loadEdgeHosts(edgeHostHostname);
+    this.loadEdgeHost();
+  };
+
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadEdgeHost = () => {
+    if (!isNew(this.props.location.search)) {
+      const hostname = this.props.match.params.hostname;
+      this.props.loadEdgeHosts(hostname);
     }
   };
 
-  private saveEntities = (hostname: string) => {
-    this.saveEdgeHostRules(hostname);
-  };
+  private getEdgeHost = () =>
+    this.state.edgeHost || this.props.edgeHost;
+
+  private getFormEdgeHost = () =>
+    this.state.formEdgeHost || this.props.formEdgeHost;
 
   private onPostSuccess = (reply: IReply<IEdgeHost>): void => {
-    super.toast(`Edge host <b>${reply.data.hostname}</b> is now saved`);
-  };
-
-  private onPostFailure = (reason: string, edgeHostHostname: string): void =>
-    super.toast(`Unable to save ${edgeHostHostname}`, 10000, reason, true);
-
-  private onPutSuccess = (hostname: string): void => {
-    super.toast(`Changes to host <b>${hostname}</b> are now saved`);
-    this.setState({hostname: hostname});
-    this.saveEntities(hostname);
-  };
-
-  private onPutFailure = (reason: string, hostname: string): void =>
-    super.toast(`Unable to update ${hostname}`, 10000, reason, true);
-
-  private onDeleteSuccess = (edgeHostHostname: string): void => {
-    super.toast(`Edge host <b>${edgeHostHostname}</b> successfully removed`);
-    this.props.history.push(`/hosts`)
-  };
-
-  private onDeleteFailure = (reason: string, edgeHostHostname: string): void =>
-    super.toast(`Unable to remove edge host ${edgeHostHostname}`, 10000, reason, true);
-
-  private onAddEdgeHostRule = (rule: string): void => {
-    this.setState({
-      newRules: this.state.newRules.concat(rule)
-    });
-  };
-
-  private onRemoveEdgeHostRules = (rules: string[]): void => {
-    this.setState({
-      newRules: this.state.newRules.filter(rule => !rules.includes(rule))
-    });
-  };
-
-  private saveEdgeHostRules = (hostname: string): void => {
-    const {newRules} = this.state;
-    if (newRules.length) {
-      postData(`hosts/edge/${hostname}/rules`, newRules,
-        () => this.onSaveRulesSuccess(hostname),
-        (reason) => this.onSaveRulesFailure(hostname, reason));
+    const edgeHost = reply.data;
+    super.toast(`<span class="green-text">Edge host <b>${edgeHost.hostname}</b> is now saved</span>`);
+    this.props.addEdgeHost(edgeHost);
+    this.saveEntities(edgeHost);
+    if (this.mounted) {
+      this.updateEdgeHost(edgeHost);
+      this.props.history.replace(edgeHost.hostname);
     }
   };
 
-  private onSaveRulesSuccess = (hostname: string): void => {
-    if (!isNewHost(this.props.match.params.hostname)) {
-      this.state.newRules.forEach(rule =>
-        this.props.addEdgeHostRule(hostname, rule)
-      );
+  private onPostFailure = (reason: string, edgeHost: IEdgeHost): void =>
+    super.toast(`Unable to save ${edgeHost.hostname}`, 10000, reason, true);
+
+  private onPutSuccess = (reply: IReply<IEdgeHost>): void => {
+    const edgeHost = reply.data;
+    super.toast(`<span class="green-text">Changes to host ${edgeHost.hostname} have been saved</span>`);
+    this.saveEntities(edgeHost);
+    if (this.mounted) {
+      this.updateEdgeHost(edgeHost);
+      this.props.history.replace(edgeHost.hostname);
     }
-    this.setState({ newRules: [] });
   };
 
-  private onSaveRulesFailure = (hostname: string, reason: string): void =>
-    super.toast(`Unable to save rules of host ${hostname}`, 10000, reason, true);
+  private onPutFailure = (reason: string, edgeHost: IEdgeHost): void =>
+    super.toast(`Unable to update ${edgeHost.hostname}`, 10000, reason, true);
+
+  private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
+    super.toast(`<span class="green-text">Edge host ${edgeHost.hostname} successfully removed</span>`);
+    if (this.mounted) {
+      this.props.history.push(`/hosts`)
+    }
+  };
+
+  private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void =>
+    super.toast(`Unable to remove edge host ${edgeHost.hostname}`, 10000, reason, true);
 
   private shouldShowSaveButton = () =>
-    !!this.state.newRules.length;
+    !!this.state.unsavedRules.length;
+
+  private saveEntities = (edgeHost: IEdgeHost) => {
+    this.saveEdgeHostRules(edgeHost);
+  };
+
+  private addEdgeHostRule = (rule: string): void => {
+    this.setState({
+      unsavedRules: this.state.unsavedRules.concat(rule)
+    });
+  };
+
+  private removeEdgeHostRules = (rules: string[]): void => {
+    this.setState({
+      unsavedRules: this.state.unsavedRules.filter(rule => !rules.includes(rule))
+    });
+  };
+
+  private saveEdgeHostRules = (edgeHost: IEdgeHost): void => {
+    const {unsavedRules} = this.state;
+    if (unsavedRules.length) {
+      postData(`hosts/edge/${edgeHost.hostname}/rules`, unsavedRules,
+        () => this.onSaveRulesSuccess(edgeHost),
+        (reason) => this.onSaveRulesFailure(edgeHost, reason));
+    }
+  };
+
+  private onSaveRulesSuccess = (edgeHost: IEdgeHost): void => {
+    this.props.addEdgeHostRules(edgeHost.hostname, this.state.unsavedRules);
+    if (this.mounted) {
+      this.setState({ unsavedRules: [] });
+    }
+  };
+
+  private onSaveRulesFailure = (edgeHost: IEdgeHost, reason: string): void =>
+    super.toast(`Unable to save rules of host ${edgeHost.hostname}`, 10000, reason, true);
+
+  private updateEdgeHost = (edgeHost: IEdgeHost) => {
+    //const previousEdgeHost = this.getEdgeHost();
+    edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
+    //TODO this.props.updateEdgeHost(previousEdgeHost, edgeHost);
+    const formEdgeHost = { ...edgeHost };
+    removeFields(formEdgeHost);
+    this.setState({edgeHost: edgeHost, formEdgeHost: formEdgeHost});
+  };
 
   private getFields = (edgeHost: Partial<IEdgeHost>): IFields =>
     Object.entries(edgeHost).map(([key, _]) => {
@@ -157,7 +197,7 @@ class EdgeHost extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: required }
+          validation: { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -167,11 +207,10 @@ class EdgeHost extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private isLocalOption = (isLocal: string): string =>
-    isLocal;
-
   private edgeHost = () => {
-    const {isLoading, error, formEdgeHost, edgeHost} = this.props;
+    const {isLoading, error} = this.props;
+    const edgeHost = this.getEdgeHost();
+    const formEdgeHost = this.getFormEdgeHost();
     // @ts-ignore
     const edgeHostKey: (keyof IEdgeHost) = formEdgeHost && Object.keys(formEdgeHost)[0];
     return (
@@ -182,31 +221,33 @@ class EdgeHost extends BaseComponent<Props, State> {
           <Form id={edgeHostKey}
                 fields={this.getFields(formEdgeHost)}
                 values={edgeHost}
-                isNew={isNewHost(this.props.match.params.hostname)}
+                isNew={isNew(this.props.location.search)}
                 showSaveButton={this.shouldShowSaveButton()}
                 post={{
                   url: 'hosts/edge',
                   successCallback: this.onPostSuccess,
-                  failureCallback: this.onPostFailure}}
+                  failureCallback: this.onPostFailure
+                }}
                 put={{
-                  url: `hosts/edge/${this.state.hostname || edgeHost[edgeHostKey]}`,
+                  url: `hosts/edge/${edgeHost.hostname}`,
                   successCallback: this.onPutSuccess,
-                  failureCallback: this.onPutFailure}}
+                  failureCallback: this.onPutFailure
+                }}
                 delete={{
-                  url: `hosts/edge/${this.state.hostname || edgeHost[edgeHostKey]}`,
+                  url: `hosts/edge/${edgeHost.hostname}`,
                   successCallback: this.onDeleteSuccess,
-                  failureCallback: this.onDeleteFailure}}
+                  failureCallback: this.onDeleteFailure
+                }}
                 saveEntities={this.saveEntities}>
             {Object.keys(formEdgeHost).map((key, index) =>
               key === 'local'
-                ? <Field<string> key={index}
-                                  id={key}
-                                  type="dropdown"
-                                  label={key}
-                                  dropdown={{
-                                    defaultValue: "Is a local machine?",
-                                    values: ["True", "False"],
-                                    optionToString: this.isLocalOption}}/>
+                ? <Field key={index}
+                         id={key}
+                         type="dropdown"
+                         label={key}
+                         dropdown={{
+                           defaultValue: "Is a local machine?",
+                           values: ['True', 'False']}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -217,28 +258,16 @@ class EdgeHost extends BaseComponent<Props, State> {
     )
   };
 
-  private entitiesList = (element: JSX.Element) => {
-    const {isLoading, error, edgeHost} = this.props;
-    if (isLoading) {
-      return <ListLoadingSpinner/>;
-    }
-    if (error) {
-      return <Error message={error}/>;
-    }
-    if (edgeHost) {
-      return element;
-    }
-    return <></>;
-  };
-
   private rules = (): JSX.Element =>
-    this.entitiesList(<EdgeHostRuleList host={this.props.edgeHost}
-                                        unsavedRules={this.state.newRules}
-                                        onAddHostRule={this.onAddEdgeHostRule}
-                                        onRemoveHostRules={this.onRemoveEdgeHostRules}/>);
+    <EdgeHostRuleList isLoadingEdgeHost={this.props.isLoading}
+                      loadEdgeHostError={this.props.error}
+                      edgeHost={this.getEdgeHost()}
+                      unsavedRules={this.state.unsavedRules}
+                      onAddHostRule={this.addEdgeHostRule}
+                      onRemoveHostRules={this.removeEdgeHostRules}/>;
 
   private genericRules = (): JSX.Element =>
-    this.entitiesList(<GenericHostRuleList/>);
+    <GenericHostRuleList/>;
 
   private tabs: Tab[] = [
     {
@@ -261,7 +290,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   render() {
     return (
       <MainLayout>
-        {this.shouldShowSaveButton() && !isNewHost(this.props.match.params.hostname) && <UnsavedChanged/>}
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>
@@ -271,16 +300,20 @@ class EdgeHost extends BaseComponent<Props, State> {
 
 }
 
+function removeFields(edgeHost: Partial<IEdgeHost>) {
+  delete edgeHost["id"];
+  delete edgeHost["hostRules"];
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.hosts.edge.isLoadingHosts;
   const error = state.entities.hosts.edge.loadHostsError;
   const hostname = props.match.params.hostname;
-  const edgeHost = isNewHost(hostname) ? emptyEdgeHost() : state.entities.hosts.edge.data[hostname];
+  const edgeHost = isNew(props.location.search) ? buildNewEdgeHost() : state.entities.hosts.edge.data[hostname];
   let formEdgeHost;
   if (edgeHost) {
     formEdgeHost = { ...edgeHost };
-    delete formEdgeHost["id"];
-    delete formEdgeHost["hostRules"];
+    removeFields(formEdgeHost);
   }
   return  {
     isLoading,
@@ -292,7 +325,9 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadEdgeHosts,
-  addEdgeHostRule
+  addEdgeHost,
+  //TODO updateEdgeHost,
+  addEdgeHostRules
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EdgeHost);

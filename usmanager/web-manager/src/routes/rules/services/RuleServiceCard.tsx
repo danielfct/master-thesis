@@ -9,18 +9,18 @@
  */
 
 import React from "react";
-import {IServiceRule} from "./RuleService";
+import {IRuleService} from "./RuleService";
 import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 
 interface ServiceRuleCardProps {
-  rule: IServiceRule;
+  rule: IRuleService;
 }
 
 type Props = ServiceRuleCardProps;
 
 const RuleServiceCard = ({rule}: Props) => (
-  <Card<IServiceRule> title={rule.name}
+  <Card<IRuleService> title={rule.name}
                       link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
                       height={'125px'}
                       margin={'10px 0'}

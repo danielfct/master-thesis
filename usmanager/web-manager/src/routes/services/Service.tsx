@@ -26,12 +26,13 @@ import React from 'react';
 import {RouteComponentProps} from 'react-router';
 import Form, {
   IFields,
-  required,
-  requiredAndNotAllowed,
-  requiredAndNumberAndMin
+  requiredAndNotAllowedAndTrimmed,
+  requiredAndNumberAndMin,
+  requiredAndTrimmed
 } from "../../components/form/Form"
-import IData from "../../components/IData";
+import IDatabaseData from "../../components/IDatabaseData";
 import {
+  addService,
   addServiceApps,
   addServiceDependencies,
   addServicePredictions,
@@ -54,9 +55,11 @@ import ServicePredictionList, {IPrediction} from "./ServicePredictionList";
 import ServiceRuleList from "./ServiceRuleList";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
 import GenericServiceRuleList from "./GenericServiceRuleList";
-import ServiceRuleServicesList from "../rules/services/RuleServiceServicesList";
+import {isNew} from "../../utils/router";
+import {normalize} from "normalizr";
+import {Schemas} from "../../middleware/api";
 
-export interface IService extends IData {
+export interface IService extends IDatabaseData {
   serviceName: string;
   dockerRepository: string;
   defaultExternalPort: number;
@@ -75,7 +78,7 @@ export interface IService extends IData {
   serviceRules?: string[];
 }
 
-const emptyService = (): Partial<IService> => ({
+const buildNewService = (): Partial<IService> => ({
   serviceName: '',
   dockerRepository: '',
   defaultExternalPort: 0,
@@ -89,9 +92,6 @@ const emptyService = (): Partial<IService> => ({
   expectedMemoryConsumption: 0,
 });
 
-const isNewService = (name: string) =>
-  name === 'new_service';
-
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
@@ -100,7 +100,9 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-  loadServices: (name: string) => any;
+  loadServices: (name: string) => void;
+  addService: (service: IService) => void;
+  //TODO updateService: (previousService: Partial<IService>, service: IService) => void;
   addServiceApps: (serviceName: string, apps: string[]) => void;
   addServiceDependencies: (serviceName: string, dependencies: string[]) => void;
   addServicePredictions: (serviceName: string, predictions: IPrediction[]) => void;
@@ -113,187 +115,233 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-type State = {
-  newApps: IAddServiceApp[],
-  newDependencies: string[],
-  newDependees: string[],
-  newPredictions: IPrediction[],
-  newRules: string[],
+interface State {
+  service?: IService,
+  formService?: IService,
+  unsavedApps: IAddServiceApp[],
+  unsavedDependencies: string[],
+  unsavedDependees: string[],
+  unsavedPredictions: IPrediction[],
+  unsavedRules: string[],
   serviceName?: string,
 }
 
 class Service extends BaseComponent<Props, State> {
 
+  private mounted = false;
+
   state: State = {
-    newApps: [],
-    newDependencies: [],
-    newDependees: [],
-    newPredictions: [],
-    newRules: [],
+    unsavedApps: [],
+    unsavedDependencies: [],
+    unsavedDependees: [],
+    unsavedPredictions: [],
+    unsavedRules: [],
   };
 
   componentDidMount(): void {
-    const serviceName = this.props.match.params.name;
-    if (serviceName && !isNewService(serviceName)) {
+    this.loadService();
+  };
+
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadService = () => {
+    if (!isNew(this.props.location.search)) {
+      const serviceName = this.props.match.params.name;
       this.props.loadServices(serviceName);
     }
   };
 
-  private onAddServiceApp = (app: IAddServiceApp): void => {
-    this.setState({
-      newApps: this.state.newApps.concat(app)
-    });
-  };
+  private getService = () =>
+    this.state.service || this.props.service;
 
-  private onRemoveServiceApps = (apps: string[]): void => {
-    this.setState({
-      newApps: this.state.newApps.filter(app => !apps.includes(app.name))
-    });
-  };
-
-  private saveServiceApps = (serviceName: string): void => {
-    const {newApps} = this.state;
-    if (newApps.length) {
-      postData(`services/${serviceName}/apps`, newApps,
-        () => this.onSaveAppsSuccess(serviceName),
-        (reason) => this.onSaveAppsFailure(serviceName, reason));
-    }
-  };
-
-  private onSaveAppsSuccess = (serviceName: string): void => {
-    if (!isNewService(this.props.match.params.name)) {
-      this.props.addServiceApps(serviceName, this.state.newApps.map(app => app.name));
-    }
-    this.setState({ newApps: [] });
-  };
-
-  private onSaveAppsFailure = (serviceName: string, reason: string): void =>
-    super.toast(`Unable to save apps of service ${serviceName}`, 10000, reason, true);
-
-  private onAddServiceDependency = (dependency: string): void => {
-    this.setState({
-      newDependencies: this.state.newDependencies.concat(dependency)
-    });
-  };
-
-  private onRemoveServiceDependencies = (dependencies: string[]): void => {
-    this.setState({
-      newDependencies: this.state.newDependencies.filter(dependency => !dependencies.includes(dependency))
-    });
-  };
-
-  private saveServiceDependencies = (serviceName: string): void => {
-    const {newDependencies} = this.state;
-    if (newDependencies.length) {
-      postData(`services/${serviceName}/dependencies`, newDependencies,
-        () => this.onSaveDependenciesSuccess(serviceName),
-        (reason) => this.onSaveDependenciesFailure(serviceName, reason));
-    }
-  };
-
-  private onSaveDependenciesSuccess = (serviceName: string): void => {
-    if (!isNewService(this.props.match.params.name)) {
-      this.props.addServiceDependencies(serviceName, this.state.newDependencies)
-    }
-    this.setState({ newDependencies: [] });
-  };
-
-  private onSaveDependenciesFailure = (serviceName: string, reason: string): void =>
-    super.toast(`Unable to save dependencies of service ${serviceName}`, 10000, reason, true);
-
-  private onAddServicePrediction = (prediction: IPrediction): void => {
-    this.setState({
-      newPredictions: this.state.newPredictions.concat(prediction)
-    });
-  };
-
-  private onRemoveServicePredictions = (predictions: string[]): void => {
-    this.setState({
-      newPredictions: this.state.newPredictions.filter(prediction => !predictions.includes(prediction.name))
-    });
-  };
-
-  private saveServicePredictions = (serviceName: string): void => {
-    const {newPredictions} = this.state;
-    if (newPredictions.length) {
-      postData(`services/${serviceName}/predictions`, newPredictions,
-        () => this.onSavePredictionsSuccess(serviceName),
-        (reason) => this.onSavePredictionsFailure(serviceName, reason));
-    }
-  };
-
-  private onSavePredictionsSuccess = (serviceName: string): void => {
-    if (!isNewService(this.props.match.params.name)) {
-      this.props.addServicePredictions(serviceName, this.state.newPredictions);
-    }
-    this.setState({ newPredictions: [] });
-  };
-
-  private onSavePredictionsFailure = (serviceName: string, reason: string): void =>
-    super.toast(`Unable to save predictions of service ${serviceName}`, 10000, reason, true);
-
-  private onAddServiceRule = (rule: string): void => {
-    this.setState({
-      newRules: this.state.newRules.concat(rule)
-    });
-  };
-
-  private onRemoveServiceRules = (rules: string[]): void => {
-    this.setState({
-      newRules: this.state.newRules.filter(rule => !rules.includes(rule))
-    });
-  };
-
-  private saveServiceRules = (serviceName: string): void => {
-    const {newRules} = this.state;
-    if (newRules.length) {
-      postData(`services/${serviceName}/rules`, newRules,
-        () => this.onSaveRulesSuccess(serviceName),
-        (reason) => this.onSaveRulesFailure(serviceName, reason));
-    }
-  };
-
-  private onSaveRulesSuccess = (serviceName: string): void => {
-    if (!isNewService(this.props.match.params.name)) {
-      this.props.addServiceRules(serviceName, this.state.newRules)
-    }
-    this.setState({ newRules: [] });
-  };
-
-  private onSaveRulesFailure = (serviceName: string, reason: string): void =>
-    super.toast(`Unable to save rules of service ${serviceName}`, 10000, reason, true);
-
-  private saveEntities = (serviceName: string) => {
-    this.saveServiceApps(serviceName);
-    this.saveServiceDependencies(serviceName);
-    this.saveServicePredictions(serviceName);
-    this.saveServiceRules(serviceName);
-  };
+  private getFormService = () =>
+    this.state.formService || this.props.formService;
 
   private onPostSuccess = (reply: IReply<IService>): void => {
-    super.toast(`Service <b>${reply.data.serviceName}</b> saved`);
-    this.saveEntities(reply.data.serviceName);
+    const service = reply.data;
+    super.toast(`<span class="green-text">Service ${reply.data.serviceName} saved</span>`);
+    this.props.addService(service);
+    this.saveEntities(service);
+    if (this.mounted) {
+      this.updateService(service);
+      this.props.history.replace(service.serviceName);
+    }
   };
 
-  private onPostFailure = (reason: string, serviceName: string): void =>
-    super.toast(`Unable to save ${serviceName}`, 10000, reason, true);
+  private onPostFailure = (reason: string, service: IService): void =>
+    super.toast(`Unable to save ${service.serviceName}`, 10000, reason, true);
 
-  private onPutSuccess = (serviceName: string): void => {
-    super.toast(`Changes to service <b>${serviceName}</b> are now saved`);
-    this.setState({serviceName: serviceName});
-    this.saveEntities(serviceName);
+  private onPutSuccess = (reply: IReply<IService>): void => {
+    const service = reply.data;
+    super.toast(`<span class="green-text">Changes to service ${service.serviceName} have been saved</span>`);
+    this.saveEntities(service);
+    if (this.mounted) {
+      this.updateService(service);
+      this.props.history.replace(service.serviceName);
+    }
   };
 
-  private onPutFailure = (reason: string, serviceName: string): void =>
-    super.toast(`Unable to update ${serviceName}`, 10000, reason, true);
+  private onPutFailure = (reason: string, service: IService): void =>
+    super.toast(`Unable to update ${service.serviceName}`, 10000, reason, true);
 
-  private onDeleteSuccess = (serviceName: string): void => {
-    super.toast(`Service <b>${serviceName}</b> successfully removed`);
-    this.props.history.push(`/services`)
+  private onDeleteSuccess = (service: IService): void => {
+    super.toast(`<span class="green-text">Service ${service.serviceName} successfully removed</span>`);
+    if (this.mounted) {
+      this.props.history.push(`/services`);
+    }
   };
 
-  private onDeleteFailure = (reason: string, serviceName: string): void =>
-    super.toast(`Unable to delete ${serviceName}`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, service: IService): void =>
+    super.toast(`Unable to delete ${service.serviceName}`, 10000, reason, true);
+
+  private shouldShowSaveButton = () =>
+    !!this.state.unsavedApps.length
+    || !!this.state.unsavedDependencies.length
+    || !!this.state.unsavedDependees.length
+    || !!this.state.unsavedPredictions.length
+    || !!this.state.unsavedRules.length;
+
+  private saveEntities = (service: IService) => {
+    this.saveServiceApps(service);
+    this.saveServiceDependencies(service);
+    this.saveServicePredictions(service);
+    this.saveServiceRules(service);
+  };
+
+  private addServiceApp = (app: IAddServiceApp): void => {
+    this.setState({
+      unsavedApps: this.state.unsavedApps.concat(app)
+    });
+  };
+
+  private removeServiceApps = (apps: string[]): void => {
+    this.setState({
+      unsavedApps: this.state.unsavedApps.filter(app => !apps.includes(app.name))
+    });
+  };
+
+  private saveServiceApps = (service: IService): void => {
+    const {unsavedApps} = this.state;
+    if (unsavedApps.length) {
+      postData(`services/${service.serviceName}/apps`, unsavedApps,
+        () => this.onSaveAppsSuccess(service),
+        (reason) => this.onSaveAppsFailure(service, reason));
+    }
+  };
+
+  private onSaveAppsSuccess = (service: IService): void => {
+    this.props.addServiceApps(service.serviceName, this.state.unsavedApps.map(app => app.name));
+    if (this.mounted) {
+      this.setState({ unsavedApps: [] });
+    }
+  };
+
+  private onSaveAppsFailure = (service: IService, reason: string): void =>
+    super.toast(`Unable to save apps of service ${service.serviceName}`, 10000, reason, true);
+
+  private addServiceDependency = (dependency: string): void => {
+    this.setState({
+      unsavedDependencies: this.state.unsavedDependencies.concat(dependency)
+    });
+  };
+
+  private removeServiceDependencies = (dependencies: string[]): void => {
+    this.setState({
+      unsavedDependencies: this.state.unsavedDependencies.filter(dependency => !dependencies.includes(dependency))
+    });
+  };
+
+  private saveServiceDependencies = (service: IService): void => {
+    const {unsavedDependencies} = this.state;
+    if (unsavedDependencies.length) {
+      postData(`services/${service.serviceName}/dependencies`, unsavedDependencies,
+        () => this.onSaveDependenciesSuccess(service),
+        (reason) => this.onSaveDependenciesFailure(service, reason));
+    }
+  };
+
+  private onSaveDependenciesSuccess = (service: IService): void => {
+    this.props.addServiceDependencies(service.serviceName, this.state.unsavedDependencies);
+    if (this.mounted) {
+      this.setState({ unsavedDependencies: [] });
+    }
+  };
+
+  private onSaveDependenciesFailure = (service: IService, reason: string): void =>
+    super.toast(`Unable to save dependencies of service ${service}`, 10000, reason, true);
+
+  private addServicePrediction = (prediction: IPrediction): void => {
+    this.setState({
+      unsavedPredictions: this.state.unsavedPredictions.concat(prediction)
+    });
+  };
+
+  private removeServicePredictions = (predictions: string[]): void => {
+    this.setState({
+      unsavedPredictions: this.state.unsavedPredictions.filter(prediction => !predictions.includes(prediction.name))
+    });
+  };
+
+  private saveServicePredictions = (service: IService): void => {
+    const {unsavedPredictions} = this.state;
+    if (unsavedPredictions.length) {
+      postData(`services/${service.serviceName}/predictions`, unsavedPredictions,
+        () => this.onSavePredictionsSuccess(service),
+        (reason) => this.onSavePredictionsFailure(service, reason));
+    }
+  };
+
+  private onSavePredictionsSuccess = (service: IService): void => {
+    this.props.addServicePredictions(service.serviceName, this.state.unsavedPredictions);
+    if (this.mounted) {
+      this.setState({ unsavedPredictions: [] });
+    }
+  };
+
+  private onSavePredictionsFailure = (service: IService, reason: string): void =>
+    super.toast(`Unable to save predictions of service ${service.serviceName}`, 10000, reason, true);
+
+  private addServiceRule = (rule: string): void => {
+    this.setState({
+      unsavedRules: this.state.unsavedRules.concat(rule)
+    });
+  };
+
+  private removeServiceRules = (rules: string[]): void => {
+    this.setState({
+      unsavedRules: this.state.unsavedRules.filter(rule => !rules.includes(rule))
+    });
+  };
+
+  private saveServiceRules = (service: IService): void => {
+    const {unsavedRules} = this.state;
+    if (unsavedRules.length) {
+      postData(`services/${service.serviceName}/rules`, unsavedRules,
+        () => this.onSaveRulesSuccess(service),
+        (reason) => this.onSaveRulesFailure(service, reason));
+    }
+  };
+
+  private onSaveRulesSuccess = (service: IService): void => {
+    this.props.addServiceRules(service.serviceName, this.state.unsavedRules);
+    if (this.mounted) {
+      this.setState({ unsavedRules: [] });
+    }
+  };
+
+  private onSaveRulesFailure = (service: IService, reason: string): void =>
+    super.toast(`Unable to save rules of service ${service.serviceName}`, 10000, reason, true);
+
+  private updateService = (service: IService) => {
+    //const previousService = this.getService();
+    service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];
+    //TODO this.props.updateService(previousService, service);
+    const formService = { ...service };
+    removeFields(formService);
+    this.setState({service: service, formService: formService});
+  };
 
   private getFields = (service: Partial<IService>): IFields =>
     Object.entries(service).map(([key, value]) => {
@@ -303,7 +351,7 @@ class Service extends BaseComponent<Props, State> {
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 0 }
-            : key === 'serviceName' ? { rule: requiredAndNotAllowed, args: ['new_service'] } : { rule: required }
+            : key === 'serviceName' ? { rule: requiredAndNotAllowedAndTrimmed, args: ['new_service'] } : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -313,18 +361,10 @@ class Service extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private shouldShowSaveButton = () =>
-    !!this.state.newApps.length
-    || !!this.state.newDependencies.length
-    || !!this.state.newDependees.length
-    || !!this.state.newPredictions.length
-    || !!this.state.newRules.length;
-
-  private serviceTypeOption = (serviceType: string): string =>
-    serviceType;
-
   private service = () => {
-    const {isLoading, error, formService, service} = this.props;
+    const {isLoading, error} = this.props;
+    const service = this.getService();
+    const formService = this.getFormService();
     // @ts-ignore
     const serviceKey: (keyof IService) = formService && Object.keys(formService)[0];
     return (
@@ -335,11 +375,23 @@ class Service extends BaseComponent<Props, State> {
           <Form id={serviceKey}
                 fields={this.getFields(formService)}
                 values={service}
-                isNew={isNewService(this.props.match.params.name)}
+                isNew={isNew(this.props.location.search)}
                 showSaveButton={this.shouldShowSaveButton()}
-                post={{url: 'services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={{url: `services/${this.state.serviceName || service[serviceKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={{url: `services/${this.state.serviceName || service[serviceKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                post={{
+                  url: 'services',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure
+                }}
+                put={{
+                  url: `services/${service.serviceName}`,
+                  successCallback: this.onPutSuccess,
+                  failureCallback: this.onPutFailure
+                }}
+                delete={{
+                  url: `services/${service.serviceName}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure
+                }}
                 saveEntities={this.saveEntities}>
             {Object.keys(formService).map((key, index) =>
               key === 'serviceType'
@@ -349,8 +401,7 @@ class Service extends BaseComponent<Props, State> {
                          label={key}
                          dropdown={{
                            defaultValue: "Choose service type",
-                           values: ["Frontend", "Backend", "Database", "System"],
-                           optionToString: this.serviceTypeOption}}/>
+                           values: ["Frontend", "Backend", "Database", "System"]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -361,50 +412,46 @@ class Service extends BaseComponent<Props, State> {
     )
   };
 
-  private entitiesList = (element: JSX.Element) => {
-    const {isLoading, error, service} = this.props;
-    if (isLoading) {
-      return <ListLoadingSpinner/>;
-    }
-    if (error) {
-      return <Error message={error}/>;
-    }
-    if (service) {
-      return element;
-    }
-    return <></>;
-  };
-
   private apps = (): JSX.Element =>
-    this.entitiesList(<ServiceAppList service={this.props.service}
-                              newApps={this.state.newApps}
-                              onAddServiceApp={this.onAddServiceApp}
-                              onRemoveServiceApps={this.onRemoveServiceApps}/>);
+    <ServiceAppList isLoadingService={this.props.isLoading}
+                    loadServiceError={this.props.error}
+                    service={this.props.service}
+                    newApps={this.state.unsavedApps}
+                    onAddServiceApp={this.addServiceApp}
+                    onRemoveServiceApps={this.removeServiceApps}/>;
 
   private dependencies = (): JSX.Element =>
-    this.entitiesList(<ServiceDependencyList service={this.props.service}
-                                     newDependencies={this.state.newDependencies}
-                                     onAddServiceDependency={this.onAddServiceDependency}
-                                     onRemoveServiceDependencies={this.onRemoveServiceDependencies}/>);
+    <ServiceDependencyList isLoadingService={this.props.isLoading}
+                           loadServiceError={this.props.error}
+                           service={this.props.service}
+                           newDependencies={this.state.unsavedDependencies}
+                           onAddServiceDependency={this.addServiceDependency}
+                           onRemoveServiceDependencies={this.removeServiceDependencies}/>;
 
   private dependees = (): JSX.Element =>
-    this.entitiesList(<ServiceDependeeList service={this.props.service}
-                                   newDependees={this.state.newDependees}/>);
+    <ServiceDependeeList isLoadingService={this.props.isLoading}
+                         loadServiceError={this.props.error}
+                         service={this.props.service}
+                         newDependees={this.state.unsavedDependees}/>;
 
   private predictions = (): JSX.Element =>
-    this.entitiesList(<ServicePredictionList service={this.props.service}
-                                     newPredictions={this.state.newPredictions}
-                                     onAddServicePrediction={this.onAddServicePrediction}
-                                     onRemoveServicePredictions={this.onRemoveServicePredictions}/>);
+    <ServicePredictionList isLoadingService={this.props.isLoading}
+                           loadServiceError={this.props.error}
+                           service={this.props.service}
+                           newPredictions={this.state.unsavedPredictions}
+                           onAddServicePrediction={this.addServicePrediction}
+                           onRemoveServicePredictions={this.removeServicePredictions}/>;
 
   private rules = (): JSX.Element =>
-    this.entitiesList(<ServiceRuleList service={this.props.service}
-                               newRules={this.state.newRules}
-                               onAddServiceRule={this.onAddServiceRule}
-                               onRemoveServiceRules={this.onRemoveServiceRules}/>);
+    <ServiceRuleList isLoadingService={this.props.isLoading}
+                     loadServiceError={this.props.error}
+                     service={this.props.service}
+                     newRules={this.state.unsavedRules}
+                     onAddServiceRule={this.addServiceRule}
+                     onRemoveServiceRules={this.removeServiceRules}/>;
 
   private genericRules = (): JSX.Element =>
-    this.entitiesList(<GenericServiceRuleList/>);
+    <GenericServiceRuleList/>;
 
   private tabs: Tab[] = [
     {
@@ -447,7 +494,7 @@ class Service extends BaseComponent<Props, State> {
   render() {
     return (
       <MainLayout>
-        {this.shouldShowSaveButton() && !isNewService(this.props.match.params.name) && <UnsavedChanged/>}
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>
@@ -457,21 +504,25 @@ class Service extends BaseComponent<Props, State> {
 
 }
 
+function removeFields(service: Partial<IService>) {
+  delete service["id"];
+  delete service["apps"];
+  delete service["dependencies"];
+  delete service["dependees"];
+  delete service["predictions"];
+  delete service["serviceRules"];
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
+  const isLoading = state.entities.services.isLoadingServices;
+  const error = state.entities.services.loadServicesError;
   const name = props.match.params.name;
-  const service = isNewService(name) ? emptyService() : state.entities.services.data[name];
+  const service = isNew(props.location.search) ? buildNewService() : state.entities.services.data[name];
   let formService;
   if (service) {
     formService = { ...service };
-    delete formService["id"];
-    delete formService["apps"];
-    delete formService["dependencies"];
-    delete formService["dependees"];
-    delete formService["predictions"];
-    delete formService["serviceRules"];
+    removeFields(formService);
   }
-  const isLoading = state.entities.services?.isLoadingServices;
-  const error = state.entities.services?.loadServicesError;
   return  {
     isLoading,
     error,
@@ -482,6 +533,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadServices,
+  addService,
   addServiceApps,
   addServiceDependencies,
   addServicePredictions,

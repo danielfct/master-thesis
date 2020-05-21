@@ -97,7 +97,7 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
       event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });
-        M.toast({ html: '<div>Default host simulated metric saved successfully!</div>' });
+        M.toast({ html: '<div>Default cloudHost simulated metric saved successfully!</div>' });
       });
   };
 
@@ -150,7 +150,7 @@ export default class DefaultHostSimulatedMetricsDetail extends React.Component {
     if (this.state.formSubmit) {
       return <Redirect to='/metrics/simulated/hosts/default'/>;
     }
-    {/*<MainLayout title={{title:'Default host simulated metric detail'}}>*/}
+    {/*<MainLayout title={{title:'Default cloudHost simulated metric detail'}}>*/}
     return (
       <MainLayout>
         <div className='row'>

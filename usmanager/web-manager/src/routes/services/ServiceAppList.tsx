@@ -26,7 +26,7 @@ import {
 } from "../../actions";
 import {connect} from "react-redux";
 import Field from "../../components/form/Field";
-import {IFields, IValues, requiredAndNumberAndMin} from "../../components/form/Form";
+import {IFields, IValues, requiredAndNumberAndMin, requiredAndNumberAndMinAndMax} from "../../components/form/Form";
 import List from "../../components/list/List";
 import M from "materialize-css";
 import Collapsible from "../../components/collapsible/Collapsible";
@@ -54,7 +54,9 @@ interface DispatchToProps {
 }
 
 interface ServiceAppListProps {
-  service: IService | Partial<IService>;
+  isLoadingService: boolean;
+  loadServiceError?: string | null;
+  service: IService | Partial<IService> | null;
   newApps: IAddServiceApp[];
   onAddServiceApp: (app: IAddServiceApp) => void;
   onRemoveServiceApps: (apps: string[]) => void;
@@ -74,8 +76,8 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   componentDidMount(): void {
     this.props.loadApps();
-    const {serviceName} = this.props.service;
-    if (serviceName) {
+    if (this.props.service?.serviceName) {
+      const {serviceName} = this.props.service;
       this.props.loadServiceApps(serviceName);
     }
   }
@@ -111,8 +113,8 @@ class ServiceAppList extends BaseComponent<Props, State> {
     this.props.onRemoveServiceApps(apps);
 
   private onDeleteSuccess = (apps: string[]): void => {
-    const {serviceName} = this.props.service;
-    if (serviceName) {
+    if (this.props.service?.serviceName) {
+      const {serviceName} = this.props.service;
       this.props.removeServiceApps(serviceName, apps);
     }
   };
@@ -133,12 +135,20 @@ class ServiceAppList extends BaseComponent<Props, State> {
       </div>
     </ListItem>;
 
-  private appServicesList = (): IAppService[] | undefined => {
-    if (this.state.selectedApp) {
-      return this.props.apps[this.state.selectedApp] && Object.values(this.props.apps[this.state.selectedApp].services)
-                                                              .filter(service => service.service.serviceName !== this.props.service.serviceName)
-                                                              .sort((a,b) => a.launchOrder - b.launchOrder);
+  private appServicesList = (): IAppService[] => {
+    if (!this.state.selectedApp) {
+      return [];
     }
+    if (!this.props.apps[this.state.selectedApp]) {
+      return [];
+    }
+    const services = this.props.apps[this.state.selectedApp].services;
+    if (!services) {
+      return [];
+    }
+    return Object.values(services)
+                 .filter(service => service.service.serviceName !== this.props.service?.serviceName)
+                 .sort((a,b) => a.launchOrder - b.launchOrder);
   };
 
   private addModal = () => {
@@ -160,7 +170,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
       launchOrder: {
         id: 'launchOrder',
         label: 'launchOrder',
-        validation: { rule: requiredAndNumberAndMin, args: 0 }
+        validation: { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
       }
     }
   );
@@ -177,41 +187,41 @@ class ServiceAppList extends BaseComponent<Props, State> {
   };
 
   render() {
-    return <ControlledList<string> isLoading={this.props.isLoading}
-                           error={this.props.error}
-                           emptyMessage='Apps list is empty'
-                           data={this.props.serviceApps}
-                           dataKey={[]} //TODO
-                           dropdown={{
-                             id: 'apps',
-                             title: 'Add app',
-                             empty: 'No more apps to add',
-                             data: this.getSelectableAppsNames(),
-                             formModal: {
-                               id: 'serviceApp',
-                               fields: this.getModalFields(),
-                               values: this.getModalValues(),
-                               content: this.addModal,
-                               position: '20%',
-                               onOpen: this.onModalOpen,
-                               open: this.state.selectedApp !== undefined && !this.props.isLoadingAppServices,
-                             }
-                           }}
-                           show={this.app}
-                           onAddInput={this.onAdd}
-                           onRemove={this.onRemove}
-                           onDelete={{
-                             url: `services/${this.props.service.serviceName}/apps`,
-                             successCallback: this.onDeleteSuccess,
-                             failureCallback: this.onDeleteFailure
-                           }}/>;
+    return <ControlledList<string> isLoading={this.props.isLoadingService || this.props.isLoading}
+                                   error={this.props.error || this.props.error}
+                                   emptyMessage='Apps list is empty'
+                                   data={this.props.serviceApps}
+                                   dataKey={[]} //TODO
+                                   dropdown={{
+                                     id: 'apps',
+                                     title: 'Add app',
+                                     empty: 'No more apps to add',
+                                     data: this.getSelectableAppsNames(),
+                                     formModal: {
+                                       id: 'serviceApp',
+                                       fields: this.getModalFields(),
+                                       values: this.getModalValues(),
+                                       content: this.addModal,
+                                       position: '20%',
+                                       onOpen: this.onModalOpen,
+                                       open: this.state.selectedApp !== undefined && !this.props.isLoadingAppServices,
+                                     }
+                                   }}
+                                   show={this.app}
+                                   onAddInput={this.onAdd}
+                                   onRemove={this.onRemove}
+                                   onDelete={{
+                                     url: `services/${this.props.service?.serviceName}/apps`,
+                                     successCallback: this.onDeleteSuccess,
+                                     failureCallback: this.onDeleteFailure
+                                   }}/>;
 
   }
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceAppListProps): StateToProps {
-  const serviceName = ownProps.service.serviceName;
+  const serviceName = ownProps.service?.serviceName;
   const service = serviceName && state.entities.services.data[serviceName];
   const serviceApps = service && service.apps;
   return {

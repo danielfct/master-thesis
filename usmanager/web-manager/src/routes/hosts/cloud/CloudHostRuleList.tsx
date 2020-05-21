@@ -16,27 +16,32 @@ import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {IHostRule} from "../../rules/hosts/RuleHost";
+import {IRuleHost} from "../../rules/hosts/RuleHost";
 import {Link} from "react-router-dom";
 import {ICloudHost} from "./CloudHost";
-import {addCloudHostRule, loadCloudHostRules, loadRulesHost, removeCloudHostRules} from "../../../actions";
+import {
+  loadCloudHostRules,
+  loadRulesHost,
+  removeCloudHostRules
+} from "../../../actions";
 
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  rules: { [key: string]: IHostRule },
+  rules: { [key: string]: IRuleHost },
   rulesName: string[];
 }
 
 interface DispatchToProps {
-  loadRulesHost: (name?: string) => any;
+  loadRulesHost: () => void;
   loadCloudHostRules: (hostname: string) => void;
   removeCloudHostRules: (hostname: string, rules: string[]) => void;
-  addCloudHostRule: (hostname: string, rule: string) => void;
 }
 
 interface HostRuleListProps {
-  host: ICloudHost | Partial<ICloudHost>;
+  isLoadingCloudHost: boolean;
+  loadCloudHostError?: string | null;
+  cloudHost: ICloudHost | Partial<ICloudHost> | null;
   unsavedRules: string[];
   onAddHostRule: (rule: string) => void;
   onRemoveHostRules: (rule: string[]) => void;
@@ -48,31 +53,30 @@ interface State {
   entitySaved: boolean;
 }
 
-
 class CloudHostRuleList extends BaseComponent<Props, State> {
 
   state: State = {
-    entitySaved: !!this.props.host.instanceId
+    entitySaved: !!this.props.cloudHost?.instanceId
   };
 
   componentDidMount(): void {
     this.props.loadRulesHost();
-    const {instanceId} = this.props.host;
-    if (instanceId) {
+    if (this.props.cloudHost?.instanceId) {
+      const {instanceId} = this.props.cloudHost;
       this.props.loadCloudHostRules(instanceId);
     }
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    if (!prevProps.host.instanceId && this.props.host.instanceId) {
+    if (!prevProps.cloudHost?.instanceId && this.props.cloudHost?.instanceId) {
       this.setState({entitySaved: true});
     }
   }
 
   private rule = (index: number, rule: string, separate: boolean, checked: boolean,
                   handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.props.host.instanceId === undefined;
-    const unsaved = this.props.unsavedRules.map(newRule => newRule).includes(rule);
+    const isNew = this.props.cloudHost?.instanceId === undefined;
+    const unsaved = this.props.unsavedRules.includes(rule);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${styles.linkedItemContent}`}>
@@ -103,8 +107,8 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
     this.props.onRemoveHostRules(rules);
 
   private onDeleteSuccess = (rules: string[]): void => {
-    const {instanceId} = this.props.host;
-    if (instanceId) {
+    if (this.props.cloudHost?.instanceId) {
+      const {instanceId} = this.props.cloudHost;
       this.props.removeCloudHostRules(instanceId, rules);
     }
   };
@@ -118,14 +122,14 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
-                           error={this.props.error}
+    return <ControlledList isLoading={this.props.isLoadingCloudHost || this.props.isLoading}
+                           error={this.props.loadCloudHostError || this.props.error}
                            emptyMessage={`Rules list is empty`}
                            data={this.props.rulesName}
                            dataKey={['instanceId']}
                            dropdown={{
                              id: 'rules',
-                             title: 'Add rule',
+                             title: 'Add host rule',
                              empty: 'No more rules to add',
                              data: this.getSelectableRules()
                            }}
@@ -133,7 +137,7 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `hosts/cloud/${this.props.host.instanceId}/rules`,
+                             url: `hosts/cloud/${this.props.cloudHost?.instanceId}/rules`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}
@@ -143,7 +147,7 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleListProps): StateToProps {
-  const instanceId = ownProps.host.instanceId;
+  const instanceId = ownProps.cloudHost?.instanceId;
   const host = instanceId && state.entities.hosts.cloud.data[instanceId];
   const rulesName = host && host.hostRules;
   return {
@@ -158,7 +162,6 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({
     loadRulesHost,
     loadCloudHostRules,
-    addCloudHostRule,
     removeCloudHostRules,
   }, dispatch);
 

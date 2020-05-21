@@ -65,7 +65,7 @@ export default class SpecificHostSimulatedMetrics extends React.Component {
     return simulatedMetricsNodes;
   };
 
-  /*<MainLayout title={{title:'Specific host simulated metrics'}}>*/
+  /*<MainLayout title={{title:'Specific cloud host simulated metrics'}}>*/
   render = () => (
       <MainLayout>
         {this.renderSimulatedMetrics()}

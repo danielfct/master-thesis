@@ -32,8 +32,8 @@ import {IContainer} from "../routes/containers/Container";
 import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
 import {INode} from "../routes/nodes/Node";
-import {IHostRule} from "../routes/rules/hosts/RuleHost";
-import {IServiceRule} from "../routes/rules/services/RuleService";
+import {IRuleHost} from "../routes/rules/hosts/RuleHost";
+import {IRuleService} from "../routes/rules/services/RuleService";
 import {ICondition} from "../routes/rules/conditions/RuleCondition";
 //import {ISimulatedMetric} from "../routes/simulatedMetrics/SimulatedMetric"; TODO
 import {IRegion} from "../routes/region/Region";
@@ -73,6 +73,14 @@ export function addApp(app: IApp): EntitiesAction {
     data: { apps: new Array(app) }
   }
 }
+export const UPDATE_APP = 'UPDATE_APP';
+export function updateApp(previousApp: Partial<IApp>, app: IApp): EntitiesAction {
+  return {
+    type: UPDATE_APP,
+    data: { apps: [previousApp, app] }
+  }
+
+}
 
 export const APP_SERVICES_REQUEST = 'APP_SERVICES_REQUEST';
 export const APP_SERVICES_SUCCESS = 'APP_SERVICES_SUCCESS';
@@ -88,12 +96,12 @@ const fetchAppServices = (appName: string) => ({
     entity: appName
   }
 });
-export const ADD_APP_SERVICE = 'ADD_APP_SERVICE';
-export function addAppService(appName: string, addAppService: IAddAppService): EntitiesAction {
+export const ADD_APP_SERVICES = 'ADD_APP_SERVICES';
+export function addAppServices(appName: string, addAppServices: IAddAppService[]): EntitiesAction {
   return {
-    type: ADD_APP_SERVICE,
+    type: ADD_APP_SERVICES,
     entity: appName,
-    data: { addAppServices: new Array(addAppService) }
+    data: { addAppServices: addAppServices }
   }
 }
 export const REMOVE_APP_SERVICES = 'REMOVE_APP_SERVICES';
@@ -421,12 +429,12 @@ const fetchEdgeHostRules = (hostname: string) => ({
     entity: hostname
   }
 });
-export const ADD_EDGE_HOST_RULE = 'ADD_EDGE_HOST_RULE';
-export function addEdgeHostRule(hostname: string, rule: string): EntitiesAction {
+export const ADD_EDGE_HOST_RULES = 'ADD_EDGE_HOST_RULES';
+export function addEdgeHostRules(hostname: string, rules: string[]): EntitiesAction {
   return {
-    type: ADD_EDGE_HOST_RULE,
+    type: ADD_EDGE_HOST_RULES,
     entity: hostname,
-    data: { rulesNames: new Array(rule) }
+    data: { rulesNames: rules }
   }
 }
 export const REMOVE_EDGE_HOST_RULES = 'REMOVE_EDGE_HOST_RULES';
@@ -497,7 +505,7 @@ const fetchRulesHost = (name?: string) => ({
       }
 });
 export const ADD_RULE_HOST = 'ADD_RULE_HOST';
-export function addRuleHost(ruleHost: IHostRule): EntitiesAction {
+export function addRuleHost(ruleHost: IRuleHost): EntitiesAction {
   return {
     type: ADD_RULE_HOST,
     data: { hostRules: new Array(ruleHost) }
@@ -623,7 +631,7 @@ const fetchRulesService = (name?: string) => ({
       }
 });
 export const ADD_RULE_SERVICE = 'ADD_RULE_SERVICE';
-export function addRuleService(ruleService: IServiceRule): EntitiesAction {
+export function addRuleService(ruleService: IRuleService): EntitiesAction {
   return {
     type: ADD_RULE_SERVICE,
     data: { hostRules: new Array(ruleService) }

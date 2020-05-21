@@ -1,7 +1,7 @@
-import IData from "../../components/IData";
+import IDatabaseData from "../../components/IDatabaseData";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import Form, {IFields, required} from "../../components/form/Form";
+import Form, {IFields, requiredAndTrimmed} from "../../components/form/Form";
 import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
@@ -9,24 +9,24 @@ import React from "react";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {loadRegions} from "../../actions";
+import {addRegion, loadRegions} from "../../actions";
 import {connect} from "react-redux";
 import {IReply} from "../../utils/api";
+import {isNew} from "../../utils/router";
+import {normalize} from "normalizr";
+import {Schemas} from "../../middleware/api";
 
-export interface IRegion extends IData {
+export interface IRegion extends IDatabaseData {
   name: string;
   description: string;
   active: boolean;
 }
 
-const emptyRegion = (): Partial<IRegion> => ({
+const buildNewRegion = (): Partial<IRegion> => ({
   name: '',
   description: '',
   active: true,
 });
-
-const isNewRegion = (name: string) =>
-  name === 'new_region';
 
 interface StateToProps {
   isLoading: boolean;
@@ -36,7 +36,9 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-  loadRegions: (name: string) => any;
+  loadRegions: (name: string) => void;
+  addRegion: (region: IRegion) => void;
+  //updateRegion: (previousRegion: Partial<IRegion>, region: IRegion) => void;
 }
 
 interface MatchParams {
@@ -45,44 +47,91 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-class Region extends BaseComponent<Props, {}> {
+interface State {
+  region?: IRegion,
+  formRegion?: IRegion,
+}
+
+class Region extends BaseComponent<Props, State> {
+
+  private mounted = false;
+
+  state: State = {
+  };
 
   componentDidMount(): void {
-    const regionName = this.props.match.params.name;
-    if (regionName && !isNewRegion(regionName)) {
+    this.loadRegion();
+    this.mounted = true;
+  };
+
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadRegion = () => {
+    if (!isNew(this.props.location.search)) {
+      const regionName = this.props.match.params.name;
       this.props.loadRegions(regionName);
     }
   };
 
+  private getRegion = () =>
+    this.state.region || this.props.region;
+
+  private getFormRegion = () =>
+    this.state.formRegion || this.props.formRegion;
+
   private onPostSuccess = (reply: IReply<IRegion>): void => {
-    super.toast(`Region <b>${reply.data.name}</b> saved`);
+    const region = reply.data;
+    super.toast(`<span class="green-text">Region ${region.name} saved</span>`);
+    this.props.addRegion(region);
+    if (this.mounted) {
+      this.updateRegion(region);
+      this.props.history.replace(region.name);
+    }
   };
 
-  private onPostFailure = (reason: string, regionName: string): void =>
-    super.toast(`Unable to save ${regionName}`, 10000, reason, true);
+  private onPostFailure = (reason: string, region: IRegion): void =>
+    super.toast(`Unable to save ${region.name}`, 10000, reason, true);
 
-  private onPutSuccess = (regionName: string): void => {
-    super.toast(`Changes to region <b>${regionName}</b> are now saved`);
+  private onPutSuccess = (reply: IReply<IRegion>): void => {
+    const region = reply.data;
+    super.toast(`<span class="green-text">Changes to region ${region.name} have been saved</span>`);
+    if (this.mounted) {
+      this.updateRegion(region);
+      this.props.history.replace(region.name);
+    }
   };
 
-  private onPutFailure = (reason: string, regionName: string): void =>
-    super.toast(`Unable to update ${regionName}`, 10000, reason, true);
+  private onPutFailure = (reason: string, region: IRegion): void =>
+    super.toast(`Unable to update ${region.name}`, 10000, reason, true);
 
-  private onDeleteSuccess = (regionName: string): void => {
-    super.toast(`Region <b>${regionName}</b> successfully removed`);
-    this.props.history.push(`/regions`)
+  private onDeleteSuccess = (region: IRegion): void => {
+    super.toast(`<span class="green-text">Region ${region.name} successfully removed</span>`);
+    if (this.mounted) {
+      this.props.history.push(`/regions`);
+    }
   };
 
-  private onDeleteFailure = (reason: string, regionName: string): void =>
-    super.toast(`Unable to delete ${regionName}`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, region: IRegion): void =>
+    super.toast(`Unable to delete ${region.name}`, 10000, reason, true);
+
+  private updateRegion = (region: IRegion) => {
+    //const previousRegion = this.getRegion();
+    region = Object.values(normalize(region, Schemas.REGION).entities.regions || {})[0];
+    //TODO this.props.updateRegion(previousRegion, region);
+    const formRegion = { ...region };
+    removeFields(formRegion);
+    this.setState({region: region, formRegion: formRegion});
+  };
 
   private getFields = (region: Partial<IRegion>): IFields =>
-    Object.entries(region).map(([key, value]) => {
+    Object.keys(region).map(key => {
       return {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: required }
+          validation: { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -92,11 +141,10 @@ class Region extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
-  private isActiveOption = (active: string): string =>
-    active;
-
   private region = () => {
-    const {isLoading, error, formRegion, region} = this.props;
+    const {isLoading, error} = this.props;
+    const region = this.getRegion();
+    const formRegion = this.getFormRegion();
     // @ts-ignore
     const regionKey: (keyof IRegion) = formRegion && Object.keys(formRegion)[0];
     return (
@@ -107,20 +155,31 @@ class Region extends BaseComponent<Props, {}> {
           <Form id={regionKey}
                 fields={this.getFields(formRegion)}
                 values={region}
-                isNew={isNewRegion(this.props.match.params.name)}
-                post={{url: 'regions', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={{url: `regions/${region[regionKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={{url: `regions/${region[regionKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}>
+                isNew={isNew(this.props.location.search)}
+                post={{
+                  url: 'regions',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure
+                }}
+                put={{
+                  url: `regions/${region.name}`,
+                  successCallback: this.onPutSuccess,
+                  failureCallback: this.onPutFailure
+                }}
+                delete={{
+                  url: `regions/${region.name}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure
+                }}>
             {Object.keys(formRegion).map((key, index) =>
               key === 'active'
-                ? <Field<string> key={index}
-                                 id={key}
-                                 label={key}
-                                 type="dropdown"
-                                 dropdown={{
-                                   defaultValue: "Is region active?",
-                                   values: ["True", "False"],
-                                   optionToString: this.isActiveOption}}/>
+                ? <Field key={index}
+                         id={key}
+                         label={key}
+                         type="dropdown"
+                         dropdown={{
+                           defaultValue: "Is region active?",
+                           values: ['True', 'False']}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -151,15 +210,19 @@ class Region extends BaseComponent<Props, {}> {
 
 }
 
+function removeFields(region: Partial<IRegion>) {
+  delete region["id"];
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.regions.isLoadingRegions;
   const error = state.entities.regions.loadRegionsError;
   const name = props.match.params.name;
-  const region = isNewRegion(name) ? emptyRegion() : state.entities.regions.data[name];
+  const region = isNew(props.location.search) ? buildNewRegion() : state.entities.regions.data[name];
   let formRegion;
   if (region) {
     formRegion = { ...region };
-    delete formRegion["id"];
+    removeFields(formRegion);
   }
   return  {
     isLoading,
@@ -171,6 +234,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadRegions,
+  addRegion,
+  //TODO updateRegion,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Region);

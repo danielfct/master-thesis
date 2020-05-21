@@ -463,8 +463,14 @@ textarea.materialize-textarea[readonly="readonly"] {
 
 .controlsContainer {
     border-bottom: 2px solid rgba(0, 0, 0, 0.8);
-    padding: 15px 40px;
+    padding: 15px 10px;
     overflow: auto;
+}
+
+@media only screen and (min-width : 768px) {
+    .controlsContainer {
+        padding: 15px 40px;
+    }
 }
 
 .noBorder {

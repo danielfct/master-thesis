@@ -34,7 +34,7 @@ export default class DefaultHostSimulatedMetricsCard extends React.Component {
     deleteData(
       `http://localhost:8080/metrics/simulated/hosts/default/${this.props.simulatedMetric.id}`,
       data => {
-        M.toast({ html: '<div>Default host simulated metric removed successfully!</div>' });
+        M.toast({ html: '<div>Default cloudHost simulated metric removed successfully!</div>' });
         this.props.reloadSimulatedMetrics();
       });
   };

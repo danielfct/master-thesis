@@ -9,9 +9,9 @@
  */
 
 import {RouteComponentProps} from "react-router";
-import IData from "../../../components/IData";
+import IDatabaseData from "../../../components/IDatabaseData";
 import BaseComponent from "../../../components/BaseComponent";
-import Form, {ICustomButton, IFields, required} from "../../../components/form/Form";
+import Form, {ICustomButton} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
@@ -27,8 +27,9 @@ import CloudHostRuleList from "./CloudHostRuleList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import {Schemas} from "../../../middleware/api";
 import {normalize} from "normalizr";
+import {isNew} from "../../../utils/router";
 
-export interface ICloudHost extends IData {
+export interface ICloudHost extends IDatabaseData {
   instanceId: string;
   imageId: string;
   instanceType: string;
@@ -43,10 +44,8 @@ export interface IState {
   name: string
 }
 
-const emptyCloudHost = (): Partial<ICloudHost> => ({ });
-
-const isNewHost = (instanceId: string) =>
-  instanceId === 'new_instance';
+const buildNewCloudHost = (): Partial<ICloudHost> => ({
+});
 
 interface StateToProps {
   isLoading: boolean;
@@ -58,6 +57,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadCloudHosts: (instanceId: string) => void;
   addCloudHost: (cloudHost: ICloudHost) => void;
+  //TODO updateCloudHost: (previousCloudHost: Partial<ICloudHost>, cloudHost: ICloudHost) => void;
   addCloudHostRule: (instanceId: string, ruleName: string) => void;
 }
 
@@ -67,7 +67,7 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-type State = {
+interface State {
   cloudHost?: ICloudHost,
   formCloudHost?: ICloudHost,
   unsavedRules: string[],
@@ -93,8 +93,8 @@ class CloudHost extends BaseComponent<Props, State> {
   }
 
   private loadCloudHost = () => {
-    const instanceId = this.props.match.params.instanceId;
-    if (instanceId && !isNewHost(instanceId)) {
+    if (!isNew(this.props.location.search)) {
+      const instanceId = this.props.match.params.instanceId;
       this.props.loadCloudHosts(instanceId);
     }
   };
@@ -105,16 +105,15 @@ class CloudHost extends BaseComponent<Props, State> {
   private getFormCloudHost = () =>
     this.state.formCloudHost || this.props.formCloudHost;
 
-
   private onPostSuccess = (reply: IReply<ICloudHost>): void => {
     const cloudHost = reply.data;
+    super.toast(`<span class="green-text">Cloud host ${cloudHost.instanceId} has now started</span>`);
     this.props.addCloudHost(cloudHost);
     this.saveEntities(cloudHost);
     if (this.mounted) {
       this.updateCloudHost(cloudHost);
       this.props.history.replace(cloudHost.instanceId);
     }
-    super.toast(`Cloud host <b>${cloudHost.instanceId}</b> has now started`);
   };
 
   private onPostFailure = (reason: string): void =>
@@ -159,17 +158,40 @@ class CloudHost extends BaseComponent<Props, State> {
     super.toast(`Unable to save rules of host ${cloudHost.instanceId}`, 10000, reason, true);
 
   private startStopTerminateButtons = (): ICustomButton[] => {
-    const state = this.getCloudHost().state;
     const buttons: ICustomButton[] = [];
+    const cloudHost = this.getCloudHost();
+    const state = this.getCloudHost().state;
     if (state?.includes('stopped')) {
-      buttons.push({text: 'Start', onClick: this.startCloudHost});
+      buttons.push({
+        button:
+          <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
+                  onClick={this.startCloudHost}>
+            Start
+          </button>
+      });
     }
     if (state?.includes('running')) {
-      buttons.push({text: 'Stop', onClick: this.stopCloudHost});
+      buttons.push({
+        button:
+          <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
+                  onClick={this.stopCloudHost}>
+            Stop
+          </button>
+      });
     }
-    if (!state?.includes('terminated')) {
-      buttons.push({text: 'Terminate', color: "red", onClick: this.terminateCloudHost,
-        confirm: {id: 'terminate-cloudHost', message: `terminate instance ${(this.state.formCloudHost || this.props.formCloudHost)?.instanceId}`}});
+    if (!state?.includes('terminated') && !state?.includes('shutting_down')) {
+      buttons.push({
+        button:
+          <button className='modal-trigger btn-flat btn-small waves-effect waves-light red-text'
+                  data-target='terminate-cloudHost'>
+            Terminate
+          </button>,
+        confirm: {
+          id: 'terminate-cloudHost',
+          message: `terminate instance ${cloudHost.instanceId}`,
+          onClickConfirm: this.terminateCloudHost
+        }
+      });
     }
     return buttons;
   };
@@ -183,7 +205,7 @@ class CloudHost extends BaseComponent<Props, State> {
   };
 
   private onStartSuccess = (cloudHost: ICloudHost) => {
-    super.toast(`Successfully started cloud host <b>${cloudHost.instanceId}</b>`, 15000);
+    super.toast(`<span class="green-text">Successfully started cloud instance ${cloudHost.instanceId}</span>`, 15000);
     if (this.mounted) {
       this.updateCloudHost(cloudHost);
     }
@@ -205,14 +227,14 @@ class CloudHost extends BaseComponent<Props, State> {
   };
 
   private onStopSuccess = (cloudHost: ICloudHost) => {
-    super.toast(`Successfully stopped cloud host <b>${cloudHost.instanceId}</b>`, 15000);
+    super.toast(`<span class="green-text">Successfully stopped cloud instance ${cloudHost.instanceId}</span>`, 15000);
     if (this.mounted) {
       this.updateCloudHost(cloudHost);
     }
   };
 
-  private onStopFailure = (reply: string, cloudHost: Partial<ICloudHost>) => {
-    super.toast(`Failed to stop cloud host <b>${cloudHost.instanceId}</b>`, 10000, reply, true);
+  private onStopFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
+    super.toast(`Failed to stop cloud host <b>${cloudHost.instanceId}</b>`, 10000, reason, true);
     if (this.mounted) {
       this.setState({isLoading: false});
     }
@@ -227,7 +249,7 @@ class CloudHost extends BaseComponent<Props, State> {
   };
 
   private onTerminateSuccess = (cloudHost: Partial<ICloudHost>) => {
-    super.toast(`Successfully terminated cloud host <b>${cloudHost.instanceId}</b>`, 15000);
+    super.toast(`<span class="green-text">Successfully terminated cloud instance ${cloudHost.instanceId}</span>`, 15000);
     if (this.mounted) {
       this.props.history.push('/hosts/cloud');
     }
@@ -241,27 +263,13 @@ class CloudHost extends BaseComponent<Props, State> {
   };
 
   private updateCloudHost = (cloudHost: ICloudHost) => {
+    //const previousCloudHost = this.getCloudHost();
     cloudHost = Object.values(normalize(cloudHost, Schemas.CLOUD_HOST).entities.cloudHosts || {})[0];
+    //TODO this.props.updateCloudHost(previousCloudHost, cloudHost):
     const formCloudHost = { ...cloudHost };
     removeFields(formCloudHost);
     this.setState({cloudHost: cloudHost, formCloudHost: formCloudHost, isLoading: false});
   };
-
-  private getFields = (cloudHost: Partial<ICloudHost>): IFields =>
-    Object.entries(cloudHost).map(([key, _]) => {
-      return {
-        [key]: {
-          id: key,
-          label: key,
-          validation: { rule: required }
-        }
-      };
-    }).reduce((fields, field) => {
-      for (let key in field) {
-        fields[key] = field[key];
-      }
-      return fields;
-    }, {});
 
   private cloudHost = () => {
     const {isLoading, error} = this.props;
@@ -275,9 +283,9 @@ class CloudHost extends BaseComponent<Props, State> {
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formCloudHost && (
           <Form id={cloudHostKey}
-                fields={this.getFields(formCloudHost)}
+                fields={{}}
                 values={cloudHost}
-                isNew={isNewHost(this.props.match.params.instanceId)}
+                isNew={isNew(this.props.location.search)}
                 showSaveButton={this.shouldShowSaveButton()}
                 post={{
                   url: 'hosts/cloud',
@@ -298,29 +306,16 @@ class CloudHost extends BaseComponent<Props, State> {
     )
   };
 
-  private entitiesList = (element: JSX.Element) => {
-    const {isLoading, error} = this.props;
-    const cloudHost = this.getCloudHost();
-    if (isLoading) {
-      return <ListLoadingSpinner/>;
-    }
-    if (error) {
-      return <Error message={error}/>;
-    }
-    if (cloudHost) {
-      return element;
-    }
-    return <></>;
-  };
-
   private rules = (): JSX.Element =>
-    this.entitiesList(<CloudHostRuleList host={this.getCloudHost()}
-                                         unsavedRules={this.state.unsavedRules}
-                                         onAddHostRule={this.addCloudHostRule}
-                                         onRemoveHostRules={this.removeCloudHostRules}/>);
+    <CloudHostRuleList isLoadingCloudHost={this.props.isLoading}
+                       loadCloudHostError={this.props.error}
+                       cloudHost={this.getCloudHost()}
+                       unsavedRules={this.state.unsavedRules}
+                       onAddHostRule={this.addCloudHostRule}
+                       onRemoveHostRules={this.removeCloudHostRules}/>;
 
   private genericRules = (): JSX.Element =>
-    this.entitiesList(<GenericHostRuleList/>);
+    <GenericHostRuleList/>;
 
   private tabs: Tab[] = [
     {
@@ -343,7 +338,7 @@ class CloudHost extends BaseComponent<Props, State> {
   render() {
     return (
       <MainLayout>
-        {this.shouldShowSaveButton() && !isNewHost(this.props.match.params.instanceId) && <UnsavedChanged/>}
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>
@@ -368,7 +363,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.hosts.cloud.isLoadingHosts;
   const error = state.entities.hosts.cloud.loadHostsError;
   const instanceId = props.match.params.instanceId;
-  const cloudHost = isNewHost(instanceId) ? emptyCloudHost() : state.entities.hosts.cloud.data[instanceId];
+  const cloudHost = isNew(props.location.search) ? buildNewCloudHost() : state.entities.hosts.cloud.data[instanceId];
   let formCloudHost;
   if (cloudHost) {
     formCloudHost = {...cloudHost};

@@ -23,7 +23,7 @@
  */
 
 import React, {createRef} from "react";
-import {deleteData, postData, putData} from "../../utils/api";
+import {cancelRequest, deleteData, postData, putData} from "../../utils/api";
 import styles from './Form.module.css';
 import {RouteComponentProps, withRouter} from "react-router";
 import {getTypeFromValue, FieldProps, IValidation} from "./Field";
@@ -34,25 +34,6 @@ import ActionProgressBar from "./ActionProgressBar";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
 import M from "materialize-css";
-
-export type RestOperation = {
-  textButton?: string,
-  url: string,
-  successCallback: (reply?: any, args?: any) => void,
-  failureCallback: (reason: string, args?: any) => void,
-}
-
-export interface IFields {
-  [key: string]: FieldProps;
-}
-
-export interface IValues {
-  [key: string]: any;
-}
-
-export interface IErrors {
-  [key: string]: string;
-}
 
 export interface IFormModal {
   id: string,
@@ -65,6 +46,31 @@ export interface IFormModal {
   open?: boolean,
 }
 
+export type RestOperation = {
+  textButton?: string,
+  url: string,
+  successCallback: (reply?: any, args?: any) => void,
+  failureCallback: (reason: string, args?: any) => void,
+}
+
+export type IFields = {
+  [key: string]: FieldProps;
+}
+
+export type IValues = {
+  [key: string]: any;
+}
+
+export type IErrors = {
+  [key: string]: string;
+}
+
+export type IFormDropdown = { id: string, title: string, empty: string, data: string[] };
+
+export type ICustomButton = { button: JSX.Element, confirm?: { id: string, message: string, onClickConfirm: () => void } };
+
+export type ISwitchDropdown = { title?: string, options: string[], onSwitch: (selected: any) => void };
+
 interface FormProps {
   id: string;
   fields: IFields;
@@ -76,13 +82,12 @@ interface FormProps {
   delete?: RestOperation;
   controlsMode?: 'top' | 'modal';
   onModalConfirm?: (values: IValues) => void;
-  dropdown?: { id: string, title: string, empty: string, data: string[]};
+  dropdown?: IFormDropdown;
   saveEntities?: (args: any) => void;
   customButtons?: ICustomButton[];
+  switchDropdown?: ISwitchDropdown;
   loading?: boolean;
 }
-
-export type ICustomButton = { text: string, color?: 'blue' | 'green' | 'red', onClick: () => void, confirm?: { id: string, message: string } };
 
 type Props = FormProps & RouteComponentProps;
 
@@ -115,6 +120,11 @@ export const notAllowed = (values: IValues, id: keyof IValues, args: any[]): str
     ? `${values[id]} is not allowed`
     : "";
 
+export const trimmed = (values: IValues, id: keyof IValues): string =>
+  typeof values[id] === 'string' && (values[id].startsWith(" ") || values[id].endsWith(" "))
+    ? `Can't start or end with spaces`
+    : "";
+
 export const min = (values: IValues, id: keyof IValues, args: any): string =>
   values[id] < args
     ? `Required minimum value of ${args}`
@@ -130,8 +140,11 @@ export const number = (values: IValues, id: keyof IValues): string =>
     ? `${camelCaseToSentenceCase(id as string)} is a number`
     : "";
 
-export const requiredAndNotAllowed = (values: IValues, id: keyof IValues, args: any[]) =>
-  required(values, id) || notAllowed(values, id, args);
+export const requiredAndTrimmed = (values: IValues, id: keyof IValues) =>
+  required(values, id) || trimmed(values, id);
+
+export const requiredAndNotAllowedAndTrimmed = (values: IValues, id: keyof IValues, args: any[]) =>
+  required(values, id) || notAllowed(values, id, args) || trimmed(values, id);
 
 export const requiredAndNumberAndMin = (values: IValues, id: keyof IValues, args: any) =>
   required(values, id) || number(values, id) || min(values, id, args);
@@ -146,6 +159,7 @@ class Form extends React.Component<Props, State> {
 
   private mounted = false;
   private dropdown = createRef<HTMLButtonElement>();
+  //TODO private switchDropdown = createRef<HTMLButtonElement>();
   private scrollbar: (ScrollBar | null) = null;
 
   state: State = {
@@ -181,7 +195,6 @@ class Form extends React.Component<Props, State> {
     if (prevProps.loading !== this.props.loading) {
       this.setState({isLoading: !!this.props.loading});
     }
-
     this.initDropdown();
   }
 
@@ -302,6 +315,11 @@ class Form extends React.Component<Props, State> {
     }
   };
 
+  private cancelRequest = () => {
+    cancelRequest.cancel('Operation canceled by the user');
+    this.setState({isLoading: false});
+  };
+
   private setValue = (id: keyof IValues, value: IValues, validate?: boolean) => {
     const values = { [id] : value };
     if (validate === undefined || validate) {
@@ -342,6 +360,11 @@ class Form extends React.Component<Props, State> {
     //TODO this.props.onAdd?.(data);
   };
 
+  private switchForm = (e: React.FormEvent<HTMLLIElement>) => {
+    const selectedForm = decodeHTML((e.target as HTMLLIElement).innerHTML);
+    this.props.switchDropdown?.onSwitch(selectedForm);
+  };
+
   render() {
     const context: IFormContext = {
       ...this.state,
@@ -351,7 +374,9 @@ class Form extends React.Component<Props, State> {
       validate: this.validate
     };
     const {saveRequired, isLoading} = this.state;
-    const {id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, children} = this.props;
+    const {id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, switchDropdown,
+      children} = this.props;
+    console.log(isLoading)
     return (
       <>
         {this.props.delete && (
@@ -362,37 +387,59 @@ class Form extends React.Component<Props, State> {
           {(controlsMode === undefined || controlsMode === 'top') && (
             <div>
               <div className='controlsContainer noBorder'>
+                {switchDropdown && (
+                  <>
+                    <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                            data-position="bottom" data-tooltip={switchDropdown.title || 'Switch form'}
+                            data-target={`switch-dropdown`}
+                            ref={this.dropdown}>
+                      <i className="material-icons">keyboard_arrow_down</i>
+                    </button>
+                    <ul id='switch-dropdown'
+                        className={`dropdown-content ${styles.dropdown}`}>
+                      <li className={`${styles.disabled}`}>
+                        <a>
+                          {switchDropdown.title || 'Switch form'}
+                        </a>
+                      </li>
+                      <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
+                        {switchDropdown.options.map((option, index) =>
+                          <li key={index} onClick={this.switchForm}>
+                            <a>
+                              {option}
+                            </a>
+                          </li>
+                        )}
+                      </PerfectScrollbar>
+                    </ul>
+                  </>
+                )}
                 {isNew
                   ?
-                  <button
-                    className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}
-                    type="submit">
-                    {this.props.post?.textButton || 'Save'}
-                  </button>
+                  <>
+                    <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}
+                            type="submit">
+                      {this.props.post?.textButton || 'Save'}
+                    </button>
+                    {isLoading && (
+                      <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right`}
+                              onClick={this.cancelRequest}>
+                        Cancel
+                      </button>
+                    )}
+                  </>
                   :
-                  <div>
-                    {editable !== undefined && (
-                      <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
-                              data-position="bottom"
-                              data-tooltip="Edit"
-                              type="button"
-                              onClick={this.onClickEdit}>
-                        <i className="large material-icons">edit</i>
-                      </button>)}
+                  <>
                     <div className={`${styles.controlButton}`}>
                       {customButtons?.map((button, index) => (
+                        /*TODO index?*/
                         <>
                           {button.confirm && (
                             <ConfirmDialog key={button.confirm.id}
                                            id={button.confirm.id}
                                            message={button.confirm?.message}
-                                           confirmCallback={button.onClick}/>)}
-                          <button key={index} //TODO
-                                  className={`${button.confirm ? 'modal-trigger' : undefined} btn-flat btn-small waves-effect waves-light ${button.color || 'blue'}-text`}
-                                  data-target={button.confirm?.id}
-                                  onClick={!button.confirm ? button.onClick : undefined}>
-                            {button.text}
-                          </button>
+                                           confirmCallback={button.confirm?.onClickConfirm}/>)}
+                          {button.button}
                         </>
                       ))}
                       {deletable !== undefined && (
@@ -407,7 +454,22 @@ class Form extends React.Component<Props, State> {
                         Save
                       </button>
                     </div>
-                  </div>
+                    {isLoading && (
+                      <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide`}
+                              onClick={this.cancelRequest}>
+                        Cancel
+                      </button>
+                    )}
+                    {editable !== undefined && (
+                      <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
+                              data-position="bottom"
+                              data-tooltip="Edit"
+                              type="button"
+                              onClick={this.onClickEdit}>
+                        <i className="large material-icons">edit</i>
+                      </button>
+                    )}
+                  </>
                 }
                 {dropdown && (
                   <>
@@ -420,7 +482,7 @@ class Form extends React.Component<Props, State> {
                     <ul id={`dropdown-${dropdown.id}`}
                         className={`dropdown-content ${styles.dropdown}`}>
                       <li className={`${styles.disabled}`}>
-                        <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : undefined}`}>
+                        <a className={`${!dropdown?.data.length ? styles.dropdownEmpty : ''}`}>
                           {dropdown.data.length ? dropdown.title : dropdown.empty}
                         </a>
                       </li>
@@ -447,20 +509,22 @@ class Form extends React.Component<Props, State> {
           </div>
           {(controlsMode === 'modal') && (
             <div className='modal-footer dialog-footer'>
-              <button className="waves-effect waves-light btn-flat red-text left"
-                      type="button"
-                      onClick={this.clearValues}>
-                Clear
-              </button>
-              <button className="modal-close waves-effect waves-light btn-flat red-text"
-                      type="button">
-                Cancel
-              </button>
-              <button className="waves-effect waves-light btn-flat green-text"
-                      type="button"
-                      onClick={this.onModalConfirm}>
-                Confirm
-              </button>
+              <div>
+                <button className="waves-effect waves-light btn-flat red-text"
+                        type="button"
+                        onClick={this.clearValues}>
+                  Clear
+                </button>
+                <button className="modal-close waves-effect waves-light btn-flat red-text"
+                        type="button">
+                  Cancel
+                </button>
+                <button className="waves-effect waves-light btn-flat green-text"
+                        type="button"
+                        onClick={this.onModalConfirm}>
+                  Confirm
+                </button>
+              </div>
             </div>
           )}
         </form>

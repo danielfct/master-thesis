@@ -30,10 +30,11 @@ import {
   APPS_SUCCESS,
   APP_SUCCESS,
   ADD_APP,
+  UPDATE_APP,
   APP_SERVICES_REQUEST,
   APP_SERVICES_FAILURE,
   APP_SERVICES_SUCCESS,
-  ADD_APP_SERVICE,
+  ADD_APP_SERVICES,
   REMOVE_APP_SERVICES,
   SERVICES_REQUEST,
   SERVICE_REQUEST,
@@ -94,7 +95,7 @@ import {
   EDGE_HOST_RULES_REQUEST,
   EDGE_HOST_RULES_FAILURE,
   EDGE_HOST_RULES_SUCCESS,
-  ADD_EDGE_HOST_RULE,
+  ADD_EDGE_HOST_RULES,
   REMOVE_EDGE_HOST_RULES,
   NODES_REQUEST,
   NODE_REQUEST,
@@ -192,12 +193,12 @@ import {IAddAppService, IAppService} from "../routes/apps/AppServicesList";
 import {IService} from "../routes/services/Service";
 import {IDependee} from "../routes/services/ServiceDependeeList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
-import {IServiceRule} from "../routes/rules/services/RuleService";
+import {IRuleService} from "../routes/rules/services/RuleService";
 import {IContainer} from "../routes/containers/Container";
 import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
 import {INode} from "../routes/nodes/Node";
-import {IHostRule} from "../routes/rules/hosts/RuleHost";
+import {IRuleHost} from "../routes/rules/hosts/RuleHost";
 import {IValueMode, IField, IOperator, IDecision} from "../routes/rules/Rule";
 import {ICondition} from "../routes/rules/conditions/RuleCondition";
 //TODO simulated metrics
@@ -257,7 +258,7 @@ export type EntitiesState = {
   },
   rules: {
     hosts: {
-      data: { [key: string]: IHostRule },
+      data: { [key: string]: IRuleHost },
       isLoadingRules: boolean,
       loadRulesError: string | null,
       isLoadingConditions: boolean,
@@ -268,7 +269,7 @@ export type EntitiesState = {
       loadEdgeHostsError: string | null,
     },
     services: {
-      data: { [key: string]: IServiceRule },
+      data: { [key: string]: IRuleService },
       isLoadingRules: boolean,
       loadRulesError: string | null,
       isLoadingConditions: boolean,
@@ -323,7 +324,7 @@ export type EntitiesAction = {
   isLoading?: {},
   error?: string,
   data?: {
-    apps?: IApp[],
+    apps?: Partial<IApp>[],
     appsNames?: string[],
     appServices?: IAppService[],
     addAppServices?: IAddAppService[],
@@ -340,8 +341,8 @@ export type EntitiesAction = {
     edgeHosts?: IEdgeHost[],
     edgeHostsHostname?: string[],
     nodes?: INode[],
-    hostRules?: IHostRule[],
-    serviceRules?: IServiceRule[],
+    hostRules?: IRuleHost[],
+    serviceRules?: IRuleService[],
     rulesNames?: string[],
     valueModes?: IValueMode[],
     fields?: IField[],
@@ -503,7 +504,15 @@ const entities = (state: EntitiesState = {
     case ADD_APP:
       if (data?.apps?.length) {
         const apps = normalize(data?.apps, Schemas.APP_ARRAY).entities.apps;
-        return state = merge({}, state, { apps: { data: apps } });
+        /*return merge({}, state, { apps: { data: apps } });*/
+      }
+      break;
+    case UPDATE_APP:
+      if (data?.apps && data.apps?.length > 1) {
+        const previousApp = data.apps[0];
+        const currentApp = data.apps[1];
+        console.log(previousApp);
+        console.log(currentApp);
       }
       break;
     case APP_SERVICES_REQUEST:
@@ -522,7 +531,7 @@ const entities = (state: EntitiesState = {
       });
     case APP_SERVICES_FAILURE:
       return merge({}, state, { apps: { isLoadingServices: false, loadServicesError: error } });
-    case ADD_APP_SERVICE:
+    case ADD_APP_SERVICES:
       if (entity) {
         const app = state.apps.data[entity];
         if (data?.addAppServices?.length) {
@@ -533,7 +542,7 @@ const entities = (state: EntitiesState = {
           const appService = { id: 0, service, launchOrder };
           if (service) {
             app.services = { ...app.services, [serviceName]: appService };
-            return state = merge({}, state, { apps: { data: { [app.name]: {...app } } } });
+            return merge({}, state, { apps: { data: { [app.name]: {...app } } } });
           }
         }
       }
@@ -541,8 +550,9 @@ const entities = (state: EntitiesState = {
     case REMOVE_APP_SERVICES:
       if (entity) {
         const app = state.apps.data[entity];
-        const filteredServices = Object.values(app.services)
-                                       .filter(appService => !data?.serviceNames?.includes(appService.service.serviceName));
+        const filteredServices = (app.services &&
+                                  Object.values(app.services)
+                                        .filter(appService => !data?.serviceNames?.includes(appService.service.serviceName))) || [];
         const normalizedServices = normalize(filteredServices, Schemas.APP_SERVICE_ARRAY).entities;
         const appWithServices = Object.assign(app, !Object.keys(normalizedServices).length ? { services: {} } : normalizedServices);
         const normalizedApp = normalize(appWithServices, Schemas.APP).entities;
@@ -592,7 +602,7 @@ const entities = (state: EntitiesState = {
     case ADD_SERVICE:
       if (data?.services?.length) {
         const services = normalize(data?.services, Schemas.SERVICE_ARRAY).entities.services;
-        return state = merge({}, state, { services: { data: services } });
+        return merge({}, state, { services: { data: services } });
       }
       break;
     case SERVICE_APPS_REQUEST:
@@ -617,7 +627,7 @@ const entities = (state: EntitiesState = {
         const service = state.services.data[entity];
         if (data?.appsNames?.length) {
           service.apps?.unshift(...data?.appsNames);
-          return state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
+          return merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
       }
       break;
@@ -657,7 +667,7 @@ const entities = (state: EntitiesState = {
         const service = state.services.data[entity];
         if (data?.dependenciesNames?.length) {
           service.dependencies?.unshift(...data?.dependenciesNames);
-          return state = merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
+          return merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
       }
       break;
@@ -715,7 +725,7 @@ const entities = (state: EntitiesState = {
         if (data?.predictions?.length) {
           const newPredictions = data?.predictions.map(prediction => ({[prediction.name]: { id: 0, ...prediction }}));
           service.predictions = merge({}, service.predictions, newPredictions);
-          return state = merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
+          return merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
         }
       }
       break;
@@ -757,7 +767,7 @@ const entities = (state: EntitiesState = {
         const service = state.services.data[entity];
         if (data?.rulesNames?.length) {
           service.serviceRules?.unshift(...data?.rulesNames);
-          return state = merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
+          return merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
         }
       }
       break;
@@ -803,7 +813,7 @@ const entities = (state: EntitiesState = {
     case ADD_CONTAINER:
       if (data?.containers?.length) {
         const containers = normalize(data?.containers, Schemas.CONTAINER_ARRAY).entities.containers;
-        return state = merge({}, state, { containers: { data: containers } });
+        return merge({}, state, { containers: { data: containers } });
       }
       break;
     case CLOUD_HOSTS_REQUEST:
@@ -841,7 +851,7 @@ const entities = (state: EntitiesState = {
     case ADD_CLOUD_HOST:
       if (data?.cloudHosts?.length) {
         const cloudHosts = normalize(data?.cloudHosts, Schemas.CLOUD_HOST_ARRAY).entities.cloudHosts;
-        return state = merge({}, state, { hosts: { cloud: { data: cloudHosts } } });
+        return merge({}, state, { hosts: { cloud: { data: cloudHosts } } });
       }
       break;
     case CLOUD_HOST_RULES_REQUEST:
@@ -875,7 +885,7 @@ const entities = (state: EntitiesState = {
           }
           cloudHost.hostRules.unshift(...data.rulesNames);
           const normalizedCloudHost = normalize(cloudHost, Schemas.CLOUD_HOST).entities.cloudHosts;
-          return state = merge({}, state, { hosts: { cloud: { data: { ...normalizedCloudHost } } } });
+          return merge({}, state, { hosts: { cloud: { data: { ...normalizedCloudHost } } } });
         }
         return state;
       }
@@ -924,7 +934,7 @@ const entities = (state: EntitiesState = {
     case ADD_EDGE_HOST:
       if (data?.edgeHosts?.length) {
         const edgeHosts = normalize(data?.edgeHosts, Schemas.EDGE_HOST_ARRAY).entities.edgeHosts;
-        return state = merge({}, state, { hosts: { edge: { data: edgeHosts } } });
+        return merge({}, state, { hosts: { edge: { data: edgeHosts } } });
       }
       break;
     case EDGE_HOST_RULES_REQUEST:
@@ -949,7 +959,7 @@ const entities = (state: EntitiesState = {
         }
       };
     }
-    case ADD_EDGE_HOST_RULE:
+    case ADD_EDGE_HOST_RULES:
       if (entity && data?.rulesNames?.length) {
         const edgeHost = state.hosts.edge.data[entity];
         if (edgeHost) {
@@ -1000,7 +1010,7 @@ const entities = (state: EntitiesState = {
     case ADD_NODE:
       if (data?.nodes?.length) {
         const nodes = normalize(data?.nodes, Schemas.NODE_ARRAY).entities.nodes;
-        return state = merge({}, state, { nodes: { data: nodes } });
+        return merge({}, state, { nodes: { data: nodes } });
       }
       break;
     case RULES_HOST_REQUEST:
@@ -1038,7 +1048,7 @@ const entities = (state: EntitiesState = {
     case ADD_RULE_HOST:
       if (data?.hostRules?.length) {
         const hostRules = normalize(data?.hostRules, Schemas.RULE_HOST_ARRAY).entities.hostRules;
-        return state = merge({}, state, { rules: { hosts : { data: hostRules } } });
+        return merge({}, state, { rules: { hosts : { data: hostRules } } });
       }
       break;
     case RULE_HOST_CONDITIONS_REQUEST:
@@ -1067,7 +1077,7 @@ const entities = (state: EntitiesState = {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
           rule.conditions?.unshift(...data?.conditionsNames);
-          return state = merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
+          return merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
       }
@@ -1115,7 +1125,7 @@ const entities = (state: EntitiesState = {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
           rule.cloudHosts?.unshift(...data?.cloudHostsId);
-          return state = merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
+          return merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
       }
@@ -1163,7 +1173,7 @@ const entities = (state: EntitiesState = {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
           rule.edgeHosts?.unshift(...data?.edgeHostsHostname);
-          return state = merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
+          return merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
       }
@@ -1220,7 +1230,7 @@ const entities = (state: EntitiesState = {
     case ADD_RULE_SERVICE:
       if (data?.serviceRules?.length) {
         const serviceRules = normalize(data?.serviceRules, Schemas.RULE_SERVICE_ARRAY).entities.serviceRules;
-        return state = merge({}, state, { rules: { services : { data: serviceRules } } });
+        return merge({}, state, { rules: { services : { data: serviceRules } } });
       }
       break;
     case RULE_SERVICE_CONDITIONS_REQUEST:
@@ -1249,7 +1259,7 @@ const entities = (state: EntitiesState = {
         const rule = state.rules.services.data[entity];
         if (rule) {
           rule.conditions?.unshift(...data?.conditionsNames);
-          return state = merge({}, state, { rules: { services: { data: { [rule.name]: {...rule } } } } });
+          return merge({}, state, { rules: { services: { data: { [rule.name]: {...rule } } } } });
         }
       }
       break;
@@ -1296,7 +1306,7 @@ const entities = (state: EntitiesState = {
         const rule = state.rules.services.data[entity];
         if (rule) {
           rule.services?.unshift(...data?.serviceNames);
-          return state = merge({}, state, { rules: { services: { data: { [rule.name]: { ...rule } } } } });
+          return merge({}, state, { rules: { services: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
       }
@@ -1353,7 +1363,7 @@ const entities = (state: EntitiesState = {
     case ADD_CONDITION:
       if (data?.conditions?.length) {
         const conditions = normalize(data?.conditions, Schemas.RULE_CONDITION_ARRAY).entities.conditions;
-        return state = merge({}, state, { rules: { conditions : { data: conditions } } });
+        return merge({}, state, { rules: { conditions : { data: conditions } } });
       }
       break;
     case VALUE_MODES_REQUEST:
@@ -1452,7 +1462,7 @@ const entities = (state: EntitiesState = {
     case ADD_REGION:
       if (data?.regions?.length) {
         const regions = normalize(data?.regions, Schemas.REGION_ARRAY).entities.regions;
-        return state = merge({}, state, { regions: { data: regions } });
+        return merge({}, state, { regions: { data: regions } });
       }
       break;
     //TODO load balancer

@@ -43,6 +43,7 @@ export class Timepicker extends React.Component<Props, State> {
     if (prevState.selectedTime === this.state.selectedTime) {
       this.initTimepicker();
     }
+    M.updateTextFields();
   }
 
   private onClose = () =>

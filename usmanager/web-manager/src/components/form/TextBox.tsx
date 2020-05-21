@@ -1,5 +1,6 @@
 import React from "react";
 import {getTypeFromValue} from "./Field";
+import M from "materialize-css";
 
 interface TextBoxProps {
   className: string;
@@ -12,6 +13,10 @@ interface TextBoxProps {
 }
 
 export class TextBox extends React.Component<TextBoxProps, any> {
+
+  componentDidUpdate(prevProps: Readonly<TextBoxProps>, prevState: Readonly<any>, snapshot?: any): void {
+    M.updateTextFields();
+  }
 
   render(): any {
     const {className, id, name, value, disabled, onChange, onBlur} = this.props;

@@ -11,7 +11,7 @@
 import BaseComponent from "../../components/BaseComponent";
 import React from "react";
 import {RouteComponentProps} from "react-router";
-import Form, {IFields, required} from "../../components/form/Form";
+import Form, {IFields, required, requiredAndTrimmed} from "../../components/form/Form";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
 import Field from "../../components/form/Field";
@@ -27,7 +27,7 @@ import {IReply} from "../../utils/api";
 export interface ILoadBalancer {
 }
 
-const emptyLoadBalancer = (): Partial<ILoadBalancer> => ({
+const buildNewLoadBalancer = (): Partial<ILoadBalancer> => ({
   service: undefined,
 });
 
@@ -65,14 +65,14 @@ class LoadBalancer extends BaseComponent<Props, {}> {
   }
 
   private onPostSuccess = (reply: IReply<ILoadBalancer>): void => {
-    //super.toast(`Load balancer Edge host <b>${edgeHostHostname}</b> is now saved`);
+    //super.toast(`Load balancer <b>${edgeHostHostname}</b> is now saved`); TODO
   };
 
   private onPostFailure = (reason: string): void =>
     super.toast(`Unable to launch load balancer`, 10000, reason, true);
 
   private onDeleteSuccess = (id: string): void => {
-    super.toast(`Load balancer <b>${id}</b> successfully stopped`);
+    super.toast(`<span class="green-text">Load balancer ${id} successfully stopped</span>`);
     this.props.history.push(`/load-balancers`)
   };
 
@@ -85,7 +85,7 @@ class LoadBalancer extends BaseComponent<Props, {}> {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: required }
+          validation: { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -175,7 +175,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = false; //state.entities.loadBalancers.isLoading;
   const error = null; //state.entities.loadBalancers.error;
   const id = props.match.params.id;
-  const loadBalancer = isLaunchLoadBalancer(id) ? emptyLoadBalancer() : {}; //state.entities.loadBalancers.data[id];
+  const loadBalancer = isLaunchLoadBalancer(id) ? buildNewLoadBalancer() : {}; //state.entities.loadBalancers.data[id];
   let formLoadBalancer;
   if (loadBalancer) {
     formLoadBalancer = { ...loadBalancer, regions: Object.keys(regions) };

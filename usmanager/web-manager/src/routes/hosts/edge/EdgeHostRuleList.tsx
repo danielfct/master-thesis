@@ -16,7 +16,7 @@ import ControlledList from "../../../components/list/ControlledList";
 import {ReduxState} from "../../../reducers";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {IHostRule} from "../../rules/hosts/RuleHost";
+import {IRuleHost} from "../../rules/hosts/RuleHost";
 import {Link} from "react-router-dom";
 import {IEdgeHost} from "./EdgeHost";
 import {
@@ -28,18 +28,20 @@ import {
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  rules: { [key: string]: IHostRule },
+  rules: { [key: string]: IRuleHost },
   rulesNames: string[];
 }
 
 interface DispatchToProps {
-  loadRulesHost: (name?: string) => any;
+  loadRulesHost: () => void;
   loadEdgeHostRules: (hostname: string) => void;
   removeEdgeHostRules: (hostname: string, rules: string[]) => void;
 }
 
 interface HostRuleListProps {
-  host: IEdgeHost | Partial<IEdgeHost>;
+  isLoadingEdgeHost: boolean;
+  loadEdgeHostError?: string | null;
+  edgeHost: IEdgeHost | Partial<IEdgeHost> | null;
   unsavedRules: string[];
   onAddHostRule: (rule: string) => void;
   onRemoveHostRules: (rule: string[]) => void;
@@ -51,8 +53,8 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     this.props.loadRulesHost();
-    const {hostname} = this.props.host;
-    if (hostname) {
+    if (this.props.edgeHost?.hostname) {
+      const {hostname} = this.props.edgeHost;
       this.props.loadEdgeHostRules(hostname);
     }
   }
@@ -60,7 +62,6 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
   private rule = (index: number, rule: string, separate: boolean, checked: boolean,
                   handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
     const unsaved = this.props.unsavedRules.map(newRule => newRule).includes(rule);
-    //TODO do unsaved color on all lists
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${styles.linkedItemContent}`}>
@@ -91,8 +92,8 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
     this.props.onRemoveHostRules(rules);
 
   private onDeleteSuccess = (rules: string[]): void => {
-    const {hostname} = this.props.host;
-    if (hostname) {
+    if (this.props.edgeHost?.hostname) {
+      const {hostname} = this.props.edgeHost;
       this.props.removeEdgeHostRules(hostname, rules);
     }
   };
@@ -106,14 +107,14 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
-                           error={this.props.error}
+    return <ControlledList isLoading={this.props.isLoadingEdgeHost || this.props.isLoading}
+                           error={this.props.loadEdgeHostError || this.props.error}
                            emptyMessage={`Rules list is empty`}
                            data={this.props.rulesNames}
                            dataKey={['hostname']}
                            dropdown={{
                              id: 'rules',
-                             title: 'Add rule',
+                             title: 'Add host rule',
                              empty: 'No more rules to add',
                              data: this.getSelectableRules()
                            }}
@@ -121,7 +122,7 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/hosts/edge/${this.props.host.hostname}`,
+                             url: `rules/hosts/edge/${this.props.edgeHost?.hostname}`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;
@@ -130,7 +131,7 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleListProps): StateToProps {
-  const hostname = ownProps.host.hostname;
+  const hostname = ownProps.edgeHost?.hostname;
   const host = hostname && state.entities.hosts.edge.data[hostname];
   const rulesNames = host && host.hostRules;
   return {

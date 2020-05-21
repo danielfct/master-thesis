@@ -28,14 +28,13 @@ export default class Rules extends BaseComponent<{}, {}> {
 
   render = () =>
     <MainLayout>
-      <AddButton tooltip={'Add rule'} dropdown={{
-        id: 'addRules',
-        title: 'Rule type',
-        empty: 'No more service rules to add',
+      <AddButton tooltip={'Add rule or condition'} dropdown={{
+        id: 'addRuleOrCondition',
+        title: 'Select option',
         data: [
-          {text: 'Host', pathname: '/rules/hosts/new_host_rule'},
-          {text: 'Service', pathname: '/rules/services/new_service_rule'},
-          {text: 'Condition', pathname: '/rules/conditions/new_condition'},
+          {text: 'Host rule', pathname: '/rules/hosts/new_host_rule?new=true'},
+          {text: 'Service rule', pathname: '/rules/services/new_service_rule?new=true'},
+          {text: 'Rule condition', pathname: '/rules/conditions/new_condition?new=true'},
         ],
       }}/>
       <div className={`${styles.collapsibleContainer}`}>

@@ -1,7 +1,7 @@
 import React from "react";
-import IData from "../../components/IData";
+import IDatabaseData from "../../components/IDatabaseData";
 
-export interface IRule extends IData {
+export interface IRule extends IDatabaseData {
   name: string;
   priority: number;
   generic: boolean;
@@ -9,24 +9,24 @@ export interface IRule extends IData {
   conditions: string[];
 }
 
-export interface IDecision extends IData {
+export interface IDecision extends IDatabaseData {
   name: string;
   componentType: IComponentType;
 }
 
-interface IComponentType extends IData {
+interface IComponentType extends IDatabaseData {
   name: string;
 }
 
-export interface IValueMode extends IData {
+export interface IValueMode extends IDatabaseData {
   name: string;
 }
 
-export interface IField extends IData {
+export interface IField extends IDatabaseData {
   name: string;
 }
 
-export interface IOperator extends IData {
+export interface IOperator extends IDatabaseData {
   name: string;
   symbol: string;
 }

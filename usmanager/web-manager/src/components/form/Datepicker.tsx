@@ -39,6 +39,7 @@ export class Datepicker extends React.Component<Props, State> {
     if (prevState.selectedDate === this.state.selectedDate) {
       this.initDatepicker();
     }
+    M.updateTextFields();
   }
 
   private onClose = () =>

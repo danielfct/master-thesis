@@ -1,16 +1,20 @@
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../components/BaseComponent";
-import Form, {IFields, required, requiredAndNumberAndMin} from "../../components/form/Form";
+import Form, {
+  ICustomButton,
+  IFields,
+  requiredAndNumberAndMin,
+  requiredAndTrimmed
+} from "../../components/form/Form";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {loadCloudHosts, loadContainers, loadEdgeHosts, loadServices} from "../../actions";
+import {addContainer, loadCloudHosts, loadContainers, loadEdgeHosts, loadServices} from "../../actions";
 import {connect} from "react-redux";
 import React, {createRef} from "react";
-import IData from "../../components/IData";
 import {ICloudHost} from "../hosts/cloud/CloudHost";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IService} from "../services/Service";
@@ -23,8 +27,12 @@ import M from "materialize-css";
 import styles from "../../components/list/ControlledList.module.css";
 import {decodeHTML} from "../../utils/text";
 import {IReply, postData} from "../../utils/api";
+import {isNew} from "../../utils/router";
+import {normalize} from "normalizr";
+import {Schemas} from "../../middleware/api";
 
-export interface IContainer extends IData {
+export interface IContainer {
+  id: string;
   created: number;
   names: string[];
   image: string;
@@ -55,21 +63,19 @@ interface INewContainer {
   externalPort: number,
 }
 
-const emptyContainer = (): INewContainer => ({
+const buildNewContainer = (): INewContainer => ({
   hostname: '',
   service: '',
   internalPort: 0,
   externalPort: 0,
 });
 
-const isNewContainer = (name: string) =>
-  name === 'new_container';
-
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  container: IContainer;
-  formContainer: Partial<IContainer> | INewContainer;
+  newContainer?: INewContainer,
+  container?: IContainer;
+  formContainer?: Partial<IContainer> | INewContainer;
   cloudHosts: { [key: string]: ICloudHost }
   edgeHosts: { [key: string]: IEdgeHost }
   services: { [key: string]: IService }
@@ -80,6 +86,8 @@ interface DispatchToProps {
   loadCloudHosts: () => void;
   loadEdgeHosts: () => void;
   loadServices: () => void;
+  addContainer: (container: IContainer) => void;
+  //TODO updateContainer: (previousContainer: Partial<IContainer>, container: IContainer) => void;
 }
 
 interface MatchParams {
@@ -89,31 +97,32 @@ interface MatchParams {
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 interface State {
+  container?: IContainer,
+  formContainer?: IContainer,
+  isLoading: boolean,
   defaultInternalPort: number,
   defaultExternalPort: number,
-  isLoading: boolean,
 }
 
 class Container extends BaseComponent<Props, State> {
 
+  private mounted = false;
   private replicateDropdown = createRef<HTMLButtonElement>();
   private migrateDropdown = createRef<HTMLButtonElement>();
   private scrollbar: (ScrollBar | null) = null;
 
   state: State = {
+    isLoading: false,
     defaultInternalPort: 0,
     defaultExternalPort: 0,
-    isLoading: false,
   };
 
   componentDidMount(): void {
-    const containerId = this.props.match.params.id;
-    if (!isNewContainer(containerId)) {
-      this.props.loadContainers(containerId);
-    }
     this.props.loadCloudHosts();
     this.props.loadEdgeHosts();
     this.props.loadServices();
+    this.loadContainer();
+    this.mounted = true;
   };
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -134,142 +143,117 @@ class Container extends BaseComponent<Props, State> {
   private onOpenDropdown = () =>
     this.scrollbar?.updateScroll();
 
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadContainer = () => {
+    if (!isNew(this.props.location.search)) {
+      const containerId = this.props.match.params.id;
+      this.props.loadContainers(containerId);
+    }
+  };
+
+  private getContainer = () =>
+    this.state.container || this.props.container;
+
+  private getFormContainer = () =>
+    this.state.formContainer || this.props.formContainer;
+
   private onPostSuccess = (reply: IReply<IContainer>): void => {
-    super.toast(`Container at <b>${reply.data.hostname}</b> has now started on id ${reply.data.id}`);
+    const container = reply.data;
+    super.toast(`<span class="green-text">Container <a href=/containers/${reply.data.id}>${reply.data.id}</a> has started at ${reply.data.hostname}</span>`);
+    this.props.addContainer(container);
+    if (this.mounted) {
+      this.updateContainer(container);
+      this.props.history.replace(container.id);
+    }
   };
 
-  private onPostFailure = (reason: string, containerHostname: string): void =>
-    super.toast(`Unable to start container at ${containerHostname}`, 10000, reason, true);
+  private onPostFailure = (reason: string, container: IContainer): void =>
+    super.toast(`Unable to start container at ${container.hostname}`, 10000, reason, true);
 
-  private onDeleteSuccess = (containerId: string): void => {
-    super.toast(`Container <b>${containerId}</b> successfully stopped`);
-    this.props.history.push(`/containers`);
+  private onDeleteSuccess = (container: IContainer): void => {
+    super.toast(`<span class="green-text">Container ${container.id} successfully stopped</span>`);
+    if (this.mounted) {
+      this.props.history.push(`/containers`);
+    }
   };
 
-  private onDeleteFailure = (reason: string, nodeId: string): void =>
-    super.toast(`Unable to stop ${nodeId}`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, container: IContainer): void =>
+    super.toast(`Unable to stop ${container.id}`, 10000, reason, true);
 
-  private getFields = (): IFields =>
-    Object.entries(emptyContainer()).map(([key, value]) => {
-      return {
-        [key]: {
-          id: key,
-          label: key,
-          validation: getTypeFromValue(value) === 'number'
-            ? { rule: requiredAndNumberAndMin, args: 0 }
-            : { rule: required }
-        }
-      };
-    }).reduce((fields, field) => {
-      for (let key in field) {
-        fields[key] = field[key];
-      }
-      return fields;
-    }, {});
-
-  private getSelectableHostnames = () => {
-    const cloudHosts = this.props.cloudHosts && Object.keys(this.props.cloudHosts);
-    const edgeHosts = this.props.edgeHosts && Object.keys(this.props.edgeHosts);
-    return cloudHosts.concat(edgeHosts);
-  };
-
-  //TODO get apps' services instead (in case a service is associated to more than 1 app)
-  private getSelectableServices = () =>
-    this.props.services && Object.keys(this.props.services);
-
-  private setDefaultPorts = (serviceName: string) => {
-    const service = this.props.services[serviceName];
-    this.setState({
-      defaultExternalPort: service.defaultExternalPort,
-      defaultInternalPort: service.defaultInternalPort});
-  };
-
-  private hostnameOption = (hostname: string) =>
-    hostname;
-
-  private serviceOption = (service: string) =>
-    service;
-
-  private formFields = (formContainer: Partial<IContainer>, isNew: boolean): JSX.Element => {
-    return (
-      isNew ?
-        <>
-          <Field key={'hostname'}
-                 id={'hostname'}
-                 label={'hostname'}
-                 type={'dropdown'}
-                 dropdown={{
-                   defaultValue: "Select hostname",
-                   values: this.getSelectableHostnames(),
-                   optionToString: this.hostnameOption}}/>
-          <Field key={'service'}
-                 id={'service'}
-                 label={'service'}
-                 type={'dropdown'}
-                 dropdown={{
-                   defaultValue: "Select service",
-                   values: this.getSelectableServices(),
-                   selectCallback: this.setDefaultPorts,
-                   optionToString: this.serviceOption}}/>
-          <Field key={'internalPort'}
-                 id={'internalPort'}
-                 label={'internalPort'}
-                 type={'numberbox'}/>
-          <Field key={'externalPort'}
-                 id={'externalPort'}
-                 label={'externalPort'}
-                 type={'numberbox'}/>
-        </>
-        :
-        <>
-          {Object.entries(formContainer).map(([key, value], index) => {
-            return key == 'created'
-              ? <Field key={index}
-                       id={key}
-                       label={key}
-                       type={"datebox"}/>
-              : <Field key={index}
-                       id={key}
-                       label={key}/>
-          })}
-        </>
-    )
+  private replicateMigrateButtons = (): ICustomButton[] => {
+    const buttons: ICustomButton[] = [];
+    buttons.push({
+        button:
+          <>
+            <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger`}
+                    data-target={`replicate-dropdown-hostname`}
+                    ref={this.replicateDropdown}>
+              Replicate
+            </button>
+            {this.chooseHostnameDropdown('replicate-dropdown-hostname', this.replicate)}
+          </>
+      },
+      {
+        button:
+          <>
+            <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger`}
+                    data-target={`migrate-dropdown-hostname`}
+                    ref={this.migrateDropdown}>
+              Migrate
+            </button>
+            {this.chooseHostnameDropdown('migrate-dropdown-hostname', this.migrate)}
+          </>
+      });
+    return buttons;
   };
 
   private replicate = (event: any) => {
+    const container = this.getContainer();
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
     this.setState({isLoading: true});
-    postData(`containers/${this.props.container.id}/replicate`, {hostname: hostname},
-      (reply: IReply<IContainer>) => this.onReplicateSuccess(reply),
-      (reply: string) => this.onReplicateFailure(reply));
+    postData(`containers/${container?.id}/replicate`, {hostname: hostname},
+      (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
+      (reason: string) => this.onReplicateFailure(reason, container));
   };
 
-  private onReplicateSuccess = (reply: IReply<IContainer>) => {
-    super.toast(`Replicated ${this.props.container.image.split('/').splice(1)} to container <a href=/containers/${reply.data.id}>${reply.data.id}</a>`, 15000);
-    this.setState({isLoading: false});
+  private onReplicateSuccess = (container: IContainer) => {
+    super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/containers/${container.id}>${container.id}</a>`, 15000);
+    if (this.mounted) {
+      this.setState({isLoading: false});
+    }
   };
 
-  private onReplicateFailure = (reply: string) => {
-    super.toast(`Unable to replicate container`, 10000, reply, true);
-    this.setState({isLoading: false});
+  private onReplicateFailure = (reason: string, container?: IContainer) => {
+    super.toast(`Unable to replicate container ${container?.id}`, 10000, reason, true);
+    if (this.mounted) {
+      this.setState({isLoading: false});
+    }
   };
 
   private migrate = (event: any) => {
+    const container = this.getContainer();
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
     this.setState({isLoading: true});
-    postData(`containers/${this.props.container.id}/migrate`, { hostname: hostname },
-      (reply: IReply<IContainer>) => this.onMigrateSuccess(reply),
-      (reply) => this.onMigrateFailure(reply));
+    postData(`containers/${container?.id}/migrate`, { hostname: hostname },
+      (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
+      (reason) => this.onMigrateFailure(reason, container));
   };
 
-  private onMigrateSuccess = (reply: IReply<IContainer>) => {
-    super.toast(`Migrated ${this.props.container.id} to container <a href=/containers/${reply.data.id}>${reply.data.id}</a>`, 15000);
-    this.setState({isLoading: false});
+  private onMigrateSuccess = (container: IContainer) => {
+    super.toast(`<span class="green-text">Migrated ${container.id} to container </span><a href=/containers/${container.id}>${container.id}</a>`, 15000);
+    if (this.mounted) {
+      this.setState({isLoading: false});
+    }
   };
 
-  private onMigrateFailure = (reply: string) => {
-    super.toast(`Unable to migrate container`, 10000, reply, true);
-    this.setState({isLoading: false});
+  private onMigrateFailure = (reason: string, container?: IContainer) => {
+    super.toast(`Unable to migrate container ${container?.id}`, 10000, reason, true);
+    if (this.mounted) {
+      this.setState({isLoading: false});
+    }
   };
 
   private chooseHostnameDropdown = (id: string, onClick: (event: any) => void) =>
@@ -298,43 +282,114 @@ class Container extends BaseComponent<Props, State> {
       </PerfectScrollbar>
     </ul>;
 
-  private replicateMigrateButtons = (): JSX.Element =>
-    <>
-      <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger`}
-              data-target={`replicate-dropdown-hostname`}
-              ref={this.replicateDropdown}>
-        Replicate
-      </button>
-      {this.chooseHostnameDropdown('replicate-dropdown-hostname', this.replicate)}
-      <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger`}
-              data-target={`migrate-dropdown-hostname`}
-              ref={this.migrateDropdown}>
-        Migrate
-      </button>
-      {this.chooseHostnameDropdown('migrate-dropdown-hostname', this.migrate)}
-    </>;
+  private updateContainer = (container: IContainer) => {
+    //const previousContainer = this.getContainer();
+    container = Object.values(normalize(container, Schemas.CONTAINER).entities.containers || {})[0];
+    //TODO this.props.updateContainer(previousContainer, container);
+    const formContainer = { ...container };
+    removeFields(formContainer);
+    this.setState({container: container, formContainer: formContainer, isLoading: false});
+  };
+
+  private getFields = (container: Partial<IContainer> | INewContainer): IFields =>
+    Object.entries(container).map(([key, value]) => {
+      return {
+        [key]: {
+          id: key,
+          label: key,
+          validation: getTypeFromValue(value) === 'number'
+            ? { rule: requiredAndNumberAndMin, args: 0 }
+            : { rule: requiredAndTrimmed }
+        }
+      };
+    }).reduce((fields, field) => {
+      for (let key in field) {
+        fields[key] = field[key];
+      }
+      return fields;
+    }, {});
+
+  private getSelectableHosts = () => {
+    const cloudHosts = Object.keys(this.props.cloudHosts);
+    const edgeHosts = Object.keys(this.props.edgeHosts);
+    return cloudHosts.concat(edgeHosts);
+  };
+
+  //TODO get apps' services instead (in case a service is associated to more than 1 app)
+  private getSelectableServices = () =>
+    Object.keys(this.props.services);
+
+  private setDefaultPorts = (serviceName: string) => {
+    const service = this.props.services[serviceName];
+    this.setState({
+      defaultExternalPort: service.defaultExternalPort,
+      defaultInternalPort: service.defaultInternalPort});
+  };
+
+  private formFields = (formContainer: Partial<IContainer>, isNew: boolean): JSX.Element =>
+    isNew ?
+      <>
+        <Field key={'host'}
+               id={'host'}
+               label={'host'} //TODO change server to accept 'host' instead of 'hostname'
+               type={'dropdown'}
+               dropdown={{
+                 defaultValue: "Select host",
+                 values: this.getSelectableHosts()}}/>
+        <Field key={'service'}
+               id={'service'}
+               label={'service'}
+               type={'dropdown'}
+               dropdown={{
+                 defaultValue: "Select service",
+                 values: this.getSelectableServices(),
+                 selectCallback: this.setDefaultPorts}}/>
+        <Field key={'internalPort'}
+               id={'internalPort'}
+               label={'internalPort'}
+               type={'numberbox'}/>
+        <Field key={'externalPort'}
+               id={'externalPort'}
+               label={'externalPort'}
+               type={'numberbox'}/>
+      </>
+      :
+      <>
+        {Object.entries(formContainer).map(([key, value], index) => {
+          return key == 'created'
+            ? <Field key={index}
+                     id={key}
+                     label={key}
+                     type={"datebox"}/>
+            : <Field key={index}
+                     id={key}
+                     label={key}/>
+        })}
+      </>;
 
   private container = () => {
-    const {isLoading, error, container, formContainer} = this.props;
-    // @ts-ignore
-    const containerKey: (keyof IContainer) = container && Object.keys(container)[0];
-    const isNew = isNewContainer(this.props.match.params.id);
-    const values = isNew
+    const {isLoading, error, newContainer} = this.props;
+    const container = this.getContainer();
+    const formContainer = this.getFormContainer();
+    const isNewContainer = isNew(this.props.location.search);
+    const containerValues = isNewContainer
       ? {
-        ...formContainer,
+        ...newContainer,
         internalPort: this.state.defaultInternalPort,
         externalPort: this.state.defaultExternalPort
       }
       : formContainer;
+    // @ts-ignore
+    const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formContainer && (
+        {!isLoading && !error && containerValues && (
           <Form id={containerKey}
-                fields={this.getFields()}
-                values={values}
-                isNew={isNew}
+                fields={this.getFields(formContainer || {})}
+                values={containerValues}
+                isNew={isNewContainer}
                 post={{
                   textButton: 'Launch',
                   url: 'containers',
@@ -346,57 +401,34 @@ class Container extends BaseComponent<Props, State> {
                     successCallback: this.onDeleteSuccess,
                     failureCallback: this.onDeleteFailure}
                   : undefined}
-                /*customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
+                customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
                   ? this.replicateMigrateButtons()
-                  : undefined}TODO*/
+                  : undefined}
                 loading={this.state.isLoading}>
-            {this.formFields(formContainer, isNew)}
+            {this.formFields(formContainer || {}, isNewContainer)}
           </Form>
         )}
       </>
     )
   };
 
-  private entitiesList = (element: JSX.Element) => {
-    const {isLoading, error, container} = this.props;
-    if (isLoading) {
-      return <ListLoadingSpinner/>;
-    }
-    if (error) {
-      return <Error message={error}/>;
-    }
-    if (container) {
-      return element;
-    }
-    return <></>;
-  };
-
   private ports = (): JSX.Element =>
-    this.entitiesList(<ContainerPortsList ports={this.props.container.ports}/>);
+    <ContainerPortsList isLoadingContainer={this.props.isLoading}
+                        loadContainerError={this.props.error}
+                        container={this.getContainer()}/>;
 
   private labels = (): JSX.Element =>
-    this.entitiesList(
-      <ContainerLabelsList
-      labels={Object.entries(this.props.container.labels).map(([key, value]) => `${key} = ${value}`)}/>);
+    <ContainerLabelsList isLoadingContainer={this.props.isLoading}
+                         loadContainerError={this.props.error}
+                         container={this.getContainer()}/>;
 
-  private logs = (): JSX.Element => {
-    const {isLoading, error, container} = this.props;
-    if (isLoading) {
-      return <ListLoadingSpinner/>;
-    }
-    if (error) {
-      return <Error message={error}/>;
-    }
-    if (container) {
-      const logs = container.logs.split("\n");
-      logs.pop();
-      return <ContainerLogsList logs={logs}/>;
-    }
-    return <></>;
-  };
+  private logs = (): JSX.Element =>
+    <ContainerLogsList isLoadingContainer={this.props.isLoading}
+                       loadContainerError={this.props.error}
+                       container={this.getContainer()}/>;
 
   private tabs: Tab[] =
-    isNewContainer(this.props.match.params.id)
+    isNew(this.props.location.search)
       ? [
         {
           title: 'Container',
@@ -439,20 +471,26 @@ class Container extends BaseComponent<Props, State> {
 
 }
 
+function removeFields(container: Partial<IContainer>) {
+  delete container["ports"];
+  delete container["labels"];
+  delete container["logs"];
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.containers.isLoadingContainers;
   const error = state.entities.containers.loadContainersError;
   const id = props.match.params.id;
-  const container = state.entities.containers.data[id];
+  const newContainer = isNew(props.location.search) ? buildNewContainer() : undefined;
+  const container = !isNew(props.location.search) ? state.entities.containers.data[id] : undefined;
   let formContainer;
-  if (isNewContainer(id)) {
-    formContainer = emptyContainer();
+  if (newContainer) {
+    formContainer = { ...newContainer };
+    removeFields(formContainer);
   }
-  else {
+  if (container) {
     formContainer = { ...container };
-    delete formContainer["ports"];
-    delete formContainer["labels"];
-    delete formContainer["logs"];
+    removeFields(formContainer);
   }
   const cloudHosts = state.entities.hosts.cloud.data;
   const edgeHosts = state.entities.hosts.edge.data;
@@ -460,6 +498,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   return  {
     isLoading,
     error,
+    newContainer,
     container,
     formContainer,
     cloudHosts,
@@ -472,7 +511,8 @@ const mapDispatchToProps: DispatchToProps = {
   loadContainers,
   loadCloudHosts,
   loadEdgeHosts,
-  loadServices
+  loadServices,
+  addContainer
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Container);

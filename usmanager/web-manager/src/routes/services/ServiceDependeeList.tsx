@@ -34,7 +34,9 @@ interface DispatchToProps {
 }
 
 interface ServiceDependeeListProps {
-  service: IService | Partial<IService>;
+  isLoadingService: boolean;
+  loadServiceError?: string | null;
+  service: IService | Partial<IService> | null;
   newDependees: string[];
 }
 
@@ -43,8 +45,8 @@ type Props = StateToProps & DispatchToProps & ServiceDependeeListProps;
 class ServiceDependeeList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    const {serviceName} = this.props.service;
-    if (serviceName) {
+    if (this.props.service?.serviceName) {
+      const {serviceName} = this.props.service;
       this.props.loadServiceDependees(serviceName);
     }
   }
@@ -63,8 +65,8 @@ class ServiceDependeeList extends BaseComponent<Props, {}> {
   render() {
     const DependeesList = List<string>();
     return (
-      <DependeesList isLoading={this.props.isLoading}
-                     error={this.props.error}
+      <DependeesList isLoading={this.props.isLoadingService || this.props.isLoading}
+                     error={this.props.loadServiceError || this.props.error}
                      emptyMessage={`Dependees list is empty`}
                      list={this.props.dependeeNames}
                      show={this.dependee}/>
@@ -74,7 +76,7 @@ class ServiceDependeeList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceDependeeListProps): StateToProps {
-  const serviceName = ownProps.service.serviceName;
+  const serviceName = ownProps.service?.serviceName;
   const service = serviceName && state.entities.services.data[serviceName];
   const serviceDependees = service && service.dependees;
   return {

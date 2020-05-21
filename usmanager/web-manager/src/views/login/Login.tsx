@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import React, {Component, createRef} from 'react'
+import React, {createRef} from 'react'
 import {basicAuthenticate, isAuthenticated, registerSuccessfulLogin} from "../../utils/auth";
 import {RouteComponentProps} from "react-router";
 import styles from './Login.module.css';
@@ -72,10 +72,10 @@ class Login extends BaseComponent<Props, State> {
     basicAuthenticate(username, password)
       .then(() => {
         registerSuccessfulLogin(username, password);
-        M.toast({ html: `<div>Welcome ${username}</div>` });
+        super.toast(`Welcome ${username}`);
         this.props.history.push(`/home`);
       }).catch((e:AxiosError) => {
-      super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true);
+      super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message);
     })
   };
 

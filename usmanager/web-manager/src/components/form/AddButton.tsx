@@ -34,7 +34,7 @@ interface Props {
   dropdown?: {
     id: string | number,
     title: string,
-    empty: string,
+    empty?: string,
     data: { text: string, pathname: string }[]
   }
 }

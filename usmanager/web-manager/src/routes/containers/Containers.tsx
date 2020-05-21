@@ -40,7 +40,7 @@ class Containers extends BaseComponent<Props, {}> {
 
   render = () =>
     <MainLayout>
-      <AddButton tooltip={'Start container'} pathname={'/containers/new_container'}/>
+      <AddButton tooltip={'Start container'} pathname={'/containers/start_container?new=true'}/>
       <div className={`${styles.container}`}>
         <CardList<IContainer>
           isLoading={this.props.isLoading}

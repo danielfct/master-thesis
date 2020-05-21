@@ -7,7 +7,9 @@ import ControlledList from "../../components/list/ControlledList";
 import {ReduxState} from "../../reducers";
 import {bindActionCreators} from "redux";
 import {
-  loadAppServices, loadServices, removeAppServices,
+  loadAppServices,
+  loadServices,
+  removeAppServices,
 } from "../../actions";
 import {connect} from "react-redux";
 import {IApp} from "./App";
@@ -18,9 +20,9 @@ import {
   IValues,
   requiredAndNumberAndMinAndMax
 } from "../../components/form/Form";
-import Data from "../../components/IData";
+import IDatabaseData from "../../components/IDatabaseData";
 
-export interface IAppService extends Data {
+export interface IAppService extends IDatabaseData {
   service: IService;
   launchOrder: number;
 }
@@ -33,18 +35,20 @@ export interface IAddAppService {
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  appServices: IAppService[];
   services: { [key: string]: IService };
+  appServices: IAppService[];
 }
 
 interface DispatchToProps {
+  loadServices: () => void;
   loadAppServices: (appName: string) => void;
   removeAppServices: (appName: string, services: string[]) => void;
-  loadServices: () => void;
 }
 
 interface ServiceAppListProps {
-  app: IApp | Partial<IApp>;
+  isLoadingApp: boolean;
+  loadAppError?: string | null;
+  app: IApp | Partial<IApp> | null;
   unsavedServices: IAddAppService[];
   onAddAppService: (service: IAddAppService) => void;
   onRemoveAppServices: (services: string[]) => void;
@@ -53,28 +57,35 @@ interface ServiceAppListProps {
 type Props = StateToProps & DispatchToProps & ServiceAppListProps;
 
 type State = {
-  selectedService?: string,
-  newServices: IAddAppService[],
+  selectedService?: string;
+  entitySaved: boolean;
 }
 
 class ServiceAppList extends BaseComponent<Props, State> {
 
   state: State = {
-    newServices: [],
+    entitySaved: !!this.props.app?.name
   };
 
   componentDidMount(): void {
-    const {name} = this.props.app;
-    if (name) {
+    this.props.loadServices();
+    if (this.props.app?.name) {
+      const {name} = this.props.app;
       this.props.loadAppServices(name);
     }
-    this.props.loadServices();
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+    if (!prevProps.app?.name && this.props.app?.name) {
+      this.setState({entitySaved: true});
+    }
   }
 
   private service = (index: number, service: IAppService | IAddAppService, separate: boolean, checked: boolean,
                      handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
     const serviceName = typeof service.service === 'string' ? service.service : service.service.serviceName;
-    const unsaved = this.props.unsavedServices.map(service => service.service).includes(service.service.toString());
+    const isNew = this.props.app?.name === undefined;
+    const unsaved = this.props.unsavedServices.map(newService => newService.service).includes(serviceName);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${listItemStyles.linkedItemContent}`}>
@@ -84,7 +95,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
-              <div className={unsaved ? listItemStyles.unsavedItem : undefined}>
+              <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
                 {service.launchOrder}. {serviceName}
               </div>
             </span>
@@ -100,23 +111,16 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   private onAdd = (service: IValues): void => {
     this.props.onAddAppService(service as IAddAppService);
-    this.setState({
-      newServices: this.state.newServices.concat(service as IAddAppService)
-    });
     this.setState({selectedService: undefined});
   };
 
   private onRemove = (services: string[]): void => {
     this.props.onRemoveAppServices(services);
-    this.setState({
-      newServices: this.state.newServices.filter(service => !services.includes(service.service))
-    });
   };
 
-
   private onDeleteSuccess = (services: string[]): void => {
-    const {name} = this.props.app;
-    if (name) {
+    if (this.props.app?.name) {
+      const {name} = this.props.app;
       this.props.removeAppServices(name, services);
     }
   };
@@ -125,14 +129,13 @@ class ServiceAppList extends BaseComponent<Props, State> {
     super.toast(`Unable to delete service`, 10000, reason, true);
 
   private getSelectableServicesNames = () => {
-    const {appServices, services} = this.props;
-    const {newServices} = this.state;
+    const {appServices, services, unsavedServices} = this.props;
     const nonSystemServices = Object.entries(services)
                                     .filter(([_, value]) => value.serviceType !== 'system')
                                     .map(([key, _]) => key);
     const serviceNames = appServices.map(appService => appService.service.serviceName);
-    const newServicesNames = newServices.map(service => service.service);
-    return nonSystemServices.filter(name => !serviceNames.includes(name) && !newServicesNames.includes(name));
+    const unsavedServicesNames = unsavedServices.map(service => service.service);
+    return nonSystemServices.filter(name => !serviceNames.includes(name) && !unsavedServicesNames.includes(name));
   };
 
   private addModal = () =>
@@ -161,48 +164,49 @@ class ServiceAppList extends BaseComponent<Props, State> {
   };
 
   render() {
-    return <ControlledList<IAppService>
-      isLoading={this.props.isLoading}
-      error={this.props.error}
-      emptyMessage={`Services list is empty`}
-      data={this.props.appServices}
-      dataKey={['service', 'serviceName']}
-      dropdown={{
-        id: 'appServices',
-        title: 'Add service',
-        empty: 'No more services to add',
-        data: this.getSelectableServicesNames(),
-        formModal: {
-          id: 'appService',
-          fields: this.getModalFields(),
-          values: this.getModalValues(),
-          content: this.addModal,
-          position: '20%',
-          onOpen: this.onModalOpen,
-          open: this.state.selectedService !== undefined,
-        }
-      }}
-      show={this.service}
-      onAddInput={this.onAdd}
-      onRemove={this.onRemove}
-      onDelete={{
-        url: `apps/${this.props.app.name}/services`,
-        successCallback: this.onDeleteSuccess,
-        failureCallback: this.onDeleteFailure
-      }}/>;
+    return <ControlledList<IAppService> isLoading={this.props.isLoadingApp || this.props.isLoading}
+                                        error={this.props.loadAppError || this.props.error}
+                                        emptyMessage={`Services list is empty`}
+                                        data={this.props.appServices}
+                                        dataKey={['service', 'serviceName']}
+                                        dropdown={{
+                                          id: 'appServices',
+                                          title: 'Add service',
+                                          empty: 'No more services to add',
+                                          data: this.getSelectableServicesNames(),
+                                          formModal: {
+                                            id: 'appService',
+                                            fields: this.getModalFields(),
+                                            values: this.getModalValues(),
+                                            content: this.addModal,
+                                            position: '20%',
+                                            onOpen: this.onModalOpen,
+                                            open: this.state.selectedService !== undefined,
+                                          }
+                                        }}
+                                        show={this.service}
+                                        onAddInput={this.onAdd}
+                                        onRemove={this.onRemove}
+                                        onDelete={{
+                                          url: `apps/${this.props.app?.name}/services`,
+                                          successCallback: this.onDeleteSuccess,
+                                          failureCallback: this.onDeleteFailure
+                                        }}
+                                        entitySaved={this.state.entitySaved}/>;
   }
 
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceAppListProps): StateToProps {
-  const appName = ownProps.app.name;
+  const appName = ownProps.app?.name;
   const app = appName && state.entities.apps.data[appName];
   const appServices = app && app.services;
   return {
     isLoading: state.entities.apps.isLoadingServices,
     error: state.entities.apps.loadServicesError,
-    appServices: appServices && Object.values(appServices).sort((a, b) => a.launchOrder - b.launchOrder) || [],
     services: state.entities.services.data,
+    appServices: appServices && Object.values(appServices).sort((a, b) => a.launchOrder - b.launchOrder) || [],
+
   }
 }
 

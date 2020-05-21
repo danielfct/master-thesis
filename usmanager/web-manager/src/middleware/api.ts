@@ -27,7 +27,7 @@ import {camelizeKeys} from 'humps';
 import {IService} from "../routes/services/Service";
 import {IServiceDependency} from "../routes/services/ServiceDependencyList";
 import axios from "axios";
-import {API_URL} from "../utils/api";
+import {API_URL, REQUEST_TIMEOUT} from "../utils/api";
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
 import {IDependee} from "../routes/services/ServiceDependeeList";
@@ -37,9 +37,9 @@ import {ICloudHost, IState} from "../routes/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";
-import {IDecision, IField, IOperator, IRule, IValueMode} from "../routes/rules/Rule";
-import {IServiceRule} from "../routes/rules/services/RuleService";
-import {IHostRule} from "../routes/rules/hosts/RuleHost";
+import {IDecision, IField, IOperator, IValueMode} from "../routes/rules/Rule";
+import {IRuleService} from "../routes/rules/services/RuleService";
+import {IRuleHost} from "../routes/rules/hosts/RuleHost";
 import {ICondition} from "../routes/rules/conditions/RuleCondition";
 import {IAppService} from "../routes/apps/AppServicesList";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
@@ -47,12 +47,13 @@ import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
     return axios.get(url, {
-        //TODO remove headers
+        //TODO remove options
         headers: {
             'Authorization': 'Basic YWRtaW46YWRtaW4=',
             'Content-type': 'application/json;charset=UTF-8',
             'Accept': 'application/json;charset=UTF-8',
         },
+        timeout: REQUEST_TIMEOUT
     }).then(response => {
         if (response.status === 200) {
             const camelizedJson = camelizeKeys(response.data);
@@ -79,24 +80,24 @@ interface ISchemas {
     SERVICE_DEPENDEE_ARRAY: schema.Entity<IDependee>[];
     SERVICE_PREDICTION: schema.Entity<IPrediction>;
     SERVICE_PREDICTION_ARRAY: schema.Entity<IPrediction>[];
-    SERVICE_RULE: schema.Entity<IServiceRule>;
-    SERVICE_RULE_ARRAY: schema.Entity<IServiceRule>[];
+    SERVICE_RULE: schema.Entity<IRuleService>;
+    SERVICE_RULE_ARRAY: schema.Entity<IRuleService>[];
     CONTAINER: schema.Entity<IContainer>;
     CONTAINER_ARRAY: schema.Entity<IContainer>[];
     CLOUD_HOST: schema.Entity<ICloudHost>;
     CLOUD_HOST_ARRAY: schema.Entity<ICloudHost>[];
-    CLOUD_HOST_RULE: schema.Entity<IHostRule>;
-    CLOUD_HOST_RULE_ARRAY: schema.Entity<IHostRule>[];
+    CLOUD_HOST_RULE: schema.Entity<IRuleHost>;
+    CLOUD_HOST_RULE_ARRAY: schema.Entity<IRuleHost>[];
     EDGE_HOST: schema.Entity<IEdgeHost>;
     EDGE_HOST_ARRAY: schema.Entity<IEdgeHost>[];
-    EDGE_HOST_RULE: schema.Entity<IHostRule>;
-    EDGE_HOST_RULE_ARRAY: schema.Entity<IHostRule>[];
+    EDGE_HOST_RULE: schema.Entity<IRuleHost>;
+    EDGE_HOST_RULE_ARRAY: schema.Entity<IRuleHost>[];
     NODE: schema.Entity<INode>;
     NODE_ARRAY: schema.Entity<INode>[];
-    RULE_HOST: schema.Entity<IHostRule>;
-    RULE_HOST_ARRAY: schema.Entity<IHostRule>[];
-    RULE_SERVICE: schema.Entity<IServiceRule>;
-    RULE_SERVICE_ARRAY: schema.Entity<IServiceRule>[];
+    RULE_HOST: schema.Entity<IRuleHost>;
+    RULE_HOST_ARRAY: schema.Entity<IRuleHost>[];
+    RULE_SERVICE: schema.Entity<IRuleService>;
+    RULE_SERVICE_ARRAY: schema.Entity<IRuleService>[];
     RULE_CONDITION: schema.Entity<ICondition>;
     RULE_CONDITION_ARRAY: schema.Entity<ICondition>[];
     VALUE_MODE_ARRAY: schema.Entity<IValueMode>[];
@@ -166,13 +167,13 @@ const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
     idAttribute: (node: INode) => node.id.toString()
 });
 
-const ruleHost: schema.Entity<IHostRule> = new schema.Entity('hostRules', undefined, {
-    idAttribute: (hostRule: IHostRule) => hostRule.name
+const ruleHost: schema.Entity<IRuleHost> = new schema.Entity('hostRules', undefined, {
+    idAttribute: (hostRule: IRuleHost) => hostRule.name
 });
 const hostRules = new schema.Array(ruleHost);
 
-const ruleService: schema.Entity<IServiceRule> = new schema.Entity('serviceRules', undefined, {
-    idAttribute: (serviceRule: IServiceRule) => serviceRule.name
+const ruleService: schema.Entity<IRuleService> = new schema.Entity('serviceRules', undefined, {
+    idAttribute: (serviceRule: IRuleService) => serviceRule.name
 });
 const serviceRules = new schema.Array(ruleService);
 

@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IServiceRule} from "./RuleService";
+import {IRuleService} from "./RuleService";
 import BaseComponent from "../../../components/BaseComponent";
 import React from "react";
 import RuleServiceCard from "./RuleServiceCard";
@@ -20,7 +20,7 @@ import {loadRulesService} from "../../../actions";
 interface StateToProps {
   isLoading: boolean
   error?: string | null;
-  serviceRules: IServiceRule[];
+  serviceRules: IRuleService[];
 }
 
 interface DispatchToProps {
@@ -35,15 +35,15 @@ class RulesServiceList extends BaseComponent<Props, {}> {
     this.props.loadRulesService();
   }
 
-  private rule = (rule: IServiceRule): JSX.Element =>
+  private rule = (rule: IRuleService): JSX.Element =>
     <RuleServiceCard key={rule.id} rule={rule}/>;
 
-  private predicate = (rule: IServiceRule, search: string): boolean =>
+  private predicate = (rule: IRuleService, search: string): boolean =>
     rule.name.toLowerCase().includes(search);
 
   render() {
     return (
-      <CardList<IServiceRule>
+      <CardList<IRuleService>
         isLoading={this.props.isLoading}
         error={this.props.error}
         emptyMessage={"No service rules to display"}

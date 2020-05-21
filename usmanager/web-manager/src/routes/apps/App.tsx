@@ -1,7 +1,7 @@
-import Data from "../../components/IData";
+import IDatabaseData from "../../components/IDatabaseData";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import Form, {ICustomButton, IFields, required} from "../../components/form/Form";
+import Form, {ICustomButton, IFields, requiredAndTrimmed} from "../../components/form/Form";
 import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
@@ -9,25 +9,23 @@ import React from "react";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {addApp, addAppService, loadApps} from "../../actions";
+import {addApp, addAppServices, loadApps, updateApp} from "../../actions";
 import {connect} from "react-redux";
 import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
 import {IReply, postData} from "../../utils/api";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
+import {isNew} from "../../utils/router";
 
-export interface IApp extends Data {
+export interface IApp extends IDatabaseData {
   name: string;
-  services: { [key: string]: IAppService }
+  services?: { [key: string]: IAppService }
 }
 
-const emptyApp = (): Partial<IApp> => ({
+const buildNewApp = (): Partial<IApp> => ({
   name: '',
 });
-
-const isNewApp = (name: string) =>
-  name === 'new_app';
 
 interface StateToProps {
   isLoading: boolean;
@@ -39,7 +37,8 @@ interface StateToProps {
 interface DispatchToProps {
   loadApps: (name: string) => void;
   addApp: (app: IApp) => void;
-  addAppService: (appName: string, appService: IAddAppService) => void;
+  updateApp: (previousApp: Partial<IApp>, app: IApp) => void;
+  addAppServices: (appName: string, appServices: IAddAppService[]) => void;
 }
 
 interface MatchParams {
@@ -48,7 +47,7 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
-type State = {
+interface State {
   app?: IApp,
   formApp?: IApp,
   unsavedServices: IAddAppService[],
@@ -74,8 +73,8 @@ class App extends BaseComponent<Props, State> {
   }
 
   private loadApp = () => {
-    const appName = this.props.match.params.name;
-    if (appName && !isNewApp(appName)) {
+    if (!isNew(this.props.location.search)) {
+      const appName = this.props.match.params.name;
       this.props.loadApps(appName);
     }
   };
@@ -88,38 +87,33 @@ class App extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IApp>): void => {
     const app = reply.data;
+    super.toast(`<span class="green-text">App ${app.name} saved</span>`);
     this.props.addApp(app);
     this.saveEntities(app);
     if (this.mounted) {
       this.updateApp(app);
       this.props.history.replace(app.name);
     }
-    super.toast(`App <b>${app.name}</b> saved`);
-
   };
 
-  private onPostFailure = (reason: string, appName: string): void =>
-    super.toast(`Unable to save ${appName}`, 10000, reason, true);
+  private onPostFailure = (reason: string, app: IApp): void =>
+    super.toast(`Unable to save ${app.name}`, 10000, reason, true);
 
   private onPutSuccess = (reply: IReply<IApp>): void => {
     const app = reply.data;
-    this.updateApp(app);
+    super.toast(`<span class="green-text">Changes to app ${app.name} have been saved</span>`);
     this.saveEntities(app);
-    super.toast(`Changes to app <b>${app.name}</b> are now saved`);
+    if (this.mounted) {
+      this.updateApp(app);
+      this.props.history.replace(app.name);
+    }
   };
 
   private onPutFailure = (reason: string, app: IApp): void =>
     super.toast(`Unable to update ${app.name}`, 10000, reason, true);
 
-  private shouldShowSaveButton = () =>
-    !!this.state.unsavedServices.length;
-
-  private saveEntities = (app: IApp) => {
-    this.saveAppServices(app);
-  };
-
   private onDeleteSuccess = (app: IApp): void => {
-    super.toast(`App <b>${app.name}</b> successfully removed`);
+    super.toast(`<span class="green-text">App ${app.name} successfully removed</span>`);
     if (this.mounted) {
       this.props.history.push(`/apps`);
     }
@@ -127,6 +121,13 @@ class App extends BaseComponent<Props, State> {
 
   private onDeleteFailure = (reason: string, app: IApp): void =>
     super.toast(`Unable to delete ${app.name}`, 10000, reason, true);
+
+  private shouldShowSaveButton = () =>
+    !!this.state.unsavedServices.length;
+
+  private saveEntities = (app: IApp) => {
+    this.saveAppServices(app);
+  };
 
   private addAppService = (service: IAddAppService): void => {
     this.setState({
@@ -150,7 +151,7 @@ class App extends BaseComponent<Props, State> {
   };
 
   private onSaveServicesSuccess = (app: IApp): void => {
-    this.state.unsavedServices.forEach(service => this.props.addAppService(app.name, service));
+    this.props.addAppServices(app.name, this.state.unsavedServices);
     if (this.mounted) {
       this.setState({ unsavedServices: [] });
     }
@@ -161,8 +162,14 @@ class App extends BaseComponent<Props, State> {
 
   private launchButton = (): ICustomButton[] => {
     const buttons: ICustomButton[] = [];
-    if (!isNewApp(this.props.match.params.name)) {
-      buttons.push({text: 'Launch', onClick: this.launchApp});
+    if (!isNew(this.props.location.search)) {
+      buttons.push({
+        button:
+          <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
+                  onClick={this.launchApp}>
+            Launch
+          </button>
+      });
     }
     return buttons;
   };
@@ -176,7 +183,7 @@ class App extends BaseComponent<Props, State> {
   };
 
   private onLaunchSuccess = (app: IApp) => {
-    super.toast(`Successfully launched ${app.name}`, 15000);
+    super.toast(`<span class="green-text">Successfully launched ${app.name}</span>`);
     if (this.mounted) {
       this.updateApp(app);
     }
@@ -190,7 +197,9 @@ class App extends BaseComponent<Props, State> {
   };
 
   private updateApp = (app: IApp) => {
+    const previousApp = this.getApp();
     app = Object.values(normalize(app, Schemas.APP).entities.apps || {})[0];
+    this.props.updateApp(previousApp, app);
     const formApp = { ...app };
     removeFields(formApp);
     this.setState({app: app, formApp: formApp, isLoading: false});
@@ -202,7 +211,7 @@ class App extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: required }
+          validation: { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -226,7 +235,7 @@ class App extends BaseComponent<Props, State> {
           <Form id={appKey}
                 fields={this.getFields(formApp)}
                 values={app}
-                isNew={isNewApp(this.props.match.params.name)}
+                isNew={isNew(this.props.location.search)}
                 showSaveButton={this.shouldShowSaveButton()}
                 post={{
                   url: 'apps',
@@ -257,26 +266,13 @@ class App extends BaseComponent<Props, State> {
     )
   };
 
-  private entitiesList = (element: JSX.Element) => {
-    const {isLoading, error} = this.props;
-    const app = this.getApp();
-    if (isLoading) {
-      return <ListLoadingSpinner/>;
-    }
-    if (error) {
-      return <Error message={error}/>;
-    }
-    if (app) {
-      return element;
-    }
-    return <></>;
-  };
-
   private services = (): JSX.Element =>
-    this.entitiesList(<AppServicesList app={this.getApp()}
-                                       unsavedServices={this.state.unsavedServices}
-                                       onAddAppService={this.addAppService}
-                                       onRemoveAppServices={this.removeAppServices}/>);
+    <AppServicesList isLoadingApp={this.props.isLoading}
+                     loadAppError={this.props.error}
+                     app={this.getApp()}
+                     unsavedServices={this.state.unsavedServices}
+                     onAddAppService={this.addAppService}
+                     onRemoveAppServices={this.removeAppServices}/>;
 
   private tabs: Tab[] = [
     {
@@ -294,7 +290,7 @@ class App extends BaseComponent<Props, State> {
   render() {
     return (
       <MainLayout>
-        {this.shouldShowSaveButton() && !isNewApp(this.props.match.params.name) && <UnsavedChanged/>}
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs}/>
         </div>
@@ -313,7 +309,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.apps.isLoadingApps;
   const error = state.entities.apps.loadAppsError;
   const name = props.match.params.name;
-  const app = isNewApp(name) ? emptyApp() : state.entities.apps.data[name];
+  const app = isNew(props.location.search) ? buildNewApp() : state.entities.apps.data[name];
   let formApp;
   if (app) {
     formApp = { ...app };
@@ -330,7 +326,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadApps,
   addApp,
-  addAppService
+  updateApp,
+  addAppServices
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

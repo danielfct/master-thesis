@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IHostRule} from "./RuleHost";
+import {IRuleHost} from "./RuleHost";
 import BaseComponent from "../../../components/BaseComponent";
 import React from "react";
 import RuleHostCard from "./RuleHostCard";
@@ -20,7 +20,7 @@ import {loadRulesHost} from "../../../actions";
 interface StateToProps {
   isLoading: boolean
   error?: string | null;
-  hostRules: IHostRule[];
+  hostRules: IRuleHost[];
 }
 
 interface DispatchToProps {
@@ -35,18 +35,18 @@ class RulesHostList extends BaseComponent<Props, {}> {
     this.props.loadRulesHost();
   }
 
-  private rule = (rule: IHostRule): JSX.Element =>
+  private rule = (rule: IRuleHost): JSX.Element =>
     <RuleHostCard key={rule.id} rule={rule}/>;
 
-  private predicate = (rule: IHostRule, search: string): boolean =>
+  private predicate = (rule: IRuleHost, search: string): boolean =>
     rule.name.toLowerCase().includes(search);
 
   render() {
     return (
-        <CardList<IHostRule>
+        <CardList<IRuleHost>
           isLoading={this.props.isLoading}
           error={this.props.error}
-          emptyMessage={"No host rules to display"}
+          emptyMessage={"No cloud host rules to display"}
           list={this.props.hostRules}
           card={this.rule}
           predicate={this.predicate}/>

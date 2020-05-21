@@ -41,7 +41,9 @@ interface DispatchToProps {
 }
 
 interface ServiceDependencyProps {
-  service: IService | Partial<IService>;
+  isLoadingService: boolean;
+  loadServiceError?: string | null;
+  service: IService | Partial<IService> | null;
   newDependencies: string[];
   onAddServiceDependency: (dependency: string) => void;
   onRemoveServiceDependencies: (dependencies: string[]) => void;
@@ -53,8 +55,8 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
     this.props.loadServices();
-    const {serviceName} = this.props.service;
-    if (serviceName) {
+    if (this.props.service?.serviceName) {
+      const {serviceName} = this.props.service;
       this.props.loadServiceDependencies(serviceName);
     }
   }
@@ -84,8 +86,8 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
     this.props.onRemoveServiceDependencies(dependencies);
 
   private onDeleteSuccess = (dependencies: string[]): void => {
-    const {serviceName} = this.props.service;
-    if (serviceName) {
+    if (this.props.service?.serviceName) {
+      const {serviceName} = this.props.service;
       this.props.removeServiceDependencies(serviceName, dependencies);
     }
   };
@@ -100,8 +102,8 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
-                           error={this.props.error}
+    return <ControlledList isLoading={this.props.isLoadingService || this.props.isLoading}
+                           error={this.props.loadServiceError || this.props.error}
                            emptyMessage={`Dependencies list is empty`}
                            data={this.props.dependencies}
                            dataKey={[]} //TODO
@@ -115,7 +117,7 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `services/${this.props.service.serviceName}/dependencies`,
+                             url: `services/${this.props.service?.serviceName}/dependencies`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;
@@ -125,7 +127,7 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: ServiceDependencyProps): StateToProps {
-  const serviceName = ownProps.service && ownProps.service.serviceName;
+  const serviceName = ownProps.service?.serviceName;
   const service = serviceName && state.entities.services.data[serviceName];
   const dependencies = service && service.dependencies;
   return {

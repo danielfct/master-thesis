@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IHostRule} from "./RuleHost";
+import {IRuleHost} from "./RuleHost";
 import BaseComponent from "../../../components/BaseComponent";
 import ListItem from "../../../components/list/ListItem";
 import styles from "../../../components/list/ListItem.module.css";
@@ -22,7 +22,6 @@ import {
   removeRuleHostCloudHosts,
 } from "../../../actions";
 import {connect} from "react-redux";
-import {Redirect} from "react-router";
 import {Link} from "react-router-dom";
 import {ICloudHost} from "../../hosts/cloud/CloudHost";
 
@@ -40,7 +39,9 @@ interface DispatchToProps {
 }
 
 interface HostRuleCloudHostListProps {
-  rule: IHostRule | Partial<IHostRule>;
+  isLoadingHostRule: boolean;
+  loadHostRuleError?: string | null;
+  ruleHost: IRuleHost | Partial<IRuleHost> | null;
   newCloudHosts: string[];
   onAddRuleCloudHost: (cloudHost: string) => void;
   onRemoveRuleCloudHosts: (cloudHost: string[]) => void;
@@ -51,12 +52,10 @@ type Props = StateToProps & DispatchToProps & HostRuleCloudHostListProps
 class HostRuleCloudHostList extends BaseComponent<Props, {}> {
 
   componentDidMount(): void {
-    if (this.props.rule) {
-      const {name} = this.props.rule;
-      if (name) {
-        this.props.loadRuleHostCloudHosts(name);
-      }
-      this.props.loadCloudHosts();
+    this.props.loadCloudHosts();
+    if (this.props.ruleHost?.name) {
+      const {name} = this.props.ruleHost;
+      this.props.loadRuleHostCloudHosts(name);
     }
   }
 
@@ -85,8 +84,8 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
     this.props.onRemoveRuleCloudHosts(cloudHosts);
 
   private onDeleteSuccess = (cloudHosts: string[]): void => {
-    const {name} = this.props.rule;
-    if (name) {
+    if (this.props.ruleHost?.name) {
+      const {name} = this.props.ruleHost;
       this.props.removeRuleHostCloudHosts(name, cloudHosts);
     }
   };
@@ -101,8 +100,8 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoading}
-                           error={this.props.error}
+    return <ControlledList isLoading={this.props.isLoadingHostRule || this.props.isLoading}
+                           error={this.props.loadHostRuleError || this.props.error}
                            emptyMessage={`Cloud hosts list is empty`}
                            data={this.props.ruleCloudHosts}
                            dataKey={[]} //TODO
@@ -116,7 +115,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/hosts/${this.props.rule.name}/conditions`,
+                             url: `rules/hosts/${this.props.ruleHost?.name}/conditions`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;
@@ -125,7 +124,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostRuleCloudHostListProps): StateToProps {
-  const ruleName = ownProps.rule && ownProps.rule.name;
+  const ruleName = ownProps.ruleHost?.name;
   const rule = ruleName && state.entities.rules.hosts.data[ruleName];
   const ruleCloudHosts = rule && rule.cloudHosts;
   return {

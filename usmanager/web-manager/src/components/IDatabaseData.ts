@@ -22,6 +22,6 @@
  * SOFTWARE.
  */
 
-export default interface Data {
-    id: number | string
+export default interface IDatabaseData {
+    id: number | string;
 }

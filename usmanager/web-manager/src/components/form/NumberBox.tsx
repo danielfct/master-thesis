@@ -14,6 +14,10 @@ interface NumberBoxProps {
 
 export class NumberBox extends React.Component<NumberBoxProps, any> {
 
+  componentDidUpdate(prevProps: Readonly<NumberBoxProps>, prevState: Readonly<any>, snapshot?: any): void {
+    M.updateTextFields();
+  }
+
   render(): any {
     const {className, id, name, min, max, value, disabled, onChange, onBlur} = this.props;
     return (

@@ -31,7 +31,12 @@ export interface FieldProps<T = string> {
 }
 
 export const getTypeFromValue = (value: any): string =>
-  value === undefined || value === '' || typeof value === 'boolean' || isNaN(value) ? 'text' : 'number';
+  value === undefined
+  || value === ''
+  || typeof value === 'boolean'
+  || typeof value === 'string' && !value.trim().length
+  || isNaN(value)
+    ? 'text' : 'number';
 
 export default class Field<T> extends React.Component<FieldProps<T>> {
 

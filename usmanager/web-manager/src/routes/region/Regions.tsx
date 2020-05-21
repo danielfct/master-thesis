@@ -38,7 +38,7 @@ class Regions extends BaseComponent<Props, {}> {
   render() {
     return (
       <MainLayout>
-        <AddButton tooltip={'Add region'} pathname={'/regions/new_region'}/>
+        <AddButton tooltip={'Add region'} pathname={'/regions/new_region?new=true'}/>
         <div className={`${styles.container}`}>
           <CardList<IRegion>
             isLoading={this.props.isLoading}

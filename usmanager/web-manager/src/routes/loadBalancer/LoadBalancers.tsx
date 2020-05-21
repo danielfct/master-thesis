@@ -16,7 +16,7 @@ import LoadBalancersList from "./LoadBalancersList";
 
 const LoadBalancers: React.FC = () =>
   <MainLayout>
-    <AddButton tooltip={'Launch load-balancer'} pathname={'/load-balancers/launch'}/>
+    <AddButton tooltip={'Launch load-balancer'} pathname={'/load-balancers/launch?new=true'}/>
     <div className={`${styles.container}`}>
       <LoadBalancersList/>
     </div>
