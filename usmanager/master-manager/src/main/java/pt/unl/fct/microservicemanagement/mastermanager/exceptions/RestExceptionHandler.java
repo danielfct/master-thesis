@@ -41,14 +41,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import java.io.IOException;
-import java.util.stream.Collectors;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -135,7 +131,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     apiError.setMessage(ex.getMessage());
     return buildResponseEntity(apiError);
   }
-
 
   /**
    * Handle javax.persistence.EntityNotFoundException
@@ -227,6 +222,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName());
     apiError.setMessage(message);
     apiError.setDebugMessage(ex.getMessage());
+    return buildResponseEntity(apiError);
+  }
+
+  @ExceptionHandler(MasterManagerException.class)
+  protected ResponseEntity<Object> handleInternalErrorException(MasterManagerException ex) {
+    ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST); //TODO bad request or internal error?
+    apiError.setMessage(ex.getMessage());
     return buildResponseEntity(apiError);
   }
 

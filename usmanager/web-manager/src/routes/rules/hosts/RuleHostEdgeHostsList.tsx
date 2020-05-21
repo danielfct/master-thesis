@@ -101,7 +101,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
   };
 
   private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to delete edge host`, 10000, reason, true);
+    super.toast(`Unable to remove edge host`, 10000, reason, true);
 
   private getSelectableEdgeHostNames = () => {
     const {edgeHosts, ruleEdgeHosts, newEdgeHosts} = this.props;

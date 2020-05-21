@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
@@ -99,7 +100,7 @@ public class DockerSwarmService {
       swarmWorker.joinSwarm(swarmJoin);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new JoinSwarmException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 

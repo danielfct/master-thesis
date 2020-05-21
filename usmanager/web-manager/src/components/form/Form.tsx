@@ -23,7 +23,7 @@
  */
 
 import React, {createRef} from "react";
-import {cancelRequest, deleteData, postData, putData} from "../../utils/api";
+import {getCancelRequest, deleteData, postData, putData, deleteCancelRequest} from "../../utils/api";
 import styles from './Form.module.css';
 import {RouteComponentProps, withRouter} from "react-router";
 import {getTypeFromValue, FieldProps, IValidation} from "./Field";
@@ -34,6 +34,7 @@ import ActionProgressBar from "./ActionProgressBar";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import ScrollBar from "react-perfect-scrollbar";
 import M from "materialize-css";
+import {Method} from "axios";
 
 export interface IFormModal {
   id: string,
@@ -71,6 +72,8 @@ export type ICustomButton = { button: JSX.Element, confirm?: { id: string, messa
 
 export type ISwitchDropdown = { title?: string, options: string[], onSwitch: (selected: any) => void };
 
+export type IFormLoading = { method: Method, url: string } | undefined;
+
 interface FormProps {
   id: string;
   fields: IFields;
@@ -86,7 +89,7 @@ interface FormProps {
   saveEntities?: (args: any) => void;
   customButtons?: ICustomButton[];
   switchDropdown?: ISwitchDropdown;
-  loading?: boolean;
+  loading?: IFormLoading;
 }
 
 type Props = FormProps & RouteComponentProps;
@@ -97,7 +100,7 @@ interface State {
   errors: IErrors;
   isEditing: boolean;
   saveRequired: boolean;
-  isLoading: boolean;
+  loading?: { method: Method, url: string };
 }
 
 export interface IFormContext extends State {
@@ -168,7 +171,7 @@ class Form extends React.Component<Props, State> {
     errors: {},
     isEditing: this.props.isNew === undefined || this.props.isNew,
     saveRequired: false,
-    isLoading: !!this.props.loading,
+    loading: this.props.loading,
   };
 
   componentDidMount(): void {
@@ -193,7 +196,7 @@ class Form extends React.Component<Props, State> {
       }, this.state));
     }
     if (prevProps.loading !== this.props.loading) {
-      this.setState({isLoading: !!this.props.loading});
+      this.setState({loading: this.props.loading});
     }
     this.initDropdown();
   }
@@ -251,16 +254,16 @@ class Form extends React.Component<Props, State> {
         () => {
           this.props.delete?.successCallback(args);
           if (this.mounted) {
-            this.setState({isLoading: false});
+            this.setState({loading: undefined});
           }
         },
         (reply) => {
           this.props.delete?.failureCallback(reply, args);
           if (this.mounted) {
-            this.setState({isLoading: false});
+            this.setState({loading: undefined});
           }
         });
-      this.setState({isLoading: true});
+      this.setState({loading: {method: 'delete', url: this.props.delete.url}});
     }
   };
 
@@ -276,16 +279,16 @@ class Form extends React.Component<Props, State> {
             (reply) => {
               post.successCallback(reply, args);
               if (this.mounted) {
-                this.setState({savedValues: args, isLoading: false});
+                this.setState({savedValues: args, loading: undefined});
               }
             },
             (reply) => {
               post.failureCallback(reply, args);
               if (this.mounted) {
-                this.setState({isLoading: false});
+                this.setState({loading: undefined});
               }
             });
-          this.setState({isLoading: true});
+          this.setState({loading: {method: 'post', url: post.url}});
         }
       }
     }
@@ -297,16 +300,16 @@ class Form extends React.Component<Props, State> {
             (reply) => {
               put.successCallback(reply, args);
               if (this.mounted) {
-                this.setState({savedValues: args, isLoading: false});
+                this.setState({savedValues: args, loading: undefined});
               }
             },
             (reason) => {
               put.failureCallback(reason, args);
               if (this.mounted) {
-                this.setState({isLoading: false});
+                this.setState({loading: undefined});
               }
             });
-          this.setState({isLoading: true});
+          this.setState({loading: {method: 'put', url: put.url}});
         }
       }
       else {
@@ -316,8 +319,12 @@ class Form extends React.Component<Props, State> {
   };
 
   private cancelRequest = () => {
-    cancelRequest.cancel('Operation canceled by the user');
-    this.setState({isLoading: false});
+    const {loading} = this.state;
+    if (loading?.method && loading.url) {
+      getCancelRequest(loading.method, loading.url).cancel('Operation canceled by the user');
+      deleteCancelRequest(loading.method, loading.url);
+      this.setState({loading: undefined});
+    }
   };
 
   private setValue = (id: keyof IValues, value: IValues, validate?: boolean) => {
@@ -373,10 +380,9 @@ class Form extends React.Component<Props, State> {
       removeValue: this.removeValue,
       validate: this.validate
     };
-    const {saveRequired, isLoading} = this.state;
+    const {saveRequired, loading} = this.state;
     const {id, isNew, values, controlsMode, put: editable, delete: deletable, customButtons, dropdown, switchDropdown,
       children} = this.props;
-    console.log(isLoading)
     return (
       <>
         {this.props.delete && (
@@ -416,18 +422,10 @@ class Form extends React.Component<Props, State> {
                 )}
                 {isNew
                   ?
-                  <>
-                    <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}
-                            type="submit">
-                      {this.props.post?.textButton || 'Save'}
-                    </button>
-                    {isLoading && (
-                      <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right`}
-                              onClick={this.cancelRequest}>
-                        Cancel
-                      </button>
-                    )}
-                  </>
+                  <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}
+                          type="submit">
+                    {this.props.post?.textButton || 'Save'}
+                  </button>
                   :
                   <>
                     <div className={`${styles.controlButton}`}>
@@ -454,12 +452,6 @@ class Form extends React.Component<Props, State> {
                         Save
                       </button>
                     </div>
-                    {isLoading && (
-                      <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide`}
-                              onClick={this.cancelRequest}>
-                        Cancel
-                      </button>
-                    )}
                     {editable !== undefined && (
                       <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
                               data-position="bottom"
@@ -471,6 +463,12 @@ class Form extends React.Component<Props, State> {
                     )}
                   </>
                 }
+                {loading && (
+                  <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide`}
+                          onClick={this.cancelRequest}>
+                    Cancel
+                  </button>
+                )}
                 {dropdown && (
                   <>
                     <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
@@ -499,7 +497,7 @@ class Form extends React.Component<Props, State> {
                   </>
                 )}
               </div>
-              <ActionProgressBar loading={isLoading}/>
+              <ActionProgressBar loading={!!loading}/>
             </div>
           )}
           <div className={`${React.Children.count(children) == 0 ? styles.emptyContent : styles.content}`}>

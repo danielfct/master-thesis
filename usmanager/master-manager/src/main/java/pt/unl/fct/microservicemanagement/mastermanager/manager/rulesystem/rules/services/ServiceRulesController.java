@@ -27,12 +27,12 @@ public class ServiceRulesController {
 
   @GetMapping("/services")
   public Iterable<ServiceRuleEntity> getRules() {
-    return serviceRulesService.getServiceRules();
+    return serviceRulesService.getRules();
   }
 
   @GetMapping("/services/{ruleName}")
   public ServiceRuleEntity getRule(@PathVariable String ruleName) {
-    return serviceRulesService.getServiceRule(ruleName);
+    return serviceRulesService.getRule(ruleName);
   }
 
   @PostMapping("/services")

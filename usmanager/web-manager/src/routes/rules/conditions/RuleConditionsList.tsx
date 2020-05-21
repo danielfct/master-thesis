@@ -1,5 +1,5 @@
 import React from 'react';
-import {ICondition} from "./RuleCondition";
+import {IRuleCondition} from "./RuleCondition";
 import BaseComponent from "../../../components/BaseComponent";
 import CardList from "../../../components/list/CardList";
 import {ReduxState} from "../../../reducers";
@@ -10,7 +10,7 @@ import {loadConditions} from "../../../actions";
 interface StateToProps {
   isLoading: boolean
   error?: string | null;
-  conditions: ICondition[];
+  conditions: IRuleCondition[];
 }
 
 interface DispatchToProps {
@@ -25,15 +25,15 @@ class RuleConditionsList extends BaseComponent<Props, {}> {
     this.props.loadConditions();
   }
 
-  private condition = (condition: ICondition): JSX.Element =>
+  private condition = (condition: IRuleCondition): JSX.Element =>
     <RuleConditionCard key={condition.id} condition={condition}/>;
 
-  private predicate = (condition: ICondition, search: string): boolean =>
+  private predicate = (condition: IRuleCondition, search: string): boolean =>
     condition.name.toString().toLowerCase().includes(search);
 
   render() {
     return (
-      <CardList<ICondition>
+      <CardList<IRuleCondition>
         isLoading={this.props.isLoading}
         error={this.props.error}
         emptyMessage={"No conditions to display"}

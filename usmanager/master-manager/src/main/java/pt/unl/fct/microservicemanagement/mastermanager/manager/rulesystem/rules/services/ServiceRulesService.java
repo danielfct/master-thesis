@@ -55,12 +55,8 @@ public class ServiceRulesService {
     lastUpdateServiceRules.getAndSet(currentTime);
   }
 
-  public Iterable<ServiceRuleEntity> getServiceRules() {
+  public Iterable<ServiceRuleEntity> getRules() {
     return rules.findAll();
-  }
-
-  public List<ServiceRuleEntity> getRules(String serviceName) {
-    return rules.findByServiceName(serviceName);
   }
 
   public ServiceRuleEntity getRule(Long id) {
@@ -70,11 +66,6 @@ public class ServiceRulesService {
 
   public ServiceRuleEntity getRule(String name) {
     return rules.findByNameIgnoreCase(name).orElseThrow(() ->
-        new EntityNotFoundException(ServiceRuleEntity.class, "name", name));
-  }
-
-  public ServiceRuleEntity getServiceRule(String name) {
-    return rules.findServiceRule(name).orElseThrow(() ->
         new EntityNotFoundException(ServiceRuleEntity.class, "name", name));
   }
 
@@ -100,10 +91,13 @@ public class ServiceRulesService {
     setLastUpdateServiceRules();
   }
 
+  public List<ServiceRuleEntity> getServiceRules(String serviceName) {
+    return rules.findByServiceName(serviceName);
+  }
+
   public List<ServiceRuleEntity> getGenericServiceRules() {
     return rules.findGenericServiceRules();
   }
-
 
   public ConditionEntity getCondition(String ruleName, String conditionName) {
     assertRuleExists(ruleName);
@@ -201,7 +195,7 @@ public class ServiceRulesService {
 
   private List<Rule> generateServiceRules(String appName, String serviceName) {
     List<ServiceRuleEntity> genericServiceRules = getGenericServiceRules();
-    List<ServiceRuleEntity> serviceRules = getRules(serviceName);
+    List<ServiceRuleEntity> serviceRules = getServiceRules(serviceName);
     var rules = new ArrayList<Rule>(genericServiceRules.size() + serviceRules.size());
     log.info("Generating service rules... (count: {})", rules.size());
     genericServiceRules.forEach(genericServiceRule -> rules.add(generateServiceRule(genericServiceRule)));

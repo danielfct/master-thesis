@@ -11,7 +11,7 @@
 import {RouteComponentProps} from "react-router";
 import IDatabaseData from "../../../components/IDatabaseData";
 import BaseComponent from "../../../components/BaseComponent";
-import Form, {ICustomButton} from "../../../components/form/Form";
+import Form, {ICustomButton, IFormLoading} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
@@ -71,7 +71,7 @@ interface State {
   cloudHost?: ICloudHost,
   formCloudHost?: ICloudHost,
   unsavedRules: string[],
-  isLoading: boolean,
+  loading: IFormLoading,
 }
 
 class CloudHost extends BaseComponent<Props, State> {
@@ -80,7 +80,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
   state: State = {
     unsavedRules: [],
-    isLoading: false,
+    loading: undefined,
   };
 
   componentDidMount(): void {
@@ -107,7 +107,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<ICloudHost>): void => {
     const cloudHost = reply.data;
-    super.toast(`<span class="green-text">Cloud host ${cloudHost.instanceId} has now started</span>`);
+    super.toast(`<span class="green-text">Cloud instance ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} has started</span>`);
     this.props.addCloudHost(cloudHost);
     this.saveEntities(cloudHost);
     if (this.mounted) {
@@ -155,7 +155,7 @@ class CloudHost extends BaseComponent<Props, State> {
   };
 
   private onSaveRulesFailure = (cloudHost: ICloudHost, reason: string): void =>
-    super.toast(`Unable to save rules of host ${cloudHost.instanceId}`, 10000, reason, true);
+    super.toast(`Unable to save rules of ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
 
   private startStopTerminateButtons = (): ICustomButton[] => {
     const buttons: ICustomButton[] = [];
@@ -198,67 +198,70 @@ class CloudHost extends BaseComponent<Props, State> {
 
   private startCloudHost = () => {
     const cloudHost = this.getCloudHost();
-    this.setState({isLoading: true});
-    postData(`hosts/cloud/${cloudHost.instanceId}/state`, 'start',
+    const url = `hosts/cloud/${cloudHost.instanceId}/state`;
+    this.setState({ loading: { method: 'post', url: url } });
+    postData(url, 'start',
       (reply: IReply<ICloudHost>) => this.onStartSuccess(reply.data),
       (reason) => this.onStartFailure(reason, cloudHost));
   };
 
   private onStartSuccess = (cloudHost: ICloudHost) => {
-    super.toast(`<span class="green-text">Successfully started cloud instance ${cloudHost.instanceId}</span>`, 15000);
+    super.toast(`<span class="green-text">Successfully started ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
     if (this.mounted) {
       this.updateCloudHost(cloudHost);
     }
   };
 
   private onStartFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-    super.toast(`Failed to start cloud host <b>${cloudHost.instanceId}</b>`, 10000, reason, true);
+    super.toast(`Failed to start ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
     if (this.mounted) {
-      this.setState({isLoading: false});
+      this.setState({loading: undefined});
     }
   };
 
   private stopCloudHost = () => {
     const cloudHost = this.getCloudHost();
-    this.setState({isLoading: true});
-    postData(`hosts/cloud/${cloudHost.instanceId}/state`, 'stop',
+    const url = `hosts/cloud/${cloudHost.instanceId}/state`;
+    this.setState({ loading: { method: 'post', url: url } });
+    postData(url, 'stop',
       (reply: IReply<ICloudHost>) => this.onStopSuccess(reply.data),
       (reason) => this.onStopFailure(reason, cloudHost));
   };
 
   private onStopSuccess = (cloudHost: ICloudHost) => {
-    super.toast(`<span class="green-text">Successfully stopped cloud instance ${cloudHost.instanceId}</span>`, 15000);
+    super.toast(`<span class="green-text">Successfully stopped ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
     if (this.mounted) {
       this.updateCloudHost(cloudHost);
     }
   };
 
   private onStopFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-    super.toast(`Failed to stop cloud host <b>${cloudHost.instanceId}</b>`, 10000, reason, true);
+    super.toast(`Failed to stop ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
     if (this.mounted) {
-      this.setState({isLoading: false});
+      this.setState({loading: undefined});
     }
   };
 
   private terminateCloudHost = () => {
     const cloudHost = this.getCloudHost();
-    this.setState({isLoading: true});
-    deleteData(`hosts/cloud/${cloudHost.instanceId}`,
+    const url = `hosts/cloud/${cloudHost.instanceId}`;
+    this.setState({ loading: { method: 'delete', url: url } });
+    deleteData(url,
       () => this.onTerminateSuccess(cloudHost),
       (reason) => this.onTerminateFailure(reason, cloudHost));
   };
 
   private onTerminateSuccess = (cloudHost: Partial<ICloudHost>) => {
-    super.toast(`<span class="green-text">Successfully terminated cloud instance ${cloudHost.instanceId}</span>`, 15000);
+    super.toast(`<span class="green-text">Successfully terminated <b class="white-text">${cloudHost.instanceId}</b> instance</span>`, 15000);
     if (this.mounted) {
       this.props.history.push('/hosts/cloud');
     }
   };
 
   private onTerminateFailure = (reason: string, cloudHost: Partial<ICloudHost>) => {
-    super.toast(`Failed to terminate cloud host <b>${cloudHost.instanceId}</b>`, 10000, reason, true);
+    super.toast(`Failed to terminate ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
     if (this.mounted) {
-      this.setState({isLoading: false});
+      this.setState({loading: undefined});
     }
   };
 
@@ -268,7 +271,7 @@ class CloudHost extends BaseComponent<Props, State> {
     //TODO this.props.updateCloudHost(previousCloudHost, cloudHost):
     const formCloudHost = { ...cloudHost };
     removeFields(formCloudHost);
-    this.setState({cloudHost: cloudHost, formCloudHost: formCloudHost, isLoading: false});
+    this.setState({cloudHost: cloudHost, formCloudHost: formCloudHost, loading: undefined});
   };
 
   private cloudHost = () => {
@@ -295,7 +298,7 @@ class CloudHost extends BaseComponent<Props, State> {
                 }}
                 customButtons={this.startStopTerminateButtons()}
                 saveEntities={this.saveEntities}
-                loading={this.state.isLoading}>
+                loading={this.state.loading}>
             {Object.keys(formCloudHost).map((key, index) =>
               <Field key={index}
                      id={key}

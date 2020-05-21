@@ -13,13 +13,13 @@ import {
 } from "../../../actions";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
-import {ICondition} from "../conditions/RuleCondition";
+import {IRuleCondition} from "../conditions/RuleCondition";
 
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
   ruleConditions: string[];
-  conditions: { [key: string]: ICondition };
+  conditions: { [key: string]: IRuleCondition };
 }
 
 interface DispatchToProps {

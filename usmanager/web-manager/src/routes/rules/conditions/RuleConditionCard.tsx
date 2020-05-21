@@ -1,20 +1,20 @@
 import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 import React from "react";
-import {ICondition} from "./RuleCondition";
+import {IRuleCondition} from "./RuleCondition";
 
 interface ConditionCardProps {
-  condition: ICondition;
+  condition: IRuleCondition;
 }
 
 type Props = ConditionCardProps;
 
 const RuleConditionCard = ({condition}: Props) => (
-  <Card<ICondition> title={condition.name.toString()}
-               link={{to: {pathname: `conditions/${condition.name}`, state: condition}}}
-               height={'150px'}
-               margin={'10px 0'}
-               hoverable>
+  <Card<IRuleCondition> title={condition.name.toString()}
+                        link={{to: {pathname: `rules/conditions/${condition.name}`, state: condition}}}
+                        height={'150px'}
+                        margin={'10px 0'}
+                        hoverable>
     <CardItem key={'valueMode'}
               label={'Value mode'}
               value={condition.valueMode.name}/>

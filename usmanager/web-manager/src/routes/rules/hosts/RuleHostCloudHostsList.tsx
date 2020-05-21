@@ -91,7 +91,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
   };
 
   private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to delete cloud host`, 10000, reason, true);
+    super.toast(`Unable to remove cloud host`, 10000, reason, true);
 
   private getSelectableCloudHostNames = () => {
     const {cloudHosts, ruleCloudHosts, newCloudHosts} = this.props;

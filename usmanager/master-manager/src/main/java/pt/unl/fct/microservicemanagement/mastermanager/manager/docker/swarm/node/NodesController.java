@@ -60,19 +60,20 @@ public class NodesController {
 
   @PostMapping
   public void addNodes(@RequestBody AddNode addNode) {
-    String hostname = addNode.getHostname();
+    //TODO NodeRole role = addNode.getRole();
+    NodeRole role = NodeRole.WORKER;
     int quantity = addNode.getQuantity();
-    String region = addNode.getRegion().getName();
-    String country = addNode.getCountry();
-    String city = addNode.getCity();
-    NodeRole role = addNode.getRole();
-    if (hostname != null) {
+    String host = addNode.getHost();
+    if (host != null) {
       for (var i = 0; i < quantity; i++) {
-        hostsService.addHost(role, hostname);
+        hostsService.addHost(role, host);
       }
     } else {
+      String region = addNode.getRegion().getName();
+      String country = addNode.getCountry();
+      String city = addNode.getCity();
       for (var i = 0; i < quantity; i++) {
-        hostsService.addHost(role, region, city, country);
+        hostsService.addHost(role, region, country, city);
       }
     }
   }

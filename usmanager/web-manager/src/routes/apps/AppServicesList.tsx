@@ -125,8 +125,8 @@ class ServiceAppList extends BaseComponent<Props, State> {
     }
   };
 
-  private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to delete service`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, services: string[]): void =>
+    super.toast(`Unable to remove ${services.length === 1 ? services[0] : 'services'} from <b>${this.props.app?.name}</b> app`, 10000, reason, true);
 
   private getSelectableServicesNames = () => {
     const {appServices, services, unsavedServices} = this.props;

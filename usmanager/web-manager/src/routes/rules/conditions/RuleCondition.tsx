@@ -10,12 +10,14 @@ import Error from "../../../components/errors/Error";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {loadConditions, loadFields, loadOperators, loadValueModes} from "../../../actions";
+import {addCondition, loadConditions, loadFields, loadOperators, loadValueModes} from "../../../actions";
 import {connect} from "react-redux";
 import {IReply} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
+import {normalize} from "normalizr";
+import {Schemas} from "../../../middleware/api";
 
-export interface ICondition extends IDatabaseData {
+export interface IRuleCondition extends IDatabaseData {
   name: string;
   valueMode: IValueMode;
   field: IField;
@@ -23,7 +25,7 @@ export interface ICondition extends IDatabaseData {
   value: number;
 }
 
-const buildNewCondition = () => ({
+const buildNewCondition = (): Partial<IRuleCondition> => ({
   name: '',
   valueMode: undefined,
   field: undefined,
@@ -34,15 +36,17 @@ const buildNewCondition = () => ({
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  condition: Partial<ICondition>;
-  formCondition: Partial<ICondition>,
-  valueModes: IValueMode[];
-  fields: IField[];
-  operators: IOperator[];
+  condition: Partial<IRuleCondition>;
+  formCondition?: Partial<IRuleCondition>,
+  valueModes: { [key:string]: IValueMode };
+  fields: { [key:string]: IField };
+  operators: { [key:string]: IOperator };
 }
 
 interface DispatchToProps {
-  loadConditions: (name: string) => any;
+  loadConditions: (name: string) => void;
+  addCondition: (condition: IRuleCondition) => void;
+  //TODO updateRuleCondition: (previousCondition: Partial<IRuleCondition>, condition: IRuleCondition) => void;
   loadValueModes: () => void;
   loadFields: () => void;
   loadOperators: () => void;
@@ -55,46 +59,88 @@ interface MatchParams {
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
-  conditionName?: string;
+  condition?: IRuleCondition,
+  formCondition?: IRuleCondition,
 }
 
 class RuleCondition extends BaseComponent<Props, State> {
 
+  private mounted = false;
+
+  state: State = {
+  };
+
   componentDidMount(): void {
+    this.loadCondition();
+    this.props.loadValueModes();
+    this.props.loadFields();
+    this.props.loadOperators();
+    this.mounted = true;
+  };
+
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadCondition = () => {
     if (!isNew(this.props.location.search)) {
       const conditionName = this.props.match.params.name;
       this.props.loadConditions(conditionName);
     }
-    this.props.loadValueModes();
-    this.props.loadFields();
-    this.props.loadOperators();
   };
 
-  private onPostSuccess = (reply: IReply<ICondition>): void => {
-    super.toast(`<span class="green-text">Condition ${reply.data.name} is now created</span>`);
+  private getCondition = () =>
+    this.state.condition || this.props.condition;
+
+  private getFormCondition = () =>
+    this.state.formCondition || this.props.formCondition;
+
+  private onPostSuccess = (reply: IReply<IRuleCondition>): void => {
+    const condition = reply.data;
+    super.toast(`<span class="green-text">Condition ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} saved</span>`);
+    this.props.addCondition(condition);
+    if (this.mounted) {
+      this.updateCondition(condition);
+      this.props.history.replace(condition.name);
+    }
   };
 
-  private onPostFailure = (reason: string, conditionName: string): void =>
-    super.toast(`Unable to save ${conditionName}`, 10000, reason, true);
+  private onPostFailure = (reason: string, condition: IRuleCondition): void =>
+    super.toast(`Unable to save <b>${condition.name}</b> condition`, 10000, reason, true);
 
-  private onPutSuccess = (conditionName: string): void => {
-    super.toast(`<span class="green-text">Changes to condition ${conditionName} have been saved</span>`);
-    this.setState({conditionName: conditionName});
+  private onPutSuccess = (reply: IReply<IRuleCondition>): void => {
+    const condition = reply.data;
+    super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition have been saved</span>`);
+    if (this.mounted) {
+      this.updateCondition(condition);
+      this.props.history.replace(condition.name);
+    }
   };
 
-  private onPutFailure = (reason: string, conditionName: string): void =>
-    super.toast(`Unable to update ${conditionName}`, 10000, reason, true);
+  private onPutFailure = (reason: string, condition: IRuleCondition): void =>
+    super.toast(`Unable to update ${this.mounted ? `<b>${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition`, 10000, reason, true);
 
-  private onDeleteSuccess = (conditionName: string): void => {
-    super.toast(`<span class="green-text">Condition ${conditionName} successfully removed</span>`);
-    this.props.history.push(`/rules/conditions`)
+  private onDeleteSuccess = (condition: IRuleCondition): void => {
+    super.toast(`<span class="green-text">Condition <b class="white-text">${condition.name}</b> successfully removed</span>`);
+    if (this.mounted) {
+      this.props.history.push(`/rules/conditions`)
+    }
   };
 
-  private onDeleteFailure = (reason: string, conditionName: string): void =>
-    super.toast(`Unable to remove ${conditionName}`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, condition: IRuleCondition): void =>
+    super.toast(`Unable to delete ${this.mounted ? <b>${condition.name}</b> : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition`, 10000, reason, true);
 
-  private getFields = (): IFields =>
-    Object.entries(buildNewCondition()/*this.getCondition()TODO*/).map(([key, value]) => {
+  private updateCondition = (condition: IRuleCondition) => {
+    //const previousCondition = this.getCondition();
+    condition = Object.values(normalize(condition, Schemas.RULE_CONDITION).entities.conditions || {})[0];
+    //TODO this.props.updateCondition(previousCondition, condition);
+    const formCondition = { ...condition };
+    removeFields(formCondition);
+    this.setState({condition: condition, formCondition: formCondition});
+  };
+
+  private getFields = (condition: Partial<IRuleCondition>): IFields =>
+    Object.entries(condition).map(([key, value]) => {
       return {
         [key]: {
           id: key,
@@ -121,21 +167,35 @@ class RuleCondition extends BaseComponent<Props, State> {
     valueMode.name;
 
   private condition = () => {
-    const {isLoading, error, condition, formCondition} = this.props;
+    const {isLoading, error} = this.props;
+    const condition = this.getCondition();
+    const formCondition = this.getFormCondition();
     // @ts-ignore
-    const conditionKey: (keyof ICondition) = formCondition && Object.keys(formCondition)[0];
+    const conditionKey: (keyof IRuleCondition) = formCondition && Object.keys(formCondition)[0];
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formCondition && (
           <Form id={conditionKey}
-                fields={this.getFields()}
+                fields={this.getFields(formCondition)}
                 values={condition}
                 isNew={isNew(this.props.location.search)}
-                post={{url: 'rules/conditions', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={{url: `rules/conditions/${this.state?.conditionName || condition[conditionKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={{url: `rules/conditions/${this.state?.conditionName || condition[conditionKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}>
+                post={{
+                  url: 'rules/conditions',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure
+                }}
+                put={{
+                  url: `rules/conditions/${condition.name}`,
+                  successCallback: this.onPutSuccess,
+                  failureCallback: this.onPutFailure
+                }}
+                delete={{
+                  url: `rules/conditions/${condition.name}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure
+                }}>
             <Field key='name' id={'name'} label='name'/>
             <Field<IField> key='fields'
                            id='field'
@@ -143,7 +203,7 @@ class RuleCondition extends BaseComponent<Props, State> {
                            type='dropdown'
                            dropdown={{
                              defaultValue: "Select field",
-                             values: this.props.fields,
+                             values: Object.values(this.props.fields),
                              optionToString: this.fieldOption}}/>
             <Field<IOperator> key='operators'
                               id='operator'
@@ -151,7 +211,7 @@ class RuleCondition extends BaseComponent<Props, State> {
                               type='dropdown'
                               dropdown={{
                                 defaultValue: "Select operator",
-                                values: this.props.operators,
+                                values: Object.values(this.props.operators),
                                 optionToString: this.operatorOption}}/>
             <Field<IValueMode> key='valueModes'
                                id='valueMode'
@@ -159,7 +219,7 @@ class RuleCondition extends BaseComponent<Props, State> {
                                type='dropdown'
                                dropdown={{
                                  defaultValue: 'Select value mode',
-                                 values: this.props.valueModes,
+                                 values: Object.values(this.props.valueModes),
                                  optionToString: this.valueModeOption}}/>
             <Field key='value' id='value' label='value'/>
           </Form>
@@ -188,27 +248,38 @@ class RuleCondition extends BaseComponent<Props, State> {
 
 }
 
+function removeFields(condition: Partial<IRuleCondition>) {
+  delete condition["id"];
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.rules.conditions.isLoadingConditions;
   const error = state.entities.rules.conditions.loadConditionsError;
   const name = props.match.params.name;
   const condition = isNew(props.location.search) ? buildNewCondition() : state.entities.rules.conditions.data[name];
   let formCondition;
-  formCondition = { ...condition };
-  delete formCondition['id'];
+  if (condition) {
+    formCondition = { ...condition };
+    removeFields(formCondition);
+  }
+  const valueModes = state.entities.valueModes.data;
+  const fields = state.entities.fields.data;
+  const operators = state.entities.operators.data;
   return  {
     isLoading,
     error,
     condition,
     formCondition,
-    valueModes: (state.entities.valueModes.data && Object.values(state.entities.valueModes.data)) || [],
-    fields: (state.entities.fields.data && Object.values(state.entities.fields.data)) || [],
-    operators: (state.entities.operators.data && Object.values(state.entities.operators.data)) || [],
+    valueModes,
+    fields,
+    operators,
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadConditions,
+  addCondition,
+  //TODO updateCondition,
   loadValueModes,
   loadFields,
   loadOperators,

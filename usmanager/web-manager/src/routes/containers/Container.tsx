@@ -2,7 +2,7 @@ import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../components/BaseComponent";
 import Form, {
   ICustomButton,
-  IFields,
+  IFields, IFormLoading,
   requiredAndNumberAndMin,
   requiredAndTrimmed
 } from "../../components/form/Form";
@@ -99,7 +99,7 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 interface State {
   container?: IContainer,
   formContainer?: IContainer,
-  isLoading: boolean,
+  loading: IFormLoading,
   defaultInternalPort: number,
   defaultExternalPort: number,
 }
@@ -112,16 +112,16 @@ class Container extends BaseComponent<Props, State> {
   private scrollbar: (ScrollBar | null) = null;
 
   state: State = {
-    isLoading: false,
+    loading: undefined,
     defaultInternalPort: 0,
     defaultExternalPort: 0,
   };
 
   componentDidMount(): void {
+    this.loadContainer();
     this.props.loadCloudHosts();
     this.props.loadEdgeHosts();
     this.props.loadServices();
-    this.loadContainer();
     this.mounted = true;
   };
 
@@ -162,7 +162,7 @@ class Container extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IContainer>): void => {
     const container = reply.data;
-    super.toast(`<span class="green-text">Container <a href=/containers/${reply.data.id}>${reply.data.id}</a> has started at ${reply.data.hostname}</span>`);
+    super.toast(`<span class="green-text">Container ${this.mounted ? `<b class="white-text">${container.id}</b>` : `<a href=/containers/${container.id}><b>${container.id}</b></a>`} has started at ${container.hostname}</span>`);
     this.props.addContainer(container);
     if (this.mounted) {
       this.updateContainer(container);
@@ -171,17 +171,17 @@ class Container extends BaseComponent<Props, State> {
   };
 
   private onPostFailure = (reason: string, container: IContainer): void =>
-    super.toast(`Unable to start container at ${container.hostname}`, 10000, reason, true);
+    super.toast(`Unable to start container at <b>${container.hostname}</b>`, 10000, reason, true);
 
   private onDeleteSuccess = (container: IContainer): void => {
-    super.toast(`<span class="green-text">Container ${container.id} successfully stopped</span>`);
+    super.toast(`<span class="green-text">Container <b class="white-text">${container.id}</b> successfully stopped</span>`);
     if (this.mounted) {
       this.props.history.push(`/containers`);
     }
   };
 
   private onDeleteFailure = (reason: string, container: IContainer): void =>
-    super.toast(`Unable to stop ${container.id}`, 10000, reason, true);
+    super.toast(`Unable to stop ${this.mounted ? `<b>${container.id}</b>` : `<a href=/containers/${container.id}><b>${container.id}</b></a>`} container`, 10000, reason, true);
 
   private replicateMigrateButtons = (): ICustomButton[] => {
     const buttons: ICustomButton[] = [];
@@ -213,46 +213,49 @@ class Container extends BaseComponent<Props, State> {
   private replicate = (event: any) => {
     const container = this.getContainer();
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
-    this.setState({isLoading: true});
-    postData(`containers/${container?.id}/replicate`, {hostname: hostname},
+    const url = `containers/${container?.id}/replicate`;
+    this.setState({ loading: { method: 'post', url: url } });
+    postData(url, {hostname: hostname},
       (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
       (reason: string) => this.onReplicateFailure(reason, container));
   };
 
   private onReplicateSuccess = (container: IContainer) => {
-    super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/containers/${container.id}>${container.id}</a>`, 15000);
+    super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/containers/${container.id}><b>${container.id}</b></a>`, 15000);
     if (this.mounted) {
-      this.setState({isLoading: false});
+      this.setState({loading: undefined});
     }
   };
 
   private onReplicateFailure = (reason: string, container?: IContainer) => {
-    super.toast(`Unable to replicate container ${container?.id}`, 10000, reason, true);
+    super.toast(`Unable to replicate ${this.mounted ? `<b>${container?.id}</b>` : `<a href=/containers/${container?.id}><b>${container?.id}</b></a>`} container`, 10000, reason, true);
     if (this.mounted) {
-      this.setState({isLoading: false});
+      this.setState({loading: undefined});
     }
   };
 
   private migrate = (event: any) => {
     const container = this.getContainer();
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
-    this.setState({isLoading: true});
-    postData(`containers/${container?.id}/migrate`, { hostname: hostname },
+    const url = `containers/${container?.id}/migrate`;
+    this.setState({ loading: { method: 'post', url: url } });
+    postData(url, { hostname: hostname },
       (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
       (reason) => this.onMigrateFailure(reason, container));
   };
 
   private onMigrateSuccess = (container: IContainer) => {
-    super.toast(`<span class="green-text">Migrated ${container.id} to container </span><a href=/containers/${container.id}>${container.id}</a>`, 15000);
+    const parentContainer = this.getContainer();
+    super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.id : `<a href=/containers/${parentContainer?.id}>${parentContainer?.id}</a>`} to container </span><a href=/containers/${container.id}>${container.id}</a>`, 15000);
     if (this.mounted) {
-      this.setState({isLoading: false});
+      this.setState({loading: undefined});
     }
   };
 
   private onMigrateFailure = (reason: string, container?: IContainer) => {
-    super.toast(`Unable to migrate container ${container?.id}`, 10000, reason, true);
+    super.toast(`Unable to migrate ${this.mounted ? `<b>${container?.id}</b>` : `<a href=/containers/${container?.id}><b>${container?.id}</b></a>`} container`, 10000, reason, true);
     if (this.mounted) {
-      this.setState({isLoading: false});
+      this.setState({loading: undefined});
     }
   };
 
@@ -288,7 +291,7 @@ class Container extends BaseComponent<Props, State> {
     //TODO this.props.updateContainer(previousContainer, container);
     const formContainer = { ...container };
     removeFields(formContainer);
-    this.setState({container: container, formContainer: formContainer, isLoading: false});
+    this.setState({container: container, formContainer: formContainer, loading: undefined});
   };
 
   private getFields = (container: Partial<IContainer> | INewContainer): IFields =>
@@ -404,7 +407,7 @@ class Container extends BaseComponent<Props, State> {
                 customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
                   ? this.replicateMigrateButtons()
                   : undefined}
-                loading={this.state.isLoading}>
+                loading={this.state.loading}>
             {this.formFields(formContainer || {}, isNewContainer)}
           </Form>
         )}

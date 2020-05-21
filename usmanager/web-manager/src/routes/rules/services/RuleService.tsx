@@ -23,6 +23,7 @@ import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
+  addRuleService,
   addRuleServiceConditions,
   addRuleServices,
   loadDecisions,
@@ -35,12 +36,15 @@ import RuleServiceConditionList from "./RuleServiceConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import RuleServiceServicesList from "./RuleServiceServicesList";
 import {isNew} from "../../../utils/router";
+import {IRuleHost} from "../hosts/RuleHost";
+import {normalize} from "normalizr";
+import {Schemas} from "../../../middleware/api";
 
 export interface IRuleService extends IRule {
   services?: string[]
 }
 
-const buildNewServiceRule = () => ({
+const buildNewServiceRule = (): Partial<IRuleService> => ({
   name: '',
   priority: 0,
   generic: undefined,
@@ -51,14 +55,15 @@ const buildNewServiceRule = () => ({
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  serviceRule: Partial<IRuleService>;
-  formServiceRule?: Partial<IRuleService>,
-  decisions: IDecision[],
+  ruleService: Partial<IRuleService>;
+  formRuleService?: Partial<IRuleService>,
+  decisions: { [key: string]: IDecision },
 }
 
 interface DispatchToProps {
-  loadRulesService: (name: string) => any;
-  loadDecisions: () => any;
+  loadRulesService: (name: string) => void;
+  addRuleService: (ruleService: IRuleService) => void;
+  loadDecisions: () => void;
   addRuleServiceConditions: (ruleName: string, conditions: string[]) => void;
   addRuleServices: (ruleName: string, services: string[]) => void;
 }
@@ -70,119 +75,161 @@ interface MatchParams {
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 type State = {
-  newConditions: string[],
-  newServices: string[],
-  ruleName?: string,
+  ruleService?: IRuleService,
+  formRuleService?: IRuleService,
+  unsavedConditions: string[],
+  unsavedServices: string[],
   isGeneric: boolean,
 }
 
 class RuleService extends BaseComponent<Props, State> {
 
+  private mounted = false;
+
   state: State = {
-    newConditions: [],
-    newServices: [],
-    isGeneric: this.props.serviceRule?.generic || false,
+    unsavedConditions: [],
+    unsavedServices: [],
+    isGeneric: this.props.ruleService?.generic || false,
   };
 
   componentDidMount(): void {
+    this.loadRuleService();
     this.props.loadDecisions();
+    this.mounted = true;
+  };
+
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadRuleService = () => {
     if (!isNew(this.props.location.search)) {
       const ruleName = this.props.match.params.name;
       this.props.loadRulesService(ruleName);
     }
   };
 
+  private getRuleService = () =>
+    this.state.ruleService || this.props.ruleService;
+
+  private getFormRuleService = () =>
+    this.state.formRuleService || this.props.formRuleService;
+
+  private onPostSuccess = (reply: IReply<IRuleService>): void => {
+    const ruleService = reply.data;
+    super.toast(`<span class="green-text">Service rule ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} saved</span>`);
+    this.props.addRuleService(ruleService);
+    this.saveEntities(reply.data);
+    if (this.mounted) {
+      this.updateRuleService(ruleService);
+      this.props.history.replace(ruleService.name);
+    }
+  };
+
+  private onPostFailure = (reason: string, ruleService: IRuleService): void =>
+    super.toast(`Unable to save <b>${ruleService.name}</b> service rule`, 10000, reason, true);
+
+  private onPutSuccess = (reply: IReply<IRuleService>): void => {
+    const ruleService = reply.data;
+    super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule have been saved</span>`);
+    this.saveEntities(ruleService);
+    if (this.mounted) {
+      this.updateRuleService(ruleService);
+      this.props.history.replace(ruleService.name);
+    }
+  };
+
+  private onPutFailure = (reason: string, ruleService: IRuleService): void =>
+    super.toast(`Unable to update ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule`, 10000, reason, true);
+
+  private onDeleteSuccess = (ruleService: IRuleService): void => {
+    super.toast(`<span class="green-text">Service rule <b class="white-text">${ruleService.name}</b> successfully removed</span>`);
+    if (this.mounted) {
+      this.props.history.push(`/rules/services`);
+    }
+  };
+
+  private onDeleteFailure = (reason: string, ruleService: IRuleService): void =>
+    super.toast(`Unable to delete ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule`, 10000, reason, true);
+
+  private shouldShowSaveButton = () =>
+    !!this.state.unsavedConditions.length
+    || !!this.state.unsavedServices.length;
+
   private saveEntities = (rule: IRuleService) => {
     this.saveRuleConditions(rule);
     this.saveRuleServices(rule);
   };
 
-  private onPostSuccess = (reply: IReply<IRuleService>): void => {
-    super.toast(`<span class="green-text">Service rule ${reply.data.name} saved</span>`);
-    this.setState({ruleName: reply.data.name});
-    this.saveEntities(reply.data);
-  };
-
-  private onPostFailure = (reason: string, rule: IRuleService): void =>
-    super.toast(`Unable to update ${rule.name}`, 10000, reason, true);
-
-  private onPutSuccess = (rule: IRuleService): void => {
-    super.toast(`<span class="green-text">Changes to service rule ${rule.name} have been saved</span>`);
-    this.setState({ruleName: rule.name});
-    this.saveEntities(rule);
-  };
-
-  private onPutFailure = (reason: string, rule: IRuleService): void =>
-    super.toast(`Unable to update ${rule.name}`, 10000, reason, true);
-
-  private onDeleteSuccess = (rule: IRuleService): void => {
-    super.toast(`<span class="green-text">Service rule ${rule.name} successfully removed</span>`);
-    this.props.history.push(`/rules`)
-  };
-
-  private onDeleteFailure = (reason: string, rule: IRuleService): void =>
-    super.toast(`Unable to delete ${rule}`, 10000, reason, true);
-
-  private onAddRuleCondition = (condition: string): void => {
+  private addRuleCondition = (condition: string): void => {
     this.setState({
-      newConditions: this.state.newConditions.concat(condition)
+      unsavedConditions: this.state.unsavedConditions.concat(condition)
     });
   };
 
-  private onRemoveRuleConditions = (conditions: string[]): void => {
+  private removeRuleConditions = (conditions: string[]): void => {
     this.setState({
-      newConditions: this.state.newConditions.filter(condition => !conditions.includes(condition))
+      unsavedConditions: this.state.unsavedConditions.filter(condition => !conditions.includes(condition))
     });
   };
 
   private saveRuleConditions = (rule: IRuleService): void => {
-    const {newConditions} = this.state;
-    if (newConditions.length) {
-      postData(`rules/services/${rule.name}/conditions`, newConditions,
+    const {unsavedConditions} = this.state;
+    if (unsavedConditions.length) {
+      postData(`rules/services/${rule.name}/conditions`, unsavedConditions,
         () => this.onSaveConditionsSuccess(rule),
         (reason) => this.onSaveConditionsFailure(rule, reason));
     }
   };
 
   private onSaveConditionsSuccess = (rule: IRuleService): void => {
-    if (!isNew(this.props.location.search)) {
-      this.props.addRuleServiceConditions(rule.name, this.state.newConditions);
+    this.props.addRuleServiceConditions(rule.name, this.state.unsavedConditions);
+    if (this.mounted) {
+      this.setState({ unsavedConditions: [] });
     }
-    this.setState({ newConditions: [] });
   };
 
-  private onSaveConditionsFailure = (rule: IRuleService, reason: string): void =>
-    super.toast(`Unable to save conditions of rule ${rule.name}`, 10000, reason, true);
+  private onSaveConditionsFailure = (ruleService: IRuleService, reason: string): void =>
+    super.toast(`Unable to save conditions of ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule`, 10000, reason, true);
 
-  private onAddRuleService = (service: string): void =>
+  private addRuleService = (service: string): void =>
     this.setState({
-      newServices: this.state.newServices.concat(service)
+      unsavedServices: this.state.unsavedServices.concat(service)
     });
 
-  private onRemoveRuleServices = (services: string[]): void => {
+  private removeRuleServices = (services: string[]): void => {
     this.setState({
-      newServices: this.state.newServices.filter(service => !services.includes(service))
+      unsavedServices: this.state.unsavedServices.filter(service => !services.includes(service))
     });
   };
 
   private saveRuleServices = (rule: IRuleService): void => {
-    const {newServices} = this.state;
-    if (newServices.length) {
-      postData(`rules/services/${rule.name}/services`, newServices,
+    const {unsavedServices} = this.state;
+    if (unsavedServices.length) {
+      postData(`rules/services/${rule.name}/services`, unsavedServices,
         () => this.onSaveServicesSuccess(rule),
         (reason) => this.onSaveServicesFailure(rule, reason));
     }
   };
 
   private onSaveServicesSuccess = (rule: IRuleService): void => {
-    if (!isNew(this.props.location.search)) {
-      this.props.addRuleServices(rule.name, this.state.newServices)
+    this.props.addRuleServices(rule.name, this.state.unsavedServices);
+    if (this.mounted) {
+      this.setState({ unsavedServices: [] });
     }
-    this.setState({ newServices: [] });
   };
 
-  private onSaveServicesFailure = (rule: IRuleService, reason: string): void =>
-    super.toast(`Unable to save services of rule ${rule.name}`, 10000, reason, true);
+  private onSaveServicesFailure = (ruleService: IRuleService, reason: string): void =>
+    super.toast(`Unable to save services of ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule`, 10000, reason, true);
+
+  private updateRuleService = (ruleService: IRuleService) => {
+    //const previousRuleService = this.getRuleService();
+    ruleService = Object.values(normalize(ruleService, Schemas.RULE_SERVICE).entities.serviceRules || {})[0];
+    //TODO this.props.updateRuleService(previousRuleService, ruleService);
+    const formRuleService = { ...ruleService };
+    removeFields(formRuleService);
+    this.setState({ruleService: ruleService, formRuleService: formRuleService});
+  };
 
   private getFields = (serviceRule: Partial<IRule>): IFields =>
     Object.entries(serviceRule).map(([key, _]) => {
@@ -203,35 +250,48 @@ class RuleService extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private shouldShowSaveButton = () =>
-    !isNew(this.props.location.search) &&
-    (!!this.state.newConditions.length || !!this.state.newServices.length);
-
   private decisionDropdownOption = (decision: IDecision): string =>
     decision.name;
 
   private isGenericSelected = (value: string) =>
-    this.setState({isGeneric: value === 'true'});
+    this.setState({isGeneric: value.toLowerCase() === 'true'});
+
+  private getSelectableDecisions = () =>
+    Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() == 'service');
 
   private serviceRule = () => {
-    const {isLoading, error, formServiceRule, serviceRule} = this.props;
+    const {isLoading, error} = this.props;
+    const ruleService = this.getRuleService();
+    const formRuleService = this.getFormRuleService();
     // @ts-ignore
-    const ruleKey: (keyof IRuleService) = formServiceRule && Object.keys(formServiceRule)[0];
+    const ruleKey: (keyof IRuleService) = formRuleService && Object.keys(formRuleService)[0];
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
         {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formServiceRule && (
+        {!isLoading && !error && formRuleService && (
           <Form id={ruleKey}
-                fields={this.getFields(formServiceRule)}
-                values={serviceRule}
+                fields={this.getFields(formRuleService)}
+                values={ruleService}
                 isNew={isNew(this.props.location.search)}
                 showSaveButton={this.shouldShowSaveButton()}
-                post={{url: 'rules/services', successCallback: this.onPostSuccess, failureCallback: this.onPostFailure}}
-                put={{url: `rules/services/${this.state.ruleName || serviceRule[ruleKey]}`, successCallback: this.onPutSuccess, failureCallback: this.onPutFailure}}
-                delete={{url: `rules/services/${this.state.ruleName || serviceRule[ruleKey]}`, successCallback: this.onDeleteSuccess, failureCallback: this.onDeleteFailure}}
+                post={{
+                  url: 'rules/services',
+                  successCallback: this.onPostSuccess,
+                  failureCallback: this.onPostFailure
+                }}
+                put={{
+                  url: `rules/services/${ruleService.name}`,
+                  successCallback: this.onPutSuccess,
+                  failureCallback: this.onPutFailure
+                }}
+                delete={{
+                  url: `rules/services/${ruleService.name}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure
+                }}
                 saveEntities={this.saveEntities}>
-            {Object.keys(formServiceRule).map((key, index) =>
+            {Object.keys(formRuleService).map((key, index) =>
               key === 'decision'
                 ? <Field<IDecision> key={index}
                                     id={key}
@@ -239,7 +299,7 @@ class RuleService extends BaseComponent<Props, State> {
                                     type="dropdown"
                                     dropdown={{
                                       defaultValue: "Choose decision",
-                                      values: this.props.decisions,
+                                      values: this.getSelectableDecisions(),
                                       optionToString: this.decisionDropdownOption}}/>
                 : key === 'generic'
                 ? <Field key={index}
@@ -264,19 +324,18 @@ class RuleService extends BaseComponent<Props, State> {
   private conditions = (): JSX.Element =>
     <RuleServiceConditionList isLoadingRuleService={this.props.isLoading}
                               loadRuleServiceError={this.props.error}
-                              ruleService={this.props.serviceRule}
-                              newConditions={this.state.newConditions}
-                              onAddRuleCondition={this.onAddRuleCondition}
-                              onRemoveRuleConditions={this.onRemoveRuleConditions}/>;
+                              ruleService={this.props.ruleService}
+                              newConditions={this.state.unsavedConditions}
+                              onAddRuleCondition={this.addRuleCondition}
+                              onRemoveRuleConditions={this.removeRuleConditions}/>;
 
   private services = (): JSX.Element =>
-
     <RuleServiceServicesList isLoadingRuleService={this.props.isLoading}
                              loadRuleServiceError={this.props.error}
-                             ruleService={this.props.serviceRule}
-                             newServices={this.state.newServices}
-                             onAddRuleService={this.onAddRuleService}
-                             onRemoveRuleServices={this.onRemoveRuleServices}/>;
+                             ruleService={this.props.ruleService}
+                             newServices={this.state.unsavedServices}
+                             onAddRuleService={this.addRuleService}
+                             onRemoveRuleServices={this.removeRuleServices}/>;
 
   private tabs = () => [
     {
@@ -310,35 +369,36 @@ class RuleService extends BaseComponent<Props, State> {
 
 }
 
+function removeFields(ruleService: Partial<IRuleService>) {
+  delete ruleService["id"];
+  delete ruleService["conditions"];
+  delete ruleService["services"];
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.rules.services.isLoadingRules;
   const error = state.entities.rules.services.loadRulesError;
   const name = props.match.params.name;
-  const isNewRule = isNew(props.location.search);
-  const serviceRule = isNewRule ? buildNewServiceRule() : state.entities.rules.services.data[name];
-  let formServiceRule;
-  if (isNewRule || !isNewRule && serviceRule) {
-    formServiceRule = { ...serviceRule };
-    if (!isNewRule) {
-      delete formServiceRule["id"];
-      delete formServiceRule["conditions"];
-      delete formServiceRule["services"];
-    }
+  const ruleService = isNew(props.location.search) ? buildNewServiceRule() : state.entities.rules.services.data[name];
+  let formRuleService;
+  if (ruleService) {
+    formRuleService = { ...ruleService };
+    removeFields(formRuleService);
   }
-  const decisions = state.entities.decisions.data
-                    && Object.values(state.entities.decisions.data)
-                             .filter(decision => decision.componentType.name.toLowerCase() == 'service');
+  const decisions = state.entities.decisions.data;
   return  {
     isLoading,
     error,
-    serviceRule,
-    formServiceRule,
+    ruleService,
+    formRuleService,
     decisions,
   }
 }
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesService,
+  addRuleService,
+  //TODO updateRuleService,
   loadDecisions,
   addRuleServiceConditions,
   addRuleServices,

@@ -856,7 +856,7 @@ public class DatabaseLoader {
 
       // conditions
       var cpuPercentageOver90 = ConditionEntity.builder()
-          .name("cpuPercentageOver90")
+          .name("CpuPercentageOver90")
           .valueMode(effectiveValue)
           .field(cpuPercentage)
           .operator(greaterThan)
@@ -864,7 +864,7 @@ public class DatabaseLoader {
           .build();
       cpuPercentageOver90 = conditions.save(cpuPercentageOver90);
       var ramPercentageOver90 = ConditionEntity.builder()
-          .name("ramPercentageOver90")
+          .name("RamPercentageOver90")
           .valueMode(effectiveValue)
           .field(ramPercentage)
           .operator(greaterThan)

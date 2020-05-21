@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import axios, {AxiosError, AxiosRequestConfig, AxiosResponse, Method} from "axios";
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse, CancelTokenSource, Method} from "axios";
 import {isAuthenticated} from "./auth";
 import {camelCaseToSentenceCase, snakeCaseToCamelCase} from "./text";
 
@@ -32,6 +32,8 @@ export interface IReply<T> extends AxiosResponse<T> {
 
 export const API_URL = 'http://localhost:8080';
 export const REQUEST_TIMEOUT = 300000;
+const CancelToken = axios.CancelToken;
+export const cancelRequests: { [key: string]: CancelTokenSource } = {};
 
 //TODO delete
 export function getData<T>(url: string, callback: (data: T) => void): any {
@@ -73,9 +75,6 @@ export function patchData<T>(url: string, requestBody: any,
   sendData<T>(url, 'PATCH', requestBody, successCallback, failureCallback);
 }
 
-const CancelToken = axios.CancelToken;
-export const cancelRequest = CancelToken.source();
-
 function sendData<T>(endpoint: string, method: Method, data: any,
                      successCallback: (response: IReply<T>) => void, failureCallback: (reason: string) => void) {
   const url = new URL(endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`);
@@ -89,12 +88,16 @@ function sendData<T>(endpoint: string, method: Method, data: any,
       'Accept': 'application/json;charset=UTF-8',
     },
     data,
+    //TODO remove
     timeout: REQUEST_TIMEOUT,
-    cancelToken: cancelRequest.token
+    //TODO remove
+    cancelToken: setCancelRequest(method, url.pathname).token
   }).then((response: AxiosResponse) => {
+    deleteCancelRequest(method, url.pathname);
     console.log(response);
     successCallback(response)
   }).catch((error: AxiosError) => {
+    deleteCancelRequest(method, url.pathname);
     if (axios.isCancel(error)) {
       console.log(error.message || 'Request canceled');
     }
@@ -121,11 +124,13 @@ export function deleteData(endpoint: string,
     },
     data,
     timeout: REQUEST_TIMEOUT,
-    cancelToken: cancelRequest.token
+    cancelToken: setCancelRequest('delete', url.pathname).token
   }).then((response: AxiosResponse) => {
+    deleteCancelRequest('delete', url.pathname);
     console.log(response);
     successCallback();
   }).catch((error: AxiosError) => {
+    deleteCancelRequest('delete', url.pathname);
     if (axios.isCancel(error)) {
       console.log(error.message || 'Request canceled');
     }
@@ -147,6 +152,19 @@ function buildErrorMessage(error: AxiosError): string {
   return `${responseStatusCode} ${responseStatusMessage} - ${responseMessage}`;
 }
 
+const buildCancelRequest = (method: Method, url: string) =>
+  `${method}:${url.startsWith('/') ? url : '/' + url}`.toLowerCase();
+
+export const setCancelRequest = (method: Method, url: string): CancelTokenSource => {
+  return cancelRequests[buildCancelRequest(method, url)] = CancelToken.source();
+};
+
+export const getCancelRequest = (method: Method, url: string): CancelTokenSource =>
+  cancelRequests[buildCancelRequest(method, url)];
+
+export const deleteCancelRequest = (method: Method, url: string): boolean =>
+  delete cancelRequests[buildCancelRequest(method, url)];
+
 export const setupAxiosInterceptors = (token: string): void => {
   axios.interceptors.request.use(
     (config: AxiosRequestConfig) => {
@@ -156,7 +174,9 @@ export const setupAxiosInterceptors = (token: string): void => {
       config.headers['Content-Type'] = 'application/json;charset=UTF-8';
       config.headers['Accept'] = 'application/json;charset=UTF-8';
       config.timeout = REQUEST_TIMEOUT;
-      config.cancelToken = cancelRequest.token;
+      if (config.method && config.url) {
+        config.cancelToken = setCancelRequest(config.method, config.url).token;
+      }
       return config
     }
   )

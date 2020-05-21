@@ -200,7 +200,7 @@ import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
 import {INode} from "../routes/nodes/Node";
 import {IRuleHost} from "../routes/rules/hosts/RuleHost";
 import {IValueMode, IField, IOperator, IDecision} from "../routes/rules/Rule";
-import {ICondition} from "../routes/rules/conditions/RuleCondition";
+import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 //TODO simulated metrics
 import {IRegion} from "../routes/region/Region";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
@@ -278,7 +278,7 @@ export type EntitiesState = {
       loadServicesError: string | null,
     },
     conditions: {
-      data: { [key: string]: ICondition },
+      data: { [key: string]: IRuleCondition },
       isLoadingConditions: boolean,
       loadConditionsError: string | null,
     }
@@ -347,7 +347,7 @@ export type EntitiesAction = {
     valueModes?: IValueMode[],
     fields?: IField[],
     operators?: IOperator[],
-    conditions?: ICondition[],
+    conditions?: IRuleCondition[],
     conditionsNames?: string[],
     decisions?: IDecision[],
     //TODO simulated metrics

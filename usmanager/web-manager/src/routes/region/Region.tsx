@@ -83,7 +83,7 @@ class Region extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IRegion>): void => {
     const region = reply.data;
-    super.toast(`<span class="green-text">Region ${region.name} saved</span>`);
+    super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} saved</span>`);
     this.props.addRegion(region);
     if (this.mounted) {
       this.updateRegion(region);
@@ -92,11 +92,11 @@ class Region extends BaseComponent<Props, State> {
   };
 
   private onPostFailure = (reason: string, region: IRegion): void =>
-    super.toast(`Unable to save ${region.name}`, 10000, reason, true);
+    super.toast(`Unable to save <b>${region.name}</b> region`, 10000, reason, true);
 
   private onPutSuccess = (reply: IReply<IRegion>): void => {
     const region = reply.data;
-    super.toast(`<span class="green-text">Changes to region ${region.name} have been saved</span>`);
+    super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region have been saved</span>`);
     if (this.mounted) {
       this.updateRegion(region);
       this.props.history.replace(region.name);
@@ -104,17 +104,17 @@ class Region extends BaseComponent<Props, State> {
   };
 
   private onPutFailure = (reason: string, region: IRegion): void =>
-    super.toast(`Unable to update ${region.name}`, 10000, reason, true);
+    super.toast(`Unable to update ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region`, 10000, reason, true);
 
   private onDeleteSuccess = (region: IRegion): void => {
-    super.toast(`<span class="green-text">Region ${region.name} successfully removed</span>`);
+    super.toast(`<span class="green-text">Region <b class="white-text">${region.name}</b> successfully removed</span>`);
     if (this.mounted) {
       this.props.history.push(`/regions`);
     }
   };
 
   private onDeleteFailure = (reason: string, region: IRegion): void =>
-    super.toast(`Unable to delete ${region.name}`, 10000, reason, true);
+    super.toast(`Unable to delete ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region`, 10000, reason, true);
 
   private updateRegion = (region: IRegion) => {
     //const previousRegion = this.getRegion();

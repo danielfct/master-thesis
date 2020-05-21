@@ -40,7 +40,7 @@ import {IApp} from "../routes/apps/App";
 import {IDecision, IField, IOperator, IValueMode} from "../routes/rules/Rule";
 import {IRuleService} from "../routes/rules/services/RuleService";
 import {IRuleHost} from "../routes/rules/hosts/RuleHost";
-import {ICondition} from "../routes/rules/conditions/RuleCondition";
+import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 import {IAppService} from "../routes/apps/AppServicesList";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 
@@ -98,8 +98,8 @@ interface ISchemas {
     RULE_HOST_ARRAY: schema.Entity<IRuleHost>[];
     RULE_SERVICE: schema.Entity<IRuleService>;
     RULE_SERVICE_ARRAY: schema.Entity<IRuleService>[];
-    RULE_CONDITION: schema.Entity<ICondition>;
-    RULE_CONDITION_ARRAY: schema.Entity<ICondition>[];
+    RULE_CONDITION: schema.Entity<IRuleCondition>;
+    RULE_CONDITION_ARRAY: schema.Entity<IRuleCondition>[];
     VALUE_MODE_ARRAY: schema.Entity<IValueMode>[];
     FIELD_ARRAY: schema.Entity<IField>[];
     OPERATOR_ARRAY: schema.Entity<IOperator>[];
@@ -192,8 +192,8 @@ const operator: schema.Entity<IOperator> = new schema.Entity('operators', undefi
 });
 const operators = new schema.Array(operator);
 
-const condition: schema.Entity<ICondition> = new schema.Entity('conditions', undefined, {
-    idAttribute: (condition: ICondition) => condition.name
+const condition: schema.Entity<IRuleCondition> = new schema.Entity('conditions', undefined, {
+    idAttribute: (condition: IRuleCondition) => condition.name
 });
 const conditions = new schema.Array(condition);
 

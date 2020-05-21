@@ -2,9 +2,9 @@
 
 [![js-eslint-style](https://img.shields.io/badge/code%20style-TSLint-blue.svg?style=flat-square)](https://palantir.github.io/tslint/)
 
-Este módulo é consistido por cliente reactjs.  
-Interage com o [Master Manager](/usmanager/master-manager) através de REST API para permitir um 
-ajuste manual do sistema, bem como a visualização do progresso e comportamento do sistema como um todo.  
+Este módulo é consistido por um cliente reactjs.  
+O qual comunica com o [Master Manager](/usmanager/master-manager) através de REST API para permitir 
+ajustar manualmente e interagir com o sistema, bem como a visualização do progresso e comportamento do sistema como um todo.  
  
 <!---
 This module brings a reactjs client to the project. Allowing the manual tweaking of the system, as well as visually 
@@ -23,7 +23,7 @@ seeing the progress and behaviour of the system as a whole.
  
  > Ubuntu 18.04.4 LTS  
  
- > Chromium 80.0.3987.87 snap 64 bits
+ > Chrome browser 81.0.4044.138
 
 ### Ferramentas usadas
 

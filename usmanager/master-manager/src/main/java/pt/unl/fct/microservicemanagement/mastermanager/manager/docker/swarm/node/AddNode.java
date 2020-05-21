@@ -33,7 +33,7 @@ import lombok.Getter;
 @Getter
 final class AddNode {
 
-  private final String hostname;
+  private final String host;
   private final int quantity;
   private final RegionEntity region;
   private final String country;

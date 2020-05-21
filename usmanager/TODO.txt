@@ -1,0 +1,54 @@
+add dropdown not showing sometimes
+modal needs 2 clicks
+loadbalancer 502 bad gateway
+field dropdown is already filled
+number field cant type 0
+add service rule not working
+normalize host rules not turning into strings
+checkstyle-cache is going to home folder
+tab change not updating history
+add red color to all new items on list
+add cloud hosts to database
+not redirect when entity not found. instead show error message
+unable to save new entity multiple times
+entities collections sometimes not updating?
+unable to add rules to hosts
+change value on form while adding new entities at the same time, prevents the form change to update:
+	fix -> action to update the form values before the action to add new entity
+logs pagesize dropdown option 'all' not working
+number fields not displaying required error
+unable to add rules to a edge host
+cloud host form is broken
+add cloud hosts at the start of the master manager
+customer launch button to services
+custom buttons are triggering form validation
+cloud host entity doesnt have ip address on running state
+cant add cloud host rules
+services is on a loop
+only show red new entities when is not new
+delete cloud instance deletes host rule?
+new node -> include cloud hosts instances
+new container erroring
+avoid adding duplicate entities like hostrulesservice -> addEdgeHost
+UPDATE_ENTITY action
+add app is forcing re-mounting when add cloud instance is not. and without services loaded
+datakey on controlledlist?
+change service.serviceName to service.name
+change addEntity actions to accept more than 1 entity
+form id is needed?
+//TODO do unsaved color on all lists with non new items
+check shouldshowsavebutton on all entities like it is on rulehost
+href on every toast from callback (like container), but not on deletes
+boolean dropdown not showing
+remove onAdd from every list
+change super.toast on lists classes
+rename all manager exceptions to MasterManagerException?
+master manager: deleteById instead of by entity
+cancel button is appearing after edit button
+
+test: reload every single page
+
+
+simulated metrics
+load balancer
+eureka

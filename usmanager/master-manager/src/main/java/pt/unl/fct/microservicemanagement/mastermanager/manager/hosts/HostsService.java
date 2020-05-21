@@ -237,8 +237,8 @@ public class HostsService {
     return continent;
   }
 
-  public void addHost(NodeRole role, String hostname) {
-    setupHost(role, hostname);
+  public void addHost(NodeRole role, String host) {
+    setupHost(role, host);
   }
 
   public String addHost(NodeRole role, String region, String country, String city) {

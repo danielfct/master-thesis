@@ -58,14 +58,15 @@ interface StateToProps {
   edgeHosts: { [key: string]: IEdgeHost };
   cloudHosts: { [key: string]: ICloudHost };
   regions: { [key: string]: IRegion };
+  nodes: { [key: string]: INode };
 }
 
 interface DispatchToProps {
-  loadNodes: (name: string) => void;
+  loadNodes: () => void;
+  addNode: (node: INode) => void;
   loadEdgeHosts: () => void;
   loadCloudHosts: () => void;
   loadRegions: () => void;
-  addNode: (node: INode) => void;
 }
 
 interface MatchParams {
@@ -92,6 +93,7 @@ class Node extends BaseComponent<Props, State> {
     this.props.loadEdgeHosts();
     this.props.loadCloudHosts();
     this.props.loadRegions();
+    this.mounted = true;
   };
 
   componentWillUnmount(): void {
@@ -99,10 +101,7 @@ class Node extends BaseComponent<Props, State> {
   }
 
   private loadNode = () => {
-    if (!isNew(this.props.location.search)) {
-      const nodeId = this.props.match.params.id;
-      this.props.loadNodes(nodeId);
-    }
+    this.props.loadNodes();
   };
 
   private getNode = () =>
@@ -110,7 +109,7 @@ class Node extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<INode>): void => {
     const node = reply.data;
-    super.toast(`<span class="green-text">Started node ${node.id} at ${node.hostname}</span>`);
+    super.toast(`<span class="green-text">Started node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.hostname}</span>`);
     this.props.addNode(node);
     if (this.mounted) {
       this.updateNode(node);
@@ -118,25 +117,25 @@ class Node extends BaseComponent<Props, State> {
     }
   };
 
-  //TODO
-  private onPostFailure = (reason: string, nodeId: string | IRegion): void => {
-    if (typeof nodeId === "string") {
-      super.toast(`Unable to start node on ${nodeId}`, 10000, reason, true);
+  private onPostFailure = (reason: string, place: string | IRegion): void => {
+    console.log(place)
+    if (typeof place === "string") {
+      super.toast(`Unable to start node at ${place}`, 10000, reason, true);
     }
     else {
-      super.toast(`Unable to start node at ${nodeId.name}`, 10000, reason, true);
+      super.toast(`Unable to start node at ${place.name}`, 10000, reason, true);
     }
   };
 
   private onDeleteSuccess = (node: INode): void => {
-    super.toast(`<span class="green-text">Node ${node.id} successfully stopped</span>`);
+    super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} successfully stopped</span>`);
     if (this.mounted) {
-      this.props.history.push(`/nodes`)
+      this.props.history.push(`/nodes`);
     }
   };
 
   private onDeleteFailure = (reason: string, node: INode): void =>
-    super.toast(`Unable to stop ${node.id}`, 10000, reason, true);
+    super.toast(`Unable to stop ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} node`, 10000, reason, true);
 
   private updateNode = (node: INode) => {
     //const previousNode = this.getNode();
@@ -164,8 +163,11 @@ class Node extends BaseComponent<Props, State> {
     }, {});
 
   private getSelectableHosts = () => {
-    const cloudHosts = Object.keys(this.props.cloudHosts);
-    const edgeHosts = Object.keys(this.props.edgeHosts);
+    const nodesHostnames = Object.values(this.props.nodes).map(node => node.hostname);
+    const cloudHosts = Object.values(this.props.cloudHosts)
+                             .filter(instance => instance.publicIpAddress && !nodesHostnames.includes(instance.publicIpAddress))
+                             .map(instance => instance.publicIpAddress);
+    const edgeHosts = Object.keys(this.props.edgeHosts).filter(edgeHost => !nodesHostnames.includes(edgeHost));
     return cloudHosts.concat(edgeHosts);
   };
 
@@ -257,7 +259,7 @@ class Node extends BaseComponent<Props, State> {
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure
                 }}
-            // delete button is never present on new nodes, so a type cast is safe
+                // delete button is never present on new nodes, so a type cast is safe
                 delete={(node as INode).role !== 'MANAGER'
                   ? {textButton: 'Remove',
                     url: `nodes/${(node as INode).id}`,
@@ -299,6 +301,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const newNodeHost = isNew(props.location.search) ? buildNewNodeHost() : undefined;
   const newNodeLocation = isNew(props.location.search) ? buildNewNodeLocation() : undefined;
   const node = !isNew(props.location.search) ? state.entities.nodes.data[id] : undefined;
+  const nodes = state.entities.nodes.data;
   const cloudHosts = state.entities.hosts.cloud.data;
   const edgeHosts = state.entities.hosts.edge.data;
   const regions = state.entities.regions.data;
@@ -308,6 +311,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     newNodeHost,
     newNodeLocation,
     node,
+    nodes,
     cloudHosts,
     edgeHosts,
     regions

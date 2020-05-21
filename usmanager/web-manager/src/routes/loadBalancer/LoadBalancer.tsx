@@ -59,20 +59,22 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 class LoadBalancer extends BaseComponent<Props, {}> {
 
+  //TODO change toasts messages
+
   componentDidMount(): void {
     this.props.loadServices();
     this.props.loadRegions();
   }
 
   private onPostSuccess = (reply: IReply<ILoadBalancer>): void => {
-    //super.toast(`Load balancer <b>${edgeHostHostname}</b> is now saved`); TODO
+    //super.toast(`Load balancer <b>${edgeHostHostname}</b> saved`); TODO
   };
 
   private onPostFailure = (reason: string): void =>
     super.toast(`Unable to launch load balancer`, 10000, reason, true);
 
   private onDeleteSuccess = (id: string): void => {
-    super.toast(`<span class="green-text">Load balancer ${id} successfully stopped</span>`);
+    super.toast(`<span class="green-text">${id} load-balancer successfully stopped</span>`);
     this.props.history.push(`/load-balancers`)
   };
 
@@ -172,7 +174,7 @@ class LoadBalancer extends BaseComponent<Props, {}> {
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const regions = state.entities.regions.data;
-  const isLoading = false; //state.entities.loadBalancers.isLoading;
+  const isLoading = false; //state.entities.loadBalancers.loading;
   const error = null; //state.entities.loadBalancers.error;
   const id = props.match.params.id;
   const loadBalancer = isLaunchLoadBalancer(id) ? buildNewLoadBalancer() : {}; //state.entities.loadBalancers.data[id];

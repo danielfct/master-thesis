@@ -88,6 +88,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   componentDidMount(): void {
     this.loadEdgeHost();
+    this.mounted = true;
   };
 
   componentWillUnmount(): void {
@@ -109,7 +110,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IEdgeHost>): void => {
     const edgeHost = reply.data;
-    super.toast(`<span class="green-text">Edge host <b>${edgeHost.hostname}</b> is now saved</span>`);
+    super.toast(`<span class="green-text">Edge host ${this.mounted ? `<b class="white-text">${edgeHost.hostname}</b>` : `<a href=/hosts/edge/${edgeHost.hostname}><b>${edgeHost.hostname}</b></a>`} saved</span>`);
     this.props.addEdgeHost(edgeHost);
     this.saveEntities(edgeHost);
     if (this.mounted) {
@@ -119,11 +120,11 @@ class EdgeHost extends BaseComponent<Props, State> {
   };
 
   private onPostFailure = (reason: string, edgeHost: IEdgeHost): void =>
-    super.toast(`Unable to save ${edgeHost.hostname}`, 10000, reason, true);
+    super.toast(`Unable to save <b>${edgeHost.hostname}</b> edge host`, 10000, reason, true);
 
   private onPutSuccess = (reply: IReply<IEdgeHost>): void => {
     const edgeHost = reply.data;
-    super.toast(`<span class="green-text">Changes to host ${edgeHost.hostname} have been saved</span>`);
+    super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${edgeHost.hostname}</b>` : `<a href=/hosts/edge/${edgeHost.hostname}><b>${edgeHost.hostname}</b></a>`} edge host have been saved</span>`);
     this.saveEntities(edgeHost);
     if (this.mounted) {
       this.updateEdgeHost(edgeHost);
@@ -132,17 +133,17 @@ class EdgeHost extends BaseComponent<Props, State> {
   };
 
   private onPutFailure = (reason: string, edgeHost: IEdgeHost): void =>
-    super.toast(`Unable to update ${edgeHost.hostname}`, 10000, reason, true);
+    super.toast(`Unable to update ${this.mounted ? `<b>${edgeHost.hostname}</b>` : `<a href=/hosts/edge/${edgeHost.hostname}><b>${edgeHost.hostname}</b></a>`} edge host`, 10000, reason, true);
 
   private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
-    super.toast(`<span class="green-text">Edge host ${edgeHost.hostname} successfully removed</span>`);
+    super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.hostname}</b> successfully removed</span>`);
     if (this.mounted) {
       this.props.history.push(`/hosts`)
     }
   };
 
   private onDeleteFailure = (reason: string, edgeHost: IEdgeHost): void =>
-    super.toast(`Unable to remove edge host ${edgeHost.hostname}`, 10000, reason, true);
+    super.toast(`Unable to delete ${this.mounted ? `<b>${edgeHost.hostname}</b>` : `<a href=/hosts/edge/${edgeHost.hostname}><b>${edgeHost.hostname}</b></a>`} edge host`, 10000, reason, true);
 
   private shouldShowSaveButton = () =>
     !!this.state.unsavedRules.length;
@@ -180,7 +181,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   };
 
   private onSaveRulesFailure = (edgeHost: IEdgeHost, reason: string): void =>
-    super.toast(`Unable to save rules of host ${edgeHost.hostname}`, 10000, reason, true);
+    super.toast(`Unable to save rules of ${this.mounted ? `<b>${edgeHost.hostname}</b>` : `<a href=/hosts/edge/${edgeHost.hostname}><b>${edgeHost.hostname}</b></a>`} edge host`, 10000, reason, true);
 
   private updateEdgeHost = (edgeHost: IEdgeHost) => {
     //const previousEdgeHost = this.getEdgeHost();

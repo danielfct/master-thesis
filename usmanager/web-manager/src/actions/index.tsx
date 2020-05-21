@@ -34,7 +34,7 @@ import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
 import {INode} from "../routes/nodes/Node";
 import {IRuleHost} from "../routes/rules/hosts/RuleHost";
 import {IRuleService} from "../routes/rules/services/RuleService";
-import {ICondition} from "../routes/rules/conditions/RuleCondition";
+import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 //import {ISimulatedMetric} from "../routes/simulatedMetrics/SimulatedMetric"; TODO
 import {IRegion} from "../routes/region/Region";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
@@ -727,7 +727,7 @@ const fetchConditions = (name?: string) => ({
       }
 });
 export const ADD_CONDITION = 'ADD_CONDITION';
-export function addCondition(condition: ICondition): EntitiesAction {
+export function addCondition(condition: IRuleCondition): EntitiesAction {
   return {
     type: ADD_CONDITION,
     data: { conditions: new Array(condition) }

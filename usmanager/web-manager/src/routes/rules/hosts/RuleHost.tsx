@@ -45,7 +45,7 @@ export interface IRuleHost extends IRule {
   edgeHosts?: string[],
 }
 
-const buildNewHostRule = () => ({
+const buildNewHostRule = (): Partial<IRuleHost> => ({
   name: '',
   priority: undefined,
   generic: undefined,
@@ -121,7 +121,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IRuleHost>): void => {
     const ruleHost = reply.data;
-    super.toast(`<span class="green-text">Host rule ${ruleHost.name} saved</span>`);
+    super.toast(`<span class="green-text">Host rule ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} saved</span>`);
     this.props.addRuleHost(ruleHost);
     this.saveEntities(reply.data);
     if (this.mounted) {
@@ -130,12 +130,12 @@ class RuleHost extends BaseComponent<Props, State> {
     }
   };
 
-  private onPostFailure = (reason: string, rule: IRuleHost): void =>
-    super.toast(`Unable to save ${rule.name}`, 10000, reason, true);
+  private onPostFailure = (reason: string, ruleHost: IRuleHost): void =>
+    super.toast(`Unable to save <b>${ruleHost.name}</b> host rule`, 10000, reason, true);
 
   private onPutSuccess = (reply: IReply<IRuleHost>): void => {
     const ruleHost = reply.data;
-    super.toast(`<span class="green-text">Changes to host rule ${ruleHost.name} have been saved</span>`);
+    super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule have been saved</span>`);
     this.saveEntities(ruleHost);
     if (this.mounted) {
       this.updateRuleHost(ruleHost);
@@ -143,20 +143,20 @@ class RuleHost extends BaseComponent<Props, State> {
     }
   };
 
-  private onPutFailure = (reason: string, rule: IRuleHost): void =>
-    super.toast(`Unable to update ${rule.name}`, 10000, reason, true);
+  private onPutFailure = (reason: string, ruleHost: IRuleHost): void =>
+    super.toast(`Unable to update ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
 
-  private onDeleteSuccess = (rule: IRuleHost): void => {
-    super.toast(`<span class="green-text">Host rule ${rule.name} successfully removed</span>`);
+  private onDeleteSuccess = (ruleHost: IRuleHost): void => {
+    super.toast(`<span class="green-text">Host rule <b class="white-text">${ruleHost.name}</b> successfully removed</span>`);
     if (this.mounted) {
       this.props.history.push(`/rules/hosts`)
     }
   };
 
   private onDeleteFailure = (reason: string, ruleHost: IRuleHost): void =>
-    super.toast(`Unable to delete ${ruleHost.name}`, 10000, reason, true);
+    super.toast(`Unable to delete ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
 
-  private shouldShowSaveButton = ():boolean =>
+  private shouldShowSaveButton = () =>
     !!this.state.unsavedConditions.length
     || !!this.state.unsavedCloudHosts.length
     || !!this.state.unsavedEdgeHosts.length;
@@ -195,8 +195,8 @@ class RuleHost extends BaseComponent<Props, State> {
     }
   };
 
-  private onSaveConditionsFailure = (rule: IRuleHost, reason: string): void =>
-    super.toast(`Unable to save conditions of rule ${rule.name}`, 10000, reason, true);
+  private onSaveConditionsFailure = (ruleHost: IRuleHost, reason: string): void =>
+    super.toast(`Unable to save conditions of ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
 
   private addRuleCloudHost = (cloudHost: string): void =>
     this.setState({
@@ -225,8 +225,8 @@ class RuleHost extends BaseComponent<Props, State> {
     }
   };
 
-  private onSaveCloudHostsFailure = (rule: IRuleHost, reason: string): void =>
-    super.toast(`Unable to save cloud hosts of rule ${rule.name}`, 10000, reason, true);
+  private onSaveCloudHostsFailure = (ruleHost: IRuleHost, reason: string): void =>
+    super.toast(`Unable to save cloud hosts of ${this.mounted ? `<b>${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
 
   private addRuleEdgeHost = (edgeHost: string): void =>
     this.setState({
@@ -255,8 +255,8 @@ class RuleHost extends BaseComponent<Props, State> {
     }
   };
 
-  private onSaveEdgeHostsFailure = (rule: IRuleHost, reason: string): void =>
-    super.toast(`Unable to save edge hosts of rule ${rule.name}`, 10000, reason, true);
+  private onSaveEdgeHostsFailure = (ruleHost: IRuleHost, reason: string): void =>
+    super.toast(`Unable to save edge hosts of ${this.mounted ? <b>${ruleHost.name}</b> : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
 
   private updateRuleHost = (ruleHost: IRuleHost) => {
     //const previousRuleHost = this.getRuleHost();
@@ -290,7 +290,7 @@ class RuleHost extends BaseComponent<Props, State> {
     decision.name;
 
   private isGenericSelected = (value: string) =>
-    this.setState({isGeneric: value === 'true'});
+    this.setState({isGeneric: value.toLowerCase() === 'true'});
 
   private getSelectableDecisions = () =>
     Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() == 'host');
@@ -449,7 +449,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
   addRuleHost,
-  //TODO updateRulehost,
+  //TODO updateRuleHost,
   loadDecisions,
   addRuleHostConditions,
   addRuleCloudHosts,

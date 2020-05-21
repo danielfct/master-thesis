@@ -1,7 +1,7 @@
 import IDatabaseData from "../../components/IDatabaseData";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import Form, {ICustomButton, IFields, requiredAndTrimmed} from "../../components/form/Form";
+import Form, {ICustomButton, IFields, IFormLoading, requiredAndTrimmed} from "../../components/form/Form";
 import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
@@ -51,7 +51,7 @@ interface State {
   app?: IApp,
   formApp?: IApp,
   unsavedServices: IAddAppService[],
-  isLoading: boolean,
+  loading: IFormLoading,
 }
 
 class App extends BaseComponent<Props, State> {
@@ -60,7 +60,7 @@ class App extends BaseComponent<Props, State> {
 
   state: State = {
     unsavedServices: [],
-    isLoading: false,
+    loading: undefined,
   };
 
   componentDidMount(): void {
@@ -87,7 +87,7 @@ class App extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IApp>): void => {
     const app = reply.data;
-    super.toast(`<span class="green-text">App ${app.name} saved</span>`);
+    super.toast(`<span class="green-text">App ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} saved</span>`);
     this.props.addApp(app);
     this.saveEntities(app);
     if (this.mounted) {
@@ -97,11 +97,11 @@ class App extends BaseComponent<Props, State> {
   };
 
   private onPostFailure = (reason: string, app: IApp): void =>
-    super.toast(`Unable to save ${app.name}`, 10000, reason, true);
+    super.toast(`Unable to save <b>${app.name}</b> app`, 10000, reason, true);
 
   private onPutSuccess = (reply: IReply<IApp>): void => {
     const app = reply.data;
-    super.toast(`<span class="green-text">Changes to app ${app.name} have been saved</span>`);
+    super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app have been saved</span>`);
     this.saveEntities(app);
     if (this.mounted) {
       this.updateApp(app);
@@ -110,17 +110,17 @@ class App extends BaseComponent<Props, State> {
   };
 
   private onPutFailure = (reason: string, app: IApp): void =>
-    super.toast(`Unable to update ${app.name}`, 10000, reason, true);
+    super.toast(`Unable to update ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
 
   private onDeleteSuccess = (app: IApp): void => {
-    super.toast(`<span class="green-text">App ${app.name} successfully removed</span>`);
+    super.toast(`<span class="green-text">App <b class="white-text">${app.name}</b> successfully removed</span>`);
     if (this.mounted) {
       this.props.history.push(`/apps`);
     }
   };
 
   private onDeleteFailure = (reason: string, app: IApp): void =>
-    super.toast(`Unable to delete ${app.name}`, 10000, reason, true);
+    super.toast(`Unable to delete ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
 
   private shouldShowSaveButton = () =>
     !!this.state.unsavedServices.length;
@@ -158,7 +158,7 @@ class App extends BaseComponent<Props, State> {
   };
 
   private onSaveServicesFailure = (app: IApp, reason: string): void =>
-    super.toast(`Unable to save services of app ${app.name}`, 10000, reason, true);
+    super.toast(`Unable to save services of ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
 
   private launchButton = (): ICustomButton[] => {
     const buttons: ICustomButton[] = [];
@@ -176,23 +176,24 @@ class App extends BaseComponent<Props, State> {
 
   private launchApp = () => {
     const app = this.getApp();
-    this.setState({isLoading: true});
-    postData(`apps/${app.name}/launch`, undefined,
+    const url = `apps/${app.name}/launch`;
+    this.setState({ loading: { method: 'post', url: url } });
+    postData(url, undefined,
       (reply: IReply<IApp>) => this.onLaunchSuccess(reply.data),
       (reason: string) => this.onLaunchFailure(reason, app));
   };
 
   private onLaunchSuccess = (app: IApp) => {
-    super.toast(`<span class="green-text">Successfully launched ${app.name}</span>`);
+    super.toast(`<span class="green-text">Successfully launched services of ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app</span>`);
     if (this.mounted) {
       this.updateApp(app);
     }
   };
 
   private onLaunchFailure = (reason: string, app: Partial<IApp>) => {
-    super.toast(`Failed to launch ${app.name}`, 10000, reason, true);
+    super.toast(`Failed to launch services of ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
     if (this.mounted) {
-      this.setState({isLoading: false});
+      this.setState({loading: undefined});
     }
   };
 
@@ -202,7 +203,7 @@ class App extends BaseComponent<Props, State> {
     this.props.updateApp(previousApp, app);
     const formApp = { ...app };
     removeFields(formApp);
-    this.setState({app: app, formApp: formApp, isLoading: false});
+    this.setState({app: app, formApp: formApp, loading: undefined});
   };
 
   private getFields = (app: Partial<IApp>): IFields =>
@@ -254,7 +255,7 @@ class App extends BaseComponent<Props, State> {
                 }}
                 customButtons={this.launchButton()}
                 saveEntities={this.saveEntities}
-                loading={this.state.isLoading}>
+                loading={this.state.loading}>
             {Object.keys(formApp).map((key, index) =>
               <Field key={index}
                      id={key}
