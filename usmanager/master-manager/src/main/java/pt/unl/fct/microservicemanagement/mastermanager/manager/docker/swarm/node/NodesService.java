@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
 
 import java.util.List;
@@ -63,7 +64,7 @@ public final class NodesService {
           NodeRole.from(n.spec().role()))).collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new GetNodesException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 
@@ -108,7 +109,7 @@ public final class NodesService {
       log.info("Deleted node '{}'", nodeId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new DeleteNodeException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 

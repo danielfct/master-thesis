@@ -25,11 +25,11 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.MasterManagerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.LaunchDockerApiProxyException;
 
 import java.util.List;
 import java.util.Map;
@@ -85,7 +85,7 @@ public class MasterManagerMonitoringService {
       try {
         dockerApiProxyService.launchDockerApiProxy("127.0.0.1");
         isProxyRunning = true;
-      } catch (LaunchDockerApiProxyException e) {
+      } catch (MasterManagerException e) {
         e.printStackTrace();
         isProxyRunning = false;
       }

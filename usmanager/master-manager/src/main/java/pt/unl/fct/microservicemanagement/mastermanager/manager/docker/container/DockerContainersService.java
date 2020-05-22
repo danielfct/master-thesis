@@ -25,11 +25,11 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
 import org.springframework.stereotype.Service;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.LaunchDockerApiProxyException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
@@ -283,7 +283,7 @@ public class DockerContainersService {
       return getContainer(containerId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new LaunchContainerException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 
@@ -312,7 +312,7 @@ public class DockerContainersService {
     var command = "lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
     CommandResult commandResult = sshService.execCommand(hostname, "findAvailableExternalPort", command, true);
     if (!commandResult.isSuccessful()) {
-      throw new LaunchDockerApiProxyException("Unable to find currently used external ports at %s: %s ", hostname,
+      throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname,
           commandResult.getError());
     }
     Pattern isNumberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
@@ -396,7 +396,7 @@ public class DockerContainersService {
       log.info("Stopped container '{}' on host '{}'", id, hostname);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new StopContainerException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 
@@ -495,6 +495,7 @@ public class DockerContainersService {
   }
 
   public SimpleContainer getContainer(String id) {
+    //TODO change to entityNotFoundException
     return findContainer(id).orElseThrow(() -> new NotFoundException("Container not found"));
   }
 
@@ -525,7 +526,7 @@ public class DockerContainersService {
       return dockerClient.inspectContainer(containerId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new InspectContainerException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 
@@ -534,7 +535,7 @@ public class DockerContainersService {
       return dockerClient.stats(containerId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new GetContainerStatsException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 

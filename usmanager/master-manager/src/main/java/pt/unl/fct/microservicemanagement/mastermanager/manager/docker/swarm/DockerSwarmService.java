@@ -62,7 +62,7 @@ public class DockerSwarmService {
       return docker.info().swarm().controlAvailable();
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new DockerOperationException("Failed to execute 'isASwarmManager': %s", e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 
@@ -72,7 +72,7 @@ public class DockerSwarmService {
           && !docker.info().swarm().controlAvailable();
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new DockerOperationException("Failed to execute 'isASwarmWorker': %s", e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 
@@ -87,7 +87,7 @@ public class DockerSwarmService {
       log.info("Started docker swarm with id {}...", swarmId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new DockerOperationException("Failed to execute 'initSwarm': %s", e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 
@@ -109,7 +109,7 @@ public class DockerSwarmService {
       docker.leaveSwarm(true);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      throw new LeaveSwarmException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 

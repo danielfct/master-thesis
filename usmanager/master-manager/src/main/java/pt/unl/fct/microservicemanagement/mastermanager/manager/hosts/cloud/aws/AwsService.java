@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
 
@@ -169,7 +170,7 @@ public class AwsService {
         new StartInstancesRequest().withInstanceIds(instanceId).getDryRunRequest();
     DryRunResult<StartInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
     if (!dryResponse.isSuccessful()) {
-      throw new SetInstanceStateException(dryResponse.getDryRunResponse().getErrorMessage());
+      throw new MasterManagerException(dryResponse.getDryRunResponse().getErrorMessage());
     }
     StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instanceId);
     ec2.startInstances(request);
@@ -185,7 +186,7 @@ public class AwsService {
         new StopInstancesRequest().withInstanceIds(instanceId).getDryRunRequest();
     DryRunResult<StopInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
     if (!dryResponse.isSuccessful()) {
-      throw new SetInstanceStateException(dryResponse.getDryRunResponse().getErrorMessage());
+      throw new MasterManagerException(dryResponse.getDryRunResponse().getErrorMessage());
     }
     var request = new StopInstancesRequest().withInstanceIds(instanceId);
     ec2.stopInstances(request);
@@ -201,7 +202,7 @@ public class AwsService {
         new TerminateInstancesRequest().withInstanceIds(instanceId).getDryRunRequest();
     DryRunResult<TerminateInstancesRequest> dryResponse = ec2.dryRun(dryRequest);
     if (!dryResponse.isSuccessful()) {
-      throw new SetInstanceStateException(dryResponse.getDryRunResponse().getErrorMessage());
+      throw new MasterManagerException(dryResponse.getDryRunResponse().getErrorMessage());
     }
     var request = new TerminateInstancesRequest().withInstanceIds(instanceId);
     ec2.terminateInstances(request);
@@ -232,12 +233,12 @@ public class AwsService {
         instance = waitInstanceState(instanceId, state);
         log.info("Setting instance {} to {} state", instanceId, state.getName());
         return instance;
-      } catch (SetInstanceStateException e) {
+      } catch (MasterManagerException e) {
         log.info("Failed to set instance {} to {} state: {}", instanceId, state.getName(), e.getMessage());
       }
       Timing.sleep(DELAY_BETWEEN_INSTANCE_OPERATION_TRIES, TimeUnit.MILLISECONDS);
     }
-    throw new SetInstanceStateException("Unable to set instance state %d within %d tries",
+    throw new MasterManagerException("Unable to set instance state %d within %d tries",
         state.getName(), INSTANCE_OPERATION_MAX_RETRIES);
   }
 
@@ -250,7 +251,7 @@ public class AwsService {
       }, SET_INSTANCE_STATE_TIMEOUT);
     } catch (TimeoutException e) {
       log.info("Unknown status of instance {} {} operation: Timed out", instanceId, state.getName());
-      throw new SetInstanceStateException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
     return instance[0];
   }

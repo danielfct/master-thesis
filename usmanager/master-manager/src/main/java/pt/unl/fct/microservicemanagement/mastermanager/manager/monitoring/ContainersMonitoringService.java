@@ -37,7 +37,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decisi
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ServiceEventEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 

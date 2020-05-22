@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
@@ -73,7 +74,7 @@ public class DockerApiProxyService {
         hostname, false, false, dockerRepository);
     CommandResult commandResult = sshService.execCommand(hostname, "launchDockerApiProxy", command);
     if (!commandResult.isSuccessful()) {
-      throw new LaunchDockerApiProxyException("Unsuccessful launch of docker api proxy on host %s: %s", hostname,
+      throw new MasterManagerException("Unsuccessful launch of docker api proxy on host %s: %s", hostname,
           commandResult.getError());
     }
   }

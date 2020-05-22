@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsProperties;
@@ -101,7 +102,7 @@ public class SshService {
       sftpClient.put(new FileSystemFile(file), filename);
     } catch (IOException e) {
       e.printStackTrace();
-      throw new UploadFileException(e.getMessage());
+      throw new MasterManagerException(e.getMessage());
     }
   }
 

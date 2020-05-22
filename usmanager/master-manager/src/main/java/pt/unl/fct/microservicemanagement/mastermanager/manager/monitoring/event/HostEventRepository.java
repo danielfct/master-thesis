@@ -24,8 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
-
 import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;

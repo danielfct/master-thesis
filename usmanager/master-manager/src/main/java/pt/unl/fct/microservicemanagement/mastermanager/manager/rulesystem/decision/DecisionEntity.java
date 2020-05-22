@@ -11,8 +11,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes.ComponentTypeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.ServiceEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ServiceEventEntity;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -10,6 +10,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
@@ -141,13 +142,13 @@ public class NginxLoadBalancerService {
     String serviceName = labels.get(DockerContainer.Label.SERVICE_NAME);
     String serverAddress = labels.get(DockerContainer.Label.SERVICE_ADDRESS);
     if (serviceType == null || serviceName == null | serverAddress == null) {
-      throw new LoadBalancerException("Failed to remove container %s from load balancer: "
+      throw new MasterManagerException("Failed to remove container %s from load balancer: "
           + "labels %s, %s and %s are required. Current container labels = %s", containerId,
           DockerContainer.Label.SERVICE_NAME, DockerContainer.Label.SERVICE_TYPE,
           DockerContainer.Label.SERVICE_ADDRESS, labels);
     }
     if (!Objects.equals(serviceType, "frontend")) {
-      throw new LoadBalancerException("Failed to remove container %s from load balancer: "
+      throw new MasterManagerException("Failed to remove container %s from load balancer: "
           + "%s doesn't support load balancer", containerId, serviceType);
     }
     List<SimpleContainer> loadBalancers = getLoadBalancersFromService(serviceName);

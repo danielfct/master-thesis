@@ -8,16 +8,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import java.util.List;
 
-@ResponseStatus(HttpStatus.BAD_GATEWAY)
-final class TerminateInstanceException extends RuntimeException {
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-  TerminateInstanceException(String s, Object... args) {
-    super(String.format(s, args));
-  }
+@Repository
+public interface ServiceEventRepository extends CrudRepository<ServiceEventEntity, Long> {
+
+  List<ServiceEventEntity> findByContainerId(@Param("containerId") String containerId);
+
+  List<ServiceEventEntity> findByServiceName(@Param("serviceName") String serviceName);
 
 }

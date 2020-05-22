@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
@@ -39,7 +40,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decisi
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.HostDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.event.HostEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEventEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -281,7 +282,7 @@ public class HostsMonitoringService {
             hostsService.getHostDetails(n.getHostname()).getRegion()))
         .map(SimpleNode::getHostname)
         .findFirst()
-        .orElseThrow(() -> new StopHostException("Failed to find new host to migrate containers to."));
+        .orElseThrow(() -> new MasterManagerException("Can't find new host to migrate containers to"));
   }
 
   private Pair<String, String> getRandomContainerToMigrate(String hostname) {
