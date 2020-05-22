@@ -11,7 +11,7 @@ type Props = ConditionCardProps;
 
 const RuleConditionCard = ({condition}: Props) => (
   <Card<IRuleCondition> title={condition.name.toString()}
-                        link={{to: {pathname: `rules/conditions/${condition.name}`, state: condition}}}
+                        link={{to: {pathname: `/rules/conditions/${condition.name}`, state: condition}}}
                         height={'150px'}
                         margin={'10px 0'}
                         hoverable>

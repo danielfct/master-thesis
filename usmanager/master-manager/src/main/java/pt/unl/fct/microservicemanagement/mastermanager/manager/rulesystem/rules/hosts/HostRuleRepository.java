@@ -68,7 +68,7 @@ public interface HostRuleRepository extends CrudRepository<HostRuleEntity, Long>
 
   @Query("select case when count(r) > 0 then true else false end "
       + "from HostRuleEntity r "
-      + "where r.name = :ruleName")
+      + "where lower(r.name) = lower(:ruleName)")
   boolean hasRule(@Param("ruleName") String ruleName);
 
   @Query("select rc.hostCondition "

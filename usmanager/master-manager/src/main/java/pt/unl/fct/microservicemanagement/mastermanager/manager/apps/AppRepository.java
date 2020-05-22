@@ -39,12 +39,7 @@ public interface AppRepository extends CrudRepository<AppEntity, Long> {
 
   @Query("select case when count(a) > 0 then true else false end "
       + "from AppEntity a "
-      + "where a.id = :appId")
-  boolean hasApp(@Param("appId") long appId);
-
-  @Query("select case when count(a) > 0 then true else false end "
-      + "from AppEntity a "
-      + "where a.name = :appName")
+      + "where lower(a.name) = lower(:appName)")
   boolean hasApp(@Param("appName") String appName);
 
   @Query("select new pt.unl.fct.microservicemanagement.mastermanager.manager.services"
@@ -57,7 +52,7 @@ public interface AppRepository extends CrudRepository<AppEntity, Long> {
 
   @Query("select s "
       + "from AppEntity a join a.appServices s "
-      + "where a.name = :appName")
+      + "where LOWER(a.name) = LOWER(:appName)")
   List<AppServiceEntity> getServices(@Param("appName") String appName);
 
 }

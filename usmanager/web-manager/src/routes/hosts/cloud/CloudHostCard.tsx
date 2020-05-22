@@ -21,7 +21,7 @@ type Props = CloudHostCardProps;
 
 const CloudHostCard = ({cloudHost}: Props) => (
   <Card<ICloudHost> title={cloudHost.instanceId}
-                    link={{ to: { pathname: `/hosts/cloud/${cloudHost.instanceId }`, state: cloudHost } }}
+                    link={{to: {pathname: `/hosts/cloud/${cloudHost.instanceId }`, state: cloudHost}}}
                     height={'185px'}
                     margin={'10px 0'}
                     hoverable>

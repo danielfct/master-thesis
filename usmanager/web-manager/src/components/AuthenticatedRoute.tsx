@@ -35,7 +35,7 @@ interface Props {
 
 const AuthenticatedRoute = ({exact, path, component:Component, title}: Props) =>
     isAuthenticated()
-        ? <Route exact={exact} path={path} render={props => <Component {...props} key={props.match.params.name} title={title}/>}/>
+        ? <Route exact={exact} path={path} render={props => <Component {...props} key={path} title={title}/>}/>
         : <Redirect to="/login" />;
 
 export default AuthenticatedRoute;

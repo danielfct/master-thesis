@@ -78,3 +78,11 @@ rules:
 #trace: true
 logging:
   config: file:src/main/resources/logging/logback-spring.xml
+#  level:
+#    org:
+#      hibernate:
+#        sql: DEBUG
+#      type:
+#        descriptor:
+#          sql:
+#            BasicBinder: TRACE

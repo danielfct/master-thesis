@@ -200,7 +200,7 @@ class App extends BaseComponent<Props, State> {
   private updateApp = (app: IApp) => {
     const previousApp = this.getApp();
     app = Object.values(normalize(app, Schemas.APP).entities.apps || {})[0];
-    this.props.updateApp(previousApp, app);
+    //this.props.updateApp(previousApp, app);
     const formApp = { ...app };
     removeFields(formApp);
     this.setState({app: app, formApp: formApp, loading: undefined});
@@ -253,7 +253,7 @@ class App extends BaseComponent<Props, State> {
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure
                 }}
-                customButtons={this.launchButton()}
+                /*customButtons={this.launchButton()}*/
                 saveEntities={this.saveEntities}
                 loading={this.state.loading}>
             {Object.keys(formApp).map((key, index) =>
@@ -281,11 +281,11 @@ class App extends BaseComponent<Props, State> {
       id: 'app',
       content: () => this.app()
     },
-    {
+   /* {
       title: 'Services',
       id: 'services',
       content: () => this.services()
-    }
+    }*/
   ];
 
   render() {

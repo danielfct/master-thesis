@@ -36,6 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -202,6 +203,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(DataIntegrityViolationException.class)
   protected ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex,
                                                                 WebRequest request) {
+    if (ex.getCause() == null) {
+      return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, ex.getMessage()));
+    }
     if (ex.getCause() instanceof ConstraintViolationException) {
       return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()));
     }
@@ -227,8 +231,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(MasterManagerException.class)
   protected ResponseEntity<Object> handleInternalErrorException(MasterManagerException ex) {
-    ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST); //TODO bad request or internal error?
+    ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR);
     apiError.setMessage(ex.getMessage());
+    return buildResponseEntity(apiError);
+  }
+
+  @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+  protected ResponseEntity<Object> handleDeleteFailure(ObjectOptimisticLockingFailureException ex) {
+    ApiError apiError = new ApiError(HttpStatus.GONE);
+    apiError.setMessage("entity is not available anymore");
     return buildResponseEntity(apiError);
   }
 

@@ -1,6 +1,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
@@ -83,6 +85,7 @@ public class HostRulesService {
   }
 
   public HostRuleEntity addRule(HostRuleEntity rule) {
+    assertRuleDoesntExist(rule);
     log.debug("Saving rule {}", ToStringBuilder.reflectionToString(rule));
     setLastUpdateHostRules();
     return rules.save(rule);
@@ -236,6 +239,13 @@ public class HostRulesService {
     }
   }
 
+  private void assertRuleDoesntExist(HostRuleEntity hostRule) {
+    var name = hostRule.getName();
+    if (rules.hasRule(name)) {
+      throw new DataIntegrityViolationException("Host rule '" + name + "' already exists");
+    }
+  }
+
   public HostDecisionResult processHostEvent(String hostname, HostEvent hostEvent) {
     if (droolsService.shouldCreateNewRuleSession(hostname, lastUpdateHostRules.get())) {
       List<Rule> rules = generateHostRules(hostname);
@@ -267,8 +277,5 @@ public class HostRulesService {
     int priority = hostRule.getPriority();
     return new Rule(id, conditions, decision, priority);
   }
-
-
-
 
 }

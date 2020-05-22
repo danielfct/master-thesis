@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
@@ -81,6 +82,7 @@ public class ServicesService {
   }
 
   public ServiceEntity addService(ServiceEntity service) {
+    assertServiceDoesntExist(service);
     log.debug("Saving service {}", ToStringBuilder.reflectionToString(service));
     return services.save(service);
   }
@@ -280,6 +282,13 @@ public class ServicesService {
   private void assertServiceExists(String serviceName) {
     if (!services.hasService(serviceName)) {
       throw new EntityNotFoundException(ServiceEntity.class, "serviceName", serviceName);
+    }
+  }
+
+  private void assertServiceDoesntExist(ServiceEntity service) {
+    var name = service.getServiceName();
+    if (services.hasService(name)) {
+      throw new DataIntegrityViolationException("Service '" + name + "' already exists");
     }
   }
 

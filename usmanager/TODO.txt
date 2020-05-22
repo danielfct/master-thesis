@@ -34,17 +34,13 @@ UPDATE_ENTITY action
 add app is forcing re-mounting when add cloud instance is not. and without services loaded
 datakey on controlledlist?
 change service.serviceName to service.name
-change addEntity actions to accept more than 1 entity
 form id is needed?
 //TODO do unsaved color on all lists with non new items
-check shouldshowsavebutton on all entities like it is on rulehost
-href on every toast from callback (like container), but not on deletes
-boolean dropdown not showing
-remove onAdd from every list
-change super.toast on lists classes
+remove onAdd from every list. change super.toast on lists classes
 rename all manager exceptions to MasterManagerException?
 master manager: deleteById instead of by entity
-cancel button is appearing after edit button
+automatic logs reload is forcing page to reload
+add assertEntityDoesntExist on every add method with @query lower()
 
 test: reload every single page
 

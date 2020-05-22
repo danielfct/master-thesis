@@ -25,7 +25,7 @@ export class TextBox extends React.Component<TextBoxProps, any> {
         className={className}
         id={id}
         name={name}
-        type={getTypeFromValue(value)}
+        type="text"
         value={value}
         disabled={disabled}
         autoComplete="off"

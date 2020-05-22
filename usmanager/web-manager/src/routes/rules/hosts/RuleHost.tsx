@@ -18,7 +18,7 @@ import Form, {
 } from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
-import Field from "../../../components/form/Field";
+import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
@@ -327,7 +327,7 @@ class RuleHost extends BaseComponent<Props, State> {
                   failureCallback: this.onDeleteFailure
                 }}
                 saveEntities={this.saveEntities}>
-            {Object.keys(formRuleHost).map((key, index) =>
+            {Object.entries(formRuleHost).map(([key, value], index) =>
               key === 'decision'
                 ? <Field<IDecision> key={index}
                                     id={key}
@@ -349,7 +349,7 @@ class RuleHost extends BaseComponent<Props, State> {
                 : <Field key={index}
                          id={key}
                          label={key}
-                         type={key == 'priority' ? 'numberbox' : undefined}/>
+                         type={value !== undefined ? getTypeFromValue(value) : 'number'}/>
             )}
           </Form>
         )}

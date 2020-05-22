@@ -24,13 +24,20 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ConditionRepository extends CrudRepository<ConditionEntity, Long> {
+
+  @Query("select case when count(c) > 0 then true else false end "
+      + "from ConditionEntity c "
+      + "where lower(c.name) = lower(:conditionName)")
+  boolean hasCondition(@Param("conditionName") String conditionName);
 
   Optional<ConditionEntity> findByName(String name);
 

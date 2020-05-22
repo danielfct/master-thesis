@@ -1,7 +1,7 @@
 import IDatabaseData from "../../components/IDatabaseData";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
-import Form, {IFields, requiredAndTrimmed} from "../../components/form/Form";
+import Form, {IFields, requiredAndTrimmed, requiredAndTrimmedAndSizeRestriction} from "../../components/form/Form";
 import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
@@ -131,7 +131,10 @@ class Region extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: requiredAndTrimmed }
+          validation:
+            key === 'description'
+              ? { rule: requiredAndTrimmedAndSizeRestriction, args: 255 }
+              : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -180,6 +183,11 @@ class Region extends BaseComponent<Props, State> {
                          dropdown={{
                            defaultValue: "Is region active?",
                            values: ['True', 'False']}}/>
+                : key === 'description'
+                ? <Field key={index}
+                         id={key}
+                         label={key}
+                         type={'multilinetext'}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>

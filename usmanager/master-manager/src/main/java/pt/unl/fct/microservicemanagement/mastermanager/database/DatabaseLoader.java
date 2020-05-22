@@ -671,16 +671,6 @@ public class DatabaseLoader {
           .isLocal(true)
           .build();
       edgeHosts.save(daniel127001);
-      var daniel192168176 = EdgeHostEntity.builder()
-          .hostname("192.168.1.76")
-          .sshUsername("daniel")
-          .sshPassword("enhj")
-          .region("eu-central-1")
-          .country("pt")
-          .city("lisbon")
-          .isLocal(true)
-          .build();
-      edgeHosts.save(daniel192168176);
       var daniel192168168 = EdgeHostEntity.builder()
           .hostname("192.168.1.68")
           .sshUsername("daniel")
@@ -691,26 +681,6 @@ public class DatabaseLoader {
           .isLocal(true)
           .build();
       edgeHosts.save(daniel192168168);
-      var daniel192168172 = EdgeHostEntity.builder()
-          .hostname("192.168.1.72")
-          .sshUsername("daniel")
-          .sshPassword("enhj")
-          .region("eu-central-1")
-          .country("pt")
-          .city("lisbon")
-          .isLocal(true)
-          .build();
-      edgeHosts.save(daniel192168172);
-      var daniel1022245206 = EdgeHostEntity.builder()
-          .hostname("10.22.245.206")
-          .sshUsername("daniel")
-          .sshPassword("enhj")
-          .region("eu-central-1")
-          .country("pt")
-          .city("lisbon")
-          .isLocal(true)
-          .build();
-      edgeHosts.save(daniel1022245206);
 
       // component types
       var container = ComponentTypeEntity.builder()

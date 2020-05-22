@@ -26,8 +26,7 @@ import React from 'react';
 import {RouteComponentProps} from 'react-router';
 import Form, {
   IFields,
-  requiredAndNotAllowedAndTrimmed,
-  requiredAndNumberAndMin,
+  requiredAndNumberAndMinAndMax,
   requiredAndTrimmed
 } from "../../components/form/Form"
 import IDatabaseData from "../../components/IDatabaseData";
@@ -81,15 +80,15 @@ export interface IService extends IDatabaseData {
 const buildNewService = (): Partial<IService> => ({
   serviceName: '',
   dockerRepository: '',
-  defaultExternalPort: 0,
-  defaultInternalPort: 0,
+  defaultExternalPort: undefined,
+  defaultInternalPort: undefined,
   defaultDb: '',
   launchCommand: '',
-  minReplicas: 0,
-  maxReplicas: 0,
+  minReplicas: undefined,
+  maxReplicas: undefined,
   outputLabel: '',
   serviceType: '',
-  expectedMemoryConsumption: 0,
+  expectedMemoryConsumption: undefined,
 });
 
 interface StateToProps {
@@ -350,9 +349,10 @@ class Service extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: getTypeFromValue(value) === 'number'
-            ? { rule: requiredAndNumberAndMin, args: 0 }
-            : key === 'serviceName' ? { rule: requiredAndNotAllowedAndTrimmed, args: ['new_service'] } : { rule: requiredAndTrimmed }
+          validation:
+            getTypeFromValue(value) === 'number'
+              ? { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
+              : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -394,7 +394,7 @@ class Service extends BaseComponent<Props, State> {
                   failureCallback: this.onDeleteFailure
                 }}
                 saveEntities={this.saveEntities}>
-            {Object.keys(formService).map((key, index) =>
+            {Object.entries(formService).map(([key, value], index) =>
               key === 'serviceType'
                 ? <Field key={index}
                          id={key}
@@ -405,7 +405,8 @@ class Service extends BaseComponent<Props, State> {
                            values: ["Frontend", "Backend", "Database", "System"]}}/>
                 : <Field key={index}
                          id={key}
-                         label={key}/>
+                         label={key}
+                         type={value !== undefined ? getTypeFromValue(value) : 'number'}/>
             )}
           </Form>
         )}

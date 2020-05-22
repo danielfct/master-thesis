@@ -24,11 +24,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +66,7 @@ public class AppsService {
   }
 
   public AppEntity addApp(AppEntity app) {
+    assertAppDoesntExist(app);
     log.debug("Saving app {}", ToStringBuilder.reflectionToString(app));
     return apps.save(app);
   }
@@ -124,7 +128,14 @@ public class AppsService {
 
   private void assertAppExists(String appName) {
     if (!apps.hasApp(appName)) {
-      throw new EntityNotFoundException(AppEntity.class, "appName", appName);
+      throw new EntityNotFoundException(AppEntity.class, "name", appName);
+    }
+  }
+
+  private void assertAppDoesntExist(AppEntity app) {
+    var name = app.getName();
+    if (apps.hasApp(name)) {
+      throw new DataIntegrityViolationException("App '" + name + "' already exists");
     }
   }
 

@@ -19,8 +19,7 @@ export interface IValidation {
 
 export interface FieldProps<T = string> {
   id: string;
-  type?: "textbox" | "datebox" | "numberbox" | "multilinetextbox" | "collapsible" | "dropdown" | "datepicker"
-    | "timepicker" | "list";
+  type?: "text" | "number" | "date" | "datepicker" | "timepicker" | "multilinetext" | "dropdown" | "list";
   label?: string;
   value?: any;
   dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
@@ -30,7 +29,7 @@ export interface FieldProps<T = string> {
   disabled?: boolean;
 }
 
-export const getTypeFromValue = (value: any): string =>
+export const getTypeFromValue = (value: any): 'text' | 'number' =>
   value === undefined
   || value === ''
   || typeof value === 'boolean'
@@ -51,13 +50,17 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     this.updateField();
   }
 
-  private onChange = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-                      id: string, formContext: IFormContext): void => {
-    let value;
+  private onChange = (id: string, formContext: IFormContext, selected?: boolean) => (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+    const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    let value = target.value;
+    if (!isNaN(+value)) {
+      value = `"${value}"`;
+    }
     try {
-      value = JSON.parse(e.currentTarget.value);
-    } catch (_) {
-      value = e.currentTarget.value;
+      value = JSON.parse(value);
+    } catch (_) { }
+    if (selected) {
+      this.props.dropdown?.selectCallback?.(value);
     }
     formContext.setValue(id, value);
   };
@@ -66,8 +69,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     formContext.setValue(id, value);
   };
 
-  private onBlur = (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-                    id: string, formContext: IFormContext): void =>
+  private onBlur = (id: string, formContext: IFormContext) => (): void =>
     formContext.validate(id);
 
   private onCheck = (listId: keyof IValues, itemId: string, checked: boolean, formContext: IFormContext) => {
@@ -115,25 +117,16 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                   </label>
                 </>
               )}
-              {(!type || type.toLowerCase() === "textbox") && (
+              {(!type || type.toLowerCase() === "text") && (
                 <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
                          id={id}
                          name={id}
-                         value={(formContext.values[id] && formContext.values[id].toString()) || ''}
+                         value={formContext.values[id]}
                          disabled={disabled || !formContext.isEditing}
-                         onChange={e => this.onChange(e, id, formContext)}
-                         onBlur={e => this.onBlur(e, id, formContext)}/>
+                         onChange={this.onChange(id, formContext)}
+                         onBlur={this.onBlur(id, formContext)}/>
               )}
-              {type && type.toLowerCase() === "datebox" && (
-                <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                         id={id}
-                         name={id}
-                         value={this.getDateStringFromTimestamp(formContext.values[id])}
-                         disabled={disabled || !formContext.isEditing}
-                         onChange={e => this.onChange(e, id, formContext)}
-                         onBlur={e => this.onBlur(e, id, formContext)}/>
-              )}
-              {type && type.toLowerCase() === "numberbox" && (
+              {type && type.toLowerCase() === "number" && (
                 <NumberBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
                            id={id}
                            name={id}
@@ -141,27 +134,17 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                            min={number && number.min}
                            max={number && number.max}
                            disabled={disabled || !formContext.isEditing}
-                           onChange={e => this.onChange(e, id, formContext)}
-                           onBlur={e => this.onBlur(e, id, formContext)}/>
+                           onChange={this.onChange(id, formContext)}
+                           onBlur={this.onBlur(id, formContext)}/>
               )}
-              {type && type.toLowerCase() === "multilinetextbox" && (
-                <MultilineTextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                                  id={id}
-                                  name={id}
-                                  value={formContext.values[id]}
-                                  disabled={disabled || !formContext.isEditing}
-                                  onChange={e => this.onChange(e, id, formContext)}
-                                  onBlur={e => this.onBlur(e, id, formContext)}/>
-              )}
-              {type && type.toLowerCase() === "dropdown" && dropdown && (
-                <Dropdown className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                          id={id}
-                          name={id}
-                          value={formContext.values[id]}
-                          disabled={disabled || !formContext.isEditing}
-                          onChange={e => { this.onChange(e, id, formContext); dropdown?.selectCallback?.((e.target as HTMLSelectElement).value) }}
-                          onBlur={e => this.onBlur(e, id, formContext)}
-                          dropdown={dropdown}/>
+              {type && type.toLowerCase() === "date" && (
+                <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                         id={id}
+                         name={id}
+                         value={this.getDateStringFromTimestamp(formContext.values[id])}
+                         disabled={disabled || !formContext.isEditing}
+                         onChange={this.onChange(id, formContext)}
+                         onBlur={this.onBlur(id, formContext)}/>
               )}
               {(type && type.toLowerCase() === "datepicker") && (
                 <Datepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
@@ -178,6 +161,25 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                             value={formContext.values[id]}
                             disabled={disabled || !formContext?.isEditing}
                             onSelect={value => this.onSelect(value, id, formContext)}/>
+              )}
+              {type && type.toLowerCase() === "multilinetext" && (
+                <MultilineTextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                                  id={id}
+                                  name={id}
+                                  value={formContext.values[id]}
+                                  disabled={disabled || !formContext.isEditing}
+                                  onChange={this.onChange(id, formContext)}
+                                  onBlur={this.onBlur(id, formContext)}/>
+              )}
+              {type && type.toLowerCase() === "dropdown" && dropdown && (
+                <Dropdown className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                          id={id}
+                          name={id}
+                          value={formContext.values[id]}
+                          disabled={disabled || !formContext.isEditing}
+                          onChange={this.onChange(id, formContext, true)}
+                          onBlur={this.onBlur(id, formContext)}
+                          dropdown={dropdown}/>
               )}
               {(type && type.toLowerCase() === "list") && (
                 <CheckboxList id={id}

@@ -23,8 +23,8 @@ export default class ReloadButton extends React.Component<Props, State> {
 
   render = () =>
     <div className={`fixed-action-btn tooltipped waves-effect btn-floating grey darken-${this.state.isReloading ? '4' : '3'}`}
-         data-position="left"
-         data-tooltip={`${this.state.isReloading ? 'Stop' : 'Start'} ${this.props.tooltip}`}
+         data-position="bottom"
+         data-tooltip={`${this.state.isReloading ? 'Deactivate automatic' : 'Activate automatic'} ${this.props.tooltip}`}
          onClick={this.handleOnClick}>
       <i className="large material-icons">cached</i>
     </div>

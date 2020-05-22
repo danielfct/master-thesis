@@ -75,7 +75,7 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
 
   @Query("select case when count(s) > 0 then true else false end "
       + "from ServiceEntity s "
-      + "where s.serviceName = :serviceName")
+      + "where lower(s.serviceName) = lower(:serviceName)")
   boolean hasService(@Param("serviceName") String serviceName);
 
   @Query("select apps.app "

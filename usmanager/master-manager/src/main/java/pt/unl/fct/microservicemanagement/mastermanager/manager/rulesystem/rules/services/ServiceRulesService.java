@@ -1,5 +1,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
@@ -11,6 +12,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.Rule;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
@@ -70,6 +72,7 @@ public class ServiceRulesService {
   }
 
   public ServiceRuleEntity addRule(ServiceRuleEntity rule) {
+    assertRuleDoesntExist(rule);
     log.debug("Saving rule {}", ToStringBuilder.reflectionToString(rule));
     setLastUpdateServiceRules();
     return rules.save(rule);
@@ -178,6 +181,13 @@ public class ServiceRulesService {
   private void assertRuleExists(String ruleName) {
     if (!rules.hasRule(ruleName)) {
       throw new EntityNotFoundException(ServiceRuleEntity.class, "ruleName", ruleName);
+    }
+  }
+
+  private void assertRuleDoesntExist(ServiceRuleEntity serviceRule) {
+    var name = serviceRule.getName();
+    if (rules.hasRule(name)) {
+      throw new DataIntegrityViolationException("Service rule '" + name + "' already exists");
     }
   }
 

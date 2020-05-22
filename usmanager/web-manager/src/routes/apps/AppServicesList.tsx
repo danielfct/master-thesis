@@ -140,7 +140,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   private addModal = () =>
     <>
-      <Field key='launchOrder' id={'launchOrder'} label='launchOrder' type={'numberbox'} number={{min: 0, max: 2147483647}}/>
+      <Field key='launchOrder' id={'launchOrder'} label='launchOrder' type={'number'} number={{min: 0, max: 2147483647}}/>
     </>;
 
   private getModalFields = (): IFields => (

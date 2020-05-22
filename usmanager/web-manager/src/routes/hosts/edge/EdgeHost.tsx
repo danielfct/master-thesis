@@ -11,7 +11,7 @@
 import IDatabaseData from "../../../components/IDatabaseData";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
-import Form, {IFields, requiredAndTrimmed} from "../../../components/form/Form";
+import Form, {IFields, requiredAndTrimmed, requiredAndTrimmedAndNotValidIpAddress} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import Error from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
@@ -28,7 +28,6 @@ import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
-import {IApp} from "../../apps/App";
 
 export interface IEdgeHost extends IDatabaseData {
   hostname: string;
@@ -75,7 +74,6 @@ interface State {
   edgeHost?: IEdgeHost,
   formEdgeHost?: IEdgeHost,
   unsavedRules: string[],
-  hostname?: string,
 }
 
 class EdgeHost extends BaseComponent<Props, State> {
@@ -198,7 +196,10 @@ class EdgeHost extends BaseComponent<Props, State> {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: requiredAndTrimmed }
+          validation:
+            key === 'hostname'
+              ? { rule: requiredAndTrimmedAndNotValidIpAddress }
+              : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {

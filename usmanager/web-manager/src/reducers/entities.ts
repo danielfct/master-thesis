@@ -504,7 +504,7 @@ const entities = (state: EntitiesState = {
     case ADD_APP:
       if (data?.apps?.length) {
         const apps = normalize(data?.apps, Schemas.APP_ARRAY).entities.apps;
-        /*return merge({}, state, { apps: { data: apps } });*/
+        return merge({}, state, { apps: { data: apps } });
       }
       break;
     case UPDATE_APP:

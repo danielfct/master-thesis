@@ -4,7 +4,7 @@ import { useTransition, animated } from 'react-spring';
 
 interface AnimatedListProps<T> {
   list: T[];
-  show: (element: T, index: number) => JSX.Element;
+  show: (element: T, index: number, last: boolean) => JSX.Element;
   header?: () => JSX.Element;
 }
 
@@ -38,7 +38,7 @@ export default function AnimatedList<T>(props: AnimatedListProps<T>) {
             zIndex: list.length - index,
             transform: y.interpolate((y: number) => `translate3d(0, ${y}px, 0)`), ...rest
           }}>
-          {show(item.data.item, index)}
+          {show(item.data.item, index, index === list.length - 1)}
         </animated.div>
       ))}
     </div>

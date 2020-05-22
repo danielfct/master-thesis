@@ -21,10 +21,10 @@ type Props = EdgeHostCardProps;
 
 const EdgeHostCard = ({edgeHost}: Props) => (
   <Card<IEdgeHost> title={edgeHost.hostname}
-                    link={{ to: { pathname: `/hosts/edge/${edgeHost.hostname }`, state: edgeHost } }}
-                    height={'215px'}
-                    margin={'10px 0'}
-                    hoverable>
+                   link={{to: {pathname: `/hosts/edge/${edgeHost.hostname }`, state: edgeHost }}}
+                   height={'215px'}
+                   margin={'10px 0'}
+                   hoverable>
     <CardItem key={'sshUsername'}
               label={'Ssh username'}
               value={`${edgeHost.sshUsername}`}/>

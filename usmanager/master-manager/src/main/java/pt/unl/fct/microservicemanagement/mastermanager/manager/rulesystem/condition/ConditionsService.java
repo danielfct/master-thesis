@@ -1,6 +1,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,7 @@ public class ConditionsService {
   }
 
   public ConditionEntity addCondition(ConditionEntity condition) {
+    assertConditionDoesntExist(condition);
     log.debug("Saving condition {}", ToStringBuilder.reflectionToString(condition));
     return conditions.save(condition);
   }
@@ -46,5 +49,12 @@ public class ConditionsService {
     var condition = getCondition(conditionName);
     conditions.delete(condition);
   }
-  
+
+  private void assertConditionDoesntExist(ConditionEntity condition) {
+    var name = condition.getName();
+    if (conditions.hasCondition(name)) {
+      throw new DataIntegrityViolationException("Condition '" + name + "' already exists");
+    }
+  }
+
 }

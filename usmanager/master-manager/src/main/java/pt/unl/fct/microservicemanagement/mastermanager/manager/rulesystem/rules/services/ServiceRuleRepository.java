@@ -57,7 +57,7 @@ public interface ServiceRuleRepository extends CrudRepository<ServiceRuleEntity,
 
   @Query("select case when count(r) > 0 then true else false end "
       + "from ServiceRuleEntity r "
-      + "where r.name = :ruleName")
+      + "where lower(r.name) = lower(:ruleName)")
   boolean hasRule(@Param("ruleName") String ruleName);
 
   @Query("select rc.serviceCondition "

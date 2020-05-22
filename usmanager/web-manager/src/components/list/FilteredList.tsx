@@ -31,7 +31,7 @@ import Empty from "./Empty";
 
 interface Props<T> {
     list: T[];
-    show: (element: T, index: number) => JSX.Element;
+    show: (element: T, index: number, last: boolean) => JSX.Element;
     predicate: (x: T, s: string) => boolean;
     search: string;
     paginate?: {

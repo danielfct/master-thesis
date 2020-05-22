@@ -24,14 +24,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.location;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 @Slf4j
 @Service
@@ -58,6 +57,7 @@ public class RegionsService {
   }
 
   public RegionEntity addRegion(RegionEntity region) {
+    assertRegionDoesntExist(region);
     log.debug("Saving region {}", ToStringBuilder.reflectionToString(region));
     return regions.save(region);
   }
@@ -77,6 +77,13 @@ public class RegionsService {
   public void deleteRegion(String name) {
     var region = getRegion(name);
     regions.delete(region);
+  }
+
+  private void assertRegionDoesntExist(RegionEntity region) {
+    var name = region.getName();
+    if (regions.hasRegion(name)) {
+      throw new DataIntegrityViolationException("Region '" + name + "' already exists");
+    }
   }
 
 }

@@ -30,7 +30,7 @@ const buildNewCondition = (): Partial<IRuleCondition> => ({
   valueMode: undefined,
   field: undefined,
   operator: undefined,
-  value: 0
+  value: undefined
 });
 
 interface StateToProps {
@@ -221,7 +221,7 @@ class RuleCondition extends BaseComponent<Props, State> {
                                  defaultValue: 'Select value mode',
                                  values: Object.values(this.props.valueModes),
                                  optionToString: this.valueModeOption}}/>
-            <Field key='value' id='value' label='value'/>
+            <Field key='value' id='value' label='value' type="number"/>
           </Form>
         )}
       </>

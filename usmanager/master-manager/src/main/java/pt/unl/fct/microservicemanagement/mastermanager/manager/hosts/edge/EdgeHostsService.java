@@ -25,7 +25,9 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
@@ -58,6 +60,7 @@ public class EdgeHostsService {
   }
 
   public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost) {
+    assertHostDoesntExist(edgeHost);
     log.debug("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
     return edgeHosts.save(edgeHost);
   }
@@ -120,6 +123,13 @@ public class EdgeHostsService {
   private void assertHostExists(String hostname) {
     if (!hasEdgeHost(hostname)) {
       throw new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname);
+    }
+  }
+
+  private void assertHostDoesntExist(EdgeHostEntity edgeHost) {
+    var hostname = edgeHost.getHostname();
+    if (edgeHosts.hasEdgeHost(hostname)) {
+      throw new DataIntegrityViolationException("Edge host '" + hostname + "' already exists");
     }
   }
 

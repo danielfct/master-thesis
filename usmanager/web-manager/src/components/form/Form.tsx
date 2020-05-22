@@ -103,7 +103,10 @@ interface State {
   loading?: { method: Method, url: string };
 }
 
-export interface IFormContext extends State {
+export interface IFormContext {
+  values: IValues;
+  errors: IErrors;
+  isEditing: boolean;
   setValue: (id: keyof IValues, value: any) => void;
   addValue: (id: keyof IValues, value: any) => void;
   removeValue: (id: keyof IValues, value: any) => void;
@@ -121,6 +124,26 @@ export const required = (values: IValues, id: keyof IValues): string =>
 export const notAllowed = (values: IValues, id: keyof IValues, args: any[]): string =>
   args.indexOf(values[id].toLowerCase()) !== -1
     ? `${values[id]} is not allowed`
+    : "";
+
+export const notValid = (values: IValues, id: keyof IValues, regularExpression: RegExp, name: string): string =>
+  !regularExpression.test(String(values[id]).toLowerCase())
+    ? `${values[id]} is not a valid ${name}`
+    : "";
+
+export const notValidIpAddress = (values: IValues, id: keyof IValues): string =>
+  notValid(values, id,
+    /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+    'ip address');
+
+export const notValidEmail = (values: IValues, id: keyof IValues): string =>
+  notValid(values, id,
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    'email');
+
+export const lengthLimit = (values: IValues, id: keyof IValues, size: number): string =>
+  values[id].length > size
+    ? `Limited to ${size} characters`
     : "";
 
 export const trimmed = (values: IValues, id: keyof IValues): string =>
@@ -146,8 +169,20 @@ export const number = (values: IValues, id: keyof IValues): string =>
 export const requiredAndTrimmed = (values: IValues, id: keyof IValues) =>
   required(values, id) || trimmed(values, id);
 
-export const requiredAndNotAllowedAndTrimmed = (values: IValues, id: keyof IValues, args: any[]) =>
-  required(values, id) || notAllowed(values, id, args) || trimmed(values, id);
+export const requiredAndTrimmedAndNotValid = (values: IValues, id: keyof IValues, args: any[]) =>
+  required(values, id) || trimmed(values, id) || notValid(values, id, args[0], args[1]);
+
+export const requiredAndTrimmedAndNotValidIpAddress = (values: IValues, id: keyof IValues) =>
+  required(values, id) || trimmed(values, id) || notValidIpAddress(values, id);
+
+export const requiredAndTrimmedAndNotValidEmail = (values: IValues, id: keyof IValues) =>
+  required(values, id) || trimmed(values, id) || notValidEmail(values, id);
+
+export const requiredAndTrimmedAndNotAllowed = (values: IValues, id: keyof IValues, args: any[]) =>
+  required(values, id) || trimmed(values, id) || notAllowed(values, id, args);
+
+export const requiredAndTrimmedAndSizeRestriction = (values: IValues, id: keyof IValues, size: number) =>
+  required(values, id) || trimmed(values, id) || lengthLimit(values, id, size);
 
 export const requiredAndNumberAndMin = (values: IValues, id: keyof IValues, args: any) =>
   required(values, id) || number(values, id) || min(values, id, args);
@@ -335,6 +370,7 @@ class Form extends React.Component<Props, State> {
     else {
       this.setState({ values: { ...this.state.values, ...values } });
     }
+
   };
 
   private addValue = (id: keyof IValues, value: any) =>
@@ -370,11 +406,14 @@ class Form extends React.Component<Props, State> {
   private switchForm = (e: React.FormEvent<HTMLLIElement>) => {
     const selectedForm = decodeHTML((e.target as HTMLLIElement).innerHTML);
     this.props.switchDropdown?.onSwitch(selectedForm);
+    this.clearValues();
   };
 
   render() {
     const context: IFormContext = {
-      ...this.state,
+      values: this.state.values,
+      errors: this.state.errors,
+      isEditing: this.state.isEditing,
       setValue: this.setValue,
       addValue: this.addValue,
       removeValue: this.removeValue,

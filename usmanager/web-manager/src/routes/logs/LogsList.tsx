@@ -1,7 +1,6 @@
 import List from "../../components/list/List";
 import React from "react";
 import {ReduxState} from "../../reducers";
-import {bindActionCreators} from "redux";
 import {loadLogs} from "../../actions";
 import {connect} from "react-redux";
 import {ILogs} from "./Logs";
@@ -20,11 +19,7 @@ interface DispatchToProps {
   loadLogs: () => void;
 }
 
-interface LogsListProps {
-
-}
-
-type Props = StateToProps & DispatchToProps & LogsListProps;
+type Props = StateToProps & DispatchToProps;
 
 class LogsList extends React.Component<Props, {}> {
 
@@ -34,12 +29,18 @@ class LogsList extends React.Component<Props, {}> {
     this.props.loadLogs();
   };
 
+  componentWillUnmount(): void {
+    if (this.reloadLogs) {
+      clearTimeout(this.reloadLogs);
+    }
+  }
+
   private predicate = (logs: ILogs, search: string): boolean =>
     logs.formattedMessage.toLowerCase().includes(search)
     || logs.levelString.toLowerCase().includes(search);
 
   private getLevelColor = (levelString: string) => {
-    switch(levelString.toLowerCase()) {
+    switch (levelString.toLowerCase()) {
       case 'trace': return 'grey-text';
       case 'debug': return 'green-text';
       case 'info': return 'blue-text';
@@ -62,9 +63,9 @@ class LogsList extends React.Component<Props, {}> {
       </div>
     </ListItem>;
 
-  private log = (log: ILogs): JSX.Element =>
+  private log = (log: ILogs, index: number, last: boolean): JSX.Element =>
     <ListItem>
-      <div className={`${styles.item}`}>
+      <div className={`${last ? styles.lastItem : styles.item}`}>
         <span className={`${styles.column}`}>
           {new Date(log.timestmp).toLocaleString()}
         </span>
@@ -77,8 +78,7 @@ class LogsList extends React.Component<Props, {}> {
       </div>
     </ListItem>;
 
-    private reload = (): void =>
-    {
+    private onReloadClick = (): void => {
       if (this.reloadLogs) {
         clearTimeout(this.reloadLogs);
       }
@@ -88,11 +88,12 @@ class LogsList extends React.Component<Props, {}> {
     };
 
   render = () => {
-    const {isLoading, error, logs} = this.props;
+    const {error, logs} = this.props;
+    let isLoading = this.props.isLoading && !this.reloadLogs;
     const LogsList = List<ILogs>();
     return (
       <>
-        <ReloadButton tooltip={'Reload'} reloadCallback={this.reload}/>
+        <ReloadButton tooltip={'reload'} reloadCallback={this.onReloadClick}/>
         <div className={`${styles.container} ${!isLoading && !error ? styles.list : undefined}`}>
           <LogsList
             isLoading={isLoading}
@@ -100,7 +101,7 @@ class LogsList extends React.Component<Props, {}> {
             emptyMessage={'No logs to show'}
             list={logs}
             show={this.log}
-            paginate={{pagesize: { initial: 25, options: [5, 10, 25, 50, 100, 'all'] }, page: { last: true }}}
+            paginate={{pagesize: { initial: 25, options: [5, 10, 25, 50, 100, 'all'] }, page: { last: true }, position: 'top-bottom'}}
             predicate={this.predicate}
             header={this.header}/>
         </div>
@@ -118,9 +119,8 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
   }
 );
 
-const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({
-    loadLogs
-  }, dispatch);
+const mapDispatchToProps: DispatchToProps = {
+  loadLogs
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(LogsList)

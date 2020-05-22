@@ -313,6 +313,7 @@ class Container extends BaseComponent<Props, State> {
     }, {});
 
   private getSelectableHosts = () => {
+    //TODO convert to cloud hostnames like on nodes
     const cloudHosts = Object.keys(this.props.cloudHosts);
     const edgeHosts = Object.keys(this.props.edgeHosts);
     return cloudHosts.concat(edgeHosts);
@@ -332,12 +333,12 @@ class Container extends BaseComponent<Props, State> {
   private formFields = (formContainer: Partial<IContainer>, isNew: boolean): JSX.Element =>
     isNew ?
       <>
-        <Field key={'host'}
-               id={'host'}
-               label={'host'} //TODO change server to accept 'host' instead of 'hostname'
+        <Field key={'hostname'}
+               id={'hostname'}
+               label={'hostname'}
                type={'dropdown'}
                dropdown={{
-                 defaultValue: "Select host",
+                 defaultValue: "Select hostname",
                  values: this.getSelectableHosts()}}/>
         <Field key={'service'}
                id={'service'}
@@ -350,11 +351,11 @@ class Container extends BaseComponent<Props, State> {
         <Field key={'internalPort'}
                id={'internalPort'}
                label={'internalPort'}
-               type={'numberbox'}/>
+               type={'number'}/>
         <Field key={'externalPort'}
                id={'externalPort'}
                label={'externalPort'}
-               type={'numberbox'}/>
+               type={'number'}/>
       </>
       :
       <>
@@ -363,7 +364,7 @@ class Container extends BaseComponent<Props, State> {
             ? <Field key={index}
                      id={key}
                      label={key}
-                     type={"datebox"}/>
+                     type={"date"}/>
             : <Field key={index}
                      id={key}
                      label={key}/>

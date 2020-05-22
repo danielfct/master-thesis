@@ -63,10 +63,10 @@ public class NodesController {
     //TODO NodeRole role = addNode.getRole();
     NodeRole role = NodeRole.WORKER;
     int quantity = addNode.getQuantity();
-    String host = addNode.getHost();
-    if (host != null) {
+    String hostname = addNode.getHostname();
+    if (hostname != null) {
       for (var i = 0; i < quantity; i++) {
-        hostsService.addHost(role, host);
+        hostsService.addHost(role, hostname);
       }
     } else {
       String region = addNode.getRegion().getName();

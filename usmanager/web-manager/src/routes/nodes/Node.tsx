@@ -26,7 +26,7 @@ export interface INode {
 }
 
 interface INewNodeHost {
-  host: string;
+  hostname: string;
   quantity: number;
 }
 
@@ -38,7 +38,7 @@ interface INewNodeLocation {
 }
 
 const buildNewNodeHost = (): INewNodeHost => ({
-  host: '',
+  hostname: '',
   quantity: 1,
 });
 
@@ -182,9 +182,9 @@ class Node extends BaseComponent<Props, State> {
         currentForm === 'On host'
           ?
           <>
-            <Field<string> key={'host'} //TODO change server to accept 'host' instead of 'hostname'
-                           id={'host'}
-                           label={'host'}
+            <Field<string> key={'hostname'}
+                           id={'hostname'}
+                           label={'hostname'}
                            type="dropdown"
                            dropdown={{
                              defaultValue: "Select host",
@@ -201,7 +201,7 @@ class Node extends BaseComponent<Props, State> {
             <Field key={'quantity'}
                    id={'quantity'}
                    label={'quantity'}
-                   type={"numberbox"}/>
+                   type={"number"}/>
           </>
           :
           <>
@@ -223,7 +223,7 @@ class Node extends BaseComponent<Props, State> {
             <Field key={'quantity'}
                    id={'quantity'}
                    label={'quantity'}
-                   type={"numberbox"}/>
+                   type={"number"}/>
           </>
         :
         node && Object.entries(node).map(([key, value], index) =>
