@@ -179,6 +179,13 @@ import {
   REGIONS_SUCCESS,
   REGION_SUCCESS,
   ADD_REGION,
+  LOAD_BALANCERS_REQUEST,
+  LOAD_BALANCER_REQUEST,
+  LOAD_BALANCERS_FAILURE,
+  LOAD_BALANCER_FAILURE,
+  LOAD_BALANCERS_SUCCESS,
+  LOAD_BALANCER_SUCCESS,
+  ADD_LOAD_BALANCER,
   //TODO load balancer
   //TODO eureka server
   LOGS_REQUEST,
@@ -309,7 +316,11 @@ export type EntitiesState = {
     isLoadingRegions: boolean,
     loadRegionsError: string | null,
   },
-  //TODO load balancers
+  loadBalancers: {
+    data: { [key: string]: ILoadBalancer },
+    isLoadingLoadBalancers: boolean,
+    loadLoadBalancersError: string | null,
+  },
   //TODO eureka servers
   logs: {
     data: { [key: number]: ILogs },
@@ -407,9 +418,6 @@ const entities = (state: EntitiesState = {
                       isLoadingNodes: false,
                       loadNodesError: null
                     },
-
-
-
                     rules: {
                       hosts: {
                         data: {},
@@ -463,7 +471,11 @@ const entities = (state: EntitiesState = {
                       isLoadingRegions: false,
                       loadRegionsError: null
                     },
-                    //TODO load balancers
+                    loadBalancers: {
+                      data: {},
+                      isLoadingLoadBalancers: false,
+                      loadLoadBalancersError: null
+                    },
                     //TODO eureka servers
                     logs: {
                       data: {},
@@ -1465,7 +1477,39 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { regions: { data: regions } });
       }
       break;
-    //TODO load balancer
+
+
+    case LOAD_BALANCERS_REQUEST:
+    case LOAD_BALANCER_REQUEST:
+      return merge({}, state, { loadBalancers: { isLoadingLoadBalancers: true, loadLoadBalancersError: null } });
+    case LOAD_BALANCERS_FAILURE:
+    case LOAD_BALANCER_FAILURE:
+      return merge({}, state, { loadBalancers: { isLoadingLoadBalancers: false, loadLoadBalancersError: error } });
+    case LOAD_BALANCERS_SUCCESS:
+      return {
+        ...state,
+        loadBalancers: {
+          ...state.regions,
+          data: merge({}, pick(state.loadBalancers.data, keys(data?.loadBalancers)), data?.loadBalancers),
+          isLoadingLoadBalancers: false,
+          loadLoadBalancersError: null,
+        }
+      };
+    case LOAD_BALANCER_SUCCESS:
+      return {
+        ...state,
+        loadBalancers: {
+          data: merge({}, state.loadBalancers.data, data?.loadBalancers),
+          isLoadingLoadBalancers: false,
+          loadLoadBalancersError: null,
+        }
+      };
+    case ADD_LOAD_BALANCER:
+      if (data?.loadBalancers?.length) {
+        const loadBalancers = normalize(data?.loadBalancers, Schemas.LOAD_BALANCER_ARRAY).entities.loadBalancers;
+        return merge({}, state, { loadBalancers: { data: loadBalancers } });
+      }
+      break;
     //TODO eureka servers
     case LOGS_REQUEST:
       return merge({}, state, { logs: { isLoadingLogs: true, loadLogsError: null } });

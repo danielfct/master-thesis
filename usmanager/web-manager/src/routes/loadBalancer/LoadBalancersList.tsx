@@ -15,6 +15,7 @@ import BaseComponent from "../../components/BaseComponent";
 import CardList from "../../components/list/CardList";
 import {ReduxState} from "../../reducers";
 import {loadLoadBalancers} from "../../actions";
+import LoadBalancerCard from "./LoadBalancerCard";
 
 interface StateToProps {
   isLoading: boolean
@@ -23,7 +24,7 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-  loadLoadBalancers: () => any;
+  loadLoadBalancers: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -35,18 +36,16 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
   }
 
   private loadBalancer = (loadBalancer: ILoadBalancer): JSX.Element =>
-    <div></div>
-    //<EdgeHostCard key={cloudHost.id} edgeHost={cloudHost}/>;
+    <LoadBalancerCard key={loadBalancer.id} loadBalancer={loadBalancer}/>;
 
   private predicate = (loadBalancer: ILoadBalancer, search: string): boolean =>
-    true
-    //cloudHost.hostname.toLowerCase().includes(search);
+    loadBalancer.hostname.toLowerCase().includes(search);
 
   render = () =>
     <CardList<ILoadBalancer>
       isLoading={this.props.isLoading}
       error={this.props.error}
-      emptyMessage={"No load balancers to display"}
+      emptyMessage={"No load-balancers to display"}
       list={this.props.loadBalancers}
       card={this.loadBalancer}
       predicate={this.predicate}/>
@@ -55,9 +54,9 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    isLoading: false, //state.entities.hosts.edge.isLoadingHosts,
-    error: null, //state.entities.hosts.edge.loadHostsError,
-    loadBalancers: /*(state.entities.hosts.edge.data && Object.values(state.entities.hosts.edge.data)) ||*/ [],
+    isLoading: state.entities.loadBalancers.isLoadingLoadBalancers,
+    error: state.entities.loadBalancers.loadLoadBalancersError,
+    loadBalancers: (state.entities.loadBalancers.data && Object.values(state.entities.loadBalancers.data)) || [],
   }
 );
 

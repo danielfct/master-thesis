@@ -11,43 +11,56 @@
 import BaseComponent from "../../components/BaseComponent";
 import React from "react";
 import {RouteComponentProps} from "react-router";
-import Form, {IFields, required, requiredAndTrimmed} from "../../components/form/Form";
+import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../components/form/Form";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import Error from "../../components/errors/Error";
-import Field from "../../components/form/Field";
+import Field, {getTypeFromValue} from "../../components/form/Field";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {loadRegions, loadServices} from "../../actions";
+import {
+  loadLoadBalancers,
+  addLoadBalancer,
+  loadRegions,
+  loadServices
+} from "../../actions";
 import {connect} from "react-redux";
 import {IService} from "../services/Service";
 import {IRegion} from "../region/Region";
 import {IReply} from "../../utils/api";
+import {isNew} from "../../utils/router";
+import {IContainer} from "../containers/Container";
+import {normalize} from "normalizr";
+import {Schemas} from "../../middleware/api";
 
-export interface ILoadBalancer {
+export interface ILoadBalancer extends IContainer {
 }
 
-const buildNewLoadBalancer = (): Partial<ILoadBalancer> => ({
+interface INewLoadBalancer {
+  service: IService | undefined,
+  regions: string[] | undefined
+}
+
+const buildNewLoadBalancer = (): INewLoadBalancer => ({
   service: undefined,
+  regions: undefined
 });
-
-const isLaunchLoadBalancer = (id: string) =>
-  id === 'launch';
-
 
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  loadBalancer: Partial<ILoadBalancer>;
-  formLoadBalancer?: Partial<ILoadBalancer>; //TODO remove formLoadBalancer if not needed
+  newLoadBalancer?: INewLoadBalancer;
+  loadBalancer?: ILoadBalancer;
+  formLoadBalancer?: Partial<ILoadBalancer> | INewLoadBalancer;
   services: { [key: string]: IService };
   regions: { [key: string]: IRegion };
 }
 
 interface DispatchToProps {
+  loadLoadBalancers: (id: string) => void;
+  addLoadBalancer: (loadBalancer: IContainer) => void;
   loadServices: () => any;
   loadRegions: () => any;
-  //addLoadBalancer: () => void; TODO
 }
 
 interface MatchParams {
@@ -56,38 +69,91 @@ interface MatchParams {
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
+interface State {
+  loadBalancer?: ILoadBalancer,
+  formLoadBalancer?: ILoadBalancer,
+}
 
-class LoadBalancer extends BaseComponent<Props, {}> {
+class LoadBalancer extends BaseComponent<Props, State> {
 
-  //TODO change toasts messages
+  private mounted = false;
+
+  state: State = {
+  };
 
   componentDidMount(): void {
+    this.loadLoadBalancer();
     this.props.loadServices();
     this.props.loadRegions();
+    this.mounted = true;
   }
 
-  private onPostSuccess = (reply: IReply<ILoadBalancer>): void => {
-    //super.toast(`Load balancer <b>${edgeHostHostname}</b> saved`); TODO
+  componentWillUnmount(): void {
+    this.mounted = false;
+  }
+
+  private loadLoadBalancer = () => {
+    if (!isNew(this.props.location.search)) {
+      const loadBalancerId = this.props.match.params.id;
+      this.props.loadLoadBalancers(loadBalancerId);
+    }
+  };
+
+  private getLoadBalancer = () =>
+    this.state.loadBalancer || this.props.loadBalancer;
+
+  private getFormLoadBalancer = () =>
+    this.state.formLoadBalancer || this.props.formLoadBalancer;
+
+  private onPostSuccess = (reply: IReply<ILoadBalancer[]>): void => {
+    const loadBalancers = reply.data;
+    loadBalancers.forEach(loadBalancer => {
+        super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.id}</b>` : `<a href=/load-balancers/${loadBalancer.id}><b>${loadBalancer.id}</b></a>`} launched</span>`);
+        this.props.addLoadBalancer(loadBalancer);
+    });
+    if (this.mounted) {
+      if (loadBalancers.length === 1) {
+        const loadBalancer = loadBalancers[0];
+        this.updateLoadBalancer(loadBalancer);
+        this.props.history.replace(loadBalancer.id)
+      }
+      else {
+        this.props.history.push('/load-balancers');
+      }
+    }
   };
 
   private onPostFailure = (reason: string): void =>
-    super.toast(`Unable to launch load balancer`, 10000, reason, true);
+    super.toast(`Unable to launch load-balancer`, 10000, reason, true);
 
-  private onDeleteSuccess = (id: string): void => {
-    super.toast(`<span class="green-text">${id} load-balancer successfully stopped</span>`);
-    this.props.history.push(`/load-balancers`)
+  private onDeleteSuccess = (loadBalancer: ILoadBalancer): void => {
+    super.toast(`<span class="green-text">Load-balancer <b class="white-text">${loadBalancer.id}</b> successfully stopped</span>`);
+    if (this.mounted) {
+      this.props.history.push(`/load-balancers`)
+    }
   };
 
-  private onDeleteFailure = (reason: string, id: string): void =>
-    super.toast(`Unable to stop load balancer ${id}`, 10000, reason, true);
+  private onDeleteFailure = (reason: string, loadBalancer: ILoadBalancer): void =>
+    super.toast(`Unable to stop ${this.mounted ? `<b>${loadBalancer.id}</b>` : `<a href=/load-balancers/${loadBalancer.id}><b>${loadBalancer.id}</b></a>`} load-balancer`, 10000, reason, true);
 
-  private getFields = (loadBalancer: Partial<ILoadBalancer>): IFields =>
-    Object.entries(loadBalancer).map(([key, _]) => {
+  private updateLoadBalancer = (loadBalancer: ILoadBalancer) => {
+    //const previousLoadBalancer = this.getLoadBalancer();
+    loadBalancer = Object.values(normalize(loadBalancer, Schemas.LOAD_BALANCER).entities.loadBalancers || {})[0];
+    //TODO this.props.updateLoadBalancer(previousLoadBalancer, loadBalancer);
+    const formLoadBalancer = { ...loadBalancer };
+    removeFields(formLoadBalancer);
+    this.setState({loadBalancer: loadBalancer, formLoadBalancer: formLoadBalancer});
+  };
+
+  private getFields = (loadBalancer: Partial<ILoadBalancer> | INewLoadBalancer): IFields =>
+    Object.entries(loadBalancer).map(([key, value]) => {
       return {
         [key]: {
           id: key,
           label: key,
-          validation: { rule: requiredAndTrimmed }
+          validation: getTypeFromValue(value) === 'number'
+            ? { rule: requiredAndNumberAndMin, args: 0 }
+            : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -97,14 +163,15 @@ class LoadBalancer extends BaseComponent<Props, {}> {
       return fields;
     }, {});
 
-  private serviceOption = (service: string) =>
-    service;
-
   private getSelectableServices = () =>
-    this.props.services && Object.keys(this.props.services);
+    Object.entries(this.props.services)
+          .filter(([_, service]) => service.serviceType === 'frontend')
+          .map(([key, _]) => key);
 
   private loadBalancer = () => {
-    const {isLoading, error, formLoadBalancer, loadBalancer} = this.props;
+    const {isLoading, error, newLoadBalancer} = this.props;
+    const loadBalancer = this.getLoadBalancer();
+    const formLoadBalancer = this.getFormLoadBalancer();
     // @ts-ignore
     const loadBalancerKey: (keyof ILoadBalancer) = formLoadBalancer && Object.keys(formLoadBalancer)[0];
     return (
@@ -113,18 +180,21 @@ class LoadBalancer extends BaseComponent<Props, {}> {
         {!isLoading && error && <Error message={error}/>}
         {!isLoading && !error && formLoadBalancer && (
           <Form id={loadBalancerKey}
-                fields={this.getFields(formLoadBalancer)}
-                values={loadBalancer}
-                isNew={isLaunchLoadBalancer(this.props.match.params.id)}
+                fields={this.getFields(formLoadBalancer || {})}
+                values={loadBalancer || newLoadBalancer || {}}
+                isNew={isNew(this.props.location.search)}
                 post={{
                   textButton: 'launch',
                   url: 'containers/loadBalancer',
                   successCallback: this.onPostSuccess,
-                  failureCallback: this.onPostFailure}}
+                  failureCallback: this.onPostFailure
+                }}
                 delete={{
-                  url: `loadBalancers/${loadBalancer[loadBalancerKey]}`,
+                  textButton: 'Stop',
+                  url: `containers/${loadBalancer?.id}`,
                   successCallback: this.onDeleteSuccess,
-                  failureCallback: this.onDeleteFailure}}>
+                  failureCallback: this.onDeleteFailure
+                }}>
             {Object.entries(formLoadBalancer).map((([key, value], index) =>
                 key === 'service'
                   ? <Field key={index}
@@ -133,18 +203,16 @@ class LoadBalancer extends BaseComponent<Props, {}> {
                            type={'dropdown'}
                            dropdown={{
                              defaultValue: "Select service",
-                             values: this.getSelectableServices(),
-                             optionToString: this.serviceOption}}/>
-                  :
-                  key === 'regions'
-                    ? <Field key={index}
-                             id={key}
-                             label={key}
-                             type={'list'}
-                             value={value}/>
-                    : <Field key={index}
-                             id={key}
-                             label={key}/>
+                             values: this.getSelectableServices()}}/>
+                  : key === 'regions'
+                  ? <Field key={index}
+                           id={key}
+                           label={key}
+                           type={'list'}
+                           value={value}/>
+                  : <Field key={index}
+                           id={key}
+                           label={key}/>
             ))}
           </Form>
         )}
@@ -172,20 +240,32 @@ class LoadBalancer extends BaseComponent<Props, {}> {
 
 }
 
+function removeFields(container: Partial<ILoadBalancer>) {
+  delete container["ports"];
+  delete container["labels"];
+  delete container["logs"];
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
-  const regions = state.entities.regions.data;
-  const isLoading = false; //state.entities.loadBalancers.loading;
-  const error = null; //state.entities.loadBalancers.error;
+  const isLoading = state.entities.loadBalancers.isLoadingLoadBalancers;
+  const error = state.entities.loadBalancers.loadLoadBalancersError;
   const id = props.match.params.id;
-  const loadBalancer = isLaunchLoadBalancer(id) ? buildNewLoadBalancer() : {}; //state.entities.loadBalancers.data[id];
+  const newLoadBalancer = isNew(props.location.search) ? buildNewLoadBalancer() : undefined;
+  const loadBalancer = !isNew(props.location.search) ? state.entities.loadBalancers.data[id] : undefined;
+  const regions = state.entities.regions.data;
   let formLoadBalancer;
+  if (newLoadBalancer) {
+    formLoadBalancer = { ...newLoadBalancer, regions: Object.keys(regions) };
+  }
   if (loadBalancer) {
-    formLoadBalancer = { ...loadBalancer, regions: Object.keys(regions) };
+    formLoadBalancer = { ...loadBalancer };
+    removeFields(formLoadBalancer);
   }
   const services = state.entities.services.data;
   return  {
     isLoading,
     error,
+    newLoadBalancer,
     loadBalancer,
     formLoadBalancer,
     services,
@@ -194,6 +274,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 }
 
 const mapDispatchToProps: DispatchToProps = {
+  loadLoadBalancers,
+  addLoadBalancer,
   loadServices,
   loadRegions,
 };

@@ -73,12 +73,12 @@ const buildNewContainer = (): INewContainer => ({
 interface StateToProps {
   isLoading: boolean;
   error?: string | null;
-  newContainer?: INewContainer,
+  newContainer?: INewContainer;
   container?: IContainer;
   formContainer?: Partial<IContainer> | INewContainer;
-  cloudHosts: { [key: string]: ICloudHost }
-  edgeHosts: { [key: string]: IEdgeHost }
-  services: { [key: string]: IService }
+  cloudHosts: { [key: string]: ICloudHost };
+  edgeHosts: { [key: string]: IEdgeHost };
+  services: { [key: string]: IService };
 }
 
 interface DispatchToProps {
@@ -382,7 +382,7 @@ class Container extends BaseComponent<Props, State> {
         internalPort: this.state.defaultInternalPort,
         externalPort: this.state.defaultExternalPort
       }
-      : formContainer;
+      : formContainer; //TODO formContainer or container?
     // @ts-ignore
     const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
     return (
@@ -398,10 +398,11 @@ class Container extends BaseComponent<Props, State> {
                   textButton: 'Launch',
                   url: 'containers',
                   successCallback: this.onPostSuccess,
-                  failureCallback: this.onPostFailure}}
+                  failureCallback: this.onPostFailure
+                }}
                 delete={container && (!container.labels['isStoppable'] || container.labels['isStoppable'] === 'true')
                   ? {textButton: 'Stop',
-                    url: `containers/${container[containerKey]}`,
+                    url: `containers/${container.id}`,
                     successCallback: this.onDeleteSuccess,
                     failureCallback: this.onDeleteFailure}
                   : undefined}
@@ -490,7 +491,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   let formContainer;
   if (newContainer) {
     formContainer = { ...newContainer };
-    removeFields(formContainer);
   }
   if (container) {
     formContainer = { ...container };
@@ -513,10 +513,10 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadContainers,
+  addContainer,
   loadCloudHosts,
   loadEdgeHosts,
   loadServices,
-  addContainer
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Container);

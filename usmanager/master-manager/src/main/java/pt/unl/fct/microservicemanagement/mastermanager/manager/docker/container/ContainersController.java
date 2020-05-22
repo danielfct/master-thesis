@@ -24,7 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
+import com.spotify.docker.client.DockerClient;
 import net.minidev.json.JSONArray;
+import org.springframework.web.bind.annotation.RequestParam;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
@@ -32,6 +34,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,8 +64,15 @@ public class ContainersController {
   }
 
   @GetMapping
-  public List<SimpleContainer> getContainers() {
-    return dockerContainersService.getContainers();
+  public List<SimpleContainer> getContainers(@RequestParam(required = false) String serviceName) {
+    List<SimpleContainer> containers;
+    if (serviceName != null) {
+      containers = dockerContainersService.getContainers(
+          DockerClient.ListContainersParam.withLabel("serviceName", serviceName));
+    } else {
+      containers = dockerContainersService.getContainers();
+    }
+    return containers;
   }
 
   @GetMapping("/{id}")
@@ -102,7 +112,7 @@ public class ContainersController {
   }
 
   @PostMapping("/loadBalancer")
-  public List<String> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
+  public List<SimpleContainer> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
     return nginxLoadBalancerService.launchLoadBalancers(service, regions.toArray(new String[0]));
   }
 

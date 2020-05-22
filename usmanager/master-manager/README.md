@@ -69,6 +69,9 @@ Sem o maven instalado:
 
 `sudo setfacl --modify user:<user name or ID>:rw /var/run/docker.sock` ([solução](https://stackoverflow.com/a/54504083))
 
+>Se ao estabeler uma ligação com o aws ec2, bloquear, fazer o seguinte:
+>https://stackoverflow.com/a/48572280 
+
 ### Licença
 
 Master manager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

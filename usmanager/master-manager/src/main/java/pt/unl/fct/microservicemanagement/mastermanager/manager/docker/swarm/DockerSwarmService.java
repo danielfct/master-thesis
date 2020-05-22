@@ -92,12 +92,14 @@ public class DockerSwarmService {
   }
 
   public void joinSwarm(String hostname) {
+    log.info("{} joining the swarm", hostname);
     try (DockerClient swarmManager = getSwarmManager();
          DockerClient swarmWorker = dockerCoreService.getDockerClient(hostname)) {
       String workerJoinToken = swarmManager.inspectSwarm().joinTokens().worker();
       SwarmJoin swarmJoin = SwarmJoin.builder().listenAddr(hostname).advertiseAddr(hostname).joinToken(workerJoinToken)
           .remoteAddrs(List.of(dockerSwarmManager)).build();
       swarmWorker.joinSwarm(swarmJoin);
+      log.info("{} joined the swarm", hostname);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());

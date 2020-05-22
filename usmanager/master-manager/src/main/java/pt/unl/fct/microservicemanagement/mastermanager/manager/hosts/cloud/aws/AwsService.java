@@ -63,27 +63,26 @@ public class AwsService {
 
   //TODO put constants into AwsProperties?
 
-  //private static final String DEFAULT_INSTANCE_AMI = "ami-0e02218c08bb8ffd5";
   private static final String DEFAULT_INSTANCE_AMI = "ami-0e02218c08bb8ffd5";
   private static final String DEFAULT_INSTANCE_SECURITY_GROUP = "launch-wizard-2";
   private static final String DEFAULT_INSTANCE_KEY_PAIR = "ec2";
   private static final int INSTANCE_OPERATION_MAX_RETRIES = 10;
   private static final long DELAY_BETWEEN_INSTANCE_OPERATION_TRIES = TimeUnit.SECONDS.toMillis(5);
   private static final long SET_INSTANCE_STATE_TIMEOUT = TimeUnit.SECONDS.toMillis(180);
+
   private static final String MASTER_MANAGER = "master-manager";
 
   private final AmazonEC2 ec2;
   private final String awsInstanceType;
 
   public AwsService(AwsProperties awsProperties) {
-    //TODO populate cloud hosts repository?
     String awsAccessKey = awsProperties.getAccess().getKey();
     String awsSecretAccessKey = awsProperties.getAccess().getSecretKey();
     var awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretAccessKey);
     var awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
     this.ec2 = AmazonEC2ClientBuilder
         .standard()
-        .withRegion(Regions.US_EAST_2)
+        .withRegion(Regions.US_EAST_1)
         .withCredentials(awsCredentialsProvider)
         .build();
     this.awsInstanceType = awsProperties.getInstance().getType();

@@ -72,21 +72,21 @@ public class NginxLoadBalancerService {
     this.restTemplate = new RestTemplate();
   }
 
-  public List<String> launchLoadBalancers(String serviceName, String[] regions) {
-    ServiceEntity serviceConfig =
-        serviceService.getService(LOAD_BALANCER);
+  public List<SimpleContainer> launchLoadBalancers(String serviceName, String[] regions) {
+    ServiceEntity serviceConfig = serviceService.getService(LOAD_BALANCER);
     double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();
-    List<String> hostnameList = Stream.of(regions)
+    List<String> availableHostnames = Stream.of(regions)
         .map(regionsService::getRegion)
         .map(region -> hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region.getName()))
         .collect(Collectors.toList());
-    hostnameList.forEach(hostname -> launchLoadBalancer(hostname, serviceName));
-    return hostnameList;
+    return availableHostnames.stream()
+        .map(hostname -> launchLoadBalancer(hostname, serviceName))
+        .collect(Collectors.toList());
   }
 
-  private void launchLoadBalancer(String hostname, String serviceName) {
+  private SimpleContainer launchLoadBalancer(String hostname, String serviceName) {
     //TODO get port from properties
-    launchLoadBalancer(hostname, serviceName, "127.0.0.1:1906", "none", "none", "none", "none");
+    return launchLoadBalancer(hostname, serviceName, "127.0.0.1:1906", "none", "none", "none", "none");
   }
 
   private SimpleContainer launchLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,

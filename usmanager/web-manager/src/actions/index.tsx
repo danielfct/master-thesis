@@ -848,17 +848,29 @@ export function addRegion(region: IRegion): EntitiesAction {
 }
 
 export const LOAD_BALANCERS_REQUEST = 'LOAD_BALANCERS_REQUEST';
+export const LOAD_BALANCER_REQUEST = 'LOAD_BALANCER_REQUEST';
 export const LOAD_BALANCERS_SUCCESS = 'LOAD_BALANCERS_SUCCESS';
+export const LOAD_BALANCER_SUCCESS = 'LOAD_BALANCER_SUCCESS';
 export const LOAD_BALANCERS_FAILURE = 'LOAD_BALANCERS_FAILURE';
+export const LOAD_BALANCER_FAILURE = 'LOAD_BALANCER_FAILURE';
 export const loadLoadBalancers = () => (dispatch: any) => {
   return dispatch(fetchLoadBalancers());
 };
-const fetchLoadBalancers = () => ({
-  [CALL_API]: {
-    types: [ LOAD_BALANCERS_REQUEST, LOAD_BALANCERS_SUCCESS, LOAD_BALANCERS_FAILURE ],
-    endpoint: `load-balancer`,
-    schema: Schemas.LOAD_BALANCER_ARRAY,
-  }
+const fetchLoadBalancers = (id?: string) => ({
+  [CALL_API]:
+    !id
+      ? {
+        types: [ LOAD_BALANCERS_REQUEST, LOAD_BALANCERS_SUCCESS, LOAD_BALANCERS_FAILURE ],
+        endpoint: `containers?serviceName=load-balancer`,
+        schema: Schemas.LOAD_BALANCER_ARRAY,
+        entity: 'loadBalancers'
+      }
+      : {
+        types: [ LOAD_BALANCER_REQUEST, LOAD_BALANCER_SUCCESS, LOAD_BALANCER_FAILURE ],
+        endpoint: `containers/${id}`,
+        schema: Schemas.LOAD_BALANCER,
+        entity: 'loadBalancers'
+      }
 });
 export const ADD_LOAD_BALANCER = 'ADD_LOAD_BALANCER';
 export function addLoadBalancer(loadBalancer: ILoadBalancer): EntitiesAction {

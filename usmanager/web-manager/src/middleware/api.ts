@@ -208,7 +208,7 @@ const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
 });
 
 const loadBalancer: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalancers', undefined, {
-    idAttribute: (loadBalancer: ILoadBalancer) => '' //TODO
+    idAttribute: (loadBalancer: ILoadBalancer) => loadBalancer.id
 });
 
 //TODO eurekaServers

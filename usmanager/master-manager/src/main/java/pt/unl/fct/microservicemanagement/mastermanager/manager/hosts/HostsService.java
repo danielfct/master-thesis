@@ -122,9 +122,11 @@ public class HostsService {
     return getAvailableNodeHostname(avgContainerMem, region, "", "");
   }
 
+  //FIXME
   public String getAvailableNodeHostname(double avgContainerMem, String region, String country, String city) {
     //TODO try to improve method
-    log.info("Looking for available nodes to host container with at least '{}' memory...", avgContainerMem);
+    log.info("Looking for available nodes to host container with at least '{}' memory at region '{}', country '{}', "
+        + "city '{}'", avgContainerMem, region, country, city);
     var otherRegionsHosts = new LinkedList<String>();
     var sameRegionHosts = new LinkedList<String>();
     var sameCountryHosts = new LinkedList<String>();
@@ -287,7 +289,7 @@ public class HostsService {
 
   //TODO make sure there is an odd number of master docker nodes
   private void setupHost(NodeRole role, String hostname) {
-    log.info("Setting up host {}", hostname);
+    log.info("Setting up host {} with role {}", hostname, role);
     dockerApiProxyService.launchDockerApiProxy(hostname);
     switch (role) {
       case MANAGER:
