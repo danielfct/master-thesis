@@ -30,8 +30,6 @@ import Navbar from "../views/navbar/Navbar";
 import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
-import EurekaPage from "../routes/eureka/Eureka";
-import LoadBalancerPage from "../routes/loadBalancer/OldLoadBalancer";
 import SimulatedMetricsLandingPage from "../routes/metrics/SimulatedMetricsLandingPage";
 import ServiceSimulatedMetrics from "../routes/metrics/ServiceSimulatedMetrics";
 import ServiceSimulatedMetricsDetail from "../routes/metrics/SimulatedMetrics";
@@ -69,6 +67,8 @@ import RuleConditions from "../routes/rules/conditions/RuleConditions";
 import Condition from "../routes/rules/conditions/RuleCondition";
 import LoadBalancers from "../routes/loadBalancer/LoadBalancers";
 import LoadBalancer from "../routes/loadBalancer/LoadBalancer";
+import EurekaServers from "../routes/eureka/EurekaServers";
+import EurekaServer from "../routes/eureka/EurekaServer";
 
 interface RootContainerProps {
     store: any;
@@ -111,8 +111,9 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/regions": { component: Regions, search: true },
     "/regions/:name": { component: Region },
     "/load-balancers": { component: LoadBalancers, search: true },
-    "/load-balancers/:id": { component: LoadBalancer, search: true },
-    "/eureka": { component: EurekaPage, search: true },
+    "/load-balancers/:id": { component: LoadBalancer },
+    "/eureka-servers": { component: EurekaServers, search: true },
+    "/eureka-servers/:id": { component: EurekaServer },
     "/logs": { component: Logs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };

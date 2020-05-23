@@ -233,6 +233,9 @@ class Form extends React.Component<Props, State> {
     if (prevProps.loading !== this.props.loading) {
       this.setState({loading: this.props.loading});
     }
+    if (prevProps.isNew !== this.props.isNew) {
+      this.setState({isEditing: this.props.isNew === undefined || this.props.isNew});
+    }
     this.initDropdown();
   }
 

@@ -38,6 +38,7 @@ import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 //import {ISimulatedMetric} from "../routes/simulatedMetrics/SimulatedMetric"; TODO
 import {IRegion} from "../routes/region/Region";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
+import {IEurekaServer} from "../routes/eureka/EurekaServer";
 //import {IEurekaServer} from "../routes/eurekaServer/EurekaServer"; TODO
 
 
@@ -880,10 +881,38 @@ export function addLoadBalancer(loadBalancer: ILoadBalancer): EntitiesAction {
   }
 }
 
-//TODO
 export const EUREKA_SERVERS_REQUEST = 'EUREKA_SERVERS_REQUEST';
+export const EUREKA_SERVER_REQUEST = 'EUREKA_SERVER_REQUEST';
 export const EUREKA_SERVERS_SUCCESS = 'EUREKA_SERVERS_SUCCESS';
+export const EUREKA_SERVER_SUCCESS = 'EUREKA_SERVER_SUCCESS';
 export const EUREKA_SERVERS_FAILURE = 'EUREKA_SERVERS_FAILURE';
+export const EUREKA_SERVER_FAILURE = 'EUREKA_SERVER_FAILURE';
+export const loadEurekaServers = () => (dispatch: any) => {
+  return dispatch(fetchEurekaServers());
+};
+const fetchEurekaServers = (id?: string) => ({
+  [CALL_API]:
+    !id
+      ? {
+        types: [ EUREKA_SERVERS_REQUEST, EUREKA_SERVERS_SUCCESS, EUREKA_SERVERS_FAILURE ],
+        endpoint: `containers?serviceName=eureka-server`,
+        schema: Schemas.EUREKA_SERVER_ARRAY,
+        entity: 'eurekaServers'
+      }
+      : {
+        types: [ EUREKA_SERVER_REQUEST, EUREKA_SERVER_SUCCESS, EUREKA_SERVER_FAILURE ],
+        endpoint: `containers/${id}`,
+        schema: Schemas.EUREKA_SERVER,
+        entity: 'eurekaServers'
+      }
+});
+export const ADD_EUREKA_SERVER = 'ADD_EUREKA_SERVER';
+export function addEurekaServer(eurekaServer: IEurekaServer): EntitiesAction {
+  return {
+    type: ADD_EUREKA_SERVER,
+    data: { eurekaServers: new Array(eurekaServer) }
+  }
+}
 
 export const LOGS_REQUEST = 'LOGS_REQUEST';
 export const LOGS_SUCCESS = 'LOGS_SUCCESS';

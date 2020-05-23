@@ -30,8 +30,7 @@ import Navbar from "../views/navbar/Navbar";
 import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
-import EurekaPage from "../routes/eureka/Eureka";
-import LoadBalancerPage from "../routes/loadBalancer/OldLoadBalancer";
+import EurekaPage from "../routes/eureka/OldEureka";
 import SimulatedMetricsLandingPage from "../routes/metrics/SimulatedMetricsLandingPage";
 import ServiceSimulatedMetrics from "../routes/metrics/ServiceSimulatedMetrics";
 import ServiceSimulatedMetricsDetail from "../routes/metrics/SimulatedMetrics";
@@ -46,27 +45,29 @@ import PageNotFound from "../components/PageNotFound";
 import Login from "../views/login/Login";
 import AuthenticatedRoute from "../components/AuthenticatedRoute";
 import Footer from "../views/footer/Footer";
+import Logs from "../routes/logs/Logs";
+import Region from "../routes/region/Region";
 import Regions from "../routes/region/Regions";
 import Nodes from "../routes/nodes/Nodes";
 import Node from "../routes/nodes/Node";
-import Region from "../routes/region/Region";
-import Logs from "../routes/logs/Logs";
-import Hosts from "../routes/hosts/Hosts";
 import CloudHost from "../routes/hosts/cloud/CloudHost";
 import EdgeHost from "../routes/hosts/edge/EdgeHost";
+import Hosts from "../routes/hosts/Hosts";
 import CloudHosts from "../routes/hosts/cloud/CloudHosts";
 import EdgeHosts from "../routes/hosts/edge/EdgeHosts";
 import Containers from "../routes/containers/Containers";
 import Container from "../routes/containers/Container";
 import Apps from "../routes/apps/Apps";
 import App from "../routes/apps/App";
-import Rules from "../routes/rules/Rules";
-import HostRules from "../routes/rules/hosts/RulesHost";
+import RulesHost from "../routes/rules/hosts/RulesHost";
 import HostRule from "../routes/rules/hosts/RuleHost";
-import ServiceRules from "../routes/rules/services/RulesService";
+import RulesService from "../routes/rules/services/RulesService";
 import ServiceRule from "../routes/rules/services/RuleService";
-import Conditions from "../routes/rules/conditions/RuleConditionsList";
+import Rules from "../routes/rules/Rules";
+import RuleConditions from "../routes/rules/conditions/RuleConditions";
 import Condition from "../routes/rules/conditions/RuleCondition";
+import LoadBalancers from "../routes/loadBalancer/LoadBalancers";
+import LoadBalancer from "../routes/loadBalancer/LoadBalancer";
 
 interface RootContainerProps {
     store: any;
@@ -76,29 +77,27 @@ type Props = RootContainerProps;
 
 export const authenticatedRoutes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
     "/home": { title: 'Microservices dynamic system management', component: Landing },
+    "/apps": { component: Apps, search: true },
+    "/apps/:name": { component: App },
     "/services": { component: Services, search: true },
     "/services/:name": { component: Service },
     "/services/service": { component: Service },
-    "/apps": { component: Apps, search: true },
-    "/apps/:name": { component: App },
-    "/hosts": { component: Hosts, search: true },
-    "/hosts/cloud": { component: CloudHosts, search: true },
-    "/hosts/cloud/:instanceId": { component: CloudHost },
-    "/hosts/edge": { component: EdgeHosts, search: true },
-    "/hosts/edge/:hostname": { component: EdgeHost },
     "/containers": { component: Containers, search: true },
     "/containers/:id": { component: Container },
-    "/rules": { component: Rules, search: true },
-    "/rules/hosts": { component: HostRules, search: true },
-    "/rules/hosts/:name": { component: HostRule },
-    "/rules/services": { component: ServiceRules, search: true },
-    "/rules/services/:name": { component: ServiceRule },
-    "/rules/conditions": { component: Conditions, search: true },
-    "/rules/conditions/:name": { component: Condition },
+    "/hosts": { component: Hosts, search: true },
+    "/hosts/cloud": { component: CloudHosts },
+    "/hosts/cloud/:instanceId": { component: CloudHost },
+    "/hosts/edge": { component: EdgeHosts },
+    "/hosts/edge/:hostname": { component: EdgeHost },
     "/nodes": { component: Nodes, search: true },
     "/nodes/:id": { component: Node },
-    "/eureka": { component: EurekaPage, search: true },
-    "/loadbalancer": { component: LoadBalancerPage, search: true },
+    "/rules": { component: Rules, search: true },
+    "/rules/hosts": { component: RulesHost, search: true },
+    "/rules/hosts/:name": { component: HostRule },
+    "/rules/services": { component: RulesService, search: true },
+    "/rules/services/:name": { component: ServiceRule },
+    "/rules/conditions": { component: RuleConditions, search: true },
+    "/rules/conditions/:name": { component: Condition },
     "/metrics/simulated": { component: SimulatedMetricsLandingPage, search: true },
     "/metrics/simulated/services": { component: ServiceSimulatedMetrics, search: true },
     "/metrics/simulated/services/service/:id?": { component: ServiceSimulatedMetricsDetail },
@@ -110,6 +109,9 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/metrics/simulated/hosts/specific/metric/:id?": { component: SpecificHostSimulatedMetricsDetail },
     "/regions": { component: Regions, search: true },
     "/regions/:name": { component: Region },
+    "/load-balancers": { component: LoadBalancers, search: true },
+    "/load-balancers/:id": { component: LoadBalancer, search: true },
+    "/eureka": { component: EurekaPage, search: true },
     "/logs": { component: Logs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };
@@ -121,20 +123,20 @@ export default class Root extends React.Component<Props, {}> {
     }
 
     render = () =>
-        <>
-            <main>
-                <Provider store={this.props.store}>
-                    <LoadingBar showFastActions className="loading-bar"/>
-                    <Navbar/>
-                    <Switch>
-                        <Route path="/" exact component={Login} />
-                        <Route path="/login" exact component={Login} />
-                        {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
-                            <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
-                    </Switch>
-                </Provider>
-            </main>
-            <Footer/>
-        </>
+      <>
+          <main>
+              <Provider store={this.props.store}>
+                  <LoadingBar showFastActions className="loading-bar"/>
+                  <Navbar/>
+                  <Switch>
+                      <Route path="/" exact component={Login} />
+                      <Route path="/login" exact component={Login} />
+                      {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
+                        <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
+                  </Switch>
+              </Provider>
+          </main>
+          <Footer/>
+      </>
 
 }

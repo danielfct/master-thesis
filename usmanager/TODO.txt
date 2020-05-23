@@ -18,8 +18,6 @@ change value on form while adding new entities at the same time, prevents the fo
 logs pagesize dropdown option 'all' not working
 number fields not displaying required error
 unable to add rules to a edge host
-cloud host form is broken
-add cloud hosts at the start of the master manager
 customer launch button to services
 custom buttons are triggering form validation
 cloud host entity doesnt have ip address on running state
@@ -29,7 +27,6 @@ only show red new entities when is not new
 delete cloud instance deletes host rule?
 new node -> include cloud hosts instances
 new container erroring
-avoid adding duplicate entities like hostrulesservice -> addEdgeHost
 UPDATE_ENTITY action
 add app is forcing re-mounting when add cloud instance is not. and without services loaded
 datakey on controlledlist?
@@ -38,9 +35,10 @@ form id is needed?
 //TODO do unsaved color on all lists with non new items
 remove onAdd from every list. change super.toast on lists classes
 rename all manager exceptions to MasterManagerException?
-master manager: deleteById instead of by entity
-automatic logs reload is forcing page to reload
 add assertEntityDoesntExist on every add method with @query lower()
+update root.prod
+launch load balancer at aws not working
+
 
 test: reload every single page
 

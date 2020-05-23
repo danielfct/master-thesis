@@ -43,6 +43,7 @@ import {IRuleHost} from "../routes/rules/hosts/RuleHost";
 import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 import {IAppService} from "../routes/apps/AppServicesList";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
+import {IEurekaServer} from "../routes/eureka/EurekaServer";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -111,8 +112,8 @@ interface ISchemas {
     REGION_ARRAY: schema.Entity<IRegion>[];
     LOAD_BALANCER: schema.Entity<ILoadBalancer>;
     LOAD_BALANCER_ARRAY: schema.Entity<ILoadBalancer>[];
-    //EUREKA_SERVICE: schema.Entity<IEurekaServer>; TODO
-    //EUREKA_SERVICE_ARRAY: schema.Entity<IEurekaServer>[]; TODO
+    EUREKA_SERVER: schema.Entity<IEurekaServer>;
+    EUREKA_SERVER_ARRAY: schema.Entity<IEurekaServer>[];
     LOGS_ARRAY: schema.Entity<ILogs>[];
 }
 
@@ -211,12 +212,13 @@ const loadBalancer: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalanc
     idAttribute: (loadBalancer: ILoadBalancer) => loadBalancer.id
 });
 
-//TODO eurekaServers
+const eurekaServer: schema.Entity<IEurekaServer> = new schema.Entity('eurekaServers', undefined, {
+    idAttribute: (eurekaServer: IEurekaServer) => eurekaServer.id
+});
 
 const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
     idAttribute: (logs: ILogs) => logs.eventId.toString()
 });
-
 
 app.define({ appServices });
 service.define({ apps, dependencies, dependees, serviceRules });
@@ -271,7 +273,8 @@ export const Schemas: ISchemas = {
     REGION_ARRAY: [region],
     LOAD_BALANCER: loadBalancer,
     LOAD_BALANCER_ARRAY: [loadBalancer],
-    //TODO eureka
+    EUREKA_SERVER: eurekaServer,
+    EUREKA_SERVER_ARRAY: [eurekaServer],
     LOGS_ARRAY: [logs],
 };
 

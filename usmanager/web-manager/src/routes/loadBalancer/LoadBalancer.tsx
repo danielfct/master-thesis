@@ -59,8 +59,8 @@ interface StateToProps {
 interface DispatchToProps {
   loadLoadBalancers: (id: string) => void;
   addLoadBalancer: (loadBalancer: IContainer) => void;
-  loadServices: () => any;
-  loadRegions: () => any;
+  loadServices: () => void;
+  loadRegions: () => void;
 }
 
 interface MatchParams {
@@ -174,6 +174,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
     const formLoadBalancer = this.getFormLoadBalancer();
     // @ts-ignore
     const loadBalancerKey: (keyof ILoadBalancer) = formLoadBalancer && Object.keys(formLoadBalancer)[0];
+    console.log(formLoadBalancer)
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}
@@ -185,7 +186,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
                 isNew={isNew(this.props.location.search)}
                 post={{
                   textButton: 'launch',
-                  url: 'containers/loadBalancer',
+                  url: 'containers/load-balancer',
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure
                 }}

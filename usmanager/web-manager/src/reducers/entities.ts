@@ -186,8 +186,15 @@ import {
   LOAD_BALANCERS_SUCCESS,
   LOAD_BALANCER_SUCCESS,
   ADD_LOAD_BALANCER,
-  //TODO load balancer
-  //TODO eureka server
+
+  EUREKA_SERVERS_REQUEST,
+  EUREKA_SERVER_REQUEST,
+  EUREKA_SERVERS_FAILURE,
+  EUREKA_SERVER_FAILURE,
+  EUREKA_SERVERS_SUCCESS,
+  EUREKA_SERVER_SUCCESS,
+  ADD_EUREKA_SERVER,
+
   LOGS_REQUEST,
   LOGS_FAILURE,
   LOGS_SUCCESS,
@@ -211,7 +218,7 @@ import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 //TODO simulated metrics
 import {IRegion} from "../routes/region/Region";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
-//TODO eureka servers
+import {IEurekaServer} from "../routes/eureka/EurekaServer";
 import {ILogs} from "../routes/logs/Logs";
 
 export type EntitiesState = {
@@ -321,7 +328,11 @@ export type EntitiesState = {
     isLoadingLoadBalancers: boolean,
     loadLoadBalancersError: string | null,
   },
-  //TODO eureka servers
+  eurekaServers: {
+    data: { [key: string]: IEurekaServer },
+    isLoadingEurekaServers: boolean,
+    loadEurekaServersError: string | null,
+  },
   logs: {
     data: { [key: number]: ILogs },
     isLoadingLogs: boolean,
@@ -364,7 +375,7 @@ export type EntitiesAction = {
     //TODO simulated metrics
     regions?: IRegion[],
     loadBalancers?: ILoadBalancer[],
-    //TODO eureka server
+    eurekaServers?: ILoadBalancer[],
     logs?: ILogs[],
   },
 };
@@ -476,7 +487,11 @@ const entities = (state: EntitiesState = {
                       isLoadingLoadBalancers: false,
                       loadLoadBalancersError: null
                     },
-                    //TODO eureka servers
+                    eurekaServers: {
+                      data: {},
+                      isLoadingEurekaServers: false,
+                      loadEurekaServersError: null
+                    },
                     logs: {
                       data: {},
                       isLoadingLogs: false,
@@ -1477,8 +1492,6 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { regions: { data: regions } });
       }
       break;
-
-
     case LOAD_BALANCERS_REQUEST:
     case LOAD_BALANCER_REQUEST:
       return merge({}, state, { loadBalancers: { isLoadingLoadBalancers: true, loadLoadBalancersError: null } });
@@ -1489,7 +1502,7 @@ const entities = (state: EntitiesState = {
       return {
         ...state,
         loadBalancers: {
-          ...state.regions,
+          ...state.loadBalancers,
           data: merge({}, pick(state.loadBalancers.data, keys(data?.loadBalancers)), data?.loadBalancers),
           isLoadingLoadBalancers: false,
           loadLoadBalancersError: null,
@@ -1510,7 +1523,37 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { loadBalancers: { data: loadBalancers } });
       }
       break;
-    //TODO eureka servers
+    case EUREKA_SERVERS_REQUEST:
+    case EUREKA_SERVER_REQUEST:
+      return merge({}, state, { eurekaServers: { isLoadingEurekaServers: true, loadEurekaServersError: null } });
+    case EUREKA_SERVERS_FAILURE:
+    case EUREKA_SERVER_FAILURE:
+      return merge({}, state, { eurekaServers: { isLoadingEurekaServers: false, loadEurekaServersError: error } });
+    case EUREKA_SERVERS_SUCCESS:
+      return {
+        ...state,
+        eurekaServers: {
+          ...state.eurekaServers,
+          data: merge({}, pick(state.eurekaServers.data, keys(data?.eurekaServers)), data?.eurekaServers),
+          isLoadingEurekaServers: false,
+          loadEurekaServersError: null,
+        }
+      };
+    case EUREKA_SERVER_SUCCESS:
+      return {
+        ...state,
+        eurekaServers: {
+          data: merge({}, state.eurekaServers.data, data?.eurekaServers),
+          isLoadingEurekaServers: false,
+          loadEurekaServersError: null,
+        }
+      };
+    case ADD_EUREKA_SERVER:
+      if (data?.eurekaServers?.length) {
+        const eurekaServers = normalize(data?.eurekaServers, Schemas.EUREKA_SERVER_ARRAY).entities.eurekaServers;
+        return merge({}, state, { eurekaServers: { data: eurekaServers } });
+      }
+      break;
     case LOGS_REQUEST:
       return merge({}, state, { logs: { isLoadingLogs: true, loadLogsError: null } });
     case LOGS_FAILURE:

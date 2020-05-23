@@ -18,10 +18,22 @@ interface State {
 
 export class CheckboxList extends React.Component<Props, State> {
 
+  private getCheckboxValues = () =>
+    this.props.values.map(v => ({ value: v, checked: false }));
+
   state: State = {
-    values: this.props.values.map(v => ({value: v, checked: false})),
-    //displayError: false TODO
+    values: [],
   };
+
+  componentDidMount(): void {
+    this.setState({ values: this.getCheckboxValues() });
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.values !== this.props.values) {
+      this.setState({ values: this.getCheckboxValues() });
+    }
+  }
 
   private handleCheckbox = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const {id, checked} = event.target;

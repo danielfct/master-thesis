@@ -111,14 +111,14 @@ public class ContainersController {
     return dockerContainersService.launchMicroserviceApplication(appId, region, country, city);
   }
 
-  @PostMapping("/loadBalancer")
+  @PostMapping("/load-balancer")
   public List<SimpleContainer> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
     return nginxLoadBalancerService.launchLoadBalancers(service, regions.toArray(new String[0]));
   }
 
-  @PostMapping("/eureka")
-  public List<SimpleContainer> launchEureka(@RequestBody List<RegionEntity> regions) {
-    return eurekaService.launchEurekaServers(regions);
+  @PostMapping("/eureka-server")
+  public List<SimpleContainer> launchEureka(@Json JSONArray regions) {
+    return eurekaService.launchEurekaServers(regions.toArray(new String[0]));
   }
 
 }

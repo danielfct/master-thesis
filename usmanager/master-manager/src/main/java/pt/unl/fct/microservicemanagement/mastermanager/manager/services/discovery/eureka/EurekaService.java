@@ -27,8 +27,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services.discove
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.spotify.docker.client.DockerClient;
 import org.springframework.stereotype.Service;
@@ -48,14 +49,16 @@ public class EurekaService {
 
   private final DockerContainersService dockerContainersService;
   private final HostsService hostsService;
+  private final RegionsService regionsService;
   private final ServicesService serviceService;
   private final int port;
 
-
   public EurekaService(DockerContainersService dockerContainersService, HostsService hostsService,
-                       ServicesService serviceService, EurekaProperties eurekaProperties) {
+                       ServicesService serviceService, RegionsService regionsService,
+                       EurekaProperties eurekaProperties) {
     this.dockerContainersService = dockerContainersService;
     this.hostsService = hostsService;
+    this.regionsService = regionsService;
     this.serviceService = serviceService;
     this.port = eurekaProperties.getPort();
   }
@@ -69,12 +72,12 @@ public class EurekaService {
         .findFirst();
   }
 
-  // Return all eureka containers started
-  public List<SimpleContainer> launchEurekaServers(List<RegionEntity> regions) {
+  public List<SimpleContainer> launchEurekaServers(String[] regions) {
     ServiceEntity service =
         serviceService.getService(EUREKA);
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
-    List<String> availableHostnames = regions.stream()
+    List<String> availableHostnames = Stream.of(regions)
+        .map(regionsService::getRegion)
         .map(region -> hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region.getName()))
         .collect(Collectors.toList());
     List<String> customEnvs = Collections.emptyList();
