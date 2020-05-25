@@ -35,7 +35,7 @@ export class Timepicker extends React.Component<Props, State> {
     });
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.initTimepicker();
   }
 

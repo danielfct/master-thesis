@@ -93,7 +93,7 @@ class Breadcrumbs extends React.Component<Props, State> {
         };
     }
 
-    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
         if (prevProps.match !== this.props.match) {
             this.setState({breadcrumbs: this.breadcrumbs(this.props)});
         }

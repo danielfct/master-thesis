@@ -53,9 +53,9 @@ import {
   SERVICE_DEPENDENCIES_SUCCESS,
   ADD_SERVICE_DEPENDENCIES,
   REMOVE_SERVICE_DEPENDENCIES,
-  SERVICE_DEPENDEES_REQUEST,
-  SERVICE_DEPENDEES_FAILURE,
-  SERVICE_DEPENDEES_SUCCESS,
+  SERVICE_DEPENDENTS_REQUEST,
+  SERVICE_DEPENDENTS_FAILURE,
+  SERVICE_DEPENDENTS_SUCCESS,
   SERVICE_PREDICTIONS_REQUEST,
   SERVICE_PREDICTIONS_FAILURE,
   SERVICE_PREDICTIONS_SUCCESS,
@@ -225,7 +225,7 @@ import {merge, pick, keys } from 'lodash';
 import {IApp} from "../routes/apps/App";
 import {IAddAppService, IAppService} from "../routes/apps/AppServicesList";
 import {IService} from "../routes/services/Service";
-import {IDependee} from "../routes/services/ServiceDependeeList";
+import {IDependent} from "../routes/services/ServiceDependentList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {IRuleService} from "../routes/rules/services/RuleService";
 import {IContainer} from "../routes/containers/Container";
@@ -259,8 +259,8 @@ export type EntitiesState = {
     loadAppsError: string | null,
     isLoadingDependencies: boolean,
     loadDependenciesError: string | null,
-    isLoadingDependees: boolean,
-    loadDependeesError: string | null,
+    isLoadingDependents: boolean,
+    loadDependentsError: string | null,
     isLoadingPredictions: boolean,
     loadPredictionsError: string | null,
     isLoadingRules: boolean,
@@ -393,7 +393,7 @@ export type EntitiesAction = {
     serviceNames?: string[]
     dependencies?: IService[],
     dependenciesNames?: string[],
-    dependees?: IDependee[],
+    dependents?: IDependent[],
     predictions?: IPrediction[],
     predictionsNames?: string[],
     containers?: IContainer[],
@@ -436,8 +436,8 @@ const entities = (state: EntitiesState = {
                       loadAppsError: null,
                       isLoadingDependencies: false,
                       loadDependenciesError: null,
-                      isLoadingDependees: false,
-                      loadDependeesError: null,
+                      isLoadingDependents: false,
+                      loadDependentsError: null,
                       isLoadingPredictions: false,
                       loadPredictionsError: null,
                       isLoadingRules: false,
@@ -675,8 +675,8 @@ const entities = (state: EntitiesState = {
           loadAppsError: state.services.loadAppsError,
           isLoadingDependencies: state.services.isLoadingDependencies,
           loadDependenciesError: state.services.loadDependenciesError,
-          isLoadingDependees: state.services.isLoadingDependees,
-          loadDependeesError: state.services.loadDependeesError,
+          isLoadingDependents: state.services.isLoadingDependents,
+          loadDependentsError: state.services.loadDependentsError,
           isLoadingPredictions: state.services.isLoadingPredictions,
           loadPredictionsError: state.services.loadPredictionsError,
           isLoadingRules: state.services.isLoadingRules,
@@ -769,20 +769,20 @@ const entities = (state: EntitiesState = {
         });
       }
       break;
-    case SERVICE_DEPENDEES_REQUEST:
-      return merge({}, state, { services: { isLoadingDependees: true, loadDependeesError: null } });
-    case SERVICE_DEPENDEES_FAILURE:
-      return merge({}, state, { services: { isLoadingDependees: false, loadDependeesError: error } });
-    case SERVICE_DEPENDEES_SUCCESS: {
+    case SERVICE_DEPENDENTS_REQUEST:
+      return merge({}, state, { services: { isLoadingDependents: true, loadDependentsError: null } });
+    case SERVICE_DEPENDENTS_FAILURE:
+      return merge({}, state, { services: { isLoadingDependents: false, loadDependentsError: error } });
+    case SERVICE_DEPENDENTS_SUCCESS: {
       const service = entity && state.services.data[entity];
-      const dependees = { dependees: data?.dependees || [] };
-      const serviceWithDependees = Object.assign(service ? service : [entity], dependees);
-      const normalizedService = normalize(serviceWithDependees, Schemas.SERVICE).entities;
+      const dependents = { dependents: data?.dependents || [] };
+      const serviceWithDependents = Object.assign(service ? service : [entity], dependents);
+      const normalizedService = normalize(serviceWithDependents, Schemas.SERVICE).entities;
       return merge({}, state, {
         services: {
           data: normalizedService.services,
-          isLoadingDependees: false,
-          loadDependeesError: null
+          isLoadingDependents: false,
+          loadDependentsError: null
         }
       });
     }

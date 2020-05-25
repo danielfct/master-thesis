@@ -14,7 +14,7 @@ interface TextBoxProps {
 
 export class TextBox extends React.Component<TextBoxProps, any> {
 
-  componentDidUpdate(prevProps: Readonly<TextBoxProps>, prevState: Readonly<any>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<TextBoxProps>, prevState: Readonly<any>, snapshot?: any): void {
     M.updateTextFields();
   }
 

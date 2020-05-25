@@ -4,7 +4,7 @@ import {RouteComponentProps} from "react-router";
 import Form, {IFields, requiredAndTrimmed, requiredAndTrimmedAndSizeRestriction} from "../../components/form/Form";
 import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
-import Error from "../../components/errors/Error";
+import {Error} from "../../components/errors/Error";
 import React from "react";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
@@ -23,8 +23,8 @@ export interface IRegion extends IDatabaseData {
 }
 
 const buildNewRegion = (): Partial<IRegion> => ({
-  name: '',
-  description: '',
+  name: undefined,
+  description: undefined,
   active: true,
 });
 
@@ -59,7 +59,7 @@ class Region extends BaseComponent<Props, State> {
   state: State = {
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadRegion();
     this.mounted = true;
   };

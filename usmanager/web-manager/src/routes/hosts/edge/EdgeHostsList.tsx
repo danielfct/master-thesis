@@ -31,7 +31,7 @@ type Props = StateToProps & DispatchToProps;
 
 class EdgeHostsList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadEdgeHosts();
   }
 
@@ -41,14 +41,17 @@ class EdgeHostsList extends BaseComponent<Props, {}> {
   private predicate = (host: IEdgeHost, search: string): boolean =>
     host.hostname.toLowerCase().includes(search);
 
-  render = () =>
-    <CardList<IEdgeHost>
-      isLoading={this.props.isLoading}
-      error={this.props.error}
-      emptyMessage={"No edge hosts to display"}
-      list={this.props.edgeHosts}
-      card={this.edgeHost}
-      predicate={this.predicate}/>
+  public render() {
+    return (
+      <CardList<IEdgeHost>
+        isLoading={this.props.isLoading}
+        error={this.props.error}
+        emptyMessage={"No edge hosts to display"}
+        list={this.props.edgeHosts}
+        card={this.edgeHost}
+        predicate={this.predicate}/>
+    );
+  }
 
 }
 

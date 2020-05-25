@@ -24,8 +24,6 @@
 
 import React from "react";
 import MainLayout from "../views/mainLayout/MainLayout";
-import BaseComponent from "./BaseComponent";
 
-export default class extends BaseComponent<{}, {}> {
-    render = () => <MainLayout/>
-}
+export const PageNotFound: React.FC = () =>
+  <MainLayout/>;

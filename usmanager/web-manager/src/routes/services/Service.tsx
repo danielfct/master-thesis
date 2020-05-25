@@ -44,12 +44,12 @@ import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {ReduxState} from "../../reducers";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import BaseComponent from "../../components/BaseComponent";
-import Error from "../../components/errors/Error";
-import Tabs, {Tab} from "../../components/tabs/Tabs";
+import {Error} from "../../components/errors/Error";
+import Tabs from "../../components/tabs/Tabs";
 import {IReply, postData} from "../../utils/api";
 import ServiceAppList, {IAddServiceApp} from "./ServiceAppList";
 import ServiceDependencyList from "./ServiceDependencyList";
-import ServiceDependeeList from "./ServiceDependeeList";
+import ServiceDependentList from "./ServiceDependentList";
 import ServicePredictionList, {IPrediction} from "./ServicePredictionList";
 import ServiceRuleList from "./ServiceRuleList";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
@@ -72,22 +72,22 @@ export interface IService extends IDatabaseData {
   expectedMemoryConsumption: number;
   apps?: string[];
   dependencies?: string[];
-  dependees?: string[];
+  dependents?: string[];
   predictions?: { [key: string]: IPrediction };
   serviceRules?: string[];
 }
 
 const buildNewService = (): Partial<IService> => ({
-  serviceName: '',
-  dockerRepository: '',
+  serviceName: undefined,
+  dockerRepository: undefined,
   defaultExternalPort: undefined,
   defaultInternalPort: undefined,
-  defaultDb: '',
-  launchCommand: '',
+  defaultDb: undefined,
+  launchCommand: undefined,
   minReplicas: undefined,
   maxReplicas: undefined,
-  outputLabel: '',
-  serviceType: '',
+  outputLabel: undefined,
+  serviceType: undefined,
   expectedMemoryConsumption: undefined,
 });
 
@@ -119,10 +119,8 @@ interface State {
   formService?: IService,
   unsavedApps: IAddServiceApp[],
   unsavedDependencies: string[],
-  unsavedDependees: string[],
   unsavedPredictions: IPrediction[],
   unsavedRules: string[],
-  serviceName?: string,
 }
 
 class Service extends BaseComponent<Props, State> {
@@ -132,12 +130,11 @@ class Service extends BaseComponent<Props, State> {
   state: State = {
     unsavedApps: [],
     unsavedDependencies: [],
-    unsavedDependees: [],
     unsavedPredictions: [],
     unsavedRules: [],
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadService();
     this.mounted = true;
   };
@@ -199,7 +196,6 @@ class Service extends BaseComponent<Props, State> {
   private shouldShowSaveButton = () =>
     !!this.state.unsavedApps.length
     || !!this.state.unsavedDependencies.length
-    || !!this.state.unsavedDependees.length
     || !!this.state.unsavedPredictions.length
     || !!this.state.unsavedRules.length;
 
@@ -418,7 +414,7 @@ class Service extends BaseComponent<Props, State> {
     <ServiceAppList isLoadingService={this.props.isLoading}
                     loadServiceError={this.props.error}
                     service={this.props.service}
-                    newApps={this.state.unsavedApps}
+                    unsavedApps={this.state.unsavedApps}
                     onAddServiceApp={this.addServiceApp}
                     onRemoveServiceApps={this.removeServiceApps}/>;
 
@@ -426,21 +422,20 @@ class Service extends BaseComponent<Props, State> {
     <ServiceDependencyList isLoadingService={this.props.isLoading}
                            loadServiceError={this.props.error}
                            service={this.props.service}
-                           newDependencies={this.state.unsavedDependencies}
+                           unsavedDependencies={this.state.unsavedDependencies}
                            onAddServiceDependency={this.addServiceDependency}
                            onRemoveServiceDependencies={this.removeServiceDependencies}/>;
 
-  private dependees = (): JSX.Element =>
-    <ServiceDependeeList isLoadingService={this.props.isLoading}
+  private dependents = (): JSX.Element =>
+    <ServiceDependentList isLoadingService={this.props.isLoading}
                          loadServiceError={this.props.error}
-                         service={this.props.service}
-                         newDependees={this.state.unsavedDependees}/>;
+                         service={this.props.service}/>;
 
   private predictions = (): JSX.Element =>
     <ServicePredictionList isLoadingService={this.props.isLoading}
                            loadServiceError={this.props.error}
                            service={this.props.service}
-                           newPredictions={this.state.unsavedPredictions}
+                           unsavedPredictions={this.state.unsavedPredictions}
                            onAddServicePrediction={this.addServicePrediction}
                            onRemoveServicePredictions={this.removeServicePredictions}/>;
 
@@ -448,7 +443,7 @@ class Service extends BaseComponent<Props, State> {
     <ServiceRuleList isLoadingService={this.props.isLoading}
                      loadServiceError={this.props.error}
                      service={this.props.service}
-                     newRules={this.state.unsavedRules}
+                     unsavedRules={this.state.unsavedRules}
                      onAddServiceRule={this.addServiceRule}
                      onRemoveServiceRules={this.removeServiceRules}/>;
 
@@ -472,9 +467,9 @@ class Service extends BaseComponent<Props, State> {
       content: () => this.dependencies()
     },
     {
-      title: 'Dependees',
-      id: 'dependees',
-      content: () => this.dependees()
+      title: 'Dependents',
+      id: 'dependents',
+      content: () => this.dependents()
     },
     {
       title: 'Predictions',
@@ -510,7 +505,7 @@ function removeFields(service: Partial<IService>) {
   delete service["id"];
   delete service["apps"];
   delete service["dependencies"];
-  delete service["dependees"];
+  delete service["dependents"];
   delete service["predictions"];
   delete service["serviceRules"];
 }

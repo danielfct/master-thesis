@@ -24,7 +24,7 @@ type Props = StateToProps & DispatchToProps;
 
 class Nodes extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadNodes();
   }
 
@@ -37,19 +37,23 @@ class Nodes extends BaseComponent<Props, {}> {
     || node.state.toLowerCase().includes(search)
     || node.role.toLowerCase().includes(search);
 
-  render = () =>
-    <MainLayout>
-      <AddButton tooltip={'Add node'} pathname={'/nodes/new_node?new=true'}/>
-      <div className={`${styles.container}`}>
-        <CardList<INode>
-          isLoading={this.props.isLoading}
-          error={this.props.error}
-          emptyMessage={"No nodes to display"}
-          list={this.props.nodes}
-          card={this.node}
-          predicate={this.predicate}/>
-      </div>
-    </MainLayout>
+  public render() {
+    return (
+      <MainLayout>
+        <AddButton tooltip={{text: 'Add node', position: 'left'}}
+                   pathname={'/nodes/new_node?new=true'}/>
+        <div className={`${styles.container}`}>
+          <CardList<INode>
+            isLoading={this.props.isLoading}
+            error={this.props.error}
+            emptyMessage={"No nodes to display"}
+            list={this.props.nodes}
+            card={this.node}
+            predicate={this.predicate}/>
+        </div>
+      </MainLayout>
+    );
+  }
 
 }
 

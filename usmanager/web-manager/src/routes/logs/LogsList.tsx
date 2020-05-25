@@ -25,7 +25,7 @@ class LogsList extends React.Component<Props, {}> {
 
   private reloadLogs: NodeJS.Timeout | null = null;
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadLogs();
   };
 
@@ -48,6 +48,7 @@ class LogsList extends React.Component<Props, {}> {
       case 'error': return 'red-text';
     }
   };
+
   private header = (): JSX.Element =>
     <ListItem>
       <div className={`${styles.headerItem}`}>
@@ -78,22 +79,24 @@ class LogsList extends React.Component<Props, {}> {
       </div>
     </ListItem>;
 
-    private onReloadClick = (): void => {
-      if (this.reloadLogs) {
-        clearTimeout(this.reloadLogs);
-      }
-      else {
-        this.reloadLogs = setInterval(this.props.loadLogs, 5000);
-      }
-    };
+  private onReloadClick = (): void => {
+    if (this.reloadLogs) {
+      clearTimeout(this.reloadLogs);
+    }
+    else {
+      this.reloadLogs = setInterval(this.props.loadLogs, 5000);
+    }
+  };
 
-  render = () => {
+  public render() {
     const {error, logs} = this.props;
     let isLoading = this.props.isLoading && !this.reloadLogs;
     const LogsList = List<ILogs>();
     return (
       <>
-        <ReloadButton tooltip={'reload'} reloadCallback={this.onReloadClick}/>
+        <ReloadButton tooltip={{activatedText: 'Deactivate automatic reload', deactivatedText: 'Activate automatic reload', position: 'bottom'}}
+                      reloadCallback={this.onReloadClick}
+                      automatic/>
         <div className={`${styles.container} ${!isLoading && !error ? styles.list : undefined}`}>
           <LogsList
             isLoading={isLoading}

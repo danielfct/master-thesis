@@ -21,7 +21,7 @@ export default class Card<T> extends React.Component<Props<T>, {}> {
   private card = createRef<HTMLDivElement>();
   private cardContent = createRef<HTMLDivElement>();
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.scrollbar?.updateScroll();
     this.blockBodyScroll();
   }

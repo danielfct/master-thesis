@@ -37,22 +37,25 @@ type Props = StateToProps;
 
 class MainLayout extends React.Component<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     M.AutoInit();
   }
 
-  render = () =>
-    <div>
-      <Sidenav/>
-      <div className="section content" style={this.props.sidenavVisible ? undefined : {paddingLeft: 0}}>
-        <div className="row col s12">
-          <Breadcrumbs/>
-        </div>
-        <div className='row col s12 m12'>
-          {this.props.children}
+  public render() {
+    return (
+      <div>
+        <Sidenav/>
+        <div className="section content" style={this.props.sidenavVisible ? undefined : {paddingLeft: 0}}>
+          <div className="row col s12">
+            <Breadcrumbs/>
+          </div>
+          <div className='row col s12 m12'>
+            {this.props.children}
+          </div>
         </div>
       </div>
-    </div>
+    );
+  }
 
 }
 

@@ -15,7 +15,7 @@ export default class extends React.Component<Props, {}> {
 
   private tabs = createRef<HTMLUListElement>();
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     M.Tabs.init(this.tabs.current as Element);
   }
 

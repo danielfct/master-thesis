@@ -72,7 +72,7 @@ class Sidenav extends React.Component<Props, {}> {
     private sidenav = createRef<HTMLUListElement>();
     private scrollbar: (ScrollBar | null) = null;
 
-    componentDidMount(): void {
+    public componentDidMount(): void {
         window.addEventListener('resize', this.handleResize);
         M.Sidenav.init(this.sidenav.current as Element);
         this.scrollbar?.updateScroll();
@@ -80,7 +80,7 @@ class Sidenav extends React.Component<Props, {}> {
         this.blockBodyScroll();
     };
 
-    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+    public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
         this.scrollbar?.updateScroll();
     }
 

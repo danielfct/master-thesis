@@ -55,27 +55,38 @@ interface State {
 
 class CloudHostRuleList extends BaseComponent<Props, State> {
 
-  state: State = {
-    entitySaved: !!this.props.cloudHost?.instanceId
-  };
-
-  componentDidMount(): void {
-    this.props.loadRulesHost();
-    if (this.props.cloudHost?.instanceId) {
-      const {instanceId} = this.props.cloudHost;
-      this.props.loadCloudHostRules(instanceId);
-    }
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+  public componentDidMount(): void {
+    this.props.loadRulesHost();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.cloudHost?.instanceId !== this.props.cloudHost?.instanceId) {
+      this.loadEntities();
+    }
     if (!prevProps.cloudHost?.instanceId && this.props.cloudHost?.instanceId) {
       this.setState({entitySaved: true});
     }
   }
 
+  private loadEntities = () => {
+    if (this.props.cloudHost?.instanceId) {
+      const {instanceId} = this.props.cloudHost;
+      this.props.loadCloudHostRules(instanceId);
+    }
+  };
+
+  private isNew = () =>
+    this.props.cloudHost?.instanceId === undefined;
+
   private rule = (index: number, rule: string, separate: boolean, checked: boolean,
                   handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.props.cloudHost?.instanceId === undefined;
+    const isNew = this.isNew();
     const unsaved = this.props.unsavedRules.includes(rule);
     return (
       <ListItem key={index} separate={separate}>
@@ -86,16 +97,18 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
-            <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-              {rule}
-            </div>
+              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                {rule}
+              </div>
             </span>
           </label>
         </div>
-        <Link to={`/rules/hosts/${rule}`}
-              className={`${styles.link} waves-effect`}>
-          <i className={`${styles.linkIcon} material-icons right`}>link</i>
-        </Link>
+        {!isNew && (
+          <Link to={`/rules/hosts/${rule}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
       </ListItem>
     );
   };

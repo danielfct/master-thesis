@@ -23,7 +23,7 @@ export default class extends React.Component<Props, State> {
 
   private collapsible = createRef<HTMLUListElement>();
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.initCollapsible();
   }
 

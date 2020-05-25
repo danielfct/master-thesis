@@ -49,19 +49,45 @@ interface HostRuleListProps {
 
 type Props = StateToProps & DispatchToProps & HostRuleListProps;
 
-class EdgeHostRuleList extends BaseComponent<Props, {}> {
+type State = {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class EdgeHostRuleList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.props.loadRulesHost();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.edgeHost?.hostname !== this.props.edgeHost?.hostname) {
+      this.loadEntities();
+    }
+    if (!prevProps.edgeHost?.hostname && this.props.edgeHost?.hostname) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.edgeHost?.hostname) {
       const {hostname} = this.props.edgeHost;
       this.props.loadEdgeHostRules(hostname);
     }
-  }
+  };
+
+  private isNew = () =>
+    this.props.edgeHost?.hostname === undefined;
 
   private rule = (index: number, rule: string, separate: boolean, checked: boolean,
                   handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const unsaved = this.props.unsavedRules.map(newRule => newRule).includes(rule);
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedRules.includes(rule);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${styles.linkedItemContent}`}>
@@ -71,16 +97,18 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
-               <div className={unsaved ? styles.unsavedItem : undefined}>
+               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                  {rule}
                </div>
             </span>
           </label>
         </div>
-        <Link to={`/rules/hosts/${rule}`}
-              className={`${styles.link} waves-effect`}>
-          <i className={`${styles.linkIcon} material-icons right`}>link</i>
-        </Link>
+        {!isNew && (
+          <Link to={`/rules/hosts/${rule}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
       </ListItem>
     );
   };
@@ -122,10 +150,11 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/hosts/edge/${this.props.edgeHost?.hostname}`,
+                             url: `hosts/edge/${this.props.edgeHost?.hostname}/rules`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }

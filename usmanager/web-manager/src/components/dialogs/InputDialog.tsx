@@ -30,11 +30,11 @@ export default class InputDialog extends BaseComponent<Props, {}> {
       onOpenEnd: this.onOpenModal
     });
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.initModal(this.props.position);
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
     this.initModal(prevProps.position);
     if (this.props.open) {
       let modal = M.Modal.getInstance(this.modal.current as Element);

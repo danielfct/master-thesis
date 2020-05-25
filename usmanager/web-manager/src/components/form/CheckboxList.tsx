@@ -25,11 +25,11 @@ export class CheckboxList extends React.Component<Props, State> {
     values: [],
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.setState({ values: this.getCheckboxValues() });
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if (prevProps.values !== this.props.values) {
       this.setState({ values: this.getCheckboxValues() });
     }
@@ -42,7 +42,7 @@ export class CheckboxList extends React.Component<Props, State> {
       stateValue.checked = checked;
       this.props.onCheck(this.props.id, id, checked);
     }
-    this.setState({ values: this.state.values/*, displayNoRegionsError: false*/ });
+    this.setState({ values: this.state.values });
   };
 
   private item = (index: number, region: string, checked: boolean): JSX.Element => {

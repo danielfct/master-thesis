@@ -31,7 +31,7 @@ type Props = StateToProps & DispatchToProps;
 
 class RulesHostList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadRulesHost();
   }
 

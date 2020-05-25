@@ -31,7 +31,7 @@ type Props = StateToProps & DispatchToProps;
 
 class SimulatedServiceMetricsList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadSimulatedServiceMetrics();
   }
 
@@ -41,14 +41,17 @@ class SimulatedServiceMetricsList extends BaseComponent<Props, {}> {
   private predicate = (simulatedMetric: ISimulatedServiceMetric, search: string): boolean =>
     simulatedMetric.name.toLowerCase().includes(search);
 
-  render = () =>
-    <CardList<ISimulatedServiceMetric>
-      isLoading={this.props.isLoading}
-      error={this.props.error}
-      emptyMessage={"No simulated service metrics to display"}
-      list={this.props.simulatedServiceMetrics}
-      card={this.simulatedServiceMetric}
-      predicate={this.predicate}/>
+  public render() {
+    return (
+      <CardList<ISimulatedServiceMetric>
+        isLoading={this.props.isLoading}
+        error={this.props.error}
+        emptyMessage={"No simulated service metrics to display"}
+        list={this.props.simulatedServiceMetrics}
+        card={this.simulatedServiceMetric}
+        predicate={this.predicate}/>
+    );
+  }
 
 }
 

@@ -56,36 +56,47 @@ interface ServiceAppListProps {
 
 type Props = StateToProps & DispatchToProps & ServiceAppListProps;
 
-type State = {
+interface State {
   selectedService?: string;
   entitySaved: boolean;
 }
 
 class ServiceAppList extends BaseComponent<Props, State> {
 
-  state: State = {
-    entitySaved: !!this.props.app?.name
-  };
-
-  componentDidMount(): void {
-    this.props.loadServices();
-    if (this.props.app?.name) {
-      const {name} = this.props.app;
-      this.props.loadAppServices(name);
-    }
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+  public componentDidMount(): void {
+    this.props.loadServices();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.app?.name !== this.props.app?.name) {
+      this.loadEntities();
+    }
     if (!prevProps.app?.name && this.props.app?.name) {
       this.setState({entitySaved: true});
     }
   }
 
+  private loadEntities = () => {
+    if (this.props.app?.name) {
+      const {name} = this.props.app;
+      this.props.loadAppServices(name);
+    }
+  };
+
+  private isNew = () =>
+    this.props.app?.name === undefined;
+
   private service = (index: number, service: IAppService | IAddAppService, separate: boolean, checked: boolean,
                      handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
     const serviceName = typeof service.service === 'string' ? service.service : service.service.serviceName;
-    const isNew = this.props.app?.name === undefined;
-    const unsaved = this.props.unsavedServices.map(newService => newService.service).includes(serviceName);
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedServices.map(service => service.service).includes(serviceName);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${listItemStyles.linkedItemContent}`}>
@@ -101,10 +112,12 @@ class ServiceAppList extends BaseComponent<Props, State> {
             </span>
           </label>
         </div>
-        <Link to={`/services/${serviceName}`}
-              className={`${listItemStyles.link} waves-effect`}>
-          <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
-        </Link>
+        {!isNew && (
+          <Link to={`/services/${serviceName}`}
+                className={`${listItemStyles.link} waves-effect`}>
+            <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
       </ListItem>
     );
   };
@@ -125,6 +138,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
     }
   };
 
+  //TODO
   private onDeleteFailure = (reason: string, services: string[]): void =>
     super.toast(`Unable to remove ${services.length === 1 ? services[0] : 'services'} from <b>${this.props.app?.name}</b> app`, 10000, reason, true);
 

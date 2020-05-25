@@ -13,13 +13,43 @@ import MainLayout from "../../../views/mainLayout/MainLayout";
 import AddButton from "../../../components/form/AddButton";
 import styles from '../edge/EdgeHosts.module.css'
 import CloudHostsList from "./CloudHostsList";
+import ReloadButton from "../../../components/list/ReloadButton";
+import BaseComponent from "../../../components/BaseComponent";
+import {loadCloudHosts, reloadCloudHosts} from "../../../actions";
+import {connect} from "react-redux";
 
-const CloudHosts: React.FC = () =>
-  <MainLayout>
-    <AddButton tooltip={'Start cloud instance'} pathname={'/hosts/cloud/new_instance?new=true'}/>
-    <div className={`${styles.container}`}>
-      <CloudHostsList/>
-    </div>
-  </MainLayout>;
+interface DispatchToProps {
+  reloadCloudHosts: () => void;
+}
 
-export default CloudHosts;
+type Props = DispatchToProps;
+
+class CloudHosts extends BaseComponent<Props, {}> {
+
+  private reloadCloudInstances = () => {
+    this.props.reloadCloudHosts();
+  };
+
+  public render() {
+    return (
+      <MainLayout>
+        <AddButton tooltip={{text: 'Start cloud instance', position: 'bottom'}}
+                   pathname={'/hosts/cloud/new_instance?new=true'}
+                   offset={0}/>
+        <ReloadButton tooltip={{text: 'Reload cloud instances', position: 'left'}}
+                      reloadCallback={this.reloadCloudInstances}
+                      offset={1}/>
+        <div className={`${styles.container}`}>
+          <CloudHostsList/>
+        </div>
+      </MainLayout>
+    );
+  }
+
+}
+
+const mapDispatchToProps: DispatchToProps = {
+  reloadCloudHosts,
+};
+
+export default connect(null, mapDispatchToProps)(CloudHosts);

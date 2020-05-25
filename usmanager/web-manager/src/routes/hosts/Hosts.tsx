@@ -13,7 +13,7 @@ export default class Hosts extends BaseComponent<{}, {}> {
   private cloudHostsCollapsible = createRef<HTMLUListElement>();
   private edgeHostsCollapsible = createRef<HTMLUListElement>();
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.init();
   }
 
@@ -22,34 +22,39 @@ export default class Hosts extends BaseComponent<{}, {}> {
     M.Collapsible.init(this.edgeHostsCollapsible.current as Element);
   };
 
-  render = () =>
-    <MainLayout>
-      <AddButton tooltip={'Add host'} dropdown={{
-        id: 'hosts',
-        title: 'Host type',
-        data: [
-          {text: 'Cloud', pathname: '/hosts/cloud/new_instance?new=true'},
-          {text: 'Edge', pathname: '/hosts/edge/add_machine?new=true'}
-        ],
-      }}/>
-      <div className={`${styles.container}`}>
-        <Collapsible id={"cloudHostsCollapsible"}
-                     title={'Cloud'}
-                     active
-                     headerClassname={styles.collapsibleSubtitle}
-                     bodyClassname={styles.collapsibleCardList}>
-          <CloudHostsList/>
-        </Collapsible>
-      </div>
-      <div className={`${styles.container}`}>
-        <Collapsible id={"edgeHostsCollapsible"}
-                     title={'Edge'}
-                     active
-                     headerClassname={styles.collapsibleSubtitle}
-                     bodyClassname={styles.collapsibleCardList}>
-          <EdgeHostsList/>
-        </Collapsible>
-      </div>
-    </MainLayout>
+  public render() {
+    return (
+      <MainLayout>
+        <AddButton tooltip={{text: 'Add host', position: 'left'}}
+                   dropdown={{
+                     id: 'hosts',
+                     title: 'Host type',
+                     data: [
+                       {text: 'Cloud', pathname: '/hosts/cloud/new_instance?new=true'},
+                       {text: 'Edge', pathname: '/hosts/edge/add_machine?new=true'}
+                     ],
+                   }}/>
+        <div className={`${styles.container}`}>
+          <Collapsible id={"cloudHostsCollapsible"}
+                       title={'Cloud'}
+                       active
+                       headerClassname={styles.collapsibleSubtitle}
+                       bodyClassname={styles.collapsibleCardList}>
+            <CloudHostsList/>
+          </Collapsible>
+        </div>
+        <div className={`${styles.container}`}>
+          <Collapsible id={"edgeHostsCollapsible"}
+                       title={'Edge'}
+                       active
+                       headerClassname={styles.collapsibleSubtitle}
+                       bodyClassname={styles.collapsibleCardList}>
+            <EdgeHostsList/>
+          </Collapsible>
+        </div>
+      </MainLayout>
+    );
+  }
+
 
 }

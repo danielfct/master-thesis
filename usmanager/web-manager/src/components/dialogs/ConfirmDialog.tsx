@@ -17,11 +17,11 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
   private initModal = () =>
     M.Modal.init(this.modal.current as Element, { startingTop: '38.5%', endingTop: '38.5%', preventScrolling: false });
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.initModal();
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
     this.initModal();
   }
 

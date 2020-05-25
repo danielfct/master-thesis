@@ -31,6 +31,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.A
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.amazonaws.services.ec2.model.Instance;
@@ -159,4 +160,23 @@ public class CloudHostsService {
     }
   }
 
+  public List<CloudHostEntity> reloadCloudInstances() {
+    cloudHosts.deleteAll();
+    List<CloudHostEntity> instances = new LinkedList<>();
+    awsService.getSimpleInstances().forEach(instance -> {
+      if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()) {
+        var cloudHost = CloudHostEntity.builder()
+            .instanceId(instance.getInstanceId())
+            .imageId(instance.getImageId())
+            .instanceType(instance.getInstanceType())
+            .state(instance.getState())
+            .publicDnsName(instance.getPublicDnsName())
+            .publicIpAddress(instance.getPublicIpAddress())
+            .build();
+        instances.add(cloudHosts.save(cloudHost));
+      }
+    });
+    System.out.println(instances);
+    return instances;
+  }
 }

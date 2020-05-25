@@ -16,7 +16,8 @@ import RulesServiceList from "./RulesServiceList";
 
 const RulesService: React.FC = () =>
   <MainLayout>
-    <AddButton tooltip={'Add service rule'} pathname={'/rules/services/new_service_rule?new=true'}/>
+    <AddButton tooltip={{text: 'Add service rule', position: 'left'}}
+               pathname={'/rules/services/new_service_rule?new=true'}/>
     <div className={`${styles.container}`}>
       <RulesServiceList/>
     </div>

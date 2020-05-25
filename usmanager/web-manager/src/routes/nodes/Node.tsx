@@ -2,7 +2,7 @@ import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../components/BaseComponent";
 import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../components/form/Form";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
-import Error from "../../components/errors/Error";
+import {Error} from "../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
@@ -26,26 +26,26 @@ export interface INode {
 }
 
 interface INewNodeHost {
-  hostname: string;
+  hostname?: string;
   quantity: number;
 }
 
 interface INewNodeLocation {
-  region: string,
-  country: string,
-  city: string,
+  region?: string,
+  country?: string,
+  city?: string,
   quantity: number,
 }
 
 const buildNewNodeHost = (): INewNodeHost => ({
-  hostname: '',
+  hostname: undefined,
   quantity: 1,
 });
 
 const buildNewNodeLocation = (): INewNodeLocation => ({
-  region: '',
-  country: '',
-  city: '',
+  region: undefined,
+  country: undefined,
+  city: undefined,
   quantity: 1,
 });
 
@@ -88,7 +88,7 @@ class Node extends BaseComponent<Props, State> {
 
   private mounted = false;
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadNode();
     this.props.loadEdgeHosts();
     this.props.loadCloudHosts();
@@ -165,7 +165,7 @@ class Node extends BaseComponent<Props, State> {
   private getSelectableHosts = () => {
     const nodesHostnames = Object.values(this.props.nodes).map(node => node.hostname);
     const cloudHosts = Object.values(this.props.cloudHosts)
-                             .filter(instance => instance.publicIpAddress && !nodesHostnames.includes(instance.publicIpAddress))
+                             .filter(instance => instance.state === 'running' && !nodesHostnames.includes(instance.publicIpAddress))
                              .map(instance => instance.publicIpAddress);
     const edgeHosts = Object.keys(this.props.edgeHosts).filter(edgeHost => !nodesHostnames.includes(edgeHost));
     return cloudHosts.concat(edgeHosts);

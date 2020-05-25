@@ -21,14 +21,25 @@ type Props = SimulatedHostMetricCardProps;
 
 const SimulatedHostMetricCard = ({simulatedHostMetric}: Props) => (
   <Card<ISimulatedHostMetric> title={simulatedHostMetric.name}
-                   link={{to: {pathname: `/simulated-metrics/hosts/${simulatedHostMetric.name }`, state: simulatedHostMetric }}}
-                   height={'215px'}
+                   link={{to: {pathname: `/simulated-metrics/hosts/${simulatedHostMetric.name}`, state: simulatedHostMetric }}}
+                   height={'170px'}
                    margin={'10px 0'}
                    hoverable>
     <CardItem key={'Field'}
               label={'Field'}
               value={`${simulatedHostMetric.field.name}`}/>
-             {/* //TODO*/}
+    <CardItem key={'MinimumValue'}
+              label='Minimum value'
+              value={`${simulatedHostMetric.minimumValue}`}/>
+    <CardItem key={'MaximumValue'}
+              label='Maximum value'
+              value={`${simulatedHostMetric.maximumValue}`}/>
+    <CardItem key={'Override'}
+              label='Override'
+              value={`${simulatedHostMetric.override}`}/>
+    <CardItem key={'Generic'}
+              label='Generic'
+              value={`${simulatedHostMetric.generic}`}/>
   </Card>
 );
 

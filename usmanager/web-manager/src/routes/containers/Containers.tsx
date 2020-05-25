@@ -9,6 +9,7 @@ import {IContainer} from "./Container";
 import styles from './Containers.module.css'
 import BaseComponent from "../../components/BaseComponent";
 import {loadContainers} from "../../actions";
+import ReloadButton from "../../components/list/ReloadButton";
 
 interface StateToProps {
   isLoading: boolean
@@ -24,7 +25,7 @@ type Props = StateToProps & DispatchToProps;
 
 class Containers extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadContainers();
   }
 
@@ -38,19 +39,31 @@ class Containers extends BaseComponent<Props, {}> {
     || container.status.toLowerCase().includes(search)
     || container.hostname.toLowerCase().includes(search);
 
-  render = () =>
-    <MainLayout>
-      <AddButton tooltip={'Start container'} pathname={'/containers/start_container?new=true'}/>
-      <div className={`${styles.container}`}>
-        <CardList<IContainer>
-          isLoading={this.props.isLoading}
-          error={this.props.error}
-          emptyMessage={"No containers to display"}
-          list={this.props.containers}
-          card={this.container}
-          predicate={this.predicate}/>
-      </div>
-    </MainLayout>
+  private reloadContainers = () => {
+    //this.props.reloadCloudHosts();
+  };
+
+  public render() {
+    return (
+      <MainLayout>
+        <AddButton tooltip={{text: 'Start container', position: 'bottom'}}
+                   pathname={'/containers/start_container?new=true'}
+                   offset={0}/>
+        <ReloadButton tooltip={{text: 'Reload containers', position: 'left'}}
+                      reloadCallback={this.reloadContainers}
+                      offset={1}/>
+        <div className={`${styles.container}`}>
+          <CardList<IContainer>
+            isLoading={this.props.isLoading}
+            error={this.props.error}
+            emptyMessage={"No containers to display"}
+            list={this.props.containers}
+            card={this.container}
+            predicate={this.predicate}/>
+        </div>
+      </MainLayout>
+    );
+  }
 
 }
 

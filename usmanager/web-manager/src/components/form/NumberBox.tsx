@@ -14,7 +14,7 @@ interface NumberBoxProps {
 
 export class NumberBox extends React.Component<NumberBoxProps, any> {
 
-  componentDidUpdate(prevProps: Readonly<NumberBoxProps>, prevState: Readonly<any>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<NumberBoxProps>, prevState: Readonly<any>, snapshot?: any): void {
     M.updateTextFields();
   }
 

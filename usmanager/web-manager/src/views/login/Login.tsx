@@ -55,7 +55,7 @@ class Login extends BaseComponent<Props, State> {
     showPassword: false,
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     M.Tabs.init(this.tabs.current as Element);
     M.updateTextFields();
   }

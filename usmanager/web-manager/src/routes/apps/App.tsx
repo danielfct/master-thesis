@@ -4,7 +4,7 @@ import {RouteComponentProps} from "react-router";
 import Form, {ICustomButton, IFields, IFormLoading, requiredAndTrimmed} from "../../components/form/Form";
 import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
-import Error from "../../components/errors/Error";
+import {Error} from "../../components/errors/Error";
 import React from "react";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
@@ -24,7 +24,7 @@ export interface IApp extends IDatabaseData {
 }
 
 const buildNewApp = (): Partial<IApp> => ({
-  name: '',
+  name: undefined,
 });
 
 interface StateToProps {
@@ -63,7 +63,7 @@ class App extends BaseComponent<Props, State> {
     loading: undefined,
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadApp();
     this.mounted = true;
   };
@@ -281,11 +281,11 @@ class App extends BaseComponent<Props, State> {
       id: 'app',
       content: () => this.app()
     },
-   /* {
+    {
       title: 'Services',
       id: 'services',
       content: () => this.services()
-    }*/
+    }
   ];
 
   render() {

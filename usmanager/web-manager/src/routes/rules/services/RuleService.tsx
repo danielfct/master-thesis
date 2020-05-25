@@ -17,7 +17,7 @@ import Form, {
   requiredAndTrimmed
 } from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
-import Error from "../../../components/errors/Error";
+import {Error} from "../../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
@@ -45,7 +45,7 @@ export interface IRuleService extends IRule {
 }
 
 const buildNewServiceRule = (): Partial<IRuleService> => ({
-  name: '',
+  name: undefined,
   priority: 0,
   generic: undefined,
   decision: undefined,
@@ -92,7 +92,7 @@ class RuleService extends BaseComponent<Props, State> {
     isGeneric: this.props.ruleService?.generic || false,
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadRuleService();
     this.props.loadDecisions();
     this.mounted = true;
@@ -325,7 +325,7 @@ class RuleService extends BaseComponent<Props, State> {
     <RuleServiceConditionList isLoadingRuleService={this.props.isLoading}
                               loadRuleServiceError={this.props.error}
                               ruleService={this.props.ruleService}
-                              newConditions={this.state.unsavedConditions}
+                              unsavedConditions={this.state.unsavedConditions}
                               onAddRuleCondition={this.addRuleCondition}
                               onRemoveRuleConditions={this.removeRuleConditions}/>;
 
@@ -333,7 +333,7 @@ class RuleService extends BaseComponent<Props, State> {
     <RuleServiceServicesList isLoadingRuleService={this.props.isLoading}
                              loadRuleServiceError={this.props.error}
                              ruleService={this.props.ruleService}
-                             newServices={this.state.unsavedServices}
+                             unsavedServices={this.state.unsavedServices}
                              onAddRuleService={this.addRuleService}
                              onRemoveRuleServices={this.removeRuleServices}/>;
 

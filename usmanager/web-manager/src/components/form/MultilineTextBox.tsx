@@ -12,7 +12,7 @@ interface Props {
 
 export class MultilineTextBox extends React.Component<Props, {}> {
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
     M.updateTextFields();
   }
 

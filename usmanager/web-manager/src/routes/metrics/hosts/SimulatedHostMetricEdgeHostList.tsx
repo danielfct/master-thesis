@@ -47,15 +47,27 @@ interface SimulatedHostMetricEdgeHostListProps {
 
 type Props = StateToProps & DispatchToProps & SimulatedHostMetricEdgeHostListProps;
 
-class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.loadEntities();
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if (prevProps.simulatedHostMetric?.name !== this.props.simulatedHostMetric?.name) {
       this.loadEntities();
+    }
+    if (!prevProps.simulatedHostMetric?.name && this.props.simulatedHostMetric?.name) {
+      this.setState({entitySaved: true});
     }
   }
 
@@ -67,9 +79,13 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, {}> {
     }
   };
 
+  private isNew = () =>
+    this.props.simulatedHostMetric?.name === undefined;
+
   private edgeHost = (index: number, edgeHost: string, separate: boolean, checked: boolean,
-                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const unsaved = this.props.unsavedEdgeHosts.map(newEdgeHost => newEdgeHost).includes(edgeHost);
+                      handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedEdgeHosts.includes(edgeHost);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${styles.linkedItemContent}`}>
@@ -79,16 +95,18 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, {}> {
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
-               <div className={!this.isNew() && unsaved ? styles.unsavedItem : undefined}>
+               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                  {edgeHost}
                </div>
             </span>
           </label>
         </div>
-        <Link to={`/hosts/edge/${edgeHost}`}
-              className={`${styles.link} waves-effect`}>
-          <i className={`${styles.linkIcon} material-icons right`}>link</i>
-        </Link>
+        {!isNew && (
+          <Link to={`/hosts/edge/${edgeHost}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
       </ListItem>
     );
   };
@@ -112,11 +130,8 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, {}> {
   private getSelectableEdgeHosts = () => {
     const {edgeHosts, simulatedMetricEdgeHosts, unsavedEdgeHosts} = this.props;
     return Object.keys(edgeHosts).filter(edgeHost => !simulatedMetricEdgeHosts.includes(edgeHost)
-                                                       && !unsavedEdgeHosts.includes(edgeHost));
+                                                     && !unsavedEdgeHosts.includes(edgeHost));
   };
-
-  private isNew = () =>
-    this.props.simulatedHostMetric?.name === undefined;
 
   render() {
     const isNew = this.isNew();
@@ -138,7 +153,8 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, {}> {
                              url: `simulated-metrics/hosts/${this.props.simulatedHostMetric?.name}/edge-hosts`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }

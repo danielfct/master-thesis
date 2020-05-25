@@ -13,7 +13,7 @@ import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {IFields, requiredAndTrimmed} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
-import Error from "../../../components/errors/Error";
+import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
@@ -79,7 +79,6 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 interface State {
   simulatedServiceMetric?: ISimulatedServiceMetric,
   formSimulatedServiceMetric?: ISimulatedServiceMetric,
-  unsavedCloudHosts: string[],
   unsavedServices: string[],
   isGeneric: boolean,
 }
@@ -90,11 +89,10 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
   state: State = {
     unsavedServices: [],
-    unsavedCloudHosts: [],
     isGeneric: this.props.simulatedServiceMetric?.generic || false,
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadSimulatedServiceMetric();
     this.props.loadFields();
     this.mounted = true;
@@ -119,7 +117,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<ISimulatedServiceMetric>): void => {
     const simulatedMetric = reply.data;
-    super.toast(`<span class="green-text">Host simulated metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
+    super.toast(`<span class="green-text">Simulated service metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
     this.props.addSimulatedServiceMetric(simulatedMetric);
     this.saveEntities(simulatedMetric);
     if (this.mounted) {
@@ -145,7 +143,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     super.toast(`Unable to update ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated service metric`, 10000, reason, true);
 
   private onDeleteSuccess = (simulatedMetric: ISimulatedServiceMetric): void => {
-    super.toast(`<span class="green-text">Host simulated metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
+    super.toast(`<span class="green-text">Simulated service metric <b class="white-text">${simulatedMetric.name}</b> successfully removed</span>`);
     if (this.mounted) {
       this.props.history.push(`/simulated-metrics/Services`);
     }
@@ -220,10 +218,8 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
   private fieldOption = (field: IField): string =>
     field.name;
 
-  private isGenericSelected = (value: string) => {
-    console.log(value);
+  private isGenericSelected = (value: string) =>
     this.setState({isGeneric: value.toLowerCase() === 'true'});
-  }
 
   private simulatedServiceMetric = () => {
     const {isLoading, error} = this.props;
@@ -284,9 +280,14 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                              selectCallback: this.isGenericSelected,
                              defaultValue: "Apply to all services?",
                              values: ['True', 'False']}}/>
-                  : <Field key={index}
-                           id={key}
-                           label={key}/>
+                  : key === 'minimumValue' || key === 'maximumValue'
+                    ? <Field key={index}
+                             id={key}
+                             label={key}
+                             type={'number'}/>
+                    : <Field key={index}
+                             id={key}
+                             label={key}/>
             )}
           </Form>
         )}
@@ -298,7 +299,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     <SimulatedServiceMetricServiceList isLoadingSimulatedServiceMetric={this.props.isLoading}
                                        loadSimulatedServiceMetricError={this.props.error}
                                        simulatedServiceMetric={this.getSimulatedServiceMetric()}
-                                       unsavedServices={this.state.unsavedCloudHosts}
+                                       unsavedServices={this.state.unsavedServices}
                                        onAddService={this.addSimulatedServiceMetricService}
                                        onRemoveServices={this.removeSimulatedServiceMetricServices}/>;
 

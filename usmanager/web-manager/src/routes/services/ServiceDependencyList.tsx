@@ -44,40 +44,76 @@ interface ServiceDependencyProps {
   isLoadingService: boolean;
   loadServiceError?: string | null;
   service: IService | Partial<IService> | null;
-  newDependencies: string[];
+  unsavedDependencies: string[];
   onAddServiceDependency: (dependency: string) => void;
   onRemoveServiceDependencies: (dependencies: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceDependencyProps;
 
-class ServiceDependencyList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class ServiceDependencyList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.props.loadServices();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.service?.serviceName !== this.props.service?.serviceName) {
+      this.loadEntities();
+    }
+    if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.service?.serviceName) {
       const {serviceName} = this.props.service;
       this.props.loadServiceDependencies(serviceName);
     }
-  }
+  };
+
+  private isNew = () =>
+    this.props.service?.serviceName === undefined;
 
   private dependency = (index: number, dependency: string, separate: boolean, checked: boolean,
-                        handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={`${styles.linkedItemContent}`}>
-        <label>
-          <input id={dependency}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{dependency}</span>
-        </label>
-      </div>
-      <Link to={`/services/${dependency}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+                        handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedDependencies.includes(dependency);
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={`${styles.linkedItemContent}`}>
+          <label>
+            <input id={dependency}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                 {dependency}
+              </div>
+            </span>
+          </label>
+        </div>
+        {!isNew && (
+          <Link to={`/services/${dependency}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
+      </ListItem>
+    );
+  };
 
   private onAdd = (dependency: string): void =>
     this.props.onAddServiceDependency(dependency);
@@ -96,9 +132,9 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
     super.toast(`Unable to delete dependency`, 10000, reason, true);
 
   private getSelectableServicesNames = () => {
-    const {services, service, dependencies, newDependencies} = this.props;
+    const {services, service, dependencies, unsavedDependencies} = this.props;
     return Object.keys(services)
-                 .filter(name => !service || name !== service.serviceName && !dependencies.includes(name) && !newDependencies.includes(name));
+                 .filter(name => !service || name !== service.serviceName && !dependencies.includes(name) && !unsavedDependencies.includes(name));
   };
 
   render() {
@@ -120,7 +156,8 @@ class ServiceDependencyList extends BaseComponent<Props, {}> {
                              url: `services/${this.props.service?.serviceName}/dependencies`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
 
   }
 

@@ -27,7 +27,7 @@ import FilteredList from './FilteredList';
 import {PagedList} from "./PagedList";
 import SimpleList from "./SimpleList";
 import ListLoadingSpinner from "./ListLoadingSpinner";
-import Error from "../errors/Error";
+import {Error} from "../errors/Error";
 import AnimatedList from "./AnimatedList";
 import Empty from "./Empty";
 

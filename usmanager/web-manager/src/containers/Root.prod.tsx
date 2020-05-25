@@ -41,10 +41,8 @@ import DefaultHostSimulatedMetricsDetail from "../routes/metrics/DefaultHostSimu
 import SpecificHostSimulatedMetrics from "../routes/metrics/SpecificHostSimulatedMetrics";
 import SpecificHostSimulatedMetricsDetail from "../routes/metrics/SpecificHostSimulatedMetricsDetail";
 import {Provider} from "react-redux";
-import PageNotFound from "../components/PageNotFound";
 import Login from "../views/login/Login";
 import AuthenticatedRoute from "../components/AuthenticatedRoute";
-import Footer from "../views/footer/Footer";
 import Logs from "../routes/logs/Logs";
 import Region from "../routes/region/Region";
 import Regions from "../routes/region/Regions";
@@ -68,6 +66,8 @@ import RuleConditions from "../routes/rules/conditions/RuleConditions";
 import Condition from "../routes/rules/conditions/RuleCondition";
 import LoadBalancers from "../routes/loadBalancer/LoadBalancers";
 import LoadBalancer from "../routes/loadBalancer/LoadBalancer";
+import {PageNotFound} from "../components/PageNotFound";
+import {Footer} from "../views/footer/Footer";
 
 interface RootContainerProps {
     store: any;
@@ -118,25 +118,28 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
 
 export default class Root extends React.Component<Props, {}> {
 
-    componentDidMount(): void {
+    public componentDidMount(): void {
         M.AutoInit();
     }
 
-    render = () =>
-      <>
-          <main>
-              <Provider store={this.props.store}>
-                  <LoadingBar showFastActions className="loading-bar"/>
-                  <Navbar/>
-                  <Switch>
-                      <Route path="/" exact component={Login} />
-                      <Route path="/login" exact component={Login} />
-                      {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
-                        <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
-                  </Switch>
-              </Provider>
-          </main>
-          <Footer/>
-      </>
+    public render() {
+        return (
+          <>
+              <main>
+                  <Provider store={this.props.store}>
+                      <LoadingBar showFastActions className="loading-bar"/>
+                      <Navbar/>
+                      <Switch>
+                          <Route path="/" exact component={Login} />
+                          <Route path="/login" exact component={Login} />
+                          {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
+                            <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
+                      </Switch>
+                  </Provider>
+              </main>
+              <Footer/>
+          </>
+        );
+    }
 
 }

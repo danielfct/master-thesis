@@ -42,40 +42,76 @@ interface HostRuleCloudHostListProps {
   isLoadingHostRule: boolean;
   loadHostRuleError?: string | null;
   ruleHost: IRuleHost | Partial<IRuleHost> | null;
-  newCloudHosts: string[];
+  unsavedCloudHosts: string[];
   onAddRuleCloudHost: (cloudHost: string) => void;
   onRemoveRuleCloudHosts: (cloudHost: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & HostRuleCloudHostListProps
 
-class HostRuleCloudHostList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class HostRuleCloudHostList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.props.loadCloudHosts();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.ruleHost?.name !== this.props.ruleHost?.name) {
+      this.loadEntities();
+    }
+    if (!prevProps.ruleHost?.name && this.props.ruleHost?.name) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.ruleHost?.name) {
       const {name} = this.props.ruleHost;
       this.props.loadRuleHostCloudHosts(name);
     }
-  }
+  };
+
+  private isNew = () =>
+    this.props.ruleHost?.name === undefined;
 
   private cloudHost = (index: number, cloudHost: string, separate: boolean, checked: boolean,
-                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={styles.linkedItemContent}>
-        <label>
-          <input id={cloudHost}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{cloudHost}</span>
-        </label>
-      </div>
-      <Link to={`/hosts/cloud/${cloudHost}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedCloudHosts.includes(cloudHost);
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={styles.linkedItemContent}>
+          <label>
+            <input id={cloudHost}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                 {cloudHost}
+               </div>
+            </span>
+          </label>
+        </div>
+        {!isNew && (
+          <Link to={`/hosts/cloud/${cloudHost}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
+      </ListItem>
+    );
+  };
 
   private onAdd = (cloudHost: string): void =>
     this.props.onAddRuleCloudHost(cloudHost);
@@ -94,9 +130,9 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
     super.toast(`Unable to remove cloud host`, 10000, reason, true);
 
   private getSelectableCloudHostNames = () => {
-    const {cloudHosts, ruleCloudHosts, newCloudHosts} = this.props;
+    const {cloudHosts, ruleCloudHosts, unsavedCloudHosts} = this.props;
     return Object.keys(cloudHosts)
-                 .filter(cloudHost => !ruleCloudHosts.includes(cloudHost) && !newCloudHosts.includes(cloudHost));
+                 .filter(cloudHost => !ruleCloudHosts.includes(cloudHost) && !unsavedCloudHosts.includes(cloudHost));
   };
 
   render() {
@@ -118,7 +154,8 @@ class HostRuleCloudHostList extends BaseComponent<Props, {}> {
                              url: `rules/hosts/${this.props.ruleHost?.name}/conditions`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }

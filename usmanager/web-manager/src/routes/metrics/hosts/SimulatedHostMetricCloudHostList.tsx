@@ -47,15 +47,27 @@ interface SimulatedHostMetricCloudHostListProps {
 
 type Props = StateToProps & DispatchToProps & SimulatedHostMetricCloudHostListProps;
 
-class SimulatedHostMetricCloudHostList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.loadEntities();
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if (prevProps.simulatedHostMetric?.name !== this.props.simulatedHostMetric?.name) {
       this.loadEntities();
+    }
+    if (!prevProps.simulatedHostMetric?.name && this.props.simulatedHostMetric?.name) {
+      this.setState({entitySaved: true});
     }
   }
 
@@ -67,10 +79,13 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, {}> {
     }
   };
 
+  private isNew = () =>
+    this.props.simulatedHostMetric?.name === undefined;
+
   private cloudHost = (index: number, cloudHost: string, separate: boolean, checked: boolean,
                        handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const isNew = this.props.simulatedHostMetric?.name === undefined;
-    const unsaved = this.props.unsavedCloudHosts.map(newCloudHost => newCloudHost).includes(cloudHost);
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedCloudHosts.includes(cloudHost);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${styles.linkedItemContent}`}>
@@ -86,10 +101,12 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, {}> {
             </span>
           </label>
         </div>
-        <Link to={`/hosts/cloud/${cloudHost}`}
-              className={`${styles.link} waves-effect`}>
-          <i className={`${styles.linkIcon} material-icons right`}>link</i>
-        </Link>
+        {!isNew && (
+          <Link to={`/hosts/cloud/${cloudHost}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
       </ListItem>
     );
   };
@@ -115,9 +132,6 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, {}> {
     return Object.keys(cloudHosts).filter(cloudHost => !simulatedMetricCloudHosts.includes(cloudHost) && !unsavedCloudHosts.includes(cloudHost));
   };
 
-  private isNew = () =>
-    this.props.simulatedHostMetric?.name === undefined;
-
   render() {
     const isNew = this.isNew();
     return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedHostMetric || this.props.isLoading)}
@@ -138,7 +152,8 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, {}> {
                              url: `simulated-metrics/hosts/${this.props.simulatedHostMetric?.name}/cloud-hosts`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }

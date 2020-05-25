@@ -119,9 +119,9 @@ public class ServicesController {
     servicesService.removeDependency(serviceName, dependencyName);
   }
 
-  @GetMapping("/{serviceName}/dependees")
-  public List<ServiceEntity> getServiceDependees(@PathVariable String serviceName) {
-    return servicesService.getDependees(serviceName);
+  @GetMapping("/{serviceName}/dependents")
+  public List<ServiceEntity> getServiceDependents(@PathVariable String serviceName) {
+    return servicesService.getDependents(serviceName);
   }
 
   @GetMapping("/{serviceName}/predictions")

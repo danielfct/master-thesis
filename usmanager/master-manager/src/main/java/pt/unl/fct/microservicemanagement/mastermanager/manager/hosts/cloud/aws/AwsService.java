@@ -27,6 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
 
 import java.util.ArrayList;

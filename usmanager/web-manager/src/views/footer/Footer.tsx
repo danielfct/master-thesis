@@ -24,13 +24,11 @@
 
 import React from "react";
 
-export default class Footer extends React.Component<{}> {
-    render = () =>
-        <footer className="page-footer">
-            <div className="row">
-                <div className="right">
-                    © {(new Date().getFullYear())} μs-manager
-                </div>
-            </div>
-        </footer>
-};
+export const Footer: React.FC = () =>
+  <footer className="page-footer">
+    <div className="row">
+      <div className="right">
+        © {(new Date().getFullYear())} μs-manager
+      </div>
+    </div>
+  </footer>;

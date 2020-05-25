@@ -31,7 +31,7 @@ type Props = StateToProps & DispatchToProps;
 
 class SimulatedHostMetricsList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadSimulatedHostMetrics();
   }
 
@@ -41,14 +41,17 @@ class SimulatedHostMetricsList extends BaseComponent<Props, {}> {
   private predicate = (simulatedMetric: ISimulatedHostMetric, search: string): boolean =>
     simulatedMetric.name.toLowerCase().includes(search);
 
-  render = () =>
-    <CardList<ISimulatedHostMetric>
-      isLoading={this.props.isLoading}
-      error={this.props.error}
-      emptyMessage={"No simulated host metrics to display"}
-      list={this.props.simulatedHostMetrics}
-      card={this.simulatedHostMetric}
-      predicate={this.predicate}/>
+  public render() {
+    return (
+      <CardList<ISimulatedHostMetric>
+        isLoading={this.props.isLoading}
+        error={this.props.error}
+        emptyMessage={"No simulated host metrics to display"}
+        list={this.props.simulatedHostMetrics}
+        card={this.simulatedHostMetric}
+        predicate={this.predicate}/>
+    );
+  }
 
 }
 

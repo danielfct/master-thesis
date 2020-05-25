@@ -5,12 +5,8 @@ interface Props {
   message: String;
 }
 
-export default class Error extends React.Component<Props, {}> {
-
-  render = () =>
-    <div className={`${styles.container}`}>
-      <i className={`${styles.icon} material-icons`}>error_outline</i>
-        <h5 className={`${styles.message}`}>{this.props.message}</h5>
-    </div>
-
-}
+export const Error: React.FC<Props> = ({message}) =>
+  <div className={`${styles.container}`}>
+    <i className={`${styles.icon} material-icons`}>error_outline</i>
+    <h5 className={`${styles.message}`}>{message}</h5>
+  </div>;

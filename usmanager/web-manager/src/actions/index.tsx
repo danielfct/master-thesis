@@ -208,17 +208,17 @@ export function removeServiceDependencies(serviceName: string, dependencies: str
   }
 }
 
-export const SERVICE_DEPENDEES_REQUEST = 'SERVICE_DEPENDEES_REQUEST';
-export const SERVICE_DEPENDEES_SUCCESS = 'SERVICE_DEPENDEES_SUCCESS';
-export const SERVICE_DEPENDEES_FAILURE = 'SERVICE_DEPENDEES_FAILURE';
-export const loadServiceDependees = (serviceName: string) => (dispatch: any) => {
-  return dispatch(fetchServiceDependees(serviceName));
+export const SERVICE_DEPENDENTS_REQUEST = 'SERVICE_DEPENDENTS_REQUEST';
+export const SERVICE_DEPENDENTS_SUCCESS = 'SERVICE_DEPENDENTS_SUCCESS';
+export const SERVICE_DEPENDENTS_FAILURE = 'SERVICE_DEPENDENTS_FAILURE';
+export const loadServiceDependents = (serviceName: string) => (dispatch: any) => {
+  return dispatch(fetchServiceDependents(serviceName));
 };
-const fetchServiceDependees = (serviceName: string) => ({
+const fetchServiceDependents = (serviceName: string) => ({
   [CALL_API]: {
-    types: [ SERVICE_DEPENDEES_REQUEST, SERVICE_DEPENDEES_SUCCESS, SERVICE_DEPENDEES_FAILURE ],
-    endpoint: `services/${serviceName}/dependees`,
-    schema: Schemas.SERVICE_DEPENDEE_ARRAY,
+    types: [ SERVICE_DEPENDENTS_REQUEST, SERVICE_DEPENDENTS_SUCCESS, SERVICE_DEPENDENTS_FAILURE ],
+    endpoint: `services/${serviceName}/dependents`,
+    schema: Schemas.SERVICE_DEPENDENT_ARRAY,
     entity: serviceName
   }
 });
@@ -342,6 +342,15 @@ const fetchCloudHosts = (instanceId?: string) => ({
         schema: Schemas.CLOUD_HOST,
         entity: 'cloudHosts'
       }
+});
+export const reloadCloudHosts = () => ({
+  [CALL_API]: {
+    types: [ CLOUD_HOSTS_REQUEST, CLOUD_HOSTS_SUCCESS, CLOUD_HOSTS_FAILURE ],
+    endpoint: `hosts/cloud/reload`,
+    schema: Schemas.CLOUD_HOST_ARRAY,
+    entity: 'cloudHosts',
+    method: 'post'
+  }
 });
 export const ADD_CLOUD_HOST = 'ADD_CLOUD_HOST';
 export function addCloudHost(cloudHost: ICloudHost): EntitiesAction {
@@ -914,13 +923,13 @@ const fetchSimulatedServiceMetrics = (name?: string) => ({
     !name
       ? {
         types: [ SIMULATED_SERVICE_METRICS_REQUEST, SIMULATED_SERVICE_METRICS_SUCCESS, SIMULATED_SERVICE_METRICS_FAILURE ],
-        endpoint: `simulated-metrics/hosts`,
+        endpoint: `simulated-metrics/services`,
         schema: Schemas.SIMULATED_SERVICE_METRIC_ARRAY,
         entity: 'simulatedServiceMetrics'
       }
       : {
         types: [ SIMULATED_SERVICE_METRIC_REQUEST, SIMULATED_SERVICE_METRIC_SUCCESS, SIMULATED_SERVICE_METRIC_FAILURE ],
-        endpoint: `simulated-metrics/hosts/${name}`,
+        endpoint: `simulated-metrics/services/${name}`,
         schema: Schemas.SIMULATED_SERVICE_METRIC,
         entity: 'simulatedServiceMetrics'
       }

@@ -31,7 +31,7 @@ type Props = StateToProps & DispatchToProps;
 
 class LoadBalancersList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadLoadBalancers();
   }
 
@@ -41,14 +41,17 @@ class LoadBalancersList extends BaseComponent<Props, {}> {
   private predicate = (loadBalancer: ILoadBalancer, search: string): boolean =>
     loadBalancer.hostname.toLowerCase().includes(search);
 
-  render = () =>
-    <CardList<ILoadBalancer>
-      isLoading={this.props.isLoading}
-      error={this.props.error}
-      emptyMessage={"No load-balancers to display"}
-      list={this.props.loadBalancers}
-      card={this.loadBalancer}
-      predicate={this.predicate}/>
+  public render() {
+    return (
+      <CardList<ILoadBalancer>
+        isLoading={this.props.isLoading}
+        error={this.props.error}
+        emptyMessage={"No load-balancers to display"}
+        list={this.props.loadBalancers}
+        card={this.loadBalancer}
+        predicate={this.predicate}/>
+    );
+  }
 
 }
 

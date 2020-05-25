@@ -209,12 +209,12 @@ class Form extends React.Component<Props, State> {
     loading: this.props.loading,
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.initDropdown();
     this.mounted = true;
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if (prevProps.showSaveButton !== this.props.showSaveButton
         || prevState.values !== this.state.values
         || prevState.savedValues !== this.state.savedValues) {

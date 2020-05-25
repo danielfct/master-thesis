@@ -42,40 +42,76 @@ interface ServiceRuleListProps {
   isLoadingService: boolean;
   loadServiceError?: string | null;
   service: IService | Partial<IService> | null;
-  newRules: string[];
+  unsavedRules: string[];
   onAddServiceRule: (rule: string) => void;
   onRemoveServiceRules: (rule: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceRuleListProps;
 
-class ServiceRuleList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class ServiceRuleList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.props.loadRulesService();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.service?.serviceName !== this.props.service?.serviceName) {
+      this.loadEntities();
+    }
+    if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.service?.serviceName) {
       const {serviceName} = this.props.service;
       this.props.loadServiceRules(serviceName);
     }
-  }
+  };
+
+  private isNew = () =>
+    this.props.service?.serviceName === undefined;
 
   private rule = (index: number, rule: string, separate: boolean, checked: boolean,
-                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={`${styles.linkedItemContent}`}>
-        <label>
-          <input id={rule}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{rule}</span>
-        </label>
-      </div>
-      <Link to={`/rules/services/${rule}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedRules.includes(rule);
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={`${styles.linkedItemContent}`}>
+          <label>
+            <input id={rule}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                 {rule}
+               </div>
+            </span>
+          </label>
+        </div>
+        {!isNew && (
+          <Link to={`/rules/services/${rule}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
+      </ListItem>
+    );
+  };
 
   private onAdd = (rule: string): void =>
     this.props.onAddServiceRule(rule);
@@ -94,8 +130,8 @@ class ServiceRuleList extends BaseComponent<Props, {}> {
     super.toast(`Unable to delete rule`, 10000, reason, true);
 
   private getSelectableRules = () => {
-    const {rules, rulesName, newRules} = this.props;
-    return Object.keys(rules).filter(name => !rulesName.includes(name) && !newRules.includes(name));
+    const {rules, rulesName, unsavedRules} = this.props;
+    return Object.keys(rules).filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
   };
 
   render() {
@@ -117,7 +153,8 @@ class ServiceRuleList extends BaseComponent<Props, {}> {
                              url: `services/${this.props.service?.serviceName}/rules`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }

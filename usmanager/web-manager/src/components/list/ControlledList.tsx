@@ -44,20 +44,30 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
 
   state: State<T> = {};
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.initDropdown();
   }
 
-  componentDidUpdate(prevProps: Readonly<Props<T>>, prevState: Readonly<State<T>>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props<T>>, prevState: Readonly<State<T>>, snapshot?: any): void {
     if (this.globalCheckbox.current) {
       this.globalCheckbox.current.checked = Object.values(this.state)
                                                   .map(data => !data || data.isChecked)
                                                   .every(checked => checked);
     }
-    if (prevProps.data !== this.props.data || prevProps.entitySaved !== this.props.entitySaved) {
+    if (prevProps.data !== this.props.data) {
       this.setState((this.props.data || []).reduce((state: State<T>, data) => {
         const dataStateKey = this.getDataStateKey(data);
         state[dataStateKey] = { value: data, isChecked: false, isNew: false };
+        return state;
+      }, {}));
+    }
+    if (prevProps.entitySaved !== this.props.entitySaved) {
+      console.log(Object.values(this.state));
+      this.setState(Object.values(this.state).reduce((state: State<T>, data) => {
+        if (data) {
+          const dataStateKey = this.getDataStateKey(data.value);
+          state[dataStateKey] = { value: data.value, isChecked: false, isNew: false };
+        }
         return state;
       }, {}));
     }
@@ -213,7 +223,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
               </label>
             </p>
           )}
-          {dropdown && (
+          {!error && dropdown && (
             <>
               <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
                       data-position="bottom" data-tooltip={dropdown.title}
@@ -252,7 +262,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
             </>
           )}
           <button className="btn-flat btn-small waves-effect waves-light red-text right"
-                  style={Object.values(this.state)
+                  style={!error && Object.values(this.state)
                                .map(item => item?.isChecked || false)
                                .some(checked => checked)
                     ? {transform: "scale(1)"}

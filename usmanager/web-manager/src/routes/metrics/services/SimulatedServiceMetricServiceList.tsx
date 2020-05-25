@@ -47,19 +47,45 @@ interface SimulatedServiceMetricServiceListProps {
 
 type Props = StateToProps & DispatchToProps & SimulatedServiceMetricServiceListProps;
 
-class SimulatedServiceMetricServiceList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.props.loadServices();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.simulatedServiceMetric === undefined && this.props.simulatedServiceMetric?.name !== undefined) {
+      this.loadEntities();
+    }
+    if (!prevProps.simulatedServiceMetric?.name && this.props.simulatedServiceMetric?.name) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.simulatedServiceMetric?.name) {
       const {name} = this.props.simulatedServiceMetric;
       this.props.loadSimulatedServiceMetricServices(name);
     }
-  }
+  };
+
+  private isNew = () =>
+    this.props.simulatedServiceMetric?.name === undefined;
 
   private service = (index: number, service: string, separate: boolean, checked: boolean,
-                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const unsaved = this.props.unsavedServices.map(newService => newService).includes(service);
+                     handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedServices.includes(service);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${styles.linkedItemContent}`}>
@@ -69,16 +95,18 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, {}> {
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
-               <div className={unsaved ? styles.unsavedItem : undefined}>
+               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
                  {service}
                </div>
             </span>
           </label>
         </div>
-        <Link to={`/services/${service}`}
-              className={`${styles.link} waves-effect`}>
-          <i className={`${styles.linkIcon} material-icons right`}>link</i>
-        </Link>
+        {!isNew && (
+          <Link to={`/services/${service}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
       </ListItem>
     );
   };
@@ -102,12 +130,13 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, {}> {
   private getSelectableServices = () => {
     const {services, simulatedMetricServices, unsavedServices} = this.props;
     return Object.keys(services).filter(service => !simulatedMetricServices.includes(service)
-                                                       && !unsavedServices.includes(service));
+                                                   && !unsavedServices.includes(service));
   };
 
   render() {
-    return <ControlledList isLoading={this.props.isLoadingSimulatedServiceMetric || this.props.isLoading}
-                           error={this.props.loadSimulatedServiceMetricError || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedServiceMetric || this.props.isLoading)}
+                           error={!isNew ? this.props.loadSimulatedServiceMetricError || this.props.error : undefined}
                            emptyMessage={`Services list is empty`}
                            data={this.props.simulatedMetricServices}
                            dataKey={['serviceName']} //TODO
@@ -121,10 +150,11 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `simulated-metrics/services/services/${this.props.simulatedServiceMetric?.name}`,
+                             url: `simulated-metrics/services/${this.props.simulatedServiceMetric?.name}/services`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }

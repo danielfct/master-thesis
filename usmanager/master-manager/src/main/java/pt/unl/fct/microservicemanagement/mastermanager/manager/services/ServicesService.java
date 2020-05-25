@@ -185,9 +185,9 @@ public class ServicesService {
     services.save(service);
   }
 
-  public List<ServiceEntity> getDependees(String serviceName) {
+  public List<ServiceEntity> getDependents(String serviceName) {
     assertServiceExists(serviceName);
-    return services.getDependees(serviceName);
+    return services.getDependents(serviceName);
   }
 
   public Iterable<ServiceEventPredictionEntity> getPredictions(String serviceName) {

@@ -24,15 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.database;
 
-import com.amazonaws.services.ec2.model.InstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsInstanceState;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
@@ -77,7 +74,7 @@ public class DatabaseLoader {
                                  ComponentTypeRepository componentTypes, OperatorRepository operators,
                                  DecisionRepository decisions, FieldRepository fields,
                                  ValueModeRepository valueModes, ConditionRepository conditions,
-                                 HostRuleRepository hostRules, AwsService awsService) {
+                                 HostRuleRepository hostRules, CloudHostsService cloudHostsService) {
     return args -> {
 
       // users
@@ -646,19 +643,7 @@ public class DatabaseLoader {
       regions.save(euWest2);
 
       // cloud hosts
-      awsService.getSimpleInstances().forEach(instance -> {
-        if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()) {
-          var cloudHost = CloudHostEntity.builder()
-              .instanceId(instance.getInstanceId())
-              .imageId(instance.getImageId())
-              .instanceType(instance.getInstanceType())
-              .state(instance.getState())
-              .publicDnsName(instance.getPublicDnsName())
-              .publicIpAddress(instance.getPublicIpAddress())
-              .build();
-          cloudHosts.save(cloudHost);
-        }
-      });
+      cloudHostsService.reloadCloudInstances();
 
       // edge hosts
       var daniel127001 = EdgeHostEntity.builder()

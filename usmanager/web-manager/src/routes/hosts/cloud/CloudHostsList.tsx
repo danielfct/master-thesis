@@ -16,6 +16,7 @@ import BaseComponent from "../../../components/BaseComponent";
 import {loadCloudHosts} from "../../../actions";
 import {ICloudHost} from "./CloudHost";
 import CloudHostCard from "./CloudHostCard";
+import ReloadButton from "../../../components/list/ReloadButton";
 
 interface StateToProps {
   isLoading: boolean
@@ -31,7 +32,7 @@ type Props = StateToProps & DispatchToProps;
 
 class CloudHostsList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadCloudHosts();
   }
 
@@ -41,14 +42,18 @@ class CloudHostsList extends BaseComponent<Props, {}> {
   private predicate = (host: ICloudHost, search: string): boolean =>
     (host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search)) || host.instanceId.includes(search);
 
-  render = () =>
-    <CardList<ICloudHost>
-      isLoading={this.props.isLoading}
-      error={this.props.error}
-      emptyMessage={"No cloud instances to display"}
-      list={this.props.cloudHosts}
-      card={this.cloudHost}
-      predicate={this.predicate}/>
+  public render() {
+    return (
+        <CardList<ICloudHost>
+          isLoading={this.props.isLoading}
+          error={this.props.error}
+          emptyMessage={"No cloud instances to display"}
+          list={this.props.cloudHosts}
+          card={this.cloudHost}
+          predicate={this.predicate}/>
+    )
+  }
+
 
 }
 

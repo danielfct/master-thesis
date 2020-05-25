@@ -48,7 +48,7 @@ type Props = StateToProps & DispatchToProps;
 
 class Services extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadServices();
   }
 
@@ -58,19 +58,23 @@ class Services extends BaseComponent<Props, {}> {
   private predicate = (service: IService, search: string): boolean =>
     service.serviceName.toLowerCase().includes(search);
 
-  render = () =>
-    <MainLayout>
-      <AddButton tooltip={'Add service'} pathname={'/services/new_service?new=true'}/>
-      <div className={`${styles.container}`}>
-        <CardList<IService>
-          isLoading={this.props.isLoading}
-          error={this.props.error}
-          emptyMessage={"No services to display"}
-          list={this.props.services}
-          card={this.service}
-          predicate={this.predicate}/>
-      </div>
-    </MainLayout>
+  public render() {
+    return (
+      <MainLayout>
+        <AddButton tooltip={{text: 'Add service', position: 'left'}}
+                   pathname={'/services/new_service?new=true'}/>
+        <div className={`${styles.container}`}>
+          <CardList<IService>
+            isLoading={this.props.isLoading}
+            error={this.props.error}
+            emptyMessage={"No services to display"}
+            list={this.props.services}
+            card={this.service}
+            predicate={this.predicate}/>
+        </div>
+      </MainLayout>
+    );
+  }
 
 }
 

@@ -47,7 +47,7 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
     }
   }
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     window.addEventListener('resize', this.handleResize);
   }
 

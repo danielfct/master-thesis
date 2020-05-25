@@ -43,6 +43,7 @@ do red color just on not new entities
 create a loadEntities function to load entities onmount and onupdate
 create a isNew function to not show loading errors
 remove link on unsaved list items
+rename dependent to dependent? https://wikidiff.com/dependent/dependent
 
 
 test: reload every single page

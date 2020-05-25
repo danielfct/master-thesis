@@ -24,7 +24,7 @@ type Props = StateToProps & DispatchToProps;
 
 class Regions extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadRegions();
   }
 
@@ -38,7 +38,8 @@ class Regions extends BaseComponent<Props, {}> {
   render() {
     return (
       <MainLayout>
-        <AddButton tooltip={'Add region'} pathname={'/regions/new_region?new=true'}/>
+        <AddButton tooltip={{text: 'Add region', position: 'left'}}
+                   pathname={'/regions/new_region?new=true'}/>
         <div className={`${styles.container}`}>
           <CardList<IRegion>
             isLoading={this.props.isLoading}

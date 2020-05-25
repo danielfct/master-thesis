@@ -42,7 +42,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
   private updateField = () =>
     M.updateTextFields();
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.updateField();
   }
 

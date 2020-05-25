@@ -13,9 +13,9 @@ import IDatabaseData from "../../../components/IDatabaseData";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {ICustomButton, IFormLoading} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
-import Error from "../../../components/errors/Error";
+import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs, {Tab} from "../../../components/tabs/Tabs";
+import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {addCloudHost, addCloudHostRule, loadCloudHosts} from "../../../actions";
@@ -46,6 +46,15 @@ export interface IState {
 
 const buildNewCloudHost = (): Partial<ICloudHost> => ({
 });
+
+export const awsInstanceStates = {
+  PENDING: { name: "pending", code: 0 },
+  RUNNING: { name: "running", code: 16 },
+  SHUTTING_DOWN: { name: "shutting-down", code: 32 },
+  TERMINATED: { name: "terminated", code: 48 },
+  STOPPING: { name: "stopping", code: 64 },
+  STOPPED: { name: "stopped", code: 80 }
+};
 
 interface StateToProps {
   isLoading: boolean;
@@ -83,7 +92,7 @@ class CloudHost extends BaseComponent<Props, State> {
     loading: undefined,
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadCloudHost();
     this.mounted = true;
   };
@@ -161,7 +170,7 @@ class CloudHost extends BaseComponent<Props, State> {
     const buttons: ICustomButton[] = [];
     const cloudHost = this.getCloudHost();
     const state = this.getCloudHost().state;
-    if (state?.includes('stopped')) {
+    if (state?.includes(awsInstanceStates.STOPPED.name)) {
       buttons.push({
         button:
           <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
@@ -170,7 +179,7 @@ class CloudHost extends BaseComponent<Props, State> {
           </button>
       });
     }
-    if (state?.includes('running')) {
+    if (state?.includes(awsInstanceStates.RUNNING.name)) {
       buttons.push({
         button:
           <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
@@ -179,7 +188,8 @@ class CloudHost extends BaseComponent<Props, State> {
           </button>
       });
     }
-    if (!state?.includes('terminated') && !state?.includes('shutting_down')) {
+    if (!state?.includes(awsInstanceStates.TERMINATED.name)
+        && !state?.includes(awsInstanceStates.SHUTTING_DOWN.name)) {
       buttons.push({
         button:
           <button className='modal-trigger btn-flat btn-small waves-effect waves-light red-text'

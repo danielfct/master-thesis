@@ -6,7 +6,7 @@ import BaseComponent from "../../../components/BaseComponent";
 import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../../components/form/Form";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
-import Error from "../../../components/errors/Error";
+import {Error} from "../../../components/errors/Error";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
@@ -26,7 +26,7 @@ export interface IRuleCondition extends IDatabaseData {
 }
 
 const buildNewCondition = (): Partial<IRuleCondition> => ({
-  name: '',
+  name: undefined,
   valueMode: undefined,
   field: undefined,
   operator: undefined,
@@ -70,7 +70,7 @@ class RuleCondition extends BaseComponent<Props, State> {
   state: State = {
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadCondition();
     this.props.loadValueModes();
     this.props.loadFields();

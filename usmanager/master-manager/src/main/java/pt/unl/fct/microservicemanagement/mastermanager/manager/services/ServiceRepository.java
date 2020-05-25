@@ -56,7 +56,7 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
   @Query("select d.service "
       + "from ServiceEntity s join s.depends d "
       + "where s.serviceName = :serviceName")
-  List<ServiceEntity> getDependees(@Param("serviceName") String serviceName);
+  List<ServiceEntity> getDependents(@Param("serviceName") String serviceName);
 
   @Query("select r "
       + "from ServiceEntity s join s.rules r "

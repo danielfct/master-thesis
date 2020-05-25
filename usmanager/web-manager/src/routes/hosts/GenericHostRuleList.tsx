@@ -33,7 +33,7 @@ type Props = StateToProps & DispatchToProps;
 
 class GenericHostRuleList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadRulesHost();
   }
 

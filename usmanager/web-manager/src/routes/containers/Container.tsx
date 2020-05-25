@@ -8,7 +8,7 @@ import Form, {
 } from "../../components/form/Form";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
-import Error from "../../components/errors/Error";
+import {Error} from "../../components/errors/Error";
 import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
@@ -57,17 +57,17 @@ export interface IContainerLabel {
 }
 
 interface INewContainer {
-  hostname: string,
-  service: string,
-  internalPort: number,
-  externalPort: number,
+  hostname?: string,
+  service?: string,
+  internalPort?: number,
+  externalPort?: number,
 }
 
 const buildNewContainer = (): INewContainer => ({
-  hostname: '',
-  service: '',
-  internalPort: 0,
-  externalPort: 0,
+  hostname: undefined,
+  service: undefined,
+  internalPort: undefined,
+  externalPort: undefined,
 });
 
 interface StateToProps {
@@ -117,7 +117,7 @@ class Container extends BaseComponent<Props, State> {
     defaultExternalPort: 0,
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadContainer();
     this.props.loadCloudHosts();
     this.props.loadEdgeHosts();
@@ -125,7 +125,7 @@ class Container extends BaseComponent<Props, State> {
     this.mounted = true;
   };
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     this.init();
   }
 
@@ -313,8 +313,9 @@ class Container extends BaseComponent<Props, State> {
     }, {});
 
   private getSelectableHosts = () => {
-    //TODO convert to cloud hostnames like on nodes
-    const cloudHosts = Object.keys(this.props.cloudHosts);
+    const cloudHosts = Object.values(this.props.cloudHosts)
+                             .filter(instance => instance.state === 'running')
+                             .map(instance => instance.publicIpAddress);
     const edgeHosts = Object.keys(this.props.edgeHosts);
     return cloudHosts.concat(edgeHosts);
   };

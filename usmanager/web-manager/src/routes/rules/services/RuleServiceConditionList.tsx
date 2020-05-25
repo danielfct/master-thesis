@@ -32,40 +32,76 @@ interface ServiceRuleConditionListProps {
   isLoadingRuleService: boolean;
   loadRuleServiceError?: string | null;
   ruleService: IRuleService | Partial<IRuleService> | null;
-  newConditions: string[];
+  unsavedConditions: string[];
   onAddRuleCondition: (condition: string) => void;
   onRemoveRuleConditions: (condition: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceRuleConditionListProps
 
-class RuleServiceConditionList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class RuleServiceConditionList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.props.loadConditions();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.ruleService?.name !== this.props.ruleService?.name) {
+      this.loadEntities();
+    }
+    if (!prevProps.ruleService?.name && this.props.ruleService?.name) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.ruleService?.name) {
       const {name} = this.props.ruleService;
       this.props.loadRuleServiceConditions(name);
     }
-  }
+  };
+
+  private isNew = () =>
+    this.props.ruleService?.name === undefined;
 
   private condition = (index: number, condition: string, separate: boolean, checked: boolean,
-                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={styles.linkedItemContent}>
-        <label>
-          <input id={condition}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{condition}</span>
-        </label>
-      </div>
-      <Link to={`/rules/conditions/${condition}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+                       handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedConditions.includes(condition);
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={styles.linkedItemContent}>
+          <label>
+            <input id={condition}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                {condition}
+              </div>
+            </span>
+          </label>
+        </div>
+        {!isNew && (
+          <Link to={`/rules/conditions/${condition}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
+      </ListItem>
+    );
+  };
 
   private onAdd = (condition: string): void =>
     this.props.onAddRuleCondition(condition);
@@ -84,9 +120,9 @@ class RuleServiceConditionList extends BaseComponent<Props, {}> {
     super.toast(`Unable to delete condition`, 10000, reason, true);
 
   private getSelectableConditionNames = () => {
-    const {conditions, ruleConditions, newConditions} = this.props;
+    const {conditions, ruleConditions, unsavedConditions} = this.props;
     return Object.keys(conditions)
-                 .filter(condition => !ruleConditions.includes(condition) && !newConditions.includes(condition));
+                 .filter(condition => !ruleConditions.includes(condition) && !unsavedConditions.includes(condition));
   };
 
   render() {
@@ -108,7 +144,8 @@ class RuleServiceConditionList extends BaseComponent<Props, {}> {
                              url: `rules/services/${this.props.ruleService?.name}/conditions`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }

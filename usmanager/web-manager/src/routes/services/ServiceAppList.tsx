@@ -24,14 +24,14 @@ import {
   loadServiceApps,
   removeServiceApps
 } from "../../actions";
-import {connect} from "react-redux";
 import Field from "../../components/form/Field";
-import {IFields, IValues, requiredAndNumberAndMin, requiredAndNumberAndMinAndMax} from "../../components/form/Form";
+import {IFields, IValues, requiredAndNumberAndMinAndMax} from "../../components/form/Form";
 import List from "../../components/list/List";
 import M from "materialize-css";
 import Collapsible from "../../components/collapsible/Collapsible";
 import {IApp} from "../apps/App";
 import {IAppService} from "../apps/AppServicesList";
+import {connect} from "react-redux";
 
 export interface IAddServiceApp {
   name: string;
@@ -57,7 +57,7 @@ interface ServiceAppListProps {
   isLoadingService: boolean;
   loadServiceError?: string | null;
   service: IService | Partial<IService> | null;
-  newApps: IAddServiceApp[];
+  unsavedApps: IAddServiceApp[];
   onAddServiceApp: (app: IAddServiceApp) => void;
   onRemoveServiceApps: (apps: string[]) => void;
 }
@@ -66,43 +66,71 @@ type Props = StateToProps & DispatchToProps & ServiceAppListProps;
 
 type State = {
   selectedApp?: string,
+  entitySaved: boolean;
 }
 
 class ServiceAppList extends BaseComponent<Props, State> {
 
   private collapsible = createRef<HTMLUListElement>();
 
-  state: State = {};
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadApps();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    M.Collapsible.init(this.collapsible.current as Element);
+    if (prevProps.service?.serviceName !== this.props.service?.serviceName) {
+      this.loadEntities();
+    }
+    if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.service?.serviceName) {
       const {serviceName} = this.props.service;
       this.props.loadServiceApps(serviceName);
     }
-  }
+  };
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    M.Collapsible.init(this.collapsible.current as Element);
-  }
+  private isNew = () =>
+    this.props.service?.serviceName === undefined;
 
   private app = (index: number, app: string, separate: boolean, checked: boolean,
-                 handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={`${listItemStyles.linkedItemContent}`}>
-        <label>
-          <input id={app}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{app}</span>
-        </label>
-      </div>
-      <Link to={`/apps/${app}`}
-            className={`${listItemStyles.link} waves-effect`}>
-        <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+                 handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedApps.map(app => app.name).includes(app);
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={`${listItemStyles.linkedItemContent}`}>
+          <label>
+            <input id={app}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+              <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
+                {app}
+              </div>
+            </span>
+          </label>
+        </div>
+        {!isNew && (
+          <Link to={`/apps/${app}`}
+                className={`${listItemStyles.link} waves-effect`}>
+            <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
+      </ListItem>
+    );
+  };
 
   private onAdd = (app: IValues): void => {
     this.props.onAddServiceApp(app as IAddServiceApp);
@@ -124,9 +152,9 @@ class ServiceAppList extends BaseComponent<Props, State> {
     super.toast(`Unable to delete app`, 10000, reason, true);
 
   private getSelectableAppsNames = () => {
-    const {apps, serviceApps, newApps} = this.props;
-    const newAppsNames = newApps.map(app => app.name);
-    return Object.keys(apps).filter(name => !serviceApps.includes(name) && !newAppsNames.includes(name));
+    const {apps, serviceApps, unsavedApps} = this.props;
+    const unsavedAppsNames = unsavedApps.map(app => app.name);
+    return Object.keys(apps).filter(name => !serviceApps.includes(name) && !unsavedAppsNames.includes(name));
   };
 
   private appServicesLaunchOrder = (service: IAppService, index: number) =>
@@ -215,7 +243,8 @@ class ServiceAppList extends BaseComponent<Props, State> {
                                      url: `services/${this.props.service?.serviceName}/apps`,
                                      successCallback: this.onDeleteSuccess,
                                      failureCallback: this.onDeleteFailure
-                                   }}/>;
+                                   }}
+                                   entitySaved={this.state.entitySaved}/>;
 
   }
 

@@ -21,14 +21,25 @@ type Props = SimulatedServiceMetricCardProps;
 
 const SimulatedServiceMetricCard = ({simulatedServiceMetric}: Props) => (
   <Card<ISimulatedServiceMetric> title={simulatedServiceMetric.name}
-                   link={{to: {pathname: `/simulated-metrics/services/${simulatedServiceMetric.name }`, state: simulatedServiceMetric }}}
-                   height={'215px'}
+                   link={{to: {pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`, state: simulatedServiceMetric }}}
+                   height={'170px'}
                    margin={'10px 0'}
                    hoverable>
     <CardItem key={'Field'}
               label={'Field'}
               value={`${simulatedServiceMetric.field.name}`}/>
-             {/* //TODO*/}
+    <CardItem key={'MinimumValue'}
+              label='Minimum value'
+              value={`${simulatedServiceMetric.minimumValue}`}/>
+    <CardItem key={'MaximumValue'}
+              label='Maximum value'
+              value={`${simulatedServiceMetric.maximumValue}`}/>
+    <CardItem key={'Override'}
+              label='Override'
+              value={`${simulatedServiceMetric.override}`}/>
+    <CardItem key={'Generic'}
+              label='Generic'
+              value={`${simulatedServiceMetric.generic}`}/>
   </Card>
 );
 

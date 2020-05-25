@@ -13,7 +13,7 @@ import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {IFields, requiredAndTrimmed} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
-import Error from "../../../components/errors/Error";
+import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
@@ -97,7 +97,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     isGeneric: this.props.simulatedHostMetric?.generic || false,
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadSimulatedHostMetric();
     this.props.loadFields();
     this.mounted = true;
@@ -318,9 +318,14 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                              selectCallback: this.isGenericSelected,
                              defaultValue: "Apply to all hosts?",
                              values: ['True', 'False']}}/>
-                  : <Field key={index}
-                           id={key}
-                           label={key}/>
+                  : key === 'minimumValue' || key === 'maximumValue'
+                    ? <Field key={index}
+                             id={key}
+                             label={key}
+                             type={'number'}/>
+                    : <Field key={index}
+                             id={key}
+                             label={key}/>
             )}
           </Form>
         )}

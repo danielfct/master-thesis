@@ -16,7 +16,8 @@ import RuleConditionsList from "./RuleConditionsList";
 
 const RuleConditions: React.FC = () =>
   <MainLayout>
-    <AddButton tooltip={'Add rule condition'} pathname={'/rules/conditions/new_condition?new=true'}/>
+    <AddButton tooltip={{text: 'Add rule conditio', position: 'left'}}
+               pathname={'/rules/conditions/new_condition?new=true'}/>
     <div className={`${styles.container}`}>
       <RuleConditionsList/>
     </div>

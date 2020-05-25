@@ -27,7 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 public enum AwsInstanceState {
   PENDING("pending", 0),
   RUNNING("running", 16),
-  SHUTTING_DOWN("shutting_down", 32),
+  SHUTTING_DOWN("shutting-down", 32),
   TERMINATED("terminated", 48),
   STOPPING("stopping", 64),
   STOPPED("stopped", 80);

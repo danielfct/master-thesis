@@ -33,7 +33,7 @@ type Props = StateToProps & DispatchToProps;
 
 class GenericServiceRuleList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadRulesService();
   }
 

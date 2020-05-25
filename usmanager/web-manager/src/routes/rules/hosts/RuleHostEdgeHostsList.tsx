@@ -52,40 +52,76 @@ interface HostRuleEdgeHostListProps {
   isLoadingHostRule: boolean;
   loadHostRuleError?: string | null;
   ruleHost: IRuleHost | Partial<IRuleHost> | null;
-  newEdgeHosts: string[];
+  unsavedEdgeHosts: string[];
   onAddRuleEdgeHost: (edgeHost: string) => void;
   onRemoveRuleEdgeHosts: (edgeHost: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & HostRuleEdgeHostListProps
 
-class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class HostRuleEdgeHostList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.props.loadEdgeHosts();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.ruleHost?.name !== this.props.ruleHost?.name) {
+      this.loadEntities();
+    }
+    if (!prevProps.ruleHost?.name && this.props.ruleHost?.name) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.ruleHost?.name) {
       const {name} = this.props.ruleHost;
       this.props.loadRuleHostEdgeHosts(name);
     }
-  }
+  };
+
+  private isNew = () =>
+    this.props.ruleHost?.name === undefined;
 
   private edgeHost = (index: number, edgeHost: string, separate: boolean, checked: boolean,
-                      handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={styles.linkedItemContent}>
-        <label>
-          <input id={edgeHost}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{edgeHost}</span>
-        </label>
-      </div>
-      <Link to={`/hosts/edge/${edgeHost}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+                      handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedEdgeHosts.includes(edgeHost);
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={styles.linkedItemContent}>
+          <label>
+            <input id={edgeHost}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                {edgeHost}
+              </div>
+            </span>
+          </label>
+        </div>
+        {!isNew && (
+          <Link to={`/hosts/edge/${edgeHost}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
+      </ListItem>
+    );
+  };
 
   private onAdd = (edgeHost: string): void =>
     this.props.onAddRuleEdgeHost(edgeHost);
@@ -104,9 +140,9 @@ class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
     super.toast(`Unable to remove edge host`, 10000, reason, true);
 
   private getSelectableEdgeHostNames = () => {
-    const {edgeHosts, ruleEdgeHosts, newEdgeHosts} = this.props;
+    const {edgeHosts, ruleEdgeHosts, unsavedEdgeHosts} = this.props;
     return Object.keys(edgeHosts)
-                 .filter(edgeHost => !ruleEdgeHosts.includes(edgeHost) && !newEdgeHosts.includes(edgeHost));
+                 .filter(edgeHost => !ruleEdgeHosts.includes(edgeHost) && !unsavedEdgeHosts.includes(edgeHost));
   };
 
   render() {
@@ -128,7 +164,8 @@ class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
                              url: `rules/hosts/${this.props.ruleHost?.name}/edge-hosts`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }

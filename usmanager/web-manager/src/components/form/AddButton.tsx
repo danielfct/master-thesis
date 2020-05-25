@@ -29,7 +29,7 @@ import M from "materialize-css";
 import ScrollBar from "react-perfect-scrollbar";
 
 interface Props {
-  tooltip: string;
+  tooltip: { text: string, position: 'left' | 'right' | 'bottom' | 'top' };
   pathname?: string;
   dropdown?: {
     id: string | number,
@@ -37,6 +37,7 @@ interface Props {
     empty?: string,
     data: { text: string, pathname: string }[]
   }
+  offset?: number;
 }
 
 export default class AddButton extends React.Component<Props, {}> {
@@ -54,22 +55,23 @@ export default class AddButton extends React.Component<Props, {}> {
   private onOpenDropdown = () =>
     this.scrollbar?.updateScroll();
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.initDropdown();
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
     this.initDropdown();
   }
 
-  render = () => {
-    const {tooltip, pathname, dropdown} = this.props;
+  public render() {
+    const {offset, tooltip, pathname, dropdown} = this.props;
     return (
       <>
         {!dropdown
           ? <div className="fixed-action-btn tooltipped"
-                 data-position="left"
-                 data-tooltip={tooltip}>
+                 data-position={tooltip.position}
+                 data-tooltip={tooltip.text}
+                 style={offset ? {right: `${offset * 55 + 23}px`} : undefined}>
             <Link className="waves-effect btn-floating grey darken-3"
                   to={pathname || ""}>
               <i className="large material-icons">add</i>
@@ -106,6 +108,5 @@ export default class AddButton extends React.Component<Props, {}> {
       </>
     );
   }
+
 }
-
-

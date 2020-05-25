@@ -24,7 +24,7 @@ export default class SimulatedMetrics extends BaseComponent<{}, {}> {
   private containersCollapsible = createRef<HTMLUListElement>();
   private hostCollapsible = createRef<HTMLUListElement>();
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.init();
   }
 
@@ -34,36 +34,38 @@ export default class SimulatedMetrics extends BaseComponent<{}, {}> {
     M.Collapsible.init(this.hostCollapsible.current as Element);
   };
 
-  render = () =>
-    <MainLayout>
-      <AddButton tooltip={'Add simulated metric'} dropdown={{
-        id: 'simulatedMetrics',
-        title: 'Simulated metric',
-        data: [
-          {text: 'Host', pathname: '/simulated-metrics/hosts/new_metric?new=true'},
-          {text: 'Service', pathname: '/simulated-metrics/services/new_metric?new=true'},
-          {text: 'Container', pathname: '/simulated-metrics/containers/new_metric?new=true'},
-        ],
-      }}/>
-      <div className={`${styles.container}`}>
-        <Collapsible id={"hostssCollapsible"}
-                     title={'Hosts'}
-                     active
-                     headerClassname={styles.collapsibleSubtitle}
-                     bodyClassname={styles.collapsibleCardList}>
-          <SimulatedHostMetricsList/>
-        </Collapsible>
-      </div>
-      <div className={`${styles.container}`}>
-        <Collapsible id={"servicesCollapsible"}
-                     title={'Services'}
-                     active
-                     headerClassname={styles.collapsibleSubtitle}
-                     bodyClassname={styles.collapsibleCardList}>
-          <SimulatedServiceMetricsList/>
-        </Collapsible>
-      </div>
-      {/* <div className={`${styles.container}`}>
+  public render() {
+    return (
+      <MainLayout>
+        <AddButton tooltip={{text: 'Add simulated metric', position: 'left'}}
+                   dropdown={{
+                     id: 'simulatedMetrics',
+                     title: 'Simulated metric',
+                     data: [
+                       {text: 'Host', pathname: '/simulated-metrics/hosts/new_metric?new=true'},
+                       {text: 'Service', pathname: '/simulated-metrics/services/new_metric?new=true'},
+                       {text: 'Container', pathname: '/simulated-metrics/containers/new_metric?new=true'},
+                     ],
+                   }}/>
+        <div className={`${styles.container}`}>
+          <Collapsible id={"hostssCollapsible"}
+                       title={'Hosts'}
+                       active
+                       headerClassname={styles.collapsibleSubtitle}
+                       bodyClassname={styles.collapsibleCardList}>
+            <SimulatedHostMetricsList/>
+          </Collapsible>
+        </div>
+        <div className={`${styles.container}`}>
+          <Collapsible id={"servicesCollapsible"}
+                       title={'Services'}
+                       active
+                       headerClassname={styles.collapsibleSubtitle}
+                       bodyClassname={styles.collapsibleCardList}>
+            <SimulatedServiceMetricsList/>
+          </Collapsible>
+        </div>
+        {/* <div className={`${styles.container}`}>
         <Collapsible id={"containersCollapsible"}
                      title={'Containers'}
                      active
@@ -72,6 +74,8 @@ export default class SimulatedMetrics extends BaseComponent<{}, {}> {
           <SimulatedContainerMetricsList/>
         </Collapsible>
       </div>*/}
-    </MainLayout>
+      </MainLayout>
+    );
+  }
 
 }

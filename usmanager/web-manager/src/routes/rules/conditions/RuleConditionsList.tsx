@@ -21,7 +21,7 @@ type Props = StateToProps & DispatchToProps;
 
 class RuleConditionsList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadConditions();
   }
 

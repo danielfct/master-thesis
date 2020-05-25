@@ -17,7 +17,7 @@ import Form, {
   requiredAndTrimmed
 } from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
-import Error from "../../../components/errors/Error";
+import {Error} from "../../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
@@ -46,7 +46,7 @@ export interface IRuleHost extends IRule {
 }
 
 const buildNewHostRule = (): Partial<IRuleHost> => ({
-  name: '',
+  name: undefined,
   priority: undefined,
   generic: undefined,
   decision: undefined,
@@ -96,7 +96,7 @@ class RuleHost extends BaseComponent<Props, State> {
     isGeneric: this.props.ruleHost?.generic || false,
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadRuleHost();
     this.props.loadDecisions();
     this.mounted = true;
@@ -361,7 +361,7 @@ class RuleHost extends BaseComponent<Props, State> {
     <HostRuleConditionList isLoadingHostRule={this.props.isLoading}
                            loadHostRuleError={this.props.error}
                            ruleHost={this.props.ruleHost}
-                           newConditions={this.state.unsavedConditions}
+                           unsavedConditions={this.state.unsavedConditions}
                            onAddRuleCondition={this.addRuleCondition}
                            onRemoveRuleConditions={this.removeRuleConditions}/>;
 
@@ -369,7 +369,7 @@ class RuleHost extends BaseComponent<Props, State> {
     <HostRuleCloudHostsList isLoadingHostRule={this.props.isLoading}
                             loadHostRuleError={this.props.error}
                             ruleHost={this.props.ruleHost}
-                            newCloudHosts={this.state.unsavedCloudHosts}
+                            unsavedCloudHosts={this.state.unsavedCloudHosts}
                             onAddRuleCloudHost={this.addRuleCloudHost}
                             onRemoveRuleCloudHosts={this.removeRuleCloudHosts}/>;
 
@@ -377,7 +377,7 @@ class RuleHost extends BaseComponent<Props, State> {
     <HostRuleEdgeHostsList isLoadingHostRule={this.props.isLoading}
                            loadHostRuleError={this.props.error}
                            ruleHost={this.props.ruleHost}
-                           newEdgeHosts={this.state.unsavedEdgeHosts}
+                           unsavedEdgeHosts={this.state.unsavedEdgeHosts}
                            onAddRuleEdgeHost={this.addRuleEdgeHost}
                            onRemoveRuleEdgeHosts={this.removeRuleEdgeHosts}/>;
 

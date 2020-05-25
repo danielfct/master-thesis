@@ -20,7 +20,7 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
     M.FormSelect.init(this.dropdown.current as Element);
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.initDropdown();
   }
 

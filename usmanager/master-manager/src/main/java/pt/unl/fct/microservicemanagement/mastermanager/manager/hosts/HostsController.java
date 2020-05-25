@@ -97,6 +97,11 @@ public class HostsController {
     return cloudHostsService.getCloudHosts();
   }
 
+  @PostMapping("/cloud/reload")
+  public List<CloudHostEntity> reloadCloudInstances() {
+    return cloudHostsService.reloadCloudInstances();
+  }
+
   @GetMapping("/cloud/{id}")
   public CloudHostEntity getCloudHost(@PathVariable String id) {
     return cloudHostsService.getCloudHost(id);

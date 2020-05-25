@@ -13,7 +13,7 @@ import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {IFields, requiredAndTrimmed, requiredAndTrimmedAndNotValidIpAddress} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
-import Error from "../../../components/errors/Error";
+import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
 import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
@@ -41,12 +41,12 @@ export interface IEdgeHost extends IDatabaseData {
 }
 
 const buildNewEdgeHost = (): Partial<IEdgeHost> => ({
-  hostname: '',
-  sshUsername: '',
-  sshPassword: '',
-  region: '',
-  country: '',
-  city: '',
+  hostname: undefined,
+  sshUsername: undefined,
+  sshPassword: undefined,
+  region: undefined,
+  country: undefined,
+  city: undefined,
   local: undefined,
 });
 
@@ -84,7 +84,7 @@ class EdgeHost extends BaseComponent<Props, State> {
     unsavedRules: [],
   };
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.loadEdgeHost();
     this.mounted = true;
   };

@@ -41,13 +41,13 @@ export interface IPrediction extends IDatabaseData {
 }
 
 const emptyPrediction = (): Partial<IPrediction> => ({
-  name: '',
-  description: '',
-  startDate: '',
-  startTime: '',
-  endDate: '',
-  endTime: '',
-  minReplicas: 0
+  name: undefined,
+  description: undefined,
+  startDate: undefined,
+  startTime: undefined,
+  endDate: undefined,
+  endTime: undefined,
+  minReplicas: undefined
 });
 
 interface StateToProps {
@@ -65,42 +65,75 @@ interface ServicePredictionListProps {
   isLoadingService: boolean;
   loadServiceError?: string | null;
   service: IService | Partial<IService> | null;
-  newPredictions: IPrediction[];
+  unsavedPredictions: IPrediction[];
   onAddServicePrediction: (prediction: IPrediction) => void;
   onRemoveServicePredictions: (prediction: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServicePredictionListProps;
 
-class ServicePredictionList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
+
+class ServicePredictionList extends BaseComponent<Props, State> {
 
   //TODO show prediction details on click
 
-  componentDidMount(): void {
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.service?.serviceName !== this.props.service?.serviceName) {
+      this.loadEntities();
+    }
+    if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.service?.serviceName) {
       const {serviceName} = this.props.service;
       this.props.loadServicePredictions(serviceName);
     }
-  }
+  };
+
+  private isNew = () =>
+    this.props.service?.serviceName === undefined;
 
   private prediction = (index: number, prediction: IPrediction, separate: boolean, checked: boolean,
-                        handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={`${styles.listItemContent}`}>
-        <label>
-          <input id={prediction.name}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{prediction.name}
-          </span>
-        </label>
-        <div className={`${styles.irrelevant}`}>
-          <div>{prediction.startDate} {prediction.startTime}</div>
-          <div>{prediction.endDate} {prediction.endTime}</div>
+                        handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedPredictions.includes(prediction);
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={`${styles.listItemContent}`}>
+          <label>
+            <input id={prediction.name}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                {prediction}
+              </div>
+            </span>
+          </label>
+          <div className={`${styles.irrelevant}`}>
+            <div>{prediction.startDate} {prediction.startTime}</div>
+            <div>{prediction.endDate} {prediction.endTime}</div>
+          </div>
         </div>
-      </div>
-    </ListItem>;
+      </ListItem>
+    );
+  };
 
   private onAdd = (prediction: IValues): void => {
     this.props.onAddServicePrediction(prediction as IPrediction);
@@ -177,7 +210,8 @@ class ServicePredictionList extends BaseComponent<Props, {}> {
                                           url: `services/${this.props.service?.serviceName}/predictions`,
                                           successCallback: this.onDeleteSuccess,
                                           failureCallback: this.onDeleteFailure
-                                        }}/>;
+                                        }}
+                                        entitySaved={this.state.entitySaved}/>;
 
   }
 

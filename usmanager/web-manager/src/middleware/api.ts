@@ -26,11 +26,11 @@ import {normalize, schema} from 'normalizr';
 import {camelizeKeys} from 'humps';
 import {IService} from "../routes/services/Service";
 import {IServiceDependency} from "../routes/services/ServiceDependencyList";
-import axios from "axios";
+import axios, {Method} from "axios";
 import {API_URL, REQUEST_TIMEOUT} from "../utils/api";
 import {ILogs} from "../routes/logs/Logs";
 import {IRegion} from "../routes/region/Region";
-import {IDependee} from "../routes/services/ServiceDependeeList";
+import {IDependent} from "../routes/services/ServiceDependentList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {INode} from "../routes/nodes/Node";
 import {ICloudHost, IState} from "../routes/hosts/cloud/CloudHost";
@@ -47,9 +47,10 @@ import {IEurekaServer} from "../routes/eureka/EurekaServer";
 import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 
-const callApi = (endpoint: string, schema: any) => {
+const callApi = (endpoint: string, schema: any, method?: Method) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
-    return axios.get(url, {
+    return axios(url, {
+        method: method || 'get',
         //TODO remove options
         headers: {
             'Authorization': 'Basic YWRtaW46YWRtaW4=',
@@ -79,8 +80,8 @@ interface ISchemas {
     SERVICE_APP_ARRAY: schema.Entity<IApp>[];
     SERVICE_DEPENDENCY: schema.Entity<IServiceDependency>;
     SERVICE_DEPENDENCY_ARRAY: schema.Entity<IServiceDependency>[];
-    SERVICE_DEPENDEE: schema.Entity<IDependee>;
-    SERVICE_DEPENDEE_ARRAY: schema.Entity<IDependee>[];
+    SERVICE_DEPENDENT: schema.Entity<IDependent>;
+    SERVICE_DEPENDENT_ARRAY: schema.Entity<IDependent>[];
     SERVICE_PREDICTION: schema.Entity<IPrediction>;
     SERVICE_PREDICTION_ARRAY: schema.Entity<IPrediction>[];
     SERVICE_RULE: schema.Entity<IRuleService>;
@@ -141,10 +142,10 @@ const dependency: schema.Entity<IServiceDependency> = new schema.Entity('depende
 });
 const dependencies = new schema.Array(dependency);
 
-const dependee: schema.Entity<IDependee> = new schema.Entity('dependees', undefined, {
-    idAttribute: (dependee: IDependee) => dependee.serviceName
+const dependent: schema.Entity<IDependent> = new schema.Entity('dependents', undefined, {
+    idAttribute: (dependent: IDependent) => dependent.serviceName
 });
-const dependees = new schema.Array(dependee);
+const dependents = new schema.Array(dependent);
 
 const prediction: schema.Entity<IPrediction> = new schema.Entity('predictions', undefined, {
     idAttribute: (prediction: IPrediction) => prediction.name
@@ -234,7 +235,7 @@ const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
 });
 
 app.define({ appServices });
-service.define({ apps, dependencies, dependees, serviceRules, simulatedServiceMetrics });
+service.define({ apps, dependencies, dependents, serviceRules, simulatedServiceMetrics });
 cloudHost.define({ hostRules, simulatedHostMetrics, state });
 edgeHost.define({ hostRules, simulatedHostMetrics });
 ruleHost.define({ conditions, edgeHosts, cloudHosts });
@@ -254,8 +255,8 @@ export const Schemas: ISchemas = {
     SERVICE_APP_ARRAY: [app],
     SERVICE_DEPENDENCY: dependency,
     SERVICE_DEPENDENCY_ARRAY: [dependency],
-    SERVICE_DEPENDEE: dependee,
-    SERVICE_DEPENDEE_ARRAY: [dependee],
+    SERVICE_DEPENDENT: dependent,
+    SERVICE_DEPENDENT_ARRAY: [dependent],
     SERVICE_PREDICTION: prediction,
     SERVICE_PREDICTION_ARRAY: [prediction],
     SERVICE_RULE: ruleService,
@@ -303,7 +304,7 @@ export default (store: any) => (next: (action: any) => void) => (action: any) =>
     if (typeof callAPI === 'undefined') {
         return next(action)
     }
-    const { endpoint, schema, types, entity } = callAPI;
+    const { endpoint, schema, types, entity, method } = callAPI;
     const actionWith = (data: any) => {
         const finalAction = Object.assign({}, action, data);
         delete finalAction[CALL_API];
@@ -311,7 +312,7 @@ export default (store: any) => (next: (action: any) => void) => (action: any) =>
     };
     const [ requestType, successType, failureType ] = types;
     next(actionWith({ type: requestType }));
-    return callApi(endpoint, schema).then(
+    return callApi(endpoint, schema, method).then(
       response => {
           next(actionWith({ type: successType, entity, data: response }));
       },

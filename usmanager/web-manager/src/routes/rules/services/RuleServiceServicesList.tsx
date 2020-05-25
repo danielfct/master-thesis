@@ -42,40 +42,76 @@ interface ServiceRuleServicesListProps {
   isLoadingRuleService: boolean;
   loadRuleServiceError?: string | null;
   ruleService: IRuleService | Partial<IRuleService> | null;
-  newServices: string[];
+  unsavedServices: string[];
   onAddRuleService: (service: string) => void;
   onRemoveRuleServices: (services: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceRuleServicesListProps
 
-class RuleServiceServicesList extends BaseComponent<Props, {}> {
+interface State {
+  entitySaved: boolean;
+}
 
-  componentDidMount(): void {
+class RuleServiceServicesList extends BaseComponent<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = { entitySaved: !this.isNew() };
+  }
+
+  public componentDidMount(): void {
     this.props.loadServices();
+    this.loadEntities();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (prevProps.ruleService?.name !== this.props.ruleService?.name) {
+      this.loadEntities();
+    }
+    if (!prevProps.ruleService?.name && this.props.ruleService?.name) {
+      this.setState({entitySaved: true});
+    }
+  }
+
+  private loadEntities = () => {
     if (this.props.ruleService?.name) {
       const {name} = this.props.ruleService;
       this.props.loadRuleServices(name);
     }
-  }
+  };
+
+  private isNew = () =>
+    this.props.ruleService?.name === undefined;
 
   private service = (index: number, service: string, separate: boolean, checked: boolean,
-                     handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element =>
-    <ListItem key={index} separate={separate}>
-      <div className={styles.linkedItemContent}>
-        <label>
-          <input id={service}
-                 type="checkbox"
-                 onChange={handleCheckbox}
-                 checked={checked}/>
-          <span id={'checkbox'}>{service}</span>
-        </label>
-      </div>
-      <Link to={`/services/${service}`}
-            className={`${styles.link} waves-effect`}>
-        <i className={`${styles.linkIcon} material-icons right`}>link</i>
-      </Link>
-    </ListItem>;
+                     handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const isNew = this.isNew();
+    const unsaved = this.props.unsavedServices.includes(service);
+    return (
+      <ListItem key={index} separate={separate}>
+        <div className={styles.linkedItemContent}>
+          <label>
+            <input id={service}
+                   type="checkbox"
+                   onChange={handleCheckbox}
+                   checked={checked}/>
+            <span id={'checkbox'}>
+              <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
+                {service}
+              </div>
+            </span>
+          </label>
+        </div>
+        {!isNew && (
+          <Link to={`/services/${service}`}
+                className={`${styles.link} waves-effect`}>
+            <i className={`${styles.linkIcon} material-icons right`}>link</i>
+          </Link>
+        )}
+      </ListItem>
+    );
+  };
 
   private onAdd = (service: string): void =>
     this.props.onAddRuleService(service);
@@ -94,9 +130,9 @@ class RuleServiceServicesList extends BaseComponent<Props, {}> {
     super.toast(`Unable to remove service`, 10000, reason, true);
 
   private getSelectableServiceNames = () => {
-    const {services, ruleServices, newServices} = this.props;
+    const {services, ruleServices, unsavedServices} = this.props;
     return Object.keys(services)
-                 .filter(service => !ruleServices.includes(service) && !newServices.includes(service));
+                 .filter(service => !ruleServices.includes(service) && !unsavedServices.includes(service));
   };
 
   render() {
@@ -118,7 +154,8 @@ class RuleServiceServicesList extends BaseComponent<Props, {}> {
                              url: `rules/services/${this.props.ruleService?.name}/services`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
-                           }}/>;
+                           }}
+                           entitySaved={this.state.entitySaved}/>;
   }
 
 }

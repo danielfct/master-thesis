@@ -31,7 +31,7 @@ type Props = StateToProps & DispatchToProps;
 
 class EurekaServersList extends BaseComponent<Props, {}> {
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     this.props.loadEurekaServers();
   }
 
@@ -41,14 +41,17 @@ class EurekaServersList extends BaseComponent<Props, {}> {
   private predicate = (eurekaServer: IEurekaServer, search: string): boolean =>
     eurekaServer.hostname.toLowerCase().includes(search);
 
-  render = () =>
-    <CardList<IEurekaServer>
-      isLoading={this.props.isLoading}
-      error={this.props.error}
-      emptyMessage={"No eureka servers to display"}
-      list={this.props.eurekaServers}
-      card={this.eurekaServer}
-      predicate={this.predicate}/>
+  public render() {
+    return (
+      <CardList<IEurekaServer>
+        isLoading={this.props.isLoading}
+        error={this.props.error}
+        emptyMessage={"No eureka servers to display"}
+        list={this.props.eurekaServers}
+        card={this.eurekaServer}
+        predicate={this.predicate}/>
+    );
+  }
 
 }
 
