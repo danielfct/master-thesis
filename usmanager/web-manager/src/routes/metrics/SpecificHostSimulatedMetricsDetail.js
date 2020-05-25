@@ -82,7 +82,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
     if (this.state.id !== 0) {
       this.setState({ loading: true });
       getData(
-          `http://localhost:8080/metrics/simulated/hosts/specific/${this.state.id}`,
+          `http://localhost:8080/simulated-metrics/hosts/specific/${this.state.id}`,
           data => this.setState({ values: data, loading: false })
       );
     }
@@ -115,7 +115,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
   onSubmitForm = event => {
     event.preventDefault();
     postData(
-        `http://localhost:8080/metrics/simulated/hosts/specific/${this.state.id}`,
+        `http://localhost:8080/simulated-metrics/hosts/specific/${this.state.id}`,
         event.target[0].value,
         data => {
           this.setState({ isEdit: false, formSubmit: true });
@@ -178,7 +178,7 @@ export default class SpecificHostSimulatedMetricsDetail extends React.Component 
 
   render() {
     if (this.state.formSubmit) {
-      return <Redirect to='/metrics/simulated/hosts/specific'/>;
+      return <Redirect to='/simulated-metrics/hosts/specific'/>;
     }
    {/* <MainLayout title={{title:'Specific cloud host simulated metric detail'}}>*/}
       return (

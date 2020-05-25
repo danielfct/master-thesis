@@ -136,7 +136,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   private onDeleteSuccess = (edgeHost: IEdgeHost): void => {
     super.toast(`<span class="green-text">Edge host <b class="white-text">${edgeHost.hostname}</b> successfully removed</span>`);
     if (this.mounted) {
-      this.props.history.push(`/hosts`)
+      this.props.history.push(`/hosts/edge`)
     }
   };
 
@@ -271,7 +271,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   private genericRules = (): JSX.Element =>
     <GenericHostRuleList/>;
 
-  private tabs: Tab[] = [
+  private tabs = () => [
     {
       title: 'Edge host',
       id: 'edgeHost',
@@ -294,7 +294,7 @@ class EdgeHost extends BaseComponent<Props, State> {
       <MainLayout>
         {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
-          <Tabs {...this.props} tabs={this.tabs}/>
+          <Tabs {...this.props} tabs={this.tabs()}/>
         </div>
       </MainLayout>
     );

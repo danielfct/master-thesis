@@ -48,7 +48,7 @@ export default class DefaultHostSimulatedMetrics extends React.Component {
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhost:8080/metrics/simulated/hosts/default',
+      'http://localhost:8080/simulated-metrics/hosts/default',
       data => this.setState({ data: data, loading: false })
     );
   };
@@ -71,7 +71,7 @@ export default class DefaultHostSimulatedMetrics extends React.Component {
       <div className="fixed-action-btn tooltipped" data-position="left"
            data-tooltip="Add default host simulated metric">
         <Link className="waves-effect waves-light btn-floating btn-large grey darken-3"
-              to='/metrics/simulated/hosts/default/metric'>
+              to='/simulated-metrics/hosts/default/metric'>
           <i className="large material-icons">add</i>
         </Link>
       </div>

@@ -39,11 +39,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HostRuleRepository extends CrudRepository<HostRuleEntity, Long> {
 
-  @Query("select r "
-      + "from HostRuleEntity r "
-      + "where r.name = :ruleName")
-  Optional<HostRuleEntity> findHostRule(@Param("ruleName") String ruleName);
-
   Optional<HostRuleEntity> findByNameIgnoreCase(@Param("name") String name);
 
   @Query("select r "

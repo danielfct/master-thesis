@@ -165,13 +165,35 @@ import {
   DECISIONS_FAILURE,
   DECISION_SUCCESS,
   DECISIONS_SUCCESS,
-  SIMULATED_METRICS_REQUEST,
-  SIMULATED_METRIC_REQUEST,
-  SIMULATED_METRICS_FAILURE,
-  SIMULATED_METRIC_FAILURE,
-  SIMULATED_METRICS_SUCCESS,
-  SIMULATED_METRIC_SUCCESS,
-  //TODO ADD_SIMULATED_METRIC,
+  SIMULATED_HOST_METRICS_REQUEST,
+  SIMULATED_HOST_METRIC_REQUEST,
+  SIMULATED_HOST_METRICS_FAILURE,
+  SIMULATED_HOST_METRIC_FAILURE,
+  SIMULATED_HOST_METRICS_SUCCESS,
+  SIMULATED_HOST_METRIC_SUCCESS,
+  ADD_SIMULATED_HOST_METRIC,
+  SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST,
+  SIMULATED_HOST_METRIC_CLOUD_HOSTS_FAILURE,
+  SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS,
+  ADD_SIMULATED_HOST_METRIC_CLOUD_HOSTS,
+  REMOVE_SIMULATED_HOST_METRIC_CLOUD_HOSTS,
+  SIMULATED_HOST_METRIC_EDGE_HOSTS_REQUEST,
+  SIMULATED_HOST_METRIC_EDGE_HOSTS_FAILURE,
+  SIMULATED_HOST_METRIC_EDGE_HOSTS_SUCCESS,
+  ADD_SIMULATED_HOST_METRIC_EDGE_HOSTS,
+  REMOVE_SIMULATED_HOST_METRIC_EDGE_HOSTS,
+  SIMULATED_SERVICE_METRICS_REQUEST,
+  SIMULATED_SERVICE_METRIC_REQUEST,
+  SIMULATED_SERVICE_METRICS_FAILURE,
+  SIMULATED_SERVICE_METRIC_FAILURE,
+  SIMULATED_SERVICE_METRICS_SUCCESS,
+  SIMULATED_SERVICE_METRIC_SUCCESS,
+  ADD_SIMULATED_SERVICE_METRIC,
+  SIMULATED_SERVICE_METRIC_SERVICES_REQUEST,
+  SIMULATED_SERVICE_METRIC_SERVICES_FAILURE,
+  SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS,
+  ADD_SIMULATED_SERVICE_METRIC_SERVICES,
+  REMOVE_SIMULATED_SERVICE_METRIC_SERVICES,
   REGIONS_REQUEST,
   REGION_REQUEST,
   REGIONS_FAILURE,
@@ -186,7 +208,6 @@ import {
   LOAD_BALANCERS_SUCCESS,
   LOAD_BALANCER_SUCCESS,
   ADD_LOAD_BALANCER,
-
   EUREKA_SERVERS_REQUEST,
   EUREKA_SERVER_REQUEST,
   EUREKA_SERVERS_FAILURE,
@@ -194,7 +215,6 @@ import {
   EUREKA_SERVERS_SUCCESS,
   EUREKA_SERVER_SUCCESS,
   ADD_EUREKA_SERVER,
-
   LOGS_REQUEST,
   LOGS_FAILURE,
   LOGS_SUCCESS,
@@ -220,6 +240,8 @@ import {IRegion} from "../routes/region/Region";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 import {IEurekaServer} from "../routes/eureka/EurekaServer";
 import {ILogs} from "../routes/logs/Logs";
+import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
+import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 
 export type EntitiesState = {
   apps: {
@@ -317,7 +339,24 @@ export type EntitiesState = {
     isLoadingDecisions: boolean,
     loadDecisionsError: string | null,
   },
-  //TODO simulated metrics
+  simulatedMetrics: {
+    services: {
+      data: { [key: string]: ISimulatedServiceMetric },
+      isLoadingSimulatedServiceMetrics: boolean,
+      loadSimulatedServiceMetricsError: string | null,
+      isLoadingServices: boolean,
+      loadServicesError: string | null,
+    }
+    hosts: {
+      data: { [key: string]: ISimulatedHostMetric },
+      isLoadingSimulatedHostMetrics: boolean,
+      loadSimulatedHostMetricsError: string | null,
+      isLoadingCloudHosts: boolean,
+      loadCloudHostsError: string | null,
+      isLoadingEdgeHosts: boolean,
+      loadEdgeHostsError: string | null,
+    },
+  },
   regions: {
     data: { [key: string]: IRegion },
     isLoadingRegions: boolean,
@@ -372,7 +411,8 @@ export type EntitiesAction = {
     conditions?: IRuleCondition[],
     conditionsNames?: string[],
     decisions?: IDecision[],
-    //TODO simulated metrics
+    simulatedHostMetrics?: ISimulatedHostMetric[],
+    simulatedServiceMetrics?: ISimulatedServiceMetric[],
     regions?: IRegion[],
     loadBalancers?: ILoadBalancer[],
     eurekaServers?: ILoadBalancer[],
@@ -476,7 +516,24 @@ const entities = (state: EntitiesState = {
                       isLoadingDecisions: false,
                       loadDecisionsError: null
                     },
-                    // TODO simulated metrics
+                    simulatedMetrics: {
+                      services: {
+                        data: {},
+                        isLoadingSimulatedServiceMetrics: false,
+                        loadSimulatedServiceMetricsError: null,
+                        isLoadingServices: false,
+                        loadServicesError: null,
+                      },
+                      hosts: {
+                        data: {},
+                        isLoadingSimulatedHostMetrics: false,
+                        loadSimulatedHostMetricsError: null,
+                        isLoadingCloudHosts: false,
+                        loadCloudHostsError: null,
+                        isLoadingEdgeHosts: false,
+                        loadEdgeHostsError: null,
+                      },
+                    },
                     regions: {
                       data: {},
                       isLoadingRegions: false,
@@ -1460,7 +1517,223 @@ const entities = (state: EntitiesState = {
           loadDecisionsError: null,
         }
       };
-    //TODO simulated metrics
+    case SIMULATED_HOST_METRICS_REQUEST:
+    case SIMULATED_HOST_METRIC_REQUEST:
+      return merge({}, state, { simulatedMetrics: { hosts: { isLoadingSimulatedHostMetrics: true, loadSimulatedHostMetricsError: null } } });
+    case SIMULATED_HOST_METRICS_FAILURE:
+    case SIMULATED_HOST_METRIC_FAILURE:
+      return merge({}, state, { simulatedMetrics: { hosts: { isLoadingSimulatedHostMetrics: false, loadSimulatedHostMetricsError: error } } });
+    case SIMULATED_HOST_METRICS_SUCCESS:
+      return {
+        ...state,
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          hosts: {
+            ...state.simulatedMetrics.hosts,
+            data: merge({}, pick(state.simulatedMetrics.hosts.data, keys(data?.simulatedHostMetrics)), data?.simulatedHostMetrics),
+            isLoadingSimulatedHostMetrics: false,
+            loadSimulatedHostMetricsError: null,
+          }
+        }
+      };
+    case SIMULATED_HOST_METRIC_SUCCESS:
+      return {
+        ...state,
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          hosts: {
+            ...state.simulatedMetrics.hosts,
+            data: merge({}, state.simulatedMetrics.hosts.data, data?.simulatedHostMetrics),
+            isLoadingSimulatedHostMetrics: false,
+            loadSimulatedHostMetricsError: null,
+          }
+        }
+      };
+    case ADD_SIMULATED_HOST_METRIC:
+      if (data?.simulatedHostMetrics?.length) {
+        const simulatedHostMetrics = normalize(data?.simulatedHostMetrics, Schemas.SIMULATED_HOST_METRIC_ARRAY).entities.simulatedHostMetrics;
+        return merge({}, state, { simulatedMetrics: { hosts : { data: simulatedHostMetrics } } });
+      }
+      break;
+    case SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST:
+      return merge({}, state, { simulatedMetrics: { hosts: { isLoadingCloudHosts: true, loadCloudHostsError: null } } });
+    case SIMULATED_HOST_METRIC_CLOUD_HOSTS_FAILURE:
+      return merge({}, state, { simulatedMetrics: { hosts: { isLoadingCloudHosts: false, loadCloudHostsError: error } } });
+    case SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS: {
+      const simulatedHostMetric = entity && state.simulatedMetrics.hosts.data[entity];
+      const cloudHosts = { cloudHosts: data?.cloudHosts || [] };
+      const simulatedHostMetricWithCloudHosts = Object.assign(simulatedHostMetric ? simulatedHostMetric : [entity], cloudHosts);
+      const normalizedSimulatedHostMetric = normalize(simulatedHostMetricWithCloudHosts, Schemas.SIMULATED_HOST_METRIC).entities;
+      return merge({}, state, {
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          hosts : {
+            ...state.simulatedMetrics.hosts,
+            data: normalizedSimulatedHostMetric.simulatedHostMetrics,
+            isLoadingCloudHosts: false,
+            loadCloudHostsError: null,
+          }
+        }
+      });
+    }
+    case ADD_SIMULATED_HOST_METRIC_CLOUD_HOSTS:
+      if (entity && data?.cloudHostsId?.length) {
+        const simulatedHostMetric = state.simulatedMetrics.hosts.data[entity];
+        if (simulatedHostMetric) {
+          simulatedHostMetric.cloudHosts?.unshift(...data?.cloudHostsId);
+          return merge({}, state, { simulatedMetrics: { hosts: { data: { [simulatedHostMetric.name]: {...simulatedHostMetric } } } } });
+        }
+      }
+      break;
+    case REMOVE_SIMULATED_HOST_METRIC_CLOUD_HOSTS:
+      if (entity) {
+        const simulatedHostMetric = state.simulatedMetrics.hosts.data[entity];
+        const filteredCloudHosts = simulatedHostMetric.cloudHosts?.filter(cloudHost => !data?.cloudHostsId?.includes(cloudHost));
+        const simulatedHostMetricWithCloudHosts = Object.assign(simulatedHostMetric, { cloudHosts: filteredCloudHosts });
+        const normalizeSimulatedHostMetric = normalize(simulatedHostMetricWithCloudHosts, Schemas.SIMULATED_HOST_METRIC).entities;
+        return merge({}, state, {
+          simulatedMetrics: {
+            ...state.simulatedMetrics,
+            hosts: {
+              ...state.simulatedMetrics.hosts,
+              data: normalizeSimulatedHostMetric.simulatedHostMetrics,
+            }
+          }
+        });
+      }
+      return state;
+    case SIMULATED_HOST_METRIC_EDGE_HOSTS_REQUEST:
+      return merge({}, state, { simulatedMetrics: { hosts: { isLoadingEdgeHosts: true, loadEdgeHostsError: null } } });
+    case SIMULATED_HOST_METRIC_EDGE_HOSTS_FAILURE:
+      return merge({}, state, { simulatedMetrics: { hosts: { isLoadingEdgeHosts: false, loadEdgeHostsError: error } } });
+    case SIMULATED_HOST_METRIC_EDGE_HOSTS_SUCCESS: {
+      const simulatedHostMetric = entity && state.simulatedMetrics.hosts.data[entity];
+      const edgeHosts = { edgeHosts: data?.edgeHosts || [] };
+      const simulatedHostMetricWithEdgeHosts = Object.assign(simulatedHostMetric ? simulatedHostMetric : [entity], edgeHosts);
+      const normalizedSimulatedHostMetric = normalize(simulatedHostMetricWithEdgeHosts, Schemas.SIMULATED_HOST_METRIC).entities;
+      return merge({}, state, {
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          hosts : {
+            ...state.simulatedMetrics.hosts,
+            data: normalizedSimulatedHostMetric.simulatedHostMetrics,
+            isLoadingEdgeHosts: false,
+            loadEdgeHostsError: null,
+          }
+        }
+      });
+    }
+    case ADD_SIMULATED_HOST_METRIC_EDGE_HOSTS:
+      if (entity && data?.edgeHostsHostname?.length) {
+        const simulatedHostMetric = state.simulatedMetrics.hosts.data[entity];
+        if (simulatedHostMetric) {
+          simulatedHostMetric.edgeHosts?.unshift(...data?.edgeHostsHostname);
+          return merge({}, state, { simulatedMetrics: { hosts: { data: { [simulatedHostMetric.name]: {...simulatedHostMetric } } } } });
+        }
+      }
+      break;
+    case REMOVE_SIMULATED_HOST_METRIC_EDGE_HOSTS:
+      if (entity) {
+        const simulatedHostMetric = state.simulatedMetrics.hosts.data[entity];
+        const filteredEdgeHosts = simulatedHostMetric.edgeHosts?.filter(edgeHost => !data?.edgeHostsHostname?.includes(edgeHost));
+        const simulatedHostMetricWithEdgeHosts = Object.assign(simulatedHostMetric, { edgeHosts: filteredEdgeHosts });
+        const normalizeSimulatedHostMetric = normalize(simulatedHostMetricWithEdgeHosts, Schemas.SIMULATED_HOST_METRIC).entities;
+        return merge({}, state, {
+          simulatedMetrics: {
+            ...state.simulatedMetrics,
+            hosts: {
+              ...state.simulatedMetrics.hosts,
+              data: normalizeSimulatedHostMetric.simulatedHostMetrics,
+            }
+          }
+        });
+      }
+      return state;
+    case SIMULATED_SERVICE_METRICS_REQUEST:
+    case SIMULATED_SERVICE_METRIC_REQUEST:
+      return merge({}, state, { simulatedMetrics: { services: { isLoadingSimulatedServiceMetrics: true, loadSimulatedServiceMetricsError: null } } });
+    case SIMULATED_SERVICE_METRICS_FAILURE:
+    case SIMULATED_SERVICE_METRIC_FAILURE:
+      return merge({}, state, { simulatedMetrics: { services: { isLoadingSimulatedServiceMetrics: false, loadSimulatedServiceMetricsError: error } } });
+    case SIMULATED_SERVICE_METRICS_SUCCESS:
+      return {
+        ...state,
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          services: {
+            ...state.simulatedMetrics.services,
+            data: merge({}, pick(state.simulatedMetrics.services.data, keys(data?.simulatedServiceMetrics)), data?.simulatedServiceMetrics),
+            isLoadingSimulatedServiceMetrics: false,
+            loadSimulatedServiceMetricsError: null,
+          }
+        }
+      };
+    case SIMULATED_SERVICE_METRIC_SUCCESS:
+      return {
+        ...state,
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          services: {
+            ...state.simulatedMetrics.services,
+            data: merge({}, state.simulatedMetrics.services.data, data?.simulatedServiceMetrics),
+            isLoadingSimulatedServiceMetrics: false,
+            loadSimulatedServiceMetricsError: null,
+          }
+        }
+      };
+    case ADD_SIMULATED_SERVICE_METRIC:
+      if (data?.simulatedServiceMetrics?.length) {
+        const simulatedServiceMetrics = normalize(data?.simulatedServiceMetrics, Schemas.SIMULATED_SERVICE_METRIC_ARRAY).entities.simulatedServiceMetrics;
+        return merge({}, state, { simulatedMetrics: { services : { data: simulatedServiceMetrics } } });
+      }
+      break;
+    case SIMULATED_SERVICE_METRIC_SERVICES_REQUEST:
+      return merge({}, state, { simulatedMetrics: { services: { isLoadingServices: true, loadServicesError: null } } });
+    case SIMULATED_SERVICE_METRIC_SERVICES_FAILURE:
+      return merge({}, state, { simulatedMetrics: { services: { isLoadingServices: false, loadServicesError: error } } });
+    case SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS: {
+      const simulatedServiceMetric = entity && state.simulatedMetrics.services.data[entity];
+      const services = { services: data?.services || [] };
+      const simulatedServiceMetricWithServices = Object.assign(simulatedServiceMetric ? simulatedServiceMetric : [entity], services);
+      const normalizedSimulatedServiceMetric = normalize(simulatedServiceMetricWithServices, Schemas.SIMULATED_SERVICE_METRIC).entities;
+      return merge({}, state, {
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          services : {
+            ...state.simulatedMetrics.services,
+            data: normalizedSimulatedServiceMetric.simulatedServiceMetrics,
+            isLoadingServices: false,
+            loadServicesError: null,
+          }
+        }
+      });
+    }
+    case ADD_SIMULATED_SERVICE_METRIC_SERVICES:
+      if (entity && data?.serviceNames?.length) {
+        const simulatedServiceMetric = state.simulatedMetrics.services.data[entity];
+        if (simulatedServiceMetric) {
+          simulatedServiceMetric.services?.unshift(...data?.serviceNames);
+          return merge({}, state, { simulatedMetrics: { services: { data: { [simulatedServiceMetric.name]: {...simulatedServiceMetric } } } } });
+        }
+      }
+      break;
+    case REMOVE_SIMULATED_SERVICE_METRIC_SERVICES:
+      if (entity) {
+        const simulatedServiceMetric = state.simulatedMetrics.services.data[entity];
+        const filteredServices = simulatedServiceMetric.services?.filter(service => !data?.serviceNames?.includes(service));
+        const simulatedServiceMetricWithServices = Object.assign(simulatedServiceMetric, { services: filteredServices });
+        const normalizeSimulatedServiceMetric = normalize(simulatedServiceMetricWithServices, Schemas.SIMULATED_SERVICE_METRIC).entities;
+        return merge({}, state, {
+          simulatedMetrics: {
+            ...state.simulatedMetrics,
+            services: {
+              ...state.simulatedMetrics.services,
+              data: normalizeSimulatedServiceMetric.simulatedServiceMetrics,
+            }
+          }
+        });
+      }
+      return state;
     case REGIONS_REQUEST:
     case REGION_REQUEST:
       return merge({}, state, { regions: { isLoadingRegions: true, loadRegionsError: null } });

@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
 import javax.persistence.CascadeType;
@@ -80,6 +81,11 @@ public class EdgeHostEntity {
   @JsonIgnore
   @ManyToMany(mappedBy = "edgeHosts", cascade = CascadeType.ALL)
   private Set<HostRuleEntity> hostRules;
+
+  @Singular
+  @JsonIgnore
+  @ManyToMany(mappedBy = "edgeHosts", cascade = CascadeType.ALL)
+  private Set<SimulatedHostMetricEntity> simulatedHostMetrics;
 
   @Override
   public boolean equals(Object o) {

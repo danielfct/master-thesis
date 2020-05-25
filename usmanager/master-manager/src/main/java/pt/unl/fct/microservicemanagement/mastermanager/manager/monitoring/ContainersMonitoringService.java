@@ -32,7 +32,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.SimulatedMetricsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.SimulatedMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
@@ -435,7 +435,9 @@ public class ContainersMonitoringService {
         "tx-bytes", txBytes));
     // Simulated metrics
     if (container.getLabels().containsKey(DockerContainer.Label.SERVICE_NAME)) {
-      Map<String, Double> simulatedFields = simulatedMetricsService.getContainerFieldsValue(serviceName, containerId);
+      //TODO
+      Map<String, Double> simulatedFields = new HashMap<>();
+      //Map<String, Double> simulatedFields = simulatedMetricsService.getContainerFieldsValue(serviceName, containerId);
       fields.putAll(simulatedFields);
     }
     // Calculated metrics

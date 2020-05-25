@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
 import java.util.Set;
@@ -81,6 +82,11 @@ public class CloudHostEntity {
   @JsonIgnore
   @ManyToMany(mappedBy = "cloudHosts", cascade = CascadeType.ALL)
   private Set<HostRuleEntity> hostRules;
+
+  @Singular
+  @JsonIgnore
+  @ManyToMany(mappedBy = "cloudHosts", cascade = CascadeType.ALL)
+  private Set<SimulatedHostMetricEntity> simulatedHostMetrics;
 
   @Override
   public boolean equals(Object o) {

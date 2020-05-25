@@ -1,63 +1,38 @@
 /*
- * MIT License
- *
  * Copyright (c) 2020 usmanager
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated;
 
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SimulatedMetricsService {
 
-  private final ServiceSimulatedMetricsRepository serviceSimulatedMetrics;
+  /*private final ServiceSimulatedMetricsRepository serviceSimulatedMetrics;
   private final ContainerSimulatedMetricsRepository containerSimulatedMetrics;
   private final DefaultHostSimulatedMetricsRepository defaultHostSimulatedMetrics;
-  private final SpecificHostSimulatedMetricsRepository specificHostSimulatedMetrics;
 
   public SimulatedMetricsService(ServiceSimulatedMetricsRepository serviceSimulatedMetrics,
                                  ContainerSimulatedMetricsRepository containerSimulatedMetrics,
-                                 DefaultHostSimulatedMetricsRepository defaultHostSimulatedMetrics,
-                                 SpecificHostSimulatedMetricsRepository specificHostSimulatedMetrics) {
+                                 DefaultHostSimulatedMetricsRepository defaultHostSimulatedMetrics) {
     this.serviceSimulatedMetrics = serviceSimulatedMetrics;
     this.containerSimulatedMetrics = containerSimulatedMetrics;
     this.defaultHostSimulatedMetrics = defaultHostSimulatedMetrics;
-    this.specificHostSimulatedMetrics = specificHostSimulatedMetrics;
   }
 
-  public Iterable<ServiceSimulatedMetricsEntity> getServiceSimulatedMetrics() {
+  public Iterable<ServiceSimulatedMetricsEntity> getSimulatedServiceMetrics() {
     return serviceSimulatedMetrics.findAll();
   }
 
-  public ServiceSimulatedMetricsEntity getServiceSimulatedMetric(long id) {
+  public ServiceSimulatedMetricsEntity getSimulatedServiceMetric(long id) {
     return serviceSimulatedMetrics.findById(id).orElseThrow(() -> new NotFoundException("Simulated metric not found"));
   }
 
@@ -69,7 +44,7 @@ public class SimulatedMetricsService {
   }
 
   public void deleteServiceSimulatedMetrics(long id) {
-    final var serviceSimulatedMetric = getServiceSimulatedMetric(id);
+    final var serviceSimulatedMetric = getSimulatedServiceMetric(id);
     serviceSimulatedMetrics.delete(serviceSimulatedMetric);
   }
 
@@ -97,24 +72,24 @@ public class SimulatedMetricsService {
   }
 
 
-  public Iterable<DefaultHostSimulatedMetricsEntity> getAllDefaultHostSimulatedMetrics() {
+  public Iterable<SimulatedHostMetricEntity> getSimulatedHostMetrics() {
     return defaultHostSimulatedMetrics.findAll();
   }
 
-  public DefaultHostSimulatedMetricsEntity getDefaultHostSimulatedMetric(long id) {
+  public SimulatedHostMetricEntity getSimulatedHostMetric(long id) {
     return defaultHostSimulatedMetrics.findById(id)
         .orElseThrow(() -> new NotFoundException("Simulated metric not found"));
   }
 
-  public long saveDefaultHostSimulatedMetrics(long id, DefaultHostSimulatedMetricsEntity defaultHostSimulatedMetric) {
+  public long saveDefaultHostSimulatedMetrics(long id, SimulatedHostMetricEntity defaultHostSimulatedMetric) {
     if (id > 0) {
       defaultHostSimulatedMetric.setId(id);
     }
     return defaultHostSimulatedMetrics.save(defaultHostSimulatedMetric).getId();
   }
 
-  public void deleteDefaultHostSimulatedMetric(long id) {
-    var defaultHostSimulatedMetric = getDefaultHostSimulatedMetric(id);
+  public void deleteHostSimulatedMetric(long id) {
+    var defaultHostSimulatedMetric = getSimulatedHostMetric(id);
     defaultHostSimulatedMetrics.delete(defaultHostSimulatedMetric);
   }
 
@@ -140,7 +115,7 @@ public class SimulatedMetricsService {
     specificHostSimulatedMetrics.delete(specificHostSimulatedMetric);
   }
 
-  /*public Pair<Double, Boolean> getHostFieldValue(String hostname, String field) {
+  *//*public Pair<Double, Boolean> getHostFieldValue(String hostname, String field) {
     List<DefaultHostSimulatedMetrics> defaultMetrics = getDefaultHostSimulatedMetricsByField(field);
     List<SpecificHostSimulatedMetrics> specificMetrics = getSpecificHostSimulatedMetricsByHostnameAndField(hostname,
         field);
@@ -178,7 +153,7 @@ public class SimulatedMetricsService {
       return Pair.of(defaultMetricsValue, overrideReal);
     else
       return Pair.of(-1.0, false);
-  }*/
+  }*//*
 
   public Optional<Double> getHostFieldValue(String hostname, String field) {
     var random = new Random();
@@ -251,6 +226,6 @@ public class SimulatedMetricsService {
     } else {
       return Pair.of(-1.0, false);
     }
-  }
+  }*/
 
 }

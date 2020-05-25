@@ -82,7 +82,7 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
     if (this.state.id !== 0) {
       this.setState({ loading: true });
       getData(
-        `http://localhost:8080/metrics/simulated/containers/${this.state.id}`,
+        `http://localhost:8080/simulated-metrics/containers/${this.state.id}`,
         data => this.setState({ values: data, loading: false })
       );
     }
@@ -115,7 +115,7 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
   onSubmitForm = event => {
     event.preventDefault();
     postData(
-      `http://localhost:8080/metrics/simulated/containers/${this.state.id}`,
+      `http://localhost:8080/simulated-metrics/containers/${this.state.id}`,
       event.target[0].value,
       data => {
         this.setState({ isEdit: false, formSubmit: true });
@@ -179,7 +179,7 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
 
   render() {
     if (this.state.formSubmit) {
-      return <Redirect to='/metrics/simulated/containers'/>;
+      return <Redirect to='/simulated-metrics/containers'/>;
     }
 {/*    <MainLayout title={{title:'Container simulated metric detail'}}>*/}
     return (

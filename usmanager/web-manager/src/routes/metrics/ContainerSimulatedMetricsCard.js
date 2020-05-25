@@ -31,7 +31,7 @@ import {deleteData} from "../../utils/api";
 export default class ContainerSimulatedMetricsCard extends React.Component {
   onClickRemove = () => {
     deleteData(
-      `http://localhost:8080/metrics/simulated/containers/${this.props.simulatedMetric.id}`,
+      `http://localhost:8080/simulated-metrics/containers/${this.props.simulatedMetric.id}`,
       data => {
         M.toast({ html: '<div>Container simulated metric removed successfully!</div>' });
         this.props.reloadSimulatedMetrics();
@@ -50,7 +50,7 @@ export default class ContainerSimulatedMetricsCard extends React.Component {
                 <div className="row">
                   <div className="col s12">
                     <Link className="waves-effect waves-light btn-small"
-                          to={'/metrics/simulated/containers/metric/' + this.props.simulatedMetric.id}>Edit</Link>
+                          to={'/simulated-metrics/containers/metric/' + this.props.simulatedMetric.id}>Edit</Link>
                     <button style={style} className="waves-effect waves-light btn-small red darken-4"
                             onClick={this.onClickRemove}>Remove
                     </button>

@@ -33,7 +33,7 @@ import Service from "../routes/services/Service";
 import EurekaPage from "../routes/eureka/OldEureka";
 import SimulatedMetricsLandingPage from "../routes/metrics/SimulatedMetricsLandingPage";
 import ServiceSimulatedMetrics from "../routes/metrics/ServiceSimulatedMetrics";
-import ServiceSimulatedMetricsDetail from "../routes/metrics/SimulatedMetrics";
+import ServiceSimulatedMetricsDetail from "../routes/metrics/OldSimulatedMetrics";
 import ContainerSimulatedMetrics from "../routes/metrics/ContainerSimulatedMetrics";
 import ContainerSimulatedMetricsDetail from "../routes/metrics/ContainerSimulatedMetricsDetail";
 import DefaultHostSimulatedMetrics from "../routes/metrics/DefaultHostSimulatedMetrics";
@@ -98,15 +98,15 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/rules/services/:name": { component: ServiceRule },
     "/rules/conditions": { component: RuleConditions, search: true },
     "/rules/conditions/:name": { component: Condition },
-    "/metrics/simulated": { component: SimulatedMetricsLandingPage, search: true },
-    "/metrics/simulated/services": { component: ServiceSimulatedMetrics, search: true },
-    "/metrics/simulated/services/service/:id?": { component: ServiceSimulatedMetricsDetail },
-    "/metrics/simulated/containers": { component: ContainerSimulatedMetrics, search: true },
-    "/metrics/simulated/containers/metric/:id?": { component: ContainerSimulatedMetricsDetail },
-    "/metrics/simulated/hosts/default": { component: DefaultHostSimulatedMetrics, search: true },
-    "/metrics/simulated/hosts/metric/:id?": { component: DefaultHostSimulatedMetricsDetail },
-    "/metrics/simulated/hosts/specific": { component: SpecificHostSimulatedMetrics, search: true },
-    "/metrics/simulated/hosts/specific/metric/:id?": { component: SpecificHostSimulatedMetricsDetail },
+    "/simulated-metrics": { component: SimulatedMetricsLandingPage, search: true },
+    "/simulated-metrics/services": { component: ServiceSimulatedMetrics, search: true },
+    "/simulated-metrics/services/service/:id?": { component: ServiceSimulatedMetricsDetail },
+    "/simulated-metrics/containers": { component: ContainerSimulatedMetrics, search: true },
+    "/simulated-metrics/containers/metric/:id?": { component: ContainerSimulatedMetricsDetail },
+    "/simulated-metrics/hosts/default": { component: DefaultHostSimulatedMetrics, search: true },
+    "/simulated-metrics/hosts/metric/:id?": { component: DefaultHostSimulatedMetricsDetail },
+    "/simulated-metrics/hosts/specific": { component: SpecificHostSimulatedMetrics, search: true },
+    "/simulated-metrics/hosts/specific/metric/:id?": { component: SpecificHostSimulatedMetricsDetail },
     "/regions": { component: Regions, search: true },
     "/regions/:name": { component: Region },
     "/load-balancers": { component: LoadBalancers, search: true },

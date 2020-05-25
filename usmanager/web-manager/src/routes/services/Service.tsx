@@ -455,7 +455,7 @@ class Service extends BaseComponent<Props, State> {
   private genericRules = (): JSX.Element =>
     <GenericServiceRuleList/>;
 
-  private tabs: Tab[] = [
+  private tabs = () => [
     {
       title: 'Service',
       id: 'service',
@@ -498,7 +498,7 @@ class Service extends BaseComponent<Props, State> {
       <MainLayout>
         {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
-          <Tabs {...this.props} tabs={this.tabs}/>
+          <Tabs {...this.props} tabs={this.tabs()}/>
         </div>
       </MainLayout>
     );

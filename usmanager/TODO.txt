@@ -38,6 +38,11 @@ rename all manager exceptions to MasterManagerException?
 add assertEntityDoesntExist on every add method with @query lower()
 update root.prod
 launch load balancer at aws not working
+compare every query 'name' with lower function
+do red color just on not new entities
+create a loadEntities function to load entities onmount and onupdate
+create a isNew function to not show loading errors
+remove link on unsaved list items
 
 
 test: reload every single page

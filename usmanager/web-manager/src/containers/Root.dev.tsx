@@ -30,15 +30,8 @@ import Navbar from "../views/navbar/Navbar";
 import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
-import SimulatedMetricsLandingPage from "../routes/metrics/SimulatedMetricsLandingPage";
-import ServiceSimulatedMetrics from "../routes/metrics/ServiceSimulatedMetrics";
-import ServiceSimulatedMetricsDetail from "../routes/metrics/SimulatedMetrics";
 import ContainerSimulatedMetrics from "../routes/metrics/ContainerSimulatedMetrics";
 import ContainerSimulatedMetricsDetail from "../routes/metrics/ContainerSimulatedMetricsDetail";
-import DefaultHostSimulatedMetrics from "../routes/metrics/DefaultHostSimulatedMetrics";
-import DefaultHostSimulatedMetricsDetail from "../routes/metrics/DefaultHostSimulatedMetricsDetail";
-import SpecificHostSimulatedMetrics from "../routes/metrics/SpecificHostSimulatedMetrics";
-import SpecificHostSimulatedMetricsDetail from "../routes/metrics/SpecificHostSimulatedMetricsDetail";
 import {Provider} from "react-redux";
 import PageNotFound from "../components/PageNotFound";
 import Login from "../views/login/Login";
@@ -69,6 +62,13 @@ import LoadBalancers from "../routes/loadBalancer/LoadBalancers";
 import LoadBalancer from "../routes/loadBalancer/LoadBalancer";
 import EurekaServers from "../routes/eureka/EurekaServers";
 import EurekaServer from "../routes/eureka/EurekaServer";
+import ServiceSimulatedMetricsDetail from "../routes/metrics/OldSimulatedMetrics";
+import SimulatedMetrics from "../routes/metrics/SimulatedMetrics";
+import SimulatedServiceMetric from "../routes/metrics/services/SimulatedServiceMetric";
+import SimulatedServiceMetricsList from "../routes/metrics/services/SimulatedServiceMetricsList";
+import SimulatedHostMetric from "../routes/metrics/hosts/SimulatedHostMetric";
+import SimulatedHostMetrics from "../routes/metrics/hosts/SimulatedHostMetrics";
+import SimulatedServiceMetrics from "../routes/metrics/services/SimulatedServiceMetrics";
 
 interface RootContainerProps {
     store: any;
@@ -99,15 +99,13 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/rules/services/:name": { component: ServiceRule },
     "/rules/conditions": { component: RuleConditions, search: true },
     "/rules/conditions/:name": { component: Condition },
-    "/metrics/simulated": { component: SimulatedMetricsLandingPage, search: true },
-    "/metrics/simulated/services": { component: ServiceSimulatedMetrics, search: true },
-    "/metrics/simulated/services/service/:id?": { component: ServiceSimulatedMetricsDetail },
-    "/metrics/simulated/containers": { component: ContainerSimulatedMetrics, search: true },
-    "/metrics/simulated/containers/metric/:id?": { component: ContainerSimulatedMetricsDetail },
-    "/metrics/simulated/hosts/default": { component: DefaultHostSimulatedMetrics, search: true },
-    "/metrics/simulated/hosts/metric/:id?": { component: DefaultHostSimulatedMetricsDetail },
-    "/metrics/simulated/hosts/specific": { component: SpecificHostSimulatedMetrics, search: true },
-    "/metrics/simulated/hosts/specific/metric/:id?": { component: SpecificHostSimulatedMetricsDetail },
+    "/simulated-metrics": { component: SimulatedMetrics, search: true },
+    "/simulated-metrics/services": { component: SimulatedServiceMetrics, search: true },
+    "/simulated-metrics/services/:name?": { component: SimulatedServiceMetric },
+    "/simulated-metrics/containers": { component: ContainerSimulatedMetrics, search: true },
+    "/simulated-metrics/containers/:name?": { component: ContainerSimulatedMetricsDetail },
+    "/simulated-metrics/hosts": { component: SimulatedHostMetrics, search: true },
+    "/simulated-metrics/hosts/:name?": { component: SimulatedHostMetric },
     "/regions": { component: Regions, search: true },
     "/regions/:name": { component: Region },
     "/load-balancers": { component: LoadBalancers, search: true },

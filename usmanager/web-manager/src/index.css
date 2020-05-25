@@ -36,7 +36,7 @@
 
 .content {
     flex: 1 0 auto;
-    padding-left: 200px;
+    padding-left: 210px;
 }
 
 @media only screen and (max-width : 992px) {
@@ -141,7 +141,7 @@ nav li {
 
 .sidenav {
     background: #282828;
-    width: 200px;
+    width: 210px;
     height: 100vh;
     z-index: 998;
     overflow: hidden;
@@ -420,7 +420,7 @@ textarea.materialize-textarea[readonly="readonly"] {
 }
 
 .center-horizontal {
-    height: calc(100vh - 200px);
+    height: calc(100vh - 210px);
     position: relative;
 }
 
@@ -463,14 +463,8 @@ textarea.materialize-textarea[readonly="readonly"] {
 
 .controlsContainer {
     border-bottom: 2px solid rgba(0, 0, 0, 0.8);
-    padding: 15px 10px;
+    padding: 15px 40px;
     overflow: auto;
-}
-
-@media only screen and (min-width : 768px) {
-    .controlsContainer {
-        padding: 15px 40px;
-    }
 }
 
 .noBorder {

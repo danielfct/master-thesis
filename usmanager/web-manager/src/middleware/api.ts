@@ -44,6 +44,8 @@ import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 import {IAppService} from "../routes/apps/AppServicesList";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 import {IEurekaServer} from "../routes/eureka/EurekaServer";
+import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
+import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 
 const callApi = (endpoint: string, schema: any) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -106,8 +108,10 @@ interface ISchemas {
     OPERATOR_ARRAY: schema.Entity<IOperator>[];
     DECISION: schema.Entity<IDecision>;
     DECISION_ARRAY: schema.Entity<IDecision>[];
-    //SIMULATED_METRIC: schema.Entity<ISimulatedMetric>; TODO
-    //SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedMetric>[]; TODO
+    SIMULATED_HOST_METRIC: schema.Entity<ISimulatedHostMetric>;
+    SIMULATED_HOST_METRIC_ARRAY: schema.Entity<ISimulatedHostMetric>[];
+    SIMULATED_SERVICE_METRIC: schema.Entity<ISimulatedHostMetric>;
+    SIMULATED_SERVICE_METRIC_ARRAY: schema.Entity<ISimulatedHostMetric>[];
     REGION: schema.Entity<IRegion>;
     REGION_ARRAY: schema.Entity<IRegion>[];
     LOAD_BALANCER: schema.Entity<ILoadBalancer>;
@@ -202,7 +206,16 @@ const decision: schema.Entity<IDecision> = new schema.Entity('decisions', undefi
     idAttribute: (decision: IDecision) => decision.name
 });
 
-// TODO simulated metrics
+const simulatedHostMetric: schema.Entity<ISimulatedHostMetric> = new schema.Entity('simulatedHostMetrics', undefined, {
+    idAttribute: (simulatedHostMetric: ISimulatedHostMetric) => simulatedHostMetric.name
+});
+const simulatedHostMetrics = new schema.Array(simulatedHostMetric);
+
+const simulatedServiceMetric: schema.Entity<ISimulatedServiceMetric> = new schema.Entity('simulatedServiceMetrics', undefined, {
+    idAttribute: (simulatedServiceMetric: ISimulatedServiceMetric) => simulatedServiceMetric.name
+});
+const simulatedServiceMetrics = new schema.Array(simulatedServiceMetric);
+
 
 const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
     idAttribute: (region: IRegion) => region.name
@@ -221,12 +234,14 @@ const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
 });
 
 app.define({ appServices });
-service.define({ apps, dependencies, dependees, serviceRules });
-cloudHost.define({ hostRules, state });
-edgeHost.define({ hostRules });
+service.define({ apps, dependencies, dependees, serviceRules, simulatedServiceMetrics });
+cloudHost.define({ hostRules, simulatedHostMetrics, state });
+edgeHost.define({ hostRules, simulatedHostMetrics });
 ruleHost.define({ conditions, edgeHosts, cloudHosts });
 ruleService.define({ conditions, services });
 condition.define({ valueModes, fields, operators });
+simulatedHostMetric.define( { edgeHosts, cloudHosts });
+simulatedServiceMetric.define( { services });
 
 export const Schemas: ISchemas = {
     APP: app,
@@ -268,7 +283,10 @@ export const Schemas: ISchemas = {
     OPERATOR_ARRAY: [operator],
     DECISION: decision,
     DECISION_ARRAY: [decision],
-    //TODO simulatedMetrics
+    SIMULATED_HOST_METRIC: simulatedHostMetric,
+    SIMULATED_HOST_METRIC_ARRAY: [simulatedHostMetric],
+    SIMULATED_SERVICE_METRIC: simulatedServiceMetric,
+    SIMULATED_SERVICE_METRIC_ARRAY: [simulatedServiceMetric],
     REGION: region,
     REGION_ARRAY: [region],
     LOAD_BALANCER: loadBalancer,

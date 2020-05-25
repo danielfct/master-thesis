@@ -275,7 +275,7 @@ class App extends BaseComponent<Props, State> {
                      onAddAppService={this.addAppService}
                      onRemoveAppServices={this.removeAppServices}/>;
 
-  private tabs: Tab[] = [
+  private tabs = () => [
     {
       title: 'App',
       id: 'app',
@@ -293,7 +293,7 @@ class App extends BaseComponent<Props, State> {
       <MainLayout>
         {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
-          <Tabs {...this.props} tabs={this.tabs}/>
+          <Tabs {...this.props} tabs={this.tabs()}/>
         </div>
       </MainLayout>
     );

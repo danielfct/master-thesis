@@ -25,7 +25,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metric.SimulatedMetricsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.SimulatedMetricsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus.PrometheusService;
 
 import java.util.HashMap;
@@ -38,14 +39,14 @@ import org.springframework.stereotype.Service;
 public class HostMetricsService {
 
   private final PrometheusService prometheusService;
-  private final SimulatedMetricsService simulatedMetricsService;
+  private final SimulatedHostMetricsService simulatedHostMetricsService;
   private final double maximumRamPercentage;
 
   public HostMetricsService(PrometheusService prometheusService,
-                            SimulatedMetricsService simulatedMetricsService,
+                            SimulatedHostMetricsService simulatedHostMetricsService,
                             HostProperties hostProperties) {
     this.prometheusService = prometheusService;
-    this.simulatedMetricsService = simulatedMetricsService;
+    this.simulatedHostMetricsService = simulatedHostMetricsService;
     this.maximumRamPercentage = hostProperties.getMaximumRamPercentage();
   }
 
@@ -59,17 +60,17 @@ public class HostMetricsService {
   }
 
   public Map<String, Double> getHostStats(String hostname) {
-    final var fields = new HashMap<String, Double>();
-    final var cpuPercentage = prometheusService.getCpuUsagePercent(hostname);
+    var fields = new HashMap<String, Double>();
+    double cpuPercentage = prometheusService.getCpuUsagePercent(hostname);
     if (cpuPercentage != -1) {
       fields.put("cpu-%", cpuPercentage);
     }
-    final var ramPercentage = prometheusService.getMemoryUsagePercent(hostname);
+    double ramPercentage = prometheusService.getMemoryUsagePercent(hostname);
     if (ramPercentage != -1) {
       fields.put("ram-%", ramPercentage);
     }
     List.of("cpu-%", "ram-%", "cpu", "ram", "bandwidth-%").forEach(field ->
-        simulatedMetricsService.getHostFieldValue(hostname, field).ifPresent(value -> fields.put(field, value))
+        simulatedHostMetricsService.getHostFieldValue(hostname, field).ifPresent(value -> fields.put(field, value))
     );
     return fields;
   }

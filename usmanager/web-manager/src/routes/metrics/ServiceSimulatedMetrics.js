@@ -48,19 +48,19 @@ export default class ServiceSimulatedMetrics extends React.Component {
   loadSimulatedMetrics = () => {
     this.setState({ loading: true });
     getData(
-      'http://localhost:8080/metrics/simulated/services',
+      'http://localhost:8080/simulated-metrics/services',
       data => this.setState({ data: data, loading: false })
     );
   };
 
   renderSimulatedMetrics = () => {
     let simulatedMetricsNodes;
-    if (this.state.data) {
+    /*if (this.state.data) {*/
       simulatedMetricsNodes = this.state.data.map((simulatedMetric, index) => (
         <ServiceSimulatedMetricsCard key={simulatedMetric.id} simulatedMetric={simulatedMetric}
                                      reloadSimulatedMetrics={this.loadSimulatedMetrics}/>
       ));
-    }
+    /*}*/
     return simulatedMetricsNodes;
   };
 /*<MainLayout title={{title:'Service simulated metrics'}}>*/
@@ -69,7 +69,7 @@ export default class ServiceSimulatedMetrics extends React.Component {
       {this.renderSimulatedMetrics()}
       <div className="fixed-action-btn tooltipped" data-position="left" data-tooltip="Add service simulated metric">
         <Link className="waves-effect waves-light btn-floating grey darken-3"
-              to='/metrics/simulated/services/metric'>
+              to='/simulated-metrics/services/metric'>
           <i className="large material-icons">add</i>
         </Link>
       </div>

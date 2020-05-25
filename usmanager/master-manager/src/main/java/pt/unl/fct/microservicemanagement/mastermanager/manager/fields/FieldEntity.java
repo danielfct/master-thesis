@@ -24,6 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.fields;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionValueEntity;
 
@@ -69,6 +71,16 @@ public class FieldEntity {
   @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<ConditionEntity> conditions = new HashSet<>();
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private Set<SimulatedHostMetricEntity> simulatedHostMetrics = new HashSet<>();
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private Set<SimulatedServiceMetricEntity> simulatedServiceMetrics = new HashSet<>();
 
   @JsonIgnore
   @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -212,7 +212,7 @@ class RuleHost extends BaseComponent<Props, State> {
   private saveRuleCloudHosts = (rule: IRuleHost): void => {
     const {unsavedCloudHosts} = this.state;
     if (unsavedCloudHosts.length) {
-      postData(`rules/hosts/${rule.name}/cloudHosts`, unsavedCloudHosts,
+      postData(`rules/hosts/${rule.name}/cloud-hosts`, unsavedCloudHosts,
         () => this.onSaveCloudHostsSuccess(rule),
         (reason) => this.onSaveCloudHostsFailure(rule, reason));
     }
@@ -242,7 +242,7 @@ class RuleHost extends BaseComponent<Props, State> {
   private saveRuleEdgeHosts = (rule: IRuleHost): void => {
     const {unsavedEdgeHosts} = this.state;
     if (unsavedEdgeHosts.length) {
-      postData(`rules/hosts/${rule.name}/edgeHosts`, unsavedEdgeHosts,
+      postData(`rules/hosts/${rule.name}/edge-hosts`, unsavedEdgeHosts,
         () => this.onSaveEdgeHostsSuccess(rule),
         (reason) => this.onSaveEdgeHostsFailure(rule, reason));
     }

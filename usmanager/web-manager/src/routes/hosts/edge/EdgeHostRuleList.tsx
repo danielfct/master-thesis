@@ -99,7 +99,7 @@ class EdgeHostRuleList extends BaseComponent<Props, {}> {
   };
 
   private onDeleteFailure = (reason: string): void =>
-    super.toast(`Unable to delete rule`, 10000, reason, true);
+    super.toast(`Unable to remove rule`, 10000, reason, true);
 
   private getSelectableRules = () => {
     const {rules, rulesNames, unsavedRules} = this.props;

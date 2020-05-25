@@ -81,12 +81,12 @@ public class HostRuleEntity {
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = CascadeType.ALL)
-  private List<EdgeHostEntity> edgeHosts;
+  private List<CloudHostEntity> cloudHosts;
 
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = CascadeType.ALL)
-  private List<CloudHostEntity> cloudHosts;
+  private List<EdgeHostEntity> edgeHosts;
 
   @Singular
   @JsonIgnore

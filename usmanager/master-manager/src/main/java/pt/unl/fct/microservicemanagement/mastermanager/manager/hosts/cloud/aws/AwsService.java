@@ -82,7 +82,7 @@ public class AwsService {
     var awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
     this.ec2 = AmazonEC2ClientBuilder
         .standard()
-        .withRegion(Regions.US_EAST_1)
+        .withRegion(Regions.US_EAST_2)
         .withCredentials(awsCredentialsProvider)
         .build();
     this.awsInstanceType = awsProperties.getInstance().getType();

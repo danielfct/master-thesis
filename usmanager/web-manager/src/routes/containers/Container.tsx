@@ -432,7 +432,7 @@ class Container extends BaseComponent<Props, State> {
                        loadContainerError={this.props.error}
                        container={this.getContainer()}/>;
 
-  private tabs: Tab[] =
+  private tabs = () =>
     isNew(this.props.location.search)
       ? [
         {
@@ -468,7 +468,7 @@ class Container extends BaseComponent<Props, State> {
     return (
       <MainLayout>
         <div className="container">
-          <Tabs {...this.props} tabs={this.tabs}/>
+          <Tabs {...this.props} tabs={this.tabs()}/>
         </div>
       </MainLayout>
     );

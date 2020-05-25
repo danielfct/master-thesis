@@ -125,7 +125,7 @@ class HostRuleEdgeHostList extends BaseComponent<Props, {}> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/hosts/${this.props.ruleHost?.name}/edgeHosts`,
+                             url: `rules/hosts/${this.props.ruleHost?.name}/edge-hosts`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}/>;

@@ -35,12 +35,11 @@ import {INode} from "../routes/nodes/Node";
 import {IRuleHost} from "../routes/rules/hosts/RuleHost";
 import {IRuleService} from "../routes/rules/services/RuleService";
 import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
-//import {ISimulatedMetric} from "../routes/simulatedMetrics/SimulatedMetric"; TODO
+import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
+import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 import {IRegion} from "../routes/region/Region";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 import {IEurekaServer} from "../routes/eureka/EurekaServer";
-//import {IEurekaServer} from "../routes/eurekaServer/EurekaServer"; TODO
-
 
 export const APPS_REQUEST = 'APPS_REQUEST';
 export const APPS_SUCCESS = 'APPS_SUCCESS';
@@ -553,7 +552,7 @@ export const loadRuleHostCloudHosts = (ruleName: string) => (dispatch: any) => {
 const fetchRuleHostCloudHosts = (ruleName: string) => ({
   [CALL_API]: {
     types: [ RULE_HOST_CLOUD_HOSTS_REQUEST, RULE_HOST_CLOUD_HOSTS_SUCCESS, RULE_HOST_CLOUD_HOSTS_FAILURE ],
-    endpoint: `rules/hosts/${ruleName}/cloudHosts`,
+    endpoint: `rules/hosts/${ruleName}/cloud-hosts`,
     schema: Schemas.CLOUD_HOST_ARRAY,
     entity: ruleName
   }
@@ -584,7 +583,7 @@ export const loadRuleHostEdgeHosts = (ruleName: string) => (dispatch: any) => {
 const fetchRuleHostEdgeHosts = (ruleName: string) => ({
   [CALL_API]: {
     types: [ RULE_HOST_EDGE_HOSTS_REQUEST, RULE_HOST_EDGE_HOSTS_SUCCESS, RULE_HOST_EDGE_HOSTS_FAILURE ],
-    endpoint: `rules/hosts/${ruleName}/edgeHosts`,
+    endpoint: `rules/hosts/${ruleName}/edge-hosts`,
     schema: Schemas.EDGE_HOST_ARRAY,
     entity: ruleName
   }
@@ -806,14 +805,164 @@ const fetchDecisions = (name?: string) => ({
       }
 });
 
-//TODO
-export const SIMULATED_METRICS_REQUEST = 'SIMULATED_METRICS_REQUEST';
-export const SIMULATED_METRICS_SUCCESS = 'SIMULATED_METRICS_SUCCESS';
-export const SIMULATED_METRICS_FAILURE = 'SIMULATED_METRICS_FAILURE';
-export const SIMULATED_METRIC_REQUEST = 'SIMULATED_METRIC_REQUEST';
-export const SIMULATED_METRIC_SUCCESS = 'SIMULATED_METRIC_SUCCESS';
-export const SIMULATED_METRIC_FAILURE = 'SIMULATED_METRIC_FAILURE';
+export const SIMULATED_HOST_METRICS_REQUEST = 'SIMULATED_HOST_METRICS_REQUEST';
+export const SIMULATED_HOST_METRIC_REQUEST = 'SIMULATED_HOST_METRIC_REQUEST';
+export const SIMULATED_HOST_METRICS_SUCCESS = 'SIMULATED_HOST_METRICS_SUCCESS';
+export const SIMULATED_HOST_METRIC_SUCCESS = 'SIMULATED_HOST_METRIC_SUCCESS';
+export const SIMULATED_HOST_METRICS_FAILURE = 'SIMULATED_HOST_METRICS_FAILURE';
+export const SIMULATED_HOST_METRIC_FAILURE = 'SIMULATED_HOST_METRIC_FAILURE';
+export const loadSimulatedHostMetrics = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchSimulatedHostMetrics(name));
+};
+const fetchSimulatedHostMetrics = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ SIMULATED_HOST_METRICS_REQUEST, SIMULATED_HOST_METRICS_SUCCESS, SIMULATED_HOST_METRICS_FAILURE ],
+        endpoint: `simulated-metrics/hosts`,
+        schema: Schemas.SIMULATED_HOST_METRIC_ARRAY,
+        entity: 'simulatedHostMetrics'
+      }
+      : {
+        types: [ SIMULATED_HOST_METRIC_REQUEST, SIMULATED_HOST_METRIC_SUCCESS, SIMULATED_HOST_METRIC_FAILURE ],
+        endpoint: `simulated-metrics/hosts/${name}`,
+        schema: Schemas.SIMULATED_HOST_METRIC,
+        entity: 'simulatedHostMetrics'
+      }
+});
+export const ADD_SIMULATED_HOST_METRIC = 'ADD_SIMULATED_HOST_METRIC';
+export function addSimulatedHostMetric(simulatedHostMetric: ISimulatedHostMetric): EntitiesAction {
+  return {
+    type: ADD_SIMULATED_HOST_METRIC,
+    data: { simulatedHostMetrics: new Array(simulatedHostMetric) }
+  }
+}
 
+export const SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST = 'SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST';
+export const SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS = 'SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS';
+export const SIMULATED_HOST_METRIC_CLOUD_HOSTS_FAILURE = 'SIMULATED_HOST_METRIC_CLOUD_HOSTS_FAILURE';
+export const loadSimulatedHostMetricCloudHosts = (simulatedHostMetricName: string) => (dispatch: any) => {
+  return dispatch(fetchSimulatedHostMetricCloudHosts(simulatedHostMetricName));
+};
+const fetchSimulatedHostMetricCloudHosts = (simulatedHostMetricName: string) => ({
+  [CALL_API]: {
+    types: [ SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST, SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS, SIMULATED_HOST_METRIC_CLOUD_HOSTS_FAILURE ],
+    endpoint: `simulated-metrics/hosts/${simulatedHostMetricName}/cloud-hosts`,
+    schema: Schemas.CLOUD_HOST_ARRAY,
+    entity: simulatedHostMetricName
+  }
+});
+export const ADD_SIMULATED_HOST_METRIC_CLOUD_HOSTS = 'ADD_SIMULATED_HOST_METRIC_CLOUD_HOSTS';
+export function addSimulatedHostMetricCloudHosts(simulatedHostMetricName: string, cloudHosts: string[]): EntitiesAction {
+  return {
+    type: ADD_SIMULATED_HOST_METRIC_CLOUD_HOSTS,
+    entity: simulatedHostMetricName,
+    data: { cloudHostsId: cloudHosts }
+  }
+}
+export const REMOVE_SIMULATED_HOST_METRIC_CLOUD_HOSTS = 'REMOVE_SIMULATED_HOST_METRIC_CLOUD_HOSTS';
+export function removeSimulatedHostMetricCloudHosts(simulatedHostMetricName: string, cloudHosts: string[]): EntitiesAction {
+  return {
+    type: REMOVE_SIMULATED_HOST_METRIC_CLOUD_HOSTS,
+    entity: simulatedHostMetricName,
+    data: { cloudHostsId: cloudHosts }
+  }
+}
+
+export const SIMULATED_HOST_METRIC_EDGE_HOSTS_REQUEST = 'SIMULATED_HOST_METRIC_EDGE_HOSTS_REQUEST';
+export const SIMULATED_HOST_METRIC_EDGE_HOSTS_SUCCESS = 'SIMULATED_HOST_METRIC_EDGE_HOSTS_SUCCESS';
+export const SIMULATED_HOST_METRIC_EDGE_HOSTS_FAILURE = 'SIMULATED_HOST_METRIC_EDGE_HOSTS_FAILURE';
+export const loadSimulatedHostMetricEdgeHosts = (simulatedHostMetricName: string) => (dispatch: any) => {
+  return dispatch(fetchSimulatedHostMetricEdgeHosts(simulatedHostMetricName));
+};
+const fetchSimulatedHostMetricEdgeHosts = (simulatedHostMetricName: string) => ({
+  [CALL_API]: {
+    types: [ SIMULATED_HOST_METRIC_EDGE_HOSTS_REQUEST, SIMULATED_HOST_METRIC_EDGE_HOSTS_SUCCESS, SIMULATED_HOST_METRIC_EDGE_HOSTS_FAILURE ],
+    endpoint: `simulated-metrics/hosts/${simulatedHostMetricName}/edge-hosts`,
+    schema: Schemas.EDGE_HOST_ARRAY,
+    entity: simulatedHostMetricName
+  }
+});
+export const ADD_SIMULATED_HOST_METRIC_EDGE_HOSTS = 'ADD_SIMULATED_HOST_METRIC_EDGE_HOSTS';
+export function addSimulatedHostMetricEdgeHosts(simulatedHostMetricName: string, edgeHosts: string[]): EntitiesAction {
+  return {
+    type: ADD_SIMULATED_HOST_METRIC_EDGE_HOSTS,
+    entity: simulatedHostMetricName,
+    data: { edgeHostsHostname: edgeHosts }
+  }
+}
+export const REMOVE_SIMULATED_HOST_METRIC_EDGE_HOSTS = 'REMOVE_SIMULATED_HOST_METRIC_EDGE_HOSTS';
+export function removeSimulatedHostMetricEdgeHosts(simulatedHostMetricName: string, edgeHosts: string[]): EntitiesAction {
+  return {
+    type: REMOVE_SIMULATED_HOST_METRIC_EDGE_HOSTS,
+    entity: simulatedHostMetricName,
+    data: { edgeHostsHostname: edgeHosts }
+  }
+}
+
+export const SIMULATED_SERVICE_METRICS_REQUEST = 'SIMULATED_SERVICE_METRICS_REQUEST';
+export const SIMULATED_SERVICE_METRIC_REQUEST = 'SIMULATED_SERVICE_METRIC_REQUEST';
+export const SIMULATED_SERVICE_METRICS_SUCCESS = 'SIMULATED_SERVICE_METRICS_SUCCESS';
+export const SIMULATED_SERVICE_METRIC_SUCCESS = 'SIMULATED_SERVICE_METRIC_SUCCESS';
+export const SIMULATED_SERVICE_METRICS_FAILURE = 'SIMULATED_SERVICE_METRICS_FAILURE';
+export const SIMULATED_SERVICE_METRIC_FAILURE = 'SIMULATED_SERVICE_METRIC_FAILURE';
+export const loadSimulatedServiceMetrics = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchSimulatedServiceMetrics(name));
+};
+const fetchSimulatedServiceMetrics = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ SIMULATED_SERVICE_METRICS_REQUEST, SIMULATED_SERVICE_METRICS_SUCCESS, SIMULATED_SERVICE_METRICS_FAILURE ],
+        endpoint: `simulated-metrics/hosts`,
+        schema: Schemas.SIMULATED_SERVICE_METRIC_ARRAY,
+        entity: 'simulatedServiceMetrics'
+      }
+      : {
+        types: [ SIMULATED_SERVICE_METRIC_REQUEST, SIMULATED_SERVICE_METRIC_SUCCESS, SIMULATED_SERVICE_METRIC_FAILURE ],
+        endpoint: `simulated-metrics/hosts/${name}`,
+        schema: Schemas.SIMULATED_SERVICE_METRIC,
+        entity: 'simulatedServiceMetrics'
+      }
+});
+export const ADD_SIMULATED_SERVICE_METRIC = 'ADD_SIMULATED_SERVICE_METRIC';
+export function addSimulatedServiceMetric(simulatedServiceMetric: ISimulatedServiceMetric): EntitiesAction {
+  return {
+    type: ADD_SIMULATED_SERVICE_METRIC,
+    data: { simulatedServiceMetrics: new Array(simulatedServiceMetric) }
+  }
+}
+
+export const SIMULATED_SERVICE_METRIC_SERVICES_REQUEST = 'SIMULATED_SERVICE_METRIC_SERVICES_REQUEST';
+export const SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS = 'SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS';
+export const SIMULATED_SERVICE_METRIC_SERVICES_FAILURE = 'SIMULATED_SERVICE_METRIC_SERVICES_FAILURE';
+export const loadSimulatedServiceMetricServices = (simulatedServiceMetricName: string) => (dispatch: any) => {
+  return dispatch(fetchSimulatedServiceMetricServices(simulatedServiceMetricName));
+};
+const fetchSimulatedServiceMetricServices = (simulatedServiceMetricName: string) => ({
+  [CALL_API]: {
+    types: [ SIMULATED_SERVICE_METRIC_SERVICES_REQUEST, SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS, SIMULATED_SERVICE_METRIC_SERVICES_FAILURE ],
+    endpoint: `simulated-metrics/services/${simulatedServiceMetricName}/services`,
+    schema: Schemas.SERVICE_ARRAY,
+    entity: simulatedServiceMetricName
+  }
+});
+export const ADD_SIMULATED_SERVICE_METRIC_SERVICES = 'ADD_SIMULATED_SERVICE_METRIC_SERVICES';
+export function addSimulatedServiceMetricServices(simulatedServiceMetricName: string, services: string[]): EntitiesAction {
+  return {
+    type: ADD_SIMULATED_SERVICE_METRIC_SERVICES,
+    entity: simulatedServiceMetricName,
+    data: { serviceNames: services }
+  }
+}
+export const REMOVE_SIMULATED_SERVICE_METRIC_SERVICES = 'REMOVE_SIMULATED_SERVICE_METRIC_SERVICES';
+export function removeSimulatedServiceMetricServices(simulatedServiceMetricName: string, services: string[]): EntitiesAction {
+  return {
+    type: REMOVE_SIMULATED_SERVICE_METRIC_SERVICES,
+    entity: simulatedServiceMetricName,
+    data: { serviceNames: services }
+  }
+}
 
 export const REGIONS_REQUEST = 'REGIONS_REQUEST';
 export const REGIONS_SUCCESS = 'REGIONS_SUCCESS';

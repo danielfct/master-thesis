@@ -81,7 +81,7 @@ class Navbar extends React.Component<Props, {}> {
                               <i className="material-icons">menu</i>
                             </a>}
                             <ul className="left">
-                                <li style={showSidenav && !loggingIn ? { paddingLeft: '200px', marginRight: "24px" } : { margin: "0 24px" } }>
+                                <li style={showSidenav && !loggingIn ? { paddingLeft: '210px', marginRight: "24px" } : { margin: "0 24px" } }>
                                     <Link className="transparent brand-logo" to={"/home"}>
                                         <img src={logo} alt=""/>
                                         Web Manager

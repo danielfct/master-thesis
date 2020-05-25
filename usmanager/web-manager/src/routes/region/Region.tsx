@@ -198,7 +198,7 @@ class Region extends BaseComponent<Props, State> {
     )
   };
 
-  private tabs: Tab[] = [
+  private tabs = () => [
     {
       title: 'Region',
       id: 'region',
@@ -210,7 +210,7 @@ class Region extends BaseComponent<Props, State> {
     return (
       <MainLayout>
         <div className="container">
-          <Tabs {...this.props} tabs={this.tabs}/>
+          <Tabs {...this.props} tabs={this.tabs()}/>
         </div>
       </MainLayout>
     );

@@ -320,7 +320,7 @@ class CloudHost extends BaseComponent<Props, State> {
   private genericRules = (): JSX.Element =>
     <GenericHostRuleList/>;
 
-  private tabs: Tab[] = [
+  private tabs = () => [
     {
       title: 'Cloud host',
       id: 'cloudHost',
@@ -343,7 +343,7 @@ class CloudHost extends BaseComponent<Props, State> {
       <MainLayout>
         {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
-          <Tabs {...this.props} tabs={this.tabs}/>
+          <Tabs {...this.props} tabs={this.tabs()}/>
         </div>
       </MainLayout>
     );

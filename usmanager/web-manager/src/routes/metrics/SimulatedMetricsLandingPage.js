@@ -30,10 +30,10 @@ export default class SimulatedMetricsLandingPage extends React.Component {
   constructor (props) {
     super(props);
     const simulatedMetricsLinks = [
-      { name: 'IService simulated metrics', link: '/metrics/simulated/services' },
-      { name: 'Container simulated metrics', link: '/metrics/simulated/containers' },
-      { name: 'Default cloudHost simulated metrics', link: '/metrics/simulated/hosts/default' },
-      { name: 'Specific cloudHost simulated metrics', link: '/metrics/simulated/hosts/specific' }
+      { name: 'Service simulated metrics', link: '/simulated-metrics/services' },
+      { name: 'Container simulated metrics', link: '/simulated-metrics/containers' },
+      { name: 'Default host simulated metrics', link: '/simulated-metrics/hosts/default' },
+      { name: 'Specific host simulated metrics', link: '/simulated-metrics/hosts/specific' }
     ];
     this.state = { links: simulatedMetricsLinks, loading: false };
   }

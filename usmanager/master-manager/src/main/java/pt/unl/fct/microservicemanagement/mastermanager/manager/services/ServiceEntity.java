@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
@@ -120,6 +121,11 @@ public class ServiceEntity {
   @JsonIgnore
   @ManyToMany(mappedBy = "services", cascade = CascadeType.ALL)
   private Set<ServiceRuleEntity> rules;
+
+  @Singular
+  @JsonIgnore
+  @ManyToMany(mappedBy = "services", cascade = CascadeType.ALL)
+  private Set<SimulatedServiceMetricEntity> simulatedServiceMetrics;
 
   public boolean hasLaunchCommand() {
     return launchCommand != null && !launchCommand.isBlank();

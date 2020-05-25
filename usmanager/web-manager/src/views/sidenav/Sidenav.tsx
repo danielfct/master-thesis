@@ -45,7 +45,11 @@ const sidenavLinks = [
             { link: '/services', name: 'Service rules' },
             { link: '/conditions', name: 'Conditions' }
         ] },
-    { link: '/metrics/simulated', name: 'Simulated metrics' },
+    { link: '/simulated-metrics', name: 'Simulated metrics', sub: [
+            { link: '/hosts', name: 'Host metrics' },
+            { link: '/services', name: 'Service metrics' },
+            { link: '/containers', name: 'Container metrics' }
+        ] },
     { link: '/regions', name: 'Regions' },
     { link: '/load-balancers', name: 'Load balancers' },
     { link: '/eureka-servers', name: 'Eureka servers' },
