@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsService;
@@ -49,7 +48,8 @@ public class CloudHostsService {
   private final AwsService awsService;
   private final HostRulesService hostRulesService;
 
-  public CloudHostsService(CloudHostRepository cloudHosts, @Lazy AwsService awsService,
+  public CloudHostsService(CloudHostRepository cloudHosts,
+                           @Lazy AwsService awsService,
                            @Lazy HostRulesService hostRulesService) {
     this.cloudHosts = cloudHosts;
     this.awsService = awsService;
@@ -125,8 +125,23 @@ public class CloudHostsService {
     cloudHosts.delete(cloudHost);
   }
 
-  public boolean hasCloudHost(String instanceId) {
-    return cloudHosts.hasCloudHost(instanceId);
+  public List<CloudHostEntity> reloadCloudInstances() {
+    cloudHosts.deleteAll();  //TODO cant delete all or else all associations are lost
+    List<CloudHostEntity> instances = new LinkedList<>();
+    awsService.getSimpleInstances().forEach(instance -> {
+      if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()) {
+        var cloudHost = CloudHostEntity.builder()
+            .instanceId(instance.getInstanceId())
+            .imageId(instance.getImageId())
+            .instanceType(instance.getInstanceType())
+            .state(instance.getState())
+            .publicDnsName(instance.getPublicDnsName())
+            .publicIpAddress(instance.getPublicIpAddress())
+            .build();
+        instances.add(cloudHosts.save(cloudHost));
+      }
+    });
+    return instances;
   }
 
   public List<HostRuleEntity> getRules(String instanceId) {
@@ -149,6 +164,10 @@ public class CloudHostsService {
     hostRulesService.removeCloudHost(ruleName, instanceId);
   }
 
+  public boolean hasCloudHost(String instanceId) {
+    return cloudHosts.hasCloudHost(instanceId);
+  }
+
   public void removeRules(String instanceId, List<String> ruleNames) {
     assertHostExists(instanceId);
     ruleNames.forEach(rule -> hostRulesService.removeCloudHost(rule, instanceId));
@@ -158,25 +177,5 @@ public class CloudHostsService {
     if (!hasCloudHost(instanceId)) {
       throw new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId);
     }
-  }
-
-  public List<CloudHostEntity> reloadCloudInstances() {
-    cloudHosts.deleteAll();
-    List<CloudHostEntity> instances = new LinkedList<>();
-    awsService.getSimpleInstances().forEach(instance -> {
-      if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()) {
-        var cloudHost = CloudHostEntity.builder()
-            .instanceId(instance.getInstanceId())
-            .imageId(instance.getImageId())
-            .instanceType(instance.getInstanceType())
-            .state(instance.getState())
-            .publicDnsName(instance.getPublicDnsName())
-            .publicIpAddress(instance.getPublicIpAddress())
-            .build();
-        instances.add(cloudHosts.save(cloudHost));
-      }
-    });
-    System.out.println(instances);
-    return instances;
   }
 }

@@ -8,18 +8,37 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
+
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 
 @Repository
-public interface DefaultHostSimulatedMetricsRepository extends CrudRepository<SimulatedHostMetricEntity, Long> {
+public interface ContainerRepository extends CrudRepository<ContainerEntity, Long> {
 
-  List<SimulatedHostMetricEntity> findByField(@Param("field") String field);
+  Optional<ContainerEntity> findByContainerId(@Param("containerId") String containerId);
+
+  @Query("select r "
+      + "from ContainerEntity c join c.containerRules r "
+      + "where r.generic = false and c.containerId = :containerId")
+  List<ContainerRuleEntity> getRules(@Param("containerId") String containerId);
+
+  /*@Query("select r "
+      + "from ContainerEntity c join c.simulatedMetrics m "
+      + "where m.generic = false and c.containerId = :containerId")
+  List<ContainerSimulatedMetricEntity> getSimulatedMetrics(@Param("containerId") String containerId);*/
+
+  @Query("select case when count(c) > 0 then true else false end "
+      + "from ContainerEntity c "
+      + "where c.containerId = :containerId")
+  boolean hasContainer(@Param("containerId") String containerId);
+
 
 }

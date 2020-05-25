@@ -28,6 +28,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
@@ -74,7 +75,9 @@ public class DatabaseLoader {
                                  ComponentTypeRepository componentTypes, OperatorRepository operators,
                                  DecisionRepository decisions, FieldRepository fields,
                                  ValueModeRepository valueModes, ConditionRepository conditions,
-                                 HostRuleRepository hostRules, CloudHostsService cloudHostsService) {
+                                 HostRuleRepository hostRules,
+                                 DockerContainersService dockerContainersService,
+                                 CloudHostsService cloudHostsService) {
     return args -> {
 
       // users
@@ -621,6 +624,9 @@ public class DatabaseLoader {
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(rabbitmqEurekaServerDependency);
+
+      // containers
+      //dockerContainersService.reloadContainers(); //TODO move to after launching docker api proxy
 
       // regions
       var usEast1 = RegionEntity.builder()

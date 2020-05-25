@@ -10,6 +10,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts;
 
+import org.springframework.stereotype.Repository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 
@@ -20,6 +21,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+@Repository
 public interface SimulatedHostMetricsRepository extends CrudRepository<SimulatedHostMetricEntity, Long> {
 
   Optional<SimulatedHostMetricEntity> findByNameIgnoreCase(@Param("name") String name);

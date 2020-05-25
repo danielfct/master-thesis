@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
@@ -147,7 +148,6 @@ public class ServicesController {
     servicesService.removePrediction(serviceName, predictionName);
   }
 
-
   @GetMapping("/{serviceName}/rules")
   public Iterable<ServiceRuleEntity> getServiceRules(@PathVariable String serviceName) {
     return servicesService.getRules(serviceName);
@@ -167,5 +167,26 @@ public class ServicesController {
   public void removeServiceRule(@PathVariable String serviceName, @PathVariable String ruleName) {
     servicesService.removeRule(serviceName, ruleName);
   }
+
+  //TODO
+  /*@GetMapping("/{serviceName}/simulatedMetrics")
+  public Iterable<SimulatedServiceMetricEntity> getServiceSimulatedMetrics(@PathVariable String serviceName) {
+    return servicesService.getSimulatedMetrics(serviceName);
+  }
+
+  @PostMapping("/{serviceName}/simulatedMetrics")
+  public void addServiceSimulatedMetrics(@PathVariable String serviceName, @RequestBody String[] simulatedMetrics) {
+    servicesService.addSimulatedMetrics(serviceName, Arrays.asList(simulatedMetrics));
+  }
+
+  @DeleteMapping("/{serviceName}/simulatedMetrics")
+  public void removeServiceSimulatedMetrics(@PathVariable String serviceName, @RequestBody String[] simulatedMetrics) {
+    servicesService.removeSimulatedMetrics(serviceName, Arrays.asList(simulatedMetrics));
+  }
+
+  @DeleteMapping("/{serviceName}/simulatedMetrics/{simulatedMetricName}")
+  public void removeServiceSimulatedMetric(@PathVariable String serviceName, @PathVariable String simulatedMetricName) {
+    servicesService.removeSimulatedMetric(serviceName, simulatedMetricName);
+  }*/
 
 }

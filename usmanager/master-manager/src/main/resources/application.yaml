@@ -35,8 +35,8 @@ aws:
     type: t2.micro
 container:
   database:
-    deploy-delay: 5
-  delay-before-stop: 45
+    deploy-delay: 5000
+  delay-before-stop: 45000
   migrate-container-on-event-count: 2
   monitor-period: 60000
   replicate-container-on-event-count: 2

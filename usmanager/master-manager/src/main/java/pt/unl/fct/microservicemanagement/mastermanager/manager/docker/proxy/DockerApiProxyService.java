@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
@@ -38,6 +39,7 @@ public class DockerApiProxyService {
 
   public static final String DOCKER_API_PROXY = "docker-api-proxy";
 
+  private final DockerContainersService dockerContainersService;
   private final ServicesService serviceService;
   private final SshService sshService;
 
@@ -45,8 +47,10 @@ public class DockerApiProxyService {
   private final String dockerApiProxyPassword;
   private final String dockerHubUsername;
 
-  public DockerApiProxyService(ServicesService serviceService, SshService sshService,
+  public DockerApiProxyService(DockerContainersService dockerContainersService, ServicesService serviceService,
+                               SshService sshService,
                                DockerProperties dockerProperties) {
+    this.dockerContainersService = dockerContainersService;
     this.serviceService = serviceService;
     this.sshService = sshService;
     this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
@@ -72,7 +76,11 @@ public class DockerApiProxyService {
         serviceName, dockerRepository, dockerRepository, externalPort, internalPort,
         dockerApiProxyUsername, dockerApiProxyPassword, serviceName, serviceType, hostname, externalPort,
         hostname, false, false, dockerRepository);
+    //TODO use launchContainer instead
     CommandResult commandResult = sshService.execCommand(hostname, "launchDockerApiProxy", command);
+
+    dockerContainersService.launchSingletonService(hostname)
+
     if (!commandResult.isSuccessful()) {
       throw new MasterManagerException("Unsuccessful launch of docker api proxy on host %s: %s", hostname,
           commandResult.getError());

@@ -29,6 +29,8 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.Cloud
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
@@ -144,6 +146,27 @@ public class HostsController {
     cloudHostsService.removeRule(instanceId, ruleName);
   }
 
+/*  @GetMapping("/cloud/{instanceId}/simulatedMetrics")
+  public Iterable<SimulatedHostMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
+    return cloudHostsService.getSimulatedMetrics(instanceId);
+  }
+
+  @PostMapping("/cloud/{instanceId}/simulatedMetrics")
+  public void addCloudHostSimulatedMetrics(@PathVariable String instanceId, @RequestBody String[] simulatedMetrics) {
+    cloudHostsService.addSimulatedMetrics(instanceId, Arrays.asList(simulatedMetrics));
+  }
+
+  @DeleteMapping("/cloud/{instanceId}/simulatedMetrics")
+  public void removeCloudHostSimulatedMetrics(@PathVariable String instanceId, @RequestBody String[] simulatedMetrics) {
+    cloudHostsService.removeSimulatedMetrics(instanceId, Arrays.asList(simulatedMetrics));
+  }
+
+  @DeleteMapping("/cloud/{instanceId}/simulatedMetrics/{simulatedMetricName}")
+  public void removeCloudHostSimulatedMetric(@PathVariable String instanceId,
+                                             @PathVariable String simulatedMetricName) {
+    cloudHostsService.removeSimulatedMetric(instanceId, simulatedMetricName);
+  }*/
+
   @GetMapping("/edge")
   public Iterable<EdgeHostEntity> getEdgeHosts() {
     return edgeHostsService.getEdgeHosts();
@@ -190,5 +213,25 @@ public class HostsController {
   public void removeEdgeHostRule(@PathVariable String hostname, @PathVariable String ruleName) {
     edgeHostsService.removeRule(hostname, ruleName);
   }
+
+/*  @GetMapping("/edge/{hostname}/simulatedMetrics")
+  public Iterable<SimulatedHostMetricEntity> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
+    return edgeHostsService.getSimulatedMetrics(hostname);
+  }
+
+  @PostMapping("/edge/{hostname}/simulatedMetrics")
+  public void addEdgeHostSimulatedMetrics(@PathVariable String hostname, @RequestBody String[] simulatedMetrics) {
+    edgeHostsService.addSimulatedMetrics(hostname, Arrays.asList(simulatedMetrics));
+  }
+
+  @DeleteMapping("/edge/{hostname}/simulatedMetrics")
+  public void removeEdgeHostSimulatedMetrics(@PathVariable String hostname, @RequestBody String[] simulatedMetrics) {
+    edgeHostsService.removeSimulatedMetrics(hostname, Arrays.asList(simulatedMetrics));
+  }
+
+  @DeleteMapping("/edge/{hostname}/simulatedMetrics/{simulatedMetricName}")
+  public void removeEdgeHostSimulatedMetric(@PathVariable String hostname, @PathVariable String simulatedMetricName) {
+    edgeHostsService.removeSimulatedMetric(hostname, simulatedMetricName);
+  }*/
 
 }

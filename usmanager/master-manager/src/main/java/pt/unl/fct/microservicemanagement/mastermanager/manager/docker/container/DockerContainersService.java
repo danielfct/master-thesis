@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.stereotype.Service;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
@@ -86,6 +87,7 @@ public class DockerContainersService {
   private final EurekaService eurekaService;
   private final HostsService hostsService;
   private final SshService sshService;
+  private final ContainersService containersService;
 
   private final String dockerHubUsername;
   private final int dockerDelayBeforeStopContainer;
@@ -96,7 +98,9 @@ public class DockerContainersService {
                                  @Lazy NginxLoadBalancerService nginxLoadBalancerService,
                                  @Lazy EurekaService eurekaService, @Lazy HostsService hostsService,
                                  SshService sshService,
-                                 DockerProperties dockerProperties, ContainerProperties containerProperties) {
+                                 ContainersService containersService,
+                                 DockerProperties dockerProperties,
+                                 ContainerProperties containerProperties) {
     this.dockerCoreService = dockerCoreService;
     this.nodesService = nodesService;
     this.appsService = appsService;
@@ -105,6 +109,7 @@ public class DockerContainersService {
     this.eurekaService = eurekaService;
     this.hostsService = hostsService;
     this.sshService = sshService;
+    this.containersService = containersService;
     this.dockerHubUsername = dockerProperties.getHub().getUsername();
     this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
   }
@@ -273,14 +278,16 @@ public class DockerContainersService {
         : containerBuilder.cmd(launchCommand.split(" ")).build();
     try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
       dockerClient.pull(dockerRepository);
-      ContainerCreation container = dockerClient.createContainer(containerConfig, containerName);
-      String containerId = container.id();
+      ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
+      String containerId = containerCreation.id();
       dockerClient.startContainer(containerId);
       if (Objects.equals(serviceType, "frontend")) {
         nginxLoadBalancerService.addToLoadBalancer(
             hostname, serviceName, serviceAddr, continent, region, country, city);
       }
-      return getContainer(containerId);
+      SimpleContainer container = getContainer(containerId);
+      containersService.addContainerFromDockerContainer(container);
+      return container;
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
@@ -454,8 +461,7 @@ public class DockerContainersService {
           stopContainer(containerId);
         }
       }
-    }, TimeUnit.SECONDS.toMillis(dockerDelayBeforeStopContainer));
-    //TODO change delay from seconds to milliseconds
+    }, dockerDelayBeforeStopContainer);
     return replicaContainer;
   }
 
@@ -472,9 +478,8 @@ public class DockerContainersService {
       return dockerClient.listContainers(filter).stream().map(this::buildSimpleContainer).collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
-      //TODO throw error?
+      throw new MasterManagerException(e.getMessage());
     }
-    return Collections.emptyList();
   }
 
   public Optional<SimpleContainer> findContainer(String hostname, DockerClient.ListContainersParam... filter) {
@@ -561,5 +566,7 @@ public class DockerContainersService {
     }
     return new SimpleContainer(id, created, names, image, command, state, status, hostname, ports, labels, logs);
   }
+
+
 
 }

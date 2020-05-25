@@ -22,16 +22,15 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -40,6 +39,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -53,6 +53,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -60,8 +61,8 @@ import lombok.Singular;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "conditions")
-public class ConditionEntity {
+@Table(name = "container_rules")
+public class ContainerRuleEntity {
 
   @Id
   @GeneratedValue
@@ -71,44 +72,33 @@ public class ConditionEntity {
   @Column(unique = true)
   private String name;
 
-  @ManyToOne
-  @JoinColumn(name = "value_mode_id")
-  private ValueModeEntity valueMode;
+  private int priority;
+
+  private boolean generic;
 
   @ManyToOne
-  @JoinColumn(name = "field_id")
-  private FieldEntity field;
-
-  @ManyToOne
-  @JoinColumn(name = "operator_id")
-  private OperatorEntity operator;
-
-  private double value;
+  @JoinColumn(name = "decision_id")
+  private DecisionEntity decision;
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<HostRuleConditionEntity> hostRuleConditions = new HashSet<>();
+  @ManyToMany(cascade = CascadeType.ALL)
+  private List<ContainerEntity> containers;
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceRuleConditionEntity> serviceConditions = new HashSet<>();
-
-  @Singular
-  @JsonIgnore
-  @OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ContainerRuleConditionEntity> containerConditions = new HashSet<>();
+  @OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ContainerRuleConditionEntity> conditions = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ConditionEntity)) {
+    if (!(o instanceof ContainerRuleEntity)) {
       return false;
     }
-    ConditionEntity other = (ConditionEntity) o;
+    ContainerRuleEntity other = (ContainerRuleEntity) o;
     return id != null && id.equals(other.getId());
   }
 

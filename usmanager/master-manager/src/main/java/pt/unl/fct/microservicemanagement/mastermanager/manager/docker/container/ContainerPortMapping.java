@@ -24,10 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public final class ContainerPortMapping {
+public final class ContainerPortMapping implements Serializable {
 
   private final int privatePort;
   private final int publicPort;

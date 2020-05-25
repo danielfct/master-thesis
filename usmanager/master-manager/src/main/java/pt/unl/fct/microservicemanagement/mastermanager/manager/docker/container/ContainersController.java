@@ -27,11 +27,16 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container
 import com.spotify.docker.client.DockerClient;
 import net.minidev.json.JSONArray;
 import org.springframework.web.bind.annotation.RequestParam;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,18 +57,21 @@ public class ContainersController {
   //TODO substituir os reqs por objetos, ou @JsonValue annotation
 
   private final DockerContainersService dockerContainersService;
+  private final ContainersService containersService;
   private final EurekaService eurekaService;
   private final NginxLoadBalancerService nginxLoadBalancerService;
 
   public ContainersController(DockerContainersService dockerContainersService,
+                              ContainersService containersService,
                               EurekaService eurekaService,
                               NginxLoadBalancerService nginxLoadBalancerService) {
     this.dockerContainersService = dockerContainersService;
+    this.containersService = containersService;
     this.eurekaService = eurekaService;
     this.nginxLoadBalancerService = nginxLoadBalancerService;
   }
 
-  @GetMapping
+  @GetMapping("/docker")
   public List<SimpleContainer> getContainers(@RequestParam(required = false) String serviceName) {
     List<SimpleContainer> containers;
     if (serviceName != null) {
@@ -75,32 +83,33 @@ public class ContainersController {
     return containers;
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/docker/{id}")
   public SimpleContainer getContainer(@PathVariable String id) {
     return dockerContainersService.getContainer(id);
   }
 
-  @PostMapping
+  @PostMapping("/docker")
   public SimpleContainer launchContainer(@Json String hostname, @Json String service,
                                          @Json String internalPort, @Json String externalPort) {
     return dockerContainersService.launchContainer(hostname, service, internalPort, externalPort);
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/docker/{id}")
   public void stopContainer(@PathVariable String id) {
     dockerContainersService.stopContainer(id);
   }
 
-  @PostMapping("/{id}/replicate")
+  @PostMapping("/docker/{id}/replicate")
   public SimpleContainer replicateContainer(@PathVariable String id, @Json String hostname) {
     return dockerContainersService.replicateContainer(id, hostname);
   }
 
-  @PostMapping("/{id}/migrate")
+  @PostMapping("/docker/{id}/migrate")
   public SimpleContainer migrateContainer(@PathVariable String id, @Json String hostname) {
     return dockerContainersService.migrateContainer(id, hostname);
   }
 
+  //TODO move to app controller
   //FIXME add appId to launchAppReq
   @PostMapping("/app/{appId}")
   public Map<String, List<SimpleContainer>> launchApp(@PathVariable long appId,
@@ -120,5 +129,56 @@ public class ContainersController {
   public List<SimpleContainer> launchEureka(@Json JSONArray regions) {
     return eurekaService.launchEurekaServers(regions.toArray(new String[0]));
   }
+
+  @GetMapping
+  public Iterable<ContainerEntity> getCont() {
+    return containersService.getContainers();
+  }
+
+  @PostMapping("/reload")
+  public List<ContainerEntity> reloadContainers() {
+    return containersService.reloadContainers();
+  }
+
+  @GetMapping("/{containerId}/rules")
+  public List<ContainerRuleEntity> addContainerRule(@PathVariable String containerId) {
+    return containersService.getRules(containerId);
+  }
+
+  @PostMapping("/{containerId}/rules")
+  public void addContainerRules(@PathVariable String containerId, @RequestBody String[] rules) {
+    containersService.addRules(containerId, Arrays.asList(rules));
+  }
+
+  @DeleteMapping("/{containerId}/rules")
+  public void removeContainerRules(@PathVariable String containerId, @RequestBody String[] rules) {
+    containersService.removeRules(containerId, Arrays.asList(rules));
+  }
+
+  @DeleteMapping("/{containerId}/rules/{ruleName}")
+  public void removeContainerRule(@PathVariable String containerId, @PathVariable String ruleName) {
+    containersService.removeRule(containerId, ruleName);
+  }
+
+/*  @GetMapping("/{containerId}/simulatedMetrics")
+  public Iterable<SimulatedContainerMetricEntity> getContainerSimulatedMetrics(@PathVariable String containerId) {
+    return containersService.getSimulatedMetrics(containerId);
+  }
+
+  @PostMapping("/{containerId}/simulatedMetrics")
+  public void addContainerSimulatedMetrics(@PathVariable String containerId, @RequestBody String[] simulatedMetrics) {
+    containersService.addSimulatedMetrics(containerId, Arrays.asList(simulatedMetrics));
+  }
+
+  @DeleteMapping("/{containerId}/simulatedMetrics")
+  public void removeContainerSimulatedMetrics(@PathVariable String containerId,
+                                              @RequestBody String[] simulatedMetrics) {
+    containersService.removeSimulatedMetrics(containerId, Arrays.asList(simulatedMetrics));
+  }
+
+  @DeleteMapping("/{containerId}/simulatedMetrics/{simulatedMetricName}")
+  public void removeContainerSimulatedMetric(@PathVariable String containerId, @PathVariable String simulatedMetricName) {
+    containersService.removeSimulatedMetric(containerId, simulatedMetricName);
+  }*/
 
 }

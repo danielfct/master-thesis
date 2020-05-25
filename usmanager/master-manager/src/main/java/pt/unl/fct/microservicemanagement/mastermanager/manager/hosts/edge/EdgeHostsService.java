@@ -91,10 +91,6 @@ public class EdgeHostsService {
     return edgeHosts.findByCountry(country);
   }
 
-  public boolean hasEdgeHost(String hostname) {
-    return edgeHosts.hasEdgeHost(hostname);
-  }
-
   public List<HostRuleEntity> getRules(String hostname) {
     assertHostExists(hostname);
     return edgeHosts.getRules(hostname);
@@ -118,6 +114,10 @@ public class EdgeHostsService {
   public void removeRules(String hostname, List<String> ruleNames) {
     assertHostExists(hostname);
     ruleNames.forEach(rule -> hostRulesService.removeEdgeHost(rule, hostname));
+  }
+
+  public boolean hasEdgeHost(String hostname) {
+    return edgeHosts.hasEdgeHost(hostname);
   }
 
   private void assertHostExists(String hostname) {
