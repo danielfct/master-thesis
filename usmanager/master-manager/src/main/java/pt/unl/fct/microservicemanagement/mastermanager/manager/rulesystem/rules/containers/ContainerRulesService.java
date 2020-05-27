@@ -46,7 +46,7 @@ public class ContainerRulesService {
     lastUpdateContainerRules.getAndSet(currentTime);
   }*/
 
-  public Iterable<ContainerRuleEntity> getRules() {
+  public List<ContainerRuleEntity> getRules() {
     return rules.findAll();
   }
 

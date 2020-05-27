@@ -29,6 +29,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceE
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -101,7 +102,7 @@ public class ServiceRuleEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

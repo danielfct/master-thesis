@@ -45,6 +45,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -101,7 +102,7 @@ public class EdgeHostEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

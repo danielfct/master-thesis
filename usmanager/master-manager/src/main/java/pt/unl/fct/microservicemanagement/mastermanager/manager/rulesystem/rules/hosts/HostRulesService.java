@@ -59,7 +59,7 @@ public class HostRulesService {
     lastUpdateHostRules.getAndSet(currentTime);
   }
 
-  public Iterable<HostRuleEntity> getRules() {
+  public List<HostRuleEntity> getRules() {
     return rules.findAll();
   }
 

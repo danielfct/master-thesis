@@ -10,22 +10,22 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ContainerRepository extends CrudRepository<ContainerEntity, Long> {
+public interface ContainerRepository extends JpaRepository<ContainerEntity, Long> {
 
   Optional<ContainerEntity> findByContainerId(@Param("containerId") String containerId);
+
+  List<ContainerEntity> findByHostname(String hostname);
 
   @Query("select r "
       + "from ContainerEntity c join c.containerRules r "
@@ -41,6 +41,5 @@ public interface ContainerRepository extends CrudRepository<ContainerEntity, Lon
       + "from ContainerEntity c "
       + "where c.containerId = :containerId")
   boolean hasContainer(@Param("containerId") String containerId);
-
 
 }

@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -95,7 +96,7 @@ public class ServiceMonitoring {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

@@ -28,8 +28,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostRepository;
@@ -77,7 +75,6 @@ public class DatabaseLoader {
                                  DecisionRepository decisions, FieldRepository fields,
                                  ValueModeRepository valueModes, ConditionRepository conditions,
                                  HostRuleRepository hostRules,
-                                 DockerContainersService dockerContainersService,
                                  CloudHostsService cloudHostsService) {
     return args -> {
 

@@ -376,7 +376,7 @@ _________________________________________________________ -->
 			else {
 				location.reload();
 			}
-		}
+		};
 		next();
 	}
 
@@ -461,7 +461,7 @@ _________________________________________________________ -->
         $.getJSON('/address', function(data) {
             if (data.status_code !== 500) {
                 var text = data.number + " ";
-                text += data.street
+                text += data.street;
                 text += "</br>";
                 text += data.city;
                 text += "</br>";

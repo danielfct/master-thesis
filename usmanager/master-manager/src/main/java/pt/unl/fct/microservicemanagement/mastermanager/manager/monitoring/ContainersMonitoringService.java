@@ -25,9 +25,9 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
@@ -71,7 +71,7 @@ public class ContainersMonitoringService {
 
   private final ContainerMonitoringRepository containersMonitoring;
 
-  private final DockerContainersService dockerContainersService;
+  private final ContainersService containersService;
   private final ServicesService servicesService;
   private final ServiceRulesService serviceRulesService;
   private final ServicesEventsService servicesEventsService;
@@ -87,7 +87,7 @@ public class ContainersMonitoringService {
   private final int migrateContainerOnEventCount;
 
   public ContainersMonitoringService(ContainerMonitoringRepository containersMonitoring,
-                                     DockerContainersService dockerContainersService,
+                                     ContainersService containersService,
                                      ServicesService servicesService, ServiceRulesService serviceRulesService,
                                      ServicesEventsService servicesEventsService, HostsService hostsService,
                                      LocationRequestService requestLocationMonitoringService,
@@ -96,7 +96,7 @@ public class ContainersMonitoringService {
                                      TestLogsService testLogsService,
                                      ContainerProperties containerProperties) {
     this.containersMonitoring = containersMonitoring;
-    this.dockerContainersService = dockerContainersService;
+    this.containersService = containersService;
     this.servicesService = servicesService;
     this.serviceRulesService = serviceRulesService;
     this.servicesEventsService = servicesEventsService;
@@ -113,7 +113,7 @@ public class ContainersMonitoringService {
 
   //TODO rename methods to container
 
-  public Iterable<ServiceMonitoring> getMonitoringServiceLogs() {
+  public List<ServiceMonitoring> getMonitoringServiceLogs() {
     return containersMonitoring.findAll();
   }
 
@@ -176,10 +176,10 @@ public class ContainersMonitoringService {
   private void monitorContainersTask(int secondsFromLastRun) {
     log.info("Starting container monitoring task...");
     var servicesDecisions = new HashMap<String, List<ServiceDecisionResult>>();
-    List<SimpleContainer> containers = dockerContainersService.getAppContainers();
-    for (SimpleContainer container : containers) {
+    List<ContainerEntity> containers = containersService.getAppContainers();
+    for (ContainerEntity container : containers) {
       log.info("On {}", container);
-      String containerId = container.getId();
+      String containerId = container.getContainerId();
       String serviceName = container.getLabels().get(ContainerConstants.Label.SERVICE_NAME);
       String serviceHostname = container.getHostname();
       Map<String, Double> newFields = getContainerStats(container, secondsFromLastRun);
@@ -325,7 +325,7 @@ public class ContainersMonitoringService {
   }
 
   private void startContainer(ServiceDecisionResult topPriorityContainerDecision,
-                              final Map<String, HostDetails> servicesLocationsRegions) {
+                              Map<String, HostDetails> servicesLocationsRegions) {
     String containerId = topPriorityContainerDecision.getContainerId();
     String hostname = topPriorityContainerDecision.getHostname();
     String serviceName = topPriorityContainerDecision.getServiceName();
@@ -341,11 +341,10 @@ public class ContainersMonitoringService {
     }
     double serviceAvgMem = servicesService.getService(serviceName).getExpectedMemoryConsumption();
     String toHostname = hostsService.getAvailableNodeHostname(serviceAvgMem, startLocation);
-    SimpleContainer replicatedContainerId = dockerContainersService.replicateContainer(containerId, hostname,
-        toHostname);
+    ContainerEntity replicatedContainer = containersService.replicateContainer(containerId, toHostname);
     HostDetails selectedHostDetails = hostsService.getHostDetails(toHostname);
     log.info("RuleDecision executed: Replicated container '{}' of service '{}' to container '{}' "
-            + "on host '{} ({}_{}_{})'", containerId, serviceName, replicatedContainerId, toHostname,
+            + "on host '{} ({}_{}_{})'", containerId, serviceName, replicatedContainer.getId(), toHostname,
         selectedHostDetails.getRegion(), selectedHostDetails.getCountry(), selectedHostDetails.getCity());
     /*if (selectedHostDetails instanceof EdgeHostDetails) {
       final var edgeHostDetails = (EdgeHostDetails) selectedHostDetails;
@@ -363,10 +362,10 @@ public class ContainersMonitoringService {
   }
 
   private void stopContainer(ServiceDecisionResult leastPriorityContainerDecision) {
-    final var containerId = leastPriorityContainerDecision.getContainerId();
-    final var hostname = leastPriorityContainerDecision.getHostname();
-    final var serviceName = leastPriorityContainerDecision.getServiceName();
-    dockerContainersService.stopContainer(containerId, hostname);
+    String containerId = leastPriorityContainerDecision.getContainerId();
+    String hostname = leastPriorityContainerDecision.getHostname();
+    String serviceName = leastPriorityContainerDecision.getServiceName();
+    containersService.stopContainer(containerId);
     final var selectedHostDetails = hostsService.getHostDetails(hostname);
     log.info("RuleDecision executed: Stopped container '{}' of service '{}' on edge host '{} ({}_{}_{})'",
         containerId, serviceName, hostname, selectedHostDetails.getRegion(), selectedHostDetails.getCountry(),
@@ -405,13 +404,12 @@ public class ContainersMonitoringService {
 
   //TODO from containerMetricsService
 
-
-  Map<String, Double> getContainerStats(SimpleContainer container, double secondsInterval) {
-    String containerId = container.getId();
+  Map<String, Double> getContainerStats(ContainerEntity container, double secondsInterval) {
+    String containerId = container.getContainerId();
     String containerHostname = container.getHostname();
     String containerName = container.getNames().get(0);
     String serviceName = container.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, containerName);
-    ContainerStats containerStats = dockerContainersService.getContainerStats(containerId, containerHostname);
+    ContainerStats containerStats = containersService.getContainerStats(containerId, containerHostname);
     CpuStats cpuStats = containerStats.cpuStats();
     CpuStats preCpuStats = containerStats.precpuStats();
     double cpu = cpuStats.cpuUsage().totalUsage().doubleValue();

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class ComponentTypesService {
@@ -16,7 +18,7 @@ public class ComponentTypesService {
     this.componentTypes = componentTypes;
   }
 
-  public Iterable<ComponentTypeEntity> getComponentTypes() {
+  public List<ComponentTypeEntity> getComponentTypes() {
     return componentTypes.findAll();
   }
 

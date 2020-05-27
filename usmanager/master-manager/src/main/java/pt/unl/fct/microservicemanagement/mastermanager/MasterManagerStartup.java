@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.ContainersMonitoringService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.HostsMonitoringService;
@@ -43,10 +44,10 @@ public class MasterManagerStartup implements ApplicationListener<ApplicationRead
   private final HostsMonitoringService hostsMonitoringService;
   private final MasterManagerMonitoringService masterManagerMonitoringService;
 
-  public MasterManagerStartup(HostsService hostsService,
-                              ContainersMonitoringService containersMonitoringService,
-                              HostsMonitoringService hostsMonitoringService,
-                              MasterManagerMonitoringService masterManagerMonitoringService) {
+  public MasterManagerStartup(@Lazy HostsService hostsService,
+                              @Lazy ContainersMonitoringService containersMonitoringService,
+                              @Lazy HostsMonitoringService hostsMonitoringService,
+                              @Lazy MasterManagerMonitoringService masterManagerMonitoringService) {
     this.hostsService = hostsService;
     this.containersMonitoringService = containersMonitoringService;
     this.hostsMonitoringService = hostsMonitoringService;

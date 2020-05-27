@@ -58,7 +58,7 @@ public class TestLogsService {
     }
   }
 
-  public Iterable<MonitoringServiceLogTests> getMonitoringServiceLogTests() {
+  public List<MonitoringServiceLogTests> getMonitoringServiceLogTests() {
     return testsMonitoringRepository.findAll();
   }
 

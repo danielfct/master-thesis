@@ -10,6 +10,24 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,22 +36,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Builder(toBuilder = true)
@@ -55,7 +59,8 @@ public class ContainerEntity {
   @NotNull
   private long created;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
+  @Fetch(value = FetchMode.SUBSELECT)
   private List<String> names;
 
   @NotNull
@@ -66,10 +71,12 @@ public class ContainerEntity {
   @NotNull
   private String hostname;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
+  @Fetch(value = FetchMode.SUBSELECT)
   private List<ContainerPortMapping> ports;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
+  @Fetch(value = FetchMode.SUBSELECT)
   private Map<String, String> labels;
 
   @Singular
@@ -80,6 +87,23 @@ public class ContainerEntity {
   /*@Singular
   @JsonIgnore
   @ManyToMany(mappedBy = "containers", cascade = CascadeType.ALL)
-  private Set<SimulatedContainerMetricEntity> simulatedContainerMetrics*/;
+  private Set<SimulatedContainerMetricEntity> simulatedContainerMetrics*/
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ContainerEntity)) {
+      return false;
+    }
+    ContainerEntity other = (ContainerEntity) o;
+    return id != null && id.equals(other.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getId());
+  }
 
 }

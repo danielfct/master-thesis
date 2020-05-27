@@ -10,12 +10,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx;
 
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.util.Pair;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
@@ -25,10 +26,10 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.spotify.docker.client.DockerClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -54,7 +55,7 @@ public class NginxLoadBalancerService {
   private final HttpHeaders headers;
   private final RestTemplate restTemplate;
 
-  public NginxLoadBalancerService(ContainersService containersService, HostsService hostsService,
+  public NginxLoadBalancerService(@Lazy ContainersService containersService, HostsService hostsService,
                                   ServicesService serviceService, RegionsService regionsService,
                                   NginxLoadBalancerProperties nginxLoadBalancerProperties,
                                   DockerProperties dockerProperties) {
@@ -107,11 +108,9 @@ public class NginxLoadBalancerService {
   }
 
   private List<ContainerEntity> getLoadBalancersFromService(String serviceName) {
-    Map<String, String> labels = Map.of(
-        ContainerConstants.Label.SERVICE_NAME, LOAD_BALANCER,
-        ContainerConstants.Label.FOR_SERVICE, serviceName
-    );
-    return containersService.getContainers(labels);
+    return containersService.getContainersWithLabels(Set.of(
+        Pair.of(ContainerConstants.Label.SERVICE_NAME, LOAD_BALANCER),
+        Pair.of(ContainerConstants.Label.FOR_SERVICE, serviceName)));
   }
 
   public void addToLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,

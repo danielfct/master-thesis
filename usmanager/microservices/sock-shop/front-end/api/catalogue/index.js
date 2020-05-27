@@ -29,7 +29,7 @@
     , request   = require("request")
     , endpoints = require("../endpoints")()
     , helpers   = require("../../helpers")
-    , app       = express()
+    , app       = express();
 
   app.get("/catalogue/images*", function (req, res, next) {
     helpers.processReqLocationHeaders(req);

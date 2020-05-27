@@ -31,6 +31,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decisi
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -104,7 +105,7 @@ public class ContainerRuleEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

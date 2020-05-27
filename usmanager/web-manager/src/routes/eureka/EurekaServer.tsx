@@ -220,10 +220,11 @@ class EurekaServer extends BaseComponent<Props, State> {
 
 }
 
-function removeFields(container: Partial<IEurekaServer>) {
-  delete container["ports"];
-  delete container["labels"];
-  delete container["logs"];
+function removeFields(eurekaServer: Partial<IEurekaServer>) {
+  delete eurekaServer["id"];
+  delete eurekaServer["ports"];
+  delete eurekaServer["labels"];
+  delete eurekaServer["logs"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {

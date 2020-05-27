@@ -232,14 +232,14 @@ _________________________________________________________ -->
                         pageSize.push(i);
                     }	
                     pageSize.push(data.size);
-                    var pageSizeHtml = "<strong>Show</strong>"
+                    var pageSizeHtml = "<strong>Show</strong>";
                     pageSize.forEach(function (p) {
                         if (size == p) {
                             pageSizeHtml = pageSizeHtml + '<a href="#" onclick=setNewPageSize(' + p + ') class="btn btn-primary btn-sm">' + p + '</a>';
                         } else {
                             pageSizeHtml = pageSizeHtml + '<a href="#" onclick=setNewPageSize(' + p + ') class="btn btn-default btn-sm">' + p + '</a>';
                         }
-                    })
+                    });
                     $('#products-number').append(pageSizeHtml);
                 });
 

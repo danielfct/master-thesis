@@ -26,13 +26,13 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes;
 
 import java.util.Optional;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface ValueModeRepository extends CrudRepository<ValueModeEntity, Long> {
+public interface ValueModeRepository extends JpaRepository<ValueModeEntity, Long> {
 
   Optional<ValueModeEntity> findByNameIgnoreCase(@Param("name") String name);
 

@@ -3,6 +3,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.logging;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class LoggingEventService {
@@ -13,7 +15,7 @@ public class LoggingEventService {
     this.loggingEvents = loggingEvents;
   }
 
-  public Iterable<LoggingEventEntity> getLogs() {
+  public List<LoggingEventEntity> getLogs() {
     return loggingEvents.findAll();
   }
 

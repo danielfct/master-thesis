@@ -30,6 +30,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condit
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionValueEntity;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -101,7 +102,7 @@ public class FieldEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

@@ -27,7 +27,7 @@ public class HostRulesController {
   }
 
   @GetMapping("/hosts")
-  public Iterable<HostRuleEntity> getHostRules() {
+  public List<HostRuleEntity> getHostRules() {
     return hostRulesService.getRules();
   }
 

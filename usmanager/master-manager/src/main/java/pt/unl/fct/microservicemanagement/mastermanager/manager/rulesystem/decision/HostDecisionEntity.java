@@ -12,6 +12,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decis
 
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -78,7 +79,7 @@ public class HostDecisionEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
@@ -32,12 +33,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HostRuleRepository extends CrudRepository<HostRuleEntity, Long> {
+public interface HostRuleRepository extends JpaRepository<HostRuleEntity, Long> {
 
   Optional<HostRuleEntity> findByNameIgnoreCase(@Param("name") String name);
 

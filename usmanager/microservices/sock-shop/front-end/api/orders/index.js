@@ -30,7 +30,7 @@
     , request   = require("request")
     , endpoints = require("../endpoints")()
     , helpers   = require("../../helpers")
-    , app       = express()
+    , app       = express();
 
   app.get("/orders", function (req, res, next) {
     console.log("Request received with body: " + JSON.stringify(req.body));

@@ -29,6 +29,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceE
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -108,7 +109,7 @@ public class ServiceEventPredictionEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

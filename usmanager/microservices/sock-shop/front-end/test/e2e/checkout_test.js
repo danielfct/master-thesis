@@ -92,7 +92,7 @@
       this.waitForText("My orders", function() {
         test.pass("user is taken to the orders page");
       }, function() {
-        console.log("dumping page screenshot as PNG")
+        console.log("dumping page screenshot as PNG");
         var cap = casper.captureBase64("png");
         console.log(cap);
         console.log("DONE");

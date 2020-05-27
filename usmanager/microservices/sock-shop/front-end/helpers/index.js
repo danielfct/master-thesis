@@ -55,7 +55,7 @@
   /* Responds with the given body and status 200 OK  */
   helpers.respondSuccessBody = function(res, body) {
     helpers.respondStatusBody(res, 200, body);
-  }
+  };
 
   /* Public: responds with the given body and status
    *
@@ -67,13 +67,13 @@
     res.writeHeader(statusCode);
     res.write(body);
     res.end();
-  }
+  };
 
   /* Responds with the given statusCode */
   helpers.respondStatus = function(res, statusCode) {
     res.writeHeader(statusCode);
     res.end();
-  }
+  };
 
   /* Rewrites and redirects any url that doesn't end with a slash. */
   helpers.rewriteSlash = function(req, res, next) {
@@ -81,7 +81,7 @@
        res.redirect(301, req.url.slice(0, -1));
    else
        next();
-  }
+  };
 
   /* Public: performs an HTTP GET request to the given URL
    *
@@ -104,7 +104,7 @@
       if (error) return next(error);
       helpers.respondSuccessBody(res, body);
     }.bind({res: res}));
-  }
+  };
 
   /* TODO: Add documentation */
   helpers.getCustomerId = function(req, env) {
@@ -125,7 +125,7 @@
     }
 
     return req.session.customerId;
-  }
+  };
 
   helpers.processReqLocationHeaders = function(req) {  
     var continent = req.headers.xcontinentcode;
@@ -158,7 +158,7 @@
         console.log("=> Error sending location info to register-go...");
       }
     });
-  }
+  };
 
   module.exports = helpers;
 }());

@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class OperatorsService {
@@ -17,7 +19,7 @@ public class OperatorsService {
     this.operators = operators;
   }
 
-  public Iterable<OperatorEntity> getOperators() {
+  public List<OperatorEntity> getOperators() {
     return operators.findAll();
   }
 

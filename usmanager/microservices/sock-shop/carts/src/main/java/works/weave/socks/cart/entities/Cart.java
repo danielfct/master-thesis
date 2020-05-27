@@ -80,9 +80,7 @@ public class Cart {
         Cart cart = (Cart) o;
 
         if (customerId != null ? !customerId.equals(cart.customerId) : cart.customerId != null) return false;
-        if (id != null ? !id.equals(cart.id) : cart.id != null) return false;
-
-        return true;
+      return id != null ? id.equals(cart.id) : cart.id == null;
     }
 
     @Override

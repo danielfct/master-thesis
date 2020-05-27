@@ -2,7 +2,7 @@
   'use strict';
 
   var expect    = require("chai").expect
-    , endpoints = require("../../api/endpoints")
+    , endpoints = require("../../api/endpoints");
 
   describe("endpoints", function() {
     describe("catalogueUrl", function() {

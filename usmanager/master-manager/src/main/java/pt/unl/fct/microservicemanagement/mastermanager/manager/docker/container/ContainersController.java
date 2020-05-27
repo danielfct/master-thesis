@@ -24,8 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
-import net.minidev.json.JSONArray;
-import org.springframework.web.bind.annotation.RequestParam;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
@@ -33,14 +31,17 @@ import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
+import net.minidev.json.JSONArray;
+import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -49,7 +50,6 @@ public class ContainersController {
 
   //TODO substituir os reqs por objetos, ou @JsonValue annotation
 
-  //private final DockerContainersService dockerContainersService;
   private final ContainersService containersService;
   private final EurekaService eurekaService;
   private final NginxLoadBalancerService nginxLoadBalancerService;
@@ -63,10 +63,11 @@ public class ContainersController {
   }
 
   @GetMapping
-  public Iterable<ContainerEntity> getContainers(@RequestParam(required = false) String serviceName) {
-    Iterable<ContainerEntity> containers;
+  public List<ContainerEntity> getContainers(@RequestParam(required = false) String serviceName) {
+    List<ContainerEntity> containers;
     if (serviceName != null) {
-      containers = containersService.getContainers(Map.of(ContainerConstants.Label.SERVICE_NAME, serviceName));
+      containers = containersService.getContainersWithLabels(
+          Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, serviceName)));
     } else {
       containers = containersService.getContainers();
     }
@@ -86,7 +87,7 @@ public class ContainersController {
 
   @DeleteMapping("/{id}")
   public void deleteContainer(@PathVariable String id) {
-    containersService.deleteContainer(id);
+    containersService.stopContainer(id);
   }
 
   @PostMapping("/{id}/replicate")
@@ -106,7 +107,7 @@ public class ContainersController {
 
   //TODO
   @PostMapping("/eureka-server")
-  public List<SimpleContainer> launchEureka(@Json JSONArray regions) {
+  public List<ContainerEntity> launchEureka(@Json JSONArray regions) {
     return eurekaService.launchEurekaServers(regions.toArray(new String[0]));
   }
 
@@ -136,7 +137,7 @@ public class ContainersController {
   }
 
 /*  @GetMapping("/{containerId}/simulatedMetrics")
-  public Iterable<SimulatedContainerMetricEntity> getContainerSimulatedMetrics(@PathVariable String containerId) {
+  public List<SimulatedContainerMetricEntity> getContainerSimulatedMetrics(@PathVariable String containerId) {
     return containersService.getSimulatedMetrics(containerId);
   }
 

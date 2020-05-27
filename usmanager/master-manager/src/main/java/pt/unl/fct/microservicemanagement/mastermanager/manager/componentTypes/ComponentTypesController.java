@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/component-types")
 public class ComponentTypesController {
@@ -21,7 +23,7 @@ public class ComponentTypesController {
   }
 
   @GetMapping
-  public Iterable<ComponentTypeEntity> getComponentTypes() {
+  public List<ComponentTypeEntity> getComponentTypes() {
     return componentTypesService.getComponentTypes();
   }
 

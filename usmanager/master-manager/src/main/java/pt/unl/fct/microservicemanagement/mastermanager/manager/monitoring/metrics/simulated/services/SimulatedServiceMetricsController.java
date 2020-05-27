@@ -35,7 +35,7 @@ public class SimulatedServiceMetricsController {
   }
 
   @GetMapping
-  public Iterable<SimulatedServiceMetricEntity> getSimulatedServiceMetrics() {
+  public List<SimulatedServiceMetricEntity> getSimulatedServiceMetrics() {
     return simulatedServiceMetricsService.getSimulatedServiceMetrics();
   }
 

@@ -317,6 +317,16 @@ export function addContainer(container: IContainer): EntitiesAction {
     data: { containers: new Array(container) }
   }
 }
+export const reloadContainers = () => ({
+  [CALL_API]: {
+    types: [ CONTAINERS_REQUEST, CONTAINERS_SUCCESS, CONTAINERS_FAILURE ],
+    endpoint: `containers/reload`,
+    schema: Schemas.CONTAINER_ARRAY,
+    entity: 'containers',
+    method: 'post'
+  }
+});
+
 
 export const CLOUD_HOSTS_REQUEST = 'CLOUD_HOSTS_REQUEST';
 export const CLOUD_HOSTS_SUCCESS = 'CLOUD_HOSTS_SUCCESS';

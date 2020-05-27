@@ -32,6 +32,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -114,7 +115,7 @@ public class ConditionEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

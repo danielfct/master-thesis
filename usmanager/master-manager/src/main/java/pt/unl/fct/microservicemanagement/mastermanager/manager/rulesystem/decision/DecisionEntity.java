@@ -15,6 +15,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ServiceEventEntity;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -87,7 +88,7 @@ public class DecisionEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

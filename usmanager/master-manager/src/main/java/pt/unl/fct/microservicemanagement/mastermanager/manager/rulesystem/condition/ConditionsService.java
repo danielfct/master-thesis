@@ -8,6 +8,8 @@ import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import java.util.List;
+
 @Slf4j
 @org.springframework.stereotype.Service
 public class ConditionsService {
@@ -18,7 +20,7 @@ public class ConditionsService {
     this.conditions = conditions;
   }
 
-  public Iterable<ConditionEntity> getConditions() {
+  public List<ConditionEntity> getConditions() {
     return conditions.findAll();
   }
 

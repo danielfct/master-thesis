@@ -10,13 +10,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ServiceDecisionRepository extends CrudRepository<ServiceDecisionEntity, Long> {
+public interface ServiceDecisionRepository extends JpaRepository<ServiceDecisionEntity, Long> {
 
 
   List<ServiceDecisionEntity> findByServiceName(String serviceName);

@@ -52,7 +52,7 @@ public class MonitoringController {
   }
 
   @GetMapping("/services")
-  public Iterable<ServiceMonitoring> getMonitoringServiceLogs() {
+  public List<ServiceMonitoring> getMonitoringServiceLogs() {
     return containersMonitoringService.getMonitoringServiceLogs();
   }
 
@@ -70,7 +70,7 @@ public class MonitoringController {
   }
 
   @GetMapping("/hosts")
-  public Iterable<HostMonitoringEntity> getMonitoringHostLogs() {
+  public List<HostMonitoringEntity> getMonitoringHostLogs() {
     return hostsMonitoringService.getMonitoringHostLogs();
   }
 
@@ -86,7 +86,7 @@ public class MonitoringController {
   }
 
   @GetMapping("/logs")
-  public Iterable<MonitoringServiceLogTests> getMonitoringServiceLogTests() {
+  public List<MonitoringServiceLogTests> getMonitoringServiceLogTests() {
     return testLogsService.getMonitoringServiceLogTests();
   }
 

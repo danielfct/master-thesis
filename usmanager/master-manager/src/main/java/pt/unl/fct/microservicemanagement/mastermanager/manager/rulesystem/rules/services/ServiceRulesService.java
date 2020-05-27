@@ -57,7 +57,7 @@ public class ServiceRulesService {
     lastUpdateServiceRules.getAndSet(currentTime);
   }
 
-  public Iterable<ServiceRuleEntity> getRules() {
+  public List<ServiceRuleEntity> getRules() {
     return rules.findAll();
   }
 

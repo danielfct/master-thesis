@@ -14,6 +14,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntit
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -81,7 +82,7 @@ public class SimulatedServiceMetricEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

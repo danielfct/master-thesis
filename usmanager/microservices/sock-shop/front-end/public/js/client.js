@@ -128,7 +128,7 @@ function order() {
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            response_payload = JSON.parse(jqXHR.responseText)
+            response_payload = JSON.parse(jqXHR.responseText);
             console.log('error: ' + jqXHR.responseText);
             if (jqXHR.status == 406) {
                 $("#user-message").html('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> Error placing order. ' + response_payload.message + '</div>');

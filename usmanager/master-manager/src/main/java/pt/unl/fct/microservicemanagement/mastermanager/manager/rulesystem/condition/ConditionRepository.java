@@ -26,13 +26,13 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condi
 
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ConditionRepository extends CrudRepository<ConditionEntity, Long> {
+public interface ConditionRepository extends JpaRepository<ConditionEntity, Long> {
 
   @Query("select case when count(c) > 0 then true else false end "
       + "from ConditionEntity c "

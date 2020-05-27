@@ -24,9 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
+import com.amazonaws.services.ec2.model.Placement;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -78,6 +80,8 @@ public class CloudHostEntity {
 
   private String publicIpAddress;
 
+  private Placement placement;
+
   @Singular
   @JsonIgnore
   @ManyToMany(mappedBy = "cloudHosts", cascade = CascadeType.ALL)
@@ -102,7 +106,7 @@ public class CloudHostEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

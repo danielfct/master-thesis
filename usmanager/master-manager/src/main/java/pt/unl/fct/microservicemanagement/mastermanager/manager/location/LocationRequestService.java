@@ -26,8 +26,6 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.location;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
@@ -282,7 +280,7 @@ public class LocationRequestService {
         return "us-east-1";
       default:
     }
-    Iterable<RegionEntity> regions = regionsService.getRegions();
+    List<RegionEntity> regions = regionsService.getRegions();
     List<String> foundRegion = new ArrayList<>();
     String regionNameBegin = "";
     switch (continent) {

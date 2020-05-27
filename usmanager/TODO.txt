@@ -39,16 +39,12 @@ add assertEntityDoesntExist on every add method with @query lower()
 update root.prod
 launch load balancer at aws not working
 compare every query 'name' with lower function
-do red color just on not new entities
-create a loadEntities function to load entities onmount and onupdate
-create a isNew function to not show loading errors
-remove link on unsaved list items
-rename dependent to dependent? https://wikidiff.com/dependent/dependent
+deleting 1 simulated service metric, deleted all of them
+change fields to number when applied
+load container logs
 
+add simulated metrics to services/hosts/containers
 
-test: reload every single page
+test: reload every single page with empty state
+test: try to delete/update/insert entities after saving
 
-
-simulated metrics
-load balancer
-eureka

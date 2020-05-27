@@ -26,11 +26,13 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import lombok.Data;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 
 @Data
-public final class SimpleContainer {
+public final class DockerContainer {
 
   private final String id;
   private final long created;
@@ -43,5 +45,22 @@ public final class SimpleContainer {
   private final List<ContainerPortMapping> ports;
   private final Map<String, String> labels;
   private final String logs;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof DockerContainer)) {
+      return false;
+    }
+    DockerContainer other = (DockerContainer) o;
+    return id != null && id.equals(other.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getId());
+  }
 
 }

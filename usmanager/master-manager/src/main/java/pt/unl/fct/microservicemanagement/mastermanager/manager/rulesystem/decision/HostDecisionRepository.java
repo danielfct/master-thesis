@@ -12,11 +12,11 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decis
 
 import java.util.List;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HostDecisionRepository extends CrudRepository<HostDecisionEntity, Long> {
+public interface HostDecisionRepository extends JpaRepository<HostDecisionEntity, Long> {
 
   List<HostDecisionEntity> findByHostname(String hostname);
 

@@ -263,7 +263,7 @@ _________________________________________________________ -->
                     $('#orderShipping').text('$' + shipping.toFixed(2));
                     $('#orderTotal').text('$' + (cartTotal + shipping).toFixed(2));
                 });
-            })
+            });
             $('#addressInvoice').replaceWith('\
                 <p>' + data.customer.firstName + ' ' + data.customer.lastName + '\
                     <br>' + data.address.number + ' ' + data.address.street + '\

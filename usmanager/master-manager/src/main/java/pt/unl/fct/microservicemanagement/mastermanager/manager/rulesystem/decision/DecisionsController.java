@@ -42,7 +42,7 @@ public class DecisionsController {
   }
 
   @GetMapping
-  public Iterable<DecisionEntity> getDecisions() {
+  public List<DecisionEntity> getDecisions() {
     return decisionsService.getDecisions();
   }
 

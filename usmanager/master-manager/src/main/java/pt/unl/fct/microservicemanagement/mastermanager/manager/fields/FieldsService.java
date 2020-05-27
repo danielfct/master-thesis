@@ -3,6 +3,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.fields;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,7 @@ public class FieldsService {
     this.fields = fields;
   }
 
-  public Iterable<FieldEntity> getFields() {
+  public List<FieldEntity> getFields() {
     return fields.findAll();
   }
 

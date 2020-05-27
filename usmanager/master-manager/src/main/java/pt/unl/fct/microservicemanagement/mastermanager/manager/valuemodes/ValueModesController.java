@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/value-modes")
 public class ValueModesController {
@@ -22,7 +24,7 @@ public class ValueModesController {
   }
 
   @GetMapping
-  public Iterable<ValueModeEntity> getValueModes() {
+  public List<ValueModeEntity> getValueModes() {
     return valueModesService.getValueModes();
   }
 

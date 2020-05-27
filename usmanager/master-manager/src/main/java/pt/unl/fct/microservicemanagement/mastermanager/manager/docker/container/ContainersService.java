@@ -13,16 +13,19 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRulesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
+import com.spotify.docker.client.messages.ContainerStats;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,7 +37,7 @@ public class ContainersService {
 
   private final ContainerRepository containers;
 
-  public ContainersService(@Lazy DockerContainersService dockerContainersService,
+  public ContainersService(DockerContainersService dockerContainersService,
                            ContainerRulesService containerRulesService,
                            ContainerRepository containers) {
     this.dockerContainersService = dockerContainersService;
@@ -42,18 +45,18 @@ public class ContainersService {
     this.containers = containers;
   }
 
-  public ContainerEntity addContainerFromDockerContainer(SimpleContainer simpleContainer) {
+  public ContainerEntity addContainerFromDockerContainer(DockerContainer dockerContainer) {
     try {
-      return getContainer(simpleContainer.getId());
+      return getContainer(dockerContainer.getId());
     } catch (EntityNotFoundException e) {
       ContainerEntity container = ContainerEntity.builder()
-          .containerId(simpleContainer.getId())
-          .created(simpleContainer.getCreated())
-          .image(simpleContainer.getImage())
-          .command(simpleContainer.getCommand())
-          .hostname(simpleContainer.getHostname())
-          .ports(simpleContainer.getPorts())
-          .labels(simpleContainer.getLabels())
+          .containerId(dockerContainer.getId())
+          .created(dockerContainer.getCreated())
+          .image(dockerContainer.getImage())
+          .command(dockerContainer.getCommand())
+          .hostname(dockerContainer.getHostname())
+          .ports(dockerContainer.getPorts())
+          .labels(dockerContainer.getLabels())
           .build();
       return addContainer(container);
     }
@@ -64,16 +67,8 @@ public class ContainersService {
     return containers.save(container);
   }
 
-  public Iterable<ContainerEntity> getContainers() {
+  public List<ContainerEntity> getContainers() {
     return containers.findAll();
-  }
-
-  public List<ContainerEntity> getContainers(Map<String, String> labels) {
-    // TODO try to build a database query instead
-    Iterable<ContainerEntity> containers = getContainers();
-    return StreamSupport.stream(containers.spliterator(), false)
-        .filter(container -> container.getLabels().entrySet().containsAll(labels.entrySet()))
-        .collect(Collectors.toList());
   }
 
   public ContainerEntity getContainer(String containerId) {
@@ -81,64 +76,112 @@ public class ContainersService {
         new EntityNotFoundException(ContainerEntity.class, "containerId", containerId));
   }
 
+  public List<ContainerEntity> getHostContainers(String hostname) {
+    return containers.findByHostname(hostname);
+  }
+
+  public List<ContainerEntity> getHostContainersWithLabels(String hostname, Set<Pair<String, String>> labels) {
+    List<ContainerEntity> containers = getHostContainers(hostname);
+    return filterContainersWithLabels(containers, labels);
+  }
+
+  public List<ContainerEntity> getContainersWithLabels(Set<Pair<String, String>> labels) {
+    List<ContainerEntity> containers = getContainers();
+    return filterContainersWithLabels(containers, labels);
+  }
+
+  //TODO TEST
+  private List<ContainerEntity> filterContainersWithLabels(List<ContainerEntity> containers,
+                                                           Set<Pair<String, String>> labels) {
+    // TODO try to build a database query instead
+    return containers.stream()
+        .filter(container -> {
+          for (Map.Entry<String, String> containerLabel: container.getLabels().entrySet()) {
+            if (!labels.contains(Pair.of(containerLabel.getKey(), containerLabel.getValue()))) {
+              return false;
+            }
+          }
+          return true;
+        })
+        .collect(Collectors.toList());
+  }
+
   public List<ContainerEntity> reloadContainers() {
-    containers.deleteAll(); //TODO cant delete all or else all associations are lost
-    List<ContainerEntity> containersList = new LinkedList<>();
-    dockerContainersService.getContainers().forEach(dockerContainer -> {
-      ContainerEntity container = addContainerFromDockerContainer(dockerContainer);
-      containersList.add(containers.save(container));
+    List<ContainerEntity> containers = getContainers();
+    List<DockerContainer> dockerContainers = dockerContainersService.getContainers();
+    List<String> dockerContainerIds = dockerContainers
+        .stream().map(DockerContainer::getId).collect(Collectors.toList());
+    Iterator<ContainerEntity> containerIterator = containers.iterator();
+    // Remove invalid container entities
+    while (containerIterator.hasNext()) {
+      ContainerEntity container = containerIterator.next();
+      String containerId = container.getContainerId();
+      if (!dockerContainerIds.contains(containerId)) {
+        deleteContainer(containerId);
+        containerIterator.remove();
+        log.debug("Removed invalid container {}", containerId);
+      }
+    }
+    // Add missing container entities
+    dockerContainers.forEach(dockerContainer -> {
+      String containerId = dockerContainer.getId();
+      if (!hasContainer(containerId)) {
+        ContainerEntity container = addContainerFromDockerContainer(dockerContainer);
+        containers.add(this.containers.save(container));
+        log.debug("Added missing container {}", containerId);
+      }
     });
-    return containersList;
+    return containers;
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName);
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton);
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, List<String> environment) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, environment);
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, environment);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName,
                                          boolean singleton, List<String> environment) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, environment);
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, environment);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, Map<String, String> labels) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, labels);
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, labels);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName,
                                          boolean singleton, Map<String, String> labels) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, labels);
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, labels);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, List<String> environment,
                                          Map<String, String> labels) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, environment, labels);
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, environment, labels);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, List<String> environment,
                                          Map<String, String> labels, Map<String, String> dynamicLaunchParams) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, environment, labels,
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, environment, labels,
         dynamicLaunchParams);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName,
                                          boolean singleton, List<String> environment, Map<String, String> labels) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, environment,
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, environment,
         labels);
     return addContainerFromDockerContainer(container);
   }
@@ -146,43 +189,88 @@ public class ContainersService {
   public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton,
                                          List<String> environment, Map<String, String> labels,
                                          Map<String, String> dynamicLaunchParams) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, environment,
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, environment,
         labels, dynamicLaunchParams);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, String internalPort,
                                          String externalPort) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, internalPort,
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, internalPort,
         externalPort);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton, String internalPort,
                                          String externalPort) {
-    SimpleContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, internalPort,
+    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, internalPort,
         externalPort);
     return addContainerFromDockerContainer(container);
   }
 
   public ContainerEntity replicateContainer(String id, String hostname) {
-    SimpleContainer container = dockerContainersService.replicateContainer(id, hostname);
+    ContainerEntity containerEntity = getContainer(id);
+    DockerContainer container = dockerContainersService.replicateContainer(containerEntity, hostname);
     return addContainerFromDockerContainer(container);
+  }
+
+  public List<ContainerEntity> migrateAppContainers(String fromHostname, String toHostname) {
+    List<ContainerEntity> containers = getHostContainers(fromHostname).stream()
+        .filter(c -> List.of("backend", "frontend").contains(c.getLabels().get(ContainerConstants.Label.SERVICE_TYPE)))
+        .collect(Collectors.toList());
+    var migratedContainers = new ArrayList<ContainerEntity>(containers.size());
+    containers.forEach(c -> migratedContainers.add(migrateContainer(c.getContainerId(), toHostname)));
+    return migratedContainers;
   }
 
   public ContainerEntity migrateContainer(String id, String hostname) {
-    SimpleContainer container = dockerContainersService.migrateContainer(id, hostname);
-    return addContainerFromDockerContainer(container);
+    ContainerEntity container = getContainer(id);
+    DockerContainer dockerContainer = dockerContainersService.migrateContainer(container, hostname);
+    return addContainerFromDockerContainer(dockerContainer);
   }
 
-  public Map<String, List<SimpleContainer>> launchApp(String appName, String region, String country, String city) {
-    return dockerContainersService.launchApp(appName, region, country, city);
+  public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services, String region, String country,
+                                                      String city) {
+    return dockerContainersService.launchApp(services, region, country, city);
+  }
+
+  public void stopContainer(String id) {
+    ContainerEntity container = getContainer(id);
+    dockerContainersService.stopContainer(container);
+    containers.delete(container);
   }
 
   public void deleteContainer(String id) {
     ContainerEntity container = getContainer(id);
-    dockerContainersService.stopContainer(id);
     containers.delete(container);
+  }
+
+  public List<ContainerEntity> getAppContainers() {
+    return getContainersWithLabels(Set.of(
+        Pair.of(ContainerConstants.Label.SERVICE_TYPE, "frontend"),
+        Pair.of(ContainerConstants.Label.SERVICE_TYPE, "backend"))
+    );
+  }
+
+  public List<ContainerEntity> getAppContainers(String hostname) {
+    return getHostContainersWithLabels(hostname, Set.of(
+        Pair.of(ContainerConstants.Label.SERVICE_TYPE, "frontend"),
+        Pair.of(ContainerConstants.Label.SERVICE_TYPE, "backend")));
+  }
+
+  public List<ContainerEntity> getDatabaseContainers(String hostname) {
+    return getHostContainersWithLabels(hostname, Set.of(
+        Pair.of(ContainerConstants.Label.SERVICE_TYPE, "database")));
+  }
+
+  public List<ContainerEntity> getSystemContainers(String hostname) {
+    return getHostContainersWithLabels(hostname, Set.of(
+        Pair.of(ContainerConstants.Label.SERVICE_TYPE, "system")));
+  }
+
+  public ContainerStats getContainerStats(String containerId, String hostname) {
+    ContainerEntity container = getContainer(containerId);
+    return dockerContainersService.getContainerStats(container, hostname);
   }
 
   public List<ContainerRuleEntity> getRules(String containerId) {

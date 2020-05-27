@@ -24,17 +24,19 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.users;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface UsersRepository extends CrudRepository<UserEntity, Long> {
+import java.util.List;
+
+public interface UsersRepository extends JpaRepository<UserEntity, Long> {
 
   UserEntity findByUsername(String username);
 
-  @Query("SELECT u "
-      + "FROM UserEntity u "
-      + "WHERE u.username LIKE CONCAT('%',:search,'%')")
-  Iterable<UserEntity> searchUsers(@Param(value = "search") String search);
+  @Query("select u "
+      + "from UserEntity u "
+      + "where u.username like concat('%',:search,'%')")
+  List<UserEntity> searchUsers(@Param(value = "search") String search);
 
 }

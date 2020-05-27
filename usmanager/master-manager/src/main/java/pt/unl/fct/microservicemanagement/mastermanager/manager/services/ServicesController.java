@@ -53,7 +53,7 @@ public class ServicesController {
   }
 
   @GetMapping
-  public Iterable<ServiceEntity> getServices() {
+  public List<ServiceEntity> getServices() {
     return servicesService.getServices();
   }
 
@@ -126,7 +126,7 @@ public class ServicesController {
   }
 
   @GetMapping("/{serviceName}/predictions")
-  public Iterable<ServiceEventPredictionEntity> getServicePredictions(@PathVariable String serviceName) {
+  public List<ServiceEventPredictionEntity> getServicePredictions(@PathVariable String serviceName) {
     return servicesService.getPredictions(serviceName);
   }
 
@@ -149,7 +149,7 @@ public class ServicesController {
   }
 
   @GetMapping("/{serviceName}/rules")
-  public Iterable<ServiceRuleEntity> getServiceRules(@PathVariable String serviceName) {
+  public List<ServiceRuleEntity> getServiceRules(@PathVariable String serviceName) {
     return servicesService.getRules(serviceName);
   }
 
@@ -170,7 +170,7 @@ public class ServicesController {
 
   //TODO
   /*@GetMapping("/{serviceName}/simulatedMetrics")
-  public Iterable<SimulatedServiceMetricEntity> getServiceSimulatedMetrics(@PathVariable String serviceName) {
+  public List<SimulatedServiceMetricEntity> getServiceSimulatedMetrics(@PathVariable String serviceName) {
     return servicesService.getSimulatedMetrics(serviceName);
   }
 

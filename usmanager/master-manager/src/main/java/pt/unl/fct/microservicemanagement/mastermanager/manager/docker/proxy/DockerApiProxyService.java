@@ -24,12 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -45,18 +45,15 @@ public class DockerApiProxyService {
   public static final String DOCKER_API_PROXY = "docker-api-proxy";
 
   private final ContainersService containersService;
-  private final ServicesService serviceService;
   private final SshService sshService;
 
   private final String dockerApiProxyUsername;
   private final String dockerApiProxyPassword;
   private final int dockerApiProxyPort;
 
-  public DockerApiProxyService(ContainersService containersService, ServicesService serviceService,
-                               SshService sshService,
+  public DockerApiProxyService(@Lazy ContainersService containersService, SshService sshService,
                                DockerProperties dockerProperties) {
     this.containersService = containersService;
-    this.serviceService = serviceService;
     this.sshService = sshService;
     this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
     this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();

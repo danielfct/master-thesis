@@ -92,7 +92,7 @@ public class AppsApi {
 
         // create path and map variables
         String localVarPath = "/apps/{appName}/all"
-            .replaceAll("\\{" + "appName" + "\\}", apiClient.escapeString(appName.toString()));
+            .replaceAll("\\{" + "appName" + "\\}", apiClient.escapeString(appName));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -215,7 +215,7 @@ public class AppsApi {
 
         // create path and map variables
         String localVarPath = "/apps/{appName}"
-            .replaceAll("\\{" + "appName" + "\\}", apiClient.escapeString(appName.toString()));
+            .replaceAll("\\{" + "appName" + "\\}", apiClient.escapeString(appName));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();

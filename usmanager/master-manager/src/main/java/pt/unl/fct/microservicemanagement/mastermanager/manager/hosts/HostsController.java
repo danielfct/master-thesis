@@ -95,7 +95,7 @@ public class HostsController {
   }
 
   @GetMapping("/cloud")
-  public Iterable<CloudHostEntity> getCloudHosts() {
+  public List<CloudHostEntity> getCloudHosts() {
     return cloudHostsService.getCloudHosts();
   }
 
@@ -147,7 +147,7 @@ public class HostsController {
   }
 
 /*  @GetMapping("/cloud/{instanceId}/simulatedMetrics")
-  public Iterable<SimulatedHostMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
+  public List<SimulatedHostMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
     return cloudHostsService.getSimulatedMetrics(instanceId);
   }
 
@@ -168,7 +168,7 @@ public class HostsController {
   }*/
 
   @GetMapping("/edge")
-  public Iterable<EdgeHostEntity> getEdgeHosts() {
+  public List<EdgeHostEntity> getEdgeHosts() {
     return edgeHostsService.getEdgeHosts();
   }
 
@@ -215,7 +215,7 @@ public class HostsController {
   }
 
 /*  @GetMapping("/edge/{hostname}/simulatedMetrics")
-  public Iterable<SimulatedHostMetricEntity> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
+  public List<SimulatedHostMetricEntity> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
     return edgeHostsService.getSimulatedMetrics(hostname);
   }
 

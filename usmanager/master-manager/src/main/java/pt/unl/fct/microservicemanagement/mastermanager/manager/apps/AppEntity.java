@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -81,7 +82,7 @@ public class AppEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

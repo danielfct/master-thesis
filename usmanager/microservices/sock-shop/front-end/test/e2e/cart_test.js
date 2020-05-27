@@ -52,7 +52,7 @@
         this.clickLabel("Add to cart");
       }, function() {
         test.fail("Catalogue items did not show up");
-      }, 3000)
+      }, 3000);
 
       this.waitForText("1 item(s) in cart", function() {
         test.pass("cart gets updated with user selection");

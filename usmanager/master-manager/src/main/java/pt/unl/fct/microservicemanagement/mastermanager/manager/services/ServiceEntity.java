@@ -30,6 +30,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.Servic
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -146,7 +147,7 @@ public class ServiceEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

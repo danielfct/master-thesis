@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 
@@ -31,12 +32,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ContainerRuleRepository extends CrudRepository<ContainerRuleEntity, Long> {
+public interface ContainerRuleRepository extends JpaRepository<ContainerRuleEntity, Long> {
 
   Optional<ContainerRuleEntity> findByNameIgnoreCase(@Param("name") String name);
 

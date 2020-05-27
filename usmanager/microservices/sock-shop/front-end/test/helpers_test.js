@@ -10,7 +10,7 @@
     , sinon      = require("sinon")
     , expect     = chai.expect
     , helpers    = require("../helpers")
-    , app
+    , app;
 
   describe("helpers", function() {
     before(function() {

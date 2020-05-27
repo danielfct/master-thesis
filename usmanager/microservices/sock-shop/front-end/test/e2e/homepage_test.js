@@ -25,7 +25,7 @@
 (function (){
   'use strict';
 
-  require("./config")
+  require("./config");
 
   casper.test.begin('Home page looks sexy', 5, function suite(test) {
     casper.start("http://front-end:8080/", function() {

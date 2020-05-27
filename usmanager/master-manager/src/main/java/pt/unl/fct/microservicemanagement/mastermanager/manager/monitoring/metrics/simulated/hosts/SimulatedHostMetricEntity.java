@@ -16,6 +16,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.Cloud
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -88,7 +89,7 @@ public class SimulatedHostMetricEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

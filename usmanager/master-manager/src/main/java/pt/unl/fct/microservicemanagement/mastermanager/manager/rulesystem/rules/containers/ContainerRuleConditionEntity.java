@@ -41,6 +41,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
+import java.util.Objects;
+
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -76,7 +78,7 @@ public class ContainerRuleConditionEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

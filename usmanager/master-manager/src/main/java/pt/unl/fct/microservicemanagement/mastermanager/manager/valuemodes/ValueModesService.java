@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class ValueModesService {
@@ -17,7 +19,7 @@ public class ValueModesService {
     this.valueModes = valueModes;
   }
 
-  public Iterable<ValueModeEntity> getValueModes() {
+  public List<ValueModeEntity> getValueModes() {
     return valueModes.findAll();
   }
 

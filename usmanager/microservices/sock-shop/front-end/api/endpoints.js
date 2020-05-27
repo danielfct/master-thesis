@@ -25,12 +25,12 @@
 (function (){
   'use strict';
 
-  var util  = require('util')
+  var util  = require('util');
   const axios = require("axios");
   var request = require('sync-request');
 
   // TODO : change
-  const defaultGetAppByNameURL = 'http://localhost:1906/api/apps/'
+  const defaultGetAppByNameURL = 'http://localhost:1906/api/apps/';
 
   module.exports = function () {
 
@@ -45,7 +45,7 @@
     module.registerUrl  = function () { return getUserUrl() + '/register' };
 
     return module;
-  }
+  };
 
   async function getAppEndpointByNameAsync (appName) {
     try {

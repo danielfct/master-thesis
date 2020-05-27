@@ -28,7 +28,7 @@ public class SimulatedMetricsService {
     this.defaultHostSimulatedMetrics = defaultHostSimulatedMetrics;
   }
 
-  public Iterable<ServiceSimulatedMetricsEntity> getSimulatedServiceMetrics() {
+  public List<ServiceSimulatedMetricsEntity> getSimulatedServiceMetrics() {
     return serviceSimulatedMetrics.findAll();
   }
 
@@ -49,7 +49,7 @@ public class SimulatedMetricsService {
   }
 
 
-  public Iterable<ContainerSimulatedMetricsEntity> getAllContainerSimulatedMetrics() {
+  public List<ContainerSimulatedMetricsEntity> getAllContainerSimulatedMetrics() {
     return containerSimulatedMetrics.findAll();
   }
 
@@ -72,7 +72,7 @@ public class SimulatedMetricsService {
   }
 
 
-  public Iterable<SimulatedHostMetricEntity> getSimulatedHostMetrics() {
+  public List<SimulatedHostMetricEntity> getSimulatedHostMetrics() {
     return defaultHostSimulatedMetrics.findAll();
   }
 
@@ -93,7 +93,7 @@ public class SimulatedMetricsService {
     defaultHostSimulatedMetrics.delete(defaultHostSimulatedMetric);
   }
 
-  public Iterable<SpecificHostSimulatedMetricsEntity> getAllSpecificHostSimulatedMetrics() {
+  public List<SpecificHostSimulatedMetricsEntity> getAllSpecificHostSimulatedMetrics() {
     return specificHostSimulatedMetrics.findAll();
   }
 

@@ -24,14 +24,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.operators;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface OperatorRepository extends CrudRepository<OperatorEntity, Long> {
+public interface OperatorRepository extends JpaRepository<OperatorEntity, Long> {
 
   Optional<OperatorEntity> findByNameIgnoreCase(@Param("name") String name);
 

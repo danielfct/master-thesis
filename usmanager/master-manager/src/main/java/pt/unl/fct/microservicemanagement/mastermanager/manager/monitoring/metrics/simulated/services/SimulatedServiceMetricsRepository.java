@@ -10,6 +10,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
@@ -17,11 +18,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 @Repository
-public interface SimulatedServiceMetricsRepository extends CrudRepository<SimulatedServiceMetricEntity, Long> {
+public interface SimulatedServiceMetricsRepository extends JpaRepository<SimulatedServiceMetricEntity, Long> {
 
   Optional<SimulatedServiceMetricEntity> findByNameIgnoreCase(@Param("name") String name);
 

@@ -38,7 +38,7 @@ public class SimulatedServiceMetricsService {
     this.simulatedServiceMetrics = simulatedServiceMetrics;
   }
 
-  public Iterable<SimulatedServiceMetricEntity> getSimulatedServiceMetrics() {
+  public List<SimulatedServiceMetricEntity> getSimulatedServiceMetrics() {
     return simulatedServiceMetrics.findAll();
   }
 

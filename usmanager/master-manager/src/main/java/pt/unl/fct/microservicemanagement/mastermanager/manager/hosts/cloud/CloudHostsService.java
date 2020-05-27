@@ -56,13 +56,18 @@ public class CloudHostsService {
     this.hostRulesService = hostRulesService;
   }
 
-  public Iterable<CloudHostEntity> getCloudHosts() {
+  public List<CloudHostEntity> getCloudHosts() {
     return cloudHosts.findAll();
   }
 
   public CloudHostEntity getCloudHost(String instanceId) {
     return cloudHosts.findByInstanceId(instanceId).orElseThrow(() ->
         new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));
+  }
+
+  public CloudHostEntity getCloudHostByHostname(String hostname) {
+    return cloudHosts.findByPublicIpAddress(hostname).orElseThrow(() ->
+        new EntityNotFoundException(CloudHostEntity.class, "hostname", hostname));
   }
 
   private CloudHostEntity saveCloudHost(CloudHostEntity cloudHost) {
@@ -79,6 +84,7 @@ public class CloudHostsService {
         .imageId(instance.getImageId())
         .publicDnsName(instance.getPublicDnsName())
         .publicIpAddress(instance.getPublicIpAddress())
+        .placement(instance.getPlacement())
         .build();
     return saveCloudHost(cloudHost);
   }
@@ -90,6 +96,10 @@ public class CloudHostsService {
   public CloudHostEntity startCloudHost() {
     Instance instance = awsService.createInstance();
     return saveCloudHostFromInstance(instance);
+  }
+
+  public CloudHostEntity startCloudHost(CloudHostEntity cloudHost) {
+    return startCloudHost(cloudHost.getInstanceId());
   }
 
   public CloudHostEntity startCloudHost(String instanceId) {

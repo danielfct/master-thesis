@@ -118,7 +118,7 @@ class Node extends BaseComponent<Props, State> {
   };
 
   private onPostFailure = (reason: string, place: string | IRegion): void => {
-    console.log(place)
+    console.log(place);
     if (typeof place === "string") {
       super.toast(`Unable to start node at ${place}`, 10000, reason, true);
     }

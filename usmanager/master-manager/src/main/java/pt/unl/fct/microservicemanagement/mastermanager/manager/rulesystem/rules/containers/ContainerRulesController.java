@@ -28,7 +28,7 @@ public class ContainerRulesController {
   }
 
   @GetMapping("/containers")
-  public Iterable<ContainerRuleEntity> getContainerRules() {
+  public List<ContainerRuleEntity> getContainerRules() {
     return containerRulesService.getRules();
   }
 

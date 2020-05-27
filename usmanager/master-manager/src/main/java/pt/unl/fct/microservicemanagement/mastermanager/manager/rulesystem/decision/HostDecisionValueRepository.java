@@ -10,10 +10,10 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HostDecisionValueRepository extends CrudRepository<HostDecisionValueEntity, Long> {
+public interface HostDecisionValueRepository extends JpaRepository<HostDecisionValueEntity, Long> {
 
 }

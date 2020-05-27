@@ -8,7 +8,7 @@ import CardList from "../../components/list/CardList";
 import {IContainer} from "./Container";
 import styles from './Containers.module.css'
 import BaseComponent from "../../components/BaseComponent";
-import {loadContainers} from "../../actions";
+import {loadContainers, reloadContainers} from "../../actions";
 import ReloadButton from "../../components/list/ReloadButton";
 
 interface StateToProps {
@@ -18,7 +18,8 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-  loadContainers: (id?: string) => any;
+  loadContainers: () => void;
+  reloadContainers: () => void;
 }
 
 type Props = StateToProps & DispatchToProps;
@@ -38,7 +39,7 @@ class Containers extends BaseComponent<Props, {}> {
     || container.hostname.toLowerCase().includes(search);
 
   private reloadContainers = () => {
-    //this.props.reloadCloudHosts();
+    this.props.reloadContainers();
   };
 
   public render() {
@@ -75,6 +76,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
 
 const mapDispatchToProps: DispatchToProps = {
   loadContainers,
+  reloadContainers
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Containers);

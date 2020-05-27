@@ -26,16 +26,16 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodeRole;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.SimpleNode;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
@@ -53,7 +53,6 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.amazonaws.services.ec2.model.Instance;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -63,10 +62,9 @@ import org.springframework.stereotype.Service;
 public class HostsService {
 
   private final NodesService nodesService;
-  private final DockerContainersService dockerContainersService;
+  private final ContainersService containersService;
   private final DockerSwarmService dockerSwarmService;
   private final EdgeHostsService edgeHostsService;
-  private final AwsService awsService;
   private final CloudHostsService cloudHostsService;
   private final SshService sshService;
   private final HostMetricsService hostMetricsService;
@@ -77,19 +75,18 @@ public class HostsService {
   private final int maxWorkers;
   private final int maxInstances;
 
-  public HostsService(NodesService nodesService, DockerContainersService dockerContainersService,
+  public HostsService(NodesService nodesService, @Lazy ContainersService containersService,
                       DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
-                      AwsService awsService, CloudHostsService cloudHostsService, SshService sshService,
+                      CloudHostsService cloudHostsService, SshService sshService,
                       HostMetricsService hostMetricsService,
                       //TODO fix lazy
                       PrometheusService prometheusService, @Lazy LocationRequestService locationRequestService,
                       DockerApiProxyService dockerApiProxyService, DockerProperties dockerProperties,
                       AwsProperties awsProperties) {
     this.nodesService = nodesService;
-    this.dockerContainersService = dockerContainersService;
+    this.containersService = containersService;
     this.dockerSwarmService = dockerSwarmService;
     this.edgeHostsService = edgeHostsService;
-    this.awsService = awsService;
     this.cloudHostsService = cloudHostsService;
     this.sshService = sshService;
     this.hostMetricsService = hostMetricsService;
@@ -204,10 +201,10 @@ public class HostsService {
       region = edgeHost.getRegion();
       continent = getContinent(region);
     } else {
-      Instance instance = awsService.getInstanceByPublicIpAddr(hostname);
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
       city = "";
       country = "";
-      String zone = instance.getPlacement().getAvailabilityZone();
+      String zone = cloudHost.getPlacement().getAvailabilityZone();
       region = Character.isDigit(zone.charAt(zone.length() - 1)) ? zone : zone.substring(0, zone.length() - 1);
       continent = getContinent(zone);
     }
@@ -252,24 +249,28 @@ public class HostsService {
   public void removeHost(String hostname) {
     //assertHostIsRunning(hostname, 10000);
     //dockerApiProxyService.launchDockerApiProxy(hostname);
-    dockerContainersService.getSystemContainers(hostname).stream()
+    containersService.getSystemContainers(hostname).stream()
         .filter(c -> !Objects.equals(c.getLabels().get(ContainerConstants.Label.SERVICE_NAME),
-            DockerApiProxyService.DOCKER_API_PROXY))
-        .forEach(c -> dockerContainersService.stopContainer(c.getId(), hostname));
+                DockerApiProxyService.DOCKER_API_PROXY))
+        .forEach(c -> containersService.stopContainer(c.getContainerId()));
     dockerSwarmService.leaveSwarm(hostname);
     //TODO porquê 5 segundos?
     //Timing.sleep(5, TimeUnit.SECONDS);
     nodesService.deleteHostNodes(hostname);
-    if (!edgeHostsService.hasEdgeHost(hostname)) {
-      Instance instance = awsService.getInstanceByPublicIpAddr(hostname);
-      awsService.stopInstance(instance.getInstanceId());
+    if (isCloudHost(hostname)) {
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
+      cloudHostsService.stopCloudHost(cloudHost.getInstanceId());
     }
+  }
+
+  private boolean isCloudHost(String hostname) {
+    return !edgeHostsService.hasEdgeHost(hostname);
   }
 
   public void clusterHosts() {
     var hostnames = new LinkedList<String>();
     hostnames.add(managerHostname);
-    if (!edgeHostsService.hasEdgeHost(managerHostname)) {
+    if (isCloudHost(managerHostname)) {
       log.info("Swarm manager '{}' is on cloud", managerHostname);
       hostnames.addAll(getWorkerAwsNodes());
     } else {
@@ -284,7 +285,7 @@ public class HostsService {
     }
     log.info("Clustering hosts into the swarm...");
     hostnames.forEach(hostname ->
-        this.setupHost(Objects.equals(hostname, managerHostname) ? NodeRole.MANAGER : NodeRole.WORKER, hostname));
+        setupHost(Objects.equals(hostname, managerHostname) ? NodeRole.MANAGER : NodeRole.WORKER, hostname));
   }
 
   //TODO make sure there is an odd number of master docker nodes
@@ -365,19 +366,16 @@ public class HostsService {
         .findFirst();
   }
 
-  //TODO move aws specific code to cloudHostsService
   private String chooseCloudHost() {
-    for (var instance : awsService.getSimpleInstances()) {
-      int stateCode = instance.getState().getCode();
+    for (var cloudHost : cloudHostsService.getCloudHosts()) {
+      int stateCode = cloudHost.getState().getCode();
       if (stateCode == AwsInstanceState.RUNNING.getCode()) {
-        String hostname = instance.getPublicIpAddress();
+        String hostname = cloudHost.getPublicIpAddress();
         if (!nodesService.isNode(hostname)) {
           return hostname;
         }
       } else if (stateCode == AwsInstanceState.STOPPED.getCode()) {
-        String instanceId = instance.getInstanceId();
-        Instance startedInstance = awsService.startInstance(instanceId);
-        return startedInstance.getPublicIpAddress();
+        return cloudHostsService.startCloudHost(cloudHost).getPublicIpAddress();
       }
     }
     return cloudHostsService.startCloudHost().getPublicIpAddress();

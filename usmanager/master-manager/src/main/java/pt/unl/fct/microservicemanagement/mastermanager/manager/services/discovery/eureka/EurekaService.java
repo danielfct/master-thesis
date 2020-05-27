@@ -24,9 +24,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka;
 
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.util.Pair;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
@@ -36,10 +38,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.spotify.docker.client.DockerClient;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,32 +49,31 @@ public class EurekaService {
 
   public static final String EUREKA = "eureka-server";
 
-  private final DockerContainersService dockerContainersService;
   private final HostsService hostsService;
   private final RegionsService regionsService;
   private final ServicesService serviceService;
+  private final ContainersService containersService;
   private final int port;
 
-  public EurekaService(DockerContainersService dockerContainersService, HostsService hostsService,
-                       ServicesService serviceService, RegionsService regionsService,
-                       EurekaProperties eurekaProperties) {
-    this.dockerContainersService = dockerContainersService;
+  public EurekaService(HostsService hostsService, ServicesService serviceService, RegionsService regionsService,
+                       @Lazy ContainersService containersService, EurekaProperties eurekaProperties) {
     this.hostsService = hostsService;
     this.regionsService = regionsService;
     this.serviceService = serviceService;
+    this.containersService = containersService;
     this.port = eurekaProperties.getPort();
   }
 
   public Optional<String> getEurekaServerAddress(String region) {
-    return dockerContainersService.getContainers(
-        DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, EUREKA),
-        DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_REGION, region))
+    return containersService.getContainersWithLabels(Set.of(
+        Pair.of(ContainerConstants.Label.SERVICE_NAME, EUREKA),
+        Pair.of(ContainerConstants.Label.SERVICE_REGION, region)))
         .stream()
         .map(container -> container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
         .findFirst();
   }
 
-  public List<SimpleContainer> launchEurekaServers(String[] regions) {
+  public List<ContainerEntity> launchEurekaServers(String[] regions) {
     ServiceEntity service =
         serviceService.getService(EUREKA);
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
@@ -87,7 +88,7 @@ public class EurekaService {
         .collect(Collectors.joining(","));
     Map<String, String> dynamicLaunchParams = Map.of("${zone}", eurekaServers);
     return availableHostnames.stream()
-        .map(hostname -> dockerContainersService.launchContainer(hostname, EUREKA, customEnvs,
+        .map(hostname -> containersService.launchContainer(hostname, EUREKA, customEnvs,
             customLabels, dynamicLaunchParams))
         .collect(Collectors.toList());
   }

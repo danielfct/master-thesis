@@ -26,12 +26,12 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.fields;
 
 import java.util.Optional;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FieldRepository extends CrudRepository<FieldEntity, Long> {
+public interface FieldRepository extends JpaRepository<FieldEntity, Long> {
 
   Optional<FieldEntity> findByNameIgnoreCase(@Param("name") String name);
 

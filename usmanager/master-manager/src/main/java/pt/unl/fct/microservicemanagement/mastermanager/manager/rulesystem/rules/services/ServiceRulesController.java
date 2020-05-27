@@ -26,7 +26,7 @@ public class ServiceRulesController {
   }
 
   @GetMapping("/services")
-  public Iterable<ServiceRuleEntity> getRules() {
+  public List<ServiceRuleEntity> getRules() {
     return serviceRulesService.getRules();
   }
 

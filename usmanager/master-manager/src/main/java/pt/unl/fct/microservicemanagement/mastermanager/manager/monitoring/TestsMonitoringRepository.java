@@ -26,12 +26,12 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import java.util.List;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TestsMonitoringRepository extends CrudRepository<MonitoringServiceLogTests, Long> {
+public interface TestsMonitoringRepository extends JpaRepository<MonitoringServiceLogTests, Long> {
 
   List<MonitoringServiceLogTests> findByServiceName(@Param("serviceName") String serviceName);
 

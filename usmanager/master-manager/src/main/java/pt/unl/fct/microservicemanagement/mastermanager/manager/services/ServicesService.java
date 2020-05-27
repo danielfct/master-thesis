@@ -63,7 +63,7 @@ public class ServicesService {
     this.appsService = appsService;
   }
 
-  public Iterable<ServiceEntity> getServices() {
+  public List<ServiceEntity> getServices() {
     return services.findAll();
   }
 
@@ -190,7 +190,7 @@ public class ServicesService {
     return services.getDependents(serviceName);
   }
 
-  public Iterable<ServiceEventPredictionEntity> getPredictions(String serviceName) {
+  public List<ServiceEventPredictionEntity> getPredictions(String serviceName) {
     assertServiceExists(serviceName);
     return services.getPredictions(serviceName);
   }

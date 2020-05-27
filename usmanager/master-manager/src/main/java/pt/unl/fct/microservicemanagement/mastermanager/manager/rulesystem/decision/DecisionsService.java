@@ -69,7 +69,7 @@ public class DecisionsService {
     this.fieldsService = fieldsService;
   }
 
-  public Iterable<DecisionEntity> getDecisions() {
+  public List<DecisionEntity> getDecisions() {
     return decisions.findAll();
   }
 

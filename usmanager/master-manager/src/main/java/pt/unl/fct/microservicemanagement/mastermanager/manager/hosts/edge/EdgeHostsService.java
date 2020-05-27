@@ -50,7 +50,7 @@ public class EdgeHostsService {
     this.hostRulesService = hostRulesService;
   }
 
-  public Iterable<EdgeHostEntity> getEdgeHosts() {
+  public List<EdgeHostEntity> getEdgeHosts() {
     return edgeHosts.findAll();
   }
 

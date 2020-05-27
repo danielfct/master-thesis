@@ -12,13 +12,13 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metri
 
 import java.util.List;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 
 @Repository
-public interface DefaultHostSimulatedMetricsRepository extends CrudRepository<SimulatedHostMetricEntity, Long> {
+public interface DefaultHostSimulatedMetricsRepository extends JpaRepository<SimulatedHostMetricEntity, Long> {
 
   List<SimulatedHostMetricEntity> findByField(@Param("field") String field);
 

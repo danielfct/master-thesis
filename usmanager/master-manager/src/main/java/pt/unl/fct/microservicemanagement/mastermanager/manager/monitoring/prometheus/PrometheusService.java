@@ -24,9 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,6 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 
 
 @Service
@@ -54,11 +53,12 @@ public class PrometheusService {
   private final ContainersService containersService;
   private final RestTemplate restTemplate;
 
-  public PrometheusService(ContainersService containersService) {
+  public PrometheusService(@Lazy ContainersService containersService) {
     this.containersService = containersService;
     this.restTemplate = new RestTemplate();
   }
 
+  //TODO move to containerService, removing dependency?
   public ContainerEntity launchPrometheus(String hostname) {
     return containersService.launchContainer(hostname, PROMETHEUS, true);
   }

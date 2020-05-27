@@ -26,13 +26,13 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
 
 import java.util.Date;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ServiceEventPredictionRepository extends CrudRepository<ServiceEventPredictionEntity, Long> {
+public interface ServiceEventPredictionRepository extends JpaRepository<ServiceEventPredictionEntity, Long> {
 
   @Query("select sp.minReplicas "
       + "from ServiceEventPredictionEntity sp inner join sp.service s "

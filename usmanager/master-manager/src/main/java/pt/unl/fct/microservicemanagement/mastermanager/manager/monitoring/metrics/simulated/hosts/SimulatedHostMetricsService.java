@@ -42,7 +42,7 @@ public class SimulatedHostMetricsService {
     this.simulatedHostMetrics = simulatedHostMetrics;
   }
 
-  public Iterable<SimulatedHostMetricEntity> getSimulatedHostMetrics() {
+  public List<SimulatedHostMetricEntity> getSimulatedHostMetrics() {
     return simulatedHostMetrics.findAll();
   }
 

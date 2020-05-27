@@ -214,4 +214,4 @@ $.fn.alignElementsSameHeight = function() {
 
 
 
-}
+};

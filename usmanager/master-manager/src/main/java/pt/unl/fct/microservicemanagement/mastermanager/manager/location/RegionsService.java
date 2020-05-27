@@ -32,6 +32,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class RegionsService {
@@ -42,7 +44,7 @@ public class RegionsService {
     this.regions = regions;
   }
 
-  public Iterable<RegionEntity> getRegions() {
+  public List<RegionEntity> getRegions() {
     return regions.findAll();
   }
 

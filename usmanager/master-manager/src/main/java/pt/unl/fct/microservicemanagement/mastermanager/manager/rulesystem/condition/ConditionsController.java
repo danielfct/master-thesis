@@ -26,6 +26,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condi
 
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +48,7 @@ public class ConditionsController {
   }
 
   @GetMapping
-  public Iterable<ConditionEntity> getConditions() {
+  public List<ConditionEntity> getConditions() {
     return conditionsService.getConditions();
   }
 

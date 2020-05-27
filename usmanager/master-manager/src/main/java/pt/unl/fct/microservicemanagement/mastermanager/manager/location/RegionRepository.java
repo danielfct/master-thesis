@@ -26,13 +26,13 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.location;
 
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RegionRepository extends CrudRepository<RegionEntity, Long> {
+public interface RegionRepository extends JpaRepository<RegionEntity, Long> {
 
   @Query("select case when count(r) > 0 then true else false end "
       + "from RegionEntity r "

@@ -29,7 +29,7 @@ public class SimulatedMetricsController {
   }
 
   @GetMapping("/containers")
-  public Iterable<ContainerSimulatedMetricsEntity> getContainerSimulatedMetric() {
+  public List<ContainerSimulatedMetricsEntity> getContainerSimulatedMetric() {
     return simulatedMetricsService.getAllContainerSimulatedMetrics();
   }
 

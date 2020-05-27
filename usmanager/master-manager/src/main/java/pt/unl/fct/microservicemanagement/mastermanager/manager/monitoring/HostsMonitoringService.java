@@ -26,8 +26,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodeRole;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.SimpleNode;
@@ -71,7 +71,7 @@ public class HostsMonitoringService {
   private final HostMonitoringRepository hostsMonitoring;
 
   private final NodesService nodesService;
-  private final DockerContainersService dockerContainersService;
+  private final ContainersService containersService;
   private final HostRulesService hostRulesService;
   private final HostsService hostsService;
   private final HostMetricsService hostMetricsService;
@@ -86,12 +86,12 @@ public class HostsMonitoringService {
   private final int minimumHosts;
 
   public HostsMonitoringService(HostMonitoringRepository hostsMonitoring, NodesService nodesService,
-                                DockerContainersService dockerContainersService, HostRulesService hostRulesService,
+                                ContainersService containersService, HostRulesService hostRulesService,
                                 HostsService hostsService, HostMetricsService hostMetricsService,
                                 ServicesService servicesService, HostsEventsService hostsEventsService,
                                 DecisionsService decisionsService, HostProperties hostProperties) {
     this.nodesService = nodesService;
-    this.dockerContainersService = dockerContainersService;
+    this.containersService = containersService;
     this.hostRulesService = hostRulesService;
     this.hostsService = hostsService;
     this.hostMetricsService = hostMetricsService;
@@ -106,7 +106,7 @@ public class HostsMonitoringService {
     this.minimumHosts = hostProperties.getMinimumHosts();
   }
 
-  public Iterable<HostMonitoringEntity> getMonitoringHostLogs() {
+  public List<HostMonitoringEntity> getMonitoringHostLogs() {
     return hostsMonitoring.findAll();
   }
 
@@ -241,7 +241,7 @@ public class HostsMonitoringService {
       double serviceAvgMem = serviceConfig.getExpectedMemoryConsumption();
       String toHostname = hostsService.getAvailableNodeHostname(serviceAvgMem, hostDetails);
       // TODO porquê migrar logo um container?
-      dockerContainersService.migrateContainer(containerId, hostname, toHostname);
+      containersService.migrateContainer(containerId, toHostname);
       log.info("RuleDecision executed: Started host '{}' and migrated container '{}' to it", toHostname, containerId);
     }
   }
@@ -260,7 +260,7 @@ public class HostsMonitoringService {
       }
     }
     String migrateToHostname = getHostToMigrate(stopHostname, nodes);
-    List<SimpleContainer> containers = dockerContainersService.migrateContainers(stopHostname, migrateToHostname);
+    List<ContainerEntity> containers = containersService.migrateAppContainers(stopHostname, migrateToHostname);
     String hostnameToRemove = stopHostname;
     //TODO os containers não migram em paralelo?
     new Timer("RemoveHostFromSwarmTimer").schedule(new TimerTask() {
@@ -287,12 +287,12 @@ public class HostsMonitoringService {
 
   private Pair<String, String> getRandomContainerToMigrate(String hostname) {
     // TODO: Improve container choice
-    List<SimpleContainer> hostContainers = dockerContainersService.getAppContainers(hostname);
+    List<ContainerEntity> hostContainers = containersService.getAppContainers(hostname);
     if (hostContainers.isEmpty()) {
       return Pair.of("", "");
     }
-    SimpleContainer container = hostContainers.get(0);
-    return Pair.of(container.getLabels().get(ContainerConstants.Label.SERVICE_NAME), container.getId());
+    ContainerEntity container = hostContainers.get(0);
+    return Pair.of(container.getLabels().get(ContainerConstants.Label.SERVICE_NAME), container.getContainerId());
   }
 
 }

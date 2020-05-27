@@ -27,7 +27,7 @@
 
   var express = require("express")
     , client  = require('prom-client')
-    , app     = express()
+    , app     = express();
 
   const metric = {
     http: {
@@ -35,7 +35,7 @@
         duration: new client.Histogram('request_duration_seconds', 'request duration in seconds', ['service', 'method', 'route', 'status_code']),
       }
     }
-  }
+  };
 
   function s(start) {
     var diff = process.hrtime(start);
@@ -49,7 +49,7 @@
         var method = method.toLowerCase();
         metric.http.requests.duration.labels('front-end', method, route, statusCode).observe(duration);
     }
-  };
+  }
 
   function middleware(request, response, done) {
     var start = process.hrtime();
@@ -59,7 +59,7 @@
     });
 
     return done();
-  };
+  }
 
 
   app.use(middleware);

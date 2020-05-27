@@ -27,13 +27,16 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -43,17 +46,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppsService {
 
-  private final AppRepository apps;
   private final ServicesService servicesService;
   private final ContainersService containersService;
+  private final AppRepository apps;
 
-  public AppsService(AppRepository apps, ServicesService servicesService, ContainersService containersService) {
-    this.apps = apps;
+  public AppsService(ServicesService servicesService, ContainersService containersService, AppRepository apps) {
     this.servicesService = servicesService;
     this.containersService = containersService;
+    this.apps = apps;
   }
 
-  public Iterable<AppEntity> getApps() {
+  public List<AppEntity> getApps() {
     return apps.findAll();
   }
 
@@ -140,8 +143,12 @@ public class AppsService {
     }
   }
 
-  public Map<String, List<SimpleContainer>> launch(String appName, String region, String country, String city) {
-    return containersService.launchApp(appName, region, country, city);
+  public Map<String, List<DockerContainer>> launch(String appName, String region, String country, String city) {
+    log.info("Launching app {} at {}/{}/{}", appName, region, country, city);
+    List<ServiceEntity> services = getServicesOrder(appName).stream()
+        .filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceType.DATABASE)
+        .map(ServiceOrder::getService).collect(Collectors.toList());
+    return containersService.launchApp(services, region, country, city);
   }
 
 }

@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
@@ -53,7 +53,7 @@ public final class AppsController {
   }
 
   @GetMapping
-  public Iterable<AppEntity> getApps() {
+  public List<AppEntity> getApps() {
     return appsService.getApps();
   }
 
@@ -105,7 +105,7 @@ public final class AppsController {
   }
 
   @PostMapping("/{appName}/launch")
-  public Map<String, List<SimpleContainer>> launch(@PathVariable String appName,
+  public Map<String, List<DockerContainer>> launch(@PathVariable String appName,
                                                    @Json String region, @Json String country, @Json String city) {
     return appsService.launch(appName, region, country, city);
   }

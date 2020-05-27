@@ -26,14 +26,15 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.MasterManagerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.spotify.docker.client.DockerClient;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,16 +42,16 @@ public class MasterManagerMonitoringService {
 
   private static final String MASTER_MANAGER = "master-manager";
 
-  private final DockerContainersService dockerContainersService;
+  private final ContainersService containersService;
   private final ContainersMonitoringService containersMonitoringService;
 
   private final long monitorPeriod;
   private final boolean isTestLogsEnable;
 
-  public MasterManagerMonitoringService(DockerContainersService dockerContainersService,
+  public MasterManagerMonitoringService(ContainersService containersService,
                                         ContainersMonitoringService containersMonitoringService,
                                         MasterManagerProperties masterManagerProperties) {
-    this.dockerContainersService = dockerContainersService;
+    this.containersService = containersService;
     this.containersMonitoringService = containersMonitoringService;
     this.monitorPeriod = masterManagerProperties.getMonitorPeriod();
     this.isTestLogsEnable = masterManagerProperties.getTests().isTestLogsEnable();
@@ -73,17 +74,17 @@ public class MasterManagerMonitoringService {
   }
 
   private void masterManagerMonitorTask(int secondsFromLastRun) {
-    dockerContainersService
-        .getContainers(DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, MASTER_MANAGER))
+    containersService
+        .getContainersWithLabels(Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, MASTER_MANAGER)))
         .stream()
         .findFirst()
         .ifPresent(c -> saveMasterManagerContainerFields(c, secondsFromLastRun));
   }
 
-  private void saveMasterManagerContainerFields(SimpleContainer container, int secondsFromLastRun) {
+  private void saveMasterManagerContainerFields(ContainerEntity container, int secondsFromLastRun) {
     Map<String, Double> newFields = containersMonitoringService.getContainerStats(container, secondsFromLastRun);
     newFields.forEach((field, value) ->
-        containersMonitoringService.saveMonitoringServiceLog(container.getId(), MASTER_MANAGER, field, value)
+        containersMonitoringService.saveMonitoringServiceLog(container.getContainerId(), MASTER_MANAGER, field, value)
     );
   }
 

@@ -46,4 +46,4 @@ export const decodeHTML = (html: string) => {
     return txt.value;
 };
 
-export const zeroPad = (num: number, maxLength: number) => String(num).padStart(maxLength, '0')
+export const zeroPad = (num: number, maxLength: number) => String(num).padStart(maxLength, '0');

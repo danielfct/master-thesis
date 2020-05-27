@@ -24,18 +24,18 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EdgeHostRepository extends CrudRepository<EdgeHostEntity, Long> {
+public interface EdgeHostRepository extends JpaRepository<EdgeHostEntity, Long> {
 
   Optional<EdgeHostEntity> findByHostname(@Param("hostname") String hostname);
 

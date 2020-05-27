@@ -27,6 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -83,7 +84,7 @@ public class ComponentTypeEntity {
 
   @Override
   public int hashCode() {
-    return 31;
+    return Objects.hashCode(getId());
   }
 
 }

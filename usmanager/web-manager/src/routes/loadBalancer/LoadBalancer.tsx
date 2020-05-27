@@ -240,10 +240,11 @@ class LoadBalancer extends BaseComponent<Props, State> {
 
 }
 
-function removeFields(container: Partial<ILoadBalancer>) {
-  delete container["ports"];
-  delete container["labels"];
-  delete container["logs"];
+function removeFields(loadBalancer: Partial<ILoadBalancer>) {
+  delete loadBalancer["id"];
+  delete loadBalancer["ports"];
+  delete loadBalancer["labels"];
+  delete loadBalancer["logs"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
