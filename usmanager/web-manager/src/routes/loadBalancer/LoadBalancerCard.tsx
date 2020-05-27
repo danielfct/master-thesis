@@ -11,17 +11,11 @@ interface LoadBalancerCardProps {
 type Props = LoadBalancerCardProps;
 
 const LoadBalancerCard = ({loadBalancer}: Props) => (
-  <Card<IContainer> title={loadBalancer.id.toString()}
-                    link={{to: {pathname: `/load-balancers/${loadBalancer.id}`, state: loadBalancer}}}
-                    height={'150px'}
+  <Card<IContainer> title={loadBalancer.containerId.toString()}
+                    link={{to: {pathname: `/load-balancers/${loadBalancer.containerId}`, state: loadBalancer}}}
+                    height={'125px'}
                     margin={'10px 0'}
                     hoverable>
-    <CardItem key={'state'}
-              label={'State'}
-              value={loadBalancer.state}/>
-    <CardItem key={'status'}
-              label={'Status'}
-              value={loadBalancer.status}/>
     <CardItem key={'hostname'}
               label={'Hostname'}
               value={loadBalancer.hostname}/>

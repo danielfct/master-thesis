@@ -10,32 +10,29 @@ interface ContainerCardProps {
 type Props = ContainerCardProps;
 
 const ServiceCard = ({container}: Props) => (
-  <Card<IContainer> title={container.id.toString()}
-               link={{to: {pathname: `/containers/${container.id}`, state: container}}}
-               height={'215px'}
+  <Card<IContainer> title={container.containerId.toString()}
+               link={{to: {pathname: `/containers/${container.containerId}`, state: container}}}
+               height={'200px'}
                margin={'10px 0'}
                hoverable>
     <CardItem key={'names'}
               label={'Names'}
-              value={container.names.join('/')}/>
+              value={container.names.join(' / ')}/>
     <CardItem key={'image'}
               label={'Image'}
               value={container.image}/>
-    <CardItem key={'state'}
-              label={'State'}
-              value={container.state}/>
-    <CardItem key={'status'}
-              label={'Status'}
-              value={container.status}/>
     <CardItem key={'hostname'}
               label={'Hostname'}
               value={container.hostname}/>
     <CardItem key={'ports'}
               label={'Ports'}
               value={`${container.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+    <CardItem key={'Stoppable'}
+              label={'Stoppable'}
+              value={`${container.labels['isStoppable'] !== undefined ? container.labels['isStoppable'] : true}`}/>
     <CardItem key={'replicable'}
               label={'Replicable'}
-              value={`${container.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
+              value={`${container.labels['isReplicable'] !== undefined ? container.labels['isReplicable'] : true}`}/>
   </Card>
 );
 

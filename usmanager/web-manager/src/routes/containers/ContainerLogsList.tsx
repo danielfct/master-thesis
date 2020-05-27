@@ -16,7 +16,7 @@ type Props = PortsListProps;
 export default class ContainerLogsList extends BaseComponent<Props, {}> {
 
   private logs = () => {
-    let logs = this.props.container?.logs.split("\n");
+    let logs = this.props.container?.logs?.split("\n");
     if (logs) {
       logs.pop();
     }

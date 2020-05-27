@@ -24,6 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.location;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
@@ -60,7 +62,7 @@ public class LocationRequestService {
   private static final double PERCENT = 0.01;
 
   private final NodesService nodesService;
-  private final DockerContainersService dockerContainersService;
+  private final ContainersService containersService;
   private final RegionsService regionsService;
   private final HostsService hostsService;
 
@@ -69,11 +71,11 @@ public class LocationRequestService {
   private final RestTemplate restTemplate;
   private final HttpHeaders headers;
 
-  public LocationRequestService(DockerContainersService dockerContainersService, NodesService nodesService,
+  public LocationRequestService(ContainersService containersService, NodesService nodesService,
                                 RegionsService regionsService, HostsService hostsService,
                                 LocationRequestProperties locationRequestProperties) {
     this.nodesService = nodesService;
-    this.dockerContainersService = dockerContainersService;
+    this.containersService = containersService;
     this.regionsService = regionsService;
     this.hostsService = hostsService;
     this.defaultPort = locationRequestProperties.getPort();
@@ -82,8 +84,8 @@ public class LocationRequestService {
     this.headers = new HttpHeaders();
   }
 
-  public SimpleContainer launchRequestLocationMonitor(String hostname) {
-    return dockerContainersService.launchSingletonService(hostname, REQUEST_LOCATION_MONITOR);
+  public ContainerEntity launchRequestLocationMonitor(String hostname) {
+    return containersService.launchContainer(hostname, REQUEST_LOCATION_MONITOR, true);
   }
 
   public List<LocationMonitoringResp> getAllMonitoringDataTop(String requestLocationHostname, int seconds) {

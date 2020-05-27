@@ -145,7 +145,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
   private getSelectableServicesNames = () => {
     const {appServices, services, unsavedServices} = this.props;
     const nonSystemServices = Object.entries(services)
-                                    .filter(([_, value]) => value.serviceType !== 'system')
+                                    .filter(([_, value]) => value.serviceType.toLowerCase() !== 'system')
                                     .map(([key, _]) => key);
     const serviceNames = appServices.map(appService => appService.service.serviceName);
     const unsavedServicesNames = unsavedServices.map(service => service.service);

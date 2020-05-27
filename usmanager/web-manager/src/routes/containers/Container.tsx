@@ -30,19 +30,18 @@ import {IReply, postData} from "../../utils/api";
 import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
+import IDatabaseData from "../../components/IDatabaseData";
 
-export interface IContainer {
-  id: string;
+export interface IContainer extends IDatabaseData {
+  containerId: string;
   created: number;
   names: string[];
   image: string;
   command: string;
-  state: string;
-  status: string;
   hostname: string;
   ports: IContainerPort[];
   labels: IContainerLabel;
-  logs: string;
+  logs?: string;
 }
 
 export interface IContainerPort {
@@ -162,11 +161,11 @@ class Container extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<IContainer>): void => {
     const container = reply.data;
-    super.toast(`<span class="green-text">Container ${this.mounted ? `<b class="white-text">${container.id}</b>` : `<a href=/containers/${container.id}><b>${container.id}</b></a>`} has started at ${container.hostname}</span>`);
+    super.toast(`<span class="green-text">Container ${this.mounted ? `<b class="white-text">${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} has started at ${container.hostname}</span>`);
     this.props.addContainer(container);
     if (this.mounted) {
       this.updateContainer(container);
-      this.props.history.replace(container.id);
+      this.props.history.replace(container.containerId);
     }
   };
 
@@ -174,14 +173,14 @@ class Container extends BaseComponent<Props, State> {
     super.toast(`Unable to start container at <b>${container.hostname}</b>`, 10000, reason, true);
 
   private onDeleteSuccess = (container: IContainer): void => {
-    super.toast(`<span class="green-text">Container <b class="white-text">${container.id}</b> successfully stopped</span>`);
+    super.toast(`<span class="green-text">Container <b class="white-text">${container.containerId}</b> successfully stopped</span>`);
     if (this.mounted) {
       this.props.history.push(`/containers`);
     }
   };
 
   private onDeleteFailure = (reason: string, container: IContainer): void =>
-    super.toast(`Unable to stop ${this.mounted ? `<b>${container.id}</b>` : `<a href=/containers/${container.id}><b>${container.id}</b></a>`} container`, 10000, reason, true);
+    super.toast(`Unable to stop ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
 
   private replicateMigrateButtons = (): ICustomButton[] => {
     const buttons: ICustomButton[] = [];
@@ -221,7 +220,7 @@ class Container extends BaseComponent<Props, State> {
   };
 
   private onReplicateSuccess = (container: IContainer) => {
-    super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/containers/${container.id}><b>${container.id}</b></a>`, 15000);
+    super.toast(`<span class="green-text">Replicated ${container.image.split('/').splice(1)} to container </span><a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`, 15000);
     if (this.mounted) {
       this.setState({loading: undefined});
     }
@@ -246,7 +245,7 @@ class Container extends BaseComponent<Props, State> {
 
   private onMigrateSuccess = (container: IContainer) => {
     const parentContainer = this.getContainer();
-    super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.id : `<a href=/containers/${parentContainer?.id}>${parentContainer?.id}</a>`} to container </span><a href=/containers/${container.id}>${container.id}</a>`, 15000);
+    super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.id : `<a href=/containers/${parentContainer?.id}>${parentContainer?.id}</a>`} to container </span><a href=/containers/${container.containerId}>${container.containerId}</a>`, 15000);
     if (this.mounted) {
       this.setState({loading: undefined});
     }
@@ -403,7 +402,7 @@ class Container extends BaseComponent<Props, State> {
                 }}
                 delete={container && (!container.labels['isStoppable'] || container.labels['isStoppable'] === 'true')
                   ? {textButton: 'Stop',
-                    url: `containers/${container.id}`,
+                    url: `containers/${container.containerId}`,
                     successCallback: this.onDeleteSuccess,
                     failureCallback: this.onDeleteFailure}
                   : undefined}
@@ -478,6 +477,7 @@ class Container extends BaseComponent<Props, State> {
 }
 
 function removeFields(container: Partial<IContainer>) {
+  delete container["id"];
   delete container["ports"];
   delete container["labels"];
   delete container["logs"];

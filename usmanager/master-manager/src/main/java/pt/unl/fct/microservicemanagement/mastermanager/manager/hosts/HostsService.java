@@ -25,7 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
@@ -253,7 +253,7 @@ public class HostsService {
     //assertHostIsRunning(hostname, 10000);
     //dockerApiProxyService.launchDockerApiProxy(hostname);
     dockerContainersService.getSystemContainers(hostname).stream()
-        .filter(c -> !Objects.equals(c.getLabels().get(DockerContainer.Label.SERVICE_NAME),
+        .filter(c -> !Objects.equals(c.getLabels().get(ContainerConstants.Label.SERVICE_NAME),
             DockerApiProxyService.DOCKER_API_PROXY))
         .forEach(c -> dockerContainersService.stopContainer(c.getId(), hostname));
     dockerSwarmService.leaveSwarm(hostname);

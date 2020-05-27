@@ -35,6 +35,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -88,10 +90,9 @@ public class ServiceEntity {
 
   private String outputLabel;
 
-  //TODO use enum https://vladmihalcea.com/the-best-way-to-map-an-enum-type-with-jpa-and-hibernate/
-  // VALUES: frontend, backend, database, system
+  @Enumerated(EnumType.STRING)
   @NotNull
-  private String serviceType;
+  private ServiceType serviceType;
 
   // Average memory consumption in bytes
   @NotNull

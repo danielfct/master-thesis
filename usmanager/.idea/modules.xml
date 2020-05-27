@@ -2,6 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/carts/carts.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/carts/carts.iml" />
+      <module fileurl="file://$PROJECT_DIR$/launcher/launcher.iml" filepath="$PROJECT_DIR$/launcher/launcher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/local-manager/managerLocal.iml" filepath="$PROJECT_DIR$/local-manager/managerLocal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/orders/orders.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/orders/orders.iml" />
+      <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/queue-master/queue-master.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/queue-master/queue-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/registration-server/registration-server.iml" filepath="$PROJECT_DIR$/registration-server/registration-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/microservices/sock-shop/shipping/shipping.iml" filepath="$PROJECT_DIR$/microservices/sock-shop/shipping/shipping.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java-client-register-go/swagger-java-client.iml" filepath="$PROJECT_DIR$/java-client-register-go/swagger-java-client.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/usmanager.iml" filepath="$PROJECT_DIR$/.idea/usmanager.iml" />
     </modules>
   </component>

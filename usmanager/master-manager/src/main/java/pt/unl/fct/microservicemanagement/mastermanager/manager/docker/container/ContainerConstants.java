@@ -24,9 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
-public final class DockerContainer {
+public final class ContainerConstants {
 
-  private DockerContainer() {
+  private ContainerConstants() {
   }
 
   public static final class Environment {
@@ -34,6 +34,10 @@ public final class DockerContainer {
     public static final String SERVICE_REGION = "SERVICE_REGION";
     public static final String SERVICE_COUNTRY = "SERVICE_COUNTRY";
     public static final String SERVICE_CITY = "SERVICE_CITY";
+    public static final String BASIC_AUTH_USERNAME = "BASIC_AUTH_USERNAME";
+    public static final String BASIC_AUTH_PASSWORD = "BASIC_AUTH_PASSWORD";
+    public static final String PROXY_PASS = "PROXY_PASS";
+
   }
 
   public static final class Label {
@@ -47,6 +51,7 @@ public final class DockerContainer {
     public static final String SERVICE_CITY = "serviceCity";
     public static final String FOR_SERVICE = "forService";
     public static final String IS_REPLICABLE = "isReplicable";
+    public static final String IS_STOPPABLE = "isStoppable";
   }
 
 }

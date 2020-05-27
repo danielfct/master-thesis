@@ -24,6 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 
 import java.util.List;
@@ -49,16 +51,16 @@ public class PrometheusService {
   private static final String HOST_AVAILABLE_MEMORY = "node_memory_MemAvailable_bytes";
   private static final String HOST_TOTAL_MEMORY = "node_memory_MemTotal_bytes";
 
-  private final DockerContainersService dockerContainersService;
+  private final ContainersService containersService;
   private final RestTemplate restTemplate;
 
-  public PrometheusService(DockerContainersService dockerContainersService) {
-    this.dockerContainersService = dockerContainersService;
+  public PrometheusService(ContainersService containersService) {
+    this.containersService = containersService;
     this.restTemplate = new RestTemplate();
   }
 
-  public SimpleContainer launchPrometheus(String hostname) {
-    return dockerContainersService.launchSingletonService(hostname, PROMETHEUS);
+  public ContainerEntity launchPrometheus(String hostname) {
+    return containersService.launchContainer(hostname, PROMETHEUS, true);
   }
 
   public double getAvailableMemory(String hostname) {

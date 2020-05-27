@@ -24,6 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
@@ -100,6 +102,12 @@ public final class AppsController {
   public void removeAppService(@PathVariable String appName,
                                @PathVariable String serviceName) {
     appsService.removeService(appName, serviceName);
+  }
+
+  @PostMapping("/{appName}/launch")
+  public Map<String, List<SimpleContainer>> launch(@PathVariable String appName,
+                                                   @Json String region, @Json String country, @Json String city) {
+    return appsService.launch(appName, region, country, city);
   }
 
 }

@@ -24,7 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EurekaService {
 
-  private static final String EUREKA = "eureka-server";
+  public static final String EUREKA = "eureka-server";
 
   private final DockerContainersService dockerContainersService;
   private final HostsService hostsService;
@@ -65,10 +65,10 @@ public class EurekaService {
 
   public Optional<String> getEurekaServerAddress(String region) {
     return dockerContainersService.getContainers(
-        DockerClient.ListContainersParam.withLabel(DockerContainer.Label.SERVICE_NAME, EUREKA),
-        DockerClient.ListContainersParam.withLabel(DockerContainer.Label.SERVICE_REGION, region))
+        DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, EUREKA),
+        DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_REGION, region))
         .stream()
-        .map(container -> container.getLabels().get(DockerContainer.Label.SERVICE_ADDRESS))
+        .map(container -> container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
         .findFirst();
   }
 

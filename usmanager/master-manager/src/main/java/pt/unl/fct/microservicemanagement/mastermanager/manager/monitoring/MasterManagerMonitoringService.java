@@ -25,13 +25,10 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.MasterManagerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -46,54 +43,41 @@ public class MasterManagerMonitoringService {
 
   private final DockerContainersService dockerContainersService;
   private final ContainersMonitoringService containersMonitoringService;
-  private final DockerApiProxyService dockerApiProxyService;
 
   private final long monitorPeriod;
   private final boolean isTestLogsEnable;
-  private boolean isProxyRunning;
 
   public MasterManagerMonitoringService(DockerContainersService dockerContainersService,
                                         ContainersMonitoringService containersMonitoringService,
-                                        DockerApiProxyService dockerApiProxyService,
                                         MasterManagerProperties masterManagerProperties) {
     this.dockerContainersService = dockerContainersService;
-    this.dockerApiProxyService = dockerApiProxyService;
     this.containersMonitoringService = containersMonitoringService;
     this.monitorPeriod = masterManagerProperties.getMonitorPeriod();
     this.isTestLogsEnable = masterManagerProperties.getTests().isTestLogsEnable();
-    this.isProxyRunning = false;
   }
 
   public void initMasterManagerMonitorTimer() {
     if (isTestLogsEnable) {
       new Timer("MasterManagerMonitorTimer", true).schedule(new TimerTask() {
-        private long lastRun = System.currentTimeMillis();
+        private long lastTime = System.currentTimeMillis();
         @Override
         public void run() {
-          long currRun = System.currentTimeMillis();
+          long currentTime = System.currentTimeMillis();
           //TODO replace diffSeconds with calculation from previous database save
-          int diffSeconds = (int) ((currRun - lastRun) / 1000);
-          lastRun = currRun;
-          masterManagerMonitorTask(diffSeconds);
+          int secondsFromLastRun = (int) ((currentTime - lastTime) / 1000);
+          lastTime = currentTime;
+          masterManagerMonitorTask(secondsFromLastRun);
         }
       }, monitorPeriod, monitorPeriod);
     }
   }
 
   private void masterManagerMonitorTask(int secondsFromLastRun) {
-    if (!isProxyRunning) {
-      try {
-        dockerApiProxyService.launchDockerApiProxy("127.0.0.1");
-        isProxyRunning = true;
-      } catch (MasterManagerException e) {
-        e.printStackTrace();
-        isProxyRunning = false;
-      }
-    } else {
-      List<SimpleContainer> container = dockerContainersService.getContainers(
-          DockerClient.ListContainersParam.withLabel(DockerContainer.Label.SERVICE_NAME, MASTER_MANAGER));
-      container.stream().findFirst().ifPresent(c -> saveMasterManagerContainerFields(c, secondsFromLastRun));
-    }
+    dockerContainersService
+        .getContainers(DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, MASTER_MANAGER))
+        .stream()
+        .findFirst()
+        .ifPresent(c -> saveMasterManagerContainerFields(c, secondsFromLastRun));
   }
 
   private void saveMasterManagerContainerFields(SimpleContainer container, int secondsFromLastRun) {

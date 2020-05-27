@@ -91,15 +91,15 @@ public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
 
   @Query("select case when count(d) > 0 then true else false end "
       + "from ServiceEntity s join s.dependencies d "
-      + "where s.id = :serviceId and d.dependency.serviceName = :otherServiceName")
-  boolean serviceDependsOnOtherService(@Param("serviceId") long serviceId,
+      + "where s.serviceName = :serviceName and d.dependency.serviceName = :otherServiceName")
+  boolean serviceDependsOnOtherService(@Param("serviceName") String serviceName,
                                        @Param("otherServiceName") String otherServiceName);
 
   @Query("select d.dependency "
       + "from ServiceEntity s join s.dependencies d "
-      + "where s.id = :serviceId and d.dependency.serviceType = :serviceType")
-  List<ServiceEntity> getDependenciesByType(@Param("serviceId") long serviceId,
-                                            @Param("serviceType") String serviceType);
+      + "where s.serviceName = :serviceName and d.dependency.serviceType = :serviceType")
+  List<ServiceEntity> getDependenciesByType(@Param("serviceName") String serviceName,
+                                            @Param("serviceType") ServiceType serviceType);
 
   @Query("select p "
       + "from ServiceEntity s join s.eventPredictions p "

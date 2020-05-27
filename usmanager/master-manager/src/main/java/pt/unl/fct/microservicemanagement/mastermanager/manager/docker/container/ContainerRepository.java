@@ -10,9 +10,11 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;

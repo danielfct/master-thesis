@@ -108,14 +108,14 @@ class LoadBalancer extends BaseComponent<Props, State> {
   private onPostSuccess = (reply: IReply<ILoadBalancer[]>): void => {
     const loadBalancers = reply.data;
     loadBalancers.forEach(loadBalancer => {
-        super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.id}</b>` : `<a href=/load-balancers/${loadBalancer.id}><b>${loadBalancer.id}</b></a>`} launched</span>`);
+        super.toast(`<span class="green-text">Load-balancer ${this.mounted ? `<b class="white-text">${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} launched</span>`);
         this.props.addLoadBalancer(loadBalancer);
     });
     if (this.mounted) {
       if (loadBalancers.length === 1) {
         const loadBalancer = loadBalancers[0];
         this.updateLoadBalancer(loadBalancer);
-        this.props.history.replace(loadBalancer.id)
+        this.props.history.replace(loadBalancer.containerId)
       }
       else {
         this.props.history.push('/load-balancers');
@@ -127,14 +127,14 @@ class LoadBalancer extends BaseComponent<Props, State> {
     super.toast(`Unable to launch load-balancer`, 10000, reason, true);
 
   private onDeleteSuccess = (loadBalancer: ILoadBalancer): void => {
-    super.toast(`<span class="green-text">Load-balancer <b class="white-text">${loadBalancer.id}</b> successfully stopped</span>`);
+    super.toast(`<span class="green-text">Load-balancer <b class="white-text">${loadBalancer.containerId}</b> successfully stopped</span>`);
     if (this.mounted) {
       this.props.history.push(`/load-balancers`)
     }
   };
 
   private onDeleteFailure = (reason: string, loadBalancer: ILoadBalancer): void =>
-    super.toast(`Unable to stop ${this.mounted ? `<b>${loadBalancer.id}</b>` : `<a href=/load-balancers/${loadBalancer.id}><b>${loadBalancer.id}</b></a>`} load-balancer`, 10000, reason, true);
+    super.toast(`Unable to stop ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} load-balancer`, 10000, reason, true);
 
   private updateLoadBalancer = (loadBalancer: ILoadBalancer) => {
     //const previousLoadBalancer = this.getLoadBalancer();
@@ -165,7 +165,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
 
   private getSelectableServices = () =>
     Object.entries(this.props.services)
-          .filter(([_, service]) => service.serviceType === 'frontend')
+          .filter(([_, service]) => service.serviceType.toLowerCase() === 'frontend')
           .map(([key, _]) => key);
 
   private loadBalancer = () => {
@@ -174,7 +174,6 @@ class LoadBalancer extends BaseComponent<Props, State> {
     const formLoadBalancer = this.getFormLoadBalancer();
     // @ts-ignore
     const loadBalancerKey: (keyof ILoadBalancer) = formLoadBalancer && Object.keys(formLoadBalancer)[0];
-    console.log(formLoadBalancer)
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}

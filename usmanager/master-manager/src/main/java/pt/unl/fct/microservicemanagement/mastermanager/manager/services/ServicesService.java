@@ -150,15 +150,15 @@ public class ServicesService {
     return services.getDependencies(serviceName);
   }
 
-  public List<ServiceEntity> getDependenciesByType(Long serviceId, String serviceType) {
-    assertServiceExists(serviceId);
-    return services.getDependenciesByType(serviceId, serviceType);
+  public List<ServiceEntity> getDependenciesByType(String serviceName, ServiceType type) {
+    assertServiceExists(serviceName);
+    return services.getDependenciesByType(serviceName, type);
   }
 
-  public boolean serviceDependsOnOtherService(Long serviceId, String otherServiceName) {
-    assertServiceExists(serviceId);
+  public boolean serviceDependsOn(String serviceName, String otherServiceName) {
+    assertServiceExists(serviceName);
     assertServiceExists(otherServiceName);
-    return services.serviceDependsOnOtherService(serviceId, otherServiceName);
+    return services.serviceDependsOnOtherService(serviceName, otherServiceName);
   }
 
   public void addDependency(String serviceName, String dependencyName) {

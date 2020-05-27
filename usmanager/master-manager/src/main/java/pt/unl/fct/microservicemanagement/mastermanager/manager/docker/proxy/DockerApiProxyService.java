@@ -26,65 +26,61 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class DockerApiProxyService {
 
   public static final String DOCKER_API_PROXY = "docker-api-proxy";
 
-  private final DockerContainersService dockerContainersService;
+  private final ContainersService containersService;
   private final ServicesService serviceService;
   private final SshService sshService;
 
   private final String dockerApiProxyUsername;
   private final String dockerApiProxyPassword;
-  private final String dockerHubUsername;
+  private final int dockerApiProxyPort;
 
-  public DockerApiProxyService(DockerContainersService dockerContainersService, ServicesService serviceService,
+  public DockerApiProxyService(ContainersService containersService, ServicesService serviceService,
                                SshService sshService,
                                DockerProperties dockerProperties) {
-    this.dockerContainersService = dockerContainersService;
+    this.containersService = containersService;
     this.serviceService = serviceService;
     this.sshService = sshService;
     this.dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
     this.dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
-    this.dockerHubUsername = dockerProperties.getHub().getUsername();
+    this.dockerApiProxyPort = dockerProperties.getApiProxy().getPort();
   }
 
-  public void launchDockerApiProxy(String hostname) {
-    ServiceEntity dockerApiProxy = serviceService.getService(DOCKER_API_PROXY);
-    String serviceName = dockerApiProxy.getServiceName();
-    String serviceType = dockerApiProxy.getServiceType();
-    String externalPort = dockerApiProxy.getDefaultExternalPort();
-    String internalPort = dockerApiProxy.getDefaultInternalPort();
-    var dockerRepository = String.format("%s/%s", dockerHubUsername, dockerApiProxy.getDockerRepository());
-    var command = String.format("COUNT_API_PROXY=$(docker ps --filter 'name=%s' | grep '%s' | wc -l) && "
-            + "if [ $COUNT_API_PROXY = 1 ]; then echo 'Proxy is running'; "
-            + "else PRIVATE_IP=$(/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1) && "
-            + "docker pull %s && "
-            + "docker run -itd --name=docker-api-proxy -p %s:%s --rm "
-            + "-e BASIC_AUTH_USERNAME=%s -e BASIC_AUTH_PASSWORD=%s -e PROXY_PASS=http://$PRIVATE_IP:2376 "
-            + "-l serviceName=%s -l serviceType=%s -l serviceAddr=%s:%s -l serviceHostname=%s -l isReplicable=%b "
-            + "-l isStoppable=%b %s && echo 'Proxy launched'; fi",
-        serviceName, dockerRepository, dockerRepository, externalPort, internalPort,
-        dockerApiProxyUsername, dockerApiProxyPassword, serviceName, serviceType, hostname, externalPort,
-        hostname, false, false, dockerRepository);
-    //TODO use launchContainer instead
-    CommandResult commandResult = sshService.execCommand(hostname, "launchDockerApiProxy", command);
-
-    dockerContainersService.launchSingletonService(hostname)
-
-    if (!commandResult.isSuccessful()) {
+  public ContainerEntity launchDockerApiProxy(String hostname) {
+    var privateIpCommand = "/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1";
+    CommandResult privateIpResult = sshService.execCommand(hostname, "launchDockerApiProxy", privateIpCommand);
+    if (!privateIpResult.isSuccessful()) {
       throw new MasterManagerException("Unsuccessful launch of docker api proxy on host %s: %s", hostname,
-          commandResult.getError());
+          privateIpResult.getError());
     }
+    String privateIp = privateIpResult.getOutput();
+    var environment = List.of(
+        String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername),
+        String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_PASSWORD,
+            dockerApiProxyPassword),
+        String.format("%s=http://%s:%d", ContainerConstants.Environment.PROXY_PASS, privateIp,
+            dockerApiProxyPort));
+    var labels = Map.of(
+        ContainerConstants.Label.IS_REPLICABLE, String.valueOf(false),
+        ContainerConstants.Label.IS_STOPPABLE, String.valueOf(false));
+    return containersService.launchContainer(hostname, DOCKER_API_PROXY, true, environment, labels);
   }
 
 }

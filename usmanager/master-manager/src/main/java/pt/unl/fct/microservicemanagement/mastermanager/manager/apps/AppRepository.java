@@ -44,9 +44,9 @@ public interface AppRepository extends CrudRepository<AppEntity, Long> {
 
   @Query("select new pt.unl.fct.microservicemanagement.mastermanager.manager.services"
       + ".ServiceOrder(s.service, s.launchOrder) "
-      + "from AppEntity a inner join a.appServices s "
-      + "where a.id = :appId order by s.launchOrder")
-  List<ServiceOrder> getServiceOrderByService(@Param("appId") long appId);
+      + "from AppEntity a join a.appServices s "
+      + "where a.name = :appName order by s.launchOrder")
+  List<ServiceOrder> getServicesOrder(@Param("appName") String appName);
 
   Optional<AppEntity> findByNameIgnoreCase(@Param("name") String name);
 

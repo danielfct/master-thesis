@@ -152,7 +152,7 @@ const prediction: schema.Entity<IPrediction> = new schema.Entity('predictions', 
 });
 
 const container: schema.Entity<IContainer> = new schema.Entity('containers', undefined, {
-    idAttribute: (container: IContainer) => container.id.toString()
+    idAttribute: (container: IContainer) => container.containerId
 });
 
 const cloudHost: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', undefined, {
@@ -223,11 +223,11 @@ const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
 });
 
 const loadBalancer: schema.Entity<ILoadBalancer> = new schema.Entity('loadBalancers', undefined, {
-    idAttribute: (loadBalancer: ILoadBalancer) => loadBalancer.id
+    idAttribute: (loadBalancer: ILoadBalancer) => loadBalancer.containerId
 });
 
 const eurekaServer: schema.Entity<IEurekaServer> = new schema.Entity('eurekaServers', undefined, {
-    idAttribute: (eurekaServer: IEurekaServer) => eurekaServer.id
+    idAttribute: (eurekaServer: IEurekaServer) => eurekaServer.containerId
 });
 
 const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {

@@ -11,17 +11,11 @@ interface EurekaServerCardProps {
 type Props = EurekaServerCardProps;
 
 const EurekaServerCard = ({eurekaServer}: Props) => (
-  <Card<IContainer> title={eurekaServer.id.toString()}
-                    link={{to: {pathname: `/eureka-servers/${eurekaServer.id}`, state: eurekaServer}}}
-                    height={'150px'}
+  <Card<IContainer> title={eurekaServer.containerId.toString()}
+                    link={{to: {pathname: `/eureka-servers/${eurekaServer.containerId}`, state: eurekaServer}}}
+                    height={'125px'}
                     margin={'10px 0'}
                     hoverable>
-    <CardItem key={'state'}
-              label={'State'}
-              value={eurekaServer.state}/>
-    <CardItem key={'status'}
-              label={'Status'}
-              value={eurekaServer.status}/>
     <CardItem key={'hostname'}
               label={'Hostname'}
               value={eurekaServer.hostname}/>

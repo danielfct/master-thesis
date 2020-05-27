@@ -45,7 +45,7 @@ docker:
   api-proxy:
     username: username
     password: password
-    port: 2375
+    port: 2376
   hub:
     username: danielfct
   install-script-path: src/main/resources/scripts/docker-install.sh

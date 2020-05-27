@@ -24,23 +24,16 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
 
-import com.spotify.docker.client.DockerClient;
 import net.minidev.json.JSONArray;
 import org.springframework.web.bind.annotation.RequestParam;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,83 +49,65 @@ public class ContainersController {
 
   //TODO substituir os reqs por objetos, ou @JsonValue annotation
 
-  private final DockerContainersService dockerContainersService;
+  //private final DockerContainersService dockerContainersService;
   private final ContainersService containersService;
   private final EurekaService eurekaService;
   private final NginxLoadBalancerService nginxLoadBalancerService;
 
-  public ContainersController(DockerContainersService dockerContainersService,
-                              ContainersService containersService,
+  public ContainersController(ContainersService containersService,
                               EurekaService eurekaService,
                               NginxLoadBalancerService nginxLoadBalancerService) {
-    this.dockerContainersService = dockerContainersService;
     this.containersService = containersService;
     this.eurekaService = eurekaService;
     this.nginxLoadBalancerService = nginxLoadBalancerService;
   }
 
-  @GetMapping("/docker")
-  public List<SimpleContainer> getContainers(@RequestParam(required = false) String serviceName) {
-    List<SimpleContainer> containers;
+  @GetMapping
+  public Iterable<ContainerEntity> getContainers(@RequestParam(required = false) String serviceName) {
+    Iterable<ContainerEntity> containers;
     if (serviceName != null) {
-      containers = dockerContainersService.getContainers(
-          DockerClient.ListContainersParam.withLabel("serviceName", serviceName));
+      containers = containersService.getContainers(Map.of(ContainerConstants.Label.SERVICE_NAME, serviceName));
     } else {
-      containers = dockerContainersService.getContainers();
+      containers = containersService.getContainers();
     }
     return containers;
   }
 
-  @GetMapping("/docker/{id}")
-  public SimpleContainer getContainer(@PathVariable String id) {
-    return dockerContainersService.getContainer(id);
+  @GetMapping("/{id}")
+  public ContainerEntity getContainer(@PathVariable String id) {
+    return containersService.getContainer(id);
   }
 
-  @PostMapping("/docker")
-  public SimpleContainer launchContainer(@Json String hostname, @Json String service,
+  @PostMapping
+  public ContainerEntity launchContainer(@Json String hostname, @Json String service,
                                          @Json String internalPort, @Json String externalPort) {
-    return dockerContainersService.launchContainer(hostname, service, internalPort, externalPort);
+    return containersService.launchContainer(hostname, service, internalPort, externalPort);
   }
 
-  @DeleteMapping("/docker/{id}")
-  public void stopContainer(@PathVariable String id) {
-    dockerContainersService.stopContainer(id);
+  @DeleteMapping("/{id}")
+  public void deleteContainer(@PathVariable String id) {
+    containersService.deleteContainer(id);
   }
 
-  @PostMapping("/docker/{id}/replicate")
-  public SimpleContainer replicateContainer(@PathVariable String id, @Json String hostname) {
-    return dockerContainersService.replicateContainer(id, hostname);
+  @PostMapping("/{id}/replicate")
+  public ContainerEntity replicateContainer(@PathVariable String id, @Json String hostname) {
+    return containersService.replicateContainer(id, hostname);
   }
 
-  @PostMapping("/docker/{id}/migrate")
-  public SimpleContainer migrateContainer(@PathVariable String id, @Json String hostname) {
-    return dockerContainersService.migrateContainer(id, hostname);
-  }
-
-  //TODO move to app controller
-  //FIXME add appId to launchAppReq
-  @PostMapping("/app/{appId}")
-  public Map<String, List<SimpleContainer>> launchApp(@PathVariable long appId,
-                                                      @RequestBody LaunchAppReq launchAppReq) {
-    final var region = launchAppReq.getRegion();
-    final var country = launchAppReq.getCountry();
-    final var city = launchAppReq.getCity();
-    return dockerContainersService.launchMicroserviceApplication(appId, region, country, city);
+  @PostMapping("/{id}/migrate")
+  public ContainerEntity migrateContainer(@PathVariable String id, @Json String hostname) {
+    return containersService.migrateContainer(id, hostname);
   }
 
   @PostMapping("/load-balancer")
-  public List<SimpleContainer> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
+  public List<ContainerEntity> launchLoadBalancer(@Json String service, @Json JSONArray regions) {
     return nginxLoadBalancerService.launchLoadBalancers(service, regions.toArray(new String[0]));
   }
 
+  //TODO
   @PostMapping("/eureka-server")
   public List<SimpleContainer> launchEureka(@Json JSONArray regions) {
     return eurekaService.launchEurekaServers(regions.toArray(new String[0]));
-  }
-
-  @GetMapping
-  public Iterable<ContainerEntity> getCont() {
-    return containersService.getContainers();
   }
 
   @PostMapping("/reload")

@@ -25,7 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
@@ -292,7 +292,7 @@ public class HostsMonitoringService {
       return Pair.of("", "");
     }
     SimpleContainer container = hostContainers.get(0);
-    return Pair.of(container.getLabels().get(DockerContainer.Label.SERVICE_NAME), container.getId());
+    return Pair.of(container.getLabels().get(ContainerConstants.Label.SERVICE_NAME), container.getId());
   }
 
 }

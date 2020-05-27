@@ -12,8 +12,9 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.ngi
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionsService;
@@ -21,7 +22,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceE
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,7 +43,7 @@ public class NginxLoadBalancerService {
 
   public static final String LOAD_BALANCER = "load-balancer";
 
-  private final DockerContainersService dockerContainersService;
+  private final ContainersService containersService;
   private final HostsService hostsService;
   private final ServicesService serviceService;
   private final RegionsService regionsService;
@@ -54,11 +54,11 @@ public class NginxLoadBalancerService {
   private final HttpHeaders headers;
   private final RestTemplate restTemplate;
 
-  public NginxLoadBalancerService(DockerContainersService dockerContainersService, HostsService hostsService,
+  public NginxLoadBalancerService(ContainersService containersService, HostsService hostsService,
                                   ServicesService serviceService, RegionsService regionsService,
                                   NginxLoadBalancerProperties nginxLoadBalancerProperties,
                                   DockerProperties dockerProperties) {
-    this.dockerContainersService = dockerContainersService;
+    this.containersService = containersService;
     this.hostsService = hostsService;
     this.serviceService = serviceService;
     this.regionsService = regionsService;
@@ -72,7 +72,7 @@ public class NginxLoadBalancerService {
     this.restTemplate = new RestTemplate();
   }
 
-  public List<SimpleContainer> launchLoadBalancers(String serviceName, String[] regions) {
+  public List<ContainerEntity> launchLoadBalancers(String serviceName, String[] regions) {
     ServiceEntity serviceConfig = serviceService.getService(LOAD_BALANCER);
     double expectedMemoryConsumption = serviceConfig.getExpectedMemoryConsumption();
     List<String> availableHostnames = Stream.of(regions)
@@ -84,38 +84,41 @@ public class NginxLoadBalancerService {
         .collect(Collectors.toList());
   }
 
-  private SimpleContainer launchLoadBalancer(String hostname, String serviceName) {
+  private ContainerEntity launchLoadBalancer(String hostname, String serviceName) {
     //TODO get port from properties
     return launchLoadBalancer(hostname, serviceName, "127.0.0.1:1906", "none", "none", "none", "none");
   }
 
-  private SimpleContainer launchLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,
+  private ContainerEntity launchLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,
                                              String region, String country, String city) {
-    var customEnvs = List.of(
+    var environment = List.of(
         "SERVER1=" + serverAddr,
         "SERVER1_CONTINENT=" + continent,
         "SERVER1_REGION=" + region,
         "SERVER1_COUNTRY=" + country,
         "SERVER1_CITY=" + city,
         "BASIC_AUTH_USERNAME=" + dockerApiProxyUsername,
-        "BASIC_AUTH_PASSWORD=" + dockerApiProxyPassword);
-    var customLabels = Map.of(DockerContainer.Label.FOR_SERVICE, serviceName);
-    Map<String, String> dynamicLaunchParams = Collections.emptyMap();
-    return dockerContainersService
-        .launchContainer(hostname, LOAD_BALANCER, customEnvs, customLabels, dynamicLaunchParams);
+        "BASIC_AUTH_PASSWORD=" + dockerApiProxyPassword
+    );
+    var labels = Map.of(
+        ContainerConstants.Label.FOR_SERVICE, serviceName
+    );
+    return containersService.launchContainer(hostname, LOAD_BALANCER, environment, labels);
   }
 
-  private List<SimpleContainer> getLoadBalancersFromService(String serviceName) {
-    return dockerContainersService.getContainers(
-        DockerClient.ListContainersParam.withLabel(DockerContainer.Label.SERVICE_NAME, LOAD_BALANCER),
-        DockerClient.ListContainersParam.withLabel(DockerContainer.Label.FOR_SERVICE, serviceName));
+  private List<ContainerEntity> getLoadBalancersFromService(String serviceName) {
+    Map<String, String> labels = Map.of(
+        ContainerConstants.Label.SERVICE_NAME, LOAD_BALANCER,
+        ContainerConstants.Label.FOR_SERVICE, serviceName
+    );
+    return containersService.getContainers(labels);
   }
 
   public void addToLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,
                                 String region, String country, String city) {
-    List<SimpleContainer> loadBalancers = getLoadBalancersFromService(serviceName);
+    List<ContainerEntity> loadBalancers = getLoadBalancersFromService(serviceName);
     if (loadBalancers.isEmpty()) {
-      SimpleContainer container = launchLoadBalancer(hostname, serviceName, serverAddr, continent, region,
+      ContainerEntity container = launchLoadBalancer(hostname, serviceName, serverAddr, continent, region,
           country, city);
       loadBalancers = List.of(container);
     }
@@ -137,24 +140,24 @@ public class NginxLoadBalancerService {
 
   public void removeFromLoadBalancer(String hostname, String containerId) {
     log.info("Removing container '{}' from load balancer", containerId);
-    Map<String, String> labels = dockerContainersService.inspectContainer(containerId, hostname).config().labels();
-    String serviceType = labels.get(DockerContainer.Label.SERVICE_TYPE);
-    String serviceName = labels.get(DockerContainer.Label.SERVICE_NAME);
-    String serverAddress = labels.get(DockerContainer.Label.SERVICE_ADDRESS);
+    Map<String, String> labels = containersService.getContainer(containerId).getLabels();
+    String serviceType = labels.get(ContainerConstants.Label.SERVICE_TYPE);
+    String serviceName = labels.get(ContainerConstants.Label.SERVICE_NAME);
+    String serverAddress = labels.get(ContainerConstants.Label.SERVICE_ADDRESS);
     if (serviceType == null || serviceName == null | serverAddress == null) {
       throw new MasterManagerException("Failed to remove container %s from load balancer: "
           + "labels %s, %s and %s are required. Current container labels = %s", containerId,
-          DockerContainer.Label.SERVICE_NAME, DockerContainer.Label.SERVICE_TYPE,
-          DockerContainer.Label.SERVICE_ADDRESS, labels);
+          ContainerConstants.Label.SERVICE_NAME, ContainerConstants.Label.SERVICE_TYPE,
+          ContainerConstants.Label.SERVICE_ADDRESS, labels);
     }
     if (!Objects.equals(serviceType, "frontend")) {
       throw new MasterManagerException("Failed to remove container %s from load balancer: "
           + "%s doesn't support load balancer", containerId, serviceType);
     }
-    List<SimpleContainer> loadBalancers = getLoadBalancersFromService(serviceName);
+    List<ContainerEntity> loadBalancers = getLoadBalancersFromService(serviceName);
     loadBalancers.forEach(loadBalancer -> {
       String url = String.format("http://%s%s/servers",
-          loadBalancer.getLabels().get(DockerContainer.Label.SERVICE_ADDRESS), nginxApiUrl);
+          loadBalancer.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS), nginxApiUrl);
       var server = new NginxSimpleServer(serverAddress);
       HttpEntity<NginxSimpleServer> request = new HttpEntity<>(server, headers);
       ResponseEntity<Message> response = restTemplate.exchange(url, HttpMethod.DELETE, request, Message.class);

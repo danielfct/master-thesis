@@ -93,7 +93,7 @@ export default class ContainerSimulatedMetricsDetail extends React.Component {
     if (this.state.containers) {
       containersNodes = this.state.containers.map(function (container) {
         return (
-          <option key={container.id} value={container.id}>{container.names[0]}</option>
+          <option key={container.containerId} value={container.containerId}>{container.names[0]}</option>
         );
       });
       return containersNodes;

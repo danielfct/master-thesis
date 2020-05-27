@@ -24,14 +24,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -44,11 +44,13 @@ import org.springframework.stereotype.Service;
 public class AppsService {
 
   private final AppRepository apps;
-  private final ServicesService services;
+  private final ServicesService servicesService;
+  private final ContainersService containersService;
 
-  public AppsService(AppRepository apps, ServicesService services) {
+  public AppsService(AppRepository apps, ServicesService servicesService, ContainersService containersService) {
     this.apps = apps;
-    this.services = services;
+    this.servicesService = servicesService;
+    this.containersService = containersService;
   }
 
   public Iterable<AppEntity> getApps() {
@@ -93,14 +95,13 @@ public class AppsService {
     return apps.getServices(appName);
   }
 
-  //FIXME
-  public List<ServiceOrder> getServiceByAppId(long appId) {
-    return apps.getServiceOrderByService(appId);
+  public List<ServiceOrder> getServicesOrder(String appName) {
+    return apps.getServicesOrder(appName);
   }
 
   public void addService(String appName, String serviceName, int order) {
     var app = getApp(appName);
-    var service = services.getService(serviceName);
+    var service = servicesService.getService(serviceName);
     var appService = AppServiceEntity.builder()
         .app(app)
         .service(service)
@@ -137,6 +138,10 @@ public class AppsService {
     if (apps.hasApp(name)) {
       throw new DataIntegrityViolationException("App '" + name + "' already exists");
     }
+  }
+
+  public Map<String, List<SimpleContainer>> launch(String appName, String region, String country, String city) {
+    return containersService.launchApp(appName, region, country, city);
   }
 
 }

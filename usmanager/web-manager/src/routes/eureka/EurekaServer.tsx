@@ -101,14 +101,14 @@ class EurekaServer extends BaseComponent<Props, State> {
   private onPostSuccess = (reply: IReply<IEurekaServer[]>): void => {
     const eurekaServers = reply.data;
     eurekaServers.forEach(eurekaServer => {
-        super.toast(`<span class="green-text">Eureka server ${this.mounted ? `<b class="white-text">${eurekaServer.id}</b>` : `<a href=/eureka-servers/${eurekaServer.id}><b>${eurekaServer.id}</b></a>`} launched</span>`);
+        super.toast(`<span class="green-text">Eureka server ${this.mounted ? `<b class="white-text">${eurekaServer.containerId}</b>` : `<a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a>`} launched</span>`);
         this.props.addEurekaServer(eurekaServer);
     });
     if (this.mounted) {
       if (eurekaServers.length === 1) {
         const eurekaServer = eurekaServers[0];
         this.updateEurekaServer(eurekaServer);
-        this.props.history.replace(eurekaServer.id)
+        this.props.history.replace(eurekaServer.containerId)
       }
       else {
         this.props.history.push('/eureka-servers');
@@ -120,14 +120,14 @@ class EurekaServer extends BaseComponent<Props, State> {
     super.toast(`Unable to launch eureka server`, 10000, reason, true);
 
   private onDeleteSuccess = (eurekaServer: IEurekaServer): void => {
-    super.toast(`<span class="green-text">Eureka server <b class="white-text">${eurekaServer.id}</b> successfully stopped</span>`);
+    super.toast(`<span class="green-text">Eureka server <b class="white-text">${eurekaServer.containerId}</b> successfully stopped</span>`);
     if (this.mounted) {
       this.props.history.push(`/eureka-servers`)
     }
   };
 
   private onDeleteFailure = (reason: string, eurekaServer: IEurekaServer): void =>
-    super.toast(`Unable to stop ${this.mounted ? `<b>${eurekaServer.id}</b>` : `<a href=/eureka-servers/${eurekaServer.id}><b>${eurekaServer.id}</b></a>`} eureka server`, 10000, reason, true);
+    super.toast(`Unable to stop ${this.mounted ? `<b>${eurekaServer.containerId}</b>` : `<a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a>`} eureka server`, 10000, reason, true);
 
   private updateEurekaServer = (eurekaServer: IEurekaServer) => {
     //const previousEurekaServer = this.getEurekaServer();

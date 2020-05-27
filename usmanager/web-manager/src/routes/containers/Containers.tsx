@@ -30,13 +30,11 @@ class Containers extends BaseComponent<Props, {}> {
   }
 
   private container = (container: IContainer): JSX.Element =>
-    <ContainerCard key={container.id} container={container}/>;
+    <ContainerCard key={container.containerId} container={container}/>;
 
   private predicate = (container: IContainer, search: string): boolean =>
-    container.id.toString().toLowerCase().includes(search)
+    container.containerId.toString().toLowerCase().includes(search)
     || container.image.toLowerCase().includes(search)
-    || container.state.toLowerCase().includes(search)
-    || container.status.toLowerCase().includes(search)
     || container.hostname.toLowerCase().includes(search);
 
   private reloadContainers = () => {

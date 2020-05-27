@@ -24,8 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.SimpleContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
@@ -180,7 +180,7 @@ public class ContainersMonitoringService {
     for (SimpleContainer container : containers) {
       log.info("On {}", container);
       String containerId = container.getId();
-      String serviceName = container.getLabels().get(DockerContainer.Label.SERVICE_NAME);
+      String serviceName = container.getLabels().get(ContainerConstants.Label.SERVICE_NAME);
       String serviceHostname = container.getHostname();
       Map<String, Double> newFields = getContainerStats(container, secondsFromLastRun);
       newFields.forEach((field, value) -> {
@@ -410,7 +410,7 @@ public class ContainersMonitoringService {
     String containerId = container.getId();
     String containerHostname = container.getHostname();
     String containerName = container.getNames().get(0);
-    String serviceName = container.getLabels().getOrDefault(DockerContainer.Label.SERVICE_NAME, containerName);
+    String serviceName = container.getLabels().getOrDefault(ContainerConstants.Label.SERVICE_NAME, containerName);
     ContainerStats containerStats = dockerContainersService.getContainerStats(containerId, containerHostname);
     CpuStats cpuStats = containerStats.cpuStats();
     CpuStats preCpuStats = containerStats.precpuStats();
@@ -434,7 +434,7 @@ public class ContainersMonitoringService {
         "rx-bytes", rxBytes,
         "tx-bytes", txBytes));
     // Simulated metrics
-    if (container.getLabels().containsKey(DockerContainer.Label.SERVICE_NAME)) {
+    if (container.getLabels().containsKey(ContainerConstants.Label.SERVICE_NAME)) {
       //TODO
       Map<String, Double> simulatedFields = new HashMap<>();
       //Map<String, Double> simulatedFields = simulatedMetricsService.getContainerFieldsValue(serviceName, containerId);

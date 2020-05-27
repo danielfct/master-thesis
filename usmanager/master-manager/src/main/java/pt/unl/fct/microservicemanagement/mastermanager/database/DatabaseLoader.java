@@ -40,6 +40,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldRepos
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes.ComponentTypeEntity;
@@ -71,7 +72,7 @@ public class DatabaseLoader {
   CommandLineRunner initDatabase(PasswordEncoder encoder, UsersRepository users, AppRepository apps,
                                  ServiceRepository services, AppServiceRepository appServices,
                                  ServiceDependencyRepository servicesDependencies, RegionRepository regions,
-                                 CloudHostRepository cloudHosts, EdgeHostRepository edgeHosts,
+                                 EdgeHostRepository edgeHosts,
                                  ComponentTypeRepository componentTypes, OperatorRepository operators,
                                  DecisionRepository decisions, FieldRepository fields,
                                  ValueModeRepository valueModes, ConditionRepository conditions,
@@ -102,7 +103,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${front-endHost}")
-          .serviceType("frontend")
+          .serviceType(ServiceType.FRONTEND)
           .expectedMemoryConsumption(209715200d)
           .build();
       frontend = services.save(frontend);
@@ -116,7 +117,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${userHost}")
-          .serviceType("backend")
+          .serviceType(ServiceType.BACKEND)
           .expectedMemoryConsumption(62914560d)
           .build();
       user = services.save(user);
@@ -130,7 +131,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${userDatabaseHost}")
-          .serviceType("database")
+          .serviceType(ServiceType.DATABASE)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(userDb);
@@ -144,7 +145,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${catalogueHost}")
-          .serviceType("backend")
+          .serviceType(ServiceType.DATABASE)
           .expectedMemoryConsumption(62914560d)
           .build();
       services.save(catalogue);
@@ -158,7 +159,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${catalogueDatabaseHost}")
-          .serviceType("database")
+          .serviceType(ServiceType.DATABASE)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(catalogueDb);
@@ -172,7 +173,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${paymentHost}")
-          .serviceType("backend")
+          .serviceType(ServiceType.BACKEND)
           .expectedMemoryConsumption(62914560d)
           .build();
       services.save(payment);
@@ -186,7 +187,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${cartsHost}")
-          .serviceType("backend")
+          .serviceType(ServiceType.BACKEND)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(carts);
@@ -200,7 +201,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${cartsDatabaseHost}")
-          .serviceType("database")
+          .serviceType(ServiceType.DATABASE)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(cartsDb);
@@ -214,7 +215,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${ordersHost}")
-          .serviceType("backend")
+          .serviceType(ServiceType.BACKEND)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(orders);
@@ -229,7 +230,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${ordersDatabaseHost}")
-          .serviceType("database")
+          .serviceType(ServiceType.DATABASE)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(ordersDb);
@@ -243,7 +244,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${shippingHost}")
-          .serviceType("backend")
+          .serviceType(ServiceType.BACKEND)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(shipping);
@@ -257,7 +258,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${queue-masterHost}")
-          .serviceType("backend")
+          .serviceType(ServiceType.BACKEND)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(queueMaster);
@@ -271,7 +272,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(1)
           .outputLabel("${rabbitmqHost}")
-          .serviceType("backend")
+          .serviceType(ServiceType.BACKEND)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(rabbitmq);
@@ -285,7 +286,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${eurekaHost}")
-          .serviceType("system")
+          .serviceType(ServiceType.SYSTEM)
           .expectedMemoryConsumption(262144000d)
           .build();
       services.save(eurekaServer);
@@ -299,7 +300,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${loadBalancerHost}")
-          .serviceType("system")
+          .serviceType(ServiceType.SYSTEM)
           .expectedMemoryConsumption(10485760d)
           .build();
       services.save(loadBalancer);
@@ -313,7 +314,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${dockerApiProxyHost}")
-          .serviceType("system")
+          .serviceType(ServiceType.SYSTEM)
           .expectedMemoryConsumption(10485760d)
           .build();
       services.save(dockerApiProxy);
@@ -327,7 +328,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${prometheusHost}")
-          .serviceType("system")
+          .serviceType(ServiceType.SYSTEM)
           .expectedMemoryConsumption(52428800d)
           .build();
       services.save(prometheus);
@@ -341,7 +342,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${requestLocationMonitorHost}")
-          .serviceType("system")
+          .serviceType(ServiceType.SYSTEM)
           .expectedMemoryConsumption(52428800d)
           .build();
       services.save(requestLocationMonitor);
@@ -358,7 +359,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(1)
           .outputLabel("${masterManagerHost}")
-          .serviceType("system")
+          .serviceType(ServiceType.SYSTEM)
           // TODO
           .expectedMemoryConsumption(0d)
           .build();
@@ -377,7 +378,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${localManagerHost}")
-          .serviceType("system")
+          .serviceType(ServiceType.SYSTEM)
           // TODO
           .expectedMemoryConsumption(0d)
           .build();
@@ -395,7 +396,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(3)
           .outputLabel("${consulServerHost}")
-          .serviceType("system")
+          .serviceType(ServiceType.SYSTEM)
           // TODO
           .expectedMemoryConsumption(0d)
           .build();
@@ -412,7 +413,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(1)
           .outputLabel("${consulClientHost}")
-          .serviceType("system")
+          .serviceType(ServiceType.SYSTEM)
           // TODO
           .expectedMemoryConsumption(0d)
           .build();
@@ -624,9 +625,6 @@ public class DatabaseLoader {
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(rabbitmqEurekaServerDependency);
-
-      // containers
-      //dockerContainersService.reloadContainers(); //TODO move to after launching docker api proxy
 
       // regions
       var usEast1 = RegionEntity.builder()
