@@ -774,7 +774,12 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         if (data?.appsNames?.length) {
-          service.apps?.unshift(...data?.appsNames);
+          if (service.apps) {
+            service.apps.unshift(...data.appsNames);
+          }
+          else {
+           service.apps = data.appsNames;
+          }
           return merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
       }
@@ -814,7 +819,12 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         if (data?.dependenciesNames?.length) {
-          service.dependencies?.unshift(...data?.dependenciesNames);
+          if (service.dependencies) {
+            service.dependencies.unshift(...data.dependenciesNames);
+          }
+          else {
+            service.dependencies = data.dependenciesNames;
+          }
           return merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
       }
@@ -914,7 +924,12 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         if (data?.rulesNames?.length) {
-          service.serviceRules?.unshift(...data?.rulesNames);
+          if (service.serviceRules) {
+            service.serviceRules.unshift(...data.rulesNames);
+          }
+          else {
+            service.serviceRules = data.rulesNames;
+          }
           return merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
         }
       }
@@ -971,7 +986,7 @@ const entities = (state: EntitiesState = {
       return merge({}, state, { containers: { isLoadingLogs: false, loadLogsError: error } });
     case CONTAINER_LOGS_SUCCESS:
       const container = entity && state.containers.data[entity];
-      const logs = { logs: data || [] };
+      const logs = { logs: data || "" };
       const containerWithLogs = Object.assign(container ? container : [entity], logs);
       const normalizedContainer = normalize(containerWithLogs, Schemas.CONTAINER).entities;
       return merge({}, state, {
@@ -1046,10 +1061,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.rulesNames?.length) {
         const cloudHost = state.hosts.cloud.data[entity];
         if (cloudHost) {
-          if (!cloudHost.hostRules) {
-            cloudHost.hostRules = [];
+          if (cloudHost.hostRules) {
+            cloudHost.hostRules.unshift(...data.rulesNames);
           }
-          cloudHost.hostRules.unshift(...data.rulesNames);
+          else {
+            cloudHost.hostRules = data.rulesNames;
+          }
           const normalizedCloudHost = normalize(cloudHost, Schemas.CLOUD_HOST).entities.cloudHosts;
           return merge({}, state, { hosts: { cloud: { data: { ...normalizedCloudHost } } } });
         }
@@ -1129,10 +1146,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.rulesNames?.length) {
         const edgeHost = state.hosts.edge.data[entity];
         if (edgeHost) {
-          if (!edgeHost.hostRules) {
-            edgeHost.hostRules = [];
+          if (edgeHost.hostRules) {
+            edgeHost.hostRules.unshift(...data.rulesNames);
           }
-          edgeHost.hostRules.unshift(...data.rulesNames);
+          else {
+            edgeHost.hostRules = data.rulesNames;
+          }
           const normalizedEdgeHost = normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts;
           return merge({}, state, { hosts: { edge: { data: { ...normalizedEdgeHost } } } });
         }
@@ -1242,7 +1261,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.conditionsNames?.length) {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
-          rule.conditions?.unshift(...data?.conditionsNames);
+          if (rule.conditions) {
+            rule.conditions.unshift(...data.conditionsNames);
+          }
+          else {
+            rule.conditions = data.conditionsNames;
+          }
           return merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
@@ -1290,7 +1314,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.cloudHostsId?.length) {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
-          rule.cloudHosts?.unshift(...data?.cloudHostsId);
+          if (rule.cloudHosts) {
+            rule.cloudHosts.unshift(...data.cloudHostsId);
+          }
+          else {
+            rule.cloudHosts = data.cloudHostsId;
+          }
           return merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
@@ -1338,7 +1367,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.edgeHostsHostname?.length) {
         const rule = state.rules.hosts.data[entity];
         if (rule) {
-          rule.edgeHosts?.unshift(...data?.edgeHostsHostname);
+          if (rule.edgeHosts) {
+            rule.edgeHosts.unshift(...data.edgeHostsHostname);
+          }
+          else {
+            rule.edgeHosts = data.edgeHostsHostname;
+          }
           return merge({}, state, { rules: { hosts: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
@@ -1424,7 +1458,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.conditionsNames?.length) {
         const rule = state.rules.services.data[entity];
         if (rule) {
-          rule.conditions?.unshift(...data?.conditionsNames);
+          if (rule.conditions) {
+            rule.conditions.unshift(...data.conditionsNames);
+          }
+          else {
+            rule.conditions = data.conditionsNames;
+          }
           return merge({}, state, { rules: { services: { data: { [rule.name]: {...rule } } } } });
         }
       }
@@ -1471,7 +1510,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.serviceNames?.length) {
         const rule = state.rules.services.data[entity];
         if (rule) {
-          rule.services?.unshift(...data?.serviceNames);
+          if (rule.services) {
+            rule.services.unshift(...data.serviceNames);
+          }
+          else {
+            rule.services = data.serviceNames;
+          }
           return merge({}, state, { rules: { services: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
@@ -1557,7 +1601,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.conditionsNames?.length) {
         const rule = state.rules.containers.data[entity];
         if (rule) {
-          rule.conditions?.unshift(...data?.conditionsNames);
+          if (rule.conditions) {
+            rule.conditions.unshift(...data.conditionsNames);
+          }
+          else {
+            rule.conditions = data.conditionsNames;
+          }
           return merge({}, state, { rules: { containers: { data: { [rule.name]: {...rule } } } } });
         }
       }
@@ -1604,7 +1653,11 @@ const entities = (state: EntitiesState = {
       if (entity && data?.containerIds?.length) {
         const rule = state.rules.containers.data[entity];
         if (rule) {
-          rule.containers?.unshift(...data?.containerIds);
+          if (rule.containers) {
+            rule.containers.unshift(...data.containerIds);
+          } else {
+            rule.containers = data?.containerIds;
+          }
           return merge({}, state, { rules: { containers: { data: { [rule.name]: { ...rule } } } } });
         }
         return state;
@@ -1795,7 +1848,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.cloudHostsId?.length) {
         const simulatedHostMetric = state.simulatedMetrics.hosts.data[entity];
         if (simulatedHostMetric) {
-          simulatedHostMetric.cloudHosts?.unshift(...data?.cloudHostsId);
+          if (simulatedHostMetric.cloudHosts) {
+            simulatedHostMetric.cloudHosts.unshift(...data.cloudHostsId);
+          }
+          else {
+            simulatedHostMetric.cloudHosts = data.cloudHostsId
+          }
           return merge({}, state, { simulatedMetrics: { hosts: { data: { [simulatedHostMetric.name]: {...simulatedHostMetric } } } } });
         }
       }
@@ -1842,7 +1900,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.edgeHostsHostname?.length) {
         const simulatedHostMetric = state.simulatedMetrics.hosts.data[entity];
         if (simulatedHostMetric) {
-          simulatedHostMetric.edgeHosts?.unshift(...data?.edgeHostsHostname);
+          if (simulatedHostMetric.edgeHosts) {
+            simulatedHostMetric.edgeHosts.unshift(...data.edgeHostsHostname);
+          }
+          else {
+            simulatedHostMetric.edgeHosts = data.edgeHostsHostname;
+          }
           return merge({}, state, { simulatedMetrics: { hosts: { data: { [simulatedHostMetric.name]: {...simulatedHostMetric } } } } });
         }
       }
@@ -1927,7 +1990,12 @@ const entities = (state: EntitiesState = {
       if (entity && data?.serviceNames?.length) {
         const simulatedServiceMetric = state.simulatedMetrics.services.data[entity];
         if (simulatedServiceMetric) {
-          simulatedServiceMetric.services?.unshift(...data?.serviceNames);
+          if (simulatedServiceMetric.services) {
+            simulatedServiceMetric.services.unshift(...data.serviceNames);
+          }
+          else {
+            simulatedServiceMetric.services = data.serviceNames;
+          }
           return merge({}, state, { simulatedMetrics: { services: { data: { [simulatedServiceMetric.name]: {...simulatedServiceMetric } } } } });
         }
       }

@@ -47,9 +47,9 @@ export interface IRuleHost extends IRule {
 
 const buildNewHostRule = (): Partial<IRuleHost> => ({
   name: undefined,
-  priority: undefined,
-  generic: undefined,
+  priority: 0,
   decision: undefined,
+  generic: undefined,
 });
 
 interface StateToProps {

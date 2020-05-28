@@ -28,12 +28,12 @@ const RuleServiceCard = ({rule}: Props) => (
     <CardItem key={'priority'}
               label={'Priority'}
               value={`${rule.priority}`}/>
-    <CardItem key={'generic'}
-              label={'Generic'}
-              value={`${rule.generic}`}/>
     <CardItem key={'decision'}
               label={'Decision'}
               value={`${rule.decision.name}`}/>
+    <CardItem key={'generic'}
+              label={'Generic'}
+              value={`${rule.generic}`}/>
   </Card>
 );
 

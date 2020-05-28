@@ -46,8 +46,8 @@ export interface IRuleContainer extends IRule {
 const buildNewContainerRule = (): Partial<IRuleContainer> => ({
   name: undefined,
   priority: 0,
-  generic: undefined,
   decision: undefined,
+  generic: undefined,
 });
 
 

@@ -131,6 +131,7 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
 
   private getSelectableContainerNames = () => {
     const {containers, ruleContainers, unsavedContainers} = this.props;
+    console.log(unsavedContainers)
     return Object.keys(containers)
                  .filter(container => !ruleContainers.includes(container) && !unsavedContainers.includes(container));
   };

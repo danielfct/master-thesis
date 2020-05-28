@@ -47,8 +47,8 @@ export interface IRuleService extends IRule {
 const buildNewServiceRule = (): Partial<IRuleService> => ({
   name: undefined,
   priority: 0,
-  generic: undefined,
   decision: undefined,
+  generic: undefined,
 });
 
 

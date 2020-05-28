@@ -1,8 +1,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
@@ -85,11 +83,11 @@ public class ContainerRulesController {
   }
 
   @DeleteMapping("/containers/{ruleName}/containers")
-  public void removeRuleCloudHosts(@PathVariable String ruleName, @RequestBody List<String> containers) {
+  public void removeRuleContainers(@PathVariable String ruleName, @RequestBody List<String> containers) {
     containerRulesService.removeContainers(ruleName, containers);
   }
 
-  @DeleteMapping("/hosts/{ruleName}/containers/{containerId}")
+  @DeleteMapping("/containers/{ruleName}/containers/{containerId}")
   public void removeRuleContainer(@PathVariable String ruleName, @PathVariable String containerId) {
     containerRulesService.removeContainer(ruleName, containerId);
   }
