@@ -104,8 +104,8 @@ function mapStateToProps(state: ReduxState, ownProps: PortsListProps): StateToPr
   const container = containerId && state.entities.containers.data[containerId];
   const logs = container && container.logs;
   return {
-    isLoading: state.entities.containers.isLoadingContainerLogs,
-    error: state.entities.containers.loadContainerLogsError,
+    isLoading: state.entities.containers.isLoadingLogs,
+    error: state.entities.containers.loadLogsError,
     logs: logs
   }
 }

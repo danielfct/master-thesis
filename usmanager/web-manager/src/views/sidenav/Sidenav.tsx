@@ -41,9 +41,10 @@ const sidenavLinks = [
         ] },
     { link: '/nodes', name: 'Nodes' },
     { link: '/rules', name: 'Rules', sub: [
+            { link: '/conditions', name: 'Conditions' },
             { link: '/hosts', name: 'Host rules' },
             { link: '/services', name: 'Service rules' },
-            { link: '/conditions', name: 'Conditions' }
+            { link: '/containers', name: 'Container rules' },
         ] },
     { link: '/simulated-metrics', name: 'Simulated metrics', sub: [
             { link: '/hosts', name: 'Host metrics' },

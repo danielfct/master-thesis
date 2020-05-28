@@ -257,7 +257,7 @@ class RuleService extends BaseComponent<Props, State> {
     this.setState({isGeneric: value.toLowerCase() === 'true'});
 
   private getSelectableDecisions = () =>
-    Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() == 'service');
+    Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() === 'service');
 
   private serviceRule = () => {
     const {isLoading, error} = this.props;
@@ -313,7 +313,7 @@ class RuleService extends BaseComponent<Props, State> {
                 : <Field key={index}
                          id={key}
                          label={key}
-                         type={value !== undefined ? getTypeFromValue(value) : 'number'}/>
+                         type={key === 'priority' ? "number" : "text"}/>
             )}
           </Form>
         )}

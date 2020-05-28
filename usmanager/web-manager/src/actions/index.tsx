@@ -40,6 +40,7 @@ import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServi
 import {IRegion} from "../routes/region/Region";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 import {IEurekaServer} from "../routes/eureka/EurekaServer";
+import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
 
 export const APPS_REQUEST = 'APPS_REQUEST';
 export const APPS_SUCCESS = 'APPS_SUCCESS';
@@ -336,6 +337,38 @@ export const loadContainerLogs = (containerId: string) => ({
     entity: containerId,
   }
 });
+
+
+export const CONTAINER_RULES_REQUEST = 'CONTAINER_RULES_REQUEST';
+export const CONTAINER_RULES_SUCCESS = 'CONTAINER_RULES_SUCCESS';
+export const CONTAINER_RULES_FAILURE = 'CONTAINER_RULES_FAILURE';
+export const loadContainerRules = (containerId: string) => (dispatch: any) => {
+  return dispatch(fetchContainerRules(containerId));
+};
+const fetchContainerRules = (containerId: string) => ({
+  [CALL_API]: {
+    types: [ CONTAINER_RULES_REQUEST, CONTAINER_RULES_SUCCESS, CONTAINER_RULES_FAILURE ],
+    endpoint: `containers/${containerId}/rules`,
+    schema: Schemas.CONTAINER_RULE_ARRAY,
+    entity: containerId
+  }
+});
+export const ADD_CONTAINER_RULES = 'ADD_CONTAINER_RULES';
+export function addContainerRules(containerId: string, rules: string[]): EntitiesAction {
+  return {
+    type: ADD_CONTAINER_RULES,
+    entity: containerId,
+    data: { rulesNames: rules }
+  }
+}
+export const REMOVE_CONTAINER_RULES = 'REMOVE_CONTAINER_RULES';
+export function removeContainerRules(containerId: string, rules: string[]): EntitiesAction {
+  return {
+    type: REMOVE_CONTAINER_RULES,
+    entity: containerId,
+    data: { rulesNames: rules }
+  }
+}
 
 export const CLOUD_HOSTS_REQUEST = 'CLOUD_HOSTS_REQUEST';
 export const CLOUD_HOSTS_SUCCESS = 'CLOUD_HOSTS_SUCCESS';
@@ -662,10 +695,9 @@ export const ADD_RULE_SERVICE = 'ADD_RULE_SERVICE';
 export function addRuleService(ruleService: IRuleService): EntitiesAction {
   return {
     type: ADD_RULE_SERVICE,
-    data: { hostRules: new Array(ruleService) }
+    data: { serviceRules: new Array(ruleService) }
   }
 }
-
 
 export const RULE_SERVICE_CONDITIONS_REQUEST = 'RULE_SERVICE_CONDITIONS_REQUEST';
 export const RULE_SERVICE_CONDITIONS_SUCCESS = 'RULE_SERVICE_CONDITIONS_SUCCESS';
@@ -690,11 +722,11 @@ export function addRuleServiceConditions(ruleName: string, conditions: string[])
   }
 }
 export const REMOVE_RULE_SERVICE_CONDITIONS = 'REMOVE_RULE_SERVICE_CONDITIONS';
-export function removeRuleServiceConditions(ruleName: string, condition: string[]): EntitiesAction {
+export function removeRuleServiceConditions(ruleName: string, conditions: string[]): EntitiesAction {
   return {
     type: REMOVE_RULE_SERVICE_CONDITIONS,
     entity: ruleName,
-    data: { conditionsNames: condition }
+    data: { conditionsNames: conditions }
   }
 }
 
@@ -726,6 +758,104 @@ export function removeRuleServices(ruleName: string, services: string[]): Entiti
     type: REMOVE_RULE_SERVICE_SERVICES,
     entity: ruleName,
     data: { serviceNames: services }
+  }
+}
+
+
+
+
+export const RULES_CONTAINER_REQUEST = 'RULES_CONTAINER_REQUEST';
+export const RULES_CONTAINER_SUCCESS = 'RULES_CONTAINER_SUCCESS';
+export const RULES_CONTAINER_FAILURE = 'RULES_CONTAINER_FAILURE';
+export const RULE_CONTAINER_REQUEST = 'RULE_CONTAINER_REQUEST';
+export const RULE_CONTAINER_SUCCESS = 'RULE_CONTAINER_SUCCESS';
+export const RULE_CONTAINER_FAILURE = 'RULE_CONTAINER_FAILURE';
+export const loadRulesContainer = (name?: string) => (dispatch: any) => {
+  return dispatch(fetchRulesContainer(name));
+};
+const fetchRulesContainer = (name?: string) => ({
+  [CALL_API]:
+    !name
+      ? {
+        types: [ RULES_CONTAINER_REQUEST, RULES_CONTAINER_SUCCESS, RULES_CONTAINER_FAILURE ],
+        endpoint: `rules/containers`,
+        schema: Schemas.RULE_CONTAINER_ARRAY,
+        entity: 'rules'
+      }
+      : {
+        types: [ RULE_CONTAINER_REQUEST, RULE_CONTAINER_SUCCESS, RULE_CONTAINER_FAILURE ],
+        endpoint: `rules/containers/${name}`,
+        schema: Schemas.RULE_CONTAINER,
+        entity: 'rules'
+      }
+});
+export const ADD_RULE_CONTAINER = 'ADD_RULE_CONTAINER';
+export function addRuleContainer(ruleContainer: IRuleContainer): EntitiesAction {
+  return {
+    type: ADD_RULE_CONTAINER,
+    data: { containerRules: new Array(ruleContainer) }
+  }
+}
+
+export const RULE_CONTAINER_CONDITIONS_REQUEST = 'RULE_CONTAINER_CONDITIONS_REQUEST';
+export const RULE_CONTAINER_CONDITIONS_SUCCESS = 'RULE_CONTAINER_CONDITIONS_SUCCESS';
+export const RULE_CONTAINER_CONDITIONS_FAILURE = 'RULE_CONTAINER_CONDITIONS_FAILURE';
+export const loadRuleContainerConditions = (ruleName: string) => (dispatch: any) => {
+  return dispatch(fetchRuleContainerConditions(ruleName));
+};
+const fetchRuleContainerConditions = (ruleName: string) => ({
+  [CALL_API]: {
+    types: [ RULE_CONTAINER_CONDITIONS_REQUEST, RULE_CONTAINER_CONDITIONS_SUCCESS, RULE_CONTAINER_CONDITIONS_FAILURE ],
+    endpoint: `rules/containers/${ruleName}/conditions`,
+    schema: Schemas.RULE_CONDITION_ARRAY,
+    entity: ruleName
+  }
+});
+export const ADD_RULE_CONTAINER_CONDITIONS = 'ADD_RULE_CONTAINER_CONDITIONS';
+export function addRuleContainerConditions(ruleName: string, conditions: string[]): EntitiesAction {
+  return {
+    type: ADD_RULE_CONTAINER_CONDITIONS,
+    entity: ruleName,
+    data: { conditionsNames: conditions }
+  }
+}
+export const REMOVE_RULE_CONTAINER_CONDITIONS = 'REMOVE_RULE_CONTAINER_CONDITIONS';
+export function removeRuleContainerConditions(ruleName: string, conditions: string[]): EntitiesAction {
+  return {
+    type: REMOVE_RULE_CONTAINER_CONDITIONS,
+    entity: ruleName,
+    data: { conditionsNames: conditions }
+  }
+}
+
+export const RULE_CONTAINER_CONTAINERS_REQUEST = 'RULE_CONTAINER_CONTAINERS_REQUEST';
+export const RULE_CONTAINER_CONTAINERS_SUCCESS = 'RULE_CONTAINER_CONTAINERS_SUCCESS';
+export const RULE_CONTAINER_CONTAINERS_FAILURE = 'RULE_CONTAINER_CONTAINERS_FAILURE';
+export const loadRuleContainers = (ruleName: string) => (dispatch: any) => {
+  return dispatch(fetchRuleContainerContainers(ruleName));
+};
+const fetchRuleContainerContainers = (ruleName: string) => ({
+  [CALL_API]: {
+    types: [ RULE_CONTAINER_CONTAINERS_REQUEST, RULE_CONTAINER_CONTAINERS_SUCCESS, RULE_CONTAINER_CONTAINERS_FAILURE ],
+    endpoint: `rules/containers/${ruleName}/containers`,
+    schema: Schemas.RULE_CONDITION_ARRAY,
+    entity: ruleName
+  }
+});
+export const ADD_RULE_CONTAINER_CONTAINERS = 'ADD_RULE_CONTAINER_CONTAINERS';
+export function addRuleContainers(ruleName: string, containers: string[]): EntitiesAction {
+  return {
+    type: ADD_RULE_CONTAINER_CONTAINERS,
+    entity: ruleName,
+    data: { containerIds: containers }
+  }
+}
+export const REMOVE_RULE_CONTAINER_CONTAINERS = 'REMOVE_RULE_CONTAINER_CONTAINERS';
+export function removeRuleContainers(ruleName: string, containers: string[]): EntitiesAction {
+  return {
+    type: REMOVE_RULE_CONTAINER_CONTAINERS,
+    entity: ruleName,
+    data: { containerIds: containers }
   }
 }
 

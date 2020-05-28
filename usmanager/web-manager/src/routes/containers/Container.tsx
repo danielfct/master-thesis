@@ -12,7 +12,14 @@ import {Error} from "../../components/errors/Error";
 import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {addContainer, loadCloudHosts, loadContainers, loadEdgeHosts, loadServices} from "../../actions";
+import {
+  addContainer, addContainerRules,
+  addServiceRules,
+  loadCloudHosts,
+  loadContainers,
+  loadEdgeHosts,
+  loadServices
+} from "../../actions";
 import {connect} from "react-redux";
 import React, {createRef} from "react";
 import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
@@ -31,6 +38,8 @@ import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
 import IDatabaseData from "../../components/IDatabaseData";
+import GenericContainerRuleList from "./GenericContainerRuleList";
+import ContainerRuleList from "./ContainerRuleList";
 
 export interface IContainer extends IDatabaseData {
   containerId: string;
@@ -42,6 +51,7 @@ export interface IContainer extends IDatabaseData {
   ports: IContainerPort[];
   labels: IContainerLabel;
   logs?: string;
+  containerRules?: string[];
 }
 
 export interface IContainerPort {
@@ -87,6 +97,7 @@ interface DispatchToProps {
   loadServices: () => void;
   addContainer: (container: IContainer) => void;
   //TODO updateContainer: (previousContainer: Partial<IContainer>, container: IContainer) => void;
+  addContainerRules: (containerId: string, rules: string[]) => void;
 }
 
 interface MatchParams {
@@ -101,6 +112,7 @@ interface State {
   loading: IFormLoading,
   defaultInternalPort: number,
   defaultExternalPort: number,
+  unsavedRules: string[],
 }
 
 class Container extends BaseComponent<Props, State> {
@@ -114,6 +126,7 @@ class Container extends BaseComponent<Props, State> {
     loading: undefined,
     defaultInternalPort: 0,
     defaultExternalPort: 0,
+    unsavedRules: [],
   };
 
   public componentDidMount(): void {
@@ -163,6 +176,7 @@ class Container extends BaseComponent<Props, State> {
     const container = reply.data;
     super.toast(`<span class="green-text">Container ${this.mounted ? `<b class="white-text">${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} has started at ${container.hostname}</span>`);
     this.props.addContainer(container);
+    this.saveEntities(container);
     if (this.mounted) {
       this.updateContainer(container);
       this.props.history.replace(container.containerId);
@@ -258,6 +272,13 @@ class Container extends BaseComponent<Props, State> {
     }
   };
 
+  private shouldShowSaveButton = () =>
+    !!this.state.unsavedRules.length;
+
+  private saveEntities = (container: IContainer) => {
+    this.saveContainerRules(container);
+  };
+
   private chooseHostnameDropdown = (id: string, onClick: (event: any) => void) =>
     <ul id={id}
         className={`dropdown-content ${styles.dropdown}`}>
@@ -283,6 +304,37 @@ class Container extends BaseComponent<Props, State> {
         )}
       </PerfectScrollbar>
     </ul>;
+
+  private addContainerRule = (rule: string): void => {
+    this.setState({
+      unsavedRules: this.state.unsavedRules.concat(rule)
+    });
+  };
+
+  private removeContainerRules = (rules: string[]): void => {
+    this.setState({
+      unsavedRules: this.state.unsavedRules.filter(rule => !rules.includes(rule))
+    });
+  };
+
+  private saveContainerRules = (container: IContainer): void => {
+    const {unsavedRules} = this.state;
+    if (unsavedRules.length) {
+      postData(`containers/${container.containerId}/rules`, unsavedRules,
+        () => this.onSaveRulesSuccess(container),
+        (reason) => this.onSaveRulesFailure(container, reason));
+    }
+  };
+
+  private onSaveRulesSuccess = (container: IContainer): void => {
+    this.props.addContainerRules(container.containerId, this.state.unsavedRules);
+    if (this.mounted) {
+      this.setState({ unsavedRules: [] });
+    }
+  };
+
+  private onSaveRulesFailure = (container: IContainer, reason: string): void =>
+    super.toast(`Unable to save rules of ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
 
   private updateContainer = (container: IContainer) => {
     //const previousContainer = this.getContainer();
@@ -382,7 +434,7 @@ class Container extends BaseComponent<Props, State> {
         internalPort: this.state.defaultInternalPort,
         externalPort: this.state.defaultExternalPort
       }
-      : formContainer; //TODO formContainer or container?
+      : formContainer;
     // @ts-ignore
     const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
     return (
@@ -394,6 +446,7 @@ class Container extends BaseComponent<Props, State> {
                 fields={this.getFields(formContainer || {})}
                 values={containerValues}
                 isNew={isNewContainer}
+                showSaveButton={this.shouldShowSaveButton()}
                 post={{
                   textButton: 'Launch',
                   url: 'containers',
@@ -409,7 +462,8 @@ class Container extends BaseComponent<Props, State> {
                 customButtons={container && (!container.labels['isReplicable'] || container.labels['isReplicable'] === 'true')
                   ? this.replicateMigrateButtons()
                   : undefined}
-                loading={this.state.loading}>
+                loading={this.state.loading}
+                saveEntities={this.saveEntities}>
             {this.formFields(formContainer || {}, isNewContainer)}
           </Form>
         )}
@@ -432,22 +486,26 @@ class Container extends BaseComponent<Props, State> {
                        loadContainerError={this.props.error}
                        container={this.getContainer()}/>;
 
-  private tabs = () =>
-    isNew(this.props.location.search)
-      ? [
-        {
-          title: 'Container',
-          id: 'container',
-          content: () => this.container()
-        },
-      ]
-      : [
-        {
-          title: 'Container',
-          id: 'container',
-          content: () => this.container()
-        },
-        {
+  private rules = (): JSX.Element =>
+    <ContainerRuleList isLoadingContainer={this.props.isLoading}
+                       loadContainerError={this.props.error}
+                       container={this.getContainer()}
+                       unsavedRules={this.state.unsavedRules}
+                       onAddContainerRule={this.addContainerRule}
+                       onRemoveContainerRules={this.removeContainerRules}/>;
+
+  private genericRules = (): JSX.Element =>
+    <GenericContainerRuleList/>;
+
+  private tabs = () => {
+    const tabs = [];
+    tabs.push({
+      title: 'Container',
+      id: 'container',
+      content: () => this.container()
+    });
+    if (!isNew(this.props.location.search)) {
+      tabs.push({
           title: 'Ports',
           id: 'ports',
           content: () => this.ports()
@@ -461,8 +519,20 @@ class Container extends BaseComponent<Props, State> {
           title: 'Logs',
           id: 'logs',
           content: () => this.logs()
-        },
-      ];
+        });
+    }
+    tabs.push({
+        title: 'Rules',
+        id: 'rules',
+        content: () => this.rules()
+      },
+      {
+        title: 'Generic rules',
+        id: 'genericEdgeRules',
+        content: () => this.genericRules()
+      });
+    return tabs;
+  };
 
   render() {
     return (
@@ -518,6 +588,7 @@ const mapDispatchToProps: DispatchToProps = {
   loadCloudHosts,
   loadEdgeHosts,
   loadServices,
+  addContainerRules,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Container);

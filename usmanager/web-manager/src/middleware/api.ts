@@ -46,6 +46,7 @@ import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 import {IEurekaServer} from "../routes/eureka/EurekaServer";
 import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
+import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
 
 const callApi = (endpoint: string, schema?: any, method?: Method) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -88,6 +89,7 @@ interface ISchemas {
     SERVICE_RULE_ARRAY: schema.Entity<IRuleService>[];
     CONTAINER: schema.Entity<IContainer>;
     CONTAINER_ARRAY: schema.Entity<IContainer>[];
+    CONTAINER_RULE_ARRAY: schema.Entity<IRuleService>[];
     CLOUD_HOST: schema.Entity<ICloudHost>;
     CLOUD_HOST_ARRAY: schema.Entity<ICloudHost>[];
     CLOUD_HOST_RULE: schema.Entity<IRuleHost>;
@@ -102,6 +104,8 @@ interface ISchemas {
     RULE_HOST_ARRAY: schema.Entity<IRuleHost>[];
     RULE_SERVICE: schema.Entity<IRuleService>;
     RULE_SERVICE_ARRAY: schema.Entity<IRuleService>[];
+    RULE_CONTAINER: schema.Entity<IRuleContainer>;
+    RULE_CONTAINER_ARRAY: schema.Entity<IRuleContainer>[];
     RULE_CONDITION: schema.Entity<IRuleCondition>;
     RULE_CONDITION_ARRAY: schema.Entity<IRuleCondition>[];
     VALUE_MODE_ARRAY: schema.Entity<IValueMode>[];
@@ -154,6 +158,7 @@ const prediction: schema.Entity<IPrediction> = new schema.Entity('predictions', 
 const container: schema.Entity<IContainer> = new schema.Entity('containers', undefined, {
     idAttribute: (container: IContainer) => container.containerId
 });
+const containers = new schema.Array(container);
 
 const cloudHost: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', undefined, {
     idAttribute: (host: ICloudHost) => host.instanceId
@@ -182,6 +187,11 @@ const ruleService: schema.Entity<IRuleService> = new schema.Entity('serviceRules
     idAttribute: (serviceRule: IRuleService) => serviceRule.name
 });
 const serviceRules = new schema.Array(ruleService);
+
+const ruleContainer: schema.Entity<IRuleContainer> = new schema.Entity('containerRules', undefined, {
+    idAttribute: (containerRule: IRuleContainer) => containerRule.name
+});
+const containerRules = new schema.Array(ruleContainer);
 
 const valueMode: schema.Entity<IValueMode> = new schema.Entity('valueModes', undefined, {
     idAttribute: (valueMode: IValueMode) => valueMode.name
@@ -236,10 +246,12 @@ const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
 
 app.define({ appServices });
 service.define({ apps, dependencies, dependents, serviceRules, simulatedServiceMetrics });
+container.define({ containerRules });
 cloudHost.define({ hostRules, simulatedHostMetrics, /*state*/ });
 edgeHost.define({ hostRules, simulatedHostMetrics });
 ruleHost.define({ conditions, edgeHosts, cloudHosts });
 ruleService.define({ conditions, services });
+ruleContainer.define({ conditions, containers });
 condition.define({ valueModes, fields, operators });
 simulatedHostMetric.define( { edgeHosts, cloudHosts });
 simulatedServiceMetric.define( { services });
@@ -263,6 +275,7 @@ export const Schemas: ISchemas = {
     SERVICE_RULE_ARRAY: [ruleService],
     CONTAINER: container,
     CONTAINER_ARRAY: [container],
+    CONTAINER_RULE_ARRAY: [ruleContainer],
     CLOUD_HOST: cloudHost,
     CLOUD_HOST_ARRAY: [cloudHost],
     CLOUD_HOST_RULE: ruleHost,
@@ -277,6 +290,8 @@ export const Schemas: ISchemas = {
     RULE_HOST_ARRAY: [ruleHost],
     RULE_SERVICE: ruleService,
     RULE_SERVICE_ARRAY: [ruleService],
+    RULE_CONTAINER: ruleContainer,
+    RULE_CONTAINER_ARRAY: [ruleContainer],
     RULE_CONDITION: condition,
     RULE_CONDITION_ARRAY: [condition],
     VALUE_MODE_ARRAY: [valueMode],

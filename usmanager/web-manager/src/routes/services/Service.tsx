@@ -401,8 +401,7 @@ class Service extends BaseComponent<Props, State> {
                            values: ["Frontend", "Backend", "Database", "System"]}}/>
                 : <Field key={index}
                          id={key}
-                         label={key}
-                         type={value !== undefined ? getTypeFromValue(value) : 'number'}/>
+                         label={key}/>
             )}
           </Form>
         )}

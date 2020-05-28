@@ -669,8 +669,12 @@ public class DatabaseLoader {
       edgeHosts.save(daniel192168168);
 
       // component types
-      var container = ComponentTypeEntity.builder()
+      var service = ComponentTypeEntity.builder()
           .name("Service")
+          .build();
+      componentTypes.save(service);
+      var container = ComponentTypeEntity.builder()
+          .name("Container")
           .build();
       componentTypes.save(container);
       var host = ComponentTypeEntity.builder()
@@ -710,7 +714,29 @@ public class DatabaseLoader {
           .build();
       operators.save(lessThanOrEqualTo);
 
-      // decision
+      // #### Decisions ####
+      // services
+      var serviceDecisionNone = DecisionEntity.builder()
+          .componentType(service)
+          .name("NONE")
+          .build();
+      decisions.save(serviceDecisionNone);
+      var serviceDecisionReplicate = DecisionEntity.builder()
+          .componentType(service)
+          .name("REPLICATE")
+          .build();
+      decisions.save(serviceDecisionReplicate);
+      var serviceDecisionMigrate = DecisionEntity.builder()
+          .componentType(service)
+          .name("MIGRATE")
+          .build();
+      decisions.save(serviceDecisionMigrate);
+      var serviceDecisionStop = DecisionEntity.builder()
+          .componentType(service)
+          .name("STOP")
+          .build();
+      decisions.save(serviceDecisionStop);
+      // containers
       var containerDecisionNone = DecisionEntity.builder()
           .componentType(container)
           .name("NONE")
@@ -731,6 +757,7 @@ public class DatabaseLoader {
           .name("STOP")
           .build();
       decisions.save(containerDecisionStop);
+      // hosts
       var hostDecisionNone = DecisionEntity.builder()
           .componentType(host)
           .name("NONE")

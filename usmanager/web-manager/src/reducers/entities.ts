@@ -146,6 +146,25 @@ import {
   RULE_SERVICE_SERVICES_SUCCESS,
   ADD_RULE_SERVICE_SERVICES,
   REMOVE_RULE_SERVICE_SERVICES,
+  RULES_CONTAINER_REQUEST,
+  RULE_CONTAINER_REQUEST,
+  RULES_CONTAINER_FAILURE,
+  RULE_CONTAINER_FAILURE,
+  RULES_CONTAINER_SUCCESS,
+  RULE_CONTAINER_SUCCESS,
+  ADD_RULE_CONTAINER,
+  RULE_CONTAINER_CONDITIONS_REQUEST,
+  RULE_CONTAINER_CONDITIONS_FAILURE,
+  RULE_CONTAINER_CONDITIONS_SUCCESS,
+  ADD_RULE_CONTAINER_CONDITIONS,
+  REMOVE_RULE_CONTAINER_CONDITIONS,
+  RULE_CONTAINER_CONTAINERS_REQUEST,
+  RULE_CONTAINER_CONTAINERS_FAILURE,
+  RULE_CONTAINER_CONTAINERS_SUCCESS,
+  ADD_RULE_CONTAINER_CONTAINERS,
+  REMOVE_RULE_CONTAINER_CONTAINERS,
+
+
   VALUE_MODES_REQUEST,
   VALUE_MODES_FAILURE,
   VALUE_MODES_SUCCESS,
@@ -244,6 +263,7 @@ import {IRegion} from "../routes/region/Region";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 import {IEurekaServer} from "../routes/eureka/EurekaServer";
 import {ILogs} from "../routes/logs/Logs";
+import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
 
 export type EntitiesState = {
   apps: {
@@ -272,8 +292,10 @@ export type EntitiesState = {
     data: { [key: string]: IContainer },
     isLoadingContainers: boolean,
     loadContainersError: string | null,
-    isLoadingContainerLogs: boolean,
-    loadContainerLogsError: string | null,
+    isLoadingLogs: boolean,
+    loadLogsError: string | null,
+    isLoadingRules: boolean,
+    loadRulesError: string | null,
   },
   hosts: {
     cloud: {
@@ -317,6 +339,15 @@ export type EntitiesState = {
       isLoadingServices: boolean,
       loadServicesError: string | null,
     },
+    containers: {
+      data: { [key: string]: IRuleContainer },
+      isLoadingRules: boolean,
+      loadRulesError: string | null,
+      isLoadingConditions: boolean,
+      loadConditionsError: string | null,
+      isLoadingContainers: boolean,
+      loadContainersError: string | null,
+    },
     conditions: {
       data: { [key: string]: IRuleCondition },
       isLoadingConditions: boolean,
@@ -344,13 +375,6 @@ export type EntitiesState = {
     loadDecisionsError: string | null,
   },
   simulatedMetrics: {
-    services: {
-      data: { [key: string]: ISimulatedServiceMetric },
-      isLoadingSimulatedServiceMetrics: boolean,
-      loadSimulatedServiceMetricsError: string | null,
-      isLoadingServices: boolean,
-      loadServicesError: string | null,
-    }
     hosts: {
       data: { [key: string]: ISimulatedHostMetric },
       isLoadingSimulatedHostMetrics: boolean,
@@ -360,6 +384,20 @@ export type EntitiesState = {
       isLoadingEdgeHosts: boolean,
       loadEdgeHostsError: string | null,
     },
+    services: {
+      data: { [key: string]: ISimulatedServiceMetric },
+      isLoadingSimulatedServiceMetrics: boolean,
+      loadSimulatedServiceMetricsError: string | null,
+      isLoadingServices: boolean,
+      loadServicesError: string | null,
+    },
+    /*containers: {
+      data: { [key: string]: ISimulatedContainerMetric },
+      isLoadingSimulatedContainerMetrics: boolean,
+      loadSimulatedContainerMetricsError: string | null,
+      isLoadingContainers: boolean,
+      loadContainersError: string | null,
+    }*/
   },
   regions: {
     data: { [key: string]: IRegion },
@@ -401,6 +439,7 @@ export type EntitiesAction = {
     predictions?: IPrediction[],
     predictionsNames?: string[],
     containers?: IContainer[],
+    containerIds?: string[],
     cloudHosts?: ICloudHost[],
     cloudHostsId?: string[],
     edgeHosts?: IEdgeHost[],
@@ -408,6 +447,7 @@ export type EntitiesAction = {
     nodes?: INode[],
     hostRules?: IRuleHost[],
     serviceRules?: IRuleService[],
+    containerRules?: IRuleContainer[],
     rulesNames?: string[],
     valueModes?: IValueMode[],
     fields?: IField[],
@@ -451,8 +491,10 @@ const entities = (state: EntitiesState = {
                       data: {},
                       isLoadingContainers: false,
                       loadContainersError: null,
-                      isLoadingContainerLogs: false,
-                      loadContainerLogsError: null,
+                      isLoadingLogs: false,
+                      loadLogsError: null,
+                      isLoadingRules: false,
+                      loadRulesError: null,
                     },
                     hosts: {
                       cloud: {
@@ -496,6 +538,15 @@ const entities = (state: EntitiesState = {
                         isLoadingServices: false,
                         loadServicesError: null,
                       },
+                      containers: {
+                        data: {},
+                        isLoadingRules: false,
+                        loadRulesError: null,
+                        isLoadingConditions: false,
+                        loadConditionsError: null,
+                        isLoadingContainers: false,
+                        loadContainersError: null,
+                      },
                       conditions: {
                         data: {},
                         isLoadingConditions: false,
@@ -523,13 +574,6 @@ const entities = (state: EntitiesState = {
                       loadDecisionsError: null
                     },
                     simulatedMetrics: {
-                      services: {
-                        data: {},
-                        isLoadingSimulatedServiceMetrics: false,
-                        loadSimulatedServiceMetricsError: null,
-                        isLoadingServices: false,
-                        loadServicesError: null,
-                      },
                       hosts: {
                         data: {},
                         isLoadingSimulatedHostMetrics: false,
@@ -539,6 +583,20 @@ const entities = (state: EntitiesState = {
                         isLoadingEdgeHosts: false,
                         loadEdgeHostsError: null,
                       },
+                      services: {
+                        data: {},
+                        isLoadingSimulatedServiceMetrics: false,
+                        loadSimulatedServiceMetricsError: null,
+                        isLoadingServices: false,
+                        loadServicesError: null,
+                      },
+                      /*containers: {
+                        data: {},
+                        isLoadingSimulatedContainerMetrics: false,
+                        loadSimulatedContainerMetricsError: null,
+                        isLoadingContainers: false,
+                        loadContainersError: null,
+                      },*/
                     },
                     regions: {
                       data: {},
@@ -908,9 +966,9 @@ const entities = (state: EntitiesState = {
       }
       break;
     case CONTAINER_LOGS_REQUEST:
-      return merge({}, state, { containers: { isLoadingContainerLogs: true, loadContainerLogsError: null } });
+      return merge({}, state, { containers: { isLoadingLogs: true, loadLogsError: null } });
     case CONTAINER_LOGS_FAILURE:
-      return merge({}, state, { containers: { isLoadingContainerLogs: false, loadContainerLogsError: error } });
+      return merge({}, state, { containers: { isLoadingLogs: false, loadLogsError: error } });
     case CONTAINER_LOGS_SUCCESS:
       const container = entity && state.containers.data[entity];
       const logs = { logs: data || [] };
@@ -920,8 +978,8 @@ const entities = (state: EntitiesState = {
         containers : {
           ...state.containers,
           data: normalizedContainer.containers,
-          isLoadingContainerLogs: false,
-          loadContainerLogsError: null,
+          isLoadingLogs: false,
+          loadLogsError: null,
         },
       });
     case CLOUD_HOSTS_REQUEST:
@@ -1431,6 +1489,139 @@ const entities = (state: EntitiesState = {
             services: {
               ...state.rules.services,
               data: normalizeRule.serviceRules,
+            }
+          }
+        });
+      }
+      break;
+    case RULES_CONTAINER_REQUEST:
+    case RULE_CONTAINER_REQUEST:
+      return merge({}, state, { rules: { containers: { isLoadingRules: true, loadRulesError: null } } });
+    case RULES_CONTAINER_FAILURE:
+    case RULE_CONTAINER_FAILURE:
+      return merge({}, state, { rules: { containers: { isLoadingRules: false, loadRulesError: error } } });
+    case RULES_CONTAINER_SUCCESS:
+      return {
+        ...state,
+        rules: {
+          ...state.rules,
+          containers: {
+            ...state.rules.containers,
+            data: merge({}, pick(state.rules.containers.data, keys(data?.containerRules)), data?.containerRules),
+            isLoadingRules: false,
+            loadRulesError: null,
+          }
+        }
+      };
+    case RULE_CONTAINER_SUCCESS:
+      return {
+        ...state,
+        rules: {
+          ...state.rules,
+          containers: {
+            ...state.rules.containers,
+            data: merge({}, state.rules.containers.data, data?.containerRules),
+            isLoadingRules: false,
+            loadRulesError: null,
+          }
+        }
+      };
+    case ADD_RULE_CONTAINER:
+      if (data?.containerRules?.length) {
+        const containerRules = normalize(data?.containerRules, Schemas.RULE_CONTAINER_ARRAY).entities.containerRules;
+        return merge({}, state, { rules: { containers : { data: containerRules } } });
+      }
+      break;
+    case RULE_CONTAINER_CONDITIONS_REQUEST:
+      return merge({}, state, { rules: { containers: { isLoadingConditions: true, loadConditionsError: null } } });
+    case RULE_CONTAINER_CONDITIONS_FAILURE:
+      return merge({}, state, { rules: { containers: { isLoadingConditions: false, loadConditionsError: error } } });
+    case RULE_CONTAINER_CONDITIONS_SUCCESS: {
+      const rule = entity && state.rules.containers.data[entity];
+      const conditions = { conditions: data?.conditions || [] };
+      const ruleWithConditions = Object.assign(rule ? rule : [entity], conditions);
+      const normalizedRule = normalize(ruleWithConditions, Schemas.RULE_CONTAINER).entities;
+      return merge({}, state, {
+        rules: {
+          ...state.rules,
+          containers : {
+            ...state.rules.containers,
+            data: normalizedRule.containerRules,
+            isLoadingConditions: false,
+            loadConditionsError: null,
+          }
+        }
+      });
+    }
+    case ADD_RULE_CONTAINER_CONDITIONS:
+      if (entity && data?.conditionsNames?.length) {
+        const rule = state.rules.containers.data[entity];
+        if (rule) {
+          rule.conditions?.unshift(...data?.conditionsNames);
+          return merge({}, state, { rules: { containers: { data: { [rule.name]: {...rule } } } } });
+        }
+      }
+      break;
+    case REMOVE_RULE_CONTAINER_CONDITIONS:
+      if (entity) {
+        const rule = state.rules.containers.data[entity];
+        const filteredConditions = rule.conditions?.filter(condition => !data?.conditionsNames?.includes(condition));
+        const ruleWithConditions = Object.assign(rule, { conditions: filteredConditions });
+        const normalizeRule = normalize(ruleWithConditions, Schemas.RULE_CONTAINER).entities;
+        return merge({}, state, {
+          rules: {
+            ...state.rules,
+            containers: {
+              ...state.rules.containers,
+              data: normalizeRule.containerRules,
+            }
+          }
+        });
+      }
+      return state;
+    case RULE_CONTAINER_CONTAINERS_REQUEST:
+      return merge({}, state, { rules: { containers: { isLoadingContainers: true, loadContainersError: null } } });
+    case RULE_CONTAINER_CONTAINERS_FAILURE:
+      return merge({}, state, { rules: { containers: { isLoadingContainers: false, loadContainersError: error } } });
+    case RULE_CONTAINER_CONTAINERS_SUCCESS: {
+      const rule = entity && state.rules.containers.data[entity];
+      const containers = { containers: data?.containers || [] };
+      const ruleWithContainers = Object.assign(rule ? rule : [entity], containers);
+      const normalizedRule = normalize(ruleWithContainers, Schemas.RULE_CONTAINER).entities;
+      return merge({}, state, {
+        rules: {
+          ...state.rules,
+          containers : {
+            ...state.rules.containers,
+            data: normalizedRule.containerRules,
+            isLoadingContainers: false,
+            loadContainersError: null,
+          },
+        }
+      });
+    }
+    case ADD_RULE_CONTAINER_CONTAINERS:
+      if (entity && data?.containerIds?.length) {
+        const rule = state.rules.containers.data[entity];
+        if (rule) {
+          rule.containers?.unshift(...data?.containerIds);
+          return merge({}, state, { rules: { containers: { data: { [rule.name]: { ...rule } } } } });
+        }
+        return state;
+      }
+      break;
+    case REMOVE_RULE_CONTAINER_CONTAINERS:
+      if (entity) {
+        const rule = state.rules.containers.data[entity];
+        const filteredContainers = rule.containers?.filter(container => !data?.containerIds?.includes(container));
+        const ruleWithContainers = Object.assign(rule, { containers: filteredContainers });
+        const normalizeRule = normalize(ruleWithContainers, Schemas.RULE_CONTAINER).entities;
+        return merge({}, state, {
+          rules: {
+            ...state.rules,
+            containers: {
+              ...state.rules.containers,
+              data: normalizeRule.containerRules,
             }
           }
         });

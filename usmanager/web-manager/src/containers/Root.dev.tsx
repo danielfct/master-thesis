@@ -50,9 +50,7 @@ import Container from "../routes/containers/Container";
 import Apps from "../routes/apps/Apps";
 import App from "../routes/apps/App";
 import RulesHost from "../routes/rules/hosts/RulesHost";
-import HostRule from "../routes/rules/hosts/RuleHost";
 import RulesService from "../routes/rules/services/RulesService";
-import ServiceRule from "../routes/rules/services/RuleService";
 import Rules from "../routes/rules/Rules";
 import RuleConditions from "../routes/rules/conditions/RuleConditions";
 import Condition from "../routes/rules/conditions/RuleCondition";
@@ -60,15 +58,17 @@ import LoadBalancers from "../routes/loadBalancer/LoadBalancers";
 import LoadBalancer from "../routes/loadBalancer/LoadBalancer";
 import EurekaServers from "../routes/eureka/EurekaServers";
 import EurekaServer from "../routes/eureka/EurekaServer";
-import ServiceSimulatedMetricsDetail from "../routes/metrics/OldSimulatedMetrics";
 import SimulatedMetrics from "../routes/metrics/SimulatedMetrics";
 import SimulatedServiceMetric from "../routes/metrics/services/SimulatedServiceMetric";
-import SimulatedServiceMetricsList from "../routes/metrics/services/SimulatedServiceMetricsList";
 import SimulatedHostMetric from "../routes/metrics/hosts/SimulatedHostMetric";
 import SimulatedHostMetrics from "../routes/metrics/hosts/SimulatedHostMetrics";
 import SimulatedServiceMetrics from "../routes/metrics/services/SimulatedServiceMetrics";
 import {PageNotFound} from "../components/PageNotFound";
 import {Footer} from "../views/footer/Footer";
+import RulesContainer from "../routes/rules/containers/RulesContainer";
+import RuleService from "../routes/rules/services/RuleService";
+import RuleHost from "../routes/rules/hosts/RuleHost";
+import RuleContainer from "../routes/rules/containers/RuleContainer";
 
 interface RootContainerProps {
     store: any;
@@ -94,9 +94,11 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/nodes/:id": { component: Node },
     "/rules": { component: Rules, search: true },
     "/rules/hosts": { component: RulesHost, search: true },
-    "/rules/hosts/:name": { component: HostRule },
+    "/rules/hosts/:name": { component: RuleHost },
     "/rules/services": { component: RulesService, search: true },
-    "/rules/services/:name": { component: ServiceRule },
+    "/rules/services/:name": { component: RuleService },
+    "/rules/containers": { component: RulesContainer, search: true },
+    "/rules/containers/:name": { component: RuleContainer },
     "/rules/conditions": { component: RuleConditions, search: true },
     "/rules/conditions/:name": { component: Condition },
     "/simulated-metrics": { component: SimulatedMetrics, search: true },

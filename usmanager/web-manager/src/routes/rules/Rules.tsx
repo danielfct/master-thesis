@@ -9,6 +9,7 @@ import RulesHostList from "./hosts/RulesHostList";
 import RulesServiceList from "./services/RulesServiceList";
 import Conditions from "./conditions/RuleConditionsList";
 import RuleConditionsList from "./conditions/RuleConditionsList";
+import RulesContainerList from "./containers/RulesContainerList";
 
 export default class Rules extends BaseComponent<{}, {}> {
 
@@ -34,11 +35,21 @@ export default class Rules extends BaseComponent<{}, {}> {
                      id: 'addRuleOrCondition',
                      title: 'Select option',
                      data: [
+                       {text: 'Rule condition', pathname: '/rules/conditions/new_condition?new=true'},
                        {text: 'Host rule', pathname: '/rules/hosts/new_host_rule?new=true'},
                        {text: 'Service rule', pathname: '/rules/services/new_service_rule?new=true'},
-                       {text: 'Rule condition', pathname: '/rules/conditions/new_condition?new=true'},
+                       {text: 'Container rule', pathname: '/rules/containers/new_container_rule?new=true'},
                      ],
                    }}/>
+        <div className={`${styles.collapsibleContainer}`}>
+          <Collapsible id={"rulesConditionCollapsible"}
+                       title={'Conditions'}
+                       active
+                       headerClassname={styles.collapsibleSubtitle}
+                       bodyClassname={styles.collapsibleCardList}>
+            <RuleConditionsList/>
+          </Collapsible>
+        </div>
         <div className={`${styles.collapsibleContainer}`}>
           <Collapsible id={"rulesHostCollapsible"}
                        title={'Hosts'}
@@ -58,12 +69,12 @@ export default class Rules extends BaseComponent<{}, {}> {
           </Collapsible>
         </div>
         <div className={`${styles.collapsibleContainer}`}>
-          <Collapsible id={"rulesConditionCollapsible"}
-                       title={'Conditions'}
+          <Collapsible id={"rulesContainerCollapsible"}
+                       title={'Containers'}
                        active
                        headerClassname={styles.collapsibleSubtitle}
                        bodyClassname={styles.collapsibleCardList}>
-            <RuleConditionsList/>
+            <RulesContainerList/>
           </Collapsible>
         </div>
       </MainLayout>
