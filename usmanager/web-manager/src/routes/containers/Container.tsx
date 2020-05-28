@@ -9,13 +9,13 @@ import Form, {
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
-import Tabs, {Tab} from "../../components/tabs/Tabs";
+import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {addContainer, loadCloudHosts, loadContainers, loadEdgeHosts, loadServices} from "../../actions";
 import {connect} from "react-redux";
 import React, {createRef} from "react";
-import {ICloudHost} from "../hosts/cloud/CloudHost";
+import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
 import {IService} from "../services/Service";
 import ContainerPortsList from "./ContainerPortsList";
@@ -212,7 +212,7 @@ class Container extends BaseComponent<Props, State> {
   private replicate = (event: any) => {
     const container = this.getContainer();
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
-    const url = `containers/${container?.id}/replicate`;
+    const url = `containers/${container?.containerId}/replicate`;
     this.setState({ loading: { method: 'post', url: url } });
     postData(url, {hostname: hostname},
       (reply: IReply<IContainer>) => this.onReplicateSuccess(reply.data),
@@ -227,7 +227,7 @@ class Container extends BaseComponent<Props, State> {
   };
 
   private onReplicateFailure = (reason: string, container?: IContainer) => {
-    super.toast(`Unable to replicate ${this.mounted ? `<b>${container?.id}</b>` : `<a href=/containers/${container?.id}><b>${container?.id}</b></a>`} container`, 10000, reason, true);
+    super.toast(`Unable to replicate ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`} container`, 10000, reason, true);
     if (this.mounted) {
       this.setState({loading: undefined});
     }
@@ -236,7 +236,7 @@ class Container extends BaseComponent<Props, State> {
   private migrate = (event: any) => {
     const container = this.getContainer();
     const hostname = decodeHTML((event.target as HTMLLIElement).innerHTML);
-    const url = `containers/${container?.id}/migrate`;
+    const url = `containers/${container?.containerId}/migrate`;
     this.setState({ loading: { method: 'post', url: url } });
     postData(url, { hostname: hostname },
       (reply: IReply<IContainer>) => this.onMigrateSuccess(reply.data),
@@ -245,14 +245,14 @@ class Container extends BaseComponent<Props, State> {
 
   private onMigrateSuccess = (container: IContainer) => {
     const parentContainer = this.getContainer();
-    super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.id : `<a href=/containers/${parentContainer?.id}>${parentContainer?.id}</a>`} to container </span><a href=/containers/${container.containerId}>${container.containerId}</a>`, 15000);
+    super.toast(`<span class="green-text">Migrated ${this.mounted ? parentContainer?.containerId : `<a href=/containers/${parentContainer?.containerId}>${parentContainer?.containerId}</a>`} to container </span><a href=/containers/${container.containerId}>${container.containerId}</a>`, 15000);
     if (this.mounted) {
       this.setState({loading: undefined});
     }
   };
 
   private onMigrateFailure = (reason: string, container?: IContainer) => {
-    super.toast(`Unable to migrate ${this.mounted ? `<b>${container?.id}</b>` : `<a href=/containers/${container?.id}><b>${container?.id}</b></a>`} container`, 10000, reason, true);
+    super.toast(`Unable to migrate ${this.mounted ? `<b>${container?.containerId}</b>` : `<a href=/containers/${container?.containerId}><b>${container?.containerId}</b></a>`} container`, 10000, reason, true);
     if (this.mounted) {
       this.setState({loading: undefined});
     }
@@ -313,7 +313,7 @@ class Container extends BaseComponent<Props, State> {
 
   private getSelectableHosts = () => {
     const cloudHosts = Object.values(this.props.cloudHosts)
-                             .filter(instance => instance.state === 'running')
+                             .filter(instance => instance.state.code === awsInstanceStates.RUNNING.code)
                              .map(instance => instance.publicIpAddress);
     const edgeHosts = Object.keys(this.props.edgeHosts);
     return cloudHosts.concat(edgeHosts);

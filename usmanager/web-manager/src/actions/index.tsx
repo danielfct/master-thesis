@@ -326,7 +326,16 @@ export const reloadContainers = () => ({
     method: 'post'
   }
 });
-
+export const CONTAINER_LOGS_REQUEST = 'CONTAINER_LOGS_REQUEST';
+export const CONTAINER_LOGS_SUCCESS = 'CONTAINER_LOGS_SUCCESS';
+export const CONTAINER_LOGS_FAILURE = 'CONTAINER_LOGS_FAILURE';
+export const loadContainerLogs = (containerId: string) => ({
+  [CALL_API]: {
+    types: [ CONTAINER_LOGS_REQUEST, CONTAINER_LOGS_SUCCESS, CONTAINER_LOGS_FAILURE ],
+    endpoint: `containers/${containerId}/logs`,
+    entity: containerId,
+  }
+});
 
 export const CLOUD_HOSTS_REQUEST = 'CLOUD_HOSTS_REQUEST';
 export const CLOUD_HOSTS_SUCCESS = 'CLOUD_HOSTS_SUCCESS';

@@ -79,8 +79,8 @@ export default class AddButton extends React.Component<Props, {}> {
           </div>
           : <>
             <div className="dropdown-trigger fixed-action-btn tooltipped waves-effect btn-floating grey darken-3"
-                 data-position="left"
-                 data-tooltip={tooltip}
+                 data-position={tooltip.position}
+                 data-tooltip={tooltip.text}
                  data-target={`dropdown-${dropdown.id}`}
                  ref={this.dropdown}>
               <i className="large material-icons">add</i>

@@ -47,7 +47,7 @@ import {IEurekaServer} from "../routes/eureka/EurekaServer";
 import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 
-const callApi = (endpoint: string, schema: any, method?: Method) => {
+const callApi = (endpoint: string, schema?: any, method?: Method) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
     return axios(url, {
         method: method || 'get',
@@ -61,7 +61,7 @@ const callApi = (endpoint: string, schema: any, method?: Method) => {
     }).then(response => {
         if (response.status === 200) {
             const camelizedJson = camelizeKeys(response.data);
-            return normalize(camelizedJson, schema).entities;
+            return schema ? normalize(camelizedJson, schema).entities : camelizedJson;
         }
         else {
             return Promise.reject(response);
@@ -160,9 +160,9 @@ const cloudHost: schema.Entity<ICloudHost> = new schema.Entity('cloudHosts', und
 });
 const cloudHosts = new schema.Array(cloudHost);
 
-const state: schema.Entity<IState> = new schema.Entity('state', undefined, {
+/*const state: schema.Entity<IState> = new schema.Entity('state', undefined, {
     idAttribute: (state: IState) => state.name
-});
+});*/
 
 const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefined, {
     idAttribute: (host: IEdgeHost) => host.hostname
@@ -236,7 +236,7 @@ const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
 
 app.define({ appServices });
 service.define({ apps, dependencies, dependents, serviceRules, simulatedServiceMetrics });
-cloudHost.define({ hostRules, simulatedHostMetrics, state });
+cloudHost.define({ hostRules, simulatedHostMetrics, /*state*/ });
 edgeHost.define({ hostRules, simulatedHostMetrics });
 ruleHost.define({ conditions, edgeHosts, cloudHosts });
 ruleService.define({ conditions, services });

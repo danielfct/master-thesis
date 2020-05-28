@@ -512,14 +512,20 @@ class DockerContainersService {
         .map(p -> new ContainerPortMapping(p.privatePort(), p.publicPort(), p.type(), p.ip()))
         .collect(Collectors.toList());
     Map<String, String> labels = container.labels();
+    return new DockerContainer(id, created, names, image, command, state, status, hostname, ports, labels);
+  }
+
+  public String getContainerLogs(ContainerEntity container) {
+    String hostname = container.getHostname();
+    String containerId = container.getContainerId();
     String logs = null;
     try (var docker = dockerCoreService.getDockerClient(hostname);
-         var stream = docker.logs(id, DockerClient.LogsParam.stdout(), DockerClient.LogsParam.stderr())) {
+         var stream = docker.logs(containerId, DockerClient.LogsParam.stdout(), DockerClient.LogsParam.stderr())) {
       logs = stream.readFully();
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
     }
-    return new DockerContainer(id, created, names, image, command, state, status, hostname, ports, labels, logs);
+    return logs;
   }
 
 }

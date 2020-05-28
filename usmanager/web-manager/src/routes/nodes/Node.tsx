@@ -16,7 +16,7 @@ import {IReply} from "../../utils/api";
 import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
-import {ICloudHost} from "../hosts/cloud/CloudHost";
+import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 
 export interface INode {
   id: string;
@@ -165,7 +165,8 @@ class Node extends BaseComponent<Props, State> {
   private getSelectableHosts = () => {
     const nodesHostnames = Object.values(this.props.nodes).map(node => node.hostname);
     const cloudHosts = Object.values(this.props.cloudHosts)
-                             .filter(instance => instance.state === 'running' && !nodesHostnames.includes(instance.publicIpAddress))
+                             .filter(instance => instance.state.code === awsInstanceStates.RUNNING.code
+                                                 && !nodesHostnames.includes(instance.publicIpAddress))
                              .map(instance => instance.publicIpAddress);
     const edgeHosts = Object.keys(this.props.edgeHosts).filter(edgeHost => !nodesHostnames.includes(edgeHost));
     return cloudHosts.concat(edgeHosts);

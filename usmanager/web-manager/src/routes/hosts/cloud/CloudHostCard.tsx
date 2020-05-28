@@ -33,13 +33,18 @@ const CloudHostCard = ({cloudHost}: Props) => (
               value={`${cloudHost.instanceType}`}/>
     <CardItem key={'state'}
               label={'state'}
-              value={`${cloudHost.state}`}/>
-    <CardItem key={'publicDnsName'}
+              value={`${cloudHost.state.name}`}/>
+    {cloudHost.publicDnsName &&
+     <CardItem key={'publicDnsName'}
               label={'publicDnsName'}
-              value={`${cloudHost.publicDnsName}`}/>
-    <CardItem key={'publicIpAddress'}
+              value={`${cloudHost.publicDnsName}`}/>}
+    {cloudHost.publicIpAddress &&
+     <CardItem key={'publicIpAddress'}
               label={'publicIpAddress'}
-              value={`${cloudHost.publicIpAddress}`}/>
+              value={`${cloudHost.publicIpAddress}`}/>}
+    <CardItem key={'placement'}
+              label={'placement'}
+              value={`${cloudHost.placement.availabilityZone}`}/>
   </Card>
 );
 

@@ -94,10 +94,14 @@ public class ContainersService {
   private List<ContainerEntity> filterContainersWithLabels(List<ContainerEntity> containers,
                                                            Set<Pair<String, String>> labels) {
     // TODO try to build a database query instead
+    List<String> labelKeys = labels.stream().map(Pair::getFirst).collect(Collectors.toList());
     return containers.stream()
         .filter(container -> {
           for (Map.Entry<String, String> containerLabel: container.getLabels().entrySet()) {
-            if (!labels.contains(Pair.of(containerLabel.getKey(), containerLabel.getValue()))) {
+            //FIXME labels is just a subset, doesnt contain all containerLabels
+            String key = containerLabel.getKey();
+            String value = containerLabel.getValue();
+            if (labelKeys.contains(key) && !labels.contains(Pair.of(key, value))) {
               return false;
             }
           }
@@ -119,6 +123,7 @@ public class ContainersService {
       if (!dockerContainerIds.contains(containerId)) {
         deleteContainer(containerId);
         containerIterator.remove();
+        //TODO wrongly removing docker api
         log.debug("Removed invalid container {}", containerId);
       }
     }
@@ -272,6 +277,12 @@ public class ContainersService {
     ContainerEntity container = getContainer(containerId);
     return dockerContainersService.getContainerStats(container, hostname);
   }
+
+  public String getLogs(String containerId) {
+    ContainerEntity container = getContainer(containerId);
+    return dockerContainersService.getContainerLogs(container);
+  }
+
 
   public List<ContainerRuleEntity> getRules(String containerId) {
     assertContainerExists(containerId);

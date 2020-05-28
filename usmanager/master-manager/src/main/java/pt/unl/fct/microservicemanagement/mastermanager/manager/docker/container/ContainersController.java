@@ -116,6 +116,11 @@ public class ContainersController {
     return containersService.reloadContainers();
   }
 
+  @GetMapping("/{containerId}/logs")
+  public String getContainerLogs(@PathVariable String containerId) {
+    return containersService.getLogs(containerId);
+  }
+
   @GetMapping("/{containerId}/rules")
   public List<ContainerRuleEntity> addContainerRule(@PathVariable String containerId) {
     return containersService.getRules(containerId);

@@ -467,6 +467,12 @@ textarea.materialize-textarea[readonly="readonly"] {
     overflow: auto;
 }
 
+.smallControlsContainer {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.8);
+    padding: 8px 25px;
+    overflow: auto;
+}
+
 .noBorder {
     border: unset;
 }

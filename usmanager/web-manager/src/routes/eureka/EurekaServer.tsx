@@ -179,7 +179,7 @@ class EurekaServer extends BaseComponent<Props, State> {
                 }}
                 delete={{
                   textButton: 'Stop',
-                  url: `containers/${eurekaServer?.id}`,
+                  url: `containers/${eurekaServer?.containerId}`,
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure
                 }}>

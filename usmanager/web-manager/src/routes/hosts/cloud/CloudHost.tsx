@@ -33,15 +33,28 @@ export interface ICloudHost extends IDatabaseData {
   instanceId: string;
   imageId: string;
   instanceType: string;
-  state: string;
+  state: {
+    code: number,
+    name: string
+  };
   publicDnsName: string;
   publicIpAddress: string;
+  placement: IPlacement;
   hostRules?: string[];
 }
 
 export interface IState {
   code: number,
   name: string
+}
+
+export interface IPlacement {
+  affinity: any;
+  availabilityZone: string;
+  groupName: string;
+  hostId: string;
+  spreadDomain: string;
+  tenancy: string;
 }
 
 const buildNewCloudHost = (): Partial<ICloudHost> => ({
@@ -169,7 +182,7 @@ class CloudHost extends BaseComponent<Props, State> {
   private startStopTerminateButtons = (): ICustomButton[] => {
     const buttons: ICustomButton[] = [];
     const cloudHost = this.getCloudHost();
-    const state = this.getCloudHost().state;
+    const state = this.getCloudHost().state?.name;
     if (state?.includes(awsInstanceStates.STOPPED.name)) {
       buttons.push({
         button:
@@ -284,6 +297,12 @@ class CloudHost extends BaseComponent<Props, State> {
     this.setState({cloudHost: cloudHost, formCloudHost: formCloudHost, loading: undefined});
   };
 
+  private cloudHostState = (state: IState) =>
+    state.name;
+
+  private cloudHostPlacement = (placement: IPlacement) =>
+    placement.availabilityZone;
+
   private cloudHost = () => {
     const {isLoading, error} = this.props;
     const cloudHost = this.getCloudHost();
@@ -310,9 +329,19 @@ class CloudHost extends BaseComponent<Props, State> {
                 saveEntities={this.saveEntities}
                 loading={this.state.loading}>
             {Object.keys(formCloudHost).map((key, index) =>
-              <Field key={index}
-                     id={key}
-                     label={key}/>)}
+              key === 'state'
+                ? <Field<IState> key={index}
+                                 id={key}
+                                 label={key}
+                                 valueToString={this.cloudHostState}/>
+                : key === 'placement'
+                ? <Field<IPlacement> key={index}
+                                     id={key}
+                                     label={key}
+                                     valueToString={this.cloudHostPlacement}/>
+                : <Field key={index}
+                         id={key}
+                         label={key}/>)}
           </Form>
         )}
       </>
@@ -363,13 +392,13 @@ class CloudHost extends BaseComponent<Props, State> {
 
 function removeFields(cloudHost: Partial<ICloudHost>) {
   delete cloudHost["id"];
-  delete cloudHost["hostRules"];
   if (!cloudHost.publicDnsName) {
     delete cloudHost["publicDnsName"];
   }
   if (!cloudHost.publicIpAddress) {
     delete cloudHost["publicIpAddress"];
   }
+  delete cloudHost["hostRules"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {

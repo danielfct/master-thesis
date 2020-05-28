@@ -44,7 +44,6 @@ public final class DockerContainer {
   private final String hostname;
   private final List<ContainerPortMapping> ports;
   private final Map<String, String> labels;
-  private final String logs;
 
   @Override
   public boolean equals(Object o) {

@@ -22,6 +22,7 @@ export interface FieldProps<T = string> {
   type?: "text" | "number" | "date" | "datepicker" | "timepicker" | "multilinetext" | "dropdown" | "list";
   label?: string;
   value?: any;
+  valueToString?: (v: T) => string
   dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
   number?: { min: number, max: number };
   validation?: IValidation;
@@ -87,7 +88,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
   };
 
   render() {
-    const {id, type, label, dropdown, number, icon, disabled} = this.props;
+    const {id, type, label, dropdown, number, icon, disabled, valueToString} = this.props;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
       const hasErrors = getError(errors);
@@ -118,13 +119,14 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                 </>
               )}
               {(!type || type.toLowerCase() === "text") && (
-                <TextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
-                         id={id}
-                         name={id}
-                         value={formContext.values[id]}
-                         disabled={disabled || !formContext.isEditing}
-                         onChange={this.onChange(id, formContext)}
-                         onBlur={this.onBlur(id, formContext)}/>
+                <TextBox<T> className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
+                            id={id}
+                            name={id}
+                            value={formContext.values[id]}
+                            disabled={disabled || !formContext.isEditing}
+                            onChange={this.onChange(id, formContext)}
+                            valueToString={valueToString}
+                            onBlur={this.onBlur(id, formContext)}/>
               )}
               {type && type.toLowerCase() === "number" && (
                 <NumberBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}

@@ -73,6 +73,9 @@ import {
   CONTAINER_SUCCESS,
   CONTAINERS_SUCCESS,
   ADD_CONTAINER,
+  CONTAINER_LOGS_REQUEST,
+  CONTAINER_LOGS_FAILURE,
+  CONTAINER_LOGS_SUCCESS,
   CLOUD_HOSTS_REQUEST,
   CLOUD_HOST_REQUEST,
   CLOUD_HOSTS_FAILURE,
@@ -235,13 +238,12 @@ import {INode} from "../routes/nodes/Node";
 import {IRuleHost} from "../routes/rules/hosts/RuleHost";
 import {IValueMode, IField, IOperator, IDecision} from "../routes/rules/Rule";
 import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
-//TODO simulated metrics
+import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
+import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 import {IRegion} from "../routes/region/Region";
 import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 import {IEurekaServer} from "../routes/eureka/EurekaServer";
 import {ILogs} from "../routes/logs/Logs";
-import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
-import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 
 export type EntitiesState = {
   apps: {
@@ -270,6 +272,8 @@ export type EntitiesState = {
     data: { [key: string]: IContainer },
     isLoadingContainers: boolean,
     loadContainersError: string | null,
+    isLoadingContainerLogs: boolean,
+    loadContainerLogsError: string | null,
   },
   hosts: {
     cloud: {
@@ -446,7 +450,9 @@ const entities = (state: EntitiesState = {
                     containers: {
                       data: {},
                       isLoadingContainers: false,
-                      loadContainersError: null
+                      loadContainersError: null,
+                      isLoadingContainerLogs: false,
+                      loadContainerLogsError: null,
                     },
                     hosts: {
                       cloud: {
@@ -889,6 +895,7 @@ const entities = (state: EntitiesState = {
       return {
         ...state,
         containers: {
+          ...state.containers,
           data: merge({}, state.containers.data, data?.containers),
           isLoadingContainers: false,
           loadContainersError: null,
@@ -900,6 +907,23 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { containers: { data: containers } });
       }
       break;
+    case CONTAINER_LOGS_REQUEST:
+      return merge({}, state, { containers: { isLoadingContainerLogs: true, loadContainerLogsError: null } });
+    case CONTAINER_LOGS_FAILURE:
+      return merge({}, state, { containers: { isLoadingContainerLogs: false, loadContainerLogsError: error } });
+    case CONTAINER_LOGS_SUCCESS:
+      const container = entity && state.containers.data[entity];
+      const logs = { logs: data || [] };
+      const containerWithLogs = Object.assign(container ? container : [entity], logs);
+      const normalizedContainer = normalize(containerWithLogs, Schemas.CONTAINER).entities;
+      return merge({}, state, {
+        containers : {
+          ...state.containers,
+          data: normalizedContainer.containers,
+          isLoadingContainerLogs: false,
+          loadContainerLogsError: null,
+        },
+      });
     case CLOUD_HOSTS_REQUEST:
     case CLOUD_HOST_REQUEST:
       return merge({}, state, { hosts: { cloud: { isLoadingHosts: true, loadHostsError: null } } });

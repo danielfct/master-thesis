@@ -15,7 +15,7 @@ import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../components/form/Field";
-import Tabs, {Tab} from "../../components/tabs/Tabs";
+import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {
@@ -191,7 +191,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
                 }}
                 delete={{
                   textButton: 'Stop',
-                  url: `containers/${loadBalancer?.id}`,
+                  url: `containers/${loadBalancer?.containerId}`,
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure
                 }}>
