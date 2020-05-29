@@ -28,7 +28,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEn
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
 
 import java.util.Objects;
 import java.util.Set;
@@ -107,12 +107,12 @@ public class ServiceEntity {
   @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceDependency> dependencies;
+  private Set<ServiceDependencyEntity> dependencies;
 
   @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceDependency> depends;
+  private Set<ServiceDependencyEntity> depends;
 
   @Singular
   @JsonIgnore

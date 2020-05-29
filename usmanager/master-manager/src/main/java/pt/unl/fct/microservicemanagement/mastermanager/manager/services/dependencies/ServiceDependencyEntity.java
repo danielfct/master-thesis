@@ -22,40 +22,62 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
+import java.util.Objects;
+
+@Entity
+@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
 @Setter
-@Configuration
-@ConfigurationProperties("container")
-public class ContainerProperties {
+@Getter
+@Table(name = "service_dependencies")
+public class ServiceDependencyEntity {
 
-  private int monitorPeriod;
-  private int replicateContainerOnEventCount;
-  private int migrateContainerOnEventCount;
-  private int stopContainerOnEventCount;
-  private int delayBeforeStop;
-  private final Database database;
+  @Id
+  @GeneratedValue
+  private Long id;
 
-  public ContainerProperties() {
-    this.database = new Database();
+  @JoinColumn(name = "service_id")
+  @ManyToOne
+  private ServiceEntity service;
+
+  @JoinColumn(name = "dependency_id")
+  @ManyToOne
+  private ServiceEntity dependency;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ServiceDependencyEntity)) {
+      return false;
+    }
+    ServiceDependencyEntity other = (ServiceDependencyEntity) o;
+    return id != null && id.equals(other.getId());
   }
 
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Database {
-
-    private int deployDelay;
-
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getId());
   }
 
 }

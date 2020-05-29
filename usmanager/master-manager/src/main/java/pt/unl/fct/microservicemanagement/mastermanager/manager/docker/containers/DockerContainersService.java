@@ -1,33 +1,23 @@
 /*
- * MIT License
- *
  * Copyright (c) 2020 usmanager
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerPortMapping;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
@@ -69,7 +59,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-class DockerContainersService {
+public class DockerContainersService {
 
   private static final long DELAY_BETWEEN_CONTAINER_LAUNCH = TimeUnit.SECONDS.toMillis(5);
   //TODO lower or higher sleep?
@@ -88,7 +78,7 @@ class DockerContainersService {
   private final int dockerDelayBeforeStopContainer;
 
   //FIXME remove @Lazy
-  DockerContainersService(DockerCoreService dockerCoreService, NodesService nodesService,
+  public DockerContainersService(DockerCoreService dockerCoreService, NodesService nodesService,
                           ServicesService servicesService,
                           NginxLoadBalancerService nginxLoadBalancerService,
                           EurekaService eurekaService,
@@ -107,7 +97,7 @@ class DockerContainersService {
     this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
   }
 
-  Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services, String region, String country,
+  public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services, String region, String country,
                                                String city) {
     var serviceContainers = new HashMap<String, List<DockerContainer>>();
     // TODO qual a utilidade do dynamicLaunchParams?
@@ -141,64 +131,64 @@ class DockerContainersService {
     return containers;
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName) {
+  public DockerContainer launchContainer(String hostname, String serviceName) {
     return launchContainer(hostname, serviceName, false);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName, boolean singleton) {
+  public DockerContainer launchContainer(String hostname, String serviceName, boolean singleton) {
     List<String> environment = Collections.emptyList();
     return launchContainer(hostname, serviceName, singleton, environment);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName, List<String> environment) {
+  public DockerContainer launchContainer(String hostname, String serviceName, List<String> environment) {
     return launchContainer(hostname, serviceName, false, environment);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName,
+  public DockerContainer launchContainer(String hostname, String serviceName,
                                   boolean singleton, List<String> environment) {
     Map<String, String> labels = Collections.emptyMap();
     return launchContainer(hostname, serviceName, singleton, environment, labels);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName, Map<String, String> labels) {
+  public DockerContainer launchContainer(String hostname, String serviceName, Map<String, String> labels) {
     return launchContainer(hostname, serviceName, false, labels);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName,
+  public DockerContainer launchContainer(String hostname, String serviceName,
                                   boolean singleton, Map<String, String> labels) {
     List<String> environment = Collections.emptyList();
     return launchContainer(hostname, serviceName, singleton, environment, labels);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName, List<String> environment,
+  public DockerContainer launchContainer(String hostname, String serviceName, List<String> environment,
                                   Map<String, String> labels) {
     return launchContainer(hostname, serviceName, false, environment, labels);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName, List<String> environment,
+  public DockerContainer launchContainer(String hostname, String serviceName, List<String> environment,
                                   Map<String, String> labels, Map<String, String> dynamicLaunchParams) {
     return launchContainer(hostname, serviceName, false, environment, labels, dynamicLaunchParams);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName,
+  public DockerContainer launchContainer(String hostname, String serviceName,
                                   boolean singleton, List<String> environment, Map<String, String> labels) {
     Map<String, String> dynamicLaunchParams = Collections.emptyMap();
     return launchContainer(hostname, serviceName, singleton, environment, labels, dynamicLaunchParams);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName, boolean singleton,
+  public DockerContainer launchContainer(String hostname, String serviceName, boolean singleton,
                                   List<String> environment, Map<String, String> labels,
                                   Map<String, String> dynamicLaunchParams) {
     ServiceEntity service = servicesService.getService(serviceName);
     return launchContainer(hostname, service, singleton, environment, labels, dynamicLaunchParams);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName, String internalPort,
+  public DockerContainer launchContainer(String hostname, String serviceName, String internalPort,
                                   String externalPort) {
     return launchContainer(hostname, serviceName, false, internalPort, externalPort);
   }
 
-  DockerContainer launchContainer(String hostname, String serviceName, boolean singleton, String internalPort,
+  public DockerContainer launchContainer(String hostname, String serviceName, boolean singleton, String internalPort,
                                   String externalPort) {
     ServiceEntity service = servicesService.getService(serviceName).toBuilder()
         .defaultInternalPort(internalPort)
@@ -351,13 +341,13 @@ class DockerContainersService {
     return serviceAddress;
   }
 
-  void stopContainer(ContainerEntity container) {
+  public void stopContainer(ContainerEntity container) {
     String containerId = container.getContainerId();
     String containerHostname = container.getHostname();
     stopContainer(containerId, containerHostname);
   }
 
-  void stopContainer(String id, String hostname) {
+  public void stopContainer(String id, String hostname) {
     ContainerInfo containerInfo = inspectContainer(id, hostname);
     String serviceType = containerInfo.config().labels().get(ContainerConstants.Label.SERVICE_TYPE);
     if (Objects.equals(serviceType, "frontend")) {
@@ -373,11 +363,11 @@ class DockerContainersService {
     }
   }
 
-  DockerContainer replicateContainer(ContainerEntity container, String toHostname) {
+  public DockerContainer replicateContainer(ContainerEntity container, String toHostname) {
     return replicateContainer(container, toHostname);
   }
 
-  DockerContainer replicateContainer(String id, String fromHostname, String toHostname) {
+  public DockerContainer replicateContainer(String id, String fromHostname, String toHostname) {
     ContainerInfo fromContainer = inspectContainer(id, fromHostname);
     String serviceName = fromContainer.name().replace("/", "").split("_")[0];
     Map.Entry<String, List<PortBinding>> port = fromContainer.hostConfig().portBindings().entrySet().iterator().next();
@@ -405,7 +395,7 @@ class DockerContainersService {
     return launchContainer(toHostname, service, false, customEnvs, customLabels, dynamicLaunchParams);
   }
 
-  DockerContainer migrateContainer(ContainerEntity container, String hostname, String toHostname) {
+  public DockerContainer migrateContainer(ContainerEntity container, String hostname, String toHostname) {
     String containerId = container.getContainerId();
     DockerContainer replicaContainer = replicateContainer(container, toHostname);
     new Timer("StopContainerTimer").schedule(new TimerTask() {
@@ -421,15 +411,15 @@ class DockerContainersService {
     return replicaContainer;
   }
 
-  DockerContainer migrateContainer(ContainerEntity container, String toHostname) {
+  public DockerContainer migrateContainer(ContainerEntity container, String toHostname) {
     return migrateContainer(container, null, toHostname);
   }
 
-  List<DockerContainer> getContainers(DockerClient.ListContainersParam... filter) {
+  public List<DockerContainer> getContainers(DockerClient.ListContainersParam... filter) {
     return getAllContainers(filter);
   }
 
-  List<DockerContainer> getContainers(String hostname, DockerClient.ListContainersParam... filter) {
+  public List<DockerContainer> getContainers(String hostname, DockerClient.ListContainersParam... filter) {
     try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
       return dockerClient.listContainers(filter).stream().map(this::buildDockerContainer).collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
@@ -438,7 +428,7 @@ class DockerContainersService {
     }
   }
 
-  Optional<DockerContainer> findContainer(String hostname, DockerClient.ListContainersParam... filter) {
+  public Optional<DockerContainer> findContainer(String hostname, DockerClient.ListContainersParam... filter) {
     return getContainers(hostname, filter).stream().findFirst();
   }
 
@@ -455,28 +445,28 @@ class DockerContainersService {
         .collect(Collectors.toList());
   }
 
-  Optional<DockerContainer> getContainer(String id) {
+  public Optional<DockerContainer> getContainer(String id) {
     return findContainer(id);
   }
 
-  List<DockerContainer> getAppContainers() {
+  public List<DockerContainer> getAppContainers() {
     return getContainers(
         DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_TYPE, "frontend"),
         DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_TYPE, "backend"));
   }
 
-  List<DockerContainer> getAppContainers(String hostname) {
+  public List<DockerContainer> getAppContainers(String hostname) {
     return getContainers(hostname,
         DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_TYPE, "frontend"),
         DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_TYPE, "backend"));
   }
 
-  List<DockerContainer> getDatabaseContainers(String hostname) {
+  public List<DockerContainer> getDatabaseContainers(String hostname) {
     return getContainers(hostname,
         DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_TYPE, "database"));
   }
 
-  List<DockerContainer> getSystemContainers(String hostname) {
+  public List<DockerContainer> getSystemContainers(String hostname) {
     return getContainers(hostname,
         DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_TYPE, "system"));
   }
@@ -490,7 +480,7 @@ class DockerContainersService {
     }
   }
 
-  ContainerStats getContainerStats(ContainerEntity container, String hostname) {
+  public ContainerStats getContainerStats(ContainerEntity container, String hostname) {
     try (var dockerClient = dockerCoreService.getDockerClient(hostname)) {
       return dockerClient.stats(container.getContainerId());
     } catch (DockerException | InterruptedException e) {

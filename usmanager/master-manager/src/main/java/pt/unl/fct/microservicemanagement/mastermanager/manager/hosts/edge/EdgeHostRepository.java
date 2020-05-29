@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
 import java.util.List;
@@ -49,6 +50,23 @@ public interface EdgeHostRepository extends JpaRepository<EdgeHostEntity, Long> 
       + "from EdgeHostEntity h join h.hostRules r "
       + "where r.generic = false and h.hostname = :hostname")
   List<HostRuleEntity> getRules(@Param("hostname") String hostname);
+
+
+  @Query("select r "
+      + "from EdgeHostEntity h join h.hostRules r "
+      + "where r.generic = false and h.hostname = :hostname and r.name = :ruleName")
+  Optional<HostRuleEntity> getRule(@Param("hostname") String hostname, @Param("ruleName") String ruleName);
+
+  @Query("select m "
+      + "from EdgeHostEntity h join h.simulatedHostMetrics m "
+      + "where h.hostname = :hostname")
+  List<SimulatedHostMetricEntity> getSimulatedMetrics(@Param("hostname") String hostname);
+
+  @Query("select m "
+      + "from EdgeHostEntity h join h.simulatedHostMetrics m "
+      + "where h.hostname = :hostname and m.name = :simulatedMetricName")
+  Optional<SimulatedHostMetricEntity> getSimulatedMetric(@Param("hostname") String hostname,
+                                                         @Param("simulatedMetricName") String simulatedMetricName);
 
   @Query("select case when count(h) > 0 then true else false end "
       + "from EdgeHostEntity h "

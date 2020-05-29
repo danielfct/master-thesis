@@ -52,6 +52,7 @@ export interface IContainer extends IDatabaseData {
   labels: IContainerLabel;
   logs?: string;
   containerRules?: string[];
+  containerSimulatedMetrics?: string[];
 }
 
 export interface IContainerPort {

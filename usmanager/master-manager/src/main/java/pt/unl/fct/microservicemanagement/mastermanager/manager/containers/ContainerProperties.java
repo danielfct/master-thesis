@@ -8,61 +8,39 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.docker;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties("docker")
-public class DockerProperties {
+@ConfigurationProperties("container")
+public class ContainerProperties {
 
-  private String installScriptPath;
-  private String repository;
-  private final Hub hub;
-  private final ApiProxy apiProxy;
-  private final Swarm swarm;
+  private int monitorPeriod;
+  private int replicateContainerOnEventCount;
+  private int migrateContainerOnEventCount;
+  private int stopContainerOnEventCount;
+  private int delayBeforeStop;
+  private final Database database;
 
-  public DockerProperties() {
-    this.hub = new Hub();
-    this.apiProxy = new ApiProxy();
-    this.swarm = new Swarm();
+  public ContainerProperties() {
+    this.database = new Database();
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   @Getter
   @Setter
-  public static final class Hub {
+  public static final class Database {
 
-    private String username;
-
-  }
-
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class ApiProxy {
-
-    private String username;
-    private String password;
-    private int port;
-
-  }
-
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  @Getter
-  @Setter
-  public static final class Swarm {
-
-    private String manager;
-    private int maxWorkers;
+    private int deployDelay;
 
   }
 

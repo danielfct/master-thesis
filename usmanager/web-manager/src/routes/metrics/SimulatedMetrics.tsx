@@ -17,21 +17,22 @@ import Collapsible from "../../components/collapsible/Collapsible";
 import BaseComponent from "../../components/BaseComponent";
 import SimulatedHostMetricsList from "./hosts/SimulatedHostMetricsList";
 import SimulatedServiceMetricsList from "./services/SimulatedServiceMetricsList";
+import SimulatedContainerMetricsList from "./containers/SimulatedContainerMetricsList";
 
 export default class SimulatedMetrics extends BaseComponent<{}, {}> {
 
+  private hostCollapsible = createRef<HTMLUListElement>();
   private servicesCollapsible = createRef<HTMLUListElement>();
   private containersCollapsible = createRef<HTMLUListElement>();
-  private hostCollapsible = createRef<HTMLUListElement>();
 
   public componentDidMount(): void {
     this.init();
   }
 
   private init = () => {
+    M.Collapsible.init(this.hostCollapsible.current as Element);
     M.Collapsible.init(this.servicesCollapsible.current as Element);
     M.Collapsible.init(this.containersCollapsible.current as Element);
-    M.Collapsible.init(this.hostCollapsible.current as Element);
   };
 
   public render() {
@@ -65,7 +66,7 @@ export default class SimulatedMetrics extends BaseComponent<{}, {}> {
             <SimulatedServiceMetricsList/>
           </Collapsible>
         </div>
-        {/* <div className={`${styles.container}`}>
+         <div className={`${styles.container}`}>
         <Collapsible id={"containersCollapsible"}
                      title={'Containers'}
                      active
@@ -73,7 +74,7 @@ export default class SimulatedMetrics extends BaseComponent<{}, {}> {
                      bodyClassname={styles.collapsibleCardList}>
           <SimulatedContainerMetricsList/>
         </Collapsible>
-      </div>*/}
+      </div>
       </MainLayout>
     );
   }

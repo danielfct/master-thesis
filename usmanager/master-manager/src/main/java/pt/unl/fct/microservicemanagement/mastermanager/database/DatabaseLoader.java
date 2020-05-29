@@ -39,6 +39,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes.ComponentTypeEntity;
@@ -51,7 +52,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operato
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.users.UserEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.users.UsersRepository;
@@ -517,107 +517,107 @@ public class DatabaseLoader {
       apps.save(sockShop);
 
       // service dependencies
-      var frontendEurekaServerDependency = ServiceDependency.builder()
+      var frontendEurekaServerDependency = ServiceDependencyEntity.builder()
           .service(frontend)
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(frontendEurekaServerDependency);
-      var frontendUserDependency = ServiceDependency.builder()
+      var frontendUserDependency = ServiceDependencyEntity.builder()
           .service(frontend)
           .dependency(user)
           .build();
       servicesDependencies.save(frontendUserDependency);
-      var frontendCatalogueDependency = ServiceDependency.builder()
+      var frontendCatalogueDependency = ServiceDependencyEntity.builder()
           .service(frontend)
           .dependency(catalogue)
           .build();
       servicesDependencies.save(frontendCatalogueDependency);
-      var frontendPaymentDependency = ServiceDependency.builder()
+      var frontendPaymentDependency = ServiceDependencyEntity.builder()
           .service(frontend)
           .dependency(payment)
           .build();
       servicesDependencies.save(frontendPaymentDependency);
-      var frontendCartsDependency = ServiceDependency.builder()
+      var frontendCartsDependency = ServiceDependencyEntity.builder()
           .service(frontend)
           .dependency(carts)
           .build();
       servicesDependencies.save(frontendCartsDependency);
-      var userEurekaServerDependency = ServiceDependency.builder()
+      var userEurekaServerDependency = ServiceDependencyEntity.builder()
           .service(user)
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(userEurekaServerDependency);
-      var userUserDbDependency = ServiceDependency.builder()
+      var userUserDbDependency = ServiceDependencyEntity.builder()
           .service(user)
           .dependency(userDb)
           .build();
       servicesDependencies.save(userUserDbDependency);
-      var catalogueEurekaServerDependency = ServiceDependency.builder()
+      var catalogueEurekaServerDependency = ServiceDependencyEntity.builder()
           .service(catalogue)
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(catalogueEurekaServerDependency);
-      var catalogueCatalogueDbDependency = ServiceDependency.builder()
+      var catalogueCatalogueDbDependency = ServiceDependencyEntity.builder()
           .service(catalogue)
           .dependency(catalogueDb)
           .build();
       servicesDependencies.save(catalogueCatalogueDbDependency);
-      var paymentEurekaServerDependency = ServiceDependency.builder()
+      var paymentEurekaServerDependency = ServiceDependencyEntity.builder()
           .service(payment)
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(paymentEurekaServerDependency);
-      var cartsEurekaServerDependency = ServiceDependency.builder()
+      var cartsEurekaServerDependency = ServiceDependencyEntity.builder()
           .service(carts)
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(cartsEurekaServerDependency);
-      var cartsCartsDbDependency = ServiceDependency.builder()
+      var cartsCartsDbDependency = ServiceDependencyEntity.builder()
           .service(carts)
           .dependency(cartsDb)
           .build();
       servicesDependencies.save(cartsCartsDbDependency);
-      var ordersEurekaServerDependency = ServiceDependency.builder()
+      var ordersEurekaServerDependency = ServiceDependencyEntity.builder()
           .service(orders)
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(ordersEurekaServerDependency);
-      var ordersPaymentDependency = ServiceDependency.builder()
+      var ordersPaymentDependency = ServiceDependencyEntity.builder()
           .service(orders)
           .dependency(payment)
           .build();
       servicesDependencies.save(ordersPaymentDependency);
-      var ordersShippingDependency = ServiceDependency.builder()
+      var ordersShippingDependency = ServiceDependencyEntity.builder()
           .service(orders)
           .dependency(shipping)
           .build();
       servicesDependencies.save(ordersShippingDependency);
-      var ordersOrdersDbDependency = ServiceDependency.builder()
+      var ordersOrdersDbDependency = ServiceDependencyEntity.builder()
           .service(orders)
           .dependency(ordersDb)
           .build();
       servicesDependencies.save(ordersOrdersDbDependency);
-      var shippingEurekaServerDependency = ServiceDependency.builder()
+      var shippingEurekaServerDependency = ServiceDependencyEntity.builder()
           .service(shipping)
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(shippingEurekaServerDependency);
-      var shippingRabbitmqDependency = ServiceDependency.builder()
+      var shippingRabbitmqDependency = ServiceDependencyEntity.builder()
           .service(shipping)
           .dependency(rabbitmq)
           .build();
       servicesDependencies.save(shippingRabbitmqDependency);
-      var queueMasterEurekaServerDependency = ServiceDependency.builder()
+      var queueMasterEurekaServerDependency = ServiceDependencyEntity.builder()
           .service(queueMaster)
           .dependency(eurekaServer)
           .build();
       servicesDependencies.save(queueMasterEurekaServerDependency);
-      var queueMasterRabbitmqDependency = ServiceDependency.builder()
+      var queueMasterRabbitmqDependency = ServiceDependencyEntity.builder()
           .service(queueMaster)
           .dependency(rabbitmq)
           .build();
       servicesDependencies.save(queueMasterRabbitmqDependency);
-      var rabbitmqEurekaServerDependency = ServiceDependency.builder()
+      var rabbitmqEurekaServerDependency = ServiceDependencyEntity.builder()
           .service(rabbitmq)
           .dependency(eurekaServer)
           .build();

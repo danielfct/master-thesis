@@ -24,10 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
-import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
@@ -36,6 +35,8 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -44,10 +45,13 @@ public class EdgeHostsService {
 
   private final EdgeHostRepository edgeHosts;
   private final HostRulesService hostRulesService;
+  private final SimulatedHostMetricsService simulatedHostMetricsService;
 
-  public EdgeHostsService(EdgeHostRepository edgeHosts, @Lazy HostRulesService hostRulesService) {
+  public EdgeHostsService(EdgeHostRepository edgeHosts, @Lazy HostRulesService hostRulesService,
+                          SimulatedHostMetricsService simulatedHostMetricsService) {
     this.edgeHosts = edgeHosts;
     this.hostRulesService = hostRulesService;
+    this.simulatedHostMetricsService = simulatedHostMetricsService;
   }
 
   public List<EdgeHostEntity> getEdgeHosts() {
@@ -96,6 +100,13 @@ public class EdgeHostsService {
     return edgeHosts.getRules(hostname);
   }
 
+  public HostRuleEntity getRule(String hostname, String ruleName) {
+    assertHostExists(hostname);
+    return edgeHosts.getRule(hostname, ruleName).orElseThrow(() ->
+        new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName)
+    );
+  }
+
   public void addRule(String hostname, String ruleName) {
     assertHostExists(hostname);
     hostRulesService.addEdgeHost(ruleName, hostname);
@@ -114,6 +125,40 @@ public class EdgeHostsService {
   public void removeRules(String hostname, List<String> ruleNames) {
     assertHostExists(hostname);
     ruleNames.forEach(rule -> hostRulesService.removeEdgeHost(rule, hostname));
+  }
+
+  public List<SimulatedHostMetricEntity> getSimulatedMetrics(String hostname) {
+    assertHostExists(hostname);
+    return edgeHosts.getSimulatedMetrics(hostname);
+  }
+
+  public SimulatedHostMetricEntity getSimulatedMetric(String hostname, String simulatedMetricName) {
+    assertHostExists(hostname);
+    return edgeHosts.getSimulatedMetric(hostname, simulatedMetricName).orElseThrow(() ->
+        new EntityNotFoundException(SimulatedHostMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+    );
+  }
+
+  public void addSimulatedMetric(String hostname, String simulatedMetricName) {
+    assertHostExists(hostname);
+    simulatedHostMetricsService.addEdgeHost(simulatedMetricName, hostname);
+  }
+
+  public void addSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
+    assertHostExists(hostname);
+    simulatedMetricNames.forEach(simulatedMetric ->
+        simulatedHostMetricsService.addEdgeHost(simulatedMetric, hostname));
+  }
+
+  public void removeSimulatedMetric(String hostname, String simulatedMetricName) {
+    assertHostExists(hostname);
+    simulatedHostMetricsService.addEdgeHost(simulatedMetricName, hostname);
+  }
+
+  public void removeSimulatedMetrics(String hostname, List<String> simulatedMetricNames) {
+    assertHostExists(hostname);
+    simulatedMetricNames.forEach(simulatedMetric ->
+        simulatedHostMetricsService.addEdgeHost(simulatedMetric, hostname));
   }
 
   public boolean hasEdgeHost(String hostname) {

@@ -29,11 +29,13 @@ import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFound
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependency;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.sql.Date;
@@ -53,13 +55,16 @@ public class ServicesService {
   private final ServiceRepository services;
   private final ServiceEventPredictionRepository serviceEventPredictions;
   private final ServiceRulesService serviceRulesService;
+  private final SimulatedServiceMetricsService simulatedServiceMetricsService;
   private final AppsService appsService;
 
   public ServicesService(ServiceRepository services, ServiceEventPredictionRepository serviceEventPredictions,
-                         ServiceRulesService serviceRulesService, @Lazy AppsService appsService) {
+                         ServiceRulesService serviceRulesService,
+                         SimulatedServiceMetricsService simulatedServiceMetricsService, @Lazy AppsService appsService) {
     this.services = services;
     this.serviceEventPredictions = serviceEventPredictions;
     this.serviceRulesService = serviceRulesService;
+    this.simulatedServiceMetricsService = simulatedServiceMetricsService;
     this.appsService = appsService;
   }
 
@@ -162,9 +167,9 @@ public class ServicesService {
   }
 
   public void addDependency(String serviceName, String dependencyName) {
-    var service = getService(serviceName);
-    var dependency = getService(dependencyName);
-    var serviceDependency = ServiceDependency.builder().service(service).dependency(dependency).build();
+    ServiceEntity service = getService(serviceName);
+    ServiceEntity dependency = getService(dependencyName);
+    var serviceDependency = ServiceDependencyEntity.builder().service(service).dependency(dependency).build();
     service = service.toBuilder().dependency(serviceDependency).build();
     services.save(service);
   }
@@ -261,6 +266,40 @@ public class ServicesService {
   public void removeRules(String serviceName, List<String> ruleNames) {
     assertServiceExists(serviceName);
     ruleNames.forEach(rule -> serviceRulesService.removeService(rule, serviceName));
+  }
+
+  public List<SimulatedServiceMetricEntity> getSimulatedMetrics(String serviceName) {
+    assertServiceExists(serviceName);
+    return services.getSimulatedMetrics(serviceName);
+  }
+
+  public SimulatedServiceMetricEntity getSimulatedMetric(String serviceName, String simulatedMetricName) {
+    assertServiceExists(serviceName);
+    return services.getSimulatedMetric(serviceName, simulatedMetricName).orElseThrow(() ->
+        new EntityNotFoundException(SimulatedServiceMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+    );
+  }
+
+  public void addSimulatedMetric(String serviceName, String simulatedMetricName) {
+    assertServiceExists(serviceName);
+    simulatedServiceMetricsService.addService(simulatedMetricName, serviceName);
+  }
+
+  public void addSimulatedMetrics(String serviceName, List<String> simulatedMetricNames) {
+    assertServiceExists(serviceName);
+    simulatedMetricNames.forEach(simulatedMetric ->
+        simulatedServiceMetricsService.addService(simulatedMetric, serviceName));
+  }
+
+  public void removeSimulatedMetric(String serviceName, String simulatedMetricName) {
+    assertServiceExists(serviceName);
+    simulatedServiceMetricsService.removeService(simulatedMetricName, serviceName);
+  }
+
+  public void removeSimulatedMetrics(String serviceName, List<String> simulatedMetricNames) {
+    assertServiceExists(serviceName);
+    simulatedMetricNames.forEach(simulatedMetric ->
+        simulatedServiceMetricsService.removeService(simulatedMetric, serviceName));
   }
 
   public int getMinReplicasByServiceName(String serviceName) {

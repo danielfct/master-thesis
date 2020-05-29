@@ -41,6 +41,7 @@ export interface ICloudHost extends IDatabaseData {
   publicIpAddress: string;
   placement: IPlacement;
   hostRules?: string[];
+  hostSimulatedMetrics?: string[];
 }
 
 export interface IState {

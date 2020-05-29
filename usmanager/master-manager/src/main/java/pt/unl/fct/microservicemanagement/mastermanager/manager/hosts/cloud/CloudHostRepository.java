@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
 import java.util.List;
@@ -45,6 +46,22 @@ public interface CloudHostRepository extends JpaRepository<CloudHostEntity, Long
       + "from CloudHostEntity h join h.hostRules r "
       + "where r.generic = false and h.instanceId = :instanceId")
   List<HostRuleEntity> getRules(@Param("instanceId") String instanceId);
+
+  @Query("select r "
+      + "from CloudHostEntity h join h.hostRules r "
+      + "where r.generic = false and h.instanceId = :instanceId and r.name = :ruleName")
+  Optional<HostRuleEntity> getRule(@Param("instanceId") String instanceId, @Param("ruleName") String ruleName);
+
+  @Query("select m "
+      + "from CloudHostEntity h join h.simulatedHostMetrics m "
+      + "where h.instanceId = :instanceId")
+  List<SimulatedHostMetricEntity> getSimulatedMetrics(@Param("instanceId") String instanceId);
+
+  @Query("select m "
+      + "from CloudHostEntity h join h.simulatedHostMetrics m "
+      + "where h.instanceId = :instanceId and m.name = :simulatedMetricName")
+  Optional<SimulatedHostMetricEntity> getSimulatedMetric(@Param("instanceId") String instanceId,
+                                                            @Param("simulatedMetricName") String simulatedMetricName);
 
   @Query("select case when count(h) > 0 then true else false end "
       + "from CloudHostEntity h "

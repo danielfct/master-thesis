@@ -2,8 +2,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules
 
 import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.DroolsService;

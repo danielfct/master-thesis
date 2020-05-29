@@ -38,6 +38,7 @@ export interface IEdgeHost extends IDatabaseData {
   city: string;
   local: boolean;
   hostRules?: string[];
+  hostSimulatedMetrics?: string[];
 }
 
 const buildNewEdgeHost = (): Partial<IEdgeHost> => ({

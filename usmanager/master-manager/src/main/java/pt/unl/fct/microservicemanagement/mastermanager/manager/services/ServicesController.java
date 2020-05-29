@@ -85,8 +85,7 @@ public class ServicesController {
   }
 
   @PostMapping("/{serviceName}/apps")
-  public void addServiceApps(@PathVariable String serviceName,
-                             @RequestBody AddServiceApp[] addServiceApps) {
+  public void addServiceApps(@PathVariable String serviceName, @RequestBody AddServiceApp[] addServiceApps) {
     servicesService.addApps(serviceName, Arrays.asList(addServiceApps));
   }
 
@@ -168,8 +167,7 @@ public class ServicesController {
     servicesService.removeRule(serviceName, ruleName);
   }
 
-  //TODO
-  /*@GetMapping("/{serviceName}/simulatedMetrics")
+  @GetMapping("/{serviceName}/simulatedMetrics")
   public List<SimulatedServiceMetricEntity> getServiceSimulatedMetrics(@PathVariable String serviceName) {
     return servicesService.getSimulatedMetrics(serviceName);
   }
@@ -187,6 +185,6 @@ public class ServicesController {
   @DeleteMapping("/{serviceName}/simulatedMetrics/{simulatedMetricName}")
   public void removeServiceSimulatedMetric(@PathVariable String serviceName, @PathVariable String simulatedMetricName) {
     servicesService.removeSimulatedMetric(serviceName, simulatedMetricName);
-  }*/
+  }
 
 }

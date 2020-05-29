@@ -8,9 +8,11 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
@@ -34,14 +36,17 @@ public class ContainersService {
 
   private final DockerContainersService dockerContainersService;
   private final ContainerRulesService containerRulesService;
+  private final SimulatedContainerMetricsService simulatedContainerMetricsService;
 
   private final ContainerRepository containers;
 
   public ContainersService(DockerContainersService dockerContainersService,
                            ContainerRulesService containerRulesService,
+                           SimulatedContainerMetricsService simulatedContainerMetricsService,
                            ContainerRepository containers) {
     this.dockerContainersService = dockerContainersService;
     this.containerRulesService = containerRulesService;
+    this.simulatedContainerMetricsService = simulatedContainerMetricsService;
     this.containers = containers;
   }
 
@@ -309,6 +314,49 @@ public class ContainersService {
     ruleNames.forEach(rule -> containerRulesService.removeContainer(rule, containerId));
   }
 
+
+
+
+
+  public List<SimulatedContainerMetricEntity> getSimulatedMetrics(String containerId) {
+    assertContainerExists(containerId);
+    return containers.getSimulatedMetrics(containerId);
+  }
+
+  public SimulatedContainerMetricEntity getSimulatedMetric(String containerId, String simulatedMetricName) {
+    assertContainerExists(containerId);
+    return containers.getSimulatedMetric(containerId, simulatedMetricName).orElseThrow(() ->
+        new EntityNotFoundException(SimulatedContainerMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+    );
+  }
+
+  public void addSimulatedMetric(String containerId, String simulatedMetricName) {
+    assertContainerExists(containerId);
+    simulatedContainerMetricsService.addContainer(simulatedMetricName, containerId);
+  }
+
+  public void addSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
+    assertContainerExists(containerId);
+    simulatedMetricNames.forEach(simulatedMetric ->
+        simulatedContainerMetricsService.addContainer(simulatedMetric, containerId));
+  }
+
+  public void removeSimulatedMetric(String containerId, String simulatedMetricName) {
+    assertContainerExists(containerId);
+    simulatedContainerMetricsService.removeContainer(simulatedMetricName, containerId);
+  }
+
+  public void removeSimulatedMetrics(String containerId, List<String> simulatedMetricNames) {
+    assertContainerExists(containerId);
+    simulatedMetricNames.forEach(simulatedMetric ->
+        simulatedContainerMetricsService.removeContainer(simulatedMetric, containerId));
+  }
+  
+  
+  
+  
+  
+  
   public boolean hasContainer(String containerId) {
     return containers.hasContainer(containerId);
   }

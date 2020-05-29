@@ -47,6 +47,7 @@ import {IEurekaServer} from "../routes/eureka/EurekaServer";
 import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
+import {ISimulatedContainerMetric} from "../routes/metrics/containers/SimulatedContainerMetric";
 
 const callApi = (endpoint: string, schema?: any, method?: Method) => {
     const url = endpoint.includes(API_URL) ? endpoint : `${API_URL}/${endpoint}`;
@@ -87,17 +88,25 @@ interface ISchemas {
     SERVICE_PREDICTION_ARRAY: schema.Entity<IPrediction>[];
     SERVICE_RULE: schema.Entity<IRuleService>;
     SERVICE_RULE_ARRAY: schema.Entity<IRuleService>[];
+    SERVICE_SIMULATED_METRIC: schema.Entity<ISimulatedServiceMetric>;
+    SERVICE_SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedServiceMetric>[];
     CONTAINER: schema.Entity<IContainer>;
     CONTAINER_ARRAY: schema.Entity<IContainer>[];
     CONTAINER_RULE_ARRAY: schema.Entity<IRuleService>[];
+    CONTAINER_SIMULATED_METRIC: schema.Entity<ISimulatedContainerMetric>;
+    CONTAINER_SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedContainerMetric>[];
     CLOUD_HOST: schema.Entity<ICloudHost>;
     CLOUD_HOST_ARRAY: schema.Entity<ICloudHost>[];
     CLOUD_HOST_RULE: schema.Entity<IRuleHost>;
     CLOUD_HOST_RULE_ARRAY: schema.Entity<IRuleHost>[];
+    CLOUD_HOST_SIMULATED_METRIC: schema.Entity<ISimulatedHostMetric>;
+    CLOUD_HOST_SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedHostMetric>[];
     EDGE_HOST: schema.Entity<IEdgeHost>;
     EDGE_HOST_ARRAY: schema.Entity<IEdgeHost>[];
     EDGE_HOST_RULE: schema.Entity<IRuleHost>;
     EDGE_HOST_RULE_ARRAY: schema.Entity<IRuleHost>[];
+    EDGE_HOST_SIMULATED_METRIC: schema.Entity<ISimulatedHostMetric>;
+    EDGE_HOST_SIMULATED_METRIC_ARRAY: schema.Entity<ISimulatedHostMetric>[];
     NODE: schema.Entity<INode>;
     NODE_ARRAY: schema.Entity<INode>[];
     RULE_HOST: schema.Entity<IRuleHost>;
@@ -115,8 +124,10 @@ interface ISchemas {
     DECISION_ARRAY: schema.Entity<IDecision>[];
     SIMULATED_HOST_METRIC: schema.Entity<ISimulatedHostMetric>;
     SIMULATED_HOST_METRIC_ARRAY: schema.Entity<ISimulatedHostMetric>[];
-    SIMULATED_SERVICE_METRIC: schema.Entity<ISimulatedHostMetric>;
-    SIMULATED_SERVICE_METRIC_ARRAY: schema.Entity<ISimulatedHostMetric>[];
+    SIMULATED_SERVICE_METRIC: schema.Entity<ISimulatedServiceMetric>;
+    SIMULATED_SERVICE_METRIC_ARRAY: schema.Entity<ISimulatedServiceMetric>[];
+    SIMULATED_CONTAINER_METRIC: schema.Entity<ISimulatedContainerMetric>;
+    SIMULATED_CONTAINER_METRIC_ARRAY: schema.Entity<ISimulatedContainerMetric>[];
     REGION: schema.Entity<IRegion>;
     REGION_ARRAY: schema.Entity<IRegion>[];
     LOAD_BALANCER: schema.Entity<ILoadBalancer>;
@@ -227,6 +238,10 @@ const simulatedServiceMetric: schema.Entity<ISimulatedServiceMetric> = new schem
 });
 const simulatedServiceMetrics = new schema.Array(simulatedServiceMetric);
 
+const simulatedContainerMetric: schema.Entity<ISimulatedContainerMetric> = new schema.Entity('simulatedContainerMetrics', undefined, {
+    idAttribute: (simulatedContainerMetric: ISimulatedContainerMetric) => simulatedContainerMetric.name
+});
+const simulatedContainerMetrics = new schema.Array(simulatedContainerMetric);
 
 const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
     idAttribute: (region: IRegion) => region.name
@@ -246,7 +261,7 @@ const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
 
 app.define({ appServices });
 service.define({ apps, dependencies, dependents, serviceRules, simulatedServiceMetrics });
-container.define({ containerRules });
+container.define({ containerRules, simulatedContainerMetrics });
 cloudHost.define({ hostRules, simulatedHostMetrics, /*state*/ });
 edgeHost.define({ hostRules, simulatedHostMetrics });
 ruleHost.define({ conditions, edgeHosts, cloudHosts });
@@ -273,17 +288,25 @@ export const Schemas: ISchemas = {
     SERVICE_PREDICTION_ARRAY: [prediction],
     SERVICE_RULE: ruleService,
     SERVICE_RULE_ARRAY: [ruleService],
+    SERVICE_SIMULATED_METRIC: simulatedServiceMetric,
+    SERVICE_SIMULATED_METRIC_ARRAY: [simulatedServiceMetric],
     CONTAINER: container,
     CONTAINER_ARRAY: [container],
     CONTAINER_RULE_ARRAY: [ruleContainer],
+    CONTAINER_SIMULATED_METRIC: simulatedContainerMetric,
+    CONTAINER_SIMULATED_METRIC_ARRAY: [simulatedContainerMetric],
     CLOUD_HOST: cloudHost,
     CLOUD_HOST_ARRAY: [cloudHost],
     CLOUD_HOST_RULE: ruleHost,
     CLOUD_HOST_RULE_ARRAY: [ruleHost],
+    CLOUD_HOST_SIMULATED_METRIC: simulatedHostMetric,
+    CLOUD_HOST_SIMULATED_METRIC_ARRAY: [simulatedHostMetric],
     EDGE_HOST: edgeHost,
     EDGE_HOST_ARRAY: [edgeHost],
     EDGE_HOST_RULE: ruleHost,
     EDGE_HOST_RULE_ARRAY: [ruleHost],
+    EDGE_HOST_SIMULATED_METRIC: simulatedHostMetric,
+    EDGE_HOST_SIMULATED_METRIC_ARRAY: [simulatedHostMetric],
     NODE: node,
     NODE_ARRAY: [node],
     RULE_HOST: ruleHost,
@@ -303,6 +326,8 @@ export const Schemas: ISchemas = {
     SIMULATED_HOST_METRIC_ARRAY: [simulatedHostMetric],
     SIMULATED_SERVICE_METRIC: simulatedServiceMetric,
     SIMULATED_SERVICE_METRIC_ARRAY: [simulatedServiceMetric],
+    SIMULATED_CONTAINER_METRIC: simulatedContainerMetric,
+    SIMULATED_CONTAINER_METRIC_ARRAY: [simulatedContainerMetric],
     REGION: region,
     REGION_ARRAY: [region],
     LOAD_BALANCER: loadBalancer,

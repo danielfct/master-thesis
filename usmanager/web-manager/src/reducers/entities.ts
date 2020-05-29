@@ -66,6 +66,11 @@ import {
   SERVICE_RULES_SUCCESS,
   ADD_SERVICE_RULES,
   REMOVE_SERVICE_RULES,
+  SERVICE_SIMULATED_METRICS_REQUEST,
+  SERVICE_SIMULATED_METRICS_FAILURE,
+  SERVICE_SIMULATED_METRICS_SUCCESS,
+  ADD_SERVICE_SIMULATED_METRICS,
+  REMOVE_SERVICE_SIMULATED_METRICS,
   CONTAINER_REQUEST,
   CONTAINERS_REQUEST,
   CONTAINER_FAILURE,
@@ -73,6 +78,16 @@ import {
   CONTAINER_SUCCESS,
   CONTAINERS_SUCCESS,
   ADD_CONTAINER,
+  CONTAINER_RULES_REQUEST,
+  CONTAINER_RULES_FAILURE,
+  CONTAINER_RULES_SUCCESS,
+  ADD_CONTAINER_RULES,
+  REMOVE_CONTAINER_RULES,
+  CONTAINER_SIMULATED_METRICS_REQUEST,
+  CONTAINER_SIMULATED_METRICS_FAILURE,
+  CONTAINER_SIMULATED_METRICS_SUCCESS,
+  ADD_CONTAINER_SIMULATED_METRICS,
+  REMOVE_CONTAINER_SIMULATED_METRICS,
   CONTAINER_LOGS_REQUEST,
   CONTAINER_LOGS_FAILURE,
   CONTAINER_LOGS_SUCCESS,
@@ -88,6 +103,11 @@ import {
   CLOUD_HOST_RULES_SUCCESS,
   ADD_CLOUD_HOST_RULE,
   REMOVE_CLOUD_HOST_RULES,
+  CLOUD_HOST_SIMULATED_METRICS_REQUEST,
+  CLOUD_HOST_SIMULATED_METRICS_FAILURE,
+  CLOUD_HOST_SIMULATED_METRICS_SUCCESS,
+  ADD_CLOUD_HOST_SIMULATED_METRICS,
+  REMOVE_CLOUD_HOST_SIMULATED_METRICS,
   EDGE_HOSTS_REQUEST,
   EDGE_HOST_REQUEST,
   EDGE_HOSTS_FAILURE,
@@ -100,6 +120,11 @@ import {
   EDGE_HOST_RULES_SUCCESS,
   ADD_EDGE_HOST_RULES,
   REMOVE_EDGE_HOST_RULES,
+  EDGE_HOST_SIMULATED_METRICS_REQUEST,
+  EDGE_HOST_SIMULATED_METRICS_FAILURE,
+  EDGE_HOST_SIMULATED_METRICS_SUCCESS,
+  ADD_EDGE_HOST_SIMULATED_METRICS,
+  REMOVE_EDGE_HOST_SIMULATED_METRICS,
   NODES_REQUEST,
   NODE_REQUEST,
   NODES_FAILURE,
@@ -163,8 +188,6 @@ import {
   RULE_CONTAINER_CONTAINERS_SUCCESS,
   ADD_RULE_CONTAINER_CONTAINERS,
   REMOVE_RULE_CONTAINER_CONTAINERS,
-
-
   VALUE_MODES_REQUEST,
   VALUE_MODES_FAILURE,
   VALUE_MODES_SUCCESS,
@@ -216,6 +239,18 @@ import {
   SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS,
   ADD_SIMULATED_SERVICE_METRIC_SERVICES,
   REMOVE_SIMULATED_SERVICE_METRIC_SERVICES,
+  SIMULATED_CONTAINER_METRICS_REQUEST,
+  SIMULATED_CONTAINER_METRIC_REQUEST,
+  SIMULATED_CONTAINER_METRICS_FAILURE,
+  SIMULATED_CONTAINER_METRIC_FAILURE,
+  SIMULATED_CONTAINER_METRICS_SUCCESS,
+  SIMULATED_CONTAINER_METRIC_SUCCESS,
+  ADD_SIMULATED_CONTAINER_METRIC,
+  SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST,
+  SIMULATED_CONTAINER_METRIC_CONTAINERS_FAILURE,
+  SIMULATED_CONTAINER_METRIC_CONTAINERS_SUCCESS,
+  ADD_SIMULATED_CONTAINER_METRIC_CONTAINERS,
+  REMOVE_SIMULATED_CONTAINER_METRIC_CONTAINERS,
   REGIONS_REQUEST,
   REGION_REQUEST,
   REGIONS_FAILURE,
@@ -264,6 +299,7 @@ import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
 import {IEurekaServer} from "../routes/eureka/EurekaServer";
 import {ILogs} from "../routes/logs/Logs";
 import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
+import {ISimulatedContainerMetric} from "../routes/metrics/containers/SimulatedContainerMetric";
 
 export type EntitiesState = {
   apps: {
@@ -287,6 +323,8 @@ export type EntitiesState = {
     loadPredictionsError: string | null,
     isLoadingRules: boolean,
     loadRulesError?: string | null,
+    isLoadingSimulatedMetrics: boolean,
+    loadSimulatedMetricsError?: string | null,
   },
   containers: {
     data: { [key: string]: IContainer },
@@ -296,6 +334,8 @@ export type EntitiesState = {
     loadLogsError: string | null,
     isLoadingRules: boolean,
     loadRulesError: string | null,
+    isLoadingSimulatedMetrics: boolean,
+    loadSimulatedMetricsError?: string | null,
   },
   hosts: {
     cloud: {
@@ -304,6 +344,8 @@ export type EntitiesState = {
       loadHostsError: string | null,
       isLoadingRules: false,
       loadRulesError: null,
+      isLoadingSimulatedMetrics: boolean,
+      loadSimulatedMetricsError?: string | null,
     },
     edge: {
       data: { [key: string]: IEdgeHost },
@@ -311,6 +353,8 @@ export type EntitiesState = {
       loadHostsError: string | null,
       isLoadingRules: false,
       loadRulesError: null,
+      isLoadingSimulatedMetrics: boolean,
+      loadSimulatedMetricsError?: string | null,
     }
   },
   nodes: {
@@ -391,13 +435,13 @@ export type EntitiesState = {
       isLoadingServices: boolean,
       loadServicesError: string | null,
     },
-    /*containers: {
+    containers: {
       data: { [key: string]: ISimulatedContainerMetric },
       isLoadingSimulatedContainerMetrics: boolean,
       loadSimulatedContainerMetricsError: string | null,
       isLoadingContainers: boolean,
       loadContainersError: string | null,
-    }*/
+    }
   },
   regions: {
     data: { [key: string]: IRegion },
@@ -457,6 +501,8 @@ export type EntitiesAction = {
     decisions?: IDecision[],
     simulatedHostMetrics?: ISimulatedHostMetric[],
     simulatedServiceMetrics?: ISimulatedServiceMetric[],
+    simulatedContainerMetrics?: ISimulatedContainerMetric[],
+    simulatedMetricNames?: string[],
     regions?: IRegion[],
     loadBalancers?: ILoadBalancer[],
     eurekaServers?: ILoadBalancer[],
@@ -486,6 +532,8 @@ const entities = (state: EntitiesState = {
                       loadPredictionsError: null,
                       isLoadingRules: false,
                       loadRulesError: null,
+                      isLoadingSimulatedMetrics: false,
+                      loadSimulatedMetricsError: null,
                     },
                     containers: {
                       data: {},
@@ -495,6 +543,8 @@ const entities = (state: EntitiesState = {
                       loadLogsError: null,
                       isLoadingRules: false,
                       loadRulesError: null,
+                      isLoadingSimulatedMetrics: false,
+                      loadSimulatedMetricsError: null,
                     },
                     hosts: {
                       cloud: {
@@ -503,6 +553,8 @@ const entities = (state: EntitiesState = {
                         loadHostsError: null,
                         isLoadingRules: false,
                         loadRulesError: null,
+                        isLoadingSimulatedMetrics: false,
+                        loadSimulatedMetricsError: null,
                       },
                       edge: {
                         data: {},
@@ -510,6 +562,8 @@ const entities = (state: EntitiesState = {
                         loadHostsError: null,
                         isLoadingRules: false,
                         loadRulesError: null,
+                        isLoadingSimulatedMetrics: false,
+                        loadSimulatedMetricsError: null,
                       },
                     },
                     nodes: {
@@ -590,13 +644,13 @@ const entities = (state: EntitiesState = {
                         isLoadingServices: false,
                         loadServicesError: null,
                       },
-                      /*containers: {
+                      containers: {
                         data: {},
                         isLoadingSimulatedContainerMetrics: false,
                         loadSimulatedContainerMetricsError: null,
                         isLoadingContainers: false,
                         loadContainersError: null,
-                      },*/
+                      },
                     },
                     regions: {
                       data: {},
@@ -732,19 +786,10 @@ const entities = (state: EntitiesState = {
       return {
         ...state,
         services: {
+          ...state.services,
           data: merge({}, state.services.data, data?.services),
           isLoadingServices: false,
           loadServicesError: null,
-          isLoadingApps: state.services.isLoadingApps,
-          loadAppsError: state.services.loadAppsError,
-          isLoadingDependencies: state.services.isLoadingDependencies,
-          loadDependenciesError: state.services.loadDependenciesError,
-          isLoadingDependents: state.services.isLoadingDependents,
-          loadDependentsError: state.services.loadDependentsError,
-          isLoadingPredictions: state.services.isLoadingPredictions,
-          loadPredictionsError: state.services.loadPredictionsError,
-          isLoadingRules: state.services.isLoadingRules,
-          loadRulesError: state.services.loadRulesError,
         }
       };
     case ADD_SERVICE:
@@ -938,8 +983,53 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         const filteredRules = service.serviceRules?.filter(rule => !data?.rulesNames?.includes(rule));
-        const serviceWithRules = Object.assign(service, { rules: filteredRules });
+        const serviceWithRules = Object.assign(service, { serviceRules: filteredRules });
         const normalizeService = normalize(serviceWithRules, Schemas.SERVICE).entities;
+        return merge({}, state, {
+          services: {
+            ...state.services,
+            data: normalizeService.services,
+          }
+        });
+      }
+      break;
+    case SERVICE_SIMULATED_METRICS_REQUEST:
+      return merge({}, state, { services: { isLoadingSimulatedMetrics: true, loadSimulatedMetricsError: null } });
+    case SERVICE_SIMULATED_METRICS_FAILURE:
+      return merge({}, state, { services: { isLoadingSimulatedMetrics: false, loadSimulatedMetricsError: error } });
+    case SERVICE_SIMULATED_METRICS_SUCCESS: {
+      const service = entity && state.services.data[entity];
+      const simulatedMetrics = { serviceSimulatedMetrics: data?.simulatedServiceMetrics || [] };
+      const serviceWithSimulatedMetrics = Object.assign(service ? service : [entity], simulatedMetrics);
+      const normalizedService = normalize(serviceWithSimulatedMetrics, Schemas.SERVICE).entities;
+      return merge({}, state, {
+        services: {
+          data: normalizedService.services,
+          isLoadingSimulatedMetrics: false,
+          loadSimulatedMetricsError: null
+        }
+      });
+    }
+    case ADD_SERVICE_SIMULATED_METRICS:
+      if (entity) {
+        const service = state.services.data[entity];
+        if (data?.simulatedMetricNames?.length) {
+          if (service.serviceSimulatedMetrics) {
+            service.serviceSimulatedMetrics.unshift(...data.simulatedMetricNames);
+          }
+          else {
+            service.serviceSimulatedMetrics = data.simulatedMetricNames;
+          }
+          return merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
+        }
+      }
+      break;
+    case REMOVE_SERVICE_SIMULATED_METRICS:
+      if (entity) {
+        const service = state.services.data[entity];
+        const filteredSimulatedMetrics = service.serviceSimulatedMetrics?.filter(simulatedMetric => !data?.simulatedMetricNames?.includes(simulatedMetric));
+        const serviceWithSimulatedMetrics = Object.assign(service, { serviceSimulatedMetrics: filteredSimulatedMetrics });
+        const normalizeService = normalize(serviceWithSimulatedMetrics, Schemas.SERVICE).entities;
         return merge({}, state, {
           services: {
             ...state.services,
@@ -997,6 +1087,96 @@ const entities = (state: EntitiesState = {
           loadLogsError: null,
         },
       });
+    case CONTAINER_RULES_REQUEST:
+      return merge({}, state, { containers: { isLoadingRules: true, loadRulesError: null } });
+    case CONTAINER_RULES_FAILURE:
+      return merge({}, state, { containers: { isLoadingRules: false, loadRulesError: error } });
+    case CONTAINER_RULES_SUCCESS: {
+      const container = entity && state.containers.data[entity];
+      const rules = { containerRules: data?.containerRules || [] };
+      const containerWithRules = Object.assign(container ? container : [entity], rules);
+      const normalizedContainer = normalize(containerWithRules, Schemas.CONTAINER).entities;
+      return merge({}, state, {
+        containers: {
+          data: normalizedContainer.containers,
+          isLoadingRules: false,
+          loadRulesError: null
+        }
+      });
+    }
+    case ADD_CONTAINER_RULES:
+      if (entity) {
+        const container = state.containers.data[entity];
+        if (data?.rulesNames?.length) {
+          if (container.containerRules) {
+            container.containerRules.unshift(...data.rulesNames);
+          }
+          else {
+            container.containerRules = data.rulesNames;
+          }
+          return merge({}, state, { containers: { data: { [container.containerId]: { ...container } } } });
+        }
+      }
+      break;
+    case REMOVE_CONTAINER_RULES:
+      if (entity) {
+        const container = state.containers.data[entity];
+        const filteredRules = container.containerRules?.filter(rule => !data?.rulesNames?.includes(rule));
+        const containerWithRules = Object.assign(container, { rules: filteredRules });
+        const normalizeContainer = normalize(containerWithRules, Schemas.CONTAINER).entities;
+        return merge({}, state, {
+          containers: {
+            ...state.containers,
+            data: normalizeContainer.containers,
+          }
+        });
+      }
+      break;
+    case CONTAINER_SIMULATED_METRICS_REQUEST:
+      return merge({}, state, { containers: { isLoadingSimulatedMetrics: true, loadSimulatedMetricsError: null } });
+    case CONTAINER_SIMULATED_METRICS_FAILURE:
+      return merge({}, state, { containers: { isLoadingSimulatedMetrics: false, loadSimulatedMetricsError: error } });
+    case CONTAINER_SIMULATED_METRICS_SUCCESS: {
+      const container = entity && state.containers.data[entity];
+      const simulatedMetrics = { containerSimulatedMetrics: data?.simulatedContainerMetrics || [] };
+      const containerWithSimulatedMetrics = Object.assign(container ? container : [entity], simulatedMetrics);
+      const normalizedContainer = normalize(containerWithSimulatedMetrics, Schemas.CONTAINER).entities;
+      return merge({}, state, {
+        containers: {
+          data: normalizedContainer.containers,
+          isLoadingSimulatedMetrics: false,
+          loadSimulatedMetricsError: null
+        }
+      });
+    }
+    case ADD_CONTAINER_SIMULATED_METRICS:
+      if (entity) {
+        const container = state.containers.data[entity];
+        if (data?.simulatedMetricNames?.length) {
+          if (container.containerSimulatedMetrics) {
+            container.containerSimulatedMetrics.unshift(...data.simulatedMetricNames);
+          }
+          else {
+            container.containerSimulatedMetrics = data.simulatedMetricNames;
+          }
+          return merge({}, state, { containers: { data: { [container.containerId]: { ...container } } } });
+        }
+      }
+      break;
+    case REMOVE_CONTAINER_SIMULATED_METRICS:
+      if (entity) {
+        const container = state.containers.data[entity];
+        const filteredSimulatedMetrics = container.containerSimulatedMetrics?.filter(simulatedMetric => !data?.simulatedMetricNames?.includes(simulatedMetric));
+        const containerWithSimulatedMetrics = Object.assign(container, { containerSimulatedMetrics: filteredSimulatedMetrics });
+        const normalizeContainer = normalize(containerWithSimulatedMetrics, Schemas.CONTAINER).entities;
+        return merge({}, state, {
+          containers: {
+            ...state.containers,
+            data: normalizeContainer.containers,
+          }
+        });
+      }
+      break;
     case CLOUD_HOSTS_REQUEST:
     case CLOUD_HOST_REQUEST:
       return merge({}, state, { hosts: { cloud: { isLoadingHosts: true, loadHostsError: null } } });
@@ -1082,6 +1262,52 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { hosts: { cloud: { data: { ...normalizedCloudHost } } } });
       }
       break;
+    case CLOUD_HOST_SIMULATED_METRICS_REQUEST:
+      return merge({}, state, { hosts: { cloud: { isLoadingSimulatedMetrics: true, loadSimulatedMetricsError: null } } });
+    case CLOUD_HOST_SIMULATED_METRICS_FAILURE:
+      return merge({}, state, { hosts: { cloud: { isLoadingSimulatedMetrics: false, loadSimulatedMetricsError: error } } });
+    case CLOUD_HOST_SIMULATED_METRICS_SUCCESS: {
+      const cloudHost = entity && state.hosts.cloud.data[entity];
+      const simulatedMetrics = { hostSimulatedMetrics: data?.simulatedHostMetrics || [] };
+      const cloudHostWithSimulatedMetrics = Object.assign(cloudHost ? cloudHost : [entity], simulatedMetrics);
+      const normalizedCloudHost = normalize(cloudHostWithSimulatedMetrics, Schemas.CLOUD_HOST).entities.cloudHosts;
+      return {
+        ...state,
+        hosts: {
+          ...state.hosts,
+          cloud: {
+            ...state.hosts.cloud,
+            data: merge({}, state.hosts.cloud.data, normalizedCloudHost),
+            isLoadingRules: false,
+            loadRulesError: null,
+          }
+        }
+      }
+    }
+    case ADD_CLOUD_HOST_SIMULATED_METRICS:
+      if (entity) {
+        const cloudHost = state.hosts.cloud.data[entity];
+        if (data?.simulatedMetricNames?.length) {
+          if (cloudHost.hostSimulatedMetrics) {
+            cloudHost.hostSimulatedMetrics.unshift(...data.simulatedMetricNames);
+          }
+          else {
+            cloudHost.hostSimulatedMetrics = data.simulatedMetricNames;
+          }
+          const normalizedCloudHost = normalize(cloudHost, Schemas.CLOUD_HOST).entities.cloudHosts;
+          return merge({}, state, { hosts: { cloud: { data: { ...normalizedCloudHost } } } });
+        }
+      }
+      break;
+    case REMOVE_CLOUD_HOST_SIMULATED_METRICS:
+      if (entity) {
+        const cloudHost = state.hosts.cloud.data[entity];
+        const filteredSimulatedMetrics = cloudHost.hostSimulatedMetrics?.filter(simulatedMetric => !data?.simulatedMetricNames?.includes(simulatedMetric));
+        const cloudHostWithSimulatedMetrics = Object.assign(cloudHost, { hostSimulatedMetrics: filteredSimulatedMetrics });
+        const normalizedCloudHost = normalize(cloudHostWithSimulatedMetrics, Schemas.CLOUD_HOST).entities.cloudHosts;
+        return merge({}, state, { hosts: { cloud: { data: { ...normalizedCloudHost } } } });
+      }
+      break;
     case EDGE_HOSTS_REQUEST:
     case EDGE_HOST_REQUEST:
       return merge({}, state, { hosts: { edge: { isLoadingHosts: true, loadHostsError: null } } });
@@ -1164,6 +1390,52 @@ const entities = (state: EntitiesState = {
         const filteredRules = edgeHost.hostRules?.filter(rule => !data?.rulesNames?.includes(rule));
         const edgeHostWithRules = Object.assign(edgeHost, { hostRules: filteredRules });
         const normalizedEdgeHost = normalize(edgeHostWithRules, Schemas.EDGE_HOST).entities.edgeHosts;
+        return merge({}, state, { hosts: { edge: { data: { ...normalizedEdgeHost } } } });
+      }
+      break;
+    case EDGE_HOST_SIMULATED_METRICS_REQUEST:
+      return merge({}, state, { hosts: { edge: { isLoadingSimulatedMetrics: true, loadSimulatedMetricsError: null } } });
+    case EDGE_HOST_SIMULATED_METRICS_FAILURE:
+      return merge({}, state, { hosts: { edge: { isLoadingSimulatedMetrics: false, loadSimulatedMetricsError: error } } });
+    case EDGE_HOST_SIMULATED_METRICS_SUCCESS: {
+      const edgeHost = entity && state.hosts.edge.data[entity];
+      const simulatedMetrics = { hostSimulatedMetrics: data?.simulatedHostMetrics || [] };
+      const edgeHostWithSimulatedMetrics = Object.assign(edgeHost ? edgeHost : [entity], simulatedMetrics);
+      const normalizedEdgeHost = normalize(edgeHostWithSimulatedMetrics, Schemas.EDGE_HOST).entities.edgeHosts;
+      return {
+        ...state,
+        hosts: {
+          ...state.hosts,
+          edge: {
+            ...state.hosts.edge,
+            data: merge({}, state.hosts.edge.data, normalizedEdgeHost),
+            isLoadingRules: false,
+            loadRulesError: null,
+          }
+        }
+      }
+    }
+    case ADD_EDGE_HOST_SIMULATED_METRICS:
+      if (entity) {
+        const edgeHost = state.hosts.edge.data[entity];
+        if (data?.simulatedMetricNames?.length) {
+          if (edgeHost.hostSimulatedMetrics) {
+            edgeHost.hostSimulatedMetrics.unshift(...data.simulatedMetricNames);
+          }
+          else {
+            edgeHost.hostSimulatedMetrics = data.simulatedMetricNames;
+          }
+          const normalizedEdgeHost = normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts;
+          return merge({}, state, { hosts: { edge: { data: { ...normalizedEdgeHost } } } });
+        }
+      }
+      break;
+    case REMOVE_EDGE_HOST_SIMULATED_METRICS:
+      if (entity) {
+        const edgeHost = state.hosts.edge.data[entity];
+        const filteredSimulatedMetrics = edgeHost.hostSimulatedMetrics?.filter(simulatedMetric => !data?.simulatedMetricNames?.includes(simulatedMetric));
+        const edgeHostWithSimulatedMetrics = Object.assign(edgeHost, { hostSimulatedMetrics: filteredSimulatedMetrics });
+        const normalizedEdgeHost = normalize(edgeHostWithSimulatedMetrics, Schemas.EDGE_HOST).entities.edgeHosts;
         return merge({}, state, { hosts: { edge: { data: { ...normalizedEdgeHost } } } });
       }
       break;
@@ -2012,6 +2284,96 @@ const entities = (state: EntitiesState = {
             services: {
               ...state.simulatedMetrics.services,
               data: normalizeSimulatedServiceMetric.simulatedServiceMetrics,
+            }
+          }
+        });
+      }
+      return state;
+    case SIMULATED_CONTAINER_METRICS_REQUEST:
+    case SIMULATED_CONTAINER_METRIC_REQUEST:
+      return merge({}, state, { simulatedMetrics: { containers: { isLoadingSimulatedContainerMetrics: true, loadSimulatedContainerMetricsError: null } } });
+    case SIMULATED_CONTAINER_METRICS_FAILURE:
+    case SIMULATED_CONTAINER_METRIC_FAILURE:
+      return merge({}, state, { simulatedMetrics: { containers: { isLoadingSimulatedContainerMetrics: false, loadSimulatedContainerMetricsError: error } } });
+    case SIMULATED_CONTAINER_METRICS_SUCCESS:
+      return {
+        ...state,
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          containers: {
+            ...state.simulatedMetrics.containers,
+            data: merge({}, pick(state.simulatedMetrics.containers.data, keys(data?.simulatedContainerMetrics)), data?.simulatedContainerMetrics),
+            isLoadingSimulatedContainerMetrics: false,
+            loadSimulatedContainerMetricsError: null,
+          }
+        }
+      };
+    case SIMULATED_CONTAINER_METRIC_SUCCESS:
+      return {
+        ...state,
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          containers: {
+            ...state.simulatedMetrics.containers,
+            data: merge({}, state.simulatedMetrics.containers.data, data?.simulatedContainerMetrics),
+            isLoadingSimulatedContainerMetrics: false,
+            loadSimulatedContainerMetricsError: null,
+          }
+        }
+      };
+    case ADD_SIMULATED_CONTAINER_METRIC:
+      if (data?.simulatedContainerMetrics?.length) {
+        const simulatedContainerMetrics = normalize(data?.simulatedContainerMetrics, Schemas.SIMULATED_CONTAINER_METRIC_ARRAY).entities.simulatedContainerMetrics;
+        return merge({}, state, { simulatedMetrics: { containers : { data: simulatedContainerMetrics } } });
+      }
+      break;
+    case SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST:
+      return merge({}, state, { simulatedMetrics: { containers: { isLoadingContainers: true, loadContainersError: null } } });
+    case SIMULATED_CONTAINER_METRIC_CONTAINERS_FAILURE:
+      return merge({}, state, { simulatedMetrics: { containers: { isLoadingContainers: false, loadContainersError: error } } });
+    case SIMULATED_CONTAINER_METRIC_CONTAINERS_SUCCESS: {
+      const simulatedContainerMetric = entity && state.simulatedMetrics.containers.data[entity];
+      const containers = { containers: data?.containers || [] };
+      const simulatedContainerMetricWithContainers = Object.assign(simulatedContainerMetric ? simulatedContainerMetric : [entity], containers);
+      const normalizedSimulatedContainerMetric = normalize(simulatedContainerMetricWithContainers, Schemas.SIMULATED_CONTAINER_METRIC).entities;
+      return merge({}, state, {
+        simulatedMetrics: {
+          ...state.simulatedMetrics,
+          containers : {
+            ...state.simulatedMetrics.containers,
+            data: normalizedSimulatedContainerMetric.simulatedContainerMetrics,
+            isLoadingContainers: false,
+            loadContainersError: null,
+          }
+        }
+      });
+    }
+    case ADD_SIMULATED_CONTAINER_METRIC_CONTAINERS:
+      if (entity && data?.containerIds?.length) {
+        const simulatedContainerMetric = state.simulatedMetrics.containers.data[entity];
+        if (simulatedContainerMetric) {
+          if (simulatedContainerMetric.containers) {
+            simulatedContainerMetric.containers.unshift(...data.containerIds);
+          }
+          else {
+            simulatedContainerMetric.containers = data.containerIds;
+          }
+          return merge({}, state, { simulatedMetrics: { containers: { data: { [simulatedContainerMetric.name]: {...simulatedContainerMetric } } } } });
+        }
+      }
+      break;
+    case REMOVE_SIMULATED_CONTAINER_METRIC_CONTAINERS:
+      if (entity) {
+        const simulatedContainerMetric = state.simulatedMetrics.containers.data[entity];
+        const filteredContainers = simulatedContainerMetric.containers?.filter(container => !data?.containerIds?.includes(container));
+        const simulatedContainerMetricWithContainers = Object.assign(simulatedContainerMetric, { containers: filteredContainers });
+        const normalizeSimulatedContainerMetric = normalize(simulatedContainerMetricWithContainers, Schemas.SIMULATED_CONTAINER_METRIC).entities;
+        return merge({}, state, {
+          simulatedMetrics: {
+            ...state.simulatedMetrics,
+            containers: {
+              ...state.simulatedMetrics.containers,
+              data: normalizeSimulatedContainerMetric.simulatedContainerMetrics,
             }
           }
         });

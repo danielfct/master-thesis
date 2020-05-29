@@ -30,7 +30,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.Cloud
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
@@ -57,37 +56,6 @@ public class HostsController {
     this.cloudHostsService = cloudHostsService;
     this.edgeHostsService = edgeHostsService;
   }
-
-  /*@GetMapping("/cloud/aws")
-  public List<AwsSimpleInstance> getEC2Instances() {
-    return aws.getSimpleInstances();
-  }
-
-  @GetMapping("/cloud/aws/{id}")
-  public Instance getEC2Instance(@PathVariable String id) {
-    return aws.getInstance(id);
-  }
-
-  @GetMapping("/cloud/aws/simple/{id}")
-  public AwsSimpleInstance getEC2SimpleInstance(@PathVariable String id) {
-    return aws.getSimpleInstance(id);
-  }
-
-  @PostMapping("/cloud/service")
-  public SimpleContainer launchEC2Service(@RequestBody AwsLaunchServiceReq launchServiceReq) {
-    //TODO fix ui
-    String instanceId = launchServiceReq.getInstanceId();
-    Instance instance = aws.startInstance(instanceId);
-    String ec2PublicIp = instance.getPublicIpAddress();
-    String serviceName = launchServiceReq.getService();
-    String internalPort = launchServiceReq.getInternalPort();
-    String externalPort = launchServiceReq.getExternalPort();
-    var dynamicLaunchParams = Map.of(
-        "${eurekaHost}", launchServiceReq.getEurekaHost(),
-        String.format("${%sDatabaseHost}", serviceName), launchServiceReq.getDatabase());
-    return dockerContainersService.launchContainer(ec2PublicIp, serviceName, internalPort, externalPort,
-        dynamicLaunchParams);
-  }*/
 
   @PostMapping("/cloud")
   public CloudHostEntity startCloudHost() {
@@ -117,13 +85,18 @@ public class HostsController {
       case "stop":
         return cloudHostsService.stopCloudHost(instanceId);
       default:
-        throw new BadRequestException("Expected one of 'start' or 'stop'");
+        throw new BadRequestException("Invalid request body: expected 'start' or 'stop'");
     }
   }
 
   @DeleteMapping("/cloud/{instanceId}")
   public void terminateCloudInstance(@PathVariable String instanceId) {
     cloudHostsService.terminateCloudHost(instanceId);
+  }
+
+  @GetMapping("/cloud/{instanceId}/rules/{ruleName}")
+  public HostRuleEntity getCloudHostRule(@PathVariable String instanceId, String ruleName) {
+    return cloudHostsService.getRule(instanceId, ruleName);
   }
 
   @GetMapping("/cloud/{instanceId}/rules")
@@ -146,9 +119,15 @@ public class HostsController {
     cloudHostsService.removeRule(instanceId, ruleName);
   }
 
-/*  @GetMapping("/cloud/{instanceId}/simulatedMetrics")
+  @GetMapping("/cloud/{instanceId}/simulatedMetrics")
   public List<SimulatedHostMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
     return cloudHostsService.getSimulatedMetrics(instanceId);
+  }
+
+  @GetMapping("/cloud/{instanceId}/simulatedMetrics/{simulatedMetricName}")
+  public SimulatedHostMetricEntity getCloudHostSimulatedMetric(@PathVariable String instanceId,
+                                                                @PathVariable String simulatedMetricName) {
+    return cloudHostsService.getSimulatedMetric(instanceId, simulatedMetricName);
   }
 
   @PostMapping("/cloud/{instanceId}/simulatedMetrics")
@@ -165,7 +144,7 @@ public class HostsController {
   public void removeCloudHostSimulatedMetric(@PathVariable String instanceId,
                                              @PathVariable String simulatedMetricName) {
     cloudHostsService.removeSimulatedMetric(instanceId, simulatedMetricName);
-  }*/
+  }
 
   @GetMapping("/edge")
   public List<EdgeHostEntity> getEdgeHosts() {
@@ -199,6 +178,11 @@ public class HostsController {
     return edgeHostsService.getRules(hostname);
   }
 
+  @GetMapping("/edge/{hostname}/rules/{ruleName}")
+  public HostRuleEntity getEdgeHostRule(@PathVariable String hostname, @PathVariable String ruleName) {
+    return edgeHostsService.getRule(hostname, ruleName);
+  }
+
   @PostMapping("/edge/{hostname}/rules")
   public void addEdgeHostRules(@PathVariable String hostname, @RequestBody String[] rules) {
     edgeHostsService.addRules(hostname, Arrays.asList(rules));
@@ -214,9 +198,15 @@ public class HostsController {
     edgeHostsService.removeRule(hostname, ruleName);
   }
 
-/*  @GetMapping("/edge/{hostname}/simulatedMetrics")
+  @GetMapping("/edge/{hostname}/simulatedMetrics")
   public List<SimulatedHostMetricEntity> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
     return edgeHostsService.getSimulatedMetrics(hostname);
+  }
+
+  @GetMapping("/edge/{hostname}/simulatedMetrics/{simulatedMetricName}")
+  public SimulatedHostMetricEntity getEdgeHostSimulatedMetric(@PathVariable String hostname,
+                                                              @PathVariable String simulatedMetricName) {
+    return edgeHostsService.getSimulatedMetric(hostname, simulatedMetricName);
   }
 
   @PostMapping("/edge/{hostname}/simulatedMetrics")
@@ -232,6 +222,6 @@ public class HostsController {
   @DeleteMapping("/edge/{hostname}/simulatedMetrics/{simulatedMetricName}")
   public void removeEdgeHostSimulatedMetric(@PathVariable String hostname, @PathVariable String simulatedMetricName) {
     edgeHostsService.removeSimulatedMetric(hostname, simulatedMetricName);
-  }*/
+  }
 
 }

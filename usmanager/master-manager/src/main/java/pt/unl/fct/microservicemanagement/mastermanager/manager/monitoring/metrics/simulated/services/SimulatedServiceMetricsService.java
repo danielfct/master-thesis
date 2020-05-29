@@ -10,6 +10,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services;
 
+import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -32,7 +33,7 @@ public class SimulatedServiceMetricsService {
 
   private final SimulatedServiceMetricsRepository simulatedServiceMetrics;
 
-  public SimulatedServiceMetricsService(ServicesService servicesService,
+  public SimulatedServiceMetricsService(@Lazy ServicesService servicesService,
                                         SimulatedServiceMetricsRepository simulatedServiceMetrics) {
     this.servicesService = servicesService;
     this.simulatedServiceMetrics = simulatedServiceMetrics;

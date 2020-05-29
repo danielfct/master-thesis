@@ -24,10 +24,10 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.location;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.SimpleNode;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;

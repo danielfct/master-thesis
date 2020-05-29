@@ -75,6 +75,7 @@ export interface IService extends IDatabaseData {
   dependents?: string[];
   predictions?: { [key: string]: IPrediction };
   serviceRules?: string[];
+  serviceSimulatedMetrics?: string[];
 }
 
 const buildNewService = (): Partial<IService> => ({

@@ -27,6 +27,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 
@@ -47,13 +49,16 @@ public class CloudHostsService {
   private final CloudHostRepository cloudHosts;
   private final AwsService awsService;
   private final HostRulesService hostRulesService;
+  private final SimulatedHostMetricsService simulatedHostMetricsService;
 
   public CloudHostsService(CloudHostRepository cloudHosts,
                            @Lazy AwsService awsService,
-                           @Lazy HostRulesService hostRulesService) {
+                           @Lazy HostRulesService hostRulesService,
+                           SimulatedHostMetricsService simulatedHostMetricsService) {
     this.cloudHosts = cloudHosts;
     this.awsService = awsService;
     this.hostRulesService = hostRulesService;
+    this.simulatedHostMetricsService = simulatedHostMetricsService;
   }
 
   public List<CloudHostEntity> getCloudHosts() {
@@ -159,6 +164,13 @@ public class CloudHostsService {
     return cloudHosts.getRules(instanceId);
   }
 
+  public HostRuleEntity getRule(String instanceId, String ruleName) {
+    assertHostExists(instanceId);
+    return cloudHosts.getRule(instanceId, ruleName).orElseThrow(() ->
+        new EntityNotFoundException(HostRuleEntity.class, "ruleName", ruleName)
+    );
+  }
+
   public void addRule(String instanceId, String ruleName) {
     assertHostExists(instanceId);
     hostRulesService.addCloudHost(ruleName, instanceId);
@@ -174,13 +186,47 @@ public class CloudHostsService {
     hostRulesService.removeCloudHost(ruleName, instanceId);
   }
 
-  public boolean hasCloudHost(String instanceId) {
-    return cloudHosts.hasCloudHost(instanceId);
-  }
-
   public void removeRules(String instanceId, List<String> ruleNames) {
     assertHostExists(instanceId);
     ruleNames.forEach(rule -> hostRulesService.removeCloudHost(rule, instanceId));
+  }
+
+  public List<SimulatedHostMetricEntity> getSimulatedMetrics(String instanceId) {
+    assertHostExists(instanceId);
+    return cloudHosts.getSimulatedMetrics(instanceId);
+  }
+
+  public SimulatedHostMetricEntity getSimulatedMetric(String instanceId, String simulatedMetricName) {
+    assertHostExists(instanceId);
+    return cloudHosts.getSimulatedMetric(instanceId, simulatedMetricName).orElseThrow(() ->
+        new EntityNotFoundException(SimulatedHostMetricEntity.class, "simulatedMetricName", simulatedMetricName)
+    );
+  }
+
+  public void addSimulatedMetric(String instanceId, String simulatedMetricName) {
+    assertHostExists(instanceId);
+    simulatedHostMetricsService.addCloudHost(simulatedMetricName, instanceId);
+  }
+
+  public void addSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
+    assertHostExists(instanceId);
+    simulatedMetricNames.forEach(simulatedMetric ->
+        simulatedHostMetricsService.addCloudHost(simulatedMetric, instanceId));
+  }
+
+  public void removeSimulatedMetric(String instanceId, String simulatedMetricName) {
+    assertHostExists(instanceId);
+    simulatedHostMetricsService.addCloudHost(simulatedMetricName, instanceId);
+  }
+
+  public void removeSimulatedMetrics(String instanceId, List<String> simulatedMetricNames) {
+    assertHostExists(instanceId);
+    simulatedMetricNames.forEach(simulatedMetric ->
+        simulatedHostMetricsService.addCloudHost(simulatedMetric, instanceId));
+  }
+
+  public boolean hasCloudHost(String instanceId) {
+    return cloudHosts.hasCloudHost(instanceId);
   }
 
   private void assertHostExists(String instanceId) {

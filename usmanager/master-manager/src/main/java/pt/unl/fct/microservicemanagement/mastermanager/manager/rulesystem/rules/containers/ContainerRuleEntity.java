@@ -24,9 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
@@ -54,7 +52,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
 
 @Entity
 @Builder(toBuilder = true)

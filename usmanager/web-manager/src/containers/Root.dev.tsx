@@ -30,8 +30,6 @@ import Navbar from "../views/navbar/Navbar";
 import Landing from "../routes/landing/Landing";
 import Services from "../routes/services/Services";
 import Service from "../routes/services/Service";
-import ContainerSimulatedMetrics from "../routes/metrics/ContainerSimulatedMetrics";
-import ContainerSimulatedMetricsDetail from "../routes/metrics/ContainerSimulatedMetricsDetail";
 import {Provider} from "react-redux";
 import Login from "../views/login/Login";
 import AuthenticatedRoute from "../components/AuthenticatedRoute";
@@ -69,6 +67,8 @@ import RulesContainer from "../routes/rules/containers/RulesContainer";
 import RuleService from "../routes/rules/services/RuleService";
 import RuleHost from "../routes/rules/hosts/RuleHost";
 import RuleContainer from "../routes/rules/containers/RuleContainer";
+import SimulatedContainerMetrics from "../routes/metrics/containers/SimulatedContainerMetrics";
+import SimulatedContainerMetric from "../routes/metrics/containers/SimulatedContainerMetric";
 
 interface RootContainerProps {
     store: any;
@@ -104,8 +104,8 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/simulated-metrics": { component: SimulatedMetrics, search: true },
     "/simulated-metrics/services": { component: SimulatedServiceMetrics, search: true },
     "/simulated-metrics/services/:name?": { component: SimulatedServiceMetric },
-    "/simulated-metrics/containers": { component: ContainerSimulatedMetrics, search: true },
-    "/simulated-metrics/containers/:name?": { component: ContainerSimulatedMetricsDetail },
+    "/simulated-metrics/containers": { component: SimulatedContainerMetrics, search: true },
+    "/simulated-metrics/containers/:name?": { component: SimulatedContainerMetric },
     "/simulated-metrics/hosts": { component: SimulatedHostMetrics, search: true },
     "/simulated-metrics/hosts/:name?": { component: SimulatedHostMetric },
     "/regions": { component: Regions, search: true },

@@ -25,13 +25,13 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodesService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.NodeRole;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node.SimpleNode;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsInstanceState;

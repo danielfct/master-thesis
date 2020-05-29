@@ -25,9 +25,9 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
 import pt.unl.fct.microservicemanagement.mastermanager.MasterManagerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 
 import java.util.Map;
 import java.util.Set;

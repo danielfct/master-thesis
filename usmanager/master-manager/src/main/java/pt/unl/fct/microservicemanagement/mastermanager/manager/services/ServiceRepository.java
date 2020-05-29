@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 
@@ -108,10 +109,20 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
 
   @Query("select p "
       + "from ServiceEntity s join s.eventPredictions p "
-      + "where s.id = :serviceId and p.id = :serviceEventPredictions")
+      + "where s.id = :serviceId and p.id = :serviceEventPrediction")
   Optional<ServiceEventPredictionEntity> getPrediction(@Param("serviceId") long serviceId,
-                                                       @Param("serviceEventPredictions")
-                                                    long serviceEventPredictions);
+                                                       @Param("serviceEventPrediction") long serviceEventPrediction);
+
+  @Query("select m "
+      + "from ServiceEntity s join s.simulatedServiceMetrics m "
+      + "where s.serviceName = :serviceName")
+  List<SimulatedServiceMetricEntity> getSimulatedMetrics(@Param("serviceName") String serviceName);
+
+  @Query("select m "
+      + "from ServiceEntity s join s.simulatedServiceMetrics m "
+      + "where s.serviceName = :serviceName and m.name = :simulatedMetricName")
+  Optional<SimulatedServiceMetricEntity> getSimulatedMetric(@Param("serviceName") String serviceName,
+                                                            @Param("simulatedMetricName") String simulatedMetricName);
 
   @Query("select s.maxReplicas "
       + "from ServiceEntity s "

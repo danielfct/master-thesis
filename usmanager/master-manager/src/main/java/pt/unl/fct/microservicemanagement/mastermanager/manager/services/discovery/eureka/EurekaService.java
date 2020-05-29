@@ -26,9 +26,9 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services.discove
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.util.Pair;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerConstants;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainerEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.container.ContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
