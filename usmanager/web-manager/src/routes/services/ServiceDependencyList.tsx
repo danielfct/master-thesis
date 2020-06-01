@@ -138,7 +138,6 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
   };
 
   public render() {
-    console.log(this.props.dependencies)
     return <ControlledList isLoading={this.props.isLoadingService || this.props.isLoading}
                            error={this.props.loadServiceError || this.props.error}
                            emptyMessage={`Dependencies list is empty`}

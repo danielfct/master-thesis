@@ -103,27 +103,29 @@ class ServiceAppList extends BaseComponent<Props, State> {
   private isNew = () =>
     this.props.service?.serviceName === undefined;
 
-  private app = (index: number, app: string, separate: boolean, checked: boolean,
+  private app = (index: number, app: string | IAddServiceApp, separate: boolean, checked: boolean,
                  handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
+    const appName = typeof app === 'string' ? app : app.name;
     const isNew = this.isNew();
-    const unsaved = this.props.unsavedApps.map(app => app.name).includes(app);
+    const unsaved = this.props.unsavedApps.map(app => app.name).includes(appName);
+    console.log(app)
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${listItemStyles.linkedItemContent}`}>
           <label>
-            <input id={app}
+            <input id={appName}
                    type="checkbox"
                    onChange={handleCheckbox}
                    checked={checked}/>
             <span id={'checkbox'}>
               <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
-                {app}
+                {appName}
               </div>
             </span>
           </label>
         </div>
         {!isNew && (
-          <Link to={`/apps/${app}`}
+          <Link to={`/apps/${appName}`}
                 className={`${listItemStyles.link} waves-effect`}>
             <i className={`${listItemStyles.linkIcon} material-icons right`}>link</i>
           </Link>
@@ -220,6 +222,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                                    error={this.props.error || this.props.error}
                                    emptyMessage='Apps list is empty'
                                    data={this.props.serviceApps}
+                                   dataKey={['name']}
                                    dropdown={{
                                      id: 'apps',
                                      title: 'Add app',

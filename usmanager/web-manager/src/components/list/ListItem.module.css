@@ -78,7 +78,11 @@
     color: #F44336;
 }
 
-.irrelevant {
+.smallText {
     font-size: 0.9rem;
     color: #9e9e9e;
+}
+
+.arrow {
+    font-size: 20px;
 }

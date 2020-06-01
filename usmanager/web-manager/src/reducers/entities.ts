@@ -926,8 +926,9 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         if (data?.predictions?.length) {
+          //TODO saved entity has id = 0, might be a problem later if updating the entity
           const newPredictions = data?.predictions.map(prediction => ({[prediction.name]: { id: 0, ...prediction }}));
-          service.predictions = merge({}, service.predictions, newPredictions);
+          service.predictions = merge({}, service.predictions, ...newPredictions);
           return merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
         }
       }
@@ -935,7 +936,7 @@ const entities = (state: EntitiesState = {
     case REMOVE_SERVICE_PREDICTIONS:
       if (entity) {
         const service = state.services.data[entity];
-        const filteredPredictions = Object.values(service.predictions || {})
+        const filteredPredictions = Object.values(service.predictions || [])
                                           .filter(prediction => !data?.predictionsNames?.includes(prediction.name));
         const normalizedPredictions = normalize(filteredPredictions, Schemas.SERVICE_PREDICTION_ARRAY).entities;
         const serviceWithPredictions = Object.assign(service, !Object.keys(normalizedPredictions).length ? { predictions: {} } : normalizedPredictions);

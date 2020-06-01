@@ -29,7 +29,8 @@
 .breadcrumb {
     font-size: 25px;
     padding: 0 5px;
-    word-wrap: break-word;
+    word-break: break-all;
+    display: inline;
     opacity: 0.25;
 }
 

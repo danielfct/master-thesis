@@ -9,6 +9,7 @@ import {decodeHTML} from "../../utils/text";
 import InputDialog from "../dialogs/InputDialog";
 import {IFormModal, IValues, RestOperation} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
+import {IAppService} from "../../routes/apps/AppServicesList";
 
 interface ControlledListProps<T> {
   dataKey: string[],
@@ -24,7 +25,8 @@ interface ControlledListProps<T> {
   onAddInput?: (input: IValues) => void;
   onRemove?: (data: string[]) => void;
   onDelete?: RestOperation;
-  entitySaved?: boolean
+  entitySaved?: boolean;
+  sort?: (a: T, b: T) => number
 }
 
 type Props<T> = ControlledListProps<T>;
@@ -211,9 +213,12 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   };
 
   public render() {
-    const {isLoading, error, emptyMessage, dropdown, formModal} = this.props;
+    const {isLoading, error, emptyMessage, dropdown, formModal, sort} = this.props;
     // @ts-ignore
-    const data = Object.values(this.state).filter(data => data).map(data => data.value);
+    let data: T[] = Object.values(this.state).filter(data => data).map(data => data.value);
+    if (sort) {
+      data = data.sort(sort);
+    }
     const DataList = List<T>();
     return (
       <div>

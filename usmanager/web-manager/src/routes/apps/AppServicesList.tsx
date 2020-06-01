@@ -206,7 +206,8 @@ class ServiceAppList extends BaseComponent<Props, State> {
                                           successCallback: this.onDeleteSuccess,
                                           failureCallback: this.onDeleteFailure
                                         }}
-                                        entitySaved={this.state.entitySaved}/>;
+                                        entitySaved={this.state.entitySaved}
+                                        sort={(a: IAppService, b: IAppService) => a.launchOrder - b.launchOrder}/>;
   }
 
 }
@@ -219,8 +220,7 @@ function mapStateToProps(state: ReduxState, ownProps: ServiceAppListProps): Stat
     isLoading: state.entities.apps.isLoadingServices,
     error: state.entities.apps.loadServicesError,
     services: state.entities.services.data,
-    appServices: appServices && Object.values(appServices).sort((a, b) => a.launchOrder - b.launchOrder) || [],
-
+    appServices: (appServices && Object.values(appServices)) || [],
   }
 }
 

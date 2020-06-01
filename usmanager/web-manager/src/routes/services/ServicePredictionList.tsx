@@ -126,9 +126,15 @@ class ServicePredictionList extends BaseComponent<Props, State> {
               </div>
             </span>
           </label>
-          <div className={`${styles.irrelevant}`}>
-            <div>{prediction.startDate} {prediction.startTime}</div>
-            <div>{prediction.endDate} {prediction.endTime}</div>
+          <div className={`${styles.smallText}`}>
+            {prediction.startDate === prediction.endDate ?
+              <div>{prediction.startDate} {prediction.startTime} <span className={styles.arrow}>&rarr;</span> {prediction.endTime}</div>
+              :
+              <>
+                <div>{prediction.startDate} {prediction.startTime}</div>
+                <div>{prediction.endDate} {prediction.endTime}</div>
+              </>
+            }
           </div>
         </div>
       </ListItem>
@@ -194,6 +200,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
                                         error={this.props.loadServiceError || this.props.error}
                                         emptyMessage='Predictions list is empty'
                                         data={this.props.predictions}
+                                        dataKey={['name']}
                                         formModal={{
                                           id: 'servicePrediction',
                                           title: 'Add prediction',
