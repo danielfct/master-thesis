@@ -48,7 +48,7 @@ export class Datepicker extends React.Component<Props, State> {
   private onSelect = (selectedDate: Date): void =>
     this.setState({ selectedDate: selectedDate.toLocaleDateString('pt') });
 
-  render() {
+  public render() {
     const {className, id, name, value, disabled} = this.props;
     return (
       <input

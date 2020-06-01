@@ -535,7 +535,7 @@ class Container extends BaseComponent<Props, State> {
     return tabs;
   };
 
-  render() {
+  public render() {
     return (
       <MainLayout>
         <div className="container">

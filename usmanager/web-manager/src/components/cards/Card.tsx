@@ -66,7 +66,7 @@ export default class Card<T> extends React.Component<Props<T>, {}> {
     )
   };
 
-  render() {
+  public render() {
     const {link, margin} = this.props;
     return (
       <div className={`col s6 m4 l3`} style={{margin}}>

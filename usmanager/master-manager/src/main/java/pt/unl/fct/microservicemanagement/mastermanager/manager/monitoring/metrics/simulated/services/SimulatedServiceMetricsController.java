@@ -45,14 +45,14 @@ public class SimulatedServiceMetricsController {
   }
 
   @PostMapping
-  public SimulatedServiceMetricEntity addServiceSimulatedMetric(
+  public SimulatedServiceMetricEntity addSimulatedServiceMetric(
       @RequestBody SimulatedServiceMetricEntity simulatedServiceMetric) {
     Validation.validatePostRequest(simulatedServiceMetric.getId());
     return simulatedServiceMetricsService.addSimulatedServiceMetric(simulatedServiceMetric);
   }
 
   @PutMapping("/{simulatedMetricName}")
-  public SimulatedServiceMetricEntity updateServiceSimulatedMetric(
+  public SimulatedServiceMetricEntity updateSimulatedServiceMetric(
       @PathVariable String simulatedMetricName,
       @RequestBody SimulatedServiceMetricEntity simulatedMetric) {
     Validation.validatePutRequest(simulatedMetric.getId());
@@ -60,7 +60,7 @@ public class SimulatedServiceMetricsController {
   }
 
   @DeleteMapping("/{simulatedMetricName}")
-  public void deleteServiceSimulatedMetric(@PathVariable String simulatedMetricName) {
+  public void deleteSimulatedServiceMetric(@PathVariable String simulatedMetricName) {
     simulatedServiceMetricsService.deleteSimulatedServiceMetric(simulatedMetricName);
   }
 

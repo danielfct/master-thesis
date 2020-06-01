@@ -46,19 +46,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class CloudHostsService {
 
-  private final CloudHostRepository cloudHosts;
   private final AwsService awsService;
   private final HostRulesService hostRulesService;
   private final SimulatedHostMetricsService simulatedHostMetricsService;
 
-  public CloudHostsService(CloudHostRepository cloudHosts,
-                           @Lazy AwsService awsService,
+  private final CloudHostRepository cloudHosts;
+
+  public CloudHostsService(@Lazy AwsService awsService,
                            @Lazy HostRulesService hostRulesService,
-                           SimulatedHostMetricsService simulatedHostMetricsService) {
-    this.cloudHosts = cloudHosts;
+                           @Lazy SimulatedHostMetricsService simulatedHostMetricsService,
+                           CloudHostRepository cloudHosts) {
     this.awsService = awsService;
     this.hostRulesService = hostRulesService;
     this.simulatedHostMetricsService = simulatedHostMetricsService;
+    this.cloudHosts = cloudHosts;
   }
 
   public List<CloudHostEntity> getCloudHosts() {
@@ -227,6 +228,10 @@ public class CloudHostsService {
 
   public boolean hasCloudHost(String instanceId) {
     return cloudHosts.hasCloudHost(instanceId);
+  }
+
+  public boolean hasCloudHostByHostname(String hostname) {
+    return cloudHosts.hasCloudHostByHostname(hostname);
   }
 
   private void assertHostExists(String instanceId) {

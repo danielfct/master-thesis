@@ -132,13 +132,12 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
     return Object.keys(cloudHosts).filter(cloudHost => !simulatedMetricCloudHosts.includes(cloudHost) && !unsavedCloudHosts.includes(cloudHost));
   };
 
-  render() {
+  public render() {
     const isNew = this.isNew();
     return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedHostMetric || this.props.isLoading)}
                            error={!isNew ? this.props.loadSimulatedHostMetricError || this.props.error : undefined}
                            emptyMessage={`Cloud hosts list is empty`}
                            data={this.props.simulatedMetricCloudHosts}
-                           dataKey={['instanceId']} //TODO
                            dropdown={{
                              id: 'cloudHosts',
                              title: 'Add cloud host',

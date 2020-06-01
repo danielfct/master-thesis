@@ -236,7 +236,7 @@ class RuleCondition extends BaseComponent<Props, State> {
     },
   ];
 
-  render() {
+  public render() {
     return (
       <MainLayout>
         <div className="container">

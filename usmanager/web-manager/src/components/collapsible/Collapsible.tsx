@@ -34,7 +34,7 @@ export default class extends React.Component<Props, State> {
   private setIsOpen = () =>
     this.setState(state => ({isOpen: !state.isOpen}));
 
-  render() {
+  public render() {
     const {id, title, active, headerClassname, bodyClassname, children} = this.props;
     const {isOpen} = this.state;
     return (

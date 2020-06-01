@@ -99,7 +99,7 @@ class Breadcrumbs extends React.Component<Props, State> {
         }
     }
 
-    render() {
+    public render() {
         return (
           <div className={`${styles.container}`}>
               {this.state.breadcrumbs.map(({title, link}, index) =>

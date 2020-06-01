@@ -125,12 +125,11 @@ class RuleHostConditionList extends BaseComponent<Props, State> {
                  .filter(condition => !ruleConditions.includes(condition) && !unsavedConditions.includes(condition));
   };
 
-  render() {
+  public render() {
     return <ControlledList isLoading={this.props.isLoadingHostRule || this.props.isLoading}
                            error={this.props.loadHostRuleError || this.props.error}
                            emptyMessage={`Conditions list is empty`}
                            data={this.props.ruleConditions}
-                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'conditions',
                              title: 'Add condition',

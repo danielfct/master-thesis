@@ -27,10 +27,31 @@ public interface SimulatedHostMetricsRepository extends JpaRepository<SimulatedH
   Optional<SimulatedHostMetricEntity> findByNameIgnoreCase(@Param("name") String name);
 
   @Query("select m "
+      + "from SimulatedHostMetricEntity m join m.cloudHosts c join m.edgeHosts e "
+      + "where c.publicIpAddress = :hostname or e.hostname = :hostname")
+  List<SimulatedHostMetricEntity> findByHost(@Param("hostname") String hostname);
+
+  @Query("select m "
+      + "from SimulatedHostMetricEntity m join m.cloudHosts c join m.edgeHosts e "
+      + "where (c.publicIpAddress = :hostname or e.hostname = :hostname) and lower(m.field.name) = lower(:field)")
+  Optional<SimulatedHostMetricEntity> findByHostAndField(@Param("hostname") String hostname,
+                                                         @Param("field") String field);
+
+  @Query("select m "
+      + "from SimulatedHostMetricEntity m join m.cloudHosts h "
+      + "where h.publicIpAddress = :hostname")
+  List<SimulatedHostMetricEntity> findByCloudHost(@Param("hostname") String hostname);
+
+  @Query("select m "
       + "from SimulatedHostMetricEntity m join m.cloudHosts h "
       + "where h.publicIpAddress = :hostname and lower(m.field.name) = lower(:field)")
   Optional<SimulatedHostMetricEntity> findByCloudHostAndField(@Param("field") String field,
                                                               @Param("hostname") String hostname);
+
+  @Query("select m "
+      + "from SimulatedHostMetricEntity m join m.edgeHosts h "
+      + "where h.hostname = :hostname")
+  List<SimulatedHostMetricEntity> findByEdgeHost(@Param("hostname") String hostname);
 
   @Query("select m "
       + "from SimulatedHostMetricEntity m join m.edgeHosts h "

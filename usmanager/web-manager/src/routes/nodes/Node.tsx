@@ -282,7 +282,7 @@ class Node extends BaseComponent<Props, State> {
       content: () => this.node()
     }];
 
-  render() {
+  public render() {
     return (
       <MainLayout>
         <div className="container">

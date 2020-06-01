@@ -24,13 +24,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.SimulatedMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus.PrometheusService;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -40,13 +40,16 @@ public class HostMetricsService {
 
   private final PrometheusService prometheusService;
   private final SimulatedHostMetricsService simulatedHostMetricsService;
+  private final FieldsService fieldsService;
   private final double maximumRamPercentage;
 
   public HostMetricsService(PrometheusService prometheusService,
                             SimulatedHostMetricsService simulatedHostMetricsService,
+                            FieldsService fieldsService,
                             HostProperties hostProperties) {
     this.prometheusService = prometheusService;
     this.simulatedHostMetricsService = simulatedHostMetricsService;
+    this.fieldsService = fieldsService;
     this.maximumRamPercentage = hostProperties.getMaximumRamPercentage();
   }
 
@@ -60,19 +63,21 @@ public class HostMetricsService {
   }
 
   public Map<String, Double> getHostStats(String hostname) {
-    var fields = new HashMap<String, Double>();
+    var fieldsValues = new HashMap<String, Double>();
     double cpuPercentage = prometheusService.getCpuUsagePercent(hostname);
     if (cpuPercentage != -1) {
-      fields.put("cpu-%", cpuPercentage);
+      // just to make sure cpu-% is a valid field name
+      FieldEntity field = fieldsService.getField("cpu-%");
+      fieldsValues.put(field.getName(), cpuPercentage);
     }
     double ramPercentage = prometheusService.getMemoryUsagePercent(hostname);
     if (ramPercentage != -1) {
-      fields.put("ram-%", ramPercentage);
+      // just to make sure ram-% is a valid field name
+      FieldEntity field = fieldsService.getField("ram-%");
+      fieldsValues.put(field.getName(), ramPercentage);
     }
-    List.of("cpu-%", "ram-%", "cpu", "ram", "bandwidth-%").forEach(field ->
-        simulatedHostMetricsService.getHostFieldValue(hostname, field).ifPresent(value -> fields.put(field, value))
-    );
-    return fields;
+    fieldsValues.putAll(simulatedHostMetricsService.getSimulatedFieldsValues(hostname));
+    return fieldsValues;
   }
 
 }

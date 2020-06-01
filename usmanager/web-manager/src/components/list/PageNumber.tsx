@@ -12,7 +12,7 @@ export class PageNumber extends React.Component<PageNumberProps, {}> {
     this.props.setPage(this.props.page - 1);
   };
 
-  render() {
+  public render() {
     const {page, active} = this.props;
     return (
       <li key={page} className={active ? "active" : "waves-effect"}>

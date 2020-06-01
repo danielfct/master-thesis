@@ -137,12 +137,12 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
                  .filter(name => !service || name !== service.serviceName && !dependencies.includes(name) && !unsavedDependencies.includes(name));
   };
 
-  render() {
+  public render() {
+    console.log(this.props.dependencies)
     return <ControlledList isLoading={this.props.isLoadingService || this.props.isLoading}
                            error={this.props.loadServiceError || this.props.error}
                            emptyMessage={`Dependencies list is empty`}
                            data={this.props.dependencies}
-                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'dependencies',
                              title: 'Add dependency',

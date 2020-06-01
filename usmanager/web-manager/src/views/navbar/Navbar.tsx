@@ -59,7 +59,7 @@ class Navbar extends React.Component<Props, {}> {
         this.props.history.push("/");
     };
 
-    render() {
+    public render() {
         const {pathname} = this.props.location;
         const route = authenticatedRoutes[pathname];
         const {user: sidenavUser, width: sidenavWidth} = this.props.sidenav;

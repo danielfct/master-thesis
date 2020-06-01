@@ -49,7 +49,7 @@ interface Props<T> {
 
 class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
 
-    render() {
+    public render() {
         const {list, predicate, search, paginate, ...otherProps} = this.props;
         const filteredList = list.filter((s:T) => predicate(s, search));
         if (list.length !== filteredList.length && filteredList.length === 0) {

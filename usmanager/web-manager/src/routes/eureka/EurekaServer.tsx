@@ -208,7 +208,7 @@ class EurekaServer extends BaseComponent<Props, State> {
     },
   ];
 
-  render() {
+  public render() {
     return (
       <MainLayout>
         <div className="container">

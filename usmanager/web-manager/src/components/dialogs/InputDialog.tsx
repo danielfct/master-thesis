@@ -53,7 +53,7 @@ export default class InputDialog extends BaseComponent<Props, {}> {
     this.props.confirmCallback(values);
   };
 
-  render() {
+  public render() {
     const {id, title, fields, values, children} = this.props;
     return (
       <div id={id} className='modal dialog' ref={this.modal}>

@@ -19,7 +19,7 @@ export default class extends React.Component<Props, {}> {
     M.Tabs.init(this.tabs.current as Element);
   }
 
-  render() {
+  public render() {
     const {tabs} = this.props;
     return (
       <>

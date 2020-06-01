@@ -10,6 +10,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 
 import java.util.List;
@@ -32,10 +34,24 @@ public interface ContainerRepository extends JpaRepository<ContainerEntity, Long
       + "where r.generic = false and c.containerId = :containerId")
   List<ContainerRuleEntity> getRules(@Param("containerId") String containerId);
 
-  /*@Query("select r "
-      + "from ContainerEntity c join c.simulatedMetrics m "
-      + "where m.generic = false and c.containerId = :containerId")
-  List<ContainerSimulatedMetricEntity> getSimulatedMetrics(@Param("containerId") String containerId);*/
+
+  @Query("select r "
+      + "from ContainerEntity c join c.containerRules r "
+      + "where r.generic = false and c.containerId = :containerId and lower(r.name) = lower(:ruleName)")
+  List<ContainerRuleEntity> getRule(@Param("containerId") String containerId,
+                                    @Param("ruleName") String ruleName);
+
+  @Query("select m "
+      + "from ContainerEntity c join c.simulatedContainerMetrics m "
+      + "where c.containerId = :containerId")
+  List<SimulatedContainerMetricEntity> getSimulatedMetrics(@Param("containerId") String containerId);
+
+  @Query("select m "
+      + "from ContainerEntity c join c.simulatedContainerMetrics m "
+      + "where c.containerId = :containerId and lower(m.name) = lower(:simulatedMetricName)")
+  Optional<SimulatedContainerMetricEntity> getSimulatedMetric(@Param("containerId") String containerId,
+                                                              @Param("simulatedMetricName") String simulatedMetricName);
+
 
   @Query("select case when count(c) > 0 then true else false end "
       + "from ContainerEntity c "

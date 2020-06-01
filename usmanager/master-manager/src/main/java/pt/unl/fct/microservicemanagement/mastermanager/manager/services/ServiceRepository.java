@@ -36,38 +36,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
-
-  Optional<ServiceEntity> findByServiceNameIgnoreCase(@Param("serviceName") String serviceName);
-
-  List<ServiceEntity> findByDockerRepository(@Param("dockerRepository") String dockerRepository);
-
-  @Query("select a.app "
-      + "from ServiceEntity s join s.appServices a "
-      + "where s.serviceName = :serviceName and a.app.name = :appName")
-  Optional<AppEntity> getApp(@Param("serviceName") String serviceName, String appName);
-
-  @Query("select d.dependency "
-      + "from ServiceEntity s join s.dependencies d "
-      + "where s.serviceName = :serviceName")
-  List<ServiceEntity> getDependencies(@Param("serviceName") String serviceName);
-
-  @Query("select d.service "
-      + "from ServiceEntity s join s.depends d "
-      + "where s.serviceName = :serviceName")
-  List<ServiceEntity> getDependents(@Param("serviceName") String serviceName);
-
-  @Query("select r "
-      + "from ServiceEntity s join s.rules r "
-      + "where r.generic = false and s.serviceName = :serviceName")
-  List<ServiceRuleEntity> getRules(@Param("serviceName") String serviceName);
-
-  @Query("select r "
-      + "from ServiceEntity s join s.rules r "
-      + "where r.generic = false and s.serviceName = :serviceName and r.name = :ruleName")
-  Optional<ServiceRuleEntity> getRule(@Param("serviceName") String serviceName, @Param("ruleName") String ruleName);
 
   @Query("select case when count(s) > 0 then true else false end "
       + "from ServiceEntity s "
@@ -79,59 +51,89 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
       + "where lower(s.serviceName) = lower(:serviceName)")
   boolean hasService(@Param("serviceName") String serviceName);
 
-  @Query("select apps.app "
-      + "from ServiceEntity s join s.appServices apps "
-      + "where s.serviceName = :serviceName")
-  List<AppEntity> getAppsByServiceName(@Param("serviceName") String serviceName);
+  Optional<ServiceEntity> findByServiceNameIgnoreCase(@Param("serviceName") String serviceName);
+
+  List<ServiceEntity> findByDockerRepositoryIgnoreCase(@Param("dockerRepository") String dockerRepository);
+
+  int getMaxReplicasByServiceNameIgnoreCase(@Param("serviceName") String serviceName);
+
+  int getMinReplicasByServiceNameIgnoreCase(@Param("serviceName") String serviceName);
+
+  @Query("select a.app "
+      + "from ServiceEntity s join s.appServices a "
+      + "where lower(s.serviceName) = lower(:serviceName)")
+  List<AppEntity> getApps(@Param("serviceName") String serviceName);
+
+  @Query("select a.app "
+      + "from ServiceEntity s join s.appServices a "
+      + "where lower(s.serviceName) = lower(:serviceName) and lower(a.app.name) = lower(:appName)")
+  Optional<AppEntity> getApp(@Param("serviceName") String serviceName, String appName);
 
   @Query("select d.dependency "
       + "from ServiceEntity s join s.dependencies d "
-      + "where s.serviceName = :serviceName and d.dependency.serviceName = :dependencyName")
+      + "where lower(s.serviceName) = lower(:serviceName)")
+  List<ServiceEntity> getDependencies(@Param("serviceName") String serviceName);
+
+  @Query("select d.dependency "
+      + "from ServiceEntity s join s.dependencies d "
+      + "where lower(s.serviceName) = lower(:serviceName) and lower(d.dependency.serviceName) = lower(:dependencyName)")
   Optional<ServiceEntity> getDependency(@Param("serviceName") String serviceName,
                                         @Param("dependencyName") String dependencyName);
 
   @Query("select case when count(d) > 0 then true else false end "
       + "from ServiceEntity s join s.dependencies d "
-      + "where s.serviceName = :serviceName and d.dependency.serviceName = :otherServiceName")
-  boolean serviceDependsOnOtherService(@Param("serviceName") String serviceName,
-                                       @Param("otherServiceName") String otherServiceName);
+      + "where lower(s.serviceName) = lower(:serviceName) and lower(d.dependency.serviceName) = lower(:dependencyName)")
+  boolean dependsOn(@Param("serviceName") String serviceName, @Param("dependencyName") String dependencyName);
 
   @Query("select d.dependency "
       + "from ServiceEntity s join s.dependencies d "
-      + "where s.serviceName = :serviceName and d.dependency.serviceType = :serviceType")
+      + "where lower(s.serviceName) = lower(:serviceName) and d.dependency.serviceType = :serviceType")
   List<ServiceEntity> getDependenciesByType(@Param("serviceName") String serviceName,
                                             @Param("serviceType") ServiceType serviceType);
 
+  @Query("select d.service "
+      + "from ServiceEntity s join s.dependents d "
+      + "where lower(s.serviceName) = lower(:serviceName)")
+  List<ServiceEntity> getDependents(@Param("serviceName") String serviceName);
+
+  //TODO confirm correctness
+  @Query("select d.service "
+      + "from ServiceEntity s join s.dependents d "
+      + "where lower(s.serviceName) = lower(:serviceName) and lower(d.service.serviceName) = lower(:dependentName)")
+  Optional<ServiceEntity> getDependent(@Param("serviceName") String serviceName,
+                                       @Param("dependentName") String dependentName);
+
+  @Query("select r "
+      + "from ServiceEntity s join s.rules r "
+      + "where r.generic = false and lower(s.serviceName) = lower(:serviceName)")
+  List<ServiceRuleEntity> getRules(@Param("serviceName") String serviceName);
+
+  @Query("select r "
+      + "from ServiceEntity s join s.rules r "
+      + "where r.generic = false and lower(s.serviceName) = lower(:serviceName) and lower(r.name) = lower(:ruleName)")
+  Optional<ServiceRuleEntity> getRule(@Param("serviceName") String serviceName, @Param("ruleName") String ruleName);
+
+
   @Query("select p "
       + "from ServiceEntity s join s.eventPredictions p "
-      + "where s.serviceName = :serviceName")
+      + "where lower(s.serviceName) = lower(:serviceName)")
   List<ServiceEventPredictionEntity> getPredictions(@Param("serviceName") String serviceName);
 
   @Query("select p "
       + "from ServiceEntity s join s.eventPredictions p "
-      + "where s.id = :serviceId and p.id = :serviceEventPrediction")
-  Optional<ServiceEventPredictionEntity> getPrediction(@Param("serviceId") long serviceId,
-                                                       @Param("serviceEventPrediction") long serviceEventPrediction);
+      + "where lower(s.serviceName) = lower(:serviceName) and lower(p.name) = lower(:eventPredictionName)")
+  Optional<ServiceEventPredictionEntity> getPrediction(@Param("serviceName") String serviceName,
+                                                       @Param("eventPredictionName") String eventPredictionName);
 
   @Query("select m "
       + "from ServiceEntity s join s.simulatedServiceMetrics m "
-      + "where s.serviceName = :serviceName")
+      + "where lower(s.serviceName) = lower(:serviceName)")
   List<SimulatedServiceMetricEntity> getSimulatedMetrics(@Param("serviceName") String serviceName);
 
   @Query("select m "
       + "from ServiceEntity s join s.simulatedServiceMetrics m "
-      + "where s.serviceName = :serviceName and m.name = :simulatedMetricName")
+      + "where lower(s.serviceName) = lower(:serviceName) and lower(m.name) = lower(:simulatedMetricName)")
   Optional<SimulatedServiceMetricEntity> getSimulatedMetric(@Param("serviceName") String serviceName,
                                                             @Param("simulatedMetricName") String simulatedMetricName);
-
-  @Query("select s.maxReplicas "
-      + "from ServiceEntity s "
-      + "where s.serviceName = :serviceName")
-  int getMaxReplicasByServiceName(@Param("serviceName") String serviceName);
-
-  @Query("select s.minReplicas "
-      + "from ServiceEntity s "
-      + "where s.serviceName = :serviceName")
-  int getMinReplicasByServiceName(@Param("serviceName") String serviceName);
 
 }

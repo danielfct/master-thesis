@@ -63,7 +63,7 @@ export class CheckboxList extends React.Component<Props, State> {
     );
   };
 
-  render() {
+  public render() {
     const {id, name} = this.props;
     const {values} = this.state;
     return (

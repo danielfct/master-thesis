@@ -133,13 +133,12 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, State> {
                                                      && !unsavedEdgeHosts.includes(edgeHost));
   };
 
-  render() {
+  public render() {
     const isNew = this.isNew();
     return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedHostMetric || this.props.isLoading)}
                            error={!isNew ? this.props.loadSimulatedHostMetricError || this.props.error : undefined}
                            emptyMessage={`Edge hosts list is empty`}
                            data={this.props.simulatedMetricEdgeHosts}
-                           dataKey={['hostname']} //TODO
                            dropdown={{
                              id: 'edgeHosts',
                              title: 'Add edge host',

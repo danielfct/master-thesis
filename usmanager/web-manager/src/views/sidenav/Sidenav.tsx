@@ -124,7 +124,7 @@ class Sidenav extends React.Component<Props, {}> {
         }
     };
 
-    render() {
+    public render() {
         return (
           <ul id="slide-out" className="sidenav sidenav-fixed no-shadows"
               style={this.props.sidenav.user ? undefined : {display: 'none'}} ref={this.sidenav}>

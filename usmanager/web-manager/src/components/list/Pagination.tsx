@@ -32,7 +32,7 @@ class Pagination extends React.Component<Props, {}> {
   private betweenEllipsis = (max: number, page: number): number[] =>
     Array.from({length: 1}, (x, i) => page + 1).reverse();
 
-  render() {
+  public render() {
     const {max, page, setPage, prevPage, nextPage, sidenavVisible} = this.props;
     const needsEllipsis = max >= 10;
     let pagination;

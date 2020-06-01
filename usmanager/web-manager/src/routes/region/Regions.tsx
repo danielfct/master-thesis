@@ -35,7 +35,7 @@ class Regions extends BaseComponent<Props, {}> {
     region.name.toLowerCase().includes(search)
     || region.description.toLowerCase().includes(search);
 
-  render() {
+  public render() {
     return (
       <MainLayout>
         <AddButton tooltip={{text: 'Add region', position: 'left'}}

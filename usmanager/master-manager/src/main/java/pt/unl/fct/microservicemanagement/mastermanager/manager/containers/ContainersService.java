@@ -13,6 +13,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
@@ -314,10 +316,6 @@ public class ContainersService {
     ruleNames.forEach(rule -> containerRulesService.removeContainer(rule, containerId));
   }
 
-
-
-
-
   public List<SimulatedContainerMetricEntity> getSimulatedMetrics(String containerId) {
     assertContainerExists(containerId);
     return containers.getSimulatedMetrics(containerId);
@@ -351,11 +349,6 @@ public class ContainersService {
     simulatedMetricNames.forEach(simulatedMetric ->
         simulatedContainerMetricsService.removeContainer(simulatedMetric, containerId));
   }
-  
-  
-  
-  
-  
   
   public boolean hasContainer(String containerId) {
     return containers.hasContainer(containerId);

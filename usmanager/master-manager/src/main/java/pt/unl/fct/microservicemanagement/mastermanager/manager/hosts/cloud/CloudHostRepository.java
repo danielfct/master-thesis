@@ -68,4 +68,9 @@ public interface CloudHostRepository extends JpaRepository<CloudHostEntity, Long
       + "where h.instanceId = :instanceId")
   boolean hasCloudHost(@Param("instanceId") String instanceId);
 
+  @Query("select case when count(h) > 0 then true else false end "
+      + "from CloudHostEntity h "
+      + "where h.publicIpAddress = :hostname")
+  boolean hasCloudHostByHostname(@Param("hostname") String hostname);
+
 }

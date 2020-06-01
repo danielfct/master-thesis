@@ -29,7 +29,7 @@ export class Dropdown<T> extends React.Component<Props<T>, {}> {
     M.updateTextFields();
   }
 
-  render() {
+  public render() {
     const {className, id, name, value, disabled, onChange, onBlur, dropdown} = this.props;
     let valueString = value === undefined ? "" : value;
     valueString = typeof valueString === 'object' ? JSON.stringify(valueString) : valueString.toString();

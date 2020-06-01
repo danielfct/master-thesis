@@ -18,8 +18,10 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHo
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -173,32 +175,34 @@ public class SimulatedHostMetricsService {
     }
   }
 
-  public Optional<Double> getHostFieldValue(String hostname, String field) {
-    Optional<SimulatedHostMetricEntity> simulatedCloudHostMetric = simulatedHostMetrics.findByCloudHostAndField(field,
-        hostname);
-    if (simulatedCloudHostMetric.isPresent()) {
-      Double fieldValue = randomizeFieldValue(simulatedCloudHostMetric.get());
-      if (simulatedCloudHostMetric.get().isOverride()) {
-        return Optional.of(fieldValue);
-      }
-    }
-    Optional<SimulatedHostMetricEntity> simulatedEdgeHostMetric = simulatedHostMetrics.findByEdgeHostAndField(field,
-        hostname);
-    if (simulatedEdgeHostMetric.isPresent()) {
-      Double fieldValue = randomizeFieldValue(simulatedEdgeHostMetric.get());
-      if (simulatedEdgeHostMetric.get().isOverride()) {
-        return Optional.of(fieldValue);
-      }
-    }
-    Optional<SimulatedHostMetricEntity> simulatedHostMetric = simulatedHostMetrics.findGenericByField(field);
-    return simulatedHostMetric.map(this::randomizeFieldValue);
+  public Map<String, Double> getSimulatedFieldsValues(String hostname) {
+    List<SimulatedHostMetricEntity> metrics = simulatedHostMetrics.findByHost(hostname);
+    return metrics.stream().collect(Collectors.toMap(metric -> metric.getField().getName(), this::randomizeFieldValue));
   }
 
-  private Double randomizeFieldValue(SimulatedHostMetricEntity simulatedHostMetric) {
+  public Optional<Double> getSimulatedFieldValue(String hostname, String field) {
+    Optional<SimulatedHostMetricEntity> metric = simulatedHostMetrics.findByHostAndField(hostname, field);
+    Optional<Double> fieldValue = metric.map(this::randomizeFieldValue);
+    if (fieldValue.isPresent() && metric.get().isOverride()) {
+      return fieldValue;
+    }
+    Optional<Double> genericFieldValue = randomizeGenericFieldValue(field);
+    if (genericFieldValue.isPresent()) {
+      return genericFieldValue;
+    }
+    return fieldValue;
+  }
+
+  private Double randomizeFieldValue(SimulatedHostMetricEntity metric) {
     var random = new Random();
-    double minValue = simulatedHostMetric.getMinimumValue();
-    double maxValue = simulatedHostMetric.getMaximumValue();
+    double minValue = metric.getMinimumValue();
+    double maxValue = metric.getMaximumValue();
     return minValue + (maxValue - minValue) * random.nextDouble();
+  }
+
+  private Optional<Double> randomizeGenericFieldValue(String field) {
+    Optional<SimulatedHostMetricEntity> metric = simulatedHostMetrics.findGenericByField(field);
+    return metric.map(this::randomizeFieldValue);
   }
 
 }

@@ -44,6 +44,10 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
 
   state: State<T> = {};
 
+  static defaultProps = {
+    dataKey: []
+  }
+
   public componentDidMount(): void {
     this.initDropdown();
   }
@@ -55,6 +59,8 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                                                   .every(checked => checked);
     }
     if (prevProps.data !== this.props.data) {
+      const previousData = prevProps.data?.map(this.getDataStateKey) || [];
+      this.invalidateStateData(previousData);
       this.setState((this.props.data || []).reduce((state: State<T>, data) => {
         const dataStateKey = this.getDataStateKey(data);
         state[dataStateKey] = { value: data, isChecked: false, isNew: false };
@@ -62,7 +68,6 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
       }, {}));
     }
     if (prevProps.entitySaved !== this.props.entitySaved) {
-      console.log(Object.values(this.state));
       this.setState(Object.values(this.state).reduce((state: State<T>, data) => {
         if (data) {
           const dataStateKey = this.getDataStateKey(data.value);
@@ -205,7 +210,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     this.props.dropdown?.formModal?.onOpen?.(this.selected);
   };
 
-  render() {
+  public render() {
     const {isLoading, error, emptyMessage, dropdown, formModal} = this.props;
     // @ts-ignore
     const data = Object.values(this.state).filter(data => data).map(data => data.value);

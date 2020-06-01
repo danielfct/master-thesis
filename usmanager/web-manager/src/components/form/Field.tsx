@@ -87,7 +87,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     return `${date.toLocaleDateString("pt")} ${date.toLocaleTimeString("pt") }`
   };
 
-  render() {
+  public render() {
     const {id, type, label, dropdown, number, icon, disabled, valueToString} = this.props;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {

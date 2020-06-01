@@ -25,7 +25,7 @@ export default class ContainerPortsList extends BaseComponent<Props, {}> {
       </div>
     </ListItem>;
 
-  render() {
+  public render() {
     const PortsList = List<IContainerPort>();
     return (
       <PortsList isLoading={this.props.isLoadingContainer}

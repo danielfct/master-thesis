@@ -8,21 +8,33 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers;
 
+
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
+
+import java.util.List;
+import java.util.Objects;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Objects;
+import lombok.Singular;
 
 @Entity
 @Builder(toBuilder = true)
@@ -30,32 +42,42 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "container_simulated_metrics")
-public class ContainerSimulatedMetricsEntity {
+@Table(name = "simulated_container_metrics")
+public class SimulatedContainerMetricEntity {
 
   @Id
   @GeneratedValue
   private Long id;
 
-  private String containerId;
+  @Column(unique = true)
+  private String name;
 
-  private String field;
+  @ManyToOne
+  @JoinColumn(name = "field_id")
+  private FieldEntity field;
 
-  private double minValue;
+  private double minimumValue;
 
-  private double maxValue;
+  private double maximumValue;
 
   private boolean override;
+
+  private boolean generic;
+
+  @Singular
+  @JsonIgnore
+  @ManyToMany(cascade = CascadeType.ALL)
+  private List<ContainerEntity> containers;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ContainerSimulatedMetricsEntity)) {
+    if (!(o instanceof SimulatedContainerMetricEntity)) {
       return false;
     }
-    ContainerSimulatedMetricsEntity other = (ContainerSimulatedMetricsEntity) o;
+    SimulatedContainerMetricEntity other = (SimulatedContainerMetricEntity) o;
     return id != null && id.equals(other.getId());
   }
 

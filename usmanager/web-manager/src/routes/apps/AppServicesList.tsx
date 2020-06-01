@@ -177,7 +177,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
     this.setState({selectedService: selectedService});
   };
 
-  render() {
+  public render() {
     return <ControlledList<IAppService> isLoading={this.props.isLoadingApp || this.props.isLoading}
                                         error={this.props.loadAppError || this.props.error}
                                         emptyMessage={`Services list is empty`}

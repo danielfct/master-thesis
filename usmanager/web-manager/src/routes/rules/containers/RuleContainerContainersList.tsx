@@ -136,12 +136,11 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
                  .filter(container => !ruleContainers.includes(container) && !unsavedContainers.includes(container));
   };
 
-  render() {
+  public render() {
     return <ControlledList isLoading={this.props.isLoadingRuleContainer || this.props.isLoading}
                            error={this.props.loadRuleContainerError || this.props.error}
                            emptyMessage={`Containers list is empty`}
                            data={this.props.ruleContainers}
-                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'containers',
                              title: 'Add container',

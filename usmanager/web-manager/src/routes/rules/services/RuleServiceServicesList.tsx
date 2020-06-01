@@ -135,12 +135,11 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
                  .filter(service => !ruleServices.includes(service) && !unsavedServices.includes(service));
   };
 
-  render() {
+  public render() {
     return <ControlledList isLoading={this.props.isLoadingRuleService || this.props.isLoading}
                            error={this.props.loadRuleServiceError || this.props.error}
                            emptyMessage={`Services list is empty`}
                            data={this.props.ruleServices}
-                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'services',
                              title: 'Add service',

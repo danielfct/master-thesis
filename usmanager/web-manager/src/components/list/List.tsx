@@ -57,7 +57,7 @@ type Props<T> = ListProps<T>;
 
 class GenericList<T> extends React.Component<Props<T>, {}> {
 
-    render() {
+    public render() {
         const {isLoading, error, emptyMessage, list, predicate, paginate, animate} = this.props;
         if (isLoading) {
             return <ListLoadingSpinner/>;

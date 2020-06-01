@@ -25,7 +25,7 @@ export default class ContainerLabelsList extends BaseComponent<Props, {}> {
       </div>
     </ListItem>;
 
-  render() {
+  public render() {
     const LabelsList = List<string>();
     return (
       <LabelsList isLoading={this.props.isLoadingContainer}

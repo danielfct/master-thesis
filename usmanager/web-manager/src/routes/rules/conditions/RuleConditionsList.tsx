@@ -31,7 +31,7 @@ class RuleConditionsList extends BaseComponent<Props, {}> {
   private predicate = (condition: IRuleCondition, search: string): boolean =>
     condition.name.toString().toLowerCase().includes(search);
 
-  render() {
+  public render() {
     return (
       <CardList<IRuleCondition>
         isLoading={this.props.isLoading}

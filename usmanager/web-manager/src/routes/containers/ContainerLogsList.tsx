@@ -69,7 +69,7 @@ class ContainerLogsList extends BaseComponent<Props, {}> {
       </div>
     </ListItem>;
 
-  render() {
+  public render() {
     const logs = this.logs();
     const LogsList = List<string>();
     return (

@@ -135,12 +135,11 @@ class HostRuleCloudHostList extends BaseComponent<Props, State> {
                  .filter(cloudHost => !ruleCloudHosts.includes(cloudHost) && !unsavedCloudHosts.includes(cloudHost));
   };
 
-  render() {
+  public render() {
     return <ControlledList isLoading={this.props.isLoadingHostRule || this.props.isLoading}
                            error={this.props.loadHostRuleError || this.props.error}
                            emptyMessage={`Cloud hosts list is empty`}
                            data={this.props.ruleCloudHosts}
-                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'cloudHosts',
                              title: 'Add cloud instance',

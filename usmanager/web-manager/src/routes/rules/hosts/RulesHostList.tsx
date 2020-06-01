@@ -41,7 +41,7 @@ class RulesHostList extends BaseComponent<Props, {}> {
   private predicate = (rule: IRuleHost, search: string): boolean =>
     rule.name.toLowerCase().includes(search);
 
-  render() {
+  public render() {
     return (
         <CardList<IRuleHost>
           isLoading={this.props.isLoading}

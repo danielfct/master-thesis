@@ -48,7 +48,7 @@ class GenericServiceRuleList extends BaseComponent<Props, {}> {
       </Link>
     </ListItem>;
 
-  render() {
+  public render() {
     const RulesList = List<string>();
     return (
       <RulesList isLoading={this.props.isLoading}

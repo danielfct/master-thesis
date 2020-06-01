@@ -288,7 +288,7 @@ class App extends BaseComponent<Props, State> {
     }
   ];
 
-  render() {
+  public render() {
     return (
       <MainLayout>
         {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}

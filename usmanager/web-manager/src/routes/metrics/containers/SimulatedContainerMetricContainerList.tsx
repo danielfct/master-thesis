@@ -133,13 +133,12 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
                                                    && !unsavedContainers.includes(container));
   };
 
-  render() {
+  public render() {
     const isNew = this.isNew();
     return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedContainerMetric || this.props.isLoading)}
                            error={!isNew ? this.props.loadSimulatedContainerMetricError || this.props.error : undefined}
                            emptyMessage={`Containers list is empty`}
                            data={this.props.simulatedMetricContainers}
-                           dataKey={['containerName']} //TODO
                            dropdown={{
                              id: 'containers',
                              title: 'Add container',

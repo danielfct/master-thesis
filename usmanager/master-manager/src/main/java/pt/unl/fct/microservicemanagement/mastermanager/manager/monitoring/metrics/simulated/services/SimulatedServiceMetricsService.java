@@ -133,7 +133,7 @@ public class SimulatedServiceMetricsService {
     }
   }
 
-  public Optional<Double> getServiceSimulatedFieldValue(String serviceName, String field) {
+  public Optional<Double> getSimulatedServiceFieldValue(String serviceName, String field) {
     Optional<SimulatedServiceMetricEntity> simulatedServiceMetric = simulatedServiceMetrics.findByServiceAndField(field,
         serviceName);
     return getFieldValue(simulatedServiceMetric, field);

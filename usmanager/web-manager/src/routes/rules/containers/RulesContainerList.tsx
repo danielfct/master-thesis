@@ -51,7 +51,7 @@ class RulesContainerList extends BaseComponent<Props, {}> {
   private predicate = (rule: IRuleContainer, search: string): boolean =>
     rule.name.toLowerCase().includes(search);
 
-  render() {
+  public render() {
     return (
       <CardList<IRuleContainer>
         isLoading={this.props.isLoading}

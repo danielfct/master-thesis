@@ -71,7 +71,7 @@ class ServiceDependentList extends BaseComponent<Props, {}> {
       </Link>
     </ListItem>;
 
-  render() {
+  public render() {
     const DependentsList = List<string>();
     return (
       <DependentsList isLoading={this.props.isLoadingService || this.props.isLoading}

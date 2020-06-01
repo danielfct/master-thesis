@@ -145,12 +145,11 @@ class HostRuleEdgeHostList extends BaseComponent<Props, State> {
                  .filter(edgeHost => !ruleEdgeHosts.includes(edgeHost) && !unsavedEdgeHosts.includes(edgeHost));
   };
 
-  render() {
+  public render() {
     return <ControlledList isLoading={this.props.isLoadingHostRule || this.props.isLoading}
                            error={this.props.loadHostRuleError || this.props.error}
                            emptyMessage={`Edge hosts list is empty`}
                            data={this.props.ruleEdgeHosts}
-                           dataKey={[]} //TODO
                            dropdown={{
                              id: 'edgeHosts',
                              title: 'Add edge host',

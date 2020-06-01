@@ -70,7 +70,7 @@ export default class CardList<T> extends React.Component<Props<T>, State> {
     }
   };
 
-  render() {
+  public render() {
     const GenericList = List<T>();
     return <GenericList {...this.props}
                         show={this.props.card}

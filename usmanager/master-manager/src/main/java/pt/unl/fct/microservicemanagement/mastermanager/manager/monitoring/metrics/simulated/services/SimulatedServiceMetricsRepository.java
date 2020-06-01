@@ -27,7 +27,7 @@ public interface SimulatedServiceMetricsRepository extends JpaRepository<Simulat
 
   @Query("select m "
       + "from SimulatedServiceMetricEntity m join m.services s "
-      + "where s.serviceName = :serviceName and lower(m.field.name) = lower(:field)")
+      + "where lower(s.serviceName) = lower(:serviceName) and lower(m.field.name) = lower(:field)")
   Optional<SimulatedServiceMetricEntity> findByServiceAndField(@Param("field") String field,
                                                                @Param("serviceName") String serviceName);
 

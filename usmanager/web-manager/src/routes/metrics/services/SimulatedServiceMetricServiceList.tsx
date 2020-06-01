@@ -133,13 +133,12 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
                                                    && !unsavedServices.includes(service));
   };
 
-  render() {
+  public render() {
     const isNew = this.isNew();
     return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedServiceMetric || this.props.isLoading)}
                            error={!isNew ? this.props.loadSimulatedServiceMetricError || this.props.error : undefined}
                            emptyMessage={`Services list is empty`}
                            data={this.props.simulatedMetricServices}
-                           dataKey={['serviceName']} //TODO
                            dropdown={{
                              id: 'services',
                              title: 'Add service',

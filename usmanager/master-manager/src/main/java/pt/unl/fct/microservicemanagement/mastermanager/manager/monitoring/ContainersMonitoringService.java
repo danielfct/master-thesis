@@ -32,12 +32,12 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.SimulatedMetricsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ServiceEventEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.ServiceDecisionResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 
@@ -78,7 +78,7 @@ public class ContainersMonitoringService {
   private final HostsService hostsService;
   private final LocationRequestService requestLocationMonitoringService;
   private final DecisionsService decisionsService;
-  private final SimulatedMetricsService simulatedMetricsService;
+  private final SimulatedContainerMetricsService simulatedContainerMetricsService;
   private final TestLogsService testLogsService;
 
   private final long monitorPeriod;
@@ -92,7 +92,7 @@ public class ContainersMonitoringService {
                                      ServicesEventsService servicesEventsService, HostsService hostsService,
                                      LocationRequestService requestLocationMonitoringService,
                                      DecisionsService decisionsService,
-                                     SimulatedMetricsService simulatedMetricsService,
+                                     SimulatedContainerMetricsService simulatedContainerMetricsService,
                                      TestLogsService testLogsService,
                                      ContainerProperties containerProperties) {
     this.containersMonitoring = containersMonitoring;
@@ -103,7 +103,7 @@ public class ContainersMonitoringService {
     this.hostsService = hostsService;
     this.requestLocationMonitoringService = requestLocationMonitoringService;
     this.decisionsService = decisionsService;
-    this.simulatedMetricsService = simulatedMetricsService;
+    this.simulatedContainerMetricsService = simulatedContainerMetricsService;
     this.testLogsService = testLogsService;
     this.monitorPeriod = containerProperties.getMonitorPeriod();
     this.stopContainerOnEventCount = containerProperties.getStopContainerOnEventCount();
@@ -401,9 +401,6 @@ public class ContainersMonitoringService {
     decisionsService.addServiceDecisionValueFromFields(serviceDecision, containerDecision.getFields());
   }
 
-
-  //TODO from containerMetricsService
-
   Map<String, Double> getContainerStats(ContainerEntity container, double secondsInterval) {
     String containerId = container.getContainerId();
     String containerHostname = container.getHostname();
@@ -433,9 +430,7 @@ public class ContainersMonitoringService {
         "tx-bytes", txBytes));
     // Simulated metrics
     if (container.getLabels().containsKey(ContainerConstants.Label.SERVICE_NAME)) {
-      //TODO
-      Map<String, Double> simulatedFields = new HashMap<>();
-      //Map<String, Double> simulatedFields = simulatedMetricsService.getContainerFieldsValue(serviceName, containerId);
+      Map<String, Double> simulatedFields = simulatedContainerMetricsService.getSimulatedFieldsValues(containerId);
       fields.putAll(simulatedFields);
     }
     // Calculated metrics
@@ -450,9 +445,8 @@ public class ContainersMonitoringService {
   }
 
   private double getContainerCpuPercent(CpuStats preCpuStats, CpuStats cpuStats) {
-    final var systemDelta = cpuStats.systemCpuUsage().doubleValue() - preCpuStats.systemCpuUsage().doubleValue();
-    final var cpuDelta = cpuStats.cpuUsage().totalUsage().doubleValue()
-        - preCpuStats.cpuUsage().totalUsage().doubleValue();
+    var systemDelta = cpuStats.systemCpuUsage().doubleValue() - preCpuStats.systemCpuUsage().doubleValue();
+    var cpuDelta = cpuStats.cpuUsage().totalUsage().doubleValue() - preCpuStats.cpuUsage().totalUsage().doubleValue();
     double cpuPercent = 0.0;
     if (systemDelta > 0.0 && cpuDelta > 0.0) {
       final double onlineCpus = cpuStats.cpuUsage().percpuUsage().stream().filter(cpuUsage -> cpuUsage >= 1).count();

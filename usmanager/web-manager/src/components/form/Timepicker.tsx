@@ -52,7 +52,7 @@ export class Timepicker extends React.Component<Props, State> {
   private onSelect = (hour: number, minute: number): void =>
     this.setState({ selectedTime: String(`${zeroPad(hour, 2)}:${zeroPad(minute, 2)}`)});
 
-  render() {
+  public render() {
     const {className, id, name, value, disabled} = this.props;
     return (
       <input className={`timepicker ${className}`}

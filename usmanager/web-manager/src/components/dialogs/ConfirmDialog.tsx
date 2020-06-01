@@ -25,7 +25,7 @@ export default class ConfirmDialog extends React.Component<Props, {}> {
     this.initModal();
   }
 
-  render() {
+  public render() {
     return (
       <div id={this.props.id} className='modal dialog' ref={this.modal}>
         <div className="modal-content">

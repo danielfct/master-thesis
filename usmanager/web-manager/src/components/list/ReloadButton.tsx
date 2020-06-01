@@ -25,7 +25,7 @@ export default class ReloadButton extends React.Component<Props, State> {
     this.props.reloadCallback();
   };
 
-  render() {
+  public render() {
     const {offset, tooltip, automatic} = this.props;
     const {isReloading} = this.state;
     return (

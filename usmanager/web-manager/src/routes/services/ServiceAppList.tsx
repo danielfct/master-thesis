@@ -215,12 +215,11 @@ class ServiceAppList extends BaseComponent<Props, State> {
     this.props.loadAppServices(selectedApp);
   };
 
-  render() {
+  public render() {
     return <ControlledList<string> isLoading={this.props.isLoadingService || this.props.isLoading}
                                    error={this.props.error || this.props.error}
                                    emptyMessage='Apps list is empty'
                                    data={this.props.serviceApps}
-                                   dataKey={[]} //TODO
                                    dropdown={{
                                      id: 'apps',
                                      title: 'Add app',

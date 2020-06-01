@@ -10,6 +10,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 
 import java.util.List;
@@ -84,10 +85,10 @@ public class ContainerEntity {
   @ManyToMany(mappedBy = "containers", cascade = CascadeType.ALL)
   private Set<ContainerRuleEntity> containerRules;
 
-  /*@Singular
+  @Singular
   @JsonIgnore
   @ManyToMany(mappedBy = "containers", cascade = CascadeType.ALL)
-  private Set<SimulatedContainerMetricEntity> simulatedContainerMetrics*/
+  private Set<SimulatedContainerMetricEntity> simulatedContainerMetrics;
 
   @Override
   public boolean equals(Object o) {

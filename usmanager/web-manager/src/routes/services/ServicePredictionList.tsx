@@ -122,7 +122,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
                    checked={checked}/>
             <span id={'checkbox'}>
               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-                {prediction}
+                {prediction.name} ({prediction.minReplicas} replicas)
               </div>
             </span>
           </label>
@@ -189,12 +189,11 @@ class ServicePredictionList extends BaseComponent<Props, State> {
       <Field key='minReplicas' id={'minReplicas'} label='minReplicas'/>
     </div>;
 
-  render() {
+  public render() {
     return <ControlledList<IPrediction> isLoading={this.props.isLoadingService || this.props.isLoading}
                                         error={this.props.loadServiceError || this.props.error}
                                         emptyMessage='Predictions list is empty'
                                         data={this.props.predictions}
-                                        dataKey={['name']}
                                         formModal={{
                                           id: 'servicePrediction',
                                           title: 'Add prediction',

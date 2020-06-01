@@ -79,7 +79,7 @@ class Login extends BaseComponent<Props, State> {
     })
   };
 
-  render() {
+  public render() {
     if (isAuthenticated()) {
       this.props.history.push(`/home`);
     }

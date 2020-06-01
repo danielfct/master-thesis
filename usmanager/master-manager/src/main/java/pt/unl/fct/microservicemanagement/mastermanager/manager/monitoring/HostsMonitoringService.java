@@ -114,7 +114,7 @@ public class HostsMonitoringService {
     return hostsMonitoring.getMonitoringHostLogByHost(hostname);
   }
 
-  public long saveMonitoringHostLog(String hostname, String field, double value) {
+  public HostMonitoringEntity saveMonitoringHostLog(String hostname, String field, double value) {
     List<HostMonitoringEntity> hostMonitoringLogs = hostsMonitoring.getMonitoringHostLogByHostAndField(hostname, field);
     final HostMonitoringEntity hostMonitoringEntity;
     Timestamp updateTime = Timestamp.from(Instant.now());
@@ -126,7 +126,7 @@ public class HostsMonitoringService {
       hostMonitoringEntity = hostMonitoringLogs.get(0);
       hostMonitoringEntity.logValue(value, updateTime);
     }
-    return hostsMonitoring.save(hostMonitoringEntity).getId();
+    return hostsMonitoring.save(hostMonitoringEntity);
   }
 
   public List<HostFieldAvg> getAvgHostFields(String hostname) {

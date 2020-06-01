@@ -11,6 +11,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
@@ -144,7 +145,8 @@ public class ContainersController {
   }
 
   @DeleteMapping("/{containerId}/simulatedMetrics/{simulatedMetricName}")
-  public void removeContainerSimulatedMetric(@PathVariable String containerId, @PathVariable String simulatedMetricName) {
+  public void removeContainerSimulatedMetric(@PathVariable String containerId,
+                                             @PathVariable String simulatedMetricName) {
     containersService.removeSimulatedMetric(containerId, simulatedMetricName);
   }
 

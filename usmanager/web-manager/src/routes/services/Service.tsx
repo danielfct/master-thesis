@@ -485,10 +485,10 @@ class Service extends BaseComponent<Props, State> {
       title: 'Generic rules',
       id: 'genericRules',
       content: () => this.genericRules()
-    }
+    },
   ];
 
-  render() {
+  public render() {
     return (
       <MainLayout>
         {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}

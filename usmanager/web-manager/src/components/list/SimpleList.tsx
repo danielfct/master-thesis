@@ -35,7 +35,7 @@ type Props<T> = GenericSimpleListProps<T>;
 
 export default class SimpleList<T> extends React.Component<Props<T>, {}> {
 
-  render() {
+  public render() {
     const {list, show, header} = this.props;
     return (
       <div className={styles.listWrapper}>

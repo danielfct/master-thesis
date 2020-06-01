@@ -41,7 +41,7 @@ class RulesServiceList extends BaseComponent<Props, {}> {
   private predicate = (rule: IRuleService, search: string): boolean =>
     rule.name.toLowerCase().includes(search);
 
-  render() {
+  public render() {
     return (
       <CardList<IRuleService>
         isLoading={this.props.isLoading}

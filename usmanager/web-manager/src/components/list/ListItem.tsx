@@ -45,7 +45,7 @@ export default class ListItem<T> extends React.Component<ListItemProps<T>,{}> {
     }
   };
 
-  render() {
+  public render() {
     const {link, longPressCallback} = this.props;
     const separatorColor = this.getSeparatorColor();
     return (

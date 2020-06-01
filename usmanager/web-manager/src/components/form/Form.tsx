@@ -412,7 +412,7 @@ class Form extends React.Component<Props, State> {
     this.clearValues();
   };
 
-  render() {
+  public render() {
     const context: IFormContext = {
       values: this.state.values,
       errors: this.state.errors,

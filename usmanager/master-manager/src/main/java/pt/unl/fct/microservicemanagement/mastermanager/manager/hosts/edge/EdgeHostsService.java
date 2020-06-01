@@ -43,15 +43,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class EdgeHostsService {
 
-  private final EdgeHostRepository edgeHosts;
   private final HostRulesService hostRulesService;
   private final SimulatedHostMetricsService simulatedHostMetricsService;
 
-  public EdgeHostsService(EdgeHostRepository edgeHosts, @Lazy HostRulesService hostRulesService,
-                          SimulatedHostMetricsService simulatedHostMetricsService) {
-    this.edgeHosts = edgeHosts;
+  private final EdgeHostRepository edgeHosts;
+
+  public EdgeHostsService(@Lazy HostRulesService hostRulesService,
+                          @Lazy SimulatedHostMetricsService simulatedHostMetricsService,
+                          EdgeHostRepository edgeHosts) {
     this.hostRulesService = hostRulesService;
     this.simulatedHostMetricsService = simulatedHostMetricsService;
+    this.edgeHosts = edgeHosts;
   }
 
   public List<EdgeHostEntity> getEdgeHosts() {

@@ -83,7 +83,7 @@ public class ServicesService {
   }
 
   public List<ServiceEntity> getServicesByDockerRepository(String dockerRepository) {
-    return services.findByDockerRepository(dockerRepository);
+    return services.findByDockerRepositoryIgnoreCase(dockerRepository);
   }
 
   public ServiceEntity addService(ServiceEntity service) {
@@ -117,7 +117,7 @@ public class ServicesService {
 
   public List<AppEntity> getApps(String serviceName) {
     assertServiceExists(serviceName);
-    return services.getAppsByServiceName(serviceName);
+    return services.getApps(serviceName);
   }
 
   public void addApp(String serviceName, AddServiceApp addServiceApp) {
@@ -163,7 +163,7 @@ public class ServicesService {
   public boolean serviceDependsOn(String serviceName, String otherServiceName) {
     assertServiceExists(serviceName);
     assertServiceExists(otherServiceName);
-    return services.serviceDependsOnOtherService(serviceName, otherServiceName);
+    return services.dependsOn(serviceName, otherServiceName);
   }
 
   public void addDependency(String serviceName, String dependencyName) {
@@ -185,8 +185,8 @@ public class ServicesService {
   public void removeDependencies(String serviceName, List<String> dependencies) {
     var service = getService(serviceName);
     log.info("Removing dependencies {}", dependencies);
-    service.getDependencies()
-        .removeIf(dependency -> dependencies.contains(dependency.getDependency().getServiceName()));
+    service.getDependencies().removeIf(dependency ->
+        dependencies.contains(dependency.getDependency().getServiceName()));
     services.save(service);
   }
 
@@ -222,18 +222,13 @@ public class ServicesService {
     services.save(service);
   }
 
-  // FIXME
-  public ServiceEventPredictionEntity getEventPrediction(Long serviceId, Long eventPredictionId) {
-    assertServiceExists(serviceId);
-    return services.getPrediction(serviceId, eventPredictionId).orElseThrow(() ->
+  public ServiceEventPredictionEntity getEventPrediction(String serviceName,
+                                                         String predictionsName) {
+    assertServiceExists(serviceName);
+    return services.getPrediction(serviceName, predictionsName).orElseThrow(() ->
         new EntityNotFoundException(
-            ServiceEventPredictionEntity.class, "eventPredictionId", eventPredictionId.toString())
+            ServiceEventPredictionEntity.class, "predictionsName", predictionsName)
     );
-  }
-
-  public void deleteServiceEventPrediction(Long serviceId, Long serviceEventPredictionId) {
-    var serviceEventPrediction = getEventPrediction(serviceId, serviceEventPredictionId);
-    serviceEventPredictions.delete(serviceEventPrediction);
   }
 
   public List<ServiceRuleEntity> getRules(String serviceName) {
@@ -305,11 +300,11 @@ public class ServicesService {
   public int getMinReplicasByServiceName(String serviceName) {
     final var date = new Date(System.currentTimeMillis());
     Integer customMinReplicas = serviceEventPredictions.getMinReplicasByServiceName(serviceName, date);
-    return customMinReplicas == null ? services.getMinReplicasByServiceName(serviceName) : customMinReplicas;
+    return customMinReplicas == null ? services.getMinReplicasByServiceNameIgnoreCase(serviceName) : customMinReplicas;
   }
 
   public int getMaxReplicasByServiceName(String serviceName) {
-    return services.getMaxReplicasByServiceName(serviceName);
+    return services.getMaxReplicasByServiceNameIgnoreCase(serviceName);
   }
 
   private void assertServiceExists(Long serviceId) {

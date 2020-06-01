@@ -95,7 +95,6 @@ public class ServiceEntity {
   @NotNull
   private ServiceType serviceType;
 
-  // Average memory consumption in bytes
   @NotNull
   private Double expectedMemoryConsumption;
 
@@ -112,7 +111,7 @@ public class ServiceEntity {
   @Singular
   @JsonIgnore
   @OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ServiceDependencyEntity> depends;
+  private Set<ServiceDependencyEntity> dependents;
 
   @Singular
   @JsonIgnore

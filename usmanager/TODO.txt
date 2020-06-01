@@ -43,6 +43,7 @@ deleting 1 simulated service metric, deleted all of them
 change fields to number when applied
 docker api proxy container is removed at reload
 container decisions are clashing with service decisions (frontend)
+add service prediction with problems
 
 add simulated metrics to services/hosts/containers
 
