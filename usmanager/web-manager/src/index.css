@@ -167,6 +167,10 @@ ul.tabs {
     overflow: hidden;
 }
 
+.tab a {
+    margin-right: 10px;
+}
+
 .parallax-container {
     min-height: 380px;
     line-height: 0;

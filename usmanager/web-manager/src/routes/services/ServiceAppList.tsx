@@ -108,7 +108,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
     const appName = typeof app === 'string' ? app : app.name;
     const isNew = this.isNew();
     const unsaved = this.props.unsavedApps.map(app => app.name).includes(appName);
-    console.log(app)
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${listItemStyles.linkedItemContent}`}>

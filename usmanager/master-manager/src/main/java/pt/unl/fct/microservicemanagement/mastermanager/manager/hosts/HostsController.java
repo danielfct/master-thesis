@@ -119,28 +119,28 @@ public class HostsController {
     cloudHostsService.removeRule(instanceId, ruleName);
   }
 
-  @GetMapping("/cloud/{instanceId}/simulatedMetrics")
+  @GetMapping("/cloud/{instanceId}/simulated-metrics")
   public List<SimulatedHostMetricEntity> getCloudHostSimulatedMetrics(@PathVariable String instanceId) {
     return cloudHostsService.getSimulatedMetrics(instanceId);
   }
 
-  @GetMapping("/cloud/{instanceId}/simulatedMetrics/{simulatedMetricName}")
+  @GetMapping("/cloud/{instanceId}/simulated-metrics/{simulatedMetricName}")
   public SimulatedHostMetricEntity getCloudHostSimulatedMetric(@PathVariable String instanceId,
                                                                 @PathVariable String simulatedMetricName) {
     return cloudHostsService.getSimulatedMetric(instanceId, simulatedMetricName);
   }
 
-  @PostMapping("/cloud/{instanceId}/simulatedMetrics")
+  @PostMapping("/cloud/{instanceId}/simulated-metrics")
   public void addCloudHostSimulatedMetrics(@PathVariable String instanceId, @RequestBody String[] simulatedMetrics) {
     cloudHostsService.addSimulatedMetrics(instanceId, Arrays.asList(simulatedMetrics));
   }
 
-  @DeleteMapping("/cloud/{instanceId}/simulatedMetrics")
+  @DeleteMapping("/cloud/{instanceId}/simulated-metrics")
   public void removeCloudHostSimulatedMetrics(@PathVariable String instanceId, @RequestBody String[] simulatedMetrics) {
     cloudHostsService.removeSimulatedMetrics(instanceId, Arrays.asList(simulatedMetrics));
   }
 
-  @DeleteMapping("/cloud/{instanceId}/simulatedMetrics/{simulatedMetricName}")
+  @DeleteMapping("/cloud/{instanceId}/simulated-metrics/{simulatedMetricName}")
   public void removeCloudHostSimulatedMetric(@PathVariable String instanceId,
                                              @PathVariable String simulatedMetricName) {
     cloudHostsService.removeSimulatedMetric(instanceId, simulatedMetricName);
@@ -198,28 +198,28 @@ public class HostsController {
     edgeHostsService.removeRule(hostname, ruleName);
   }
 
-  @GetMapping("/edge/{hostname}/simulatedMetrics")
+  @GetMapping("/edge/{hostname}/simulated-metrics")
   public List<SimulatedHostMetricEntity> getEdgeHostSimulatedMetrics(@PathVariable String hostname) {
     return edgeHostsService.getSimulatedMetrics(hostname);
   }
 
-  @GetMapping("/edge/{hostname}/simulatedMetrics/{simulatedMetricName}")
+  @GetMapping("/edge/{hostname}/simulated-metrics/{simulatedMetricName}")
   public SimulatedHostMetricEntity getEdgeHostSimulatedMetric(@PathVariable String hostname,
                                                               @PathVariable String simulatedMetricName) {
     return edgeHostsService.getSimulatedMetric(hostname, simulatedMetricName);
   }
 
-  @PostMapping("/edge/{hostname}/simulatedMetrics")
+  @PostMapping("/edge/{hostname}/simulated-metrics")
   public void addEdgeHostSimulatedMetrics(@PathVariable String hostname, @RequestBody String[] simulatedMetrics) {
     edgeHostsService.addSimulatedMetrics(hostname, Arrays.asList(simulatedMetrics));
   }
 
-  @DeleteMapping("/edge/{hostname}/simulatedMetrics")
+  @DeleteMapping("/edge/{hostname}/simulated-metrics")
   public void removeEdgeHostSimulatedMetrics(@PathVariable String hostname, @RequestBody String[] simulatedMetrics) {
     edgeHostsService.removeSimulatedMetrics(hostname, Arrays.asList(simulatedMetrics));
   }
 
-  @DeleteMapping("/edge/{hostname}/simulatedMetrics/{simulatedMetricName}")
+  @DeleteMapping("/edge/{hostname}/simulated-metrics/{simulatedMetricName}")
   public void removeEdgeHostSimulatedMetric(@PathVariable String hostname, @PathVariable String simulatedMetricName) {
     edgeHostsService.removeSimulatedMetric(hostname, simulatedMetricName);
   }

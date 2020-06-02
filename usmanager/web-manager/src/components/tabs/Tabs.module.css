@@ -1,3 +1,16 @@
 .tabContent {
     padding: 0 !important;
 }
+
+.scrollButton {
+    position: relative;
+    top: 40px;
+}
+
+.leftScrollButton {
+    left: -50px;
+}
+
+.rightScrollButton {
+    left: 60px;
+}

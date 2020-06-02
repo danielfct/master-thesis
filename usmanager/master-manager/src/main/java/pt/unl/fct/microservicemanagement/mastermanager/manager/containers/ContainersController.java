@@ -128,23 +128,23 @@ public class ContainersController {
     containersService.removeRule(containerId, ruleName);
   }
 
-  @GetMapping("/{containerId}/simulatedMetrics")
+  @GetMapping("/{containerId}/simulated-metrics")
   public List<SimulatedContainerMetricEntity> getContainerSimulatedMetrics(@PathVariable String containerId) {
     return containersService.getSimulatedMetrics(containerId);
   }
 
-  @PostMapping("/{containerId}/simulatedMetrics")
+  @PostMapping("/{containerId}/simulated-metrics")
   public void addContainerSimulatedMetrics(@PathVariable String containerId, @RequestBody String[] simulatedMetrics) {
     containersService.addSimulatedMetrics(containerId, Arrays.asList(simulatedMetrics));
   }
 
-  @DeleteMapping("/{containerId}/simulatedMetrics")
+  @DeleteMapping("/{containerId}/simulated-metrics")
   public void removeContainerSimulatedMetrics(@PathVariable String containerId,
                                               @RequestBody String[] simulatedMetrics) {
     containersService.removeSimulatedMetrics(containerId, Arrays.asList(simulatedMetrics));
   }
 
-  @DeleteMapping("/{containerId}/simulatedMetrics/{simulatedMetricName}")
+  @DeleteMapping("/{containerId}/simulated-metrics/{simulatedMetricName}")
   public void removeContainerSimulatedMetric(@PathVariable String containerId,
                                              @PathVariable String simulatedMetricName) {
     containersService.removeSimulatedMetric(containerId, simulatedMetricName);

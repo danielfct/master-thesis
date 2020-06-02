@@ -236,7 +236,7 @@ const simulatedHostMetrics = new schema.Array(simulatedHostMetric);
 const simulatedServiceMetric: schema.Entity<ISimulatedServiceMetric> = new schema.Entity('simulatedServiceMetrics', undefined, {
     idAttribute: (simulatedServiceMetric: ISimulatedServiceMetric) => simulatedServiceMetric.name
 });
-const simulatedServiceMetrics = new schema.Array(simulatedServiceMetric);
+const serviceSimulatedMetrics = new schema.Array(simulatedServiceMetric);
 
 const simulatedContainerMetric: schema.Entity<ISimulatedContainerMetric> = new schema.Entity('simulatedContainerMetrics', undefined, {
     idAttribute: (simulatedContainerMetric: ISimulatedContainerMetric) => simulatedContainerMetric.name
@@ -260,7 +260,7 @@ const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
 });
 
 app.define({ appServices });
-service.define({ apps, dependencies, dependents, serviceRules, simulatedServiceMetrics });
+service.define({ apps, dependencies, dependents, serviceRules, serviceSimulatedMetrics });
 container.define({ containerRules, simulatedContainerMetrics });
 cloudHost.define({ hostRules, simulatedHostMetrics, /*state*/ });
 edgeHost.define({ hostRules, simulatedHostMetrics });

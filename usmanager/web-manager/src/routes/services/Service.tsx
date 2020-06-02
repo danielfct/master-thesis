@@ -35,7 +35,7 @@ import {
   addServiceApps,
   addServiceDependencies,
   addServicePredictions,
-  addServiceRules,
+  addServiceRules, addServiceSimulatedMetrics,
   loadServices
 } from "../../actions";
 import {connect} from "react-redux";
@@ -57,6 +57,7 @@ import GenericServiceRuleList from "./GenericServiceRuleList";
 import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
+import ServiceSimulatedMetricList from "./ServiceSimulateMetricList";
 
 export interface IService extends IDatabaseData {
   serviceName: string;
@@ -107,6 +108,7 @@ interface DispatchToProps {
   addServiceDependencies: (serviceName: string, dependencies: string[]) => void;
   addServicePredictions: (serviceName: string, predictions: IPrediction[]) => void;
   addServiceRules: (serviceName: string, rules: string[]) => void;
+  addServiceSimulatedMetrics: (serviceName: string, simulatedMetrics: string[]) => void;
 }
 
 interface MatchParams {
@@ -122,6 +124,7 @@ interface State {
   unsavedDependencies: string[],
   unsavedPredictions: IPrediction[],
   unsavedRules: string[],
+  unsavedSimulatedMetrics: string[],
 }
 
 class Service extends BaseComponent<Props, State> {
@@ -133,6 +136,7 @@ class Service extends BaseComponent<Props, State> {
     unsavedDependencies: [],
     unsavedPredictions: [],
     unsavedRules: [],
+    unsavedSimulatedMetrics: [],
   };
 
   public componentDidMount(): void {
@@ -198,13 +202,15 @@ class Service extends BaseComponent<Props, State> {
     !!this.state.unsavedApps.length
     || !!this.state.unsavedDependencies.length
     || !!this.state.unsavedPredictions.length
-    || !!this.state.unsavedRules.length;
+    || !!this.state.unsavedRules.length
+    || !!this.state.unsavedSimulatedMetrics.length;
 
   private saveEntities = (service: IService) => {
     this.saveServiceApps(service);
     this.saveServiceDependencies(service);
     this.saveServicePredictions(service);
     this.saveServiceRules(service);
+    this.saveServiceSimulatedMetrics(service);
   };
 
   private addServiceApp = (app: IAddServiceApp): void => {
@@ -331,6 +337,37 @@ class Service extends BaseComponent<Props, State> {
   private onSaveRulesFailure = (service: IService, reason: string): void =>
     super.toast(`Unable to save rules of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
 
+  private addServiceSimulatedMetric = (simulatedMetric: string): void => {
+    this.setState({
+      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.concat(simulatedMetric)
+    });
+  };
+
+  private removeServiceSimulatedMetrics = (simulatedMetrics: string[]): void => {
+    this.setState({
+      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.filter(metric => !simulatedMetrics.includes(metric))
+    });
+  };
+
+  private saveServiceSimulatedMetrics = (service: IService): void => {
+    const {unsavedSimulatedMetrics} = this.state;
+    if (unsavedSimulatedMetrics.length) {
+      postData(`services/${service.serviceName}/simulated-metrics`, unsavedSimulatedMetrics,
+        () => this.onSaveSimulatedMetricsSuccess(service),
+        (reason) => this.onSaveSimulatedMetricsFailure(service, reason));
+    }
+  };
+
+  private onSaveSimulatedMetricsSuccess = (service: IService): void => {
+    this.props.addServiceSimulatedMetrics(service.serviceName, this.state.unsavedSimulatedMetrics);
+    if (this.mounted) {
+      this.setState({ unsavedSimulatedMetrics: [] });
+    }
+  };
+
+  private onSaveSimulatedMetricsFailure = (service: IService, reason: string): void =>
+    super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
+
   private updateService = (service: IService) => {
     //const previousService = this.getService();
     service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];
@@ -428,8 +465,8 @@ class Service extends BaseComponent<Props, State> {
 
   private dependents = (): JSX.Element =>
     <ServiceDependentList isLoadingService={this.props.isLoading}
-                         loadServiceError={this.props.error}
-                         service={this.props.service}/>;
+                          loadServiceError={this.props.error}
+                          service={this.props.service}/>;
 
   private predictions = (): JSX.Element =>
     <ServicePredictionList isLoadingService={this.props.isLoading}
@@ -449,6 +486,17 @@ class Service extends BaseComponent<Props, State> {
 
   private genericRules = (): JSX.Element =>
     <GenericServiceRuleList/>;
+
+  private simulatedMetrics = (): JSX.Element =>
+    <ServiceSimulatedMetricList isLoadingService={this.props.isLoading}
+                                loadServiceError={this.props.error}
+                                service={this.props.service}
+                                unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
+                                onAddServiceSimulatedMetric={this.addServiceSimulatedMetric}
+                                onRemoveServiceSimulatedMetrics={this.removeServiceSimulatedMetrics}/>;
+
+  private genericSimulatedServiceMetrics = (): JSX.Element =>
+     <GenericServiceRuleList/>; //TODO
 
   private tabs = () => [
     {
@@ -486,6 +534,16 @@ class Service extends BaseComponent<Props, State> {
       id: 'genericRules',
       content: () => this.genericRules()
     },
+    {
+      title: 'Simulated metrics',
+      id: 'simulatedMetrics',
+      content: () => this.simulatedMetrics()
+    },
+    {
+      title: 'Generic metrics',
+      id: 'genericSimulatedMetrics',
+      content: () => this.genericSimulatedServiceMetrics()
+    },
   ];
 
   public render() {
@@ -508,6 +566,7 @@ function removeFields(service: Partial<IService>) {
   delete service["dependents"];
   delete service["predictions"];
   delete service["serviceRules"];
+  delete service["serviceSimulatedMetrics"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
@@ -535,6 +594,7 @@ const mapDispatchToProps: DispatchToProps = {
   addServiceDependencies,
   addServicePredictions,
   addServiceRules,
+  addServiceSimulatedMetrics,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Service);
