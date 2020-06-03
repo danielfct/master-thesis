@@ -136,8 +136,9 @@ class RuleContainerContainersList extends BaseComponent<Props, State> {
   };
 
   public render() {
-    return <ControlledList isLoading={this.props.isLoadingRuleContainer || this.props.isLoading}
-                           error={this.props.loadRuleContainerError || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleContainer || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadRuleContainerError || this.props.error : undefined}
                            emptyMessage={`Containers list is empty`}
                            data={this.props.ruleContainers}
                            dropdown={{

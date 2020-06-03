@@ -230,7 +230,7 @@ function mapStateToProps(state: ReduxState, ownProps: ServicePredictionListProps
   return {
     isLoading: state.entities.services.isLoadingPredictions,
     error: state.entities.services.loadPredictionsError,
-    predictions: predictions && Object.values(predictions) || [],
+    predictions: (predictions && Object.values(predictions)) || [],
   }
 }
 

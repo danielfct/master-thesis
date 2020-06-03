@@ -138,7 +138,7 @@ export const notValidIpAddress = (values: IValues, id: keyof IValues): string =>
 
 export const notValidEmail = (values: IValues, id: keyof IValues): string =>
   notValid(values, id,
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
     'email');
 
 export const lengthLimit = (values: IValues, id: keyof IValues, size: number): string =>
@@ -254,9 +254,9 @@ class Form extends React.Component<Props, State> {
   private saveRequired = () => {
     return !isEqualWith(this.state.savedValues, this.state.values, (first, second) =>
       ((typeof first === 'boolean' && typeof second === 'string' && first.toString() === second)
-      || (typeof first === 'string' && typeof second === 'boolean') && first === second.toString()
-      || (typeof first === 'number' && typeof second === 'string') && first.toString() === second
-      || (typeof first === 'string' && typeof second === 'number') && first === second.toString()) || undefined);
+      || (typeof first === 'string' && typeof second === 'boolean' && first === second.toString())
+      || (typeof first === 'number' && typeof second === 'string' && first.toString() === second)
+      || (typeof first === 'string' && typeof second === 'number' && first === second.toString())) || undefined);
   };
 
   private validate = (id: keyof IValues): string => {
@@ -270,9 +270,7 @@ class Form extends React.Component<Props, State> {
 
   private validateForm(): boolean {
     const errors: IErrors = {};
-    Object.keys(this.props.fields).map((fieldName: string) => {
-      errors[fieldName] = this.validate(fieldName);
-    });
+    Object.keys(this.props.fields).forEach((fieldName: string) => errors[fieldName] = this.validate(fieldName));
     this.setState({errors});
     return this.isValid(errors);
   }
@@ -471,7 +469,6 @@ class Form extends React.Component<Props, State> {
                   <>
                     <div className={`${styles.controlButton}`}>
                       {customButtons?.map((button, index) => (
-                        /*TODO index?*/
                         <>
                           {button.confirm && (
                             <ConfirmDialog key={button.confirm.id}
@@ -541,7 +538,7 @@ class Form extends React.Component<Props, State> {
               <ActionProgressBar loading={!!loading}/>
             </div>
           )}
-          <div className={`${React.Children.count(children) == 0 ? styles.emptyContent : styles.content}`}>
+          <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
             <FormContext.Provider value={context}>
               {children}
             </FormContext.Provider>

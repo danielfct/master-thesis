@@ -134,12 +134,13 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
   private getSelectableServicesNames = () => {
     const {services, service, dependencies, unsavedDependencies} = this.props;
     return Object.keys(services)
-                 .filter(name => !service || name !== service.serviceName && !dependencies.includes(name) && !unsavedDependencies.includes(name));
+                 .filter(name => (!service || name !== service.serviceName) && !dependencies.includes(name) && !unsavedDependencies.includes(name));
   };
 
   public render() {
-    return <ControlledList isLoading={this.props.isLoadingService || this.props.isLoading}
-                           error={this.props.loadServiceError || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
                            emptyMessage={`Dependencies list is empty`}
                            data={this.props.dependencies}
                            dropdown={{

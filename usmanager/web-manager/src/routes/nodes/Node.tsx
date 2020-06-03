@@ -20,7 +20,7 @@ import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 
 export interface INode {
   id: string;
-  hostname: string; //TODO what about cloud?
+  hostname: string;
   state: string;
   role: string;
 }
@@ -31,7 +31,7 @@ interface INewNodeHost {
 }
 
 interface INewNodeLocation {
-  region?: string,
+  region?: IRegion,
   country?: string,
   city?: string,
   quantity: number,
@@ -117,13 +117,19 @@ class Node extends BaseComponent<Props, State> {
     }
   };
 
-  private onPostFailure = (reason: string, place: string | IRegion): void => {
-    if (typeof place === "string") {
-      super.toast(`Unable to start node at ${place}`, 10000, reason, true);
+  private onPostFailure = (reason: string, place: INewNodeHost | INewNodeLocation): void => {
+    console.log(place)
+    let message;
+    if ("hostname" in place && place.hostname) {
+      message = `Unable to start node at ${place.hostname}`;
+    }
+    else if ("city" in place) {
+      message = `Unable to start node at ${place.city}`;
     }
     else {
-      super.toast(`Unable to start node at ${place.name}`, 10000, reason, true);
+      message = `Unable to start node`;
     }
+    super.toast(message, 10000, reason, true);
   };
 
   private onDeleteSuccess = (node: INode): void => {

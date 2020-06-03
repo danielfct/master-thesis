@@ -135,7 +135,7 @@ class SimulatedHostMetricEdgeHostList extends BaseComponent<Props, State> {
 
   public render() {
     const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedHostMetric || this.props.isLoading)}
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingSimulatedHostMetric || this.props.isLoading : undefined}
                            error={!isNew ? this.props.loadSimulatedHostMetricError || this.props.error : undefined}
                            emptyMessage={`Edge hosts list is empty`}
                            data={this.props.simulatedMetricEdgeHosts}

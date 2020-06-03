@@ -235,7 +235,7 @@ class RuleContainer extends BaseComponent<Props, State> {
           id: key,
           label: key,
           validation:
-            key == 'priority'
+            key === 'priority'
               ? { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
               : { rule: requiredAndTrimmed }
         }
@@ -254,7 +254,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     this.setState({isGeneric: generic});
 
   private getSelectableDecisions = () =>
-    Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() == 'container');
+    Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() === 'container');
 
   private containerRule = () => {
     const {isLoading, error} = this.props;

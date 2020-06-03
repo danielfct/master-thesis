@@ -15,7 +15,7 @@ interface State {
 export default class ReloadButton extends React.Component<Props, State> {
 
   state: State = {
-    isReloading: this.props.automatic && this.props.reloading || false
+    isReloading: (this.props.automatic && this.props.reloading) || false
   };
 
   handleOnClick = () =>  {

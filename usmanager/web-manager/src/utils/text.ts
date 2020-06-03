@@ -22,8 +22,6 @@
  * SOFTWARE.
  */
 
-import * as queryString from "querystring";
-
 export const snakeCaseToCamelCase = (text: string): string => text.replace(
   /([_][a-z])/g,
   (group) => group.toUpperCase()

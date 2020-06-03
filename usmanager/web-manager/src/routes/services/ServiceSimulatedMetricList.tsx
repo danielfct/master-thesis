@@ -145,8 +145,9 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
   };
 
   public render() {
-    return <ControlledList isLoading={this.props.isLoadingService || this.props.isLoading}
-                           error={this.props.loadServiceError || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
                            emptyMessage={`Simulated metrics list is empty`}
                            data={this.props.simulatedMetricsName}
                            dropdown={{

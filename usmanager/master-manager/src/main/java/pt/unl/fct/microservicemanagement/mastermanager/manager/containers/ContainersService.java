@@ -59,6 +59,7 @@ public class ContainersService {
       ContainerEntity container = ContainerEntity.builder()
           .containerId(dockerContainer.getId())
           .created(dockerContainer.getCreated())
+          .names(dockerContainer.getNames())
           .image(dockerContainer.getImage())
           .command(dockerContainer.getCommand())
           .hostname(dockerContainer.getHostname())

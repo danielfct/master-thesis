@@ -118,7 +118,7 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
   {
     isLoading: state.entities.logs.isLoadingLogs,
     error: state.entities.logs.loadLogsError,
-    logs: state.entities.logs && Object.values(state.entities.logs.data) || [],
+    logs: (state.entities.logs && Object.values(state.entities.logs.data)) || [],
   }
 );
 

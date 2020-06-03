@@ -33,7 +33,7 @@ import {IRegion} from "../routes/region/Region";
 import {IDependent} from "../routes/services/ServiceDependentList";
 import {IPrediction} from "../routes/services/ServicePredictionList";
 import {INode} from "../routes/nodes/Node";
-import {ICloudHost, IState} from "../routes/hosts/cloud/CloudHost";
+import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
 import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
 import {IContainer} from "../routes/containers/Container";
 import {IApp} from "../routes/apps/App";

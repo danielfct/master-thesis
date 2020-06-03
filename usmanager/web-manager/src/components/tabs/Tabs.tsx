@@ -50,7 +50,7 @@ class Tabs extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
     M.Tabs.init(this.tabsRef.current as Element);
-    if (prevProps.sidenav != this.props.sidenav) {
+    if (prevProps.sidenav !== this.props.sidenav) {
       this.setState({
         showScrollLeft: this.shouldShowScrollLeft(),
         showScrollRight: this.shouldShowScrollRight(),
@@ -101,7 +101,7 @@ class Tabs extends React.Component<Props, State> {
   private executeRightScroll = () => {
     const tabs = this.tabsRef.current;
     if (tabs) {
-      if (this.state.previousScrollRight == tabs.scrollLeft) {
+      if (this.state.previousScrollRight === tabs.scrollLeft) {
         this.stopRightScrollTimer();
       }
       this.setState({previousScrollRight: tabs.scrollLeft});
@@ -124,7 +124,7 @@ class Tabs extends React.Component<Props, State> {
   private executeLeftScroll = () => {
     const tabs = this.tabsRef.current;
     if (tabs) {
-      if (this.state.previousScrollLeft == tabs.scrollLeft) {
+      if (this.state.previousScrollLeft === tabs.scrollLeft) {
         this.stopLeftScrollTimer();
       }
       this.setState({previousScrollLeft: tabs.scrollLeft});

@@ -34,9 +34,10 @@ export const getTypeFromValue = (value: any): 'text' | 'number' =>
   value === undefined
   || value === ''
   || typeof value === 'boolean'
-  || typeof value === 'string' && !value.trim().length
+  || (typeof value === 'string' && !value.trim().length)
   || isNaN(value)
-    ? 'text' : 'number';
+    ? 'text'
+    : 'number';
 
 export default class Field<T> extends React.Component<FieldProps<T>> {
 

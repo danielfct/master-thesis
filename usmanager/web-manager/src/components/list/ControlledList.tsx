@@ -9,7 +9,6 @@ import {decodeHTML} from "../../utils/text";
 import InputDialog from "../dialogs/InputDialog";
 import {IFormModal, IValues, RestOperation} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
-import {IAppService} from "../../routes/apps/AppServicesList";
 
 interface ControlledListProps<T> {
   dataKey: string[],
@@ -110,7 +109,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   };
 
   private getDataStateKey = (data: T): string => {
-    if (typeof data == 'string') {
+    if (typeof data === 'string') {
       return data;
     }
     const key = this.props.dataKey;
@@ -133,7 +132,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   };
 
   private show = (data: T, index: number): JSX.Element => {
-    const separate = index != Object.entries(this.state).filter(([_, data]) => data).length - 1;
+    const separate = index !== Object.entries(this.state).filter(([_, data]) => data).length - 1;
     const checked = this.getDataState(data)?.isChecked || false;
     return this.props.show(index, data, separate, checked, this.handleCheckbox)
   };
@@ -172,7 +171,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     const persistedData = checkedData.filter(([_, data]) => !data?.isNew).map(([name, _]) => name);
     if (persistedData.length) {
       const {url} = this.props.onDelete;
-      if (persistedData.length == 1) {
+      if (persistedData.length === 1) {
         deleteData(`${url}/${persistedData[0]}`, () => this.onDeleteSuccess(persistedData), this.onDeleteFailure);
       }
       else {

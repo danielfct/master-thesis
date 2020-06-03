@@ -7,7 +7,6 @@ import M from "materialize-css";
 import Collapsible from "../../components/collapsible/Collapsible";
 import RulesHostList from "./hosts/RulesHostList";
 import RulesServiceList from "./services/RulesServiceList";
-import Conditions from "./conditions/RuleConditionsList";
 import RuleConditionsList from "./conditions/RuleConditionsList";
 import RulesContainerList from "./containers/RulesContainerList";
 

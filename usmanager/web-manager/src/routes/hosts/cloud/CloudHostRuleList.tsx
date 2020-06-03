@@ -135,8 +135,9 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
   };
 
   public render() {
-    return <ControlledList isLoading={this.props.isLoadingCloudHost || this.props.isLoading}
-                           error={this.props.loadCloudHostError || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingCloudHost || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadCloudHostError || this.props.error : undefined}
                            emptyMessage={`Rules list is empty`}
                            data={this.props.rulesName}
                            dropdown={{

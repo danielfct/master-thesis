@@ -19,7 +19,7 @@ export default class ContainerPortsList extends BaseComponent<Props, {}> {
     this.props.container?.ports || [];
 
   private port = (port: IContainerPort, index: number): JSX.Element =>
-    <ListItem key={index} separate={index != this.ports().length - 1}>
+    <ListItem key={index} separate={index !== this.ports().length - 1}>
       <div className={`${styles.listItemContent}`}>
         <span>{port.privatePort}:{port.publicPort} {port.ip}/{port.type}</span>
       </div>

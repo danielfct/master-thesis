@@ -450,7 +450,7 @@ class Container extends BaseComponent<Props, State> {
       :
       <>
         {Object.entries(formContainer).map(([key, value], index) => {
-          return key == 'created'
+          return key === 'created'
             ? <Field key={index}
                      id={key}
                      label={key}
@@ -612,6 +612,7 @@ function removeFields(container: Partial<IContainer>) {
   delete container["ports"];
   delete container["labels"];
   delete container["logs"];
+  delete container["containerRules"];
   delete container["containerSimulatedMetrics"];
 }
 

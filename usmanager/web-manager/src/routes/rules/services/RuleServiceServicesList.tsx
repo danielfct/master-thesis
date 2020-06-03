@@ -136,8 +136,9 @@ class RuleServiceServicesList extends BaseComponent<Props, State> {
   };
 
   public render() {
-    return <ControlledList isLoading={this.props.isLoadingRuleService || this.props.isLoading}
-                           error={this.props.loadRuleServiceError || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingRuleService || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadRuleServiceError || this.props.error : undefined}
                            emptyMessage={`Services list is empty`}
                            data={this.props.ruleServices}
                            dropdown={{

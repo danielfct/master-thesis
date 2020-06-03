@@ -16,7 +16,6 @@ import BaseComponent from "../../../components/BaseComponent";
 import {loadCloudHosts} from "../../../actions";
 import {ICloudHost} from "./CloudHost";
 import CloudHostCard from "./CloudHostCard";
-import ReloadButton from "../../../components/list/ReloadButton";
 
 interface StateToProps {
   isLoading: boolean

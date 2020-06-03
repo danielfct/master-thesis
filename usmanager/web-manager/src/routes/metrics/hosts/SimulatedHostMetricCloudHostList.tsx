@@ -134,7 +134,7 @@ class SimulatedHostMetricCloudHostList extends BaseComponent<Props, State> {
 
   public render() {
     const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedHostMetric || this.props.isLoading)}
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingSimulatedHostMetric || this.props.isLoading : undefined}
                            error={!isNew ? this.props.loadSimulatedHostMetricError || this.props.error : undefined}
                            emptyMessage={`Cloud hosts list is empty`}
                            data={this.props.simulatedMetricCloudHosts}

@@ -1,5 +1,4 @@
 import React from "react";
-import {getTypeFromValue} from "./Field";
 import M from "materialize-css";
 
 interface TextBoxProps<T> {
@@ -27,7 +26,7 @@ export class TextBox<T> extends React.Component<TextBoxProps<T>, any> {
         id={id}
         name={name}
         type="text"
-        value={typeof value == 'object' && valueToString ? valueToString(value) : value}
+        value={typeof value === 'object' && valueToString ? valueToString(value) : (value || '')}
         disabled={disabled}
         autoComplete="off"
         onChange={onChange}

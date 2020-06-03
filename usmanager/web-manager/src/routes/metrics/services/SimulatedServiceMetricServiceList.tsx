@@ -135,7 +135,7 @@ class SimulatedServiceMetricServiceList extends BaseComponent<Props, State> {
 
   public render() {
     const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedServiceMetric || this.props.isLoading)}
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingSimulatedServiceMetric || this.props.isLoading : undefined}
                            error={!isNew ? this.props.loadSimulatedServiceMetricError || this.props.error : undefined}
                            emptyMessage={`Services list is empty`}
                            data={this.props.simulatedMetricServices}

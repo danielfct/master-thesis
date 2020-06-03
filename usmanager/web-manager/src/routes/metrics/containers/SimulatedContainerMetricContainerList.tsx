@@ -135,7 +135,7 @@ class SimulatedContainerMetricContainerList extends BaseComponent<Props, State> 
 
   public render() {
     const isNew = this.isNew();
-    return <ControlledList isLoading={!isNew && (this.props.isLoadingSimulatedContainerMetric || this.props.isLoading)}
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingSimulatedContainerMetric || this.props.isLoading : undefined}
                            error={!isNew ? this.props.loadSimulatedContainerMetricError || this.props.error : undefined}
                            emptyMessage={`Containers list is empty`}
                            data={this.props.simulatedMetricContainers}

@@ -18,7 +18,7 @@ import Form, {
 } from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
-import Field, {getTypeFromValue} from "../../../components/form/Field";
+import Field from "../../../components/form/Field";
 import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
@@ -271,7 +271,7 @@ class RuleHost extends BaseComponent<Props, State> {
           id: key,
           label: key,
           validation:
-            key == 'priority'
+            key === 'priority'
               ? { rule: requiredAndNumberAndMinAndMax, args: [0, 2147483647] }
               : { rule: requiredAndTrimmed }
         }
@@ -290,7 +290,7 @@ class RuleHost extends BaseComponent<Props, State> {
     this.setState({isGeneric: generic});
 
   private getSelectableDecisions = () =>
-    Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() == 'host');
+    Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() === 'host');
 
   private hostRule = () => {
     const {isLoading, error} = this.props;

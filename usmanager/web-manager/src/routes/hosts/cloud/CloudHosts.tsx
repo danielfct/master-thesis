@@ -15,7 +15,7 @@ import styles from '../edge/EdgeHosts.module.css'
 import CloudHostsList from "./CloudHostsList";
 import ReloadButton from "../../../components/list/ReloadButton";
 import BaseComponent from "../../../components/BaseComponent";
-import {loadCloudHosts, reloadCloudHosts} from "../../../actions";
+import {reloadCloudHosts} from "../../../actions";
 import {connect} from "react-redux";
 
 interface DispatchToProps {

@@ -135,8 +135,9 @@ class EdgeHostRuleList extends BaseComponent<Props, State> {
   };
 
   public render() {
-    return <ControlledList isLoading={this.props.isLoadingEdgeHost || this.props.isLoading}
-                           error={this.props.loadEdgeHostError || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList isLoading={!isNew ? this.props.isLoadingEdgeHost || this.props.isLoading : undefined}
+                           error={!isNew ? this.props.loadEdgeHostError || this.props.error : undefined}
                            emptyMessage={`Rules list is empty`}
                            data={this.props.rulesNames}
                            dropdown={{
