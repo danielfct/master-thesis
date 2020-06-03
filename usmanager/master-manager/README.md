@@ -57,7 +57,7 @@ Usa o sistema de gestão de regras de negócios Drools para gerir as regras apli
 
 Com o maven instalado:
 
-> `mvn spring-boot:run`
+> `mvn spring-boot:run -Dspring-boot.run.arguments=--secret=...`
 
 Sem o maven instalado:
 

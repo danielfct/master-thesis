@@ -24,10 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
-import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
 
 import java.util.ArrayList;
@@ -55,6 +52,7 @@ import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
 import com.amazonaws.services.ec2.model.Tag;
+import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -62,19 +60,25 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AwsService {
 
-  //TODO put constants into AwsProperties?
-
-  private static final String DEFAULT_INSTANCE_AMI = "ami-0e02218c08bb8ffd5";
-  private static final String DEFAULT_INSTANCE_SECURITY_GROUP = "launch-wizard-2";
+  //TODO put constants into AwsProperties
+  /*private static final String DEFAULT_INSTANCE_AMI = "ami-0e02218c08bb8ffd5";
+  private static final String DEFAULT_INSTANCE_SECURITY_GROUP = "us-manager-security-group";
   private static final String DEFAULT_INSTANCE_KEY_PAIR = "ec2";
   private static final int INSTANCE_OPERATION_MAX_RETRIES = 10;
   private static final long DELAY_BETWEEN_INSTANCE_OPERATION_TRIES = TimeUnit.SECONDS.toMillis(5);
   private static final long SET_INSTANCE_STATE_TIMEOUT = TimeUnit.SECONDS.toMillis(180);
 
-  private static final String MASTER_MANAGER = "master-manager";
+  private static final String MICROSERVICES_MANAGER_TAG = "us-manager";*/
 
   private final AmazonEC2 ec2;
+  private final String awsInstanceAmi;
+  private final String awsInstanceSecurityGroup;
+  private final String awsInstanceKeyPair;
   private final String awsInstanceType;
+  private final String awsInstanceTag;
+  private final int awsMaxRetries;
+  private final int awsDelayBetweenRetries;
+  private final int awsConnectionTimeout;
 
   public AwsService(AwsProperties awsProperties) {
     String awsAccessKey = awsProperties.getAccess().getKey();
@@ -86,7 +90,14 @@ public class AwsService {
         .withRegion(Regions.US_EAST_2)
         .withCredentials(awsCredentialsProvider)
         .build();
+    this.awsInstanceAmi = awsProperties.getInstance().getAmi();
+    this.awsInstanceSecurityGroup = awsProperties.getInstance().getSecurityGroup();
+    this.awsInstanceKeyPair = awsProperties.getInstance().getKeyPair();
     this.awsInstanceType = awsProperties.getInstance().getType();
+    this.awsInstanceTag = awsProperties.getInstance().getTag();
+    this.awsMaxRetries = awsProperties.getMaxRetries();
+    this.awsDelayBetweenRetries = awsProperties.getDelayBetweenRetries();
+    this.awsConnectionTimeout = awsProperties.getConnectionTimeout();
   }
 
   private List<Instance> getInstances() {
@@ -96,41 +107,29 @@ public class AwsService {
     do {
       result = ec2.describeInstances(request);
       result.getReservations().stream().map(Reservation::getInstances).flatMap(List::stream)
-          .filter(this::isMasterManagerInstance).forEach(instances::add);
+          .filter(this::isMicroserviceManagerInstance).forEach(instances::add);
       request.setNextToken(result.getNextToken());
     } while (result.getNextToken() != null);
     return instances;
   }
 
-  public List<AwsSimpleInstance> getSimpleInstances() {
-    return getInstances().stream().map(AwsSimpleInstance::new).collect(Collectors.toList());
-  }
-
   public Instance getInstance(String id) {
-    final DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
+    DescribeInstancesRequest request = new DescribeInstancesRequest().withInstanceIds(id);
     DescribeInstancesResult result;
     do {
       result = ec2.describeInstances(request);
       Optional<Instance> instance = result.getReservations().stream().map(Reservation::getInstances)
-          .flatMap(List::stream).filter(this::isMasterManagerInstance).findFirst();
+          .flatMap(List::stream).filter(this::isMicroserviceManagerInstance).findFirst();
       if (instance.isPresent()) {
         return instance.get();
       }
       request.setNextToken(result.getNextToken());
     } while (result.getNextToken() != null);
-    throw new NotFoundException();
+    throw new MasterManagerException("Instance with id %s not found", id);
   }
 
-  public AwsSimpleInstance getSimpleInstance(String instanceId) {
-    Instance instance = getInstance(instanceId);
-    return new AwsSimpleInstance(instance);
-  }
-
-  public Instance getInstanceByPublicIpAddr(String publicIpAddress) {
-    return getInstances().stream()
-        .filter(instance -> Objects.equals(instance.getPublicIpAddress(), publicIpAddress))
-        .findFirst()
-        .orElseThrow(() -> new NotFoundException("Instance with ip %s not found", publicIpAddress));
+  public List<AwsSimpleInstance> getSimpleInstances() {
+    return getInstances().stream().map(AwsSimpleInstance::new).collect(Collectors.toList());
   }
 
   public Instance createInstance() {
@@ -144,18 +143,18 @@ public class AwsService {
 
   private String createEC2() {
     var runInstancesRequest = new RunInstancesRequest()
-        .withImageId(DEFAULT_INSTANCE_AMI)
+        .withImageId(awsInstanceAmi)
         .withInstanceType(awsInstanceType)
         .withMinCount(1)
         .withMaxCount(1)
-        .withSecurityGroups(DEFAULT_INSTANCE_SECURITY_GROUP)
-        .withKeyName(DEFAULT_INSTANCE_KEY_PAIR);
+        .withSecurityGroups(awsInstanceSecurityGroup)
+        .withKeyName(awsInstanceKeyPair);
     RunInstancesResult result = ec2.runInstances(runInstancesRequest);
     Instance instance = result.getReservation().getInstances().get(0);
     String instanceId = instance.getInstanceId();
     var instanceName = String.format("ubuntu-%d", System.currentTimeMillis());
     var createTagsRequest = new CreateTagsRequest().withResources(instanceId)
-        .withTags(new Tag("Name", instanceName), new Tag(MASTER_MANAGER, "true"));
+        .withTags(new Tag("Name", instanceName), new Tag(awsInstanceTag, "true"));
     ec2.createTags(createTagsRequest);
     return instanceId;
   }
@@ -209,7 +208,7 @@ public class AwsService {
   }
 
   private Instance setInstanceState(String instanceId, AwsInstanceState state) {
-    for (var tries = 0; tries < INSTANCE_OPERATION_MAX_RETRIES; tries++) {
+    for (var tries = 0; tries < awsMaxRetries; tries++) {
       Instance instance = getInstance(instanceId);
       int instanceState = instance.getState().getCode();
       if (instanceState == state.getCode()) {
@@ -236,10 +235,10 @@ public class AwsService {
       } catch (MasterManagerException e) {
         log.info("Failed to set instance {} to {} state: {}", instanceId, state.getName(), e.getMessage());
       }
-      Timing.sleep(DELAY_BETWEEN_INSTANCE_OPERATION_TRIES, TimeUnit.MILLISECONDS);
+      Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
     }
     throw new MasterManagerException("Unable to set instance state %d within %d tries",
-        state.getName(), INSTANCE_OPERATION_MAX_RETRIES);
+        state.getName(), awsMaxRetries);
   }
 
   private Instance waitInstanceState(String instanceId, AwsInstanceState state) {
@@ -248,7 +247,7 @@ public class AwsService {
       Timing.wait(() -> {
         instance[0] = getInstance(instanceId);
         return instance[0].getState().getCode() == state.getCode();
-      }, SET_INSTANCE_STATE_TIMEOUT);
+      }, awsConnectionTimeout);
     } catch (TimeoutException e) {
       log.info("Unknown status of instance {} {} operation: Timed out", instanceId, state.getName());
       throw new MasterManagerException(e.getMessage());
@@ -256,9 +255,9 @@ public class AwsService {
     return instance[0];
   }
 
-  private boolean isMasterManagerInstance(Instance instance) {
+  private boolean isMicroserviceManagerInstance(Instance instance) {
     return instance.getTags().stream().anyMatch(tag ->
-        Objects.equals(tag.getKey(), MASTER_MANAGER) && Objects.equals(tag.getValue(), "true"));
+        Objects.equals(tag.getKey(), awsInstanceTag) && Objects.equals(tag.getValue(), "true"));
   }
 
 }

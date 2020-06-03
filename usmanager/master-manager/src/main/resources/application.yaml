@@ -24,15 +24,21 @@ spring:
         show_sql: false
         use_sql_comments: false
 aws:
+  initial-max-instances: 2
+  max-retries: 10
+  delay-between-retries: 5000
+  connection-timeout: 180000
   access:
-    key: AKIAIKTSO6FUZZS4WZ4Q
-    key-file-path: ${awsAccessKeyFilePath:src/main/resources/aws/ec2.pem}
-    secret-key: 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
+    key: AKIAS5UBHWDI3WO52EV5
+    secret-key: ${secret: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}
+    key-file-path: src/main/resources/aws/ec2.pem
     username: ubuntu
   instance:
-    delay: 10000
-    initial-max-instances: 2
+    ami: ami-049901c0e04cbba06
+    security-group: us-manager-security-group
+    key-pair: ec2
     type: t2.micro
+    tag: us-manager
 container:
   database:
     deploy-delay: 5000

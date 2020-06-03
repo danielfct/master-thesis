@@ -32,12 +32,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Getter
+@Setter
 @Configuration
 @ConfigurationProperties("aws")
 public class AwsProperties {
 
   private final AwsProperties.Access access;
   private final AwsProperties.Instance instance;
+  private int initialMaxInstances;
+  private int maxRetries;
+  private int delayBetweenRetries;
+  private int connectionTimeout;
 
   public AwsProperties() {
     this.access = new Access();
@@ -61,9 +66,11 @@ public class AwsProperties {
   @Setter
   public static final class Instance {
 
-    private int initialMaxInstances;
+    private String ami;
+    private String securityGroup;
+    private String keyPair;
     private String type;
-    private int delay;
+    private String tag;
 
   }
 

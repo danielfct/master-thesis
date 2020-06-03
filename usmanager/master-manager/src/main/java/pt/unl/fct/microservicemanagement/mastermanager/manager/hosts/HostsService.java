@@ -95,7 +95,7 @@ public class HostsService {
     this.dockerApiProxyService = dockerApiProxyService;
     this.managerHostname = dockerProperties.getSwarm().getManager();
     this.maxWorkers = dockerProperties.getSwarm().getMaxWorkers();
-    this.maxInstances = awsProperties.getInstance().getInitialMaxInstances();
+    this.maxInstances = awsProperties.getInitialMaxInstances();
   }
 
   public String getAvailableNodeHostname(double avgContainerMem, HostDetails hostDetails) {
