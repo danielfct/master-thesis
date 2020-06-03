@@ -138,7 +138,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
     }
   };
 
-  //TODO
   private onDeleteFailure = (reason: string, services: string[]): void =>
     super.toast(`Unable to remove ${services.length === 1 ? services[0] : 'services'} from <b>${this.props.app?.name}</b> app`, 10000, reason, true);
 

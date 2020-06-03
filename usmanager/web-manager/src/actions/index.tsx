@@ -38,8 +38,8 @@ import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 import {IRegion} from "../routes/region/Region";
-import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
-import {IEurekaServer} from "../routes/eureka/EurekaServer";
+import {ILoadBalancer} from "../routes/loadBalancers/LoadBalancer";
+import {IEurekaServer} from "../routes/eurekaServers/EurekaServer";
 import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
 import {ISimulatedContainerMetric} from "../routes/metrics/containers/SimulatedContainerMetric";
 
@@ -74,14 +74,6 @@ export function addApp(app: IApp): EntitiesAction {
     type: ADD_APP,
     data: { apps: new Array(app) }
   }
-}
-export const UPDATE_APP = 'UPDATE_APP';
-export function updateApp(previousApp: Partial<IApp>, app: IApp): EntitiesAction {
-  return {
-    type: UPDATE_APP,
-    data: { apps: [previousApp, app] }
-  }
-
 }
 
 export const APP_SERVICES_REQUEST = 'APP_SERVICES_REQUEST';

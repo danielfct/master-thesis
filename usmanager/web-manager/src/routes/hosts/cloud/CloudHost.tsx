@@ -18,7 +18,12 @@ import Field from "../../../components/form/Field";
 import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addCloudHost, addCloudHostRule, loadCloudHosts} from "../../../actions";
+import {
+  addCloudHost,
+  addCloudHostRule,
+  addCloudHostSimulatedMetrics,
+  loadCloudHosts
+} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import {deleteData, IReply, postData} from "../../../utils/api";
@@ -28,6 +33,8 @@ import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import {Schemas} from "../../../middleware/api";
 import {normalize} from "normalizr";
 import {isNew} from "../../../utils/router";
+import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
+import CloudHostSimulatedMetricList from "./CloudHostSimulatedMetricList";
 
 export interface ICloudHost extends IDatabaseData {
   instanceId: string;
@@ -80,8 +87,8 @@ interface StateToProps {
 interface DispatchToProps {
   loadCloudHosts: (instanceId: string) => void;
   addCloudHost: (cloudHost: ICloudHost) => void;
-  //TODO updateCloudHost: (previousCloudHost: Partial<ICloudHost>, cloudHost: ICloudHost) => void;
   addCloudHostRule: (instanceId: string, ruleName: string) => void;
+  addCloudHostSimulatedMetrics: (instanceId: string, simulatedMetrics: string[]) => void;
 }
 
 interface MatchParams {
@@ -94,6 +101,7 @@ interface State {
   cloudHost?: ICloudHost,
   formCloudHost?: ICloudHost,
   unsavedRules: string[],
+  unsavedSimulatedMetrics: string[],
   loading: IFormLoading,
 }
 
@@ -103,6 +111,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
   state: State = {
     unsavedRules: [],
+    unsavedSimulatedMetrics: [],
     loading: undefined,
   };
 
@@ -143,10 +152,12 @@ class CloudHost extends BaseComponent<Props, State> {
     super.toast(`Unable to start a new cloud instance`, 10000, reason, true);
 
   private shouldShowSaveButton = () =>
-    !!this.state.unsavedRules.length;
+    !!this.state.unsavedRules.length
+    || !!this.state.unsavedSimulatedMetrics.length;
 
   private saveEntities = (cloudHost: ICloudHost) => {
     this.saveCloudHostRules(cloudHost);
+    this.saveCloudHostSimulatedMetrics(cloudHost);
   };
 
   private addCloudHostRule = (rule: string): void => {
@@ -179,6 +190,38 @@ class CloudHost extends BaseComponent<Props, State> {
 
   private onSaveRulesFailure = (cloudHost: ICloudHost, reason: string): void =>
     super.toast(`Unable to save rules of ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance`, 10000, reason, true);
+
+  private removeHostSimulatedMetrics = (simulatedMetrics: string[]): void => {
+    this.setState({
+      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.filter(metric => !simulatedMetrics.includes(metric))
+    });
+  };
+
+  private addHostSimulatedMetric = (simulatedMetric: string): void => {
+    this.setState({
+      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.concat(simulatedMetric)
+    });
+  };
+
+  private saveCloudHostSimulatedMetrics = (cloudHost: ICloudHost): void => {
+    const {unsavedSimulatedMetrics} = this.state;
+    if (unsavedSimulatedMetrics.length) {
+      postData(`hosts/cloud/${cloudHost.instanceId}/simulated-metrics`, unsavedSimulatedMetrics,
+        () => this.onSaveSimulatedMetricsSuccess(cloudHost),
+        (reason) => this.onSaveSimulatedMetricsFailure(cloudHost, reason));
+    }
+  };
+
+  private onSaveSimulatedMetricsSuccess = (cloudHost: ICloudHost): void => {
+    this.props.addCloudHostSimulatedMetrics(cloudHost.instanceId, this.state.unsavedSimulatedMetrics);
+    if (this.mounted) {
+      this.setState({ unsavedSimulatedMetrics: [] });
+    }
+  };
+
+  private onSaveSimulatedMetricsFailure = (cloudHost: ICloudHost, reason: string): void =>
+    super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} cloud host`, 10000, reason, true);
+
 
   private startStopTerminateButtons = (): ICustomButton[] => {
     const buttons: ICustomButton[] = [];
@@ -290,9 +333,7 @@ class CloudHost extends BaseComponent<Props, State> {
   };
 
   private updateCloudHost = (cloudHost: ICloudHost) => {
-    //const previousCloudHost = this.getCloudHost();
     cloudHost = Object.values(normalize(cloudHost, Schemas.CLOUD_HOST).entities.cloudHosts || {})[0];
-    //TODO this.props.updateCloudHost(previousCloudHost, cloudHost):
     const formCloudHost = { ...cloudHost };
     removeFields(formCloudHost);
     this.setState({cloudHost: cloudHost, formCloudHost: formCloudHost, loading: undefined});
@@ -360,6 +401,17 @@ class CloudHost extends BaseComponent<Props, State> {
   private genericRules = (): JSX.Element =>
     <GenericHostRuleList/>;
 
+  private simulatedMetrics = (): JSX.Element =>
+    <CloudHostSimulatedMetricList isLoadingCloudHost={this.props.isLoading}
+                                  loadCloudHostError={this.props.error}
+                                  cloudHost={this.getCloudHost()}
+                                  unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
+                                  onAddSimulatedHostMetric={this.addHostSimulatedMetric}
+                                  onRemoveSimulatedHostMetrics={this.removeHostSimulatedMetrics}/>;
+
+  private genericSimulatedMetrics = (): JSX.Element =>
+    <GenericSimulatedHostMetricList/>;
+
   private tabs = () => [
     {
       title: 'Cloud host',
@@ -375,6 +427,16 @@ class CloudHost extends BaseComponent<Props, State> {
       title: 'Generic rules',
       id: 'genericEdgeRules',
       content: () => this.genericRules()
+    },
+    {
+      title: 'Simulated metrics',
+      id: 'simulatedMetrics',
+      content: () => this.simulatedMetrics()
+    },
+    {
+      title: 'Generic simulated metrics',
+      id: 'genericSimulatedMetrics',
+      content: () => this.genericSimulatedMetrics()
     },
   ];
 
@@ -400,6 +462,7 @@ function removeFields(cloudHost: Partial<ICloudHost>) {
     delete cloudHost["publicIpAddress"];
   }
   delete cloudHost["hostRules"];
+  delete cloudHost["hostSimulatedMetrics"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
@@ -423,7 +486,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadCloudHosts,
   addCloudHost,
-  addCloudHostRule
+  addCloudHostRule,
+  addCloudHostSimulatedMetrics,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CloudHost);

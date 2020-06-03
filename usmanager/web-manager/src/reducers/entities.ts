@@ -30,7 +30,6 @@ import {
   APPS_SUCCESS,
   APP_SUCCESS,
   ADD_APP,
-  UPDATE_APP,
   APP_SERVICES_REQUEST,
   APP_SERVICES_FAILURE,
   APP_SERVICES_SUCCESS,
@@ -295,8 +294,8 @@ import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 import {IRegion} from "../routes/region/Region";
-import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
-import {IEurekaServer} from "../routes/eureka/EurekaServer";
+import {ILoadBalancer} from "../routes/loadBalancers/LoadBalancer";
+import {IEurekaServer} from "../routes/eurekaServers/EurekaServer";
 import {ILogs} from "../routes/logs/Logs";
 import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
 import {ISimulatedContainerMetric} from "../routes/metrics/containers/SimulatedContainerMetric";
@@ -709,14 +708,6 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { apps: { data: apps } });
       }
       break;
-    case UPDATE_APP:
-      if (data?.apps && data.apps?.length > 1) {
-        const previousApp = data.apps[0];
-        const currentApp = data.apps[1];
-        console.log(previousApp);
-        console.log(currentApp);
-      }
-      break;
     case APP_SERVICES_REQUEST:
       return merge({}, state, { apps: { isLoadingServices: true, loadServicesError: null } });
     case APP_SERVICES_SUCCESS:
@@ -926,7 +917,7 @@ const entities = (state: EntitiesState = {
       if (entity) {
         const service = state.services.data[entity];
         if (data?.predictions?.length) {
-          //TODO saved entity has id = 0, might be a problem later if updating the entity
+          //FIXME saved entity has id = 0, might be a problem later if updating the entity
           const newPredictions = data?.predictions.map(prediction => ({[prediction.name]: { id: 0, ...prediction }}));
           service.predictions = merge({}, service.predictions, ...newPredictions);
           return merge({}, state, { services: { data: { [service.serviceName]: { ...service } } } });
@@ -1279,8 +1270,8 @@ const entities = (state: EntitiesState = {
           cloud: {
             ...state.hosts.cloud,
             data: merge({}, state.hosts.cloud.data, normalizedCloudHost),
-            isLoadingRules: false,
-            loadRulesError: null,
+            isLoadingSimulatedMetrics: false,
+            loadSimulatedMetricsError: null,
           }
         }
       }
@@ -1410,8 +1401,8 @@ const entities = (state: EntitiesState = {
           edge: {
             ...state.hosts.edge,
             data: merge({}, state.hosts.edge.data, normalizedEdgeHost),
-            isLoadingRules: false,
-            loadRulesError: null,
+            isLoadingSimulatedMetrics: false,
+            loadSimulatedMetricsError: null,
           }
         }
       }

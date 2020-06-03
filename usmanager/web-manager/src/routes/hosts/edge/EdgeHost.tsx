@@ -15,10 +15,10 @@ import Form, {IFields, requiredAndTrimmed, requiredAndTrimmedAndNotValidIpAddres
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs, {Tab} from "../../../components/tabs/Tabs";
+import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addEdgeHost, addEdgeHostRules, loadEdgeHosts} from "../../../actions";
+import {addEdgeHost, addEdgeHostRules, addEdgeHostSimulatedMetrics, loadEdgeHosts} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import EdgeHostRuleList from "./EdgeHostRuleList";
@@ -28,6 +28,8 @@ import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
+import EdgeHostSimulatedMetricList from "./EdgeHostSimulatedMetricList";
+import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 
 export interface IEdgeHost extends IDatabaseData {
   hostname: string;
@@ -61,8 +63,8 @@ interface StateToProps {
 interface DispatchToProps {
   loadEdgeHosts: (hostname: string) => void;
   addEdgeHost: (edgeHost: IEdgeHost) => void;
-  //TODO updateEdgeHost: (previousEdgeHost: Partial<IEdgeHost>, edgeHost: IEdgeHost) => void;
   addEdgeHostRules: (hostname: string, rules: string[]) => void;
+  addEdgeHostSimulatedMetrics: (hostname: string, simulatedMetrics: string[]) => void;
 }
 
 interface MatchParams {
@@ -75,6 +77,7 @@ interface State {
   edgeHost?: IEdgeHost,
   formEdgeHost?: IEdgeHost,
   unsavedRules: string[],
+  unsavedSimulatedMetrics: string[],
 }
 
 class EdgeHost extends BaseComponent<Props, State> {
@@ -83,6 +86,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   state: State = {
     unsavedRules: [],
+    unsavedSimulatedMetrics: [],
   };
 
   public componentDidMount(): void {
@@ -145,10 +149,12 @@ class EdgeHost extends BaseComponent<Props, State> {
     super.toast(`Unable to delete ${this.mounted ? `<b>${edgeHost.hostname}</b>` : `<a href=/hosts/edge/${edgeHost.hostname}><b>${edgeHost.hostname}</b></a>`} edge host`, 10000, reason, true);
 
   private shouldShowSaveButton = () =>
-    !!this.state.unsavedRules.length;
+    !!this.state.unsavedRules.length
+    || !!this.state.unsavedSimulatedMetrics.length;
 
   private saveEntities = (edgeHost: IEdgeHost) => {
     this.saveEdgeHostRules(edgeHost);
+    this.saveEdgeHostSimulatedMetrics(edgeHost);
   };
 
   private addEdgeHostRule = (rule: string): void => {
@@ -182,10 +188,39 @@ class EdgeHost extends BaseComponent<Props, State> {
   private onSaveRulesFailure = (edgeHost: IEdgeHost, reason: string): void =>
     super.toast(`Unable to save rules of ${this.mounted ? `<b>${edgeHost.hostname}</b>` : `<a href=/hosts/edge/${edgeHost.hostname}><b>${edgeHost.hostname}</b></a>`} edge host`, 10000, reason, true);
 
+  private removeHostSimulatedMetrics = (simulatedMetrics: string[]): void => {
+    this.setState({
+      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.filter(metric => !simulatedMetrics.includes(metric))
+    });
+  };
+
+  private addHostSimulatedMetric = (simulatedMetric: string): void => {
+    this.setState({
+      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.concat(simulatedMetric)
+    });
+  };
+
+  private saveEdgeHostSimulatedMetrics = (edgeHost: IEdgeHost): void => {
+    const {unsavedSimulatedMetrics} = this.state;
+    if (unsavedSimulatedMetrics.length) {
+      postData(`hosts/edge/${edgeHost.hostname}/simulated-metrics`, unsavedSimulatedMetrics,
+        () => this.onSaveSimulatedMetricsSuccess(edgeHost),
+        (reason) => this.onSaveSimulatedMetricsFailure(edgeHost, reason));
+    }
+  };
+
+  private onSaveSimulatedMetricsSuccess = (edgeHost: IEdgeHost): void => {
+    this.props.addEdgeHostSimulatedMetrics(edgeHost.hostname, this.state.unsavedSimulatedMetrics);
+    if (this.mounted) {
+      this.setState({ unsavedSimulatedMetrics: [] });
+    }
+  };
+
+  private onSaveSimulatedMetricsFailure = (edgeHost: IEdgeHost, reason: string): void =>
+    super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${edgeHost.hostname}</b>` : `<a href=/hosts/edge/${edgeHost.hostname}><b>${edgeHost.hostname}</b></a>`} edge host`, 10000, reason, true);
+
   private updateEdgeHost = (edgeHost: IEdgeHost) => {
-    //const previousEdgeHost = this.getEdgeHost();
     edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
-    //TODO this.props.updateEdgeHost(previousEdgeHost, edgeHost);
     const formEdgeHost = { ...edgeHost };
     removeFields(formEdgeHost);
     this.setState({edgeHost: edgeHost, formEdgeHost: formEdgeHost});
@@ -244,13 +279,13 @@ class EdgeHost extends BaseComponent<Props, State> {
                 saveEntities={this.saveEntities}>
             {Object.keys(formEdgeHost).map((key, index) =>
               key === 'local'
-                ? <Field key={index}
+                ? <Field<boolean> key={index}
                          id={key}
                          type="dropdown"
                          label={key}
                          dropdown={{
                            defaultValue: "Is a local machine?",
-                           values: ['True', 'False']}}/>
+                           values: [true, false]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}/>
@@ -272,6 +307,17 @@ class EdgeHost extends BaseComponent<Props, State> {
   private genericRules = (): JSX.Element =>
     <GenericHostRuleList/>;
 
+  private simulatedMetrics = (): JSX.Element =>
+    <EdgeHostSimulatedMetricList isLoadingEdgeHost={this.props.isLoading}
+                                 loadEdgeHostError={this.props.error}
+                                 edgeHost={this.getEdgeHost()}
+                                 unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
+                                 onAddSimulatedHostMetric={this.addHostSimulatedMetric}
+                                 onRemoveSimulatedHostMetrics={this.removeHostSimulatedMetrics}/>;
+
+  private genericSimulatedMetrics = (): JSX.Element =>
+    <GenericSimulatedHostMetricList/>;
+
   private tabs = () => [
     {
       title: 'Edge host',
@@ -287,6 +333,16 @@ class EdgeHost extends BaseComponent<Props, State> {
       title: 'Generic rules',
       id: 'genericEdgeRules',
       content: () => this.genericRules()
+    },
+    {
+      title: 'Simulated metrics',
+      id: 'simulatedMetrics',
+      content: () => this.simulatedMetrics()
+    },
+    {
+      title: 'Generic simulated metrics',
+      id: 'genericSimulatedMetrics',
+      content: () => this.genericSimulatedMetrics()
     },
   ];
 
@@ -306,6 +362,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 function removeFields(edgeHost: Partial<IEdgeHost>) {
   delete edgeHost["id"];
   delete edgeHost["hostRules"];
+  delete edgeHost["hostSimulatedMetrics"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
@@ -329,8 +386,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadEdgeHosts,
   addEdgeHost,
-  //TODO updateEdgeHost,
-  addEdgeHostRules
+  addEdgeHostRules,
+  addEdgeHostSimulatedMetrics,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EdgeHost);

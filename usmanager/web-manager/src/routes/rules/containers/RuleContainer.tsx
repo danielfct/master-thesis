@@ -18,7 +18,7 @@ import Form, {
 } from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
-import Field, {getTypeFromValue} from "../../../components/form/Field";
+import Field from "../../../components/form/Field";
 import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
@@ -222,9 +222,7 @@ class RuleContainer extends BaseComponent<Props, State> {
     super.toast(`Unable to save containers of ${this.mounted ? `<b>${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} container rule`, 10000, reason, true);
 
   private updateRuleContainer = (ruleContainer: IRuleContainer) => {
-    //const previousRuleContainer = this.getRuleContainer();
     ruleContainer = Object.values(normalize(ruleContainer, Schemas.RULE_CONTAINER).entities.containerRules || {})[0];
-    //TODO this.props.updateRuleContainer(previousRuleContainer, ruleContainer);
     const formRuleContainer = { ...ruleContainer };
     removeFields(formRuleContainer);
     this.setState({ruleContainer: ruleContainer, formRuleContainer: formRuleContainer});
@@ -252,8 +250,8 @@ class RuleContainer extends BaseComponent<Props, State> {
   private decisionDropdownOption = (decision: IDecision): string =>
     decision.name;
 
-  private isGenericSelected = (value: string) =>
-    this.setState({isGeneric: value.toLowerCase() === 'true'});
+  private isGenericSelected = (generic: boolean) =>
+    this.setState({isGeneric: generic});
 
   private getSelectableDecisions = () =>
     Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() == 'container');
@@ -301,14 +299,14 @@ class RuleContainer extends BaseComponent<Props, State> {
                                       values: this.getSelectableDecisions(),
                                       optionToString: this.decisionDropdownOption}}/>
                 : key === 'generic'
-                ? <Field key={index}
+                ? <Field<boolean> key={index}
                          id={key}
                          label={key}
                          type="dropdown"
                          dropdown={{
                            selectCallback: this.isGenericSelected,
                            defaultValue: "Apply to all containers?",
-                           values: ['True', 'False']}}/>
+                           values: [true, false]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}
@@ -323,7 +321,7 @@ class RuleContainer extends BaseComponent<Props, State> {
   private conditions = (): JSX.Element =>
     <RuleContainerConditionList isLoadingRuleContainer={this.props.isLoading}
                               loadRuleContainerError={this.props.error}
-                              ruleContainer={this.props.ruleContainer}
+                              ruleContainer={this.getRuleContainer()}
                               unsavedConditions={this.state.unsavedConditions}
                               onAddRuleCondition={this.addRuleCondition}
                               onRemoveRuleConditions={this.removeRuleConditions}/>;
@@ -331,7 +329,7 @@ class RuleContainer extends BaseComponent<Props, State> {
   private containers = (): JSX.Element =>
     <RuleContainerContainersList isLoadingRuleContainer={this.props.isLoading}
                              loadRuleContainerError={this.props.error}
-                             ruleContainer={this.props.ruleContainer}
+                             ruleContainer={this.getRuleContainer()}
                              unsavedContainers={this.state.unsavedContainers}
                              onAddRuleContainer={this.addRuleContainer}
                              onRemoveRuleContainers={this.removeRuleContainers}/>;
@@ -397,7 +395,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadRulesContainer,
   addRuleContainer,
-  //TODO updateRuleContainer,
   loadDecisions,
   addRuleContainerConditions,
   addRuleContainers,

@@ -6,7 +6,7 @@ import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import React from "react";
-import Tabs, {Tab} from "../../components/tabs/Tabs";
+import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {addRegion, loadRegions} from "../../actions";
@@ -38,7 +38,6 @@ interface StateToProps {
 interface DispatchToProps {
   loadRegions: (name: string) => void;
   addRegion: (region: IRegion) => void;
-  //updateRegion: (previousRegion: Partial<IRegion>, region: IRegion) => void;
 }
 
 interface MatchParams {
@@ -117,9 +116,7 @@ class Region extends BaseComponent<Props, State> {
     super.toast(`Unable to delete ${this.mounted ? `<b>${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region`, 10000, reason, true);
 
   private updateRegion = (region: IRegion) => {
-    //const previousRegion = this.getRegion();
     region = Object.values(normalize(region, Schemas.REGION).entities.regions || {})[0];
-    //TODO this.props.updateRegion(previousRegion, region);
     const formRegion = { ...region };
     removeFields(formRegion);
     this.setState({region: region, formRegion: formRegion});
@@ -176,13 +173,13 @@ class Region extends BaseComponent<Props, State> {
                 }}>
             {Object.keys(formRegion).map((key, index) =>
               key === 'active'
-                ? <Field key={index}
+                ? <Field<boolean> key={index}
                          id={key}
                          label={key}
                          type="dropdown"
                          dropdown={{
                            defaultValue: "Is region active?",
-                           values: ['True', 'False']}}/>
+                           values: [true, false]}}/>
                 : key === 'description'
                 ? <Field key={index}
                          id={key}
@@ -243,7 +240,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadRegions,
   addRegion,
-  //TODO updateRegion,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Region);

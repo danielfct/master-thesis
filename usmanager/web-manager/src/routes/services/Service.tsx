@@ -57,7 +57,8 @@ import GenericServiceRuleList from "./GenericServiceRuleList";
 import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
-import ServiceSimulatedMetricList from "./ServiceSimulateMetricList";
+import ServiceSimulatedMetricList from "./ServiceSimulatedMetricList";
+import GenericServiceSimulatedMetricList from "./GenericSimulatedServiceMetricList";
 
 export interface IService extends IDatabaseData {
   serviceName: string;
@@ -103,7 +104,6 @@ interface StateToProps {
 interface DispatchToProps {
   loadServices: (name: string) => void;
   addService: (service: IService) => void;
-  //TODO updateService: (previousService: Partial<IService>, service: IService) => void;
   addServiceApps: (serviceName: string, apps: string[]) => void;
   addServiceDependencies: (serviceName: string, dependencies: string[]) => void;
   addServicePredictions: (serviceName: string, predictions: IPrediction[]) => void;
@@ -189,7 +189,7 @@ class Service extends BaseComponent<Props, State> {
     super.toast(`Unable to update ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
 
   private onDeleteSuccess = (service: IService): void => {
-    super.toast(`<span class="green-text">Service <b class={'white-text'}>${service.serviceName}</b> successfully removed</span>`);
+    super.toast(`<span class="green-text">Service <b class="white-text">${service.serviceName}</b> successfully removed</span>`);
     if (this.mounted) {
       this.props.history.push(`/services`);
     }
@@ -369,9 +369,7 @@ class Service extends BaseComponent<Props, State> {
     super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
 
   private updateService = (service: IService) => {
-    //const previousService = this.getService();
     service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];
-    //TODO this.props.updateService(previousService, service);
     const formService = { ...service };
     removeFields(formService);
     this.setState({service: service, formService: formService});
@@ -450,7 +448,7 @@ class Service extends BaseComponent<Props, State> {
   private apps = (): JSX.Element =>
     <ServiceAppList isLoadingService={this.props.isLoading}
                     loadServiceError={this.props.error}
-                    service={this.props.service}
+                    service={this.getService()}
                     unsavedApps={this.state.unsavedApps}
                     onAddServiceApp={this.addServiceApp}
                     onRemoveServiceApps={this.removeServiceApps}/>;
@@ -458,7 +456,7 @@ class Service extends BaseComponent<Props, State> {
   private dependencies = (): JSX.Element =>
     <ServiceDependencyList isLoadingService={this.props.isLoading}
                            loadServiceError={this.props.error}
-                           service={this.props.service}
+                           service={this.getService()}
                            unsavedDependencies={this.state.unsavedDependencies}
                            onAddServiceDependency={this.addServiceDependency}
                            onRemoveServiceDependencies={this.removeServiceDependencies}/>;
@@ -466,12 +464,12 @@ class Service extends BaseComponent<Props, State> {
   private dependents = (): JSX.Element =>
     <ServiceDependentList isLoadingService={this.props.isLoading}
                           loadServiceError={this.props.error}
-                          service={this.props.service}/>;
+                          service={this.getService()}/>;
 
   private predictions = (): JSX.Element =>
     <ServicePredictionList isLoadingService={this.props.isLoading}
                            loadServiceError={this.props.error}
-                           service={this.props.service}
+                           service={this.getService()}
                            unsavedPredictions={this.state.unsavedPredictions}
                            onAddServicePrediction={this.addServicePrediction}
                            onRemoveServicePredictions={this.removeServicePredictions}/>;
@@ -479,7 +477,7 @@ class Service extends BaseComponent<Props, State> {
   private rules = (): JSX.Element =>
     <ServiceRuleList isLoadingService={this.props.isLoading}
                      loadServiceError={this.props.error}
-                     service={this.props.service}
+                     service={this.getService()}
                      unsavedRules={this.state.unsavedRules}
                      onAddServiceRule={this.addServiceRule}
                      onRemoveServiceRules={this.removeServiceRules}/>;
@@ -490,13 +488,13 @@ class Service extends BaseComponent<Props, State> {
   private simulatedMetrics = (): JSX.Element =>
     <ServiceSimulatedMetricList isLoadingService={this.props.isLoading}
                                 loadServiceError={this.props.error}
-                                service={this.props.service}
+                                service={this.getService()}
                                 unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
-                                onAddServiceSimulatedMetric={this.addServiceSimulatedMetric}
-                                onRemoveServiceSimulatedMetrics={this.removeServiceSimulatedMetrics}/>;
+                                onAddSimulatedServiceMetric={this.addServiceSimulatedMetric}
+                                onRemoveSimulatedServiceMetrics={this.removeServiceSimulatedMetrics}/>;
 
-  private genericSimulatedServiceMetrics = (): JSX.Element =>
-     <GenericServiceRuleList/>; //TODO
+  private genericSimulatedMetrics = (): JSX.Element =>
+     <GenericServiceSimulatedMetricList/>;
 
   private tabs = () => [
     {
@@ -540,9 +538,9 @@ class Service extends BaseComponent<Props, State> {
       content: () => this.simulatedMetrics()
     },
     {
-      title: 'Generic metrics',
+      title: 'Generic simulated metrics',
       id: 'genericSimulatedMetrics',
-      content: () => this.genericSimulatedServiceMetrics()
+      content: () => this.genericSimulatedMetrics()
     },
   ];
 

@@ -197,7 +197,6 @@ class Form extends React.Component<Props, State> {
 
   private mounted = false;
   private dropdown = createRef<HTMLButtonElement>();
-  //TODO private switchDropdown = createRef<HTMLButtonElement>();
   private scrollbar: (ScrollBar | null) = null;
 
   state: State = {

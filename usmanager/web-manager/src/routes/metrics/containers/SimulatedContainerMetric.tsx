@@ -64,8 +64,6 @@ interface StateToProps {
 interface DispatchToProps {
   loadSimulatedContainerMetrics: (name: string) => void;
   addSimulatedContainerMetric: (simulatedContainerMetric: ISimulatedContainerMetric) => void;
-  //TODO updateSimulatedContainerMetric: (previousSimulatedContainerMetric: Partial<ISimulatedContainerMetric>,
-  // simulatedContainerMetric: ISimulatedContainerMetric) => void;
   loadFields: () => void;
   addSimulatedContainerMetricContainers: (name: string, containers: string[]) => void;
 }
@@ -191,9 +189,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     super.toast(`Unable to save containers of ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric`, 10000, reason, true);
 
   private updateSimulatedContainerMetric = (simulatedContainerMetric: ISimulatedContainerMetric) => {
-    //const previousSimulatedMetric = this.getSimulatedContainerMetric();
     simulatedContainerMetric = Object.values(normalize(simulatedContainerMetric, Schemas.SIMULATED_SERVICE_METRIC).entities.simulatedContainerMetrics || {})[0];
-    //TODO this.props.updateSimulatedContainerMetric(previousSimulatedMetric, simulatedMetric);
     const formSimulatedContainerMetric = { ...simulatedContainerMetric };
     removeFields(formSimulatedContainerMetric);
     this.setState({simulatedContainerMetric: simulatedContainerMetric, formSimulatedContainerMetric: formSimulatedContainerMetric});
@@ -218,8 +214,8 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
   private fieldOption = (field: IField): string =>
     field.name;
 
-  private isGenericSelected = (value: string) =>
-    this.setState({isGeneric: value.toLowerCase() === 'true'});
+  private isGenericSelected = (generic: boolean) =>
+    this.setState({isGeneric: generic});
 
   private simulatedContainerMetric = () => {
     const {isLoading, error} = this.props;
@@ -264,22 +260,22 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
                                    values: Object.values(this.props.fields),
                                    optionToString: this.fieldOption}}/>
                 : key === 'override'
-                ? <Field key={index}
+                ? <Field<boolean> key={index}
                          id={key}
                          label={key}
                          type="dropdown"
                          dropdown={{
                            defaultValue: "Override true metrics?",
-                           values: ['True', 'False']}}/>
+                           values: [true, false]}}/>
                 : key === 'generic'
-                  ? <Field key={index}
+                  ? <Field<boolean> key={index}
                            id={key}
                            label={key}
                            type="dropdown"
                            dropdown={{
                              selectCallback: this.isGenericSelected,
                              defaultValue: "Apply to all containers?",
-                             values: ['True', 'False']}}/>
+                             values: [true, false]}}/>
                   : key === 'minimumValue' || key === 'maximumValue'
                     ? <Field key={index}
                              id={key}
@@ -358,7 +354,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadSimulatedContainerMetrics,
   addSimulatedContainerMetric,
-  //TODO updateSimulatedContainerMetric,
   loadFields,
   addSimulatedContainerMetricContainers,
 };

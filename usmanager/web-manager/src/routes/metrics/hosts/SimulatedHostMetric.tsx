@@ -15,7 +15,7 @@ import Form, {IFields, requiredAndTrimmed} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs, {Tab} from "../../../components/tabs/Tabs";
+import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
@@ -66,8 +66,6 @@ interface StateToProps {
 interface DispatchToProps {
   loadSimulatedHostMetrics: (name: string) => void;
   addSimulatedHostMetric: (simulatedHostMetric: ISimulatedHostMetric) => void;
-  //TODO updateSimulatedHostMetric: (previousSimulatedHostMetric: Partial<ISimulatedHostMetric>,
-  // simulatedHostMetric: ISimulatedHostMetric) => void;
   loadFields: () => void;
   addSimulatedHostMetricCloudHosts: (name: string, cloudHosts: string[]) => void;
   addSimulatedHostMetricEdgeHosts: (name: string, edgeHosts: string[]) => void;
@@ -229,9 +227,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     super.toast(`Unable to save edge hosts of ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric`, 10000, reason, true);
 
   private updateSimulatedHostMetric = (simulatedHostMetric: ISimulatedHostMetric) => {
-    //const previousSimulatedMetric = this.getSimulatedHostMetric();
     simulatedHostMetric = Object.values(normalize(simulatedHostMetric, Schemas.SIMULATED_HOST_METRIC).entities.simulatedHostMetrics || {})[0];
-    //TODO this.props.updateSimulatedHostMetric(previousSimulatedMetric, simulatedMetric);
     const formSimulatedHostMetric = { ...simulatedHostMetric };
     removeFields(formSimulatedHostMetric);
     this.setState({simulatedHostMetric: simulatedHostMetric, formSimulatedHostMetric: formSimulatedHostMetric});
@@ -256,8 +252,8 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
   private fieldOption = (field: IField): string =>
     field.name;
 
-  private isGenericSelected = (value: string) =>
-    this.setState({isGeneric: value.toLowerCase() === 'true'});
+  private isGenericSelected = (generic: boolean) =>
+    this.setState({isGeneric: generic});
 
   private simulatedHostMetric = () => {
     const {isLoading, error} = this.props;
@@ -302,22 +298,22 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                    values: Object.values(this.props.fields),
                                    optionToString: this.fieldOption}}/>
                 : key === 'override'
-                ? <Field key={index}
+                ? <Field<boolean> key={index}
                          id={key}
                          label={key}
                          type="dropdown"
                          dropdown={{
                            defaultValue: "Override true metrics?",
-                           values: ['True', 'False']}}/>
+                           values: [true, false]}}/>
                 : key === 'generic'
-                  ? <Field key={index}
+                  ? <Field<boolean> key={index}
                            id={key}
                            label={key}
                            type="dropdown"
                            dropdown={{
                              selectCallback: this.isGenericSelected,
                              defaultValue: "Apply to all hosts?",
-                             values: ['True', 'False']}}/>
+                             values: [true, false]}}/>
                   : key === 'minimumValue' || key === 'maximumValue'
                     ? <Field key={index}
                              id={key}
@@ -411,7 +407,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadSimulatedHostMetrics,
   addSimulatedHostMetric,
-  //TODO updateSimulatedHostMetric,
   loadFields,
   addSimulatedHostMetricCloudHosts,
   addSimulatedHostMetricEdgeHosts

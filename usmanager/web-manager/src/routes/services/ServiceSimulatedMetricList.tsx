@@ -53,8 +53,8 @@ interface ServiceSimulatedMetricListProps {
   loadServiceError?: string | null;
   service: IService | Partial<IService> | null;
   unsavedSimulatedMetrics: string[];
-  onAddServiceSimulatedMetric: (simulatedMetric: string) => void;
-  onRemoveServiceSimulatedMetrics: (simulatedMetric: string[]) => void;
+  onAddSimulatedServiceMetric: (simulatedMetric: string) => void;
+  onRemoveSimulatedServiceMetrics: (simulatedMetric: string[]) => void;
 }
 
 type Props = StateToProps & DispatchToProps & ServiceSimulatedMetricListProps;
@@ -124,10 +124,10 @@ class ServiceSimulatedMetricList extends BaseComponent<Props, State> {
   };
 
   private onAdd = (simulatedMetric: string): void =>
-    this.props.onAddServiceSimulatedMetric(simulatedMetric);
+    this.props.onAddSimulatedServiceMetric(simulatedMetric);
 
   private onRemove = (simulatedMetrics: string[]) =>
-    this.props.onRemoveServiceSimulatedMetrics(simulatedMetrics);
+    this.props.onRemoveSimulatedServiceMetrics(simulatedMetrics);
 
   private onDeleteSuccess = (simulatedMetrics: string[]): void => {
     if (this.props.service?.serviceName) {

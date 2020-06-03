@@ -6,10 +6,10 @@ import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import React from "react";
-import Tabs, {Tab} from "../../components/tabs/Tabs";
+import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {addApp, addAppServices, loadApps, updateApp} from "../../actions";
+import {addApp, addAppServices, loadApps} from "../../actions";
 import {connect} from "react-redux";
 import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
 import {IReply, postData} from "../../utils/api";
@@ -37,7 +37,6 @@ interface StateToProps {
 interface DispatchToProps {
   loadApps: (name: string) => void;
   addApp: (app: IApp) => void;
-  updateApp: (previousApp: Partial<IApp>, app: IApp) => void;
   addAppServices: (appName: string, appServices: IAddAppService[]) => void;
 }
 
@@ -198,9 +197,7 @@ class App extends BaseComponent<Props, State> {
   };
 
   private updateApp = (app: IApp) => {
-    const previousApp = this.getApp();
     app = Object.values(normalize(app, Schemas.APP).entities.apps || {})[0];
-    //this.props.updateApp(previousApp, app);
     const formApp = { ...app };
     removeFields(formApp);
     this.setState({app: app, formApp: formApp, loading: undefined});
@@ -253,7 +250,7 @@ class App extends BaseComponent<Props, State> {
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure
                 }}
-                /*customButtons={this.launchButton()}*/
+                customButtons={this.launchButton()}
                 saveEntities={this.saveEntities}
                 loading={this.state.loading}>
             {Object.keys(formApp).map((key, index) =>
@@ -327,7 +324,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadApps,
   addApp,
-  updateApp,
   addAppServices
 };
 

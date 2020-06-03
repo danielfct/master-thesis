@@ -15,7 +15,7 @@ import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../components/form/Field";
-import Tabs, {Tab} from "../../components/tabs/Tabs";
+import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {
@@ -130,9 +130,7 @@ class EurekaServer extends BaseComponent<Props, State> {
     super.toast(`Unable to stop ${this.mounted ? `<b>${eurekaServer.containerId}</b>` : `<a href=/eureka-servers/${eurekaServer.containerId}><b>${eurekaServer.containerId}</b></a>`} eureka server`, 10000, reason, true);
 
   private updateEurekaServer = (eurekaServer: IEurekaServer) => {
-    //const previousEurekaServer = this.getEurekaServer();
     eurekaServer = Object.values(normalize(eurekaServer, Schemas.EUREKA_SERVER).entities.eurekaServers || {})[0];
-    //TODO this.props.updateEurekaServer(previousEurekaServer, eurekaServer);
     const formEurekaServer = { ...eurekaServer };
     removeFields(formEurekaServer);
     this.setState({eurekaServer: eurekaServer, formEurekaServer: formEurekaServer});

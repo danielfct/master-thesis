@@ -27,7 +27,7 @@ export default function AnimatedList<T>(props: AnimatedListProps<T>) {
       update: ({ y, height }) => ({ y, height })
     }
   );
-  //TODO: has a few bugs
+  //FIXME: currently not being used, has a few bugs
   return (
     <div style={{height: (rows.length * 59) }}>
       {header && header()}

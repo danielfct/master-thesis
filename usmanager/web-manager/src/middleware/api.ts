@@ -42,8 +42,8 @@ import {IRuleService} from "../routes/rules/services/RuleService";
 import {IRuleHost} from "../routes/rules/hosts/RuleHost";
 import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
 import {IAppService} from "../routes/apps/AppServicesList";
-import {ILoadBalancer} from "../routes/loadBalancer/LoadBalancer";
-import {IEurekaServer} from "../routes/eureka/EurekaServer";
+import {ILoadBalancer} from "../routes/loadBalancers/LoadBalancer";
+import {IEurekaServer} from "../routes/eurekaServers/EurekaServer";
 import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
 import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
 import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
@@ -231,7 +231,7 @@ const decision: schema.Entity<IDecision> = new schema.Entity('decisions', undefi
 const simulatedHostMetric: schema.Entity<ISimulatedHostMetric> = new schema.Entity('simulatedHostMetrics', undefined, {
     idAttribute: (simulatedHostMetric: ISimulatedHostMetric) => simulatedHostMetric.name
 });
-const simulatedHostMetrics = new schema.Array(simulatedHostMetric);
+const hostSimulatedMetrics = new schema.Array(simulatedHostMetric);
 
 const simulatedServiceMetric: schema.Entity<ISimulatedServiceMetric> = new schema.Entity('simulatedServiceMetrics', undefined, {
     idAttribute: (simulatedServiceMetric: ISimulatedServiceMetric) => simulatedServiceMetric.name
@@ -241,7 +241,7 @@ const serviceSimulatedMetrics = new schema.Array(simulatedServiceMetric);
 const simulatedContainerMetric: schema.Entity<ISimulatedContainerMetric> = new schema.Entity('simulatedContainerMetrics', undefined, {
     idAttribute: (simulatedContainerMetric: ISimulatedContainerMetric) => simulatedContainerMetric.name
 });
-const simulatedContainerMetrics = new schema.Array(simulatedContainerMetric);
+const containerSimulatedMetrics = new schema.Array(simulatedContainerMetric);
 
 const region: schema.Entity<IRegion> = new schema.Entity('regions', undefined, {
     idAttribute: (region: IRegion) => region.name
@@ -261,15 +261,16 @@ const logs: schema.Entity<ILogs> = new schema.Entity('logs', undefined, {
 
 app.define({ appServices });
 service.define({ apps, dependencies, dependents, serviceRules, serviceSimulatedMetrics });
-container.define({ containerRules, simulatedContainerMetrics });
-cloudHost.define({ hostRules, simulatedHostMetrics, /*state*/ });
-edgeHost.define({ hostRules, simulatedHostMetrics });
+container.define({ containerRules, containerSimulatedMetrics });
+cloudHost.define({ hostRules, hostSimulatedMetrics, /*state*/ });
+edgeHost.define({ hostRules, hostSimulatedMetrics });
 ruleHost.define({ conditions, edgeHosts, cloudHosts });
 ruleService.define({ conditions, services });
 ruleContainer.define({ conditions, containers });
 condition.define({ valueModes, fields, operators });
 simulatedHostMetric.define( { edgeHosts, cloudHosts });
 simulatedServiceMetric.define( { services });
+simulatedContainerMetric.define({ containers });
 
 export const Schemas: ISchemas = {
     APP: app,

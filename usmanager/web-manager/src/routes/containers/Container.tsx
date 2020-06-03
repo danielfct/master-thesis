@@ -13,8 +13,9 @@ import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {
-  addContainer, addContainerRules,
-  addServiceRules,
+  addContainer,
+  addContainerRules,
+  addContainerSimulatedMetrics,
   loadCloudHosts,
   loadContainers,
   loadEdgeHosts,
@@ -40,6 +41,9 @@ import {Schemas} from "../../middleware/api";
 import IDatabaseData from "../../components/IDatabaseData";
 import GenericContainerRuleList from "./GenericContainerRuleList";
 import ContainerRuleList from "./ContainerRuleList";
+import ContainerSimulatedMetricList from "./ContainerSimulatedMetricList";
+import GenericSimulatedContainerMetricList from "./GenericSimulatedContainerMetricList";
+import UnsavedChanged from "../../components/form/UnsavedChanges";
 
 export interface IContainer extends IDatabaseData {
   containerId: string;
@@ -97,8 +101,8 @@ interface DispatchToProps {
   loadEdgeHosts: () => void;
   loadServices: () => void;
   addContainer: (container: IContainer) => void;
-  //TODO updateContainer: (previousContainer: Partial<IContainer>, container: IContainer) => void;
   addContainerRules: (containerId: string, rules: string[]) => void;
+  addContainerSimulatedMetrics: (containerId: string, simulatedMetrics: string[]) => void;
 }
 
 interface MatchParams {
@@ -114,6 +118,7 @@ interface State {
   defaultInternalPort: number,
   defaultExternalPort: number,
   unsavedRules: string[],
+  unsavedSimulatedMetrics: string[],
 }
 
 class Container extends BaseComponent<Props, State> {
@@ -128,6 +133,7 @@ class Container extends BaseComponent<Props, State> {
     defaultInternalPort: 0,
     defaultExternalPort: 0,
     unsavedRules: [],
+    unsavedSimulatedMetrics: [],
   };
 
   public componentDidMount(): void {
@@ -273,39 +279,6 @@ class Container extends BaseComponent<Props, State> {
     }
   };
 
-  private shouldShowSaveButton = () =>
-    !!this.state.unsavedRules.length;
-
-  private saveEntities = (container: IContainer) => {
-    this.saveContainerRules(container);
-  };
-
-  private chooseHostnameDropdown = (id: string, onClick: (event: any) => void) =>
-    <ul id={id}
-        className={`dropdown-content ${styles.dropdown}`}>
-      <li className={`${styles.disabled}`}>
-        <a>
-          Choose hostname
-        </a>
-      </li>
-      <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
-        {Object.values(this.props.cloudHosts).map((data, index) =>
-          <li key={index} onClick={onClick}>
-            <a>
-              {data.publicIpAddress}
-            </a>
-          </li>
-        )}
-        {Object.values(this.props.edgeHosts).map((data, index) =>
-          <li key={index} onClick={onClick}>
-            <a>
-              {data.hostname}
-            </a>
-          </li>
-        )}
-      </PerfectScrollbar>
-    </ul>;
-
   private addContainerRule = (rule: string): void => {
     this.setState({
       unsavedRules: this.state.unsavedRules.concat(rule)
@@ -337,10 +310,74 @@ class Container extends BaseComponent<Props, State> {
   private onSaveRulesFailure = (container: IContainer, reason: string): void =>
     super.toast(`Unable to save rules of ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
 
+  private addContainerSimulatedMetric = (simulatedMetric: string): void => {
+    this.setState({
+      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.concat(simulatedMetric)
+    });
+  };
+
+  private removeContainerSimulatedMetrics = (simulatedMetrics: string[]): void => {
+    this.setState({
+      unsavedSimulatedMetrics: this.state.unsavedSimulatedMetrics.filter(metric => !simulatedMetrics.includes(metric))
+    });
+  };
+
+  private saveContainerSimulatedMetrics = (container: IContainer): void => {
+    const {unsavedSimulatedMetrics} = this.state;
+    if (unsavedSimulatedMetrics.length) {
+      postData(`containers/${container.containerId}/simulated-metrics`, unsavedSimulatedMetrics,
+        () => this.onSaveSimulatedMetricsSuccess(container),
+        (reason) => this.onSaveSimulatedMetricsFailure(container, reason));
+    }
+  };
+
+  private onSaveSimulatedMetricsSuccess = (container: IContainer): void => {
+    this.props.addContainerSimulatedMetrics(container.containerId, this.state.unsavedSimulatedMetrics);
+    if (this.mounted) {
+      this.setState({ unsavedSimulatedMetrics: [] });
+    }
+  };
+
+  private onSaveSimulatedMetricsFailure = (container: IContainer, reason: string): void =>
+    super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} container`, 10000, reason, true);
+
+  private shouldShowSaveButton = () =>
+    !!this.state.unsavedRules.length
+    || !!this.state.unsavedSimulatedMetrics.length;
+
+  private saveEntities = (container: IContainer) => {
+    this.saveContainerRules(container);
+    this.saveContainerSimulatedMetrics(container);
+  };
+
+  private chooseHostnameDropdown = (id: string, onClick: (event: any) => void) =>
+    <ul id={id}
+        className={`dropdown-content ${styles.dropdown}`}>
+      <li className={`${styles.disabled}`}>
+        <a>
+          Choose hostname
+        </a>
+      </li>
+      <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
+        {Object.values(this.props.cloudHosts).map((data, index) =>
+          <li key={index} onClick={onClick}>
+            <a>
+              {data.publicIpAddress}
+            </a>
+          </li>
+        )}
+        {Object.values(this.props.edgeHosts).map((data, index) =>
+          <li key={index} onClick={onClick}>
+            <a>
+              {data.hostname}
+            </a>
+          </li>
+        )}
+      </PerfectScrollbar>
+    </ul>;
+
   private updateContainer = (container: IContainer) => {
-    //const previousContainer = this.getContainer();
     container = Object.values(normalize(container, Schemas.CONTAINER).entities.containers || {})[0];
-    //TODO this.props.updateContainer(previousContainer, container);
     const formContainer = { ...container };
     removeFields(formContainer);
     this.setState({container: container, formContainer: formContainer, loading: undefined});
@@ -498,6 +535,17 @@ class Container extends BaseComponent<Props, State> {
   private genericRules = (): JSX.Element =>
     <GenericContainerRuleList/>;
 
+  private simulatedMetrics = (): JSX.Element =>
+    <ContainerSimulatedMetricList isLoadingContainer={this.props.isLoading}
+                                  loadContainerError={this.props.error}
+                                  container={this.getContainer()}
+                                  unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
+                                  onAddSimulatedContainerMetric={this.addContainerSimulatedMetric}
+                                  onRemoveSimulatedContainerMetrics={this.removeContainerSimulatedMetrics}/>;
+
+  private genericSimulatedMetrics = (): JSX.Element =>
+    <GenericSimulatedContainerMetricList/>;
+
   private tabs = () => {
     const tabs = [];
     tabs.push({
@@ -531,13 +579,25 @@ class Container extends BaseComponent<Props, State> {
         title: 'Generic rules',
         id: 'genericEdgeRules',
         content: () => this.genericRules()
-      });
+      },
+      {
+        title: 'Simulated metrics',
+        id: 'simulatedMetrics',
+        content: () => this.simulatedMetrics()
+      },
+      {
+        title: 'Generic simulated metrics',
+        id: 'genericSimulatedMetrics',
+        content: () => this.genericSimulatedMetrics()
+      }
+    );
     return tabs;
   };
 
   public render() {
     return (
       <MainLayout>
+        {this.shouldShowSaveButton() && !isNew(this.props.location.search) && <UnsavedChanged/>}
         <div className="container">
           <Tabs {...this.props} tabs={this.tabs()}/>
         </div>
@@ -552,6 +612,7 @@ function removeFields(container: Partial<IContainer>) {
   delete container["ports"];
   delete container["labels"];
   delete container["logs"];
+  delete container["containerSimulatedMetrics"];
 }
 
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
@@ -590,6 +651,7 @@ const mapDispatchToProps: DispatchToProps = {
   loadEdgeHosts,
   loadServices,
   addContainerRules,
+  addContainerSimulatedMetrics,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Container);

@@ -148,7 +148,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
     }
   };
 
-  //TODO change toasts of onDeleteFailure of entities lists
   private onDeleteFailure = (reason: string): void =>
     super.toast(`Unable to delete app`, 10000, reason, true);
 

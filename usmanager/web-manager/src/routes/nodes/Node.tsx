@@ -4,7 +4,7 @@ import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../components/form/Field";
-import Tabs, {Tab} from "../../components/tabs/Tabs";
+import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {addNode, loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions} from "../../actions";
@@ -118,7 +118,6 @@ class Node extends BaseComponent<Props, State> {
   };
 
   private onPostFailure = (reason: string, place: string | IRegion): void => {
-    console.log(place);
     if (typeof place === "string") {
       super.toast(`Unable to start node at ${place}`, 10000, reason, true);
     }
@@ -138,9 +137,7 @@ class Node extends BaseComponent<Props, State> {
     super.toast(`Unable to stop ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} node`, 10000, reason, true);
 
   private updateNode = (node: INode) => {
-    //const previousNode = this.getNode();
     node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
-    //TODO this.props.updateNode(previousNode, node);
     this.setState({node: node});
   };
 
@@ -244,7 +241,6 @@ class Node extends BaseComponent<Props, State> {
     const node = isNewNode ? (currentForm === 'On host' ? newNodeHost : newNodeLocation) : this.getNode();
     // @ts-ignore
     const nodeKey: (keyof INode) = node && Object.keys(node)[0];
-    console.log(node && this.getFields(node));
     return (
       <>
         {isLoading && <ListLoadingSpinner/>}

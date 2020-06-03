@@ -15,7 +15,7 @@ import Form, {IFields, requiredAndTrimmed} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs, {Tab} from "../../../components/tabs/Tabs";
+import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
@@ -64,8 +64,6 @@ interface StateToProps {
 interface DispatchToProps {
   loadSimulatedServiceMetrics: (name: string) => void;
   addSimulatedServiceMetric: (simulatedServiceMetric: ISimulatedServiceMetric) => void;
-  //TODO updateSimulatedServiceMetric: (previousSimulatedServiceMetric: Partial<ISimulatedServiceMetric>,
-  // simulatedServiceMetric: ISimulatedServiceMetric) => void;
   loadFields: () => void;
   addSimulatedServiceMetricServices: (name: string, services: string[]) => void;
 }
@@ -191,9 +189,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     super.toast(`Unable to save services of ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated service metric`, 10000, reason, true);
 
   private updateSimulatedServiceMetric = (simulatedServiceMetric: ISimulatedServiceMetric) => {
-    //const previousSimulatedMetric = this.getSimulatedServiceMetric();
     simulatedServiceMetric = Object.values(normalize(simulatedServiceMetric, Schemas.SIMULATED_SERVICE_METRIC).entities.simulatedServiceMetrics || {})[0];
-    //TODO this.props.updateSimulatedServiceMetric(previousSimulatedMetric, simulatedMetric);
     const formSimulatedServiceMetric = { ...simulatedServiceMetric };
     removeFields(formSimulatedServiceMetric);
     this.setState({simulatedServiceMetric: simulatedServiceMetric, formSimulatedServiceMetric: formSimulatedServiceMetric});
@@ -218,8 +214,8 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
   private fieldOption = (field: IField): string =>
     field.name;
 
-  private isGenericSelected = (value: string) =>
-    this.setState({isGeneric: value.toLowerCase() === 'true'});
+  private isGenericSelected = (generic: boolean) =>
+    this.setState({isGeneric: generic});
 
   private simulatedServiceMetric = () => {
     const {isLoading, error} = this.props;
@@ -264,22 +260,22 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                    values: Object.values(this.props.fields),
                                    optionToString: this.fieldOption}}/>
                 : key === 'override'
-                ? <Field key={index}
+                ? <Field<boolean> key={index}
                          id={key}
                          label={key}
                          type="dropdown"
                          dropdown={{
                            defaultValue: "Override true metrics?",
-                           values: ['True', 'False']}}/>
+                           values: [true, false]}}/>
                 : key === 'generic'
-                  ? <Field key={index}
+                  ? <Field<boolean> key={index}
                            id={key}
                            label={key}
                            type="dropdown"
                            dropdown={{
                              selectCallback: this.isGenericSelected,
                              defaultValue: "Apply to all services?",
-                             values: ['True', 'False']}}/>
+                             values: [true, false]}}/>
                   : key === 'minimumValue' || key === 'maximumValue'
                     ? <Field key={index}
                              id={key}
@@ -358,7 +354,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadSimulatedServiceMetrics,
   addSimulatedServiceMetric,
-  //TODO updateSimulatedServiceMetric,
   loadFields,
   addSimulatedServiceMetricServices,
 };

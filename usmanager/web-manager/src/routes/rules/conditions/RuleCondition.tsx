@@ -7,7 +7,7 @@ import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
-import Tabs, {Tab} from "../../../components/tabs/Tabs";
+import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {addCondition, loadConditions, loadFields, loadOperators, loadValueModes} from "../../../actions";
@@ -46,7 +46,6 @@ interface StateToProps {
 interface DispatchToProps {
   loadConditions: (name: string) => void;
   addCondition: (condition: IRuleCondition) => void;
-  //TODO updateRuleCondition: (previousCondition: Partial<IRuleCondition>, condition: IRuleCondition) => void;
   loadValueModes: () => void;
   loadFields: () => void;
   loadOperators: () => void;
@@ -131,9 +130,7 @@ class RuleCondition extends BaseComponent<Props, State> {
     super.toast(`Unable to delete ${this.mounted ? <b>${condition.name}</b> : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition`, 10000, reason, true);
 
   private updateCondition = (condition: IRuleCondition) => {
-    //const previousCondition = this.getCondition();
     condition = Object.values(normalize(condition, Schemas.RULE_CONDITION).entities.conditions || {})[0];
-    //TODO this.props.updateCondition(previousCondition, condition);
     const formCondition = { ...condition };
     removeFields(formCondition);
     this.setState({condition: condition, formCondition: formCondition});
@@ -279,7 +276,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadConditions,
   addCondition,
-  //TODO updateCondition,
   loadValueModes,
   loadFields,
   loadOperators,

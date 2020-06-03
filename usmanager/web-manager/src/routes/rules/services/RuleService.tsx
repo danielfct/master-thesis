@@ -18,7 +18,7 @@ import Form, {
 } from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
-import Field, {getTypeFromValue} from "../../../components/form/Field";
+import Field from "../../../components/form/Field";
 import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
@@ -36,7 +36,6 @@ import RuleServiceConditionList from "./RuleServiceConditionList";
 import UnsavedChanged from "../../../components/form/UnsavedChanges";
 import RuleServiceServicesList from "./RuleServiceServicesList";
 import {isNew} from "../../../utils/router";
-import {IRuleHost} from "../hosts/RuleHost";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 
@@ -223,9 +222,7 @@ class RuleService extends BaseComponent<Props, State> {
     super.toast(`Unable to save services of ${this.mounted ? `<b>${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule`, 10000, reason, true);
 
   private updateRuleService = (ruleService: IRuleService) => {
-    //const previousRuleService = this.getRuleService();
     ruleService = Object.values(normalize(ruleService, Schemas.RULE_SERVICE).entities.serviceRules || {})[0];
-    //TODO this.props.updateRuleService(previousRuleService, ruleService);
     const formRuleService = { ...ruleService };
     removeFields(formRuleService);
     this.setState({ruleService: ruleService, formRuleService: formRuleService});
@@ -253,8 +250,8 @@ class RuleService extends BaseComponent<Props, State> {
   private decisionDropdownOption = (decision: IDecision): string =>
     decision.name;
 
-  private isGenericSelected = (value: string) =>
-    this.setState({isGeneric: value.toLowerCase() === 'true'});
+  private isGenericSelected = (generic: boolean) =>
+    this.setState({isGeneric: generic});
 
   private getSelectableDecisions = () =>
     Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() === 'service');
@@ -302,14 +299,14 @@ class RuleService extends BaseComponent<Props, State> {
                                       values: this.getSelectableDecisions(),
                                       optionToString: this.decisionDropdownOption}}/>
                 : key === 'generic'
-                ? <Field key={index}
+                ? <Field<boolean> key={index}
                          id={key}
                          label={key}
                          type="dropdown"
                          dropdown={{
                            selectCallback: this.isGenericSelected,
                            defaultValue: "Apply to all services?",
-                           values: ['True', 'False']}}/>
+                           values: [true, false]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}
@@ -324,7 +321,7 @@ class RuleService extends BaseComponent<Props, State> {
   private conditions = (): JSX.Element =>
     <RuleServiceConditionList isLoadingRuleService={this.props.isLoading}
                               loadRuleServiceError={this.props.error}
-                              ruleService={this.props.ruleService}
+                              ruleService={this.getRuleService()}
                               unsavedConditions={this.state.unsavedConditions}
                               onAddRuleCondition={this.addRuleCondition}
                               onRemoveRuleConditions={this.removeRuleConditions}/>;
@@ -332,7 +329,7 @@ class RuleService extends BaseComponent<Props, State> {
   private services = (): JSX.Element =>
     <RuleServiceServicesList isLoadingRuleService={this.props.isLoading}
                              loadRuleServiceError={this.props.error}
-                             ruleService={this.props.ruleService}
+                             ruleService={this.getRuleService()}
                              unsavedServices={this.state.unsavedServices}
                              onAddRuleService={this.addRuleService}
                              onRemoveRuleServices={this.removeRuleServices}/>;
@@ -398,7 +395,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadRulesService,
   addRuleService,
-  //TODO updateRuleService,
   loadDecisions,
   addRuleServiceConditions,
   addRuleServices,

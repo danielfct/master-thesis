@@ -137,9 +137,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
     super.toast(`Unable to stop ${this.mounted ? `<b>${loadBalancer.containerId}</b>` : `<a href=/load-balancers/${loadBalancer.containerId}><b>${loadBalancer.containerId}</b></a>`} load-balancer`, 10000, reason, true);
 
   private updateLoadBalancer = (loadBalancer: ILoadBalancer) => {
-    //const previousLoadBalancer = this.getLoadBalancer();
     loadBalancer = Object.values(normalize(loadBalancer, Schemas.LOAD_BALANCER).entities.loadBalancers || {})[0];
-    //TODO this.props.updateLoadBalancer(previousLoadBalancer, loadBalancer);
     const formLoadBalancer = { ...loadBalancer };
     removeFields(formLoadBalancer);
     this.setState({loadBalancer: loadBalancer, formLoadBalancer: formLoadBalancer});

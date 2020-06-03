@@ -63,7 +63,6 @@ interface StateToProps {
 interface DispatchToProps {
   loadRulesHost: (name: string) => void;
   addRuleHost: (ruleHost: IRuleHost) => void;
-  //TODO updateRuleHost: (previousRuleHost: Partial<IRuleHost>, ruleHost: IRuleHost) => void;
   loadDecisions: () => void;
   addRuleHostConditions: (ruleName: string, conditions: string[]) => void;
   addRuleCloudHosts: (ruleName: string, cloudHosts: string[]) => void;
@@ -259,9 +258,7 @@ class RuleHost extends BaseComponent<Props, State> {
     super.toast(`Unable to save edge hosts of ${this.mounted ? <b>${ruleHost.name}</b> : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule`, 10000, reason, true);
 
   private updateRuleHost = (ruleHost: IRuleHost) => {
-    //const previousRuleHost = this.getRuleHost();
     ruleHost = Object.values(normalize(ruleHost, Schemas.RULE_HOST).entities.hostRules || {})[0];
-    //TODO this.props.updateRuleHost(previousRuleHost, ruleHost);
     const formRuleHost = { ...ruleHost };
     removeFields(formRuleHost);
     this.setState({ruleHost: ruleHost, formRuleHost: formRuleHost});
@@ -289,8 +286,8 @@ class RuleHost extends BaseComponent<Props, State> {
   private decisionDropdownOption = (decision: IDecision) =>
     decision.name;
 
-  private isGenericSelected = (value: string) =>
-    this.setState({isGeneric: value.toLowerCase() === 'true'});
+  private isGenericSelected = (generic: boolean) =>
+    this.setState({isGeneric: generic});
 
   private getSelectableDecisions = () =>
     Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() == 'host');
@@ -338,14 +335,14 @@ class RuleHost extends BaseComponent<Props, State> {
                                       values: this.getSelectableDecisions(),
                                       optionToString: this.decisionDropdownOption}}/>
                 : key === 'generic'
-                ? <Field key={index}
+                ? <Field<boolean> key={index}
                          id={key}
                          label={key}
                          type="dropdown"
                          dropdown={{
                            selectCallback: this.isGenericSelected,
                            defaultValue: "Apply to all hosts?",
-                           values: ['True', 'False']}}/>
+                           values: [true, false]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}
@@ -360,7 +357,7 @@ class RuleHost extends BaseComponent<Props, State> {
   private conditions = (): JSX.Element =>
     <HostRuleConditionList isLoadingHostRule={this.props.isLoading}
                            loadHostRuleError={this.props.error}
-                           ruleHost={this.props.ruleHost}
+                           ruleHost={this.getRuleHost()}
                            unsavedConditions={this.state.unsavedConditions}
                            onAddRuleCondition={this.addRuleCondition}
                            onRemoveRuleConditions={this.removeRuleConditions}/>;
@@ -368,7 +365,7 @@ class RuleHost extends BaseComponent<Props, State> {
   private cloudHosts = (): JSX.Element =>
     <HostRuleCloudHostsList isLoadingHostRule={this.props.isLoading}
                             loadHostRuleError={this.props.error}
-                            ruleHost={this.props.ruleHost}
+                            ruleHost={this.getRuleHost()}
                             unsavedCloudHosts={this.state.unsavedCloudHosts}
                             onAddRuleCloudHost={this.addRuleCloudHost}
                             onRemoveRuleCloudHosts={this.removeRuleCloudHosts}/>;
@@ -376,7 +373,7 @@ class RuleHost extends BaseComponent<Props, State> {
   private edgeHosts = (): JSX.Element =>
     <HostRuleEdgeHostsList isLoadingHostRule={this.props.isLoading}
                            loadHostRuleError={this.props.error}
-                           ruleHost={this.props.ruleHost}
+                           ruleHost={this.getRuleHost()}
                            unsavedEdgeHosts={this.state.unsavedEdgeHosts}
                            onAddRuleEdgeHost={this.addRuleEdgeHost}
                            onRemoveRuleEdgeHosts={this.removeRuleEdgeHosts}/>;
@@ -449,7 +446,6 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
   addRuleHost,
-  //TODO updateRuleHost,
   loadDecisions,
   addRuleHostConditions,
   addRuleCloudHosts,
