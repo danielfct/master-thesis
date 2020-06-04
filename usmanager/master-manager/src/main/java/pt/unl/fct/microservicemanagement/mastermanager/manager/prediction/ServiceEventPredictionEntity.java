@@ -85,7 +85,7 @@ public class ServiceEventPredictionEntity {
   @JsonFormat(pattern = "HH:mm")
   private LocalTime endTime;
 
-  private int minReplicas;
+  private int minimumReplicas;
 
   @JsonIgnore
   @JoinColumn(name = "service_id")

@@ -37,7 +37,7 @@ export interface IPrediction extends IDatabaseData {
   startTime: string;
   endDate: string;
   endTime: string;
-  minReplicas: number;
+  minimumReplicas: number;
 }
 
 const emptyPrediction = (): Partial<IPrediction> => ({
@@ -47,7 +47,7 @@ const emptyPrediction = (): Partial<IPrediction> => ({
   startTime: undefined,
   endDate: undefined,
   endTime: undefined,
-  minReplicas: undefined
+  minimumReplicas: undefined
 });
 
 interface StateToProps {
@@ -122,7 +122,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
                    checked={checked}/>
             <span id={'checkbox'}>
               <div className={!isNew && unsaved ? styles.unsavedItem : undefined}>
-                {prediction.name} ({prediction.minReplicas} replicas)
+                {prediction.name} ({prediction.minimumReplicas} replicas)
               </div>
             </span>
           </label>
@@ -176,7 +176,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
       return fields;
     }, {});
 
-  private addModal = () =>
+  private predictionModal = () =>
     <div>
       <Field key='name' id={'name'} label='name'/>
       <Field key='description' id={'description'} label='description' type='multilinetext'/>
@@ -192,12 +192,15 @@ class ServicePredictionList extends BaseComponent<Props, State> {
       <div className={'col s6 inline-field'}>
         <Field key='endTime' id={'endTime'} label='endTime' type='timepicker' icon={false}/>
       </div>
-      <Field key='minReplicas' id={'minReplicas'} label='minReplicas'/>
+      <div className={'col s12 inline-field'}>
+        <Field key='minimumReplicas' id={'minimumReplicas'} label='minimumReplicas' type={'number'}/>
+      </div>
     </div>;
 
   public render() {
-    return <ControlledList<IPrediction> isLoading={this.props.isLoadingService || this.props.isLoading}
-                                        error={this.props.loadServiceError || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList<IPrediction> isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+                                        error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
                                         emptyMessage='Predictions list is empty'
                                         data={this.props.predictions}
                                         dataKey={['name']}
@@ -206,8 +209,8 @@ class ServicePredictionList extends BaseComponent<Props, State> {
                                           title: 'Add prediction',
                                           fields: this.getFields(),
                                           values: emptyPrediction(),
-                                          content: this.addModal,
-                                          position: '15%'
+                                          content: this.predictionModal,
+                                          fullScreen: true,
                                         }}
                                         show={this.prediction}
                                         onAddInput={this.onAdd}

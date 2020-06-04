@@ -111,6 +111,9 @@ class EdgeHost extends BaseComponent<Props, State> {
   private getFormEdgeHost = () =>
     this.state.formEdgeHost || this.props.formEdgeHost;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IEdgeHost>): void => {
     const edgeHost = reply.data;
     super.toast(`<span class="green-text">Edge host ${this.mounted ? `<b class="white-text">${edgeHost.hostname}</b>` : `<a href=/hosts/edge/${edgeHost.hostname}><b>${edgeHost.hostname}</b></a>`} saved</span>`);
@@ -251,11 +254,12 @@ class EdgeHost extends BaseComponent<Props, State> {
     const formEdgeHost = this.getFormEdgeHost();
     // @ts-ignore
     const edgeHostKey: (keyof IEdgeHost) = formEdgeHost && Object.keys(formEdgeHost)[0];
+    const isNewEdgeHost = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formEdgeHost && (
+        {!isNewEdgeHost && isLoading && <ListLoadingSpinner/>}
+        {!isNewEdgeHost && !isLoading && error && <Error message={error}/>}
+        {(isNewEdgeHost || !isLoading) && (isNewEdgeHost || !error) && formEdgeHost && (
           <Form id={edgeHostKey}
                 fields={this.getFields(formEdgeHost)}
                 values={edgeHost}
@@ -298,7 +302,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private rules = (): JSX.Element =>
     <EdgeHostRuleList isLoadingEdgeHost={this.props.isLoading}
-                      loadEdgeHostError={this.props.error}
+                      loadEdgeHostError={!this.isNew() ? this.props.error : undefined}
                       edgeHost={this.getEdgeHost()}
                       unsavedRules={this.state.unsavedRules}
                       onAddHostRule={this.addEdgeHostRule}
@@ -309,7 +313,7 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private simulatedMetrics = (): JSX.Element =>
     <EdgeHostSimulatedMetricList isLoadingEdgeHost={this.props.isLoading}
-                                 loadEdgeHostError={this.props.error}
+                                 loadEdgeHostError={!this.isNew() ? this.props.error : undefined}
                                  edgeHost={this.getEdgeHost()}
                                  unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
                                  onAddSimulatedHostMetric={this.addHostSimulatedMetric}

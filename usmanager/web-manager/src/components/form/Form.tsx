@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import React, {createRef} from "react";
+import React, {createRef, RefObject} from "react";
 import {getCancelRequest, deleteData, postData, putData, deleteCancelRequest} from "../../utils/api";
 import styles from './Form.module.css';
 import {RouteComponentProps, withRouter} from "react-router";
@@ -43,8 +43,8 @@ export interface IFormModal {
   values: IValues,
   position?: string,
   content: () => JSX.Element,
-  onOpen?: (selected: any) => void,
-  open?: boolean,
+  fullScreen?: boolean,
+  scrollbar?: React.RefObject<ScrollBar>
 }
 
 export type RestOperation = {
@@ -83,8 +83,12 @@ interface FormProps {
   post?: RestOperation;
   put?: RestOperation;
   delete?: RestOperation;
-  controlsMode?: 'top' | 'modal';
-  onModalConfirm?: (values: IValues) => void;
+  controlsMode?: 'top' | 'modal' | 'modal-fullscreen';
+  modal?: {
+    onConfirm?: (values: IValues) => void;
+    scrollbar?: RefObject<ScrollBar>;
+    scrollMaxHeight: number;
+  }
   dropdown?: IFormDropdown;
   saveEntities?: (args: any) => void;
   customButtons?: ICustomButton[];
@@ -115,6 +119,8 @@ export interface IFormContext {
 
 export const FormContext =
   React.createContext<IFormContext | null>(null);
+
+//TODO validation for correct dates and times
 
 export const required = (values: IValues, id: keyof IValues): string =>
   values[id] === undefined || values[id] === null || values[id] === ""
@@ -197,16 +203,19 @@ class Form extends React.Component<Props, State> {
 
   private mounted = false;
   private dropdown = createRef<HTMLButtonElement>();
-  private scrollbar: (ScrollBar | null) = null;
+  private dropdownScrollbar: (ScrollBar | null) = null;
 
-  state: State = {
-    values: this.props.values,
-    savedValues: this.props.values,
-    errors: {},
-    isEditing: this.props.isNew === undefined || this.props.isNew,
-    saveRequired: false,
-    loading: this.props.loading,
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      values: props.values,
+      savedValues: props.values,
+      errors: {},
+      isEditing: props.isNew === undefined || props.isNew,
+      saveRequired: false,
+      loading: props.loading,
+    }
+  }
 
   public componentDidMount(): void {
     this.initDropdown();
@@ -245,7 +254,7 @@ class Form extends React.Component<Props, State> {
       });
 
   private onOpenDropdown = () =>
-    this.scrollbar?.updateScroll();
+    this.dropdownScrollbar?.updateScroll();
 
   componentWillUnmount(): void {
     this.mounted = false;
@@ -389,7 +398,8 @@ class Form extends React.Component<Props, State> {
     if (!this.validateForm()) {
       return;
     }
-    this.props.onModalConfirm?.(this.state.values);
+    this.props.modal?.onConfirm?.(this.state.values);
+    console.log(this.props.values)
     this.clearValues();
   };
 
@@ -400,7 +410,6 @@ class Form extends React.Component<Props, State> {
     const data = decodeHTML((event.target as HTMLLIElement).innerHTML);
     // @ts-ignore
     this.setState({ [data]: { value: data, isChecked: false, isNew: true } });
-    //TODO this.props.onAdd?.(data);
   };
 
   private switchForm = (e: React.FormEvent<HTMLLIElement>) => {
@@ -447,7 +456,7 @@ class Form extends React.Component<Props, State> {
                           {switchDropdown.title || 'Switch form'}
                         </a>
                       </li>
-                      <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
+                      <PerfectScrollbar ref={(ref) => { this.dropdownScrollbar = ref; }}>
                         {switchDropdown.options.map((option, index) =>
                           <li key={index} onClick={this.switchForm}>
                             <a>
@@ -468,7 +477,7 @@ class Form extends React.Component<Props, State> {
                   :
                   <>
                     <div className={`${styles.controlButton}`}>
-                      {customButtons?.map((button, index) => (
+                      {customButtons?.map(button => (
                         <>
                           {button.confirm && (
                             <ConfirmDialog key={button.confirm.id}
@@ -522,7 +531,7 @@ class Form extends React.Component<Props, State> {
                           {dropdown.data.length ? dropdown.title : dropdown.empty}
                         </a>
                       </li>
-                      <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
+                      <PerfectScrollbar ref={(ref) => { this.dropdownScrollbar = ref; }}>
                         {dropdown.data.map((data, index) =>
                           <li key={index} onClick={this.onAdd}>
                             <a>
@@ -538,13 +547,28 @@ class Form extends React.Component<Props, State> {
               <ActionProgressBar loading={!!loading}/>
             </div>
           )}
-          <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
-            <FormContext.Provider value={context}>
-              {children}
-            </FormContext.Provider>
-          </div>
-          {(controlsMode === 'modal') && (
-            <div className='modal-footer dialog-footer'>
+          {controlsMode?.includes('modal') ?
+            <ScrollBar ref={this.props.modal?.scrollbar}
+                       component={'div'}
+                       style={this.props.modal?.scrollMaxHeight ? {maxHeight: Math.floor(this.props.modal?.scrollMaxHeight)} : undefined}
+                       options={{
+                         useBothWheelAxes: false,
+                         suppressScrollX: true
+                       }}>
+              <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
+                <FormContext.Provider value={context}>
+                  {children}
+                </FormContext.Provider>
+              </div>
+            </ScrollBar>
+            : <div className={`${React.Children.count(children) === 0 ? styles.emptyContent : styles.content}`}>
+              <FormContext.Provider value={context}>
+                {children}
+              </FormContext.Provider>
+            </div>
+          }
+          {(controlsMode === 'modal' || controlsMode === 'modal-fullscreen') && (
+            <div className={`modal-footer dialog-footer ${controlsMode === 'modal-fullscreen' ? 'modal-footer-fullscreen' : ''}`}>
               <div>
                 <button className="waves-effect waves-light btn-flat red-text"
                         type="button"

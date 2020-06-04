@@ -8,6 +8,7 @@ interface Props {
   value: string;
   disabled?: boolean;
   onSelect: (date: string) => void;
+  onChange: (e: React.FormEvent<HTMLInputElement>) => void;
   options?: Partial<DatepickerOptions>;
 }
 
@@ -49,16 +50,17 @@ export class Datepicker extends React.Component<Props, State> {
     this.setState({ selectedDate: selectedDate.toLocaleDateString('pt') });
 
   public render() {
-    const {className, id, name, value, disabled} = this.props;
+    const {className, id, name, value, disabled, onChange} = this.props;
     return (
       <input
         className={`datepicker ${className}`}
         type="text"
         id={id}
         name={name}
-        value={value}
+        value={value || ''}
         disabled={disabled}
         autoComplete="off"
+        onChange={onChange}
         ref={this.datepicker}/>
     );
   }

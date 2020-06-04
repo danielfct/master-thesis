@@ -32,6 +32,7 @@ import Collapsible from "../../components/collapsible/Collapsible";
 import {IApp} from "../apps/App";
 import {IAppService} from "../apps/AppServicesList";
 import {connect} from "react-redux";
+import ScrollBar from "react-perfect-scrollbar";
 
 export interface IAddServiceApp {
   name: string;
@@ -72,6 +73,7 @@ type State = {
 class ServiceAppList extends BaseComponent<Props, State> {
 
   private collapsible = createRef<HTMLUListElement>();
+  private scrollbar = createRef<ScrollBar>();
 
   constructor(props: Props) {
     super(props);
@@ -118,7 +120,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                    checked={checked}/>
             <span id={'checkbox'}>
               <div className={!isNew && unsaved ? listItemStyles.unsavedItem : undefined}>
-                {appName}
+                {typeof app === 'object' ? app.launchOrder + '.' : ''} {appName}
               </div>
             </span>
           </label>
@@ -180,14 +182,15 @@ class ServiceAppList extends BaseComponent<Props, State> {
                  .sort((a,b) => a.launchOrder - b.launchOrder);
   };
 
-  private addModal = () => {
+  private serviceAppModal = () => {
     const OtherServicesList = List<IAppService>();
     const list = this.appServicesList();
     return (
       <>
-        <Field key='launchOrder' id={'launchOrder'} label='launchOrder'/>
+        <Field key='launchOrder' id={'launchOrder'} label='launchOrder' type={'number'}/>
         <Collapsible id={'otherServicesList'}
-                     title={'Other services\' launch order'}>
+                     title={'Other services\' launch order'}
+                     onChange={this.updateModalScrollbar}>
           {list && <OtherServicesList list={list} show={this.appServicesLaunchOrder}/>}
         </Collapsible>
       </>
@@ -206,18 +209,24 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   private getModalValues = (): IValues => (
     {
-      launchOrder: 0
+      launchOrder: undefined
     }
   );
 
-  private onModalOpen = (selectedApp: string): void => {
+  private onSelectApp = (selectedApp: string): void => {
     this.setState({selectedApp: selectedApp});
     this.props.loadAppServices(selectedApp);
   };
 
+  private updateModalScrollbar = () => {
+    console.log('update scrollbar')
+    this.scrollbar.current?.updateScroll();
+  }
+
   public render() {
-    return <ControlledList<string> isLoading={this.props.isLoadingService || this.props.isLoading}
-                                   error={this.props.error || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList<string> isLoading={!isNew ? this.props.isLoadingService || this.props.isLoading : undefined}
+                                   error={!isNew ? this.props.loadServiceError || this.props.error : undefined}
                                    emptyMessage='Apps list is empty'
                                    data={this.props.serviceApps}
                                    dataKey={['name']}
@@ -226,14 +235,16 @@ class ServiceAppList extends BaseComponent<Props, State> {
                                      title: 'Add app',
                                      empty: 'No more apps to add',
                                      data: this.getSelectableAppsNames(),
+                                     onSelect: this.onSelectApp,
                                      formModal: {
                                        id: 'serviceApp',
+                                       title: 'Add app',
                                        fields: this.getModalFields(),
                                        values: this.getModalValues(),
-                                       content: this.addModal,
+                                       content: this.serviceAppModal,
                                        position: '20%',
-                                       onOpen: this.onModalOpen,
-                                       open: this.state.selectedApp !== undefined && !this.props.isLoadingAppServices,
+                                       scrollbar: this.scrollbar,
+                                       fullScreen: true,
                                      }
                                    }}
                                    show={this.app}

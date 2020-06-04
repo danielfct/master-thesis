@@ -105,6 +105,9 @@ class LoadBalancer extends BaseComponent<Props, State> {
   private getFormLoadBalancer = () =>
     this.state.formLoadBalancer || this.props.formLoadBalancer;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<ILoadBalancer[]>): void => {
     const loadBalancers = reply.data;
     loadBalancers.forEach(loadBalancer => {
@@ -172,11 +175,12 @@ class LoadBalancer extends BaseComponent<Props, State> {
     const formLoadBalancer = this.getFormLoadBalancer();
     // @ts-ignore
     const loadBalancerKey: (keyof ILoadBalancer) = formLoadBalancer && Object.keys(formLoadBalancer)[0];
+    const isNewLoadBalancer = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formLoadBalancer && (
+        {!isNewLoadBalancer && isLoading && <ListLoadingSpinner/>}
+        {!isNewLoadBalancer && !isLoading && error && <Error message={error}/>}
+        {(isNewLoadBalancer || !isLoading) && (isNewLoadBalancer || !error) && formLoadBalancer && (
           <Form id={loadBalancerKey}
                 fields={this.getFields(formLoadBalancer || {})}
                 values={loadBalancer || newLoadBalancer || {}}

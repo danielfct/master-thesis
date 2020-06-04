@@ -84,6 +84,9 @@ class App extends BaseComponent<Props, State> {
   private getFormApp = () =>
     this.state.formApp || this.props.formApp;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IApp>): void => {
     const app = reply.data;
     super.toast(`<span class="green-text">App ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} saved</span>`);
@@ -225,11 +228,12 @@ class App extends BaseComponent<Props, State> {
     const formApp = this.getFormApp();
     // @ts-ignore
     const appKey: (keyof IApp) = formApp && Object.keys(formApp)[0];
+    const isNewApp = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formApp && (
+        {!isNewApp && isLoading && <ListLoadingSpinner/>}
+        {!isNewApp && !isLoading && error && <Error message={error}/>}
+        {(isNewApp || !isLoading) && (isNewApp || !error) && formApp && (
           <Form id={appKey}
                 fields={this.getFields(formApp)}
                 values={app}
@@ -266,7 +270,7 @@ class App extends BaseComponent<Props, State> {
 
   private services = (): JSX.Element =>
     <AppServicesList isLoadingApp={this.props.isLoading}
-                     loadAppError={this.props.error}
+                     loadAppError={!this.isNew() ? this.props.error : undefined}
                      app={this.getApp()}
                      unsavedServices={this.state.unsavedServices}
                      onAddAppService={this.addAppService}

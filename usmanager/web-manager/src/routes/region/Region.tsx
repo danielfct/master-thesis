@@ -80,6 +80,9 @@ class Region extends BaseComponent<Props, State> {
   private getFormRegion = () =>
     this.state.formRegion || this.props.formRegion;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IRegion>): void => {
     const region = reply.data;
     super.toast(`<span class="green-text">Region ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} saved</span>`);
@@ -147,11 +150,12 @@ class Region extends BaseComponent<Props, State> {
     const formRegion = this.getFormRegion();
     // @ts-ignore
     const regionKey: (keyof IRegion) = formRegion && Object.keys(formRegion)[0];
+    const isNewRegion = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formRegion && (
+        {!isNewRegion && isLoading && <ListLoadingSpinner/>}
+        {!isNewRegion && !isLoading && error && <Error message={error}/>}
+        {(isNewRegion || !isLoading) && (isNewRegion || !error) && formRegion && (
           <Form id={regionKey}
                 fields={this.getFields(formRegion)}
                 values={region}

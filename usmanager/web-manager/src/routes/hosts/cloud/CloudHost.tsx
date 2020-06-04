@@ -137,6 +137,9 @@ class CloudHost extends BaseComponent<Props, State> {
   private getFormCloudHost = () =>
     this.state.formCloudHost || this.props.formCloudHost;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<ICloudHost>): void => {
     const cloudHost = reply.data;
     super.toast(`<span class="green-text">Cloud instance ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} has started</span>`);
@@ -351,11 +354,12 @@ class CloudHost extends BaseComponent<Props, State> {
     const formCloudHost = this.getFormCloudHost();
     // @ts-ignore
     const cloudHostKey: (keyof ICloudHost) = formCloudHost && Object.keys(formCloudHost)[0];
+    const isNewCloudHost = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formCloudHost && (
+        {!isNewCloudHost && isLoading && <ListLoadingSpinner/>}
+        {!isNewCloudHost && !isLoading && error && <Error message={error}/>}
+        {(isNewCloudHost || !isLoading) && (isNewCloudHost || !error) && formCloudHost && (
           <Form id={cloudHostKey}
                 fields={{}}
                 values={cloudHost}
@@ -392,7 +396,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
   private rules = (): JSX.Element =>
     <CloudHostRuleList isLoadingCloudHost={this.props.isLoading}
-                       loadCloudHostError={this.props.error}
+                       loadCloudHostError={!this.isNew() ? this.props.error : undefined}
                        cloudHost={this.getCloudHost()}
                        unsavedRules={this.state.unsavedRules}
                        onAddHostRule={this.addCloudHostRule}
@@ -403,7 +407,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
   private simulatedMetrics = (): JSX.Element =>
     <CloudHostSimulatedMetricList isLoadingCloudHost={this.props.isLoading}
-                                  loadCloudHostError={this.props.error}
+                                  loadCloudHostError={!this.isNew() ? this.props.error : undefined}
                                   cloudHost={this.getCloudHost()}
                                   unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
                                   onAddSimulatedHostMetric={this.addHostSimulatedMetric}

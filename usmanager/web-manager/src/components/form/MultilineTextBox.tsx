@@ -23,7 +23,7 @@ export class MultilineTextBox extends React.Component<Props, {}> {
         className={`materialize-textarea ${className}`}
         id={id}
         name={name}
-        value={value}
+        value={value || ''}
         disabled={disabled}
         onChange={onChange}
         onBlur={onBlur}/>

@@ -113,6 +113,9 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
   private getFormSimulatedContainerMetric = () =>
     this.state.formSimulatedContainerMetric || this.props.formSimulatedContainerMetric;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<ISimulatedContainerMetric>): void => {
     const simulatedMetric = reply.data;
     super.toast(`<span class="green-text">Simulated container metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
@@ -223,11 +226,12 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     const formSimulatedContainerMetric = this.getFormSimulatedContainerMetric();
     // @ts-ignore
     const simulatedContainerMetricKey: (keyof ISimulatedContainerMetric) = formSimulatedContainerMetric && Object.keys(formSimulatedContainerMetric)[0];
+    const isNewSimulatedContainerMetric = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formSimulatedContainerMetric && (
+        {!isNewSimulatedContainerMetric && isLoading && <ListLoadingSpinner/>}
+        {!isNewSimulatedContainerMetric && !isLoading && error && <Error message={error}/>}
+        {(isNewSimulatedContainerMetric || !isLoading) && (isNewSimulatedContainerMetric || !error) && formSimulatedContainerMetric && (
           <Form id={simulatedContainerMetricKey}
                 fields={this.getFields(formSimulatedContainerMetric)}
                 values={simulatedContainerMetric}
@@ -293,7 +297,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
   private containers = (): JSX.Element =>
     <SimulatedContainerMetricContainerList isLoadingSimulatedContainerMetric={this.props.isLoading}
-                                           loadSimulatedContainerMetricError={this.props.error}
+                                           loadSimulatedContainerMetricError={!this.isNew() ? this.props.error : undefined}
                                            simulatedContainerMetric={this.getSimulatedContainerMetric()}
                                            unsavedContainers={this.state.unsavedContainers}
                                            onAddContainer={this.addSimulatedContainerMetricContainer}

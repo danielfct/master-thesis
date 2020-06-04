@@ -179,6 +179,9 @@ class Container extends BaseComponent<Props, State> {
   private getFormContainer = () =>
     this.state.formContainer || this.props.formContainer;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IContainer>): void => {
     const container = reply.data;
     super.toast(`<span class="green-text">Container ${this.mounted ? `<b class="white-text">${container.containerId}</b>` : `<a href=/containers/${container.containerId}><b>${container.containerId}</b></a>`} has started at ${container.hostname}</span>`);
@@ -465,7 +468,7 @@ class Container extends BaseComponent<Props, State> {
     const {isLoading, error, newContainer} = this.props;
     const container = this.getContainer();
     const formContainer = this.getFormContainer();
-    const isNewContainer = isNew(this.props.location.search);
+    const isNewContainer = this.isNew();
     const containerValues = isNewContainer
       ? {
         ...newContainer,
@@ -477,9 +480,9 @@ class Container extends BaseComponent<Props, State> {
     const containerKey: (keyof IContainer) = formContainer && Object.keys(formContainer)[0];
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && containerValues && (
+        {!isNewContainer && isLoading && <ListLoadingSpinner/>}
+        {!isNewContainer && !isLoading && error && <Error message={error}/>}
+        {(isNewContainer || !isLoading) && (isNewContainer || !error) && containerValues && (
           <Form id={containerKey}
                 fields={this.getFields(formContainer || {})}
                 values={containerValues}
@@ -511,22 +514,22 @@ class Container extends BaseComponent<Props, State> {
 
   private ports = (): JSX.Element =>
     <ContainerPortsList isLoadingContainer={this.props.isLoading}
-                        loadContainerError={this.props.error}
+                        loadContainerError={!this.isNew() ? this.props.error : undefined}
                         container={this.getContainer()}/>;
 
   private labels = (): JSX.Element =>
     <ContainerLabelsList isLoadingContainer={this.props.isLoading}
-                         loadContainerError={this.props.error}
+                         loadContainerError={!this.isNew() ? this.props.error : undefined}
                          container={this.getContainer()}/>;
 
   private logs = (): JSX.Element =>
     <ContainerLogsList isLoadingContainer={this.props.isLoading}
-                       loadContainerError={this.props.error}
+                       loadContainerError={!this.isNew() ? this.props.error : undefined}
                        container={this.getContainer()}/>;
 
   private rules = (): JSX.Element =>
     <ContainerRuleList isLoadingContainer={this.props.isLoading}
-                       loadContainerError={this.props.error}
+                       loadContainerError={!this.isNew() ? this.props.error : undefined}
                        container={this.getContainer()}
                        unsavedRules={this.state.unsavedRules}
                        onAddContainerRule={this.addContainerRule}
@@ -537,7 +540,7 @@ class Container extends BaseComponent<Props, State> {
 
   private simulatedMetrics = (): JSX.Element =>
     <ContainerSimulatedMetricList isLoadingContainer={this.props.isLoading}
-                                  loadContainerError={this.props.error}
+                                  loadContainerError={!this.isNew() ? this.props.error : undefined}
                                   container={this.getContainer()}
                                   unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
                                   onAddSimulatedContainerMetric={this.addContainerSimulatedMetric}

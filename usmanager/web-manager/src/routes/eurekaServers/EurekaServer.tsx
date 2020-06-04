@@ -98,6 +98,9 @@ class EurekaServer extends BaseComponent<Props, State> {
   private getFormEurekaServer = () =>
     this.state.formEurekaServer || this.props.formEurekaServer;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IEurekaServer[]>): void => {
     const eurekaServers = reply.data;
     eurekaServers.forEach(eurekaServer => {
@@ -160,11 +163,12 @@ class EurekaServer extends BaseComponent<Props, State> {
     const formEurekaServer = this.getFormEurekaServer();
     // @ts-ignore
     const eurekaServerKey: (keyof IEurekaServer) = formEurekaServer && Object.keys(formEurekaServer)[0];
+    const isNewEurekaServer = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formEurekaServer && (
+        {!isNewEurekaServer && isLoading && <ListLoadingSpinner/>}
+        {!isNewEurekaServer && !isLoading && error && <Error message={error}/>}
+        {(isNewEurekaServer || !isLoading) && (isNewEurekaServer || !error) && formEurekaServer && (
           <Form id={eurekaServerKey}
                 fields={this.getFields(formEurekaServer || {})}
                 values={eurekaServer || newEurekaServer || {}}

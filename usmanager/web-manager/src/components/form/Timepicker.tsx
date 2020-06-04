@@ -8,8 +8,9 @@ interface Props {
   name: string;
   value: string;
   disabled?: boolean;
-  options?: Partial<TimepickerOptions>;
   onSelect: (time: string) => void;
+  onChange: (e: React.FormEvent<HTMLInputElement>) => void;
+  options?: Partial<TimepickerOptions>;
 }
 
 interface State {
@@ -53,15 +54,16 @@ export class Timepicker extends React.Component<Props, State> {
     this.setState({ selectedTime: String(`${zeroPad(hour, 2)}:${zeroPad(minute, 2)}`)});
 
   public render() {
-    const {className, id, name, value, disabled} = this.props;
+    const {className, id, name, value, disabled, onChange} = this.props;
     return (
       <input className={`timepicker ${className}`}
              type="text"
              id={id}
              name={name}
-             value={value}
+             value={value || ''}
              disabled={disabled}
              autoComplete="off"
+             onChange={onChange}
              ref={this.timepicker}/>
     )
   }

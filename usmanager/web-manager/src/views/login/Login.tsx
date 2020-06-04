@@ -72,10 +72,10 @@ class Login extends BaseComponent<Props, State> {
     basicAuthenticate(username, password)
       .then(() => {
         registerSuccessfulLogin(username, password);
-        super.toast(`Welcome ${username}`);
+        super.toast(`Welcome ${username}`, undefined, undefined, true, true);
         this.props.history.push(`/home`);
       }).catch((e:AxiosError) => {
-      super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true);
+      super.toast(`Unable to login`, 7500, e.response?.status === 401 ? 'Invalid username and/or password' : e.message, true, true);
     })
   };
 

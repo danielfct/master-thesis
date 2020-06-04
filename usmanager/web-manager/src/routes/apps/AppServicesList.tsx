@@ -172,13 +172,14 @@ class ServiceAppList extends BaseComponent<Props, State> {
     }
   );
 
-  private onModalOpen = (selectedService: string): void => {
+  private onDropdownSelect = (selectedService: string): void => {
     this.setState({selectedService: selectedService});
   };
 
   public render() {
-    return <ControlledList<IAppService> isLoading={this.props.isLoadingApp || this.props.isLoading}
-                                        error={this.props.loadAppError || this.props.error}
+    const isNew = this.isNew();
+    return <ControlledList<IAppService> isLoading={!isNew ? this.props.isLoadingApp || this.props.isLoading : undefined}
+                                        error={!isNew ? this.props.loadAppError || this.props.error : undefined}
                                         emptyMessage={`Services list is empty`}
                                         data={this.props.appServices}
                                         dataKey={['service', 'serviceName']}
@@ -187,14 +188,13 @@ class ServiceAppList extends BaseComponent<Props, State> {
                                           title: 'Add service',
                                           empty: 'No more services to add',
                                           data: this.getSelectableServicesNames(),
+                                          onSelect: this.onDropdownSelect,
                                           formModal: {
                                             id: 'appService',
                                             fields: this.getModalFields(),
                                             values: this.getModalValues(),
                                             content: this.addModal,
                                             position: '20%',
-                                            onOpen: this.onModalOpen,
-                                            open: this.state.selectedService !== undefined,
                                           }
                                         }}
                                         show={this.service}

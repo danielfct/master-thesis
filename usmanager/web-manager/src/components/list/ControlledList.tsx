@@ -10,13 +10,22 @@ import InputDialog from "../dialogs/InputDialog";
 import {IFormModal, IValues, RestOperation} from "../form/Form";
 import ScrollBar from "react-perfect-scrollbar";
 
+interface IDropdown {
+  id: string,
+  title: string,
+  empty: string,
+  data: string[],
+  onSelect?: (selected: any) => void,
+  formModal?: IFormModal
+}
+
 interface ControlledListProps<T> {
   dataKey: string[],
   isLoading?: boolean;
   error?: string | null;
   emptyMessage?: string;
   data?: T[];
-  dropdown?: { id: string, title: string, empty: string, data: string[], formModal?: IFormModal};
+  dropdown?: IDropdown;
   formModal?: IFormModal;
   show: (index: number, element: T, separate: boolean, checked: boolean,
          handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void) => JSX.Element;
@@ -201,14 +210,15 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                         values={formModal.values}
                         position={formModal.position}
                         confirmCallback={preSelected ? this.onAddDropdownModalInput : this.onAddFormModalInput}
-                        open={formModal.open}>
+                        fullscreen={formModal.fullScreen}
+                        scrollbar={formModal.scrollbar}>
       {formModal?.content()}
     </InputDialog>;
   };
 
   private setSelected = (event: any) => {
     this.selected = decodeHTML((event.target as HTMLLIElement).innerHTML);
-    this.props.dropdown?.formModal?.onOpen?.(this.selected);
+    this.props.dropdown?.onSelect?.(this.selected);
   };
 
   public render() {
@@ -222,7 +232,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
     return (
       <div>
         <div className='controlsContainer'>
-          {data.length > 0 && (
+          {!error && data.length > 0 && (
             <p className={`${styles.nolabelCheckbox}`}>
               <label>
                 <input type="checkbox"
@@ -250,7 +260,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
                 <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
                   {dropdown.data.map((data, index) =>
                     <li key={index} onClick={!dropdown?.formModal ? this.onAdd : this.setSelected}>
-                      <a>
+                      <a className={'modal-trigger'} data-target={dropdown.formModal?.id}>
                         {data}
                       </a>
                     </li>
@@ -260,7 +270,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
               {dropdown?.formModal && this.inputDialog(dropdown?.formModal, true)}
             </>
           )}
-          {(formModal &&
+          {(!error && formModal &&
             <>
                 <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
                         data-position="bottom" data-tooltip={formModal.title}
@@ -272,8 +282,8 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
           )}
           <button className="btn-flat btn-small waves-effect waves-light red-text right"
                   style={!error && Object.values(this.state)
-                               .map(item => item?.isChecked || false)
-                               .some(checked => checked)
+                                         .map(item => item?.isChecked || false)
+                                         .some(checked => checked)
                     ? {transform: "scale(1)"}
                     : {transform: "scale(0)"}}
                   onClick={this.onRemove}>

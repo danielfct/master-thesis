@@ -26,7 +26,7 @@ export class NumberBox extends React.Component<NumberBoxProps, any> {
         id={id}
         name={name}
         type="number"
-        value={value}
+        value={value || ''}
         min={min}
         max={max}
         disabled={disabled}

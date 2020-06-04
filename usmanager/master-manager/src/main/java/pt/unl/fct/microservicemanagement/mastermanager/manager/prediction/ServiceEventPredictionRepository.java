@@ -34,7 +34,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ServiceEventPredictionRepository extends JpaRepository<ServiceEventPredictionEntity, Long> {
 
-  @Query("select sp.minReplicas "
+  @Query("select sp.minimumReplicas "
       + "from ServiceEventPredictionEntity sp inner join sp.service s "
       + "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
       + "order by sp.lastUpdate desc")

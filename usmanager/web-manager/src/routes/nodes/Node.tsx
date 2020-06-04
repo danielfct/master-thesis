@@ -107,6 +107,9 @@ class Node extends BaseComponent<Props, State> {
   private getNode = () =>
     this.state.node || this.props.node;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<INode>): void => {
     const node = reply.data;
     super.toast(`<span class="green-text">Started node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.hostname}</span>`);
@@ -243,15 +246,15 @@ class Node extends BaseComponent<Props, State> {
   private node = () => {
     const {isLoading, error, newNodeHost, newNodeLocation} = this.props;
     const {currentForm} = this.state;
-    const isNewNode = isNew(this.props.location.search);
+    const isNewNode = this.isNew();
     const node = isNewNode ? (currentForm === 'On host' ? newNodeHost : newNodeLocation) : this.getNode();
     // @ts-ignore
     const nodeKey: (keyof INode) = node && Object.keys(node)[0];
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && node && (
+        {!isNewNode && isLoading && <ListLoadingSpinner/>}
+        {!isNewNode && !isLoading && error && <Error message={error}/>}
+        {(isNewNode || !isLoading) && (isNewNode || !error) && node && (
           <Form id={nodeKey}
                 fields={this.getFields(node)}
                 values={node}

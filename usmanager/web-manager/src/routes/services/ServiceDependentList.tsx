@@ -75,10 +75,10 @@ class ServiceDependentList extends BaseComponent<Props, {}> {
     const DependentsList = List<string>();
     return (
       <DependentsList isLoading={this.props.isLoadingService || this.props.isLoading}
-                     error={this.props.loadServiceError || this.props.error}
-                     emptyMessage={`Dependents list is empty`}
-                     list={this.props.dependentNames}
-                     show={this.dependent}/>
+                      error={this.props.loadServiceError || this.props.error}
+                      emptyMessage={`Dependents list is empty`}
+                      list={this.props.dependentNames}
+                      show={this.dependent}/>
     );
   }
 

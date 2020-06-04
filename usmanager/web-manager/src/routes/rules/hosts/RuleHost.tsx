@@ -118,6 +118,9 @@ class RuleHost extends BaseComponent<Props, State> {
   private getFormRuleHost = () =>
     this.state.formRuleHost || this.props.formRuleHost;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IRuleHost>): void => {
     const ruleHost = reply.data;
     super.toast(`<span class="green-text">Host rule ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} saved</span>`);
@@ -298,11 +301,12 @@ class RuleHost extends BaseComponent<Props, State> {
     const formRuleHost = this.getFormRuleHost();
     // @ts-ignore
     const ruleKey: (keyof IRuleHost) = formRuleHost && Object.keys(formRuleHost)[0];
+    const isNewRuleHost = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formRuleHost && (
+        {!isNewRuleHost && isLoading && <ListLoadingSpinner/>}
+        {!isNewRuleHost && !isLoading && error && <Error message={error}/>}
+        {(isNewRuleHost || !isLoading) && (isNewRuleHost || !error) && formRuleHost && (
           <Form id={ruleKey}
                 fields={this.getFields(formRuleHost)}
                 values={ruleHost}
@@ -356,7 +360,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
   private conditions = (): JSX.Element =>
     <HostRuleConditionList isLoadingHostRule={this.props.isLoading}
-                           loadHostRuleError={this.props.error}
+                           loadHostRuleError={!this.isNew() ? this.props.error : undefined}
                            ruleHost={this.getRuleHost()}
                            unsavedConditions={this.state.unsavedConditions}
                            onAddRuleCondition={this.addRuleCondition}
@@ -364,7 +368,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
   private cloudHosts = (): JSX.Element =>
     <HostRuleCloudHostsList isLoadingHostRule={this.props.isLoading}
-                            loadHostRuleError={this.props.error}
+                            loadHostRuleError={!this.isNew() ? this.props.error : undefined}
                             ruleHost={this.getRuleHost()}
                             unsavedCloudHosts={this.state.unsavedCloudHosts}
                             onAddRuleCloudHost={this.addRuleCloudHost}
@@ -372,7 +376,7 @@ class RuleHost extends BaseComponent<Props, State> {
 
   private edgeHosts = (): JSX.Element =>
     <HostRuleEdgeHostsList isLoadingHostRule={this.props.isLoading}
-                           loadHostRuleError={this.props.error}
+                           loadHostRuleError={!this.isNew() ? this.props.error : undefined}
                            ruleHost={this.getRuleHost()}
                            unsavedEdgeHosts={this.state.unsavedEdgeHosts}
                            onAddRuleEdgeHost={this.addRuleEdgeHost}

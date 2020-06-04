@@ -1,5 +1,6 @@
 import React, {createRef} from "react";
 import M from "materialize-css";
+import ResizeObserver from 'resize-observer-polyfill';
 
 interface Props {
   id: string;
@@ -7,13 +8,12 @@ interface Props {
   active?: boolean;
   headerClassname?: string;
   bodyClassname?: string;
+  onChange?: () => void;
 }
 
 interface State {
   isOpen: boolean;
 }
-
-//FIXME: fix scrollbar when collapsible is opened/closed
 
 export default class extends React.Component<Props, State> {
 
@@ -22,23 +22,39 @@ export default class extends React.Component<Props, State> {
   };
 
   private collapsible = createRef<HTMLUListElement>();
+  private resizeObserver: (ResizeObserver | null) = null;
 
   public componentDidMount(): void {
     this.initCollapsible();
+    if (this.props.onChange) {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.props.onChange?.();
+      });
+      this.resizeObserver.observe(this.collapsible.current as Element);
+    }
   }
 
   private initCollapsible = () => {
     M.Collapsible.init(this.collapsible.current as Element);
   };
 
-  private setIsOpen = () =>
+  componentWillUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
+
+  private onChange = () => {
     this.setState(state => ({isOpen: !state.isOpen}));
+    this.props.onChange?.();
+  }
+
 
   public render() {
     const {id, title, active, headerClassname, bodyClassname, children} = this.props;
     const {isOpen} = this.state;
     return (
-      <ul id={id} className="collapsible" ref={this.collapsible} onClick={this.setIsOpen}>
+      <ul id={id} className="collapsible" ref={this.collapsible} onClick={this.onChange}>
         <li className={active ? "active" : undefined}>
           <ul className={`collapsible-header no-select ${headerClassname}`}>
             <div className={`subtitle`}>{title}</div>

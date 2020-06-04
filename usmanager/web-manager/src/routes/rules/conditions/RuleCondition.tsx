@@ -94,6 +94,9 @@ class RuleCondition extends BaseComponent<Props, State> {
   private getFormCondition = () =>
     this.state.formCondition || this.props.formCondition;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IRuleCondition>): void => {
     const condition = reply.data;
     super.toast(`<span class="green-text">Condition ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} saved</span>`);
@@ -169,11 +172,12 @@ class RuleCondition extends BaseComponent<Props, State> {
     const formCondition = this.getFormCondition();
     // @ts-ignore
     const conditionKey: (keyof IRuleCondition) = formCondition && Object.keys(formCondition)[0];
+    const isNewRuleCondition = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formCondition && (
+        {!isNewRuleCondition && isLoading && <ListLoadingSpinner/>}
+        {!isNewRuleCondition && !isLoading && error && <Error message={error}/>}
+        {(isNewRuleCondition || !isLoading) && (isNewRuleCondition || !error) && formCondition && (
           <Form id={conditionKey}
                 fields={this.getFields(formCondition)}
                 values={condition}

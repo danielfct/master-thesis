@@ -118,6 +118,9 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
   private getFormSimulatedHostMetric = () =>
     this.state.formSimulatedHostMetric || this.props.formSimulatedHostMetric;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<ISimulatedHostMetric>): void => {
     const simulatedMetric = reply.data;
     super.toast(`<span class="green-text">Simulated host metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
@@ -261,11 +264,12 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     const formSimulatedHostMetric = this.getFormSimulatedHostMetric();
     // @ts-ignore
     const simulatedHostMetricKey: (keyof ISimulatedHostMetric) = formSimulatedHostMetric && Object.keys(formSimulatedHostMetric)[0];
+    const isNewSimulatedHostMetric = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formSimulatedHostMetric && (
+        {!isNewSimulatedHostMetric && isLoading && <ListLoadingSpinner/>}
+        {!isNewSimulatedHostMetric && !isLoading && error && <Error message={error}/>}
+        {(isNewSimulatedHostMetric || !isLoading) && (isNewSimulatedHostMetric || !error) && formSimulatedHostMetric && (
           <Form id={simulatedHostMetricKey}
                 fields={this.getFields(formSimulatedHostMetric)}
                 values={simulatedHostMetric}
@@ -331,7 +335,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
 
   private cloudHosts = (): JSX.Element =>
     <SimulatedHostMetricCloudHostList isLoadingSimulatedHostMetric={this.props.isLoading}
-                                      loadSimulatedHostMetricError={this.props.error}
+                                      loadSimulatedHostMetricError={!this.isNew() ? this.props.error : undefined}
                                       simulatedHostMetric={this.getSimulatedHostMetric()}
                                       unsavedCloudHosts={this.state.unsavedCloudHosts}
                                       onAddCloudHost={this.addSimulatedHostMetricCloudHost}
@@ -339,7 +343,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
 
   private edgeHosts = (): JSX.Element =>
     <SimulatedHostMetricEdgeHostList isLoadingSimulatedHostMetric={this.props.isLoading}
-                                     loadSimulatedHostMetricError={this.props.error}
+                                     loadSimulatedHostMetricError={!this.isNew() ? this.props.error : undefined}
                                      simulatedHostMetric={this.getSimulatedHostMetric()}
                                      unsavedEdgeHosts={this.state.unsavedEdgeHosts}
                                      onAddEdgeHost={this.addSimulatedHostMetricEdgeHost}

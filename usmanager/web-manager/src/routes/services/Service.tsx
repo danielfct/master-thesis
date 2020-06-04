@@ -161,6 +161,9 @@ class Service extends BaseComponent<Props, State> {
   private getFormService = () =>
     this.state.formService || this.props.formService;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IService>): void => {
     const service = reply.data;
     super.toast(`<span class="green-text">Service ${this.mounted ? `<b class="white-text">${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} saved</span>`);
@@ -400,15 +403,16 @@ class Service extends BaseComponent<Props, State> {
     const formService = this.getFormService();
     // @ts-ignore
     const serviceKey: (keyof IService) = formService && Object.keys(formService)[0];
+    const isNewService = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formService && (
+        {!isNewService && isLoading && <ListLoadingSpinner/>}
+        {!isNewService && !isLoading && error && <Error message={error}/>}
+        {(isNewService || !isLoading) && (isNewService || !error) && formService && (
           <Form id={serviceKey}
                 fields={this.getFields(formService)}
                 values={service}
-                isNew={isNew(this.props.location.search)}
+                isNew={isNewService}
                 showSaveButton={this.shouldShowSaveButton()}
                 post={{
                   url: 'services',
@@ -447,7 +451,7 @@ class Service extends BaseComponent<Props, State> {
 
   private apps = (): JSX.Element =>
     <ServiceAppList isLoadingService={this.props.isLoading}
-                    loadServiceError={this.props.error}
+                    loadServiceError={!this.isNew() ? this.props.error : undefined}
                     service={this.getService()}
                     unsavedApps={this.state.unsavedApps}
                     onAddServiceApp={this.addServiceApp}
@@ -455,7 +459,7 @@ class Service extends BaseComponent<Props, State> {
 
   private dependencies = (): JSX.Element =>
     <ServiceDependencyList isLoadingService={this.props.isLoading}
-                           loadServiceError={this.props.error}
+                           loadServiceError={!this.isNew() ? this.props.error : undefined}
                            service={this.getService()}
                            unsavedDependencies={this.state.unsavedDependencies}
                            onAddServiceDependency={this.addServiceDependency}
@@ -463,12 +467,12 @@ class Service extends BaseComponent<Props, State> {
 
   private dependents = (): JSX.Element =>
     <ServiceDependentList isLoadingService={this.props.isLoading}
-                          loadServiceError={this.props.error}
+                          loadServiceError={!this.isNew() ? this.props.error : undefined}
                           service={this.getService()}/>;
 
   private predictions = (): JSX.Element =>
     <ServicePredictionList isLoadingService={this.props.isLoading}
-                           loadServiceError={this.props.error}
+                           loadServiceError={!this.isNew() ? this.props.error : undefined}
                            service={this.getService()}
                            unsavedPredictions={this.state.unsavedPredictions}
                            onAddServicePrediction={this.addServicePrediction}
@@ -476,7 +480,7 @@ class Service extends BaseComponent<Props, State> {
 
   private rules = (): JSX.Element =>
     <ServiceRuleList isLoadingService={this.props.isLoading}
-                     loadServiceError={this.props.error}
+                     loadServiceError={!this.isNew() ? this.props.error : undefined}
                      service={this.getService()}
                      unsavedRules={this.state.unsavedRules}
                      onAddServiceRule={this.addServiceRule}
@@ -487,7 +491,7 @@ class Service extends BaseComponent<Props, State> {
 
   private simulatedMetrics = (): JSX.Element =>
     <ServiceSimulatedMetricList isLoadingService={this.props.isLoading}
-                                loadServiceError={this.props.error}
+                                loadServiceError={!this.isNew() ? this.props.error : undefined}
                                 service={this.getService()}
                                 unsavedSimulatedMetrics={this.state.unsavedSimulatedMetrics}
                                 onAddSimulatedServiceMetric={this.addServiceSimulatedMetric}
@@ -496,53 +500,57 @@ class Service extends BaseComponent<Props, State> {
   private genericSimulatedMetrics = (): JSX.Element =>
      <GenericServiceSimulatedMetricList/>;
 
-  private tabs = () => [
-    {
-      title: 'Service',
-      id: 'service',
-      content: () => this.service()
-    },
-    {
-      title: 'Apps',
-      id: 'apps',
-      content: () => this.apps()
-    },
-    {
-      title: 'Dependencies',
-      id: 'dependencies',
-      content: () => this.dependencies()
-    },
-    {
-      title: 'Dependents',
-      id: 'dependents',
-      content: () => this.dependents()
-    },
-    {
-      title: 'Predictions',
-      id: 'predictions',
-      content: () => this.predictions()
-    },
-    {
-      title: 'Rules',
-      id: 'serviceRules',
-      content: () => this.rules()
-    },
-    {
-      title: 'Generic rules',
-      id: 'genericRules',
-      content: () => this.genericRules()
-    },
-    {
-      title: 'Simulated metrics',
-      id: 'simulatedMetrics',
-      content: () => this.simulatedMetrics()
-    },
-    {
-      title: 'Generic simulated metrics',
-      id: 'genericSimulatedMetrics',
-      content: () => this.genericSimulatedMetrics()
-    },
-  ];
+  private tabs = () => {
+    const tabs = [];
+    tabs.push({
+        title: 'Service',
+        id: 'service',
+        content: () => this.service()
+      },
+      {
+        title: 'Apps',
+        id: 'apps',
+        content: () => this.apps()
+      },
+      {
+        title: 'Dependencies',
+        id: 'dependencies',
+        content: () => this.dependencies()
+      });
+    if (!this.isNew()) {
+      tabs.push({
+        title: 'Dependents',
+        id: 'dependents',
+        content: () => this.dependents()
+      });
+    }
+    tabs.push({
+        title: 'Predictions',
+        id: 'predictions',
+        content: () => this.predictions()
+      },
+      {
+        title: 'Rules',
+        id: 'serviceRules',
+        content: () => this.rules()
+      },
+      {
+        title: 'Generic rules',
+        id: 'genericRules',
+        content: () => this.genericRules()
+      },
+      {
+        title: 'Simulated metrics',
+        id: 'simulatedMetrics',
+        content: () => this.simulatedMetrics()
+      },
+      {
+        title: 'Generic simulated metrics',
+        id: 'genericSimulatedMetrics',
+        content: () => this.genericSimulatedMetrics()
+      });
+    return tabs;
+  }
 
   public render() {
     return (

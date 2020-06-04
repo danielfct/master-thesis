@@ -49,6 +49,21 @@ Executar os comandos seguintes deve resolvê-lo:
 >
 > `sudo sysctl -p`
 
+### TODO list
+
+- O código pode ser fatorizado um pouco mais. 
+Por exemplo, existir um componente genérico Entity que representa as entidades principais,
+como app, service, container, host, etc. E um EntityList para representar as listas das entidades, 
+por exemplo dos serviços da apps, ou das regras de um container.
+Iria permitir a remoção de algum código que parece repetido.
+
+- Melhorar o modal que aparece ao adicionar um service prediction. 
+O modal ficou demasiado grande, o que implica fazer scrolling para ver os botões de cancelamento/submissão. 
+Talvez substituir temporariamente o ControlledList por um form seria melhor (com uma seta para retrocesso incluído na parte esquerda do form)
+
+- Outro melhoramento seria o uso de listas animadas, trabalho o qual já foi iniciado no componente AnimatedList (ver [react-spring](https://www.react-spring.io/)).
+Por exemplo, ao remover/adicionar novos elementos a uma lista, ou ao mudar de página numa lista paginada.
+
 ### Licença
 
 Web manager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.

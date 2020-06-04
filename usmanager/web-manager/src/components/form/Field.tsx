@@ -67,7 +67,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     formContext.setValue(id, value);
   };
 
-  private onSelect = (value: string, id: string, formContext: IFormContext) => {
+  private onSelect = (id: string, formContext: IFormContext) => (value: string) => {
     formContext.setValue(id, value);
   };
 
@@ -155,7 +155,8 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                             name={id}
                             value={formContext.values[id]}
                             disabled={disabled || !formContext.isEditing}
-                            onSelect={date => this.onSelect(date, id, formContext)}/>
+                            onSelect={this.onSelect(id, formContext)}
+                            onChange={this.onChange(id, formContext)}/>
               )}
               {(type && type.toLowerCase() === "timepicker") && (
                 <Timepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
@@ -163,7 +164,8 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                             name={id}
                             value={formContext.values[id]}
                             disabled={disabled || !formContext?.isEditing}
-                            onSelect={value => this.onSelect(value, id, formContext)}/>
+                            onSelect={this.onSelect(id, formContext)}
+                            onChange={this.onChange(id, formContext)}/>
               )}
               {type && type.toLowerCase() === "multilinetext" && (
                 <MultilineTextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}

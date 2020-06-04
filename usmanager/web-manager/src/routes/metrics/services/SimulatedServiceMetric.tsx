@@ -113,6 +113,9 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
   private getFormSimulatedServiceMetric = () =>
     this.state.formSimulatedServiceMetric || this.props.formSimulatedServiceMetric;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<ISimulatedServiceMetric>): void => {
     const simulatedMetric = reply.data;
     super.toast(`<span class="green-text">Simulated service metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
@@ -223,11 +226,12 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     const formSimulatedServiceMetric = this.getFormSimulatedServiceMetric();
     // @ts-ignore
     const simulatedServiceMetricKey: (keyof ISimulatedServiceMetric) = formSimulatedServiceMetric && Object.keys(formSimulatedServiceMetric)[0];
+    const isNewSimulatedServiceMetric = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formSimulatedServiceMetric && (
+        {!isNewSimulatedServiceMetric && isLoading && <ListLoadingSpinner/>}
+        {!isNewSimulatedServiceMetric && !isLoading && error && <Error message={error}/>}
+        {(isNewSimulatedServiceMetric || !isLoading) && (isNewSimulatedServiceMetric || !error) && formSimulatedServiceMetric && (
           <Form id={simulatedServiceMetricKey}
                 fields={this.getFields(formSimulatedServiceMetric)}
                 values={simulatedServiceMetric}
@@ -293,7 +297,7 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
   private services = (): JSX.Element =>
     <SimulatedServiceMetricServiceList isLoadingSimulatedServiceMetric={this.props.isLoading}
-                                       loadSimulatedServiceMetricError={this.props.error}
+                                       loadSimulatedServiceMetricError={!this.isNew() ? this.props.error : undefined}
                                        simulatedServiceMetric={this.getSimulatedServiceMetric()}
                                        unsavedServices={this.state.unsavedServices}
                                        onAddService={this.addSimulatedServiceMetricService}

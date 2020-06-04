@@ -114,6 +114,9 @@ class RuleService extends BaseComponent<Props, State> {
   private getFormRuleService = () =>
     this.state.formRuleService || this.props.formRuleService;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IRuleService>): void => {
     const ruleService = reply.data;
     super.toast(`<span class="green-text">Service rule ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} saved</span>`);
@@ -262,11 +265,12 @@ class RuleService extends BaseComponent<Props, State> {
     const formRuleService = this.getFormRuleService();
     // @ts-ignore
     const ruleKey: (keyof IRuleService) = formRuleService && Object.keys(formRuleService)[0];
+    const isNewRuleService = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formRuleService && (
+        {!isNewRuleService && isLoading && <ListLoadingSpinner/>}
+        {!isNewRuleService && !isLoading && error && <Error message={error}/>}
+        {(isNewRuleService || !isLoading) && (isNewRuleService || !error) && formRuleService && (
           <Form id={ruleKey}
                 fields={this.getFields(formRuleService)}
                 values={ruleService}
@@ -320,7 +324,7 @@ class RuleService extends BaseComponent<Props, State> {
 
   private conditions = (): JSX.Element =>
     <RuleServiceConditionList isLoadingRuleService={this.props.isLoading}
-                              loadRuleServiceError={this.props.error}
+                              loadRuleServiceError={!this.isNew() ? this.props.error : undefined}
                               ruleService={this.getRuleService()}
                               unsavedConditions={this.state.unsavedConditions}
                               onAddRuleCondition={this.addRuleCondition}
@@ -328,7 +332,7 @@ class RuleService extends BaseComponent<Props, State> {
 
   private services = (): JSX.Element =>
     <RuleServiceServicesList isLoadingRuleService={this.props.isLoading}
-                             loadRuleServiceError={this.props.error}
+                             loadRuleServiceError={!this.isNew() ? this.props.error : undefined}
                              ruleService={this.getRuleService()}
                              unsavedServices={this.state.unsavedServices}
                              onAddRuleService={this.addRuleService}

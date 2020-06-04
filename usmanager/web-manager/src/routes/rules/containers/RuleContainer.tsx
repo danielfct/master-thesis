@@ -114,6 +114,9 @@ class RuleContainer extends BaseComponent<Props, State> {
   private getFormRuleContainer = () =>
     this.state.formRuleContainer || this.props.formRuleContainer;
 
+  private isNew = () =>
+    isNew(this.props.location.search);
+
   private onPostSuccess = (reply: IReply<IRuleContainer>): void => {
     const ruleContainer = reply.data;
     super.toast(`<span class="green-text">Container rule ${this.mounted ? `<b class="white-text">${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} saved</span>`);
@@ -262,11 +265,12 @@ class RuleContainer extends BaseComponent<Props, State> {
     const formRuleContainer = this.getFormRuleContainer();
     // @ts-ignore
     const ruleKey: (keyof IRuleContainer) = formRuleContainer && Object.keys(formRuleContainer)[0];
+    const isNewRuleContainer = this.isNew();
     return (
       <>
-        {isLoading && <ListLoadingSpinner/>}
-        {!isLoading && error && <Error message={error}/>}
-        {!isLoading && !error && formRuleContainer && (
+        {!isNewRuleContainer && isLoading && <ListLoadingSpinner/>}
+        {!isNewRuleContainer && !isLoading && error && <Error message={error}/>}
+        {(isNewRuleContainer || !isLoading) && (isNewRuleContainer || !error) && formRuleContainer && (
           <Form id={ruleKey}
                 fields={this.getFields(formRuleContainer)}
                 values={ruleContainer}
@@ -320,7 +324,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
   private conditions = (): JSX.Element =>
     <RuleContainerConditionList isLoadingRuleContainer={this.props.isLoading}
-                              loadRuleContainerError={this.props.error}
+                              loadRuleContainerError={!this.isNew() ? this.props.error : undefined}
                               ruleContainer={this.getRuleContainer()}
                               unsavedConditions={this.state.unsavedConditions}
                               onAddRuleCondition={this.addRuleCondition}
@@ -328,7 +332,7 @@ class RuleContainer extends BaseComponent<Props, State> {
 
   private containers = (): JSX.Element =>
     <RuleContainerContainersList isLoadingRuleContainer={this.props.isLoading}
-                             loadRuleContainerError={this.props.error}
+                             loadRuleContainerError={!this.isNew() ? this.props.error : undefined}
                              ruleContainer={this.getRuleContainer()}
                              unsavedContainers={this.state.unsavedContainers}
                              onAddRuleContainer={this.addRuleContainer}
