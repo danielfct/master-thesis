@@ -1,5 +1,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
@@ -37,6 +39,11 @@ public class ContainerRulesController {
 
   @PostMapping("/containers")
   public ContainerRuleEntity addRule(@RequestBody ContainerRuleEntity rule) {
+    ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
+    if (decisionComponentType != ComponentType.CONTAINER) {
+      throw new BadRequestException("Expected decision type %s, instead got %s",
+          ComponentType.CONTAINER.getType(), decisionComponentType.getType());
+    }
     Validation.validatePostRequest(rule.getId());
     return containerRulesService.addRule(rule);
   }

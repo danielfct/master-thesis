@@ -1,5 +1,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
@@ -38,6 +40,11 @@ public class HostRulesController {
 
   @PostMapping("/hosts")
   public HostRuleEntity addRule(@RequestBody HostRuleEntity rule) {
+    ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
+    if (decisionComponentType != ComponentType.HOST) {
+      throw new BadRequestException("Expected decision type %s, instead got %s",
+          ComponentType.HOST.getType(), decisionComponentType.getType());
+    }
     Validation.validatePostRequest(rule.getId());
     return hostRulesService.addRule(rule);
   }

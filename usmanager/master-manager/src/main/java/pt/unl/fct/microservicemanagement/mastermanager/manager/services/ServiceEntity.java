@@ -120,12 +120,12 @@ public class ServiceEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "services", cascade = CascadeType.ALL)
-  private Set<ServiceRuleEntity> rules;
+  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  private Set<ServiceRuleEntity> serviceRules;
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "services", cascade = CascadeType.ALL)
+  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private Set<SimulatedServiceMetricEntity> simulatedServiceMetrics;
 
   public boolean hasLaunchCommand() {

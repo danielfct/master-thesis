@@ -81,17 +81,17 @@ public class HostRuleEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany(mappedBy = "hostRules", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<CloudHostEntity> cloudHosts;
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany(mappedBy = "hostRules", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<EdgeHostEntity> edgeHosts;
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL)
   private Set<HostRuleConditionEntity> conditions = new HashSet<>();
 
   @Override

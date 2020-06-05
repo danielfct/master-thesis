@@ -10,13 +10,19 @@ export interface IRule extends IDatabaseData {
 }
 
 export interface IDecision extends IDatabaseData {
-  name: string;
+  value: string;
   componentType: IComponentType;
 }
 
 interface IComponentType extends IDatabaseData {
-  name: string;
+  type: string;
 }
+
+export const componentTypes = {
+  HOST: { type: "host" },
+  SERVICE: { type: "service" },
+  CONTAINER: { type: "container" }
+};
 
 export interface IValueMode extends IDatabaseData {
   name: string;

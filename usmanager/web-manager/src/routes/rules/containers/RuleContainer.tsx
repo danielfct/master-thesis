@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IDecision, IRule} from "../Rule";
+import {componentTypes, IDecision, IRule} from "../Rule";
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../../components/BaseComponent";
 import Form, {
@@ -99,6 +99,12 @@ class RuleContainer extends BaseComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+    if (prevProps.ruleContainer?.generic != this.props.ruleContainer?.generic) {
+      this.setState({isGeneric: this.props.ruleContainer?.generic || false})
+    }
   }
 
   private loadRuleContainer = () => {
@@ -251,13 +257,14 @@ class RuleContainer extends BaseComponent<Props, State> {
     }, {});
 
   private decisionDropdownOption = (decision: IDecision): string =>
-    decision.name;
+    decision.value;
 
   private isGenericSelected = (generic: boolean) =>
     this.setState({isGeneric: generic});
 
   private getSelectableDecisions = () =>
-    Object.values(this.props.decisions).filter(decision => decision.componentType.name.toLowerCase() === 'container');
+    Object.values(this.props.decisions).filter(decision =>
+      decision.componentType.type.toLocaleLowerCase() === componentTypes.CONTAINER.type.toLocaleLowerCase());
 
   private containerRule = () => {
     const {isLoading, error} = this.props;

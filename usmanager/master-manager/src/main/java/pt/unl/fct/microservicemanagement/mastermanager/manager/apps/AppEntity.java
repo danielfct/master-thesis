@@ -65,7 +65,7 @@ public class AppEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "app", cascade = CascadeType.ALL)
   private Set<AppServiceEntity> appServices;
 
   @Override

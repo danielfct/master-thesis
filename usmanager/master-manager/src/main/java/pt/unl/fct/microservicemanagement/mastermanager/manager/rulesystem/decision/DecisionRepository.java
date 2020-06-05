@@ -24,6 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentType;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -34,12 +37,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DecisionRepository extends JpaRepository<DecisionEntity, Long> {
 
-  Optional<DecisionEntity> findByNameIgnoreCase(@Param("name") String name);
+  Optional<DecisionEntity> findByValue(@Param("decision") RuleDecision decision);
 
-  List<DecisionEntity> findByComponentTypeNameIgnoreCase(@Param("componentType") String componentType);
+  List<DecisionEntity> findByComponentTypeType(@Param("componentType") ComponentType componentType);
 
-  Optional<DecisionEntity> findByNameIgnoreCaseAndComponentTypeNameIgnoreCase(
-      @Param("decisionName") String decisionName,
-      @Param("componentType") String componentType);
+  Optional<DecisionEntity> findByValueAndComponentTypeType(
+      @Param("decision") RuleDecision decision,
+      @Param("componentType") ComponentType componentType);
 
 }

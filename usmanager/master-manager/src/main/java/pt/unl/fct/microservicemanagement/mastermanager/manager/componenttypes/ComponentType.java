@@ -8,33 +8,31 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
-import {IRuleService} from "./RuleService";
-import Card from "../../../components/cards/Card";
-import CardItem from "../../../components/list/CardItem";
+package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
-interface ServiceRuleCardProps {
-  rule: IRuleService;
+public enum ComponentType {
+
+  HOST("host"),
+  SERVICE("service"),
+  CONTAINER("container");
+
+  private final String type;
+
+  ComponentType(String type) {
+    this.type = type;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public static ComponentType fromString(String type) {
+    for (ComponentType c : ComponentType.values()) {
+      if (c.type.equalsIgnoreCase(type)) {
+        return c;
+      }
+    }
+    return null;
+  }
+
 }
-
-type Props = ServiceRuleCardProps;
-
-const RuleServiceCard = ({rule}: Props) => (
-  <Card<IRuleService> title={rule.name}
-                      link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
-                      height={'125px'}
-                      margin={'10px 0'}
-                      hoverable>
-    <CardItem key={'priority'}
-              label={'Priority'}
-              value={`${rule.priority}`}/>
-    <CardItem key={'decision'}
-              label={'Decision'}
-              value={`${rule.decision.value}`}/>
-    <CardItem key={'generic'}
-              label={'Generic'}
-              value={`${rule.generic}`}/>
-  </Card>
-);
-
-export default RuleServiceCard;

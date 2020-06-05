@@ -17,7 +17,7 @@ public enum ServiceType {
   DATABASE("database"),
   SYSTEM("system");
 
-  private String type;
+  private final String type;
 
   ServiceType(String type) {
     this.type = type;
@@ -26,4 +26,5 @@ public enum ServiceType {
   public String getType() {
     return type;
   }
+
 }

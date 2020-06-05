@@ -66,7 +66,7 @@ public class SimulatedContainerMetricEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany(mappedBy = "simulatedContainerMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<ContainerEntity> containers;
 
   @Override

@@ -30,7 +30,7 @@ const RuleHostCard = ({rule}: Props) => (
               value={`${rule.priority}`}/>
     <CardItem key={'decision'}
               label={'Decision'}
-              value={`${rule.decision.name}`}/>
+              value={`${rule.decision.value}`}/>
     <CardItem key={'generic'}
               label={'Generic'}
               value={`${rule.generic}`}/>

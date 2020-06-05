@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
 import java.util.Optional;
 
@@ -33,6 +33,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ComponentTypeRepository extends JpaRepository<ComponentTypeEntity, Long> {
 
-  Optional<ComponentTypeEntity> findByNameIgnoreCase(@Param("name") String name);
+  Optional<ComponentTypeEntity> findByType(@Param("type") ComponentType type);
 
 }

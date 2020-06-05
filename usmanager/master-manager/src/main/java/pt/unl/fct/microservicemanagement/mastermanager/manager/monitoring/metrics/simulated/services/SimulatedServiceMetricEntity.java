@@ -65,7 +65,7 @@ public class SimulatedServiceMetricEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany(mappedBy = "simulatedServiceMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<ServiceEntity> services;
 
   @Override

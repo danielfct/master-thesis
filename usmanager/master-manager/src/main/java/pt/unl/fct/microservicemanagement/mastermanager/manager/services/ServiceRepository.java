@@ -104,15 +104,14 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
                                        @Param("dependentName") String dependentName);
 
   @Query("select r "
-      + "from ServiceEntity s join s.rules r "
+      + "from ServiceEntity s join s.serviceRules r "
       + "where r.generic = false and lower(s.serviceName) = lower(:serviceName)")
   List<ServiceRuleEntity> getRules(@Param("serviceName") String serviceName);
 
   @Query("select r "
-      + "from ServiceEntity s join s.rules r "
+      + "from ServiceEntity s join s.serviceRules r "
       + "where r.generic = false and lower(s.serviceName) = lower(:serviceName) and lower(r.name) = lower(:ruleName)")
   Optional<ServiceRuleEntity> getRule(@Param("serviceName") String serviceName, @Param("ruleName") String ruleName);
-
 
   @Query("select p "
       + "from ServiceEntity s join s.eventPredictions p "

@@ -1,6 +1,5 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ContainerEvent;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
@@ -12,7 +11,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.Rule;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RulesProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
@@ -26,6 +24,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -222,10 +221,9 @@ public class ServiceRulesService {
       Operator operator = Operator.fromValue(condition.getOperator().getName());
       return new Condition(fieldName, value, operator);
     }).collect(Collectors.toList());
-    RuleDecision decision = RuleDecision.fromValue(serviceRule.getDecision().getName());
+    RuleDecision decision = serviceRule.getDecision().getValue();
     int priority = serviceRule.getPriority();
     return new Rule(id, conditions, decision, priority);
   }
-
 
 }

@@ -28,8 +28,6 @@
 		"https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-	<!--<property name="basedir" value="${checkstyle.basedir}"/>-->
-	<property name="cacheFile" value="${checkstyle.cache.filepath}"/>
 	<property name="severity" value="error"/>
 	<property name="fileExtensions" value="java, properties, xml, vm, g, g4, dtd"/>
 
@@ -120,16 +118,11 @@
 			<property name="tokens"
 					  value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT,
 					  INSTANCE_INIT"/>
-			<!--ANNOTATION_DEF"/> TODO-->
 		</module>
 		<module name="NeedBraces">
 			<property name="tokens"
 					  value="LITERAL_DO, LITERAL_ELSE, LITERAL_FOR, LITERAL_IF, LITERAL_WHILE"/>
 		</module>
-		<!--<module name="NeedBraces">
-			<property name="tokens" value="LAMBDA"/>
-			<property name="allowSingleLineStatement" value="true"/>
-		</module>-->
 
 		<!-- Class Design -->
 		<module name="FinalClass"/>

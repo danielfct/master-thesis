@@ -67,12 +67,12 @@ public class SimulatedHostMetricEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<CloudHostEntity> cloudHosts;
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<EdgeHostEntity> edgeHosts;
 
   @Override

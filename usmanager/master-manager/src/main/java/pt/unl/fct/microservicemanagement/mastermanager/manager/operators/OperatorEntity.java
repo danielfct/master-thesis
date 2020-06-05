@@ -73,7 +73,7 @@ public class OperatorEntity {
   private String symbol;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "operator", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "operator", cascade = CascadeType.ALL)
   @Builder.Default
   private Set<ConditionEntity> conditions = new HashSet<>();
 

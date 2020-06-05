@@ -82,12 +82,12 @@ public class ContainerEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "containers", cascade = CascadeType.ALL)
+  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private Set<ContainerRuleEntity> containerRules;
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "containers", cascade = CascadeType.ALL)
+  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private Set<SimulatedContainerMetricEntity> simulatedContainerMetrics;
 
   @Override

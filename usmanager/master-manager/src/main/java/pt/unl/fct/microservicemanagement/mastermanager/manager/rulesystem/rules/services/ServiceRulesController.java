@@ -1,5 +1,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
@@ -37,6 +39,11 @@ public class ServiceRulesController {
 
   @PostMapping("/services")
   public ServiceRuleEntity addRule(@RequestBody ServiceRuleEntity rule) {
+    ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
+    if (decisionComponentType != ComponentType.SERVICE) {
+      throw new BadRequestException("Expected decision type %s, instead got %s",
+          ComponentType.SERVICE.getType(), decisionComponentType.getType());
+    }
     Validation.validatePostRequest(rule.getId());
     return serviceRulesService.addRule(rule);
   }

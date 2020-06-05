@@ -1,22 +1,8 @@
 loadbalancer 502 bad gateway
-add service rule not working
-checkstyle-cache is going to home folder
-logs pagesize dropdown option 'all' not working
-number fields not displaying required error
-custom buttons are triggering form validation
-cloud host entity doesnt have ip address on running state
-cant add cloud host rules
-only show red new entities when is not new
-delete cloud instance deletes host rule?
-new node -> include cloud hosts instances
 new container erroring
-remove onAdd from every list. change super.toast on lists classes
 rename all manager exceptions to MasterManagerException?
-add assertEntityDoesntExist on every add method with @query lower()
+add assertEntityDoesntExist on every add method and compare every query 'name' with lower function
 launch load balancer at aws not working
-compare every query 'name' with lower function
-deleting 1 simulated service metric, deleted all of them
-change fields to number when applied
 docker api proxy container is removed at reload
 container decisions are clashing with service decisions (frontend)
 launch app not working due to requiring region/country/city

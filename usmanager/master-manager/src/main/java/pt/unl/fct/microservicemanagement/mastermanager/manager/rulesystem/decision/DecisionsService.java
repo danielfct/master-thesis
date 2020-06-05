@@ -25,7 +25,9 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
@@ -73,9 +75,10 @@ public class DecisionsService {
     return decisions.findAll();
   }
 
-  public DecisionEntity getDecision(String name) {
-    return decisions.findByNameIgnoreCase(name).orElseThrow(() ->
-        new EntityNotFoundException(DecisionEntity.class, "name", name));
+  public DecisionEntity getDecision(String decisionName) {
+    RuleDecision decision = RuleDecision.fromString(decisionName);
+    return decisions.findByValue(decision).orElseThrow(() ->
+        new EntityNotFoundException(DecisionEntity.class, "decision", decisionName));
   }
 
   public DecisionEntity getDecision(Long id) {
@@ -84,20 +87,22 @@ public class DecisionsService {
   }
 
   public List<DecisionEntity> getServicesPossibleDecisions() {
-    return decisions.findByComponentTypeNameIgnoreCase("service");
+    return decisions.findByComponentTypeType(ComponentType.SERVICE);
   }
 
   public List<DecisionEntity> getHostsPossibleDecisions() {
-    return decisions.findByComponentTypeNameIgnoreCase("host");
+    return decisions.findByComponentTypeType(ComponentType.HOST);
   }
 
   public DecisionEntity getServicePossibleDecision(String decisionName) {
-    return decisions.findByNameIgnoreCaseAndComponentTypeNameIgnoreCase(decisionName, "service").orElseThrow(() ->
+    RuleDecision decision = RuleDecision.fromString(decisionName);
+    return decisions.findByValueAndComponentTypeType(decision, ComponentType.SERVICE).orElseThrow(() ->
         new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
   }
 
   public DecisionEntity getHostPossibleDecision(String decisionName) {
-    return decisions.findByNameIgnoreCaseAndComponentTypeNameIgnoreCase(decisionName, "host").orElseThrow(() ->
+    RuleDecision decision = RuleDecision.fromString(decisionName);
+    return decisions.findByValueAndComponentTypeType(decision, ComponentType.HOST).orElseThrow(() ->
         new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
   }
 

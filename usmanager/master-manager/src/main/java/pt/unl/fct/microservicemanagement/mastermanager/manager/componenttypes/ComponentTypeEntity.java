@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
@@ -33,6 +33,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -59,14 +61,12 @@ public class ComponentTypeEntity {
   @GeneratedValue
   private Long id;
 
-  // Possible values:
-  // - service; - host
-  //TODO enum
   @Column(unique = true)
-  private String name;
+  @Enumerated(EnumType.STRING)
+  private ComponentType type;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL)
   @Builder.Default
   private Set<DecisionEntity> decisions = new HashSet<>();
 

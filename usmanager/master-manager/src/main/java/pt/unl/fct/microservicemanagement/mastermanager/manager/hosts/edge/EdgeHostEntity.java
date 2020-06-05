@@ -80,12 +80,12 @@ public class EdgeHostEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "edgeHosts", cascade = CascadeType.ALL)
+  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private Set<HostRuleEntity> hostRules;
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "edgeHosts", cascade = CascadeType.ALL)
+  @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private Set<SimulatedHostMetricEntity> simulatedHostMetrics;
 
   @Override

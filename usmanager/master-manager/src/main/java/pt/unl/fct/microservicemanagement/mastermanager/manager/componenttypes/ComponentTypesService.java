@@ -1,12 +1,13 @@
-package pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.springframework.stereotype.Service;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -27,9 +28,10 @@ public class ComponentTypesService {
         new EntityNotFoundException(ComponentTypeEntity.class, "id", id.toString()));
   }
 
-  public ComponentTypeEntity getComponentType(String name) {
-    return componentTypes.findByNameIgnoreCase(name).orElseThrow(() ->
-        new EntityNotFoundException(ComponentTypeEntity.class, "name", name));
+  public ComponentTypeEntity getComponentType(String type) {
+    ComponentType componentType = ComponentType.fromString(type);
+    return componentTypes.findByType(componentType).orElseThrow(() ->
+        new EntityNotFoundException(ComponentTypeEntity.class, "type", type));
   }
 
   public ComponentTypeEntity addComponentType(ComponentTypeEntity componentType) {

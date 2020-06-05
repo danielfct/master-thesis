@@ -80,12 +80,12 @@ public class ContainerRuleEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany(mappedBy = "containerRules", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<ContainerEntity> containers;
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL)
   private Set<ContainerRuleConditionEntity> conditions = new HashSet<>();
 
   @Override

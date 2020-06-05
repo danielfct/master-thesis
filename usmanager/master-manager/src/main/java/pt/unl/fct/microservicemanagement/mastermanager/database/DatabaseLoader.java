@@ -28,6 +28,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostRepository;
@@ -35,15 +36,19 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEn
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes.ComponentTypeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes.ComponentTypeRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
@@ -74,7 +79,7 @@ public class DatabaseLoader {
                                  ComponentTypeRepository componentTypes, OperatorRepository operators,
                                  DecisionRepository decisions, FieldRepository fields,
                                  ValueModeRepository valueModes, ConditionRepository conditions,
-                                 HostRuleRepository hostRules,
+                                 HostRuleRepository hostRules, ServiceRuleRepository serviceRules,
                                  CloudHostsService cloudHostsService) {
     return args -> {
 
@@ -669,18 +674,18 @@ public class DatabaseLoader {
       edgeHosts.save(daniel192168168);
 
       // component types
+      var host = ComponentTypeEntity.builder()
+          .type(ComponentType.HOST)
+          .build();
+      componentTypes.save(host);
       var service = ComponentTypeEntity.builder()
-          .name("Service")
+          .type(ComponentType.SERVICE)
           .build();
       componentTypes.save(service);
       var container = ComponentTypeEntity.builder()
-          .name("Container")
+          .type(ComponentType.CONTAINER)
           .build();
       componentTypes.save(container);
-      var host = ComponentTypeEntity.builder()
-          .name("Host")
-          .build();
-      componentTypes.save(host);
 
       // operator
       var notEqualTo = OperatorEntity.builder()
@@ -718,59 +723,59 @@ public class DatabaseLoader {
       // services
       var serviceDecisionNone = DecisionEntity.builder()
           .componentType(service)
-          .name("NONE")
+          .value(RuleDecision.NONE)
           .build();
       decisions.save(serviceDecisionNone);
       var serviceDecisionReplicate = DecisionEntity.builder()
           .componentType(service)
-          .name("REPLICATE")
+          .value(RuleDecision.REPLICATE)
           .build();
       decisions.save(serviceDecisionReplicate);
       var serviceDecisionMigrate = DecisionEntity.builder()
           .componentType(service)
-          .name("MIGRATE")
+          .value(RuleDecision.MIGRATE)
           .build();
       decisions.save(serviceDecisionMigrate);
       var serviceDecisionStop = DecisionEntity.builder()
           .componentType(service)
-          .name("STOP")
+          .value(RuleDecision.STOP)
           .build();
       decisions.save(serviceDecisionStop);
       // containers
       var containerDecisionNone = DecisionEntity.builder()
           .componentType(container)
-          .name("NONE")
+          .value(RuleDecision.NONE)
           .build();
       decisions.save(containerDecisionNone);
       var containerDecisionReplicate = DecisionEntity.builder()
           .componentType(container)
-          .name("REPLICATE")
+          .value(RuleDecision.REPLICATE)
           .build();
       decisions.save(containerDecisionReplicate);
       var containerDecisionMigrate = DecisionEntity.builder()
           .componentType(container)
-          .name("MIGRATE")
+          .value(RuleDecision.MIGRATE)
           .build();
       decisions.save(containerDecisionMigrate);
       var containerDecisionStop = DecisionEntity.builder()
           .componentType(container)
-          .name("STOP")
+          .value(RuleDecision.STOP)
           .build();
       decisions.save(containerDecisionStop);
       // hosts
       var hostDecisionNone = DecisionEntity.builder()
           .componentType(host)
-          .name("NONE")
+          .value(RuleDecision.NONE)
           .build();
       decisions.save(hostDecisionNone);
       var hostDecisionStart = DecisionEntity.builder()
           .componentType(host)
-          .name("START")
+          .value(RuleDecision.START)
           .build();
       decisions.save(hostDecisionStart);
       var hostDecisionStop = DecisionEntity.builder()
           .componentType(host)
-          .name("STOP")
+          .value(RuleDecision.STOP)
           .build();
       decisions.save(hostDecisionStop);
 
@@ -854,12 +859,29 @@ public class DatabaseLoader {
           .value(90)
           .build();
       ramPercentageOver90 = conditions.save(ramPercentageOver90);
+      var rxBytesPerSecOver500000 = ConditionEntity.builder()
+          .name("RxBytesPerSecOver500000")
+          .valueMode(effectiveValue)
+          .field(rxBytesPerSec)
+          .operator(greaterThan)
+          .value(500000)
+          .build();
+      rxBytesPerSecOver500000 = conditions.save(rxBytesPerSecOver500000);
+      var txBytesPerSecOver100000 = ConditionEntity.builder()
+          .name("txBytesPerSecOver100000")
+          .valueMode(effectiveValue)
+          .field(rxBytesPerSec)
+          .operator(greaterThan)
+          .value(100000)
+          .build();
+      txBytesPerSecOver100000 = conditions.save(txBytesPerSecOver100000);
 
       // generic host rules
       var cpuAndRamOver90GenericHostRule = HostRuleEntity.builder()
           .name("CpuAndRamOver90")
           .priority(1)
           .decision(hostDecisionStart)
+          .generic(true)
           .build();
       cpuAndRamOver90GenericHostRule = hostRules.save(cpuAndRamOver90GenericHostRule);
       var cpuOver90Condition = HostRuleConditionEntity.builder()
@@ -875,6 +897,24 @@ public class DatabaseLoader {
           .condition(ramOver90Condition)
           .build();
       hostRules.save(cpuAndRamOver90GenericHostRule);
+
+      // generic service rules
+      var rxOver500000GenericServiceRule = ServiceRuleEntity.builder()
+          .name("RxOver500000")
+          .priority(1)
+          .decision(serviceDecisionReplicate)
+          .generic(true)
+          .build();
+      rxOver500000GenericServiceRule = serviceRules.save(rxOver500000GenericServiceRule);
+      var rxOver500000Condition = ServiceRuleConditionEntity.builder()
+          .serviceRule(rxOver500000GenericServiceRule)
+          .serviceCondition(rxBytesPerSecOver500000)
+          .build();
+      rxOver500000GenericServiceRule = rxOver500000GenericServiceRule.toBuilder()
+          .condition(rxOver500000Condition)
+          .build();
+      serviceRules.save(rxOver500000GenericServiceRule);
+
     };
   }
 

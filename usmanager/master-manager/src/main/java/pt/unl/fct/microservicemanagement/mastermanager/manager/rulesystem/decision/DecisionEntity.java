@@ -10,7 +10,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes.ComponentTypeEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.HostEventEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.event.ServiceEventEntity;
 
@@ -20,6 +20,8 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -35,6 +37,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 
 @Entity
 @Builder(toBuilder = true)
@@ -49,11 +52,8 @@ public class DecisionEntity {
   @GeneratedValue
   private Long id;
 
-  //TODO use enum
-  // Possible values:
-  // - NONE; - REPLICATE; - MIGRATE; - STOP; (services)
-  // - NONE; - START; - STOP (hosts)
-  private String name;
+  @Enumerated(EnumType.STRING)
+  private RuleDecision value;
 
   @ManyToOne
   @JoinColumn(name = "component_type_id")
@@ -61,12 +61,12 @@ public class DecisionEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL)
   private Set<ServiceEventEntity> serviceEvents = new HashSet<>();
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL)
   private Set<HostEventEntity> hostEvents = new HashSet<>();
 
   /*@Singular

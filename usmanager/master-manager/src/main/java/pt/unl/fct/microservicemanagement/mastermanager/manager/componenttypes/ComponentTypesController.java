@@ -1,4 +1,4 @@
-package pt.unl.fct.microservicemanagement.mastermanager.manager.componentTypes;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -10,9 +10,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum RuleDecision {
 
   NONE("NONE"),
@@ -21,32 +18,19 @@ public enum RuleDecision {
   START("START"),
   STOP("STOP");
 
-  private static Map<String, RuleDecision> constants = new HashMap<>();
+  private final String decision;
 
-  private final String value;
+  RuleDecision(String decision) {
+    this.decision = decision;
+  }
 
-  static {
-    for (RuleDecision c : values()) {
-      constants.put(c.value, c);
+  public static RuleDecision fromString(String decision) {
+    for (RuleDecision d : RuleDecision.values()) {
+      if (d.decision.equalsIgnoreCase(decision)) {
+        return d;
+      }
     }
-  }
-
-  RuleDecision(String value) {
-    this.value = value;
-  }
-
-  @Override
-  public String toString() {
-    return this.value;
-  }
-
-  public static RuleDecision fromValue(String value) {
-    RuleDecision constant = constants.get(value);
-    if (constant == null) {
-      throw new IllegalArgumentException(value);
-    } else {
-      return constant;
-    }
+    return null;
   }
 
 }

@@ -76,7 +76,7 @@ public class ServiceRuleEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany(mappedBy = "serviceRules", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<ServiceEntity> services;
 
   @ManyToOne
@@ -85,7 +85,7 @@ public class ServiceRuleEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL)
   private Set<ServiceRuleConditionEntity> conditions = new HashSet<>();
 
   @Override
