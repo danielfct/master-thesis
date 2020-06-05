@@ -13,7 +13,7 @@ import MainLayout from "../../../views/mainLayout/MainLayout";
 import AddButton from "../../../components/form/AddButton";
 import styles from '../edge/EdgeHosts.module.css'
 import CloudHostsList from "./CloudHostsList";
-import ReloadButton from "../../../components/list/ReloadButton";
+import ActionButton from "../../../components/list/ActionButton";
 import BaseComponent from "../../../components/BaseComponent";
 import {reloadCloudHosts} from "../../../actions";
 import {connect} from "react-redux";
@@ -36,8 +36,9 @@ class CloudHosts extends BaseComponent<Props, {}> {
         <AddButton tooltip={{text: 'Start cloud instance', position: 'bottom'}}
                    pathname={'/hosts/cloud/new_instance?new=true'}
                    offset={0}/>
-        <ReloadButton tooltip={{text: 'Reload cloud instances', position: 'left'}}
-                      reloadCallback={this.reloadCloudInstances}
+        <ActionButton icon={'sync'}
+                      tooltip={{text: 'Sync cloud instances', position: 'left'}}
+                      clickCallback={this.reloadCloudInstances}
                       offset={1}/>
         <div className={`${styles.container}`}>
           <CloudHostsList/>

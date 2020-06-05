@@ -57,7 +57,7 @@ como app, service, container, host, etc. E um EntityList para representar as lis
 por exemplo dos serviços da apps, ou das regras de um container.
 Iria permitir a remoção de algum código que parece repetido.
 
-- Melhorar o modal que aparece ao adicionar um service prediction. 
+- :heavy_check_mark: Melhorar o modal que aparece ao adicionar um service prediction. 
 O modal ficou demasiado grande, o que implica fazer scrolling para ver os botões de cancelamento/submissão. 
 Talvez substituir temporariamente o ControlledList por um form seria melhor (com uma seta para retrocesso incluído na parte esquerda do form)
 

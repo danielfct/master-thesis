@@ -441,7 +441,9 @@ class Service extends BaseComponent<Props, State> {
                            values: ["Frontend", "Backend", "Database", "System"]}}/>
                 : <Field key={index}
                          id={key}
-                         label={key}/>
+                         label={key}
+                type={['defaultExternalPort', 'defaultInternalPort', 'minReplicas', 'maxReplicas',
+                  'expectedMemoryConsumption'].includes(key) ? 'number' : 'text'}/>
             )}
           </Form>
         )}

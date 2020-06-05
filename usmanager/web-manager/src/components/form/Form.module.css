@@ -88,3 +88,7 @@ ul.dropdown li.disabled a:hover {
     background-color: #282828;
     cursor: default;
 }
+
+.customButton {
+    display: inline;
+}

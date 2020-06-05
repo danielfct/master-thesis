@@ -192,9 +192,7 @@ class ServicePredictionList extends BaseComponent<Props, State> {
       <div className={'col s6 inline-field'}>
         <Field key='endTime' id={'endTime'} label='endTime' type='timepicker' icon={false}/>
       </div>
-      <div className={'col s12 inline-field'}>
-        <Field key='minimumReplicas' id={'minimumReplicas'} label='minimumReplicas' type={'number'}/>
-      </div>
+      <Field key='minimumReplicas' id={'minimumReplicas'} label='minimumReplicas' type={'number'}/>
     </div>;
 
   public render() {

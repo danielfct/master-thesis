@@ -218,10 +218,8 @@ class ServiceAppList extends BaseComponent<Props, State> {
     this.props.loadAppServices(selectedApp);
   };
 
-  private updateModalScrollbar = () => {
-    console.log('update scrollbar')
+  private updateModalScrollbar = () =>
     this.scrollbar.current?.updateScroll();
-  }
 
   public render() {
     const isNew = this.isNew();

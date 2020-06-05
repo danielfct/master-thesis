@@ -1,49 +1,27 @@
-add dropdown not showing sometimes
-modal needs 2 clicks
 loadbalancer 502 bad gateway
-field dropdown is already filled
-number field cant type 0
 add service rule not working
-normalize host rules not turning into strings
 checkstyle-cache is going to home folder
-tab change not updating history
-add red color to all new items on list
-add cloud hosts to database
-not redirect when entity not found. instead show error message
-unable to save new entity multiple times
-entities collections sometimes not updating?
-unable to add rules to hosts
-change value on form while adding new entities at the same time, prevents the form change to update:
-	fix -> action to update the form values before the action to add new entity
 logs pagesize dropdown option 'all' not working
 number fields not displaying required error
-unable to add rules to a edge host
-customer launch button to services
 custom buttons are triggering form validation
 cloud host entity doesnt have ip address on running state
 cant add cloud host rules
-services is on a loop
 only show red new entities when is not new
 delete cloud instance deletes host rule?
 new node -> include cloud hosts instances
 new container erroring
-UPDATE_ENTITY action
-add app is forcing re-mounting when add cloud instance is not. and without services loaded
-datakey on controlledlist?
-change service.serviceName to service.name
-form id is needed?
-//TODO do unsaved color on all lists with non new items
 remove onAdd from every list. change super.toast on lists classes
 rename all manager exceptions to MasterManagerException?
 add assertEntityDoesntExist on every add method with @query lower()
-update root.prod
 launch load balancer at aws not working
 compare every query 'name' with lower function
 deleting 1 simulated service metric, deleted all of them
 change fields to number when applied
 docker api proxy container is removed at reload
 container decisions are clashing with service decisions (frontend)
-add service prediction with problems (when duplicated name)
+launch app not working due to requiring region/country/city
+
+
 
 test: reload every single page with empty state
 test: try to delete/update/insert entities after saving

@@ -154,15 +154,23 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
   };
 
   private onAddDropdownModalInput = (input: any): void => {
-    if (this.selected && this.props.dropdown?.formModal) {
-      input = { [this.props.dataKey ? this.props.dataKey[0] : this.selected]: this.selected, ...input };
-      this.setState({ [this.selected]: { value: input, isChecked: false, isNew: true } });
+    if (this.selected) {
+      let selectedProperty;
+      for (let i = this.props.dataKey.length - 1; i >= 0; i--) {
+        selectedProperty = { [this.props.dataKey[i]]: selectedProperty ? selectedProperty : this.selected };
+      }
+      input = { ...selectedProperty, ...input };
+      const key = this.getDataStateKey(input);
+      this.setState({ [key]: { value: input, isChecked: false, isNew: true } });
       this.props.onAddInput?.(input);
     }
   };
 
   private onAddFormModalInput = (input: any): void => {
     const key = this.getDataStateKey(input);
+    if (Object.keys(this.state).includes(key)) {
+      return super.toast(`Unable to add ${key}`, 10000, 'already exists');
+    }
     this.setState({ [key]: { value: input, isChecked: false, isNew: true } });
     this.props.onAddInput?.(input);
   };

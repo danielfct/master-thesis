@@ -22,7 +22,7 @@ type Props = SimulatedServiceMetricCardProps;
 const SimulatedServiceMetricCard = ({simulatedServiceMetric}: Props) => (
   <Card<ISimulatedServiceMetric> title={simulatedServiceMetric.name}
                    link={{to: {pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`, state: simulatedServiceMetric }}}
-                   height={'170px'}
+                   height={'180px'}
                    margin={'10px 0'}
                    hoverable>
     <CardItem key={'Field'}

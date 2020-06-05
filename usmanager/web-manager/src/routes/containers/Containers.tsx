@@ -9,7 +9,7 @@ import {IContainer} from "./Container";
 import styles from './Containers.module.css'
 import BaseComponent from "../../components/BaseComponent";
 import {loadContainers, reloadContainers} from "../../actions";
-import ReloadButton from "../../components/list/ReloadButton";
+import ActionButton from "../../components/list/ActionButton";
 
 interface StateToProps {
   isLoading: boolean
@@ -48,8 +48,9 @@ class Containers extends BaseComponent<Props, {}> {
         <AddButton tooltip={{text: 'Start container', position: 'bottom'}}
                    pathname={'/containers/start_container?new=true'}
                    offset={0}/>
-        <ReloadButton tooltip={{text: 'Reload containers', position: 'left'}}
-                      reloadCallback={this.reloadContainers}
+        <ActionButton icon={'sync'}
+                      tooltip={{text: 'Sync containers', position: 'left'}}
+                      clickCallback={this.reloadContainers}
                       offset={1}/>
         <div className={`${styles.container}`}>
           <CardList<IContainer>

@@ -6,7 +6,7 @@ import {connect} from "react-redux";
 import {ILogs} from "./Logs";
 import ListItem from "../../components/list/ListItem";
 import styles from './LogsList.module.css';
-import ReloadButton from "../../components/list/ReloadButton";
+import ActionButton from "../../components/list/ActionButton";
 import {capitalize} from "../../utils/text";
 
 interface StateToProps {
@@ -94,8 +94,9 @@ class LogsList extends React.Component<Props, {}> {
     const LogsList = List<ILogs>();
     return (
       <>
-        <ReloadButton tooltip={{activatedText: 'Deactivate automatic reload', deactivatedText: 'Activate automatic reload', position: 'bottom'}}
-                      reloadCallback={this.onReloadClick}
+        <ActionButton icon={'cached'}
+                      tooltip={{activatedText: 'Deactivate automatic reload', deactivatedText: 'Activate automatic reload', position: 'bottom'}}
+                      clickCallback={this.onReloadClick}
                       automatic/>
         <div className={`${styles.container} ${!isLoading && !error ? styles.list : undefined}`}>
           <LogsList

@@ -399,7 +399,6 @@ class Form extends React.Component<Props, State> {
       return;
     }
     this.props.modal?.onConfirm?.(this.state.values);
-    console.log(this.props.values)
     this.clearValues();
   };
 
@@ -477,15 +476,15 @@ class Form extends React.Component<Props, State> {
                   :
                   <>
                     <div className={`${styles.controlButton}`}>
-                      {customButtons?.map(button => (
-                        <>
+                      {customButtons?.map((button, index) => (
+                        <div key={index} className={styles.customButton}>
                           {button.confirm && (
                             <ConfirmDialog key={button.confirm.id}
                                            id={button.confirm.id}
                                            message={button.confirm?.message}
                                            confirmCallback={button.confirm?.onClickConfirm}/>)}
                           {button.button}
-                        </>
+                        </div>
                       ))}
                       {deletable !== undefined && (
                         <button className='modal-trigger btn-flat btn-small waves-effect waves-light red-text'
