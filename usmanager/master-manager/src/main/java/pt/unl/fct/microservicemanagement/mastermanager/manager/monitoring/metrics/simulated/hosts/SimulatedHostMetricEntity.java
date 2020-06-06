@@ -11,10 +11,12 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts;
 
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +38,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -50,7 +53,7 @@ public class SimulatedHostMetricEntity {
   @GeneratedValue
   private Long id;
 
-  @Column(unique = true)
+  @NaturalId
   private String name;
 
   @ManyToOne
@@ -75,6 +78,21 @@ public class SimulatedHostMetricEntity {
   @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<EdgeHostEntity> edgeHosts;
 
+  public void removeAssociations() {
+    Iterator<CloudHostEntity> cloudHostsIterator = cloudHosts.iterator();
+    while (cloudHostsIterator.hasNext()) {
+      CloudHostEntity cloudHost = cloudHostsIterator.next();
+      cloudHostsIterator.remove();
+      cloudHost.getSimulatedHostMetrics().remove(this);
+    }
+    Iterator<EdgeHostEntity> edgeHostsIterator = edgeHosts.iterator();
+    while (edgeHostsIterator.hasNext()) {
+      EdgeHostEntity edgeHost = edgeHostsIterator.next();
+      edgeHostsIterator.remove();
+      edgeHost.getSimulatedHostMetrics().remove(this);
+    }
+  }
+  
   @Override
   public boolean equals(Object o) {
     if (this == o) {

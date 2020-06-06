@@ -19,12 +19,13 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -39,6 +40,7 @@ import lombok.Setter;
 import lombok.Singular;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
@@ -53,8 +55,7 @@ public class ContainerEntity {
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String containerId;
 
   @NotNull
@@ -83,12 +84,40 @@ public class ContainerEntity {
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @JoinTable(name = "container_rule",
+      joinColumns = @JoinColumn(name = "container_id"),
+      inverseJoinColumns = @JoinColumn(name = "rule_id")
+  )
   private Set<ContainerRuleEntity> containerRules;
 
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @JoinTable(name = "container_simulated_metric",
+      joinColumns = @JoinColumn(name = "container_id"),
+      inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
+  )
   private Set<SimulatedContainerMetricEntity> simulatedContainerMetrics;
+
+  public void addRule(ContainerRuleEntity rule) {
+    containerRules.add(rule);
+    rule.getContainers().add(this);
+  }
+
+  public void removeRule(ContainerRuleEntity rule) {
+    containerRules.remove(rule);
+    rule.getContainers().remove(this);
+  }
+
+  public void addSimulatedContainerMetric(SimulatedContainerMetricEntity containerMetric) {
+    simulatedContainerMetrics.add(containerMetric);
+    containerMetric.getContainers().add(this);
+  }
+
+  public void removeSimulatedContainerMetric(SimulatedContainerMetricEntity containerMetric) {
+    simulatedContainerMetrics.remove(containerMetric);
+    containerMetric.getContainers().remove(this);
+  }
 
   @Override
   public boolean equals(Object o) {

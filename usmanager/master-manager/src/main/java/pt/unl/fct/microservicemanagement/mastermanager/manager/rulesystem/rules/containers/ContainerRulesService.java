@@ -79,6 +79,7 @@ public class ContainerRulesService {
   public void deleteRule(String ruleName) {
     log.debug("Deleting rule {}", ruleName);
     ContainerRuleEntity rule = getRule(ruleName);
+    rule.removeAssociations();
     rules.delete(rule);
     //setLastUpdateContainerRules();
   }
@@ -143,18 +144,18 @@ public class ContainerRulesService {
   }
 
   public void addContainer(String ruleName, String containerId) {
-    ContainerEntity container = containersService.getContainer(containerId);
-    ContainerRuleEntity rule = getRule(ruleName);
-    if (!container.getContainerRules().contains(rule)) {
-      log.debug("Adding container {} to rule {}", containerId, ruleName);
-      rule = rule.toBuilder().container(container).build();
-      rules.save(rule);
-      //setLastUpdateContainerRules();
-    }
+    addContainers(ruleName, List.of(containerId));
   }
 
   public void addContainers(String ruleName, List<String> containerIds) {
-    containerIds.forEach(containerId -> addContainer(ruleName, containerId));
+    log.debug("Adding containers {} to rule {}", containerIds, ruleName);
+    ContainerRuleEntity rule = getRule(ruleName);
+    containerIds.forEach(containerId -> {
+      ContainerEntity container = containersService.getContainer(containerId);
+      container.addRule(rule);
+    });
+    rules.save(rule);
+    //setLastUpdateContainerRules();
   }
 
   public void removeContainer(String ruleName, String containerId) {
@@ -164,8 +165,7 @@ public class ContainerRulesService {
   public void removeContainers(String ruleName, List<String> containerIds) {
     log.info("Removing containers {} from rule {}", containerIds, ruleName);
     ContainerRuleEntity rule = getRule(ruleName);
-    rule.getContainers()
-        .removeIf(container -> containerIds.contains(container.getContainerId()));
+    containerIds.forEach(containerId -> containersService.getContainer(containerId).removeRule(rule));
     rules.save(rule);
     //setLastUpdateContainerRules();
   }

@@ -42,7 +42,7 @@ public class ContainerRulesController {
     ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
     if (decisionComponentType != ComponentType.CONTAINER) {
       throw new BadRequestException("Expected decision type %s, instead got %s",
-          ComponentType.CONTAINER.getType(), decisionComponentType.getType());
+          ComponentType.CONTAINER.getValue(), decisionComponentType.getValue());
     }
     Validation.validatePostRequest(rule.getId());
     return containerRulesService.addRule(rule);

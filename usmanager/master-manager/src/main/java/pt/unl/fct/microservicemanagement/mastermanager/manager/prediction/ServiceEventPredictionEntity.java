@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.sql.Timestamp;
@@ -63,8 +64,7 @@ public class ServiceEventPredictionEntity {
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String name;
 
   private String description;

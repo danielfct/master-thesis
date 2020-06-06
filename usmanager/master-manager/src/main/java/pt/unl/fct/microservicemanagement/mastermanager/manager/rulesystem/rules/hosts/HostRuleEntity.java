@@ -24,11 +24,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -53,6 +55,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 @Entity
 @Builder(toBuilder = true)
@@ -67,8 +70,7 @@ public class HostRuleEntity {
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String name;
 
   private int priority;
@@ -93,6 +95,21 @@ public class HostRuleEntity {
   @JsonIgnore
   @OneToMany(mappedBy = "hostRule", cascade = CascadeType.ALL)
   private Set<HostRuleConditionEntity> conditions = new HashSet<>();
+
+  public void removeAssociations() {
+    Iterator<CloudHostEntity> cloudHostsIterator = cloudHosts.iterator();
+    while (cloudHostsIterator.hasNext()) {
+      CloudHostEntity cloudHost = cloudHostsIterator.next();
+      cloudHostsIterator.remove();
+      cloudHost.getHostRules().remove(this);
+    }
+    Iterator<EdgeHostEntity> edgeHostsIterator = edgeHosts.iterator();
+    while (edgeHostsIterator.hasNext()) {
+      EdgeHostEntity edgeHost = edgeHostsIterator.next();
+      edgeHostsIterator.remove();
+      edgeHost.getHostRules().remove(this);
+    }
+  }
 
   @Override
   public boolean equals(Object o) {

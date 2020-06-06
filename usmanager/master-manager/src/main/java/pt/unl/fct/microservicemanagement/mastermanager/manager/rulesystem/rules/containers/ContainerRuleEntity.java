@@ -24,10 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -66,8 +68,7 @@ public class ContainerRuleEntity {
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String name;
 
   private int priority;
@@ -88,6 +89,15 @@ public class ContainerRuleEntity {
   @OneToMany(mappedBy = "containerRule", cascade = CascadeType.ALL)
   private Set<ContainerRuleConditionEntity> conditions = new HashSet<>();
 
+  public void removeAssociations() {
+    Iterator<ContainerEntity> containersIterator = containers.iterator();
+    while (containersIterator.hasNext()) {
+      ContainerEntity container = containersIterator.next();
+      containersIterator.remove();
+      container.getContainerRules().remove(this);
+    }
+  }
+  
   @Override
   public boolean equals(Object o) {
     if (this == o) {

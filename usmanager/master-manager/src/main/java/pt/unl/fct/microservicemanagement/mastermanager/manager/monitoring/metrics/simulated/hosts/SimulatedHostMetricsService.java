@@ -76,6 +76,7 @@ public class SimulatedHostMetricsService {
   public void deleteSimulatedHostMetric(String simulatedMetricName) {
     log.debug("Deleting simulated host metric {}", simulatedMetricName);
     SimulatedHostMetricEntity simulatedHostMetric = getSimulatedHostMetric(simulatedMetricName);
+    simulatedHostMetric.removeAssociations();
     simulatedHostMetrics.delete(simulatedHostMetric);
   }
 
@@ -98,19 +99,19 @@ public class SimulatedHostMetricsService {
     return simulatedHostMetrics.getCloudHost(simulatedMetricName, instanceId).orElseThrow(() ->
         new EntityNotFoundException(CloudHostEntity.class, "instanceId", instanceId));
   }
-
+  
   public void addCloudHost(String simulatedMetricName, String instanceId) {
-    CloudHostEntity cloudHost = cloudHostsService.getCloudHost(instanceId);
-    SimulatedHostMetricEntity simulatedHostMetric = getSimulatedHostMetric(simulatedMetricName);
-    if (!cloudHost.getSimulatedHostMetrics().contains(simulatedHostMetric)) {
-      log.debug("Adding cloud host {} to simulated host metric {}", instanceId, simulatedMetricName);
-      simulatedHostMetric = simulatedHostMetric.toBuilder().cloudHost(cloudHost).build();
-      simulatedHostMetrics.save(simulatedHostMetric);
-    }
+    addCloudHosts(simulatedMetricName, List.of(instanceId));
   }
 
   public void addCloudHosts(String simulatedMetricName, List<String> instanceIds) {
-    instanceIds.forEach(instanceId -> addCloudHost(simulatedMetricName, instanceId));
+    log.debug("Adding cloud hosts {} to simulated metric {}", instanceIds, simulatedMetricName);
+    SimulatedHostMetricEntity hostMetric = getSimulatedHostMetric(simulatedMetricName);
+    instanceIds.forEach(instanceId -> {
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHost(instanceId);
+      cloudHost.addSimulatedHostMetric(hostMetric);
+    });
+    simulatedHostMetrics.save(hostMetric);
   }
 
   public void removeCloudHost(String simulatedMetricName, String instanceId) {
@@ -118,11 +119,10 @@ public class SimulatedHostMetricsService {
   }
 
   public void removeCloudHosts(String simulatedMetricName, List<String> instanceIds) {
-    log.info("Removing cloud hosts {} from simulated host metric {}", instanceIds, simulatedMetricName);
-    SimulatedHostMetricEntity simulatedHostMetric = getSimulatedHostMetric(simulatedMetricName);
-    simulatedHostMetric.getCloudHosts()
-        .removeIf(cloudHost -> instanceIds.contains(cloudHost.getInstanceId()));
-    simulatedHostMetrics.save(simulatedHostMetric);
+    log.info("Removing cloud hosts {} from simulated metric {}", instanceIds, simulatedMetricName);
+    SimulatedHostMetricEntity hostMetric = getSimulatedHostMetric(simulatedMetricName);
+    instanceIds.forEach(instanceId -> cloudHostsService.getCloudHost(instanceId).removeSimulatedHostMetric(hostMetric));
+    simulatedHostMetrics.save(hostMetric);
   }
 
   public List<EdgeHostEntity> getEdgeHosts(String simulatedMetricName) {
@@ -137,29 +137,28 @@ public class SimulatedHostMetricsService {
   }
 
   public void addEdgeHost(String simulatedMetricName, String hostname) {
-    EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
-    SimulatedHostMetricEntity simulatedHostMetric = getSimulatedHostMetric(simulatedMetricName);
-    if (!edgeHost.getSimulatedHostMetrics().contains(simulatedHostMetric)) {
-      log.debug("Adding edge host {} to simulated host metric {}", hostname, simulatedMetricName);
-      simulatedHostMetric = simulatedHostMetric.toBuilder().edgeHost(edgeHost).build();
-      simulatedHostMetrics.save(simulatedHostMetric);
-    }
+    addEdgeHosts(simulatedMetricName, List.of(hostname));
   }
 
   public void addEdgeHosts(String simulatedMetricName, List<String> hostnames) {
-    hostnames.forEach(hostname -> addEdgeHost(simulatedMetricName, hostname));
+    log.debug("Adding edge hosts {} to simulated metric {}", hostnames, simulatedMetricName);
+    SimulatedHostMetricEntity hostMetric = getSimulatedHostMetric(simulatedMetricName);
+    hostnames.forEach(hostname -> {
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
+      edgeHost.addSimulatedHostMetric(hostMetric);
+    });
+    simulatedHostMetrics.save(hostMetric);
   }
 
-  public void removeEdgeHost(String simulatedMetricName, String hostname) {
-    removeEdgeHosts(simulatedMetricName, List.of(hostname));
+  public void removeEdgeHost(String simulatedMetricName, String instanceId) {
+    removeEdgeHosts(simulatedMetricName, List.of(instanceId));
   }
 
-  public void removeEdgeHosts(String simulatedMetricName, List<String> hostnames) {
-    log.info("Removing edge hosts {} from simulated host metric {}", hostnames, simulatedMetricName);
-    SimulatedHostMetricEntity simulatedHostMetric = getSimulatedHostMetric(simulatedMetricName);
-    simulatedHostMetric.getEdgeHosts()
-        .removeIf(edgeHost -> hostnames.contains(edgeHost.getHostname()));
-    simulatedHostMetrics.save(simulatedHostMetric);
+  public void removeEdgeHosts(String simulatedMetricName, List<String> instanceIds) {
+    log.info("Removing edge hosts {} from simulated metric {}", instanceIds, simulatedMetricName);
+    SimulatedHostMetricEntity hostMetric = getSimulatedHostMetric(simulatedMetricName);
+    instanceIds.forEach(instanceId -> edgeHostsService.getEdgeHost(instanceId).removeSimulatedHostMetric(hostMetric));
+    simulatedHostMetrics.save(hostMetric);
   }
 
   private void assertSimulatedHostMetricExists(String simulatedMetricName) {

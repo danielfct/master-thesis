@@ -1,6 +1,5 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
@@ -26,6 +25,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -97,6 +97,7 @@ public class HostRulesService {
   public void deleteRule(String ruleName) {
     log.debug("Deleting rule {}", ruleName);
     HostRuleEntity rule = getRule(ruleName);
+    rule.removeAssociations();
     rules.delete(rule);
     setLastUpdateHostRules();
   }
@@ -161,18 +162,18 @@ public class HostRulesService {
   }
 
   public void addCloudHost(String ruleName, String instanceId) {
-    CloudHostEntity cloudHost = cloudHostsService.getCloudHost(instanceId);
-    HostRuleEntity rule = getRule(ruleName);
-    if (!cloudHost.getHostRules().contains(rule)) {
-      log.debug("Adding cloud host {} to rule {}", instanceId, ruleName);
-      rule = rule.toBuilder().cloudHost(cloudHost).build();
-      rules.save(rule);
-      setLastUpdateHostRules();
-    }
+    addCloudHosts(ruleName, List.of(instanceId));
   }
 
   public void addCloudHosts(String ruleName, List<String> instanceIds) {
-    instanceIds.forEach(instanceId -> addCloudHost(ruleName, instanceId));
+    log.debug("Adding cloud hosts {} to rule {}", instanceIds, ruleName);
+    HostRuleEntity rule = getRule(ruleName);
+    instanceIds.forEach(instanceId -> {
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHost(instanceId);
+      cloudHost.addRule(rule);
+    });
+    rules.save(rule);
+    setLastUpdateHostRules();
   }
 
   public void removeCloudHost(String ruleName, String instanceId) {
@@ -182,8 +183,7 @@ public class HostRulesService {
   public void removeCloudHosts(String ruleName, List<String> instanceIds) {
     log.info("Removing cloud hosts {} from rule {}", instanceIds, ruleName);
     HostRuleEntity rule = getRule(ruleName);
-    rule.getCloudHosts()
-        .removeIf(cloudHost -> instanceIds.contains(cloudHost.getInstanceId()));
+    instanceIds.forEach(instanceId -> cloudHostsService.getCloudHost(instanceId).removeRule(rule));
     rules.save(rule);
     setLastUpdateHostRules();
   }
@@ -200,18 +200,18 @@ public class HostRulesService {
   }
 
   public void addEdgeHost(String ruleName, String hostname) {
-    EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
-    HostRuleEntity rule = getRule(ruleName);
-    if (!edgeHost.getHostRules().contains(rule)) {
-      log.debug("Adding edge host {} to rule {}", hostname, ruleName);
-      rule = rule.toBuilder().edgeHost(edgeHost).build();
-      rules.save(rule);
-      setLastUpdateHostRules();
-    }
+    addEdgeHosts(ruleName, List.of(hostname));
   }
 
   public void addEdgeHosts(String ruleName, List<String> hostnames) {
-    hostnames.forEach(hostname -> addEdgeHost(ruleName, hostname));
+    log.debug("Adding edge hosts {} to rule {}", hostnames, ruleName);
+    HostRuleEntity rule = getRule(ruleName);
+    hostnames.forEach(hostname -> {
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
+      edgeHost.addRule(rule);
+    });
+    rules.save(rule);
+    setLastUpdateHostRules();
   }
 
   public void removeEdgeHost(String ruleName, String hostname) {
@@ -219,10 +219,9 @@ public class HostRulesService {
   }
 
   public void removeEdgeHosts(String ruleName, List<String> hostnames) {
-    log.info("Removing edge hosts {}", hostnames);
-    var rule = getRule(ruleName);
-    rule.getEdgeHosts()
-        .removeIf(edgeHost -> hostnames.contains(edgeHost.getHostname()));
+    log.info("Removing edge hosts {} from rule {}", hostnames, ruleName);
+    HostRuleEntity rule = getRule(ruleName);
+    hostnames.forEach(hostname -> edgeHostsService.getEdgeHost(hostname).removeRule(rule));
     rules.save(rule);
     setLastUpdateHostRules();
   }

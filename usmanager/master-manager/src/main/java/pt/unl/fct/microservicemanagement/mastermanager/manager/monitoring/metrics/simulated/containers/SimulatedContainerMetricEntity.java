@@ -10,15 +10,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers;
 
-
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -35,6 +34,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
@@ -49,7 +49,7 @@ public class SimulatedContainerMetricEntity {
   @GeneratedValue
   private Long id;
 
-  @Column(unique = true)
+  @NaturalId
   private String name;
 
   @ManyToOne
@@ -69,6 +69,15 @@ public class SimulatedContainerMetricEntity {
   @ManyToMany(mappedBy = "simulatedContainerMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<ContainerEntity> containers;
 
+  public void removeAssociations() {
+    Iterator<ContainerEntity> containersIterator = containers.iterator();
+    while (containersIterator.hasNext()) {
+      ContainerEntity container = containersIterator.next();
+      containersIterator.remove();
+      container.getSimulatedContainerMetrics().remove(this);
+    }
+  }
+  
   @Override
   public boolean equals(Object o) {
     if (this == o) {

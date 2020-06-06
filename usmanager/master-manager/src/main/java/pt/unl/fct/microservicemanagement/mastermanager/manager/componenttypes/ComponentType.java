@@ -16,19 +16,19 @@ public enum ComponentType {
   SERVICE("service"),
   CONTAINER("container");
 
-  private final String type;
+  private final String value;
 
-  ComponentType(String type) {
-    this.type = type;
+  ComponentType(String value) {
+    this.value = value;
   }
 
-  public String getType() {
-    return type;
+  public String getValue() {
+    return value;
   }
 
-  public static ComponentType fromString(String type) {
+  public static ComponentType fromString(String value) {
     for (ComponentType c : ComponentType.values()) {
-      if (c.type.equalsIgnoreCase(type)) {
+      if (c.value.equalsIgnoreCase(value)) {
         return c;
       }
     }

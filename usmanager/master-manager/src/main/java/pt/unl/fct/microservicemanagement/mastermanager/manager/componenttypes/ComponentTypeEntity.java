@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 
 import java.util.HashSet;
@@ -31,7 +32,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -61,7 +61,7 @@ public class ComponentTypeEntity {
   @GeneratedValue
   private Long id;
 
-  @Column(unique = true)
+  @NaturalId
   @Enumerated(EnumType.STRING)
   private ComponentType type;
 

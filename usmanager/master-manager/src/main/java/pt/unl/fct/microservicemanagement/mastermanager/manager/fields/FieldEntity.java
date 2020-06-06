@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.fields;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
@@ -62,10 +63,7 @@ public class FieldEntity {
   @GeneratedValue
   private Long id;
 
-  //TODO enum
-  // Possible values:
-  // - cpu, - ram, ...
-  @Column(unique = true)
+  @NaturalId
   private String name;
 
   @JsonIgnore

@@ -10,7 +10,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services;
 
-import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -22,6 +21,7 @@ import java.util.Random;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -71,6 +71,7 @@ public class SimulatedServiceMetricsService {
   public void deleteSimulatedServiceMetric(String simulatedMetricName) {
     log.debug("Deleting simulated service metric {}", simulatedMetricName);
     SimulatedServiceMetricEntity simulatedServiceMetric = getSimulatedServiceMetric(simulatedMetricName);
+    simulatedServiceMetric.removeAssociations();
     simulatedServiceMetrics.delete(simulatedServiceMetric);
   }
 
@@ -95,17 +96,17 @@ public class SimulatedServiceMetricsService {
   }
 
   public void addService(String simulatedMetricName, String serviceName) {
-    ServiceEntity service = servicesService.getService(serviceName);
-    SimulatedServiceMetricEntity simulatedServiceMetric = getSimulatedServiceMetric(simulatedMetricName);
-    if (!service.getSimulatedServiceMetrics().contains(simulatedServiceMetric)) {
-      log.debug("Adding service {} to simulated service metric {}", serviceName, simulatedMetricName);
-      simulatedServiceMetric = simulatedServiceMetric.toBuilder().service(service).build();
-      simulatedServiceMetrics.save(simulatedServiceMetric);
-    }
+    addServices(simulatedMetricName, List.of(serviceName));
   }
 
   public void addServices(String simulatedMetricName, List<String> serviceNames) {
-    serviceNames.forEach(serviceName -> addService(simulatedMetricName, serviceName));
+    log.debug("Adding services {} to simulated metric {}", serviceNames, simulatedMetricName);
+    SimulatedServiceMetricEntity serviceMetric = getSimulatedServiceMetric(simulatedMetricName);
+    serviceNames.forEach(serviceName -> {
+      ServiceEntity service = servicesService.getService(serviceName);
+      service.addSimulatedServiceMetric(serviceMetric);
+    });
+    simulatedServiceMetrics.save(serviceMetric);
   }
 
   public void removeService(String simulatedMetricName, String serviceName) {
@@ -113,11 +114,11 @@ public class SimulatedServiceMetricsService {
   }
 
   public void removeServices(String simulatedMetricName, List<String> serviceNames) {
-    log.info("Removing services {} from simulated service metric {}", serviceNames, simulatedMetricName);
-    SimulatedServiceMetricEntity simulatedServiceMetric = getSimulatedServiceMetric(simulatedMetricName);
-    simulatedServiceMetric.getServices()
-        .removeIf(service -> serviceNames.contains(service.getServiceName()));
-    simulatedServiceMetrics.save(simulatedServiceMetric);
+    log.info("Removing services {} from simulated metric {}", serviceNames, simulatedMetricName);
+    SimulatedServiceMetricEntity serviceMetric = getSimulatedServiceMetric(simulatedMetricName);
+    serviceNames.forEach(serviceName ->
+        servicesService.getService(serviceName).removeSimulatedServiceMetric(serviceMetric));
+    simulatedServiceMetrics.save(serviceMetric);
   }
 
   private void assertSimulatedServiceMetricExists(String simulatedMetricName) {

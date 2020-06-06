@@ -1,6 +1,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ public class ValueModesService {
   }
 
   public ValueModeEntity addValueMode(ValueModeEntity valueMode) {
+    assertValueModeDoesntExist(valueMode);
     log.debug("Saving valueMode {}", ToStringBuilder.reflectionToString(valueMode));
     return valueModes.save(valueMode);
   }
@@ -54,6 +57,13 @@ public class ValueModesService {
   public void deleteValueMode(String valueModeName) {
     var valueMode = getValueMode(valueModeName);
     valueModes.delete(valueMode);
+  }
+
+  private void assertValueModeDoesntExist(ValueModeEntity valueMode) {
+    var valueModeName = valueMode.getName();
+    if (valueModes.hasValueMode(valueModeName)) {
+      throw new DataIntegrityViolationException("Value mode '" + valueModeName + "' already exists");
+    }
   }
 
 }

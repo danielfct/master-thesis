@@ -118,6 +118,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
   private onPostSuccess = (reply: IReply<ISimulatedContainerMetric>): void => {
     const simulatedMetric = reply.data;
+    console.log(simulatedMetric)
     super.toast(`<span class="green-text">Simulated container metric ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} saved</span>`);
     this.props.addSimulatedContainerMetric(simulatedMetric);
     this.saveEntities(simulatedMetric);
@@ -192,7 +193,7 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     super.toast(`Unable to save containers of ${this.mounted ? `<b>${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric`, 10000, reason, true);
 
   private updateSimulatedContainerMetric = (simulatedContainerMetric: ISimulatedContainerMetric) => {
-    simulatedContainerMetric = Object.values(normalize(simulatedContainerMetric, Schemas.SIMULATED_SERVICE_METRIC).entities.simulatedContainerMetrics || {})[0];
+    simulatedContainerMetric = Object.values(normalize(simulatedContainerMetric, Schemas.SIMULATED_CONTAINER_METRIC).entities.simulatedContainerMetrics || {})[0];
     const formSimulatedContainerMetric = { ...simulatedContainerMetric };
     removeFields(formSimulatedContainerMetric);
     this.setState({simulatedContainerMetric: simulatedContainerMetric, formSimulatedContainerMetric: formSimulatedContainerMetric});

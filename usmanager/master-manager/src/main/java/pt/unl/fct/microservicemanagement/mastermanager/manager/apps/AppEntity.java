@@ -45,6 +45,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
@@ -59,8 +60,7 @@ public class AppEntity {
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String name;
 
   @Singular

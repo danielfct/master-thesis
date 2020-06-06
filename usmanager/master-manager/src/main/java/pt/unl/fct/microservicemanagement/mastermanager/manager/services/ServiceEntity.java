@@ -24,9 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
 
@@ -40,6 +43,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -68,8 +73,7 @@ public class ServiceEntity {
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String serviceName;
 
   @NotNull
@@ -121,12 +125,40 @@ public class ServiceEntity {
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @JoinTable(name = "service_rule",
+      joinColumns = @JoinColumn(name = "service_id"),
+      inverseJoinColumns = @JoinColumn(name = "rule_id")
+  )
   private Set<ServiceRuleEntity> serviceRules;
 
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @JoinTable(name = "service_simulated_metric",
+      joinColumns = @JoinColumn(name = "service_id"),
+      inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
+  )
   private Set<SimulatedServiceMetricEntity> simulatedServiceMetrics;
+
+  public void addRule(ServiceRuleEntity rule) {
+    serviceRules.add(rule);
+    rule.getServices().add(this);
+  }
+
+  public void removeRule(ServiceRuleEntity rule) {
+    serviceRules.remove(rule);
+    rule.getServices().remove(this);
+  }
+
+  public void addSimulatedServiceMetric(SimulatedServiceMetricEntity serviceMetric) {
+    simulatedServiceMetrics.add(serviceMetric);
+    serviceMetric.getServices().add(this);
+  }
+
+  public void removeSimulatedServiceMetric(SimulatedServiceMetricEntity serviceMetric) {
+    simulatedServiceMetrics.remove(serviceMetric);
+    serviceMetric.getServices().remove(this);
+  }
 
   public boolean hasLaunchCommand() {
     return launchCommand != null && !launchCommand.isBlank();

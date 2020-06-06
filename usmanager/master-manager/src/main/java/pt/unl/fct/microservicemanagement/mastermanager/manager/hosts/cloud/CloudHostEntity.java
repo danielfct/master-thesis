@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
-import com.amazonaws.services.ec2.model.Placement;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
@@ -32,15 +31,17 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.Placement;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -49,6 +50,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Builder(toBuilder = true)
@@ -63,8 +65,7 @@ public class CloudHostEntity {
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String instanceId;
 
   @NotNull
@@ -85,12 +86,40 @@ public class CloudHostEntity {
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @JoinTable(name = "cloud_host_rule",
+      joinColumns = @JoinColumn(name = "cloud_host_id"),
+      inverseJoinColumns = @JoinColumn(name = "rule_id")
+  )
   private Set<HostRuleEntity> hostRules;
 
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @JoinTable(name = "cloud_host_simulated_metric",
+      joinColumns = @JoinColumn(name = "cloud_host_id"),
+      inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
+  )
   private Set<SimulatedHostMetricEntity> simulatedHostMetrics;
+
+  public void addRule(HostRuleEntity rule) {
+    hostRules.add(rule);
+    rule.getCloudHosts().add(this);
+  }
+
+  public void removeRule(HostRuleEntity rule) {
+    hostRules.remove(rule);
+    rule.getCloudHosts().remove(this);
+  }
+
+  public void addSimulatedHostMetric(SimulatedHostMetricEntity hostMetric) {
+    simulatedHostMetrics.add(hostMetric);
+    hostMetric.getCloudHosts().add(this);
+  }
+
+  public void removeSimulatedHostMetric(SimulatedHostMetricEntity hostMetric) {
+    simulatedHostMetrics.remove(hostMetric);
+    hostMetric.getCloudHosts().remove(this);
+  }
 
   @Override
   public boolean equals(Object o) {

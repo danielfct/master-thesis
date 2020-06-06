@@ -89,6 +89,7 @@ public class ServiceRulesService {
   public void deleteRule(String ruleName) {
     log.debug("Deleting rule {}", ruleName);
     ServiceRuleEntity rule = getRule(ruleName);
+    rule.removeAssociations();
     rules.delete(rule);
     setLastUpdateServiceRules();
   }
@@ -152,16 +153,18 @@ public class ServiceRulesService {
   }
 
   public void addService(String ruleName, String serviceName) {
-    log.debug("Adding service {} to rule {}", serviceName, ruleName);
-    ServiceEntity service = servicesService.getService(serviceName);
-    ServiceRuleEntity rule = getRule(ruleName);
-    rule = rule.toBuilder().service(service).build();
-    rules.save(rule);
-    setLastUpdateServiceRules();
+    addServices(ruleName, List.of(serviceName));
   }
 
   public void addServices(String ruleName, List<String> serviceNames) {
-    serviceNames.forEach(serviceName -> addService(ruleName, serviceName));
+    log.debug("Adding services {} to rule {}", serviceNames, ruleName);
+    ServiceRuleEntity rule = getRule(ruleName);
+    serviceNames.forEach(serviceName -> {
+      ServiceEntity service = servicesService.getService(serviceName);
+      service.addRule(rule);
+    });
+    rules.save(rule);
+    setLastUpdateServiceRules();
   }
 
   public void removeService(String ruleName, String serviceName) {
@@ -169,10 +172,9 @@ public class ServiceRulesService {
   }
 
   public void removeServices(String ruleName, List<String> serviceNames) {
-    log.info("Removing service {} from rule {}", serviceNames, ruleName);
+    log.info("Removing services {} from rule {}", serviceNames, ruleName);
     ServiceRuleEntity rule = getRule(ruleName);
-    rule.getServices()
-        .removeIf(service -> serviceNames.contains(service.getServiceName()));
+    serviceNames.forEach(serviceName -> servicesService.getService(serviceName).removeRule(rule));
     rules.save(rule);
     setLastUpdateServiceRules();
   }

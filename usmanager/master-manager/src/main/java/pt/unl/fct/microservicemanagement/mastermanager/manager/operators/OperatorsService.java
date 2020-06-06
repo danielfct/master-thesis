@@ -1,6 +1,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.operators;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ public class OperatorsService {
   }
 
   public OperatorEntity addOperator(OperatorEntity operator) {
+    assertOperatorDoesntExist(operator);
     log.debug("Saving operator {}", ToStringBuilder.reflectionToString(operator));
     return operators.save(operator);
   }
@@ -54,6 +57,13 @@ public class OperatorsService {
   public void deleteOperator(String operatorName) {
     var operator = getOperator(operatorName);
     operators.delete(operator);
+  }
+
+  private void assertOperatorDoesntExist(OperatorEntity operator) {
+    var operatorName = operator.getName();
+    if (operators.hasOperator(operatorName)) {
+      throw new DataIntegrityViolationException("Operator '" + operatorName + "' already exists");
+    }
   }
 
 }

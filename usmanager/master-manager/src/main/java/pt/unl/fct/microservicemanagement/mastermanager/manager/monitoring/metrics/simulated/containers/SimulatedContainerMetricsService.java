@@ -74,6 +74,7 @@ public class SimulatedContainerMetricsService {
   public void deleteSimulatedContainerMetric(String simulatedMetricName) {
     log.debug("Deleting simulated container metric {}", simulatedMetricName);
     SimulatedContainerMetricEntity simulatedContainerMetric = getSimulatedContainerMetric(simulatedMetricName);
+    simulatedContainerMetric.removeAssociations();
     simulatedContainerMetrics.delete(simulatedContainerMetric);
   }
 
@@ -98,17 +99,17 @@ public class SimulatedContainerMetricsService {
   }
 
   public void addContainer(String simulatedMetricName, String containerId) {
-    ContainerEntity container = containersService.getContainer(containerId);
-    SimulatedContainerMetricEntity simulatedContainerMetric = getSimulatedContainerMetric(simulatedMetricName);
-    if (!container.getSimulatedContainerMetrics().contains(simulatedContainerMetric)) {
-      log.debug("Adding container {} to simulated container metric {}", containerId, simulatedMetricName);
-      simulatedContainerMetric = simulatedContainerMetric.toBuilder().container(container).build();
-      simulatedContainerMetrics.save(simulatedContainerMetric);
-    }
+    addContainers(simulatedMetricName, List.of(containerId));
   }
 
   public void addContainers(String simulatedMetricName, List<String> containerIds) {
-    containerIds.forEach(containerId -> addContainer(simulatedMetricName, containerId));
+    log.debug("Adding containers {} to simulated metric {}", containerIds, simulatedMetricName);
+    SimulatedContainerMetricEntity containerMetric = getSimulatedContainerMetric(simulatedMetricName);
+    containerIds.forEach(containerId -> {
+      ContainerEntity container = containersService.getContainer(containerId);
+      container.addSimulatedContainerMetric(containerMetric);
+    });
+    simulatedContainerMetrics.save(containerMetric);
   }
 
   public void removeContainer(String simulatedMetricName, String containerId) {
@@ -116,11 +117,11 @@ public class SimulatedContainerMetricsService {
   }
 
   public void removeContainers(String simulatedMetricName, List<String> containerIds) {
-    log.info("Removing containers {} from simulated container metric {}", containerIds, simulatedMetricName);
-    SimulatedContainerMetricEntity simulatedContainerMetric = getSimulatedContainerMetric(simulatedMetricName);
-    simulatedContainerMetric.getContainers()
-        .removeIf(container -> containerIds.contains(container.getContainerId()));
-    simulatedContainerMetrics.save(simulatedContainerMetric);
+    log.info("Removing containers {} from simulated metric {}", containerIds, simulatedMetricName);
+    SimulatedContainerMetricEntity containerMetric = getSimulatedContainerMetric(simulatedMetricName);
+    containerIds.forEach(containerId ->
+        containersService.getContainer(containerId).removeSimulatedContainerMetric(containerMetric));
+    simulatedContainerMetrics.save(containerMetric);
   }
 
   private void assertSimulatedContainerMetricExists(String name) {

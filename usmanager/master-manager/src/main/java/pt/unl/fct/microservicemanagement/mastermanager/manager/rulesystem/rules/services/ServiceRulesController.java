@@ -42,7 +42,7 @@ public class ServiceRulesController {
     ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
     if (decisionComponentType != ComponentType.SERVICE) {
       throw new BadRequestException("Expected decision type %s, instead got %s",
-          ComponentType.SERVICE.getType(), decisionComponentType.getType());
+          ComponentType.SERVICE.getValue(), decisionComponentType.getValue());
     }
     Validation.validatePostRequest(rule.getId());
     return serviceRulesService.addRule(rule);

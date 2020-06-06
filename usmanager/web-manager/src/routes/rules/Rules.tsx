@@ -10,7 +10,7 @@ import RulesContainerList from "./containers/RulesContainerList";
 
 const Rules = () =>
   <MainLayout>
-    <AddButton tooltip={{text: 'Add rule or condition', position: 'left'}}
+    <AddButton tooltip={{text: 'Add condition or rule', position: 'left'}}
                dropdown={{
                  id: 'addRuleOrCondition',
                  title: 'Select option',

@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
@@ -32,6 +33,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -61,8 +64,7 @@ public class EdgeHostEntity {
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String hostname;
 
   private String sshUsername;
@@ -81,12 +83,40 @@ public class EdgeHostEntity {
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @JoinTable(name = "edge_host_rule",
+      joinColumns = @JoinColumn(name = "edge_host_id"),
+      inverseJoinColumns = @JoinColumn(name = "rule_id")
+  )
   private Set<HostRuleEntity> hostRules;
 
   @Singular
   @JsonIgnore
   @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @JoinTable(name = "edge_host_simulated_metric",
+      joinColumns = @JoinColumn(name = "edge_host_id"),
+      inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
+  )
   private Set<SimulatedHostMetricEntity> simulatedHostMetrics;
+
+  public void addRule(HostRuleEntity rule) {
+    hostRules.add(rule);
+    rule.getEdgeHosts().add(this);
+  }
+
+  public void removeRule(HostRuleEntity rule) {
+    hostRules.remove(rule);
+    rule.getEdgeHosts().remove(this);
+  }
+
+  public void addSimulatedHostMetric(SimulatedHostMetricEntity hostMetric) {
+    simulatedHostMetrics.add(hostMetric);
+    hostMetric.getEdgeHosts().add(this);
+  }
+
+  public void removeSimulatedHostMetric(SimulatedHostMetricEntity hostMetric) {
+    simulatedHostMetrics.remove(hostMetric);
+    hostMetric.getEdgeHosts().remove(this);
+  }
 
   @Override
   public boolean equals(Object o) {

@@ -131,7 +131,10 @@ class CloudHostRuleList extends BaseComponent<Props, State> {
 
   private getSelectableRules = () => {
     const {rules, rulesName, unsavedRules} = this.props;
-    return Object.keys(rules).filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
+    return Object.entries(rules)
+                 .filter(([_, rule]) => !rule.generic)
+                 .map(([ruleName, _]) => ruleName)
+                 .filter(name => !rulesName.includes(name) && !unsavedRules.includes(name));
   };
 
   public render() {

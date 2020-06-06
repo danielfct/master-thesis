@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.Placement;
 import lombok.Data;
 
 @Data
@@ -37,6 +38,7 @@ public final class AwsSimpleInstance {
   private final InstanceState state;
   private final String publicDnsName;
   private final String publicIpAddress;
+  private final Placement placement;
 
   AwsSimpleInstance(Instance instance) {
     this.instanceId = instance.getInstanceId();
@@ -45,6 +47,7 @@ public final class AwsSimpleInstance {
     this.state = instance.getState();
     this.publicDnsName = instance.getPublicDnsName();
     this.publicIpAddress = instance.getPublicIpAddress();
+    this.placement = instance.getPlacement();
   }
 
 }

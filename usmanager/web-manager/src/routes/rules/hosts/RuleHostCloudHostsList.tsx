@@ -151,7 +151,7 @@ class HostRuleCloudHostList extends BaseComponent<Props, State> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `rules/hosts/${this.props.ruleHost?.name}/conditions`,
+                             url: `rules/hosts/${this.props.ruleHost?.name}/cloud-hosts`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}

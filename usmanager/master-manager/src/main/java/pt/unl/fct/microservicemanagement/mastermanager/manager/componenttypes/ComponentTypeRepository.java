@@ -27,6 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -34,5 +35,10 @@ import org.springframework.stereotype.Repository;
 public interface ComponentTypeRepository extends JpaRepository<ComponentTypeEntity, Long> {
 
   Optional<ComponentTypeEntity> findByType(@Param("type") ComponentType type);
+
+  @Query("select case when count(t) > 0 then true else false end "
+      + "from ComponentTypeEntity t "
+      + "where lower(t.type) = lower(:type)")
+  boolean hasComponentType(@Param("type") String type);
 
 }

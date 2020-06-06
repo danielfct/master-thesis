@@ -10,6 +10,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainersService;
@@ -71,6 +72,7 @@ public class ContainersService {
   }
 
   public ContainerEntity addContainer(ContainerEntity container) {
+    assertContainerDoesntExist(container);
     log.debug("Saving container {}", ToStringBuilder.reflectionToString(container));
     return containers.save(container);
   }
@@ -98,7 +100,6 @@ public class ContainersService {
     return filterContainersWithLabels(containers, labels);
   }
 
-  //TODO TEST
   private List<ContainerEntity> filterContainersWithLabels(List<ContainerEntity> containers,
                                                            Set<Pair<String, String>> labels) {
     // TODO try to build a database query instead
@@ -106,7 +107,6 @@ public class ContainersService {
     return containers.stream()
         .filter(container -> {
           for (Map.Entry<String, String> containerLabel: container.getLabels().entrySet()) {
-            //FIXME labels is just a subset, doesnt contain all containerLabels
             String key = containerLabel.getKey();
             String value = containerLabel.getValue();
             if (labelKeys.contains(key) && !labels.contains(Pair.of(key, value))) {
@@ -131,7 +131,7 @@ public class ContainersService {
       if (!dockerContainerIds.contains(containerId)) {
         deleteContainer(containerId);
         containerIterator.remove();
-        //TODO wrongly removing docker api
+        //TODO wrongly? removing docker api
         log.debug("Removed invalid container {}", containerId);
       }
     }
@@ -139,8 +139,8 @@ public class ContainersService {
     dockerContainers.forEach(dockerContainer -> {
       String containerId = dockerContainer.getId();
       if (!hasContainer(containerId)) {
-        ContainerEntity container = addContainerFromDockerContainer(dockerContainer);
-        containers.add(this.containers.save(container));
+        ContainerEntity containerEntity = addContainerFromDockerContainer(dockerContainer);
+        containers.add(containerEntity);
         log.debug("Added missing container {}", containerId);
       }
     });
@@ -350,7 +350,7 @@ public class ContainersService {
     simulatedMetricNames.forEach(simulatedMetric ->
         simulatedContainerMetricsService.removeContainer(simulatedMetric, containerId));
   }
-  
+
   public boolean hasContainer(String containerId) {
     return containers.hasContainer(containerId);
   }
@@ -358,6 +358,13 @@ public class ContainersService {
   private void assertContainerExists(String containerId) {
     if (!hasContainer(containerId)) {
       throw new EntityNotFoundException(ContainerEntity.class, "containerId", containerId);
+    }
+  }
+
+  private void assertContainerDoesntExist(ContainerEntity container) {
+    var containerId = container.getContainerId();
+    if (containers.hasContainer(containerId)) {
+      throw new DataIntegrityViolationException("Container '" + containerId + "' already exists");
     }
   }
 

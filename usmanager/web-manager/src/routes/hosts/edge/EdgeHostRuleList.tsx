@@ -131,7 +131,10 @@ class EdgeHostRuleList extends BaseComponent<Props, State> {
 
   private getSelectableRules = () => {
     const {rules, rulesNames, unsavedRules} = this.props;
-    return Object.keys(rules).filter(name => !rulesNames.includes(name) && !unsavedRules.includes(name));
+    return Object.entries(rules)
+                 .filter(([_, rule]) => !rule.generic)
+                 .map(([ruleName, _]) => ruleName)
+                 .filter(name => !rulesNames.includes(name) && !unsavedRules.includes(name));
   };
 
   public render() {

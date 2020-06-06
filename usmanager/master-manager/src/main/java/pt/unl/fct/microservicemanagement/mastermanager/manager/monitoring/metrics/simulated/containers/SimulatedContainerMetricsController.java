@@ -64,7 +64,6 @@ public class SimulatedContainerMetricsController {
     simulatedContainerMetricsService.deleteSimulatedContainerMetric(simulatedMetricName);
   }
 
-
   @GetMapping("/{simulatedMetricName}/containers")
   public List<ContainerEntity> getSimulatedContainerMetricContainers(@PathVariable String simulatedMetricName) {
     return simulatedContainerMetricsService.getContainers(simulatedMetricName);

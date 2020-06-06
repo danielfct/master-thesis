@@ -24,10 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -38,6 +40,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -66,8 +69,7 @@ public class ServiceRuleEntity {
   @GeneratedValue
   private Long id;
 
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String name;
 
   private int priority;
@@ -87,6 +89,15 @@ public class ServiceRuleEntity {
   @JsonIgnore
   @OneToMany(mappedBy = "serviceRule", cascade = CascadeType.ALL)
   private Set<ServiceRuleConditionEntity> conditions = new HashSet<>();
+
+  public void removeAssociations() {
+    Iterator<ServiceEntity> servicesIterator = services.iterator();
+    while (servicesIterator.hasNext()) {
+      ServiceEntity service = servicesIterator.next();
+      servicesIterator.remove();
+      service.getServiceRules().remove(this);
+    }
+  }
 
   @Override
   public boolean equals(Object o) {

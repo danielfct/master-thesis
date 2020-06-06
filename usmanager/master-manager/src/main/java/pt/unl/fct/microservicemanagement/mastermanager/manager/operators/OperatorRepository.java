@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.operators;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -34,5 +35,10 @@ import java.util.Optional;
 public interface OperatorRepository extends JpaRepository<OperatorEntity, Long> {
 
   Optional<OperatorEntity> findByNameIgnoreCase(@Param("name") String name);
+
+  @Query("select case when count(o) > 0 then true else false end "
+      + "from OperatorEntity o "
+      + "where lower(o.name) = lower(:name)")
+  boolean hasOperator(@Param("name") String name);
 
 }

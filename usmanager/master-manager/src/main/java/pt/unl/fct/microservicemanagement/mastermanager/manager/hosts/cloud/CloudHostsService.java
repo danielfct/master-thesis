@@ -25,15 +25,20 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsSimpleInstance;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
@@ -99,6 +104,19 @@ public class CloudHostsService {
     return saveCloudHostFromInstance(0L, instance);
   }
 
+  private CloudHostEntity addCloudHostFromSimpleInstance(AwsSimpleInstance simpleInstance) {
+    CloudHostEntity cloudHost = CloudHostEntity.builder()
+        .instanceId(simpleInstance.getInstanceId())
+        .instanceType(simpleInstance.getInstanceType())
+        .state(simpleInstance.getState())
+        .imageId(simpleInstance.getImageId())
+        .publicDnsName(simpleInstance.getPublicDnsName())
+        .publicIpAddress(simpleInstance.getPublicIpAddress())
+        .placement(simpleInstance.getPlacement())
+        .build();
+    return saveCloudHost(cloudHost);
+  }
+
   public CloudHostEntity startCloudHost() {
     Instance instance = awsService.createInstance();
     return saveCloudHostFromInstance(instance);
@@ -142,22 +160,30 @@ public class CloudHostsService {
   }
 
   public List<CloudHostEntity> reloadCloudInstances() {
-    cloudHosts.deleteAll();  //TODO cant delete all or else all associations are lost
-    List<CloudHostEntity> instances = new LinkedList<>();
-    awsService.getSimpleInstances().forEach(instance -> {
-      if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode()) {
-        var cloudHost = CloudHostEntity.builder()
-            .instanceId(instance.getInstanceId())
-            .imageId(instance.getImageId())
-            .instanceType(instance.getInstanceType())
-            .state(instance.getState())
-            .publicDnsName(instance.getPublicDnsName())
-            .publicIpAddress(instance.getPublicIpAddress())
-            .build();
-        instances.add(cloudHosts.save(cloudHost));
+    List<CloudHostEntity> cloudHosts = getCloudHosts();
+    List<AwsSimpleInstance> awsInstances = awsService.getSimpleInstances();
+    List<String> awsInstancesIds = awsInstances
+        .stream().map(AwsSimpleInstance::getInstanceId).collect(Collectors.toList());
+    Iterator<CloudHostEntity> cloudHostsIterator = cloudHosts.iterator();
+    // Remove invalid cloud host entities
+    while (cloudHostsIterator.hasNext()) {
+      CloudHostEntity cloudHost = cloudHostsIterator.next();
+      String instanceId = cloudHost.getInstanceId();
+      if (!awsInstancesIds.contains(instanceId)) {
+        this.cloudHosts.delete(cloudHost);
+        cloudHostsIterator.remove();
+      }
+    }
+    // Add missing cloud host entities
+    awsInstances.forEach(instance -> {
+      String instanceId = instance.getInstanceId();
+      if (instance.getState().getCode() != AwsInstanceState.TERMINATED.getCode() && !hasCloudHost(instanceId)) {
+        CloudHostEntity cloudHost = addCloudHostFromSimpleInstance(instance);
+        cloudHosts.add(cloudHost);
+        log.debug("Added missing cloud host {}", instanceId);
       }
     });
-    return instances;
+    return cloudHosts;
   }
 
   public List<HostRuleEntity> getRules(String instanceId) {

@@ -870,7 +870,7 @@ public class DatabaseLoader {
       var txBytesPerSecOver100000 = ConditionEntity.builder()
           .name("txBytesPerSecOver100000")
           .valueMode(effectiveValue)
-          .field(rxBytesPerSec)
+          .field(txBytesPerSec)
           .operator(greaterThan)
           .value(100000)
           .build();

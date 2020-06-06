@@ -1,6 +1,8 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.fields;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;
@@ -34,6 +36,7 @@ public class FieldsService {
   }
 
   public FieldEntity addField(FieldEntity field) {
+    assertFieldDoesntExist(field);
     log.debug("Saving field {}", ToStringBuilder.reflectionToString(field));
     return fields.save(field);
   }
@@ -54,6 +57,13 @@ public class FieldsService {
   public void deleteField(String fieldName) {
     var field = getField(fieldName);
     fields.delete(field);
+  }
+
+  private void assertFieldDoesntExist(FieldEntity field) {
+    var fieldName = field.getName();
+    if (fields.hasField(fieldName)) {
+      throw new DataIntegrityViolationException("Field '" + fieldName + "' already exists");
+    }
   }
 
 }

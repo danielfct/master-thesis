@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.operators;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 
 import java.util.HashSet;
@@ -64,8 +65,7 @@ public class OperatorEntity {
   // - NOT_EQUAL_TO; - EQUAL_TO; - GREATER_THAN; - LESS_THAN;
   // - GREATER_THAN_OR_EQUAL_TO; - LESS_THAN_OR_EQUAL_TO
   //TODO enum
-  @NotNull
-  @Column(unique = true)
+  @NaturalId
   private String name;
 
   @NotNull

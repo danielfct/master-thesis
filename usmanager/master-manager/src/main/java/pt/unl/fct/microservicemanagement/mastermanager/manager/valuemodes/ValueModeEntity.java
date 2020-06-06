@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes;
 
+import org.hibernate.annotations.NaturalId;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
 
 import java.util.HashSet;
@@ -58,6 +59,7 @@ public class ValueModeEntity {
   @GeneratedValue
   private Long id;
 
+  @NaturalId
   private String name;
 
   @JsonIgnore
