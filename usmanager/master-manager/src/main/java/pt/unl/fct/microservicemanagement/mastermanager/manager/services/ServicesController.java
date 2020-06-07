@@ -130,9 +130,9 @@ public class ServicesController {
   }
 
   @PostMapping("/{serviceName}/predictions")
-  public void addServicePredictions(@PathVariable String serviceName,
-                                    @RequestBody ServiceEventPredictionEntity[] predictions) {
-    servicesService.addPredictions(serviceName, Arrays.asList(predictions));
+  public List<ServiceEventPredictionEntity> addServicePredictions(@PathVariable String serviceName,
+                                                                  @RequestBody ServiceEventPredictionEntity[] predictions) {
+    return servicesService.addPredictions(serviceName, Arrays.asList(predictions));
   }
 
   @DeleteMapping("/{serviceName}/predictions")

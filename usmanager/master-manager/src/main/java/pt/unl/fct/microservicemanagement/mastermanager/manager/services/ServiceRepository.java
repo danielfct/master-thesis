@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.services.SimulatedServiceMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.prediction.ServiceEventPredictionEntity;
@@ -33,10 +32,10 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
@@ -55,9 +54,15 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
 
   List<ServiceEntity> findByDockerRepositoryIgnoreCase(@Param("dockerRepository") String dockerRepository);
 
-  int getMaxReplicasByServiceNameIgnoreCase(@Param("serviceName") String serviceName);
+  @Query("select s.minReplicas "
+      + "from ServiceEntity s "
+      + "where lower(s.serviceName) = lower(:serviceName)")
+  int getMinReplicas(@Param("serviceName") String serviceName);
 
-  int getMinReplicasByServiceNameIgnoreCase(@Param("serviceName") String serviceName);
+  @Query("select s.maxReplicas "
+      + "from ServiceEntity s "
+      + "where lower(s.serviceName) = lower(:serviceName)")
+  int getMaxReplicas(@Param("serviceName") String serviceName);
 
   @Query("select a.app "
       + "from ServiceEntity s join s.appServices a "

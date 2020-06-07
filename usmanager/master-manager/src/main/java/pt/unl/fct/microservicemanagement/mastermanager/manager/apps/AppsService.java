@@ -28,6 +28,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
@@ -143,12 +144,12 @@ public class AppsService {
     }
   }
 
-  public Map<String, List<DockerContainer>> launch(String appName, String region, String country, String city) {
-    log.info("Launching app {} at {}/{}/{}", appName, region, country, city);
+  public Map<String, List<DockerContainer>> launch(String appName, RegionEntity region, String country, String city) {
+    log.info("Launching app {} at {}/{}/{}", appName, region.getName(), country, city);
     List<ServiceEntity> services = getServicesOrder(appName).stream()
         .filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceType.DATABASE)
         .map(ServiceOrder::getService).collect(Collectors.toList());
-    return containersService.launchApp(services, region, country, city);
+    return containersService.launchApp(services, region.getName(), country, city);
   }
 
 }

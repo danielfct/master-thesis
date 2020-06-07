@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.prediction;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,6 +39,6 @@ public interface ServiceEventPredictionRepository extends JpaRepository<ServiceE
       + "from ServiceEventPredictionEntity sp inner join sp.service s "
       + "where s.serviceName = :serviceName and sp.startDate <= :date and sp.endDate > :date "
       + "order by sp.lastUpdate desc")
-  Integer getMinReplicasByServiceName(@Param("serviceName") String serviceName, @Param("date") Date date);
+  Integer getMinReplicasByServiceName(@Param("serviceName") String serviceName, @Param("date") LocalDate date);
 
 }

@@ -363,10 +363,11 @@ class Container extends BaseComponent<Props, State> {
       </li>
       <PerfectScrollbar ref={(ref) => { this.scrollbar = ref; }}>
         {Object.values(this.props.cloudHosts).map((data, index) =>
+          data.publicIpAddress &&
           <li key={index} onClick={onClick}>
-            <a>
-              {data.publicIpAddress}
-            </a>
+              <a>
+                {data.publicIpAddress}
+              </a>
           </li>
         )}
         {Object.values(this.props.edgeHosts).map((data, index) =>

@@ -6,8 +6,7 @@ add assertEntityDoesntExist on every add method and compare every query 'name' w
 
 launch load balancer at aws not working
 docker api proxy container is removed at reload
-launch app not working due to requiring region/country/city
-operatorEntity enum
+fix master-manager dockerfile
 
 
 test: reload every single page with empty state

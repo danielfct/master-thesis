@@ -21,6 +21,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
@@ -97,13 +98,14 @@ public class DockerContainersService {
     this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
   }
 
-  public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services, String region, String country,
-                                               String city) {
+  public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services,
+                                                      String region, String country, String city) {
     var serviceContainers = new HashMap<String, List<DockerContainer>>();
     // TODO qual a utilidade do dynamicLaunchParams?
     var dynamicLaunchParams = new HashMap<String, String>();
     services.forEach(service -> {
-      List<DockerContainer> containers = launchMicroservice(service, region, country, city, dynamicLaunchParams);
+      List<DockerContainer> containers = launchMicroservice(service, region, country, city,
+          dynamicLaunchParams);
       serviceContainers.put(service.getServiceName(), containers);
       containers.forEach(container -> {
         String hostname = container.getHostname();

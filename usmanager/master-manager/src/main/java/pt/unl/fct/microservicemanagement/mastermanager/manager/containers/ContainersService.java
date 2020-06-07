@@ -14,6 +14,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
@@ -242,8 +243,8 @@ public class ContainersService {
     return addContainerFromDockerContainer(dockerContainer);
   }
 
-  public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services, String region, String country,
-                                                      String city) {
+  public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services,
+                                                      String region, String country, String city) {
     return dockerContainersService.launchApp(services, region, country, city);
   }
 

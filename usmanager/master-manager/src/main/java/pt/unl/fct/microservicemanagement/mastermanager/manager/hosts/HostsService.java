@@ -145,19 +145,19 @@ public class HostsService {
                 }
               }
             }*/
-            if (!Text.isNullOrEmpty(country) && hostDetails.getCountry().equals(country)) {
+            if (!Text.isNullOrEmpty(country) && hostDetails.getCountry().equalsIgnoreCase(country)) {
               sameCountryHosts.add(hostname);
             }
-            if (!Text.isNullOrEmpty(city) && hostDetails.getCity().equals(city)) {
+            if (!Text.isNullOrEmpty(city) && hostDetails.getCity().equalsIgnoreCase(city)) {
               sameCityHosts.add(hostname);
             }
           } else {
             otherRegionsHosts.add(hostname);
           }
         });
-    log.info("Found hosts {} on same city", sameCityHosts.toString());
-    log.info("Found hosts {} on same country", sameCountryHosts.toString());
     log.info("Found hosts {} on same region", sameRegionHosts.toString());
+    log.info("Found hosts {} on same country", sameCountryHosts.toString());
+    log.info("Found hosts {} on same city", sameCityHosts.toString());
     log.info("Found hosts {} on other regions", otherRegionsHosts.toString());
     var random = new Random();
     if (!sameCityHosts.isEmpty()) {

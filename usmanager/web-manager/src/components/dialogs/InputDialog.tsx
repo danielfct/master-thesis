@@ -87,7 +87,6 @@ export default class InputDialog extends BaseComponent<Props, State> {
 
   private onOpenModal = (): void => {
     M.updateTextFields();
-    console.log('modal open')
     this.scrollbar.current?.updateScroll();
   };
 

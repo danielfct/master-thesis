@@ -549,7 +549,9 @@ class Form extends React.Component<Props, State> {
           {controlsMode?.includes('modal') ?
             <ScrollBar ref={this.props.modal?.scrollbar}
                        component={'div'}
-                       style={this.props.modal?.scrollMaxHeight ? {maxHeight: Math.floor(this.props.modal?.scrollMaxHeight)} : undefined}
+                       style={this.props.modal?.scrollMaxHeight
+                         ? {maxHeight: Math.floor(this.props.modal?.scrollMaxHeight)}
+                         : undefined}
                        options={{
                          useBothWheelAxes: false,
                          suppressScrollX: true

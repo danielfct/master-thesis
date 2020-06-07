@@ -38,9 +38,10 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -200,15 +201,19 @@ public class ServicesService {
     return services.getPredictions(serviceName);
   }
 
-  public void addPrediction(String serviceName, ServiceEventPredictionEntity prediction) {
+  public ServiceEventPredictionEntity addPrediction(String serviceName, ServiceEventPredictionEntity prediction) {
     var service = getService(serviceName);
     var servicePrediction = prediction.toBuilder().service(service).lastUpdate(Timestamp.from(Instant.now())).build();
     service = service.toBuilder().eventPrediction(servicePrediction).build();
     services.save(service);
+    return getEventPrediction(serviceName, prediction.getName());
   }
 
-  public void addPredictions(String serviceName, List<ServiceEventPredictionEntity> predictions) {
-    predictions.forEach(prediction -> addPrediction(serviceName, prediction));
+  public List<ServiceEventPredictionEntity> addPredictions(String serviceName,
+                                                           List<ServiceEventPredictionEntity> predictions) {
+    List<ServiceEventPredictionEntity> predictionsEntities = new ArrayList<>(predictions.size());
+    predictions.forEach(prediction -> predictionsEntities.add(addPrediction(serviceName, prediction)));
+    return predictionsEntities;
   }
 
   public void removePrediction(String serviceName, String predictionName) {
@@ -298,13 +303,16 @@ public class ServicesService {
   }
 
   public int getMinReplicasByServiceName(String serviceName) {
-    final var date = new Date(System.currentTimeMillis());
-    Integer customMinReplicas = serviceEventPredictions.getMinReplicasByServiceName(serviceName, date);
-    return customMinReplicas == null ? services.getMinReplicasByServiceNameIgnoreCase(serviceName) : customMinReplicas;
+    Integer customMinReplicas = serviceEventPredictions.getMinReplicasByServiceName(serviceName, LocalDate.now());
+    if (customMinReplicas != null) {
+      log.debug("Found event prediction with {} replicas", customMinReplicas);
+      return customMinReplicas;
+    }
+    return services.getMinReplicas(serviceName);
   }
 
   public int getMaxReplicasByServiceName(String serviceName) {
-    return services.getMaxReplicasByServiceNameIgnoreCase(serviceName);
+    return services.getMaxReplicas(serviceName);
   }
 
   private void assertServiceExists(Long serviceId) {

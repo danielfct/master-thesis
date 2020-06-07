@@ -78,7 +78,7 @@ interface State {
 
 class ServicePredictionList extends BaseComponent<Props, State> {
 
-  //TODO show prediction details on click
+  //TODO allow to edit prediction details, by clicking the prediction opening a filled modal form
 
   constructor(props: Props) {
     super(props);
