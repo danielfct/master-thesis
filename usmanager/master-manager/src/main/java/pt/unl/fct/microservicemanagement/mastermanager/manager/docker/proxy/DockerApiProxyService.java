@@ -55,13 +55,14 @@ public class DockerApiProxyService {
     String privateIp = privateIpResult.getOutput();
     var environment = List.of(
         String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername),
-        String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_PASSWORD,
-            dockerApiProxyPassword),
-        String.format("%s=http://%s:%d", ContainerConstants.Environment.PROXY_PASS, privateIp,
-            dockerApiProxyPort));
+        String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword),
+        String.format("%s=http://%s:%d", ContainerConstants.Environment.PROXY_PASS, privateIp, dockerApiProxyPort)
+    );
     var labels = Map.of(
         ContainerConstants.Label.IS_REPLICABLE, String.valueOf(false),
-        ContainerConstants.Label.IS_STOPPABLE, String.valueOf(false));
+        ContainerConstants.Label.IS_STOPPABLE, String.valueOf(false),
+        ContainerConstants.Label.IS_TRACEABLE, String.valueOf(false)
+    );
     return containersService.launchContainer(hostname, DOCKER_API_PROXY, true, environment, labels);
   }
 

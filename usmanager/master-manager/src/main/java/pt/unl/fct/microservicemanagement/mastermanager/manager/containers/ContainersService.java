@@ -10,11 +10,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
@@ -25,12 +23,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.spotify.docker.client.messages.ContainerStats;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -132,7 +132,6 @@ public class ContainersService {
       if (!dockerContainerIds.contains(containerId)) {
         deleteContainer(containerId);
         containerIterator.remove();
-        //TODO wrongly? removing docker api
         log.debug("Removed invalid container {}", containerId);
       }
     }
@@ -149,83 +148,86 @@ public class ContainersService {
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, List<String> environment) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, environment);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, environment);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
-  public ContainerEntity launchContainer(String hostname, String serviceName,
-                                         boolean singleton, List<String> environment) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, environment);
-    return addContainerFromDockerContainer(container);
+  public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton,
+                                         List<String> environment) {
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+        environment);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, Map<String, String> labels) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, labels);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, labels);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName,
                                          boolean singleton, Map<String, String> labels) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, labels);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+        labels);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, List<String> environment,
                                          Map<String, String> labels) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, environment, labels);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, environment,
+        labels);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, List<String> environment,
                                          Map<String, String> labels, Map<String, String> dynamicLaunchParams) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, environment, labels,
-        dynamicLaunchParams);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, environment,
+        labels, dynamicLaunchParams);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
-  public ContainerEntity launchContainer(String hostname, String serviceName,
-                                         boolean singleton, List<String> environment, Map<String, String> labels) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, environment,
-        labels);
-    return addContainerFromDockerContainer(container);
+  public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton,
+                                         List<String> environment, Map<String, String> labels) {
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+        environment, labels);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton,
                                          List<String> environment, Map<String, String> labels,
                                          Map<String, String> dynamicLaunchParams) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, environment,
-        labels, dynamicLaunchParams);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+        environment, labels, dynamicLaunchParams);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, String internalPort,
                                          String externalPort) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, internalPort,
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, internalPort,
         externalPort);
-    return addContainerFromDockerContainer(container);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton, String internalPort,
                                          String externalPort) {
-    DockerContainer container = dockerContainersService.launchContainer(hostname, serviceName, singleton, internalPort,
-        externalPort);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton,
+        internalPort, externalPort);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public ContainerEntity replicateContainer(String id, String hostname) {
     ContainerEntity containerEntity = getContainer(id);
-    DockerContainer container = dockerContainersService.replicateContainer(containerEntity, hostname);
-    return addContainerFromDockerContainer(container);
+    Optional<DockerContainer> container = dockerContainersService.replicateContainer(containerEntity, hostname);
+    return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public List<ContainerEntity> migrateAppContainers(String fromHostname, String toHostname) {
@@ -239,8 +241,8 @@ public class ContainersService {
 
   public ContainerEntity migrateContainer(String id, String hostname) {
     ContainerEntity container = getContainer(id);
-    DockerContainer dockerContainer = dockerContainersService.migrateContainer(container, hostname);
-    return addContainerFromDockerContainer(dockerContainer);
+    Optional<DockerContainer> dockerContainer = dockerContainersService.migrateContainer(container, hostname);
+    return dockerContainer.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
   public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services,

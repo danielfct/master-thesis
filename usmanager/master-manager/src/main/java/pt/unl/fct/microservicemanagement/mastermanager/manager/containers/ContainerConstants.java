@@ -38,6 +38,7 @@ public final class ContainerConstants {
     public static final String FOR_SERVICE = "forService";
     public static final String IS_REPLICABLE = "isReplicable";
     public static final String IS_STOPPABLE = "isStoppable";
+    public static final String IS_TRACEABLE = "isTraceable";
   }
 
 }
