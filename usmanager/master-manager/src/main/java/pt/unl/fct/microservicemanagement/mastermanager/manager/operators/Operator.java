@@ -24,45 +24,23 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.operators;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum Operator {
 
-  NOT_EQUAL_TO("NOT_EQUAL_TO"),
-  EQUAL_TO("EQUAL_TO"),
-  GREATER_THAN("GREATER_THAN"),
-  LESS_THAN("LESS_THAN"),
-  GREATER_THAN_OR_EQUAL_TO("GREATER_THAN_OR_EQUAL_TO"),
-  LESS_THAN_OR_EQUAL_TO("LESS_THAN_OR_EQUAL_TO");
+  NOT_EQUAL_TO("!="),
+  EQUAL_TO("=="),
+  GREATER_THAN(">"),
+  LESS_THAN("<"),
+  GREATER_THAN_OR_EQUAL_TO(">="),
+  LESS_THAN_OR_EQUAL_TO("<=");
 
-  private static Map<String, Operator> constants;
+  private final String symbol;
 
-  private final String value;
-
-  static {
-    constants = new HashMap<>();
-    for (Operator c : values()) {
-      constants.put(c.value, c);
-    }
+  Operator(String symbol) {
+    this.symbol = symbol;
   }
 
-  Operator(String value) {
-    this.value = value;
-  }
-
-  @Override
-  public String toString() {
-    return this.value;
-  }
-
-  public static Operator fromValue(String value) {
-    Operator constant = constants.get(value);
-    if (constant == null) {
-      throw new IllegalArgumentException(value);
-    } else {
-      return constant;
-    }
+  public String getSymbol() {
+    return symbol;
   }
 
 }

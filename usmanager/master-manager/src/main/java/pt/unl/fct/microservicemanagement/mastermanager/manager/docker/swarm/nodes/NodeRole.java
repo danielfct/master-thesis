@@ -12,10 +12,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nod
 
 public enum NodeRole {
 
-  MANAGER, WORKER;
-
-  static NodeRole from(String role) {
-    return NodeRole.valueOf(role.replace(" ", "_").toUpperCase());
-  }
+  MANAGER,
+  WORKER;
 
 }

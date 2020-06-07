@@ -212,7 +212,7 @@ public class AwsService {
       Instance instance = getInstance(instanceId);
       int instanceState = instance.getState().getCode();
       if (instanceState == state.getCode()) {
-        log.info("Instance {} is already on state {}", instanceId, state.getName());
+        log.info("Instance {} is already on state {}", instanceId, state.getState());
         return instance;
       }
       try {
@@ -230,15 +230,15 @@ public class AwsService {
             throw new UnsupportedOperationException();
         }
         instance = waitInstanceState(instanceId, state);
-        log.info("Setting instance {} to {} state", instanceId, state.getName());
+        log.info("Setting instance {} to {} state", instanceId, state.getState());
         return instance;
       } catch (MasterManagerException e) {
-        log.info("Failed to set instance {} to {} state: {}", instanceId, state.getName(), e.getMessage());
+        log.info("Failed to set instance {} to {} state: {}", instanceId, state.getState(), e.getMessage());
       }
       Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
     }
     throw new MasterManagerException("Unable to set instance state %d within %d tries",
-        state.getName(), awsMaxRetries);
+        state.getState(), awsMaxRetries);
   }
 
   private Instance waitInstanceState(String instanceId, AwsInstanceState state) {
@@ -249,7 +249,7 @@ public class AwsService {
         return instance[0].getState().getCode() == state.getCode();
       }, awsConnectionTimeout);
     } catch (TimeoutException e) {
-      log.info("Unknown status of instance {} {} operation: Timed out", instanceId, state.getName());
+      log.info("Unknown status of instance {} {} operation: Timed out", instanceId, state.getState());
       throw new MasterManagerException(e.getMessage());
     }
     return instance[0];

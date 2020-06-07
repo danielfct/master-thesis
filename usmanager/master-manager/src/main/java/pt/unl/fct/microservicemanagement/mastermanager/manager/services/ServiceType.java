@@ -12,19 +12,9 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.services;
 
 public enum ServiceType {
 
-  FRONTEND("frontend"),
-  BACKEND("backend"),
-  DATABASE("database"),
-  SYSTEM("system");
-
-  private final String type;
-
-  ServiceType(String type) {
-    this.type = type;
-  }
-
-  public String getType() {
-    return type;
-  }
+  FRONTEND,
+  BACKEND,
+  DATABASE,
+  SYSTEM;
 
 }

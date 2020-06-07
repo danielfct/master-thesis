@@ -34,11 +34,11 @@ import java.util.Optional;
 @Repository
 public interface OperatorRepository extends JpaRepository<OperatorEntity, Long> {
 
-  Optional<OperatorEntity> findByNameIgnoreCase(@Param("name") String name);
+  Optional<OperatorEntity> findByOperator(@Param("operator") Operator operator);
 
   @Query("select case when count(o) > 0 then true else false end "
       + "from OperatorEntity o "
-      + "where lower(o.name) = lower(:name)")
-  boolean hasOperator(@Param("name") String name);
+      + "where o.operator = :operator")
+  boolean hasOperator(@Param("operator") String operator);
 
 }

@@ -2,7 +2,6 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class ComponentTypesService {
   }
 
   public ComponentTypeEntity getComponentType(String type) {
-    ComponentType componentType = ComponentType.fromString(type);
+    ComponentType componentType = ComponentType.valueOf(type.toUpperCase());
     return componentTypes.findByType(componentType).orElseThrow(() ->
         new EntityNotFoundException(ComponentTypeEntity.class, "type", type));
   }
@@ -61,7 +60,7 @@ public class ComponentTypesService {
   }
 
   private void assertComponentTypeDoesntExist(ComponentTypeEntity componentType) {
-    var componentTypeName = componentType.getType().getValue();
+    var componentTypeName = componentType.getType().name();
     if (componentTypes.hasComponentType(componentTypeName)) {
       throw new DataIntegrityViolationException("Component type '" + componentTypeName + "' already exists");
     }

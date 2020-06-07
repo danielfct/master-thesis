@@ -34,6 +34,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -61,12 +63,9 @@ public class OperatorEntity {
   @GeneratedValue
   private Long id;
 
-  // Possible values:
-  // - NOT_EQUAL_TO; - EQUAL_TO; - GREATER_THAN; - LESS_THAN;
-  // - GREATER_THAN_OR_EQUAL_TO; - LESS_THAN_OR_EQUAL_TO
-  //TODO enum
   @NaturalId
-  private String name;
+  @Enumerated(EnumType.STRING)
+  private Operator operator;
 
   @NotNull
   @Column(unique = true)

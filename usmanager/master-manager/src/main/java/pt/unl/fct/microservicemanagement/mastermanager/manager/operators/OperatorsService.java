@@ -31,7 +31,8 @@ public class OperatorsService {
   }
 
   public OperatorEntity getOperator(String operatorName) {
-    return operators.findByNameIgnoreCase(operatorName).orElseThrow(() ->
+    Operator operator = Operator.valueOf(operatorName.toUpperCase());
+    return operators.findByOperator(operator).orElseThrow(() ->
         new EntityNotFoundException(OperatorEntity.class, "name", operatorName));
   }
 
@@ -60,7 +61,7 @@ public class OperatorsService {
   }
 
   private void assertOperatorDoesntExist(OperatorEntity operator) {
-    var operatorName = operator.getName();
+    var operatorName = operator.getOperator().name();
     if (operators.hasOperator(operatorName)) {
       throw new DataIntegrityViolationException("Operator '" + operatorName + "' already exists");
     }

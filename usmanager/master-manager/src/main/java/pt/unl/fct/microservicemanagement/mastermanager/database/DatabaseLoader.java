@@ -36,6 +36,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEn
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
@@ -689,33 +690,33 @@ public class DatabaseLoader {
 
       // operator
       var notEqualTo = OperatorEntity.builder()
-          .name("NOT_EQUAL_TO")
-          .symbol("!=")
+          .operator(Operator.NOT_EQUAL_TO)
+          .symbol(Operator.NOT_EQUAL_TO.getSymbol())
           .build();
       operators.save(notEqualTo);
       var equalTo = OperatorEntity.builder()
-          .name("EQUAL_TO")
-          .symbol("==")
+          .operator(Operator.EQUAL_TO)
+          .symbol(Operator.EQUAL_TO.getSymbol())
           .build();
       operators.save(equalTo);
       var greaterThan = OperatorEntity.builder()
-          .name("GREATER_THAN")
-          .symbol(">")
+          .operator(Operator.GREATER_THAN)
+          .symbol(Operator.GREATER_THAN.getSymbol())
           .build();
       operators.save(greaterThan);
       var lessThan = OperatorEntity.builder()
-          .name("LESS_THAN")
-          .symbol("<")
+          .operator(Operator.LESS_THAN)
+          .symbol(Operator.LESS_THAN.getSymbol())
           .build();
       operators.save(lessThan);
       var greaterThanOrEqualTo = OperatorEntity.builder()
-          .name("GREATER_THAN_OR_EQUAL_TO")
-          .symbol(">=")
+          .operator(Operator.GREATER_THAN_OR_EQUAL_TO)
+          .symbol(Operator.GREATER_THAN_OR_EQUAL_TO.getSymbol())
           .build();
       operators.save(greaterThanOrEqualTo);
       var lessThanOrEqualTo = OperatorEntity.builder()
-          .name("LESS_THAN_OR_EQUAL_TO")
-          .symbol("<=")
+          .operator(Operator.LESS_THAN_OR_EQUAL_TO)
+          .symbol(Operator.LESS_THAN_OR_EQUAL_TO.getSymbol())
           .build();
       operators.save(lessThanOrEqualTo);
 

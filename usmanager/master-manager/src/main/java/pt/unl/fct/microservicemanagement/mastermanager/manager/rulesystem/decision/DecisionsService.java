@@ -76,7 +76,7 @@ public class DecisionsService {
   }
 
   public DecisionEntity getDecision(String decisionName) {
-    RuleDecision decision = RuleDecision.fromString(decisionName);
+    RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
     return decisions.findByValue(decision).orElseThrow(() ->
         new EntityNotFoundException(DecisionEntity.class, "decision", decisionName));
   }
@@ -95,13 +95,13 @@ public class DecisionsService {
   }
 
   public DecisionEntity getServicePossibleDecision(String decisionName) {
-    RuleDecision decision = RuleDecision.fromString(decisionName);
+    RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
     return decisions.findByValueAndComponentTypeType(decision, ComponentType.SERVICE).orElseThrow(() ->
         new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
   }
 
   public DecisionEntity getHostPossibleDecision(String decisionName) {
-    RuleDecision decision = RuleDecision.fromString(decisionName);
+    RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
     return decisions.findByValueAndComponentTypeType(decision, ComponentType.HOST).orElseThrow(() ->
         new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
   }

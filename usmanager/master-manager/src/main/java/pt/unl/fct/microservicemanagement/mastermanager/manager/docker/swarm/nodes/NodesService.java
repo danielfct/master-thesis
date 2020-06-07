@@ -46,8 +46,10 @@ public final class NodesService {
       if (filter != null) {
         nodeStream = nodeStream.filter(filter);
       }
-      return nodeStream.map(n -> new SimpleNode(n.id(), n.status().addr(), n.status().state(),
-          NodeRole.from(n.spec().role()))).collect(Collectors.toList());
+      return nodeStream
+          .map(n -> new SimpleNode(n.id(), n.status().addr(), n.status().state(),
+              NodeRole.valueOf(n.spec().role().toUpperCase())))
+          .collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());

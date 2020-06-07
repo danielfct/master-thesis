@@ -12,27 +12,8 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes;
 
 public enum ComponentType {
 
-  HOST("host"),
-  SERVICE("service"),
-  CONTAINER("container");
-
-  private final String value;
-
-  ComponentType(String value) {
-    this.value = value;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  public static ComponentType fromString(String value) {
-    for (ComponentType c : ComponentType.values()) {
-      if (c.value.equalsIgnoreCase(value)) {
-        return c;
-      }
-    }
-    return null;
-  }
+  HOST,
+  SERVICE,
+  CONTAINER;
 
 }

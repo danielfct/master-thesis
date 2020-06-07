@@ -263,7 +263,7 @@ public class HostRulesService {
       String fieldName = String.format("%s-%S", condition.getField().getName(),
           condition.getValueMode().getName());
       double value = condition.getValue();
-      Operator operator = Operator.fromValue(condition.getOperator().getName());
+      Operator operator = condition.getOperator().getOperator();
       return new Condition(fieldName, value, operator);
     }).collect(Collectors.toList());
     RuleDecision decision = hostRule.getDecision().getValue();

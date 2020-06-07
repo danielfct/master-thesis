@@ -214,7 +214,7 @@ public class DockerContainersService {
         return container;
       }
     }
-    String serviceType = service.getServiceType().getType();
+    String serviceType = service.getServiceType().name();
     String internalPort = service.getDefaultInternalPort();
     String externalPort = findAvailableExternalPort(hostname, service.getDefaultExternalPort());
     String serviceAddr = String.format("%s:%s", hostname, externalPort);
@@ -291,7 +291,7 @@ public class DockerContainersService {
       ContainerCreation containerCreation = dockerClient.createContainer(containerConfig, containerName);
       String containerId = containerCreation.id();
       dockerClient.startContainer(containerId);
-      if (Objects.equals(serviceType, ServiceType.FRONTEND.getType())) {
+      if (Objects.equals(serviceType, ServiceType.FRONTEND.name())) {
         nginxLoadBalancerService.addToLoadBalancer(hostname, serviceName, serviceAddr, continent, region, country,
             city);
       }

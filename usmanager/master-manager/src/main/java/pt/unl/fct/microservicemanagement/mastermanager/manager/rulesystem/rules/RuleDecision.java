@@ -12,26 +12,11 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules
 
 public enum RuleDecision {
 
-  NONE("NONE"),
-  REPLICATE("REPLICATE"),
-  MIGRATE("MIGRATE"),
-  START("START"),
-  STOP("STOP");
-
-  private final String decision;
-
-  RuleDecision(String decision) {
-    this.decision = decision;
-  }
-
-  public static RuleDecision fromString(String decision) {
-    for (RuleDecision d : RuleDecision.values()) {
-      if (d.decision.equalsIgnoreCase(decision)) {
-        return d;
-      }
-    }
-    return null;
-  }
+  NONE,
+  REPLICATE,
+  MIGRATE,
+  START,
+  STOP;
 
 }
 

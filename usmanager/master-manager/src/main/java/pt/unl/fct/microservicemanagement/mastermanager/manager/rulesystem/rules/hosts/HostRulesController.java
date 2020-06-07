@@ -43,7 +43,7 @@ public class HostRulesController {
     ComponentType decisionComponentType = rule.getDecision().getComponentType().getType();
     if (decisionComponentType != ComponentType.HOST) {
       throw new BadRequestException("Expected decision type %s, instead got %s",
-          ComponentType.HOST.getValue(), decisionComponentType.getValue());
+          ComponentType.HOST.name(), decisionComponentType.name());
     }
     Validation.validatePostRequest(rule.getId());
     return hostRulesService.addRule(rule);

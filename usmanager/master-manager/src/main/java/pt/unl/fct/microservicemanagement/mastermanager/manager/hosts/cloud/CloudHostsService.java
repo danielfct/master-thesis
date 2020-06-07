@@ -25,8 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsSimpleInstance;
@@ -36,7 +34,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,7 +127,7 @@ public class CloudHostsService {
     CloudHostEntity cloudHost = getCloudHost(instanceId);
     InstanceState state = new InstanceState()
         .withCode(AwsInstanceState.PENDING.getCode())
-        .withName(AwsInstanceState.PENDING.getName());
+        .withName(AwsInstanceState.PENDING.getState());
     cloudHost.setState(state);
     cloudHost = cloudHosts.save(cloudHost);
     Instance instance = awsService.startInstance(instanceId);
@@ -141,7 +138,7 @@ public class CloudHostsService {
     CloudHostEntity cloudHost = getCloudHost(instanceId);
     InstanceState state = new InstanceState()
         .withCode(AwsInstanceState.STOPPING.getCode())
-        .withName(AwsInstanceState.STOPPING.getName());
+        .withName(AwsInstanceState.STOPPING.getState());
     cloudHost.setState(state);
     cloudHost = cloudHosts.save(cloudHost);
     Instance instance = awsService.stopInstance(instanceId);
@@ -152,7 +149,7 @@ public class CloudHostsService {
     CloudHostEntity cloudHost = getCloudHost(instanceId);
     InstanceState state = new InstanceState()
         .withCode(AwsInstanceState.SHUTTING_DOWN.getCode())
-        .withName(AwsInstanceState.SHUTTING_DOWN.getName());
+        .withName(AwsInstanceState.SHUTTING_DOWN.getState());
     cloudHost.setState(state);
     cloudHost = cloudHosts.save(cloudHost);
     awsService.terminateInstance(instanceId);
