@@ -1,6 +1,6 @@
 FROM golang:1.10
 
-COPY . /go/src/bitbucket.org/microservicemanagement/register-go
+COPY ../. /go/src/bitbucket.org/microservicemanagement/register-go
 WORKDIR /go/src/bitbucket.org/microservicemanagement/register-go
 
 RUN go get -u github.com/FiloSottile/gvt

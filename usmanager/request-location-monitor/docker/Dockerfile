@@ -1,6 +1,6 @@
 FROM golang:1.10
 
-COPY . /go/src/bitbucket.org/microservicemanagement/request-location-monitor
+COPY ../. /go/src/bitbucket.org/microservicemanagement/request-location-monitor
 WORKDIR /go/src/bitbucket.org/microservicemanagement/request-location-monitor
 
 RUN go get -u github.com/FiloSottile/gvt
