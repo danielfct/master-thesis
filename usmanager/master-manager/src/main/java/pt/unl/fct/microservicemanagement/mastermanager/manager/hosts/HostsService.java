@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
@@ -251,7 +252,7 @@ public class HostsService {
     //dockerApiProxyService.launchDockerApiProxy(hostname);
     containersService.getSystemContainers(hostname).stream()
         .filter(c -> !Objects.equals(c.getLabels().get(ContainerConstants.Label.SERVICE_NAME),
-                DockerApiProxyService.DOCKER_API_PROXY))
+            DockerApiProxyService.DOCKER_API_PROXY))
         .forEach(c -> containersService.stopContainer(c.getContainerId()));
     dockerSwarmService.leaveSwarm(hostname);
     //TODO porquê 5 segundos?
@@ -284,8 +285,15 @@ public class HostsService {
       }
     }
     log.info("Clustering hosts into the swarm...");
-    hostnames.forEach(hostname ->
-        setupHost(Objects.equals(hostname, managerHostname) ? NodeRole.MANAGER : NodeRole.WORKER, hostname));
+    try {
+      hostnames.forEach(hostname -> {
+        NodeRole role = Objects.equals(hostname, managerHostname) ? NodeRole.MANAGER : NodeRole.WORKER;
+        setupHost(role, hostname);
+      });
+    } catch (MasterManagerException e) {
+      log.debug(e.getMessage());
+    }
+
   }
 
   //TODO make sure there is an odd number of master docker nodes
@@ -307,13 +315,11 @@ public class HostsService {
   }
 
   private void setupManager(String managerHostname) {
-    if (!dockerSwarmService.isASwarmManager(managerHostname)) {
-      dockerSwarmService.initSwarm();
-    } else {
-      log.info("Manager {} is already a swarm manager", managerHostname);
+    if (dockerSwarmService.isASwarmManager(managerHostname)) {
+      throw new MasterManagerException("Host %s is already a swarm manager", managerHostname);
     }
-    // TODO why now?
-    nodesService.deleteUnresponsiveNodes();
+    dockerSwarmService.initSwarm();
+    //nodesService.deleteUnresponsiveNodes();
   }
 
   private void setupWorker(String workerHostname) {
@@ -321,7 +327,7 @@ public class HostsService {
   }
 
   private List<String> getWorkerAwsNodes() {
-    int presentWorkers = nodesService.getAvailableNodes().size() - 1;
+    int presentWorkers = nodesService.getAvailableNodes().size() - 1; //TODO not true with multiple master nodes
     int maxInitialWorkers = Math.max(0, maxInstances - 1);
     int workersToAdd = maxInitialWorkers - presentWorkers;
     List<String> hostnames = new ArrayList<>(workersToAdd);

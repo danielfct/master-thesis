@@ -10,14 +10,17 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public final class SimpleNode {
 
   private final String id;
   private final String hostname;
   private final String state;
-  private final NodeRole role;
+  private NodeRole role;
+  private final long version;
 
 }

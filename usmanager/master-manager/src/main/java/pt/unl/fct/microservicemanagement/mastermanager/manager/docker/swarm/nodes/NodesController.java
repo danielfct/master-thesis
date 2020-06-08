@@ -10,8 +10,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes;
 
+import org.springframework.web.bind.annotation.PutMapping;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +25,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 @RestController
 @RequestMapping("/nodes")
@@ -46,8 +52,7 @@ public class NodesController {
 
   @PostMapping
   public void addNodes(@RequestBody AddNode addNode) {
-    //TODO NodeRole role = addNode.getRole();
-    NodeRole role = NodeRole.WORKER;
+    NodeRole role = addNode.getRole();
     int quantity = addNode.getQuantity();
     String hostname = addNode.getHostname();
     if (hostname != null) {
@@ -62,6 +67,17 @@ public class NodesController {
         hostsService.addHost(role, region, country, city);
       }
     }
+  }
+
+  @PutMapping("/{nodeId}")
+  public SimpleNode updateNode(@PathVariable String nodeId, @Json String role) {
+    NodeRole nodeRole;
+    try {
+      nodeRole = NodeRole.valueOf(role.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException("Node role %s is not supported: %s", role, Arrays.toString(NodeRole.values()));
+    }
+    return nodesService.changeRole(nodeId, nodeRole);
   }
 
   @DeleteMapping("/{id}")

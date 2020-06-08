@@ -13,3 +13,8 @@ fix master-manager dockerfile
 test: 
 reload every single page with empty state
 try to delete/update/insert entities after saving
+
+
+documento:
+1. ver porque docker e kubernets scheduling não resolve o nosso problema
+https://blog.scottlogic.com/2016/06/17/docker-swarm.html (não usar esta referencia, procurar uma oficial mas semelhante)

@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Node;
+import com.spotify.docker.client.messages.swarm.NodeSpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +49,7 @@ public final class NodesService {
       }
       return nodeStream
           .map(n -> new SimpleNode(n.id(), n.status().addr(), n.status().state(),
-              NodeRole.valueOf(n.spec().role().toUpperCase())))
+              NodeRole.valueOf(n.spec().role().toUpperCase()), n.version().index()))
           .collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
@@ -105,5 +106,18 @@ public final class NodesService {
     return getAvailableNodes(n -> Objects.equals(n.description().hostname(), hostname)).isEmpty();
   }
 
+  public SimpleNode changeRole(String nodeId, NodeRole newRole) {
+    var swarmManager = dockerSwarmService.getSwarmManager();
+    SimpleNode node = getNode(nodeId);
+    NodeSpec nodeSpec = NodeSpec.builder().role(newRole.name()).availability("active").build();
+    try {
+      swarmManager.updateNode(node.getId(), node.getVersion(), nodeSpec);
+      node.setRole(newRole);
+      return node;
+    } catch (DockerException | InterruptedException e) {
+      e.printStackTrace();
+      throw new MasterManagerException(e.getMessage());
+    }
+  }
 
 }

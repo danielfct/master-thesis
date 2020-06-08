@@ -17,16 +17,19 @@ import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
 import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
+import {IRuleHost} from "../rules/hosts/RuleHost";
 
 export interface INode {
   id: string;
   hostname: string;
   state: string;
   role: string;
+  version: number;
 }
 
 interface INewNodeHost {
   hostname?: string;
+  role?: string;
   quantity: number;
 }
 
@@ -34,11 +37,13 @@ interface INewNodeLocation {
   region?: IRegion,
   country?: string,
   city?: string,
+  role?: string;
   quantity: number,
 }
 
 const buildNewNodeHost = (): INewNodeHost => ({
   hostname: undefined,
+  role: undefined,
   quantity: 1,
 });
 
@@ -46,6 +51,7 @@ const buildNewNodeLocation = (): INewNodeLocation => ({
   region: undefined,
   country: undefined,
   city: undefined,
+  role: undefined,
   quantity: 1,
 });
 
@@ -121,7 +127,6 @@ class Node extends BaseComponent<Props, State> {
   };
 
   private onPostFailure = (reason: string, place: INewNodeHost | INewNodeLocation): void => {
-    console.log(place)
     let message;
     if ("hostname" in place && place.hostname) {
       message = `Unable to start node at ${place.hostname}`;
@@ -134,6 +139,21 @@ class Node extends BaseComponent<Props, State> {
     }
     super.toast(message, 10000, reason, true);
   };
+
+
+
+  private onPutSuccess = (reply: IReply<INode>): void => {
+    const node = reply.data;
+    const previousRole = this.getNode()?.role.toLowerCase();
+    super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} has been ${previousRole === 'manager' ? 'demoted' : 'promoted'} to ${node.role}</span>`);
+    if (this.mounted) {
+      this.updateNode(node);
+      this.props.history.replace(node.id);
+    }
+  };
+
+  private onPutFailure = (reason: string, node: INode): void =>
+    super.toast(`Unable to change role of node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`}`, 10000, reason, true);
 
   private onDeleteSuccess = (node: INode): void => {
     super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} successfully stopped</span>`);
@@ -169,12 +189,12 @@ class Node extends BaseComponent<Props, State> {
     }, {});
 
   private getSelectableHosts = () => {
-    const nodesHostnames = Object.values(this.props.nodes).map(node => node.hostname);
+    const nodesHostname = Object.values(this.props.nodes).map(node => node.hostname);
     const cloudHosts = Object.values(this.props.cloudHosts)
                              .filter(instance => instance.state.code === awsInstanceStates.RUNNING.code
-                                                 && !nodesHostnames.includes(instance.publicIpAddress))
+                                                 && !nodesHostname.includes(instance.publicIpAddress))
                              .map(instance => instance.publicIpAddress);
-    const edgeHosts = Object.keys(this.props.edgeHosts).filter(edgeHost => !nodesHostnames.includes(edgeHost));
+    const edgeHosts = Object.keys(this.props.edgeHosts).filter(edgeHost => !nodesHostname.includes(edgeHost));
     return cloudHosts.concat(edgeHosts);
   };
 
@@ -197,14 +217,14 @@ class Node extends BaseComponent<Props, State> {
                              defaultValue: "Select host",
                              values: this.getSelectableHosts()
                            }}/>
-            {/*<Field key={'role'}
-             id={'role'}
-             label={'role'}
-             type="dropdown"
-             dropdown={{
-               defaultValue: "Select role",
-               values: ['MANAGER', 'WORKER']
-             }}/>*/}
+            <Field key={'role'}
+                   id={'role'}
+                   label={'role'}
+                   type="dropdown"
+                   dropdown={{
+                     defaultValue: "Select role",
+                     values: ['MANAGER', 'WORKER']
+                   }}/>
             <Field key={'quantity'}
                    id={'quantity'}
                    label={'quantity'}
@@ -227,6 +247,14 @@ class Node extends BaseComponent<Props, State> {
             <Field key={'city'}
                    id={'city'}
                    label={'city'}/>
+            <Field key={'role'}
+                   id={'role'}
+                   label={'role'}
+                   type="dropdown"
+                   dropdown={{
+                     defaultValue: "Select role",
+                     values: ['MANAGER', 'WORKER']
+                   }}/>
             <Field key={'quantity'}
                    id={'quantity'}
                    label={'quantity'}
@@ -234,9 +262,19 @@ class Node extends BaseComponent<Props, State> {
           </>
         :
         node && Object.entries(node).map(([key, value], index) =>
-               <Field key={index}
-                      id={key}
-                      label={key}/>)
+               key === 'role'
+                 ? <Field key={'role'}
+                        id={'role'}
+                        label={'role'}
+                        type="dropdown"
+                        dropdown={{
+                          defaultValue: "Select role",
+                          values: ['MANAGER', 'WORKER']
+                        }}/>
+                 : <Field key={index}
+                        id={key}
+                        label={key}
+                        disabled={true}/>)
     );
   };
 
@@ -265,7 +303,12 @@ class Node extends BaseComponent<Props, State> {
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure
                 }}
-                // delete button is never present on new nodes, so a type cast is safe
+                put={{
+                  url: `nodes/${(node as INode).id}`,
+                  successCallback: this.onPutSuccess,
+                  failureCallback: this.onPutFailure
+                }}
+            // delete button is never present on new nodes, so a type cast is safe
                 delete={(node as INode).role !== 'MANAGER'
                   ? {textButton: 'Remove',
                     url: `nodes/${(node as INode).id}`,
