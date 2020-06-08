@@ -1,14 +1,15 @@
+web-manager:
 loadbalancer 502 bad gateway
 new container erroring
-rename all manager exceptions to MasterManagerException?
+launch load balancer at aws not working
 
+master-manager
+rename all manager exceptions to MasterManagerException, when applied
 add assertEntityDoesntExist on every add method and compare every query 'name' with lower function
 
-launch load balancer at aws not working
-docker api proxy container is removed at reload
+docker:
 fix master-manager dockerfile
 
-
-test: reload every single page with empty state
-test: try to delete/update/insert entities after saving
-
+test: 
+reload every single page with empty state
+try to delete/update/insert entities after saving

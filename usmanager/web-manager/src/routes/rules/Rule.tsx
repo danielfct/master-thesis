@@ -33,6 +33,6 @@ export interface IField extends IDatabaseData {
 }
 
 export interface IOperator extends IDatabaseData {
-  name: string;
+  operator: string;
   symbol: string;
 }

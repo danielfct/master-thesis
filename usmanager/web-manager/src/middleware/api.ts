@@ -215,7 +215,7 @@ const field: schema.Entity<IField> = new schema.Entity('fields', undefined, {
 const fields = new schema.Array(field);
 
 const operator: schema.Entity<IOperator> = new schema.Entity('operators', undefined, {
-    idAttribute: (operator: IOperator) => operator.name
+    idAttribute: (operator: IOperator) => operator.operator
 });
 const operators = new schema.Array(operator);
 

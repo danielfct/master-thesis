@@ -11,7 +11,7 @@
 import React from "react";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import AddButton from "../../../components/form/AddButton";
-import styles from "../hosts/RulesHost.module.css";
+import styles from "./RuleConditions.module.css";
 import RuleConditionsList from "./RuleConditionsList";
 
 const RuleConditions: React.FC = () =>
