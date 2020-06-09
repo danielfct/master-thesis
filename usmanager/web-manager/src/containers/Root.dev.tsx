@@ -69,6 +69,7 @@ import RuleHost from "../routes/rules/hosts/RuleHost";
 import RuleContainer from "../routes/rules/containers/RuleContainer";
 import SimulatedContainerMetrics from "../routes/metrics/containers/SimulatedContainerMetrics";
 import SimulatedContainerMetric from "../routes/metrics/containers/SimulatedContainerMetric";
+import Ssh from "../routes/ssh/Ssh";
 
 interface RootContainerProps {
     store: any;
@@ -114,6 +115,7 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/load-balancers/:id": { component: LoadBalancer },
     "/eureka-servers": { component: EurekaServers, search: true },
     "/eureka-servers/:id": { component: EurekaServer },
+    "/ssh": { component: Ssh },
     "/logs": { component: Logs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };

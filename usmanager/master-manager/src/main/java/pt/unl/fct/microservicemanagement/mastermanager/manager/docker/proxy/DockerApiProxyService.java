@@ -10,13 +10,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshCommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class DockerApiProxyService {
 
@@ -47,7 +49,7 @@ public class DockerApiProxyService {
 
   public ContainerEntity launchDockerApiProxy(String hostname) {
     var privateIpCommand = "/sbin/ip -o -4 addr list docker0 | awk '{print $4}' | cut -d/ -f1";
-    CommandResult privateIpResult = sshService.execCommand(hostname, "launchDockerApiProxy", privateIpCommand);
+    SshCommandResult privateIpResult = sshService.execCommand(hostname, privateIpCommand);
     if (!privateIpResult.isSuccessful()) {
       throw new MasterManagerException("Unsuccessful launch of docker api proxy on host %s: %s", hostname,
           privateIpResult.getError());

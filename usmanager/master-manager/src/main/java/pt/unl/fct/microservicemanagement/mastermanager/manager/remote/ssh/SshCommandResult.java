@@ -29,10 +29,11 @@ import lombok.Data;
 
 @Builder
 @Data
-public class CommandResult {
+public class SshCommandResult {
 
-  private final int exitStatus;
+  private final String hostname;
   private final String command;
+  private final int exitStatus;
   private final String output;
   private String error;
 

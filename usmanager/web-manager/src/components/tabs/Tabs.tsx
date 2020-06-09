@@ -1,5 +1,4 @@
 import React, {createRef} from "react";
-import {RouteComponentProps} from "react-router";
 import M from "materialize-css";
 import styles from './Tabs.module.css';
 import {ReduxState} from "../../reducers";
@@ -15,7 +14,7 @@ interface StateToProps {
   sidenav: { user: boolean, width: boolean }
 }
 
-type Props = StateToProps & TabsProps & RouteComponentProps;
+type Props = StateToProps & TabsProps;
 
 interface State {
   previousScrollRight: number | null;
@@ -89,8 +88,6 @@ class Tabs extends React.Component<Props, State> {
     return false;
   }
 
-
-
   private setRightScrollTimer = () => {
     this.stopLeftScrollTimer();
     if (!this.rightScrollTimer) {
@@ -149,14 +146,6 @@ class Tabs extends React.Component<Props, State> {
     }
     this.leftScrollTimer = null;
   }
-
-  /*private scrollbarShowing = () => {
-    const body = document.body, html = document.documentElement;
-    const height = Math.max( body.scrollHeight, body.offsetHeight,
-      html.clientHeight, html.scrollHeight, html.offsetHeight );
-    const clientHeight = window.innerHeight ? window.innerHeight : body.clientHeight;
-    return height > clientHeight;
-  }*/
 
   public render() {
     const {tabs} = this.props;

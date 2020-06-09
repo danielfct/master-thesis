@@ -55,6 +55,7 @@ public class NodesController {
     NodeRole role = addNode.getRole();
     int quantity = addNode.getQuantity();
     String hostname = addNode.getHostname();
+    //TODO return new SimpleNodes
     if (hostname != null) {
       for (var i = 0; i < quantity; i++) {
         hostsService.addHost(role, hostname);

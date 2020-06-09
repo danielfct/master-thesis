@@ -495,7 +495,7 @@ class Form extends React.Component<Props, State> {
                       <button className='btn-flat btn-small waves-effect waves-light green-text slide'
                               style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
                               type="submit">
-                        Save
+                        {this.props.post?.textButton || 'Save'}
                       </button>
                     </div>
                     {editable !== undefined && (

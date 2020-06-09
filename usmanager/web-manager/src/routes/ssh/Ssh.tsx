@@ -8,12 +8,30 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.exceptions;
+import MainLayout from "../../views/mainLayout/MainLayout";
+import Tabs from "../../components/tabs/Tabs";
+import React from "react";
+import SshCommand from "./SshCommand";
+import SshFile from "./SshFile";
 
-public class MasterManagerException extends RuntimeException {
-
-  public MasterManagerException(String s, Object... args) {
-    super(args.length > 0 ? String.format(s, args) : s);
+const tabs = () => [
+  {
+    title: 'Execute command',
+    id: 'executeCommand',
+    content: () => <SshCommand/>
+  },
+  {
+    title: 'Upload file',
+    id: 'uploadFile',
+    content: () => <SshFile/>
   }
+];
 
-}
+const Ssh: React.FC = () =>
+  <MainLayout>
+    <div className="container">
+      <Tabs tabs={tabs()}/>
+    </div>
+  </MainLayout>;
+
+export default Ssh;

@@ -106,11 +106,11 @@ public class SshService {
     }
   }
 
-  public CommandResult execCommand(String hostname, String commandName, String command) {
-    return execCommand(hostname, commandName, command, false);
+  public SshCommandResult execCommand(String hostname, String command) {
+    return execCommand(hostname, command, false);
   }
 
-  public CommandResult execCommand(String hostname, String commandName, String command, boolean sudo) {
+  public SshCommandResult execCommand(String hostname, String command, boolean sudo) {
     try (SSHClient sshClient = initClient(hostname);
          Session session = sshClient.startSession()) {
       String execCommand;
@@ -126,13 +126,13 @@ public class SshService {
       Session.Command cmd = session.exec(execCommand);
       cmd.join(EXEC_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
       int exitStatus = cmd.getExitStatus();
-      String output = IOUtils.readFully(cmd.getInputStream()).toString();
-      String error = IOUtils.readFully(cmd.getErrorStream()).toString();
-      log.info("Command: {}, exited with status: {}, output: {}, error: {}", commandName, exitStatus, output, error);
-      return new CommandResult(exitStatus, command, output, error);
+      String output = IOUtils.readFully(cmd.getInputStream()).toString().strip();
+      String error = IOUtils.readFully(cmd.getErrorStream()).toString().strip();
+      log.info("Command exited with status: {}, output: {}, error: {}", exitStatus, output, error);
+      return new SshCommandResult(hostname, command, exitStatus, output, error);
     } catch (IOException e) {
       e.printStackTrace();
-      return new CommandResult(-1, command, "", e.getMessage());
+      return new SshCommandResult(hostname, command, -1, "", e.getMessage());
     }
   }
 

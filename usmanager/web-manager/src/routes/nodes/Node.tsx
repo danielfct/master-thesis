@@ -17,7 +17,6 @@ import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
 import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
-import {IRuleHost} from "../rules/hosts/RuleHost";
 
 export interface INode {
   id: string;
@@ -61,8 +60,8 @@ interface StateToProps {
   newNodeHost?: INewNodeHost;
   newNodeLocation?: INewNodeLocation;
   node?: INode;
-  edgeHosts: { [key: string]: IEdgeHost };
   cloudHosts: { [key: string]: ICloudHost };
+  edgeHosts: { [key: string]: IEdgeHost };
   regions: { [key: string]: IRegion };
   nodes: { [key: string]: INode };
 }
@@ -342,7 +341,6 @@ class Node extends BaseComponent<Props, State> {
 
 }
 
-
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.nodes.isLoadingNodes;
   const error = state.entities.nodes.loadNodesError;
@@ -370,8 +368,8 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadNodes,
   addNode,
-  loadEdgeHosts,
   loadCloudHosts,
+  loadEdgeHosts,
   loadRegions,
 };
 

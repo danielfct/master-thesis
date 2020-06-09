@@ -21,7 +21,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.node
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.CommandResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshCommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
@@ -301,8 +301,9 @@ public class DockerContainersService {
         nginxLoadBalancerService.addToLoadBalancer(hostname, serviceName, serviceAddr, continent, region, country,
             city);
       }
-      boolean shouldAddToDatabase = Objects.equals(containerLabels.get(ContainerConstants.Label.IS_TRACEABLE), "true");
-      return shouldAddToDatabase ? getContainer(containerId) : Optional.empty();
+      return Objects.equals(containerLabels.get(ContainerConstants.Label.IS_TRACEABLE), "false")
+          ? Optional.empty()
+          : getContainer(containerId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
@@ -311,13 +312,13 @@ public class DockerContainersService {
 
   private String findAvailableExternalPort(String hostname, String startExternalPort) {
     var command = "lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
-    CommandResult commandResult = sshService.execCommand(hostname, "findAvailableExternalPort", command, true);
-    if (!commandResult.isSuccessful()) {
+    SshCommandResult sshCommandResult = sshService.execCommand(hostname, command, true);
+    if (!sshCommandResult.isSuccessful()) {
       throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname,
-          commandResult.getError());
+          sshCommandResult.getError());
     }
     Pattern isNumberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
-    List<Integer> usedExternalPorts = Arrays.stream(commandResult.getOutput().split("\n"))
+    List<Integer> usedExternalPorts = Arrays.stream(sshCommandResult.getOutput().split("\n"))
         .filter(v -> isNumberPattern.matcher(v).matches())
         .map(Integer::parseInt)
         .collect(Collectors.toList());

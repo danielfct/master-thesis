@@ -26,7 +26,6 @@ import {Schemas} from "../../middleware/api";
 import {isNew} from "../../utils/router";
 import InputDialog from "../../components/dialogs/InputDialog";
 import {IRegion} from "../region/Region";
-import {IEdgeHost} from "../hosts/edge/EdgeHost";
 
 export interface IApp extends IDatabaseData {
   name: string;

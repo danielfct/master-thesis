@@ -3,26 +3,36 @@ import M from "materialize-css";
 
 export default class BaseComponent<P, S> extends React.Component<P, S> {
 
-  private toasts: M.Toast[] = [];
+  private toasts: {id: number, toast: M.Toast}[] = [];
 
-  componentWillUnmount(): void {
-    this.toasts.forEach(toast => toast.timeRemaining = 1000);
+  public componentWillUnmount(): void {
+    this.toasts.forEach(toast => toast.toast.timeRemaining = 1000);
   }
 
-  removeToast = (html: string) => () =>
+  removeToast = (id: number) => () =>
     this.toasts.forEach((toast, index) => {
-        if (toast.options.html === html) {
-          delete this.toasts[index];
+        if (toast.id === id) {
+          return delete this.toasts[index];
         }
       }
     );
 
-  toast(message: string, displayLength: number = 4000, error?: string, instance?: boolean, unique?: boolean): void {
-    const html = `<div>${message}${error ? `: <b class="red-text">${error}</b>` : ''}</div>`;
-    if (!unique || !this.toasts.some(toast => toast.options.html === html)) {
-      const toast = M.toast({ html , displayLength,  completeCallback: this.removeToast(html)});
+  private getToastId = (): number => {
+    for (let i = 0; ; i++) {
+      if (!this.toasts[i]) {
+        return i;
+      }
+    }
+  }
+
+  toast(message: string, displayLength: number = 4000, error?: string,
+        instance?: boolean, unique?: boolean): void {
+    const id = this.getToastId();
+    const html = `<span>${message}${error ? `: <b class="red-text">${error}</b>` : ''}</span>`;
+    if (!unique || !this.toasts.some(toast => toast.toast.options.html === html)) {
+      const toast = M.toast({ html , displayLength,  completeCallback: this.removeToast(id), classes:'test'});
       if (instance || unique) {
-        this.toasts.push(toast);
+        this.toasts.push({id: id, toast: toast});
       }
     }
   };

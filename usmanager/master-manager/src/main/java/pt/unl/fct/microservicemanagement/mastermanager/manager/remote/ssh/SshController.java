@@ -24,11 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 
 @RestController
 @RequestMapping("/ssh")
@@ -41,13 +42,17 @@ public class SshController {
   }
 
   @PostMapping("/execute")
-  public CommandResult execute(@RequestBody CommandSshData commandData) {
-    return sshService.execCommand(commandData.getHostname(), commandData.getName(), commandData.getCommand());
+  public SshCommandResult execute(@Json String hostname, @Json String command) {
+    return sshService.execCommand(hostname, command);
   }
 
-  @PostMapping("/upload/{filename}")
-  public void upload(@PathVariable String filename, @RequestBody CommandSftpData commandSftpData) {
-    sshService.uploadFile(commandSftpData.getHostname(), filename);
+  @PostMapping("/upload")
+  public void upload(@Json String hostname, @Json String filename) {
+    try {
+      sshService.uploadFile(hostname, filename);
+    } catch (NotFoundException e) {
+      throw new BadRequestException(e.getMessage());
+    }
   }
 
 }

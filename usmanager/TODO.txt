@@ -6,6 +6,8 @@ launch load balancer at aws not working
 master-manager
 rename all manager exceptions to MasterManagerException, when applied
 add assertEntityDoesntExist on every add method and compare every query 'name' with lower function
+NodesController return new SimpleNodes
+
 
 docker:
 fix master-manager dockerfile
@@ -16,5 +18,10 @@ try to delete/update/insert entities after saving
 
 
 documento:
+1. docker swarm 
+https://docs.docker.com/engine/swarm/
+https://docs.docker.com/engine/swarm/admin_guide/
+https://docs.docker.com/engine/swarm/key-concepts/
 1. ver porque docker e kubernets scheduling não resolve o nosso problema
 https://blog.scottlogic.com/2016/06/17/docker-swarm.html (não usar esta referencia, procurar uma oficial mas semelhante)
+2. o docker swarm contem um service discovery, mas apenas se for usado o 'docker service' para iniciar e gerir containers, (funciona através da configuração de uma overlay network). o que implica o uso do docker swarm scheduling, que não é util para o nosso caso

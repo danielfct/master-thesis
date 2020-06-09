@@ -300,15 +300,19 @@ public class HostsService {
   private void setupHost(NodeRole role, String hostname) {
     log.info("Setting up host {} with role {}", hostname, role);
     dockerApiProxyService.launchDockerApiProxy(hostname);
-    switch (role) {
-      case MANAGER:
-        setupManager(hostname);
-        break;
-      case WORKER:
-        setupWorker(hostname);
-        break;
-      default:
-        return;
+    try {
+      switch (role) {
+        case MANAGER:
+          setupManager(hostname);
+          break;
+        case WORKER:
+          setupWorker(hostname);
+          break;
+        default:
+          return;
+      }
+    } catch (MasterManagerException e) {
+      log.debug(e.getMessage());
     }
     prometheusService.launchPrometheus(hostname);
     locationRequestService.launchRequestLocationMonitor(hostname);

@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import org.springframework.stereotype.Service;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 
 @Service
 public class DockerCoreService {
@@ -23,15 +24,21 @@ public class DockerCoreService {
   private static final long CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
   private static final long READ_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
 
+  private final SshService sshService;
+
   private final String dockerAuthorization;
   private final int dockerApiPort;
+  private final String dockerScriptFile;
 
-  public DockerCoreService(DockerProperties dockerProperties) {
+  public DockerCoreService(SshService sshService, DockerProperties dockerProperties) {
+    this.sshService = sshService;
     String dockerApiProxyUsername = dockerProperties.getApiProxy().getUsername();
     String dockerApiProxyPassword = dockerProperties.getApiProxy().getPassword();
     var auth = String.format("%s:%s", dockerApiProxyUsername, dockerApiProxyPassword).getBytes();
     this.dockerAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
     this.dockerApiPort = dockerProperties.getApiProxy().getPort();
+    String dockerScriptPath = dockerProperties.getInstallScriptPath();
+    dockerScriptFile = dockerScriptPath.substring(dockerScriptPath.lastIndexOf('/') + 1);
   }
 
   public DockerClient getDockerClient(String hostname) {
@@ -42,6 +49,10 @@ public class DockerCoreService {
         .connectTimeoutMillis(CONNECTION_TIMEOUT)
         .readTimeoutMillis(READ_TIMEOUT)
         .build();
+  }
+
+  public void installDocker(String hostname) {
+    sshService.uploadFile(hostname, dockerScriptFile);
   }
 
 }

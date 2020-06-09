@@ -54,7 +54,8 @@ const sidenavLinks = [
     { link: '/regions', name: 'Regions' },
     { link: '/load-balancers', name: 'Load balancers' },
     { link: '/eureka-servers', name: 'Eureka servers' },
-    { link: '/logs', name: 'Logs'}
+    { link: '/ssh', name: 'Ssh'},
+    { link: '/logs', name: 'Logs'},
 ];
 
 interface StateToProps {
