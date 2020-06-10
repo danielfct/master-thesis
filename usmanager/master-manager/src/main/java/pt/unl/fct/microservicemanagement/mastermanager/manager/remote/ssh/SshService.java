@@ -65,8 +65,9 @@ public class SshService {
     this.edgeHostsService = edgeHostsService;
     this.awsKeyFilePath = awsProperties.getAccess().getKeyFilePath();
     this.awsUser = awsProperties.getAccess().getUsername();
+    String dockerScript = dockerProperties.getInstallScript();
     String dockerScriptPath = dockerProperties.getInstallScriptPath();
-    this.scriptPaths = Map.of(dockerScriptPath.substring(dockerScriptPath.lastIndexOf('/') + 1), dockerScriptPath);
+    this.scriptPaths = Map.of(dockerScript, dockerScriptPath);
     Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
   }
 
@@ -99,6 +100,7 @@ public class SshService {
         throw new NotFoundException("File %s not found", filename);
       }
       var file = new File(scriptPath);
+      log.info("Transferring file {} to host {}", filename, hostname);
       sftpClient.put(new FileSystemFile(file), filename);
     } catch (IOException e) {
       e.printStackTrace();

@@ -12,9 +12,9 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nod
 
 import org.springframework.web.bind.annotation.PutMapping;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
-import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 @RestController
 @RequestMapping("/nodes")
@@ -51,23 +50,26 @@ public class NodesController {
   }
 
   @PostMapping
-  public void addNodes(@RequestBody AddNode addNode) {
+  public List<SimpleNode> addNodes(@RequestBody AddNode addNode) {
     NodeRole role = addNode.getRole();
     int quantity = addNode.getQuantity();
     String hostname = addNode.getHostname();
-    //TODO return new SimpleNodes
+    List<SimpleNode> nodes = new ArrayList<>(addNode.getQuantity());
     if (hostname != null) {
       for (var i = 0; i < quantity; i++) {
-        hostsService.addHost(role, hostname);
+        SimpleNode node = hostsService.addHost(hostname, role);
+        nodes.add(node);
       }
     } else {
       String region = addNode.getRegion().getName();
       String country = addNode.getCountry();
       String city = addNode.getCity();
       for (var i = 0; i < quantity; i++) {
-        hostsService.addHost(role, region, country, city);
+        SimpleNode node = hostsService.addHost(region, country, city, role);
+        nodes.add(node);
       }
     }
+    return nodes;
   }
 
   @PutMapping("/{nodeId}")

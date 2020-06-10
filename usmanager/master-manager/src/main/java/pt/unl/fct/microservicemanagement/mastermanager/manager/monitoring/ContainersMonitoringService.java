@@ -340,7 +340,7 @@ public class ContainersMonitoringService {
           serviceName, hostname, startLocation.getRegion());
     }
     double serviceAvgMem = servicesService.getService(serviceName).getExpectedMemoryConsumption();
-    String toHostname = hostsService.getAvailableNodeHostname(serviceAvgMem, startLocation);
+    String toHostname = hostsService.getAvailableHost(serviceAvgMem, startLocation);
     ContainerEntity replicatedContainer = containersService.replicateContainer(containerId, toHostname);
     HostDetails selectedHostDetails = hostsService.getHostDetails(toHostname);
     log.info("RuleDecision executed: Replicated container '{}' of service '{}' to container '{}' "

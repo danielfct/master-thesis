@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("docker")
 public class DockerProperties {
 
+  private String installScript;
   private String installScriptPath;
   private String repository;
   private final Hub hub;

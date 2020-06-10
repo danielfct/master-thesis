@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public final class NodesService {
+public class NodesService {
 
   private final DockerSwarmService dockerSwarmService;
 
@@ -52,7 +52,6 @@ public final class NodesService {
               NodeRole.valueOf(n.spec().role().toUpperCase()), n.version().index()))
           .collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
-      e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
     }
   }
@@ -61,6 +60,12 @@ public final class NodesService {
     return getNodes(node -> Objects.equals(node.id(), id)).stream()
         .findFirst()
         .orElseThrow(() -> new EntityNotFoundException(SimpleNode.class, "id", id));
+  }
+
+  public SimpleNode getHostNode(String hostname) {
+    return getNodes(node -> Objects.equals(node.status().addr(), hostname)).stream()
+        .findFirst()
+        .orElseThrow(() -> new EntityNotFoundException(SimpleNode.class, "hostname", hostname));
   }
 
   public List<SimpleNode> getAvailableNodes() {

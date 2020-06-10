@@ -7,7 +7,7 @@ master-manager
 rename all manager exceptions to MasterManagerException, when applied
 add assertEntityDoesntExist on every add method and compare every query 'name' with lower function
 NodesController return new SimpleNodes
-
+choose node based on geocoding https://developers.google.com/maps/documentation/geocoding/start?csw=1
 
 docker:
 fix master-manager dockerfile

@@ -10,6 +10,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers;
 
+import com.spotify.docker.client.exceptions.DockerRequestException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
@@ -17,6 +18,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.Contai
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
@@ -126,7 +128,7 @@ public class DockerContainersService {
     int minReplicas = servicesService.getMinReplicasByServiceName(service.getServiceName());
     var containers = new ArrayList<DockerContainer>(minReplicas);
     for (int i = 0; i < minReplicas; i++) {
-      String hostname = hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region, country, city);
+      String hostname = hostsService.getAvailableHost(expectedMemoryConsumption, region, country, city);
       Optional<DockerContainer> container = launchContainer(hostname, service, false, environment, labels,
           dynamicLaunchParams);
       container.ifPresent(containers::add);
@@ -209,20 +211,27 @@ public class DockerContainersService {
                                                     boolean singleton, List<String> environment,
                                                     Map<String, String> labels,
                                                     Map<String, String> dynamicLaunchParams) {
-    log.info("Launching container...");
     String serviceName = service.getServiceName();
+    log.info("Launching container with {} at {}...", serviceName, hostname);
     if (singleton) {
-      List<DockerContainer> containers =
-          getContainers(DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName));
+      List<DockerContainer> containers = List.of();
+      try {
+        containers = getContainers(
+            DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, serviceName),
+            DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_HOSTNAME, hostname)
+        );
+      } catch (MasterManagerException e) {
+        log.debug(e.getMessage());
+      }
       if (containers.size() > 0) {
         DockerContainer container = containers.get(0);
-        log.info("service '{}' is already running on container '{}'", serviceName, container.getId());
+        log.info("Service {} is already running on container {}", serviceName, container.getId());
         return Optional.of(container);
       }
     }
     String serviceType = service.getServiceType().name();
     String internalPort = service.getDefaultInternalPort();
-    String externalPort = findAvailableExternalPort(hostname, service.getDefaultExternalPort());
+    String externalPort = hostsService.findAvailableExternalPort(hostname, service.getDefaultExternalPort());
     String serviceAddr = String.format("%s:%s", hostname, externalPort);
     String containerName = String.format("%s_%s_%s", serviceName, hostname, externalPort);
     String dockerRepository = String.format("%s/%s", dockerHubUsername, service.getDockerRepository());
@@ -307,25 +316,6 @@ public class DockerContainersService {
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
-    }
-  }
-
-  private String findAvailableExternalPort(String hostname, String startExternalPort) {
-    var command = "lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
-    SshCommandResult sshCommandResult = sshService.execCommand(hostname, command, true);
-    if (!sshCommandResult.isSuccessful()) {
-      throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname,
-          sshCommandResult.getError());
-    }
-    Pattern isNumberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
-    List<Integer> usedExternalPorts = Arrays.stream(sshCommandResult.getOutput().split("\n"))
-        .filter(v -> isNumberPattern.matcher(v).matches())
-        .map(Integer::parseInt)
-        .collect(Collectors.toList());
-    for (var i = Integer.parseInt(startExternalPort); ; i++) {
-      if (!usedExternalPorts.contains(i)) {
-        return String.valueOf(i);
-      }
     }
   }
 

@@ -79,7 +79,7 @@ public class EurekaService {
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
     List<String> availableHostnames = Stream.of(regions)
         .map(regionsService::getRegion)
-        .map(region -> hostsService.getAvailableNodeHostname(expectedMemoryConsumption, region.getName()))
+        .map(region -> hostsService.getAvailableHost(expectedMemoryConsumption, region.getName()))
         .collect(Collectors.toList());
     List<String> customEnvs = Collections.emptyList();
     Map<String, String> customLabels = Collections.emptyMap();

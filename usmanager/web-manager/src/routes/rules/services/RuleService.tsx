@@ -102,7 +102,7 @@ class RuleService extends BaseComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-    if (prevProps.ruleService?.generic != this.props.ruleService?.generic) {
+    if (prevProps.ruleService?.generic !== this.props.ruleService?.generic) {
       this.setState({isGeneric: this.props.ruleService?.generic || false})
     }
   }

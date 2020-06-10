@@ -10,13 +10,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
+
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import org.springframework.stereotype.Service;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 
 @Service
 public class DockerCoreService {
@@ -37,8 +38,7 @@ public class DockerCoreService {
     var auth = String.format("%s:%s", dockerApiProxyUsername, dockerApiProxyPassword).getBytes();
     this.dockerAuthorization = String.format("Basic %s", new String(Base64.getEncoder().encode(auth)));
     this.dockerApiPort = dockerProperties.getApiProxy().getPort();
-    String dockerScriptPath = dockerProperties.getInstallScriptPath();
-    dockerScriptFile = dockerScriptPath.substring(dockerScriptPath.lastIndexOf('/') + 1);
+    this.dockerScriptFile = dockerProperties.getInstallScript();
   }
 
   public DockerClient getDockerClient(String hostname) {

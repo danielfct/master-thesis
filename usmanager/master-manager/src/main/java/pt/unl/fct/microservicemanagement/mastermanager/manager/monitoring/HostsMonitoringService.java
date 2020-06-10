@@ -239,7 +239,7 @@ public class HostsMonitoringService {
     if (!containerId.isEmpty()) {
       ServiceEntity serviceConfig = servicesService.getService(serviceName);
       double serviceAvgMem = serviceConfig.getExpectedMemoryConsumption();
-      String toHostname = hostsService.getAvailableNodeHostname(serviceAvgMem, hostDetails);
+      String toHostname = hostsService.getAvailableHost(serviceAvgMem, hostDetails);
       // TODO porquê migrar logo um container?
       containersService.migrateContainer(containerId, toHostname);
       log.info("RuleDecision executed: Started host '{}' and migrated container '{}' to it", toHostname, containerId);

@@ -263,17 +263,17 @@ class Node extends BaseComponent<Props, State> {
         node && Object.entries(node).map(([key, value], index) =>
                key === 'role'
                  ? <Field key={'role'}
-                        id={'role'}
-                        label={'role'}
-                        type="dropdown"
-                        dropdown={{
-                          defaultValue: "Select role",
-                          values: ['MANAGER', 'WORKER']
-                        }}/>
+                          id={'role'}
+                          label={'role'}
+                          type="dropdown"
+                          dropdown={{
+                            defaultValue: "Select role",
+                            values: ['MANAGER', 'WORKER']
+                          }}/>
                  : <Field key={index}
-                        id={key}
-                        label={key}
-                        disabled={true}/>)
+                          id={key}
+                          label={key}
+                          disabled={true}/>)
     );
   };
 
@@ -297,7 +297,7 @@ class Node extends BaseComponent<Props, State> {
                 values={node}
                 isNew={isNewNode}
                 post={{
-                  textButton: 'Start',
+                  textButton: isNewNode ? 'Start' : 'Save',
                   url: 'nodes',
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure
@@ -307,13 +307,12 @@ class Node extends BaseComponent<Props, State> {
                   successCallback: this.onPutSuccess,
                   failureCallback: this.onPutFailure
                 }}
-            // delete button is never present on new nodes, so a type cast is safe
-                delete={(node as INode).role !== 'MANAGER'
-                  ? {textButton: 'Remove',
-                    url: `nodes/${(node as INode).id}`,
-                    successCallback: this.onDeleteSuccess,
-                    failureCallback: this.onDeleteFailure}
-                  : undefined}
+                // delete button is never present on new nodes, so a type cast is safe
+                delete={{
+                  textButton: 'Leave swarm',
+                  url: `nodes/${(node as INode).id}`,
+                  successCallback: this.onDeleteSuccess,
+                  failureCallback: this.onDeleteFailure}}
                 switchDropdown={isNewNode ? {options: ['On host', 'On location'], onSwitch: this.switchForm} : undefined}>
             {this.formFields(isNewNode)}
           </Form>

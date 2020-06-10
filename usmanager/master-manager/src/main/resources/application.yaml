@@ -54,6 +54,7 @@ docker:
     port: 2376
   hub:
     username: danielfct
+  install-script: docker-install.sh
   install-script-path: src/main/resources/scripts/docker-install.sh
   swarm:
     manager: ${dockerManager:127.0.0.1}

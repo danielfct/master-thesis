@@ -42,16 +42,19 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHo
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.HostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus.PrometheusService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshCommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -99,7 +102,7 @@ public class HostsService {
     this.maxInstances = awsProperties.getInitialMaxInstances();
   }
 
-  public String getAvailableNodeHostname(double avgContainerMem, HostDetails hostDetails) {
+  public String getAvailableHost(double avgContainerMem, HostDetails hostDetails) {
     /*if (hostDetails instanceof EdgeHostDetails) {
       final var edgeHostDetails = (EdgeHostDetails) hostDetails;
       return getAvailableNodeHostname(avgContainerMem, edgeHostDetails.getRegion(),
@@ -112,16 +115,16 @@ public class HostsService {
     else {
       throw new NotImplementedException();
     }*/
-    return getAvailableNodeHostname(avgContainerMem, hostDetails.getRegion(),
+    return getAvailableHost(avgContainerMem, hostDetails.getRegion(),
         hostDetails.getCountry(), hostDetails.getCity());
   }
 
-  public String getAvailableNodeHostname(double avgContainerMem, String region) {
-    return getAvailableNodeHostname(avgContainerMem, region, "", "");
+  public String getAvailableHost(double avgContainerMem, String region) {
+    return getAvailableHost(avgContainerMem, region, "", "");
   }
 
   //FIXME
-  public String getAvailableNodeHostname(double avgContainerMem, String region, String country, String city) {
+  public String getAvailableHost(double avgContainerMem, String region, String country, String city) {
     //TODO try to improve method
     log.info("Looking for available nodes to host container with at least '{}' memory at region '{}', country '{}', "
         + "city '{}'", avgContainerMem, region, country, city);
@@ -156,6 +159,7 @@ public class HostsService {
             otherRegionsHosts.add(hostname);
           }
         });
+    //TODO https://developers.google.com/maps/documentation/geocoding/start?csw=1
     log.info("Found hosts {} on same region", sameRegionHosts.toString());
     log.info("Found hosts {} on same country", sameCountryHosts.toString());
     log.info("Found hosts {} on same city", sameCityHosts.toString());
@@ -173,7 +177,7 @@ public class HostsService {
       return otherRegionsHosts.get(random.nextInt(otherRegionsHosts.size()));
     } else {
       log.info("Didn't find any available node");
-      return addHost(NodeRole.WORKER, region, country, city);
+      return addHost(region, country, city, NodeRole.WORKER).getHostname();
     }
   }
 
@@ -237,14 +241,14 @@ public class HostsService {
     return continent;
   }
 
-  public void addHost(NodeRole role, String hostname) {
-    setupHost(role, hostname);
+  public SimpleNode addHost(String region, String country, String city, NodeRole role) {
+    String hostname = chooseEdgeHost(region, country, city).orElse(chooseCloudHost());
+    return addHost(hostname, role);
   }
 
-  public String addHost(NodeRole role, String region, String country, String city) {
-    String hostname = chooseEdgeHost(region, country, city).orElse(chooseCloudHost());
-    addHost(role, hostname);
-    return hostname;
+  public SimpleNode addHost(String hostname, NodeRole role) {
+    String nodeId = setupHost(hostname, role);
+    return nodesService.getNode(nodeId);
   }
 
   public void removeHost(String hostname) {
@@ -254,10 +258,10 @@ public class HostsService {
         .filter(c -> !Objects.equals(c.getLabels().get(ContainerConstants.Label.SERVICE_NAME),
             DockerApiProxyService.DOCKER_API_PROXY))
         .forEach(c -> containersService.stopContainer(c.getContainerId()));
-    dockerSwarmService.leaveSwarm(hostname);
+    nodesService.deleteHostNodes(hostname);
     //TODO porquê 5 segundos?
     //Timing.sleep(5, TimeUnit.SECONDS);
-    nodesService.deleteHostNodes(hostname);
+    dockerSwarmService.leaveSwarm(hostname);
     if (isCloudHost(hostname)) {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
       cloudHostsService.stopCloudHost(cloudHost.getInstanceId());
@@ -288,46 +292,42 @@ public class HostsService {
     try {
       hostnames.forEach(hostname -> {
         NodeRole role = Objects.equals(hostname, managerHostname) ? NodeRole.MANAGER : NodeRole.WORKER;
-        setupHost(role, hostname);
+        setupHost(hostname, role);
       });
     } catch (MasterManagerException e) {
       log.debug(e.getMessage());
     }
-
   }
 
   //TODO make sure there is an odd number of master docker nodes
-  private void setupHost(NodeRole role, String hostname) {
+  private String setupHost(String hostname, NodeRole role) {
     log.info("Setting up host {} with role {}", hostname, role);
     dockerApiProxyService.launchDockerApiProxy(hostname);
-    try {
-      switch (role) {
-        case MANAGER:
-          setupManager(hostname);
-          break;
-        case WORKER:
-          setupWorker(hostname);
-          break;
-        default:
-          return;
-      }
-    } catch (MasterManagerException e) {
-      log.debug(e.getMessage());
+    String nodeId;
+    switch (role) {
+      case MANAGER:
+        nodeId = setupManager(hostname);
+        break;
+      case WORKER:
+        nodeId = setupWorker(hostname);
+        break;
+      default:
+        throw new UnsupportedOperationException();
     }
     prometheusService.launchPrometheus(hostname);
     locationRequestService.launchRequestLocationMonitor(hostname);
+    return nodeId;
   }
 
-  private void setupManager(String managerHostname) {
-    if (dockerSwarmService.isASwarmManager(managerHostname)) {
-      throw new MasterManagerException("Host %s is already a swarm manager", managerHostname);
-    }
-    dockerSwarmService.initSwarm();
+  private String setupManager(String managerHostname) {
+    Optional<String> swarmId = dockerSwarmService.isASwarmManager(managerHostname);
+    swarmId.ifPresent(id -> log.info("Host {} is already a swarm manager at node {}", managerHostname, id));
     //nodesService.deleteUnresponsiveNodes();
+    return swarmId.orElseGet(dockerSwarmService::initSwarm);
   }
 
-  private void setupWorker(String workerHostname) {
-    dockerSwarmService.joinSwarm(workerHostname);
+  private String setupWorker(String workerHostname) {
+    return dockerSwarmService.joinSwarm(workerHostname);
   }
 
   private List<String> getWorkerAwsNodes() {
@@ -389,6 +389,29 @@ public class HostsService {
       }
     }
     return cloudHostsService.startCloudHost().getPublicIpAddress();
+  }
+
+  public String findAvailableExternalPort(String startExternalPort) {
+    return findAvailableExternalPort("127.0.0.1", startExternalPort);
+  }
+
+  public String findAvailableExternalPort(String hostname, String startExternalPort) {
+    var command = "lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
+    SshCommandResult sshCommandResult = sshService.execCommand(hostname, command, true);
+    if (!sshCommandResult.isSuccessful()) {
+      throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname,
+          sshCommandResult.getError());
+    }
+    Pattern isNumberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+    List<Integer> usedExternalPorts = Arrays.stream(sshCommandResult.getOutput().split("\n"))
+        .filter(v -> isNumberPattern.matcher(v).matches())
+        .map(Integer::parseInt)
+        .collect(Collectors.toList());
+    for (var i = Integer.parseInt(startExternalPort); ; i++) {
+      if (!usedExternalPorts.contains(i)) {
+        return String.valueOf(i);
+      }
+    }
   }
 
 }

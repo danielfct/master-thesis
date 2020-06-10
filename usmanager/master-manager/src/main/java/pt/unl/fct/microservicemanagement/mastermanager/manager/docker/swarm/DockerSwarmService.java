@@ -13,16 +13,19 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.SwarmInit;
 import com.spotify.docker.client.messages.swarm.SwarmJoin;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,12 +33,17 @@ import org.springframework.stereotype.Service;
 public class DockerSwarmService {
 
   private final DockerCoreService dockerCoreService;
+  private final HostsService hostsService;
+  private final NodesService nodesService;
   private final String dockerSwarmManager;
 
   public DockerSwarmService(DockerCoreService dockerCoreService,
-                            SshService sshService,
+                            @Lazy HostsService hostsService,
+                            @Lazy NodesService nodesService,
                             DockerProperties dockerProperties) {
     this.dockerCoreService = dockerCoreService;
+    this.hostsService = hostsService;
+    this.nodesService = nodesService;
     this.dockerSwarmManager = dockerProperties.getSwarm().getManager();
   }
 
@@ -43,49 +51,60 @@ public class DockerSwarmService {
     return dockerCoreService.getDockerClient(dockerSwarmManager);
   }
 
-  public boolean isASwarmManager(String hostname) {
+  public Optional<String> isASwarmManager(String hostname) {
     try (var docker = dockerCoreService.getDockerClient(hostname)) {
-      return docker.info().swarm().controlAvailable();
+      return docker.info().swarm().controlAvailable()
+          ? Optional.of(nodesService.getHostNode(hostname).getId())
+          : Optional.empty();
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
     }
   }
 
-  public boolean isASwarmWorker(String hostname) {
+  public Optional<String> isASwarmWorker(String hostname) {
     try (var docker = dockerCoreService.getDockerClient(hostname)) {
       return Objects.equals(docker.info().swarm().localNodeState(), "active")
-          && !docker.info().swarm().controlAvailable();
+          && !docker.info().swarm().controlAvailable()
+          ? Optional.of(nodesService.getHostNode(hostname).getId())
+          : Optional.empty();
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
     }
   }
 
-  public void initSwarm() {
+  public String initSwarm() {
     try (var docker = getSwarmManager()) {
-      log.info("Initializing docker swarm at {}...", dockerSwarmManager);
+      String port = hostsService.findAvailableExternalPort("2377");
+      String listenAddress = String.format("%s:%s", "0.0.0.0", port);
+      log.info("Initializing docker swarm at {} with listen address {}", dockerSwarmManager, listenAddress);
       var swarmInit = SwarmInit.builder()
           .advertiseAddr(dockerSwarmManager)
-          .listenAddr("0.0.0.0:2377")
+          .listenAddr(listenAddress)
           .build();
       String swarmId = docker.initSwarm(swarmInit);
-      log.info("Started docker swarm with id {}...", swarmId);
+      log.info("Started docker swarm with id {}", swarmId);
+      return swarmId;
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
     }
   }
 
-  public void joinSwarm(String hostname) {
-    log.info("{} joining the swarm", hostname);
+  public String joinSwarm(String hostname) {
     try (DockerClient swarmManager = getSwarmManager();
          DockerClient swarmWorker = dockerCoreService.getDockerClient(hostname)) {
       String workerJoinToken = swarmManager.inspectSwarm().joinTokens().worker();
-      SwarmJoin swarmJoin = SwarmJoin.builder().listenAddr(hostname).advertiseAddr(hostname).joinToken(workerJoinToken)
+      SwarmJoin swarmJoin = SwarmJoin.builder()
+          .listenAddr(hostname)
+          .advertiseAddr(hostname)
+          .joinToken(workerJoinToken)
           .remoteAddrs(List.of(dockerSwarmManager)).build();
       swarmWorker.joinSwarm(swarmJoin);
-      log.info("{} joined the swarm", hostname);
+      String id = swarmWorker.info().id();
+      log.info("{} joined the swarm as node {}", hostname, id);
+      return id;
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
