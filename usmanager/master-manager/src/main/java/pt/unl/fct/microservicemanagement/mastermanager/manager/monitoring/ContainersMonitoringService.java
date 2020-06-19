@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerProperties;
@@ -168,7 +169,11 @@ public class ContainersMonitoringService {
         //TODO replace diffSeconds with calculation from previous database save
         int diffSeconds = (int) ((currRun - lastRun) / TimeUnit.SECONDS.toMillis(1));
         lastRun = currRun;
-        monitorContainersTask(diffSeconds);
+        try {
+          monitorContainersTask(diffSeconds);
+        } catch (MasterManagerException e) {
+          log.error(e.getMessage());
+        }
       }
     }, monitorPeriod, monitorPeriod);
   }

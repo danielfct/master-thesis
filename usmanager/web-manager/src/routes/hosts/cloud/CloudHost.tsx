@@ -46,6 +46,7 @@ export interface ICloudHost extends IDatabaseData {
   };
   publicDnsName: string;
   publicIpAddress: string;
+  privateIpAddress: string;
   placement: IPlacement;
   hostRules?: string[];
   hostSimulatedMetrics?: string[];
@@ -464,6 +465,9 @@ function removeFields(cloudHost: Partial<ICloudHost>) {
   }
   if (!cloudHost.publicIpAddress) {
     delete cloudHost["publicIpAddress"];
+  }
+  if (!cloudHost.privateIpAddress) {
+    delete cloudHost["privateIpAddress"];
   }
   delete cloudHost["hostRules"];
   delete cloudHost["hostSimulatedMetrics"];

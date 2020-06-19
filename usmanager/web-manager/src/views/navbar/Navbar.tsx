@@ -76,12 +76,13 @@ class Navbar extends React.Component<Props, {}> {
                             {!loggingIn &&
                             <a className="sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light"
                                data-target="slide-out"
-                               style={showSidenav ? undefined : { display: 'inherit' }}
                                onClick={this.handleSidenav}>
                               <i className="material-icons">menu</i>
                             </a>}
                             <ul className="left">
-                                <li style={showSidenav && !loggingIn ? { paddingLeft: '210px', marginRight: "24px" } : { margin: "0 24px" } }>
+                                <li style={showSidenav && !loggingIn
+                                  ? { paddingLeft: '200px', marginLeft: '-74px', marginRight: "24px", transition: "padding-left .25s, margin-left .25s" }
+                                  : { marginRight: "0", transition: "padding-left .25s margin-right .25s" } }>
                                     <Link className="transparent brand-logo" to={"/home"}>
                                         <img src={logo} alt=""/>
                                         Web Manager

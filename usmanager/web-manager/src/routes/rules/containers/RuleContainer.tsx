@@ -102,7 +102,7 @@ class RuleContainer extends BaseComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-    if (prevProps.ruleContainer?.generic != this.props.ruleContainer?.generic) {
+    if (prevProps.ruleContainer?.generic !== this.props.ruleContainer?.generic) {
       this.setState({isGeneric: this.props.ruleContainer?.generic || false})
     }
   }

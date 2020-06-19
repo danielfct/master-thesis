@@ -47,7 +47,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EurekaService {
 
-  public static final String EUREKA = "eureka-server";
+  public static final String EUREKA_SERVER = "eureka-server";
 
   private final HostsService hostsService;
   private final RegionsService regionsService;
@@ -66,7 +66,7 @@ public class EurekaService {
 
   public Optional<String> getEurekaServerAddress(String region) {
     return containersService.getContainersWithLabels(Set.of(
-        Pair.of(ContainerConstants.Label.SERVICE_NAME, EUREKA),
+        Pair.of(ContainerConstants.Label.SERVICE_NAME, EUREKA_SERVER),
         Pair.of(ContainerConstants.Label.SERVICE_REGION, region)))
         .stream()
         .map(container -> container.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS))
@@ -75,7 +75,7 @@ public class EurekaService {
 
   public List<ContainerEntity> launchEurekaServers(String[] regions) {
     ServiceEntity service =
-        serviceService.getService(EUREKA);
+        serviceService.getService(EUREKA_SERVER);
     double expectedMemoryConsumption = service.getExpectedMemoryConsumption();
     List<String> availableHostnames = Stream.of(regions)
         .map(regionsService::getRegion)
@@ -88,7 +88,7 @@ public class EurekaService {
         .collect(Collectors.joining(","));
     Map<String, String> dynamicLaunchParams = Map.of("${zone}", eurekaServers);
     return availableHostnames.stream()
-        .map(hostname -> containersService.launchContainer(hostname, EUREKA, customEnvs,
+        .map(hostname -> containersService.launchContainer(hostname, EUREKA_SERVER, customEnvs,
             customLabels, dynamicLaunchParams))
         .collect(Collectors.toList());
   }

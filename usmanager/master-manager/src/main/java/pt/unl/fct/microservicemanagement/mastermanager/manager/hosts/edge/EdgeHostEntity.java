@@ -64,21 +64,19 @@ public class EdgeHostEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
-  private String hostname;
+  private String username;
 
-  private String sshUsername;
+  private String publicDnsName;
 
-  // Base64 format
-  private String sshPassword;
+  private String privateIpAddress;
+
+  private String publicIpAddress;
 
   private String region;
 
   private String country;
 
   private String city;
-
-  private boolean isLocal;
 
   @Singular
   @JsonIgnore
@@ -97,6 +95,11 @@ public class EdgeHostEntity {
       inverseJoinColumns = @JoinColumn(name = "simulated_metric_id")
   )
   private Set<SimulatedHostMetricEntity> simulatedHostMetrics;
+
+  @JsonIgnore
+  public String getHostname() {
+    return this.publicDnsName == null ? this.publicIpAddress : this.publicDnsName;
+  }
 
   public void addRule(HostRuleEntity rule) {
     hostRules.add(rule);

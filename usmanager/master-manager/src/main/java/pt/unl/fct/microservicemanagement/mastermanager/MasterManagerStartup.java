@@ -25,6 +25,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager;
 
 import org.springframework.context.annotation.Lazy;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.ContainersMonitoringService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.HostsMonitoringService;
@@ -56,7 +57,12 @@ public class MasterManagerStartup implements ApplicationListener<ApplicationRead
 
   @Override
   public void onApplicationEvent(ApplicationReadyEvent event) {
-    hostsService.clusterHosts();
+    hostsService.setMachineInfo();
+    try {
+      hostsService.clusterHosts();
+    } catch (MasterManagerException e) {
+      log.error(e.getMessage());
+    }
     containersMonitoringService.initContainerMonitorTimer();
     hostsMonitoringService.initHostMonitorTimer();
     masterManagerMonitoringService.initMasterManagerMonitorTimer();

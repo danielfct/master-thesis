@@ -45,7 +45,10 @@ class MainLayout extends React.Component<Props, {}> {
     return (
       <div>
         <Sidenav/>
-        <div className="section content" style={this.props.sidenavVisible ? undefined : {paddingLeft: 0}}>
+        <div className="section content"
+             style={this.props.sidenavVisible
+               ? {paddingLeft: 200, transition: 'padding-left .25s'}
+               : {paddingLeft: 0, transition: 'padding-left .25s'}}>
           <div className="row col s12">
             <Breadcrumbs/>
           </div>
@@ -61,7 +64,7 @@ class MainLayout extends React.Component<Props, {}> {
 
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
-    sidenavVisible: state.ui.sidenav.user,
+    sidenavVisible: state.ui.sidenav.user && state.ui.sidenav.width,
   }
 );
 

@@ -23,6 +23,9 @@ spring:
         format_sql: false
         show_sql: false
         use_sql_comments: false
+edge:
+  access:
+    key-file-path: src/main/resources/edge
 aws:
   initial-max-instances: 2
   max-retries: 10
@@ -34,7 +37,7 @@ aws:
     key-file-path: src/main/resources/aws/ec2.pem
     username: ubuntu
   instance:
-    ami: ami-049901c0e04cbba06
+    ami: ami-0b30a88613f4a9846
     security-group: us-manager-security-group
     key-pair: ec2
     type: t2.micro
@@ -48,16 +51,18 @@ container:
   replicate-container-on-event-count: 2
   stop-container-on-event-count: 3
 docker:
+  install-script: docker-install.sh
+  install-script-path: src/main/resources/scripts/docker-install.sh
+  api:
+    port: 2376
   api-proxy:
     username: username
     password: password
-    port: 2376
+    port: 2375
   hub:
     username: danielfct
-  install-script: docker-install.sh
-  install-script-path: src/main/resources/scripts/docker-install.sh
   swarm:
-    manager: ${dockerManager:127.0.0.1}
+    manager: ${dockerManager:daniel@dpimenta.ddns.net}
     max-workers: 1
 eureka:
   port: 8761
@@ -70,6 +75,7 @@ host:
   start-host-on-events-count: 3
   stop-host-on-events-count: 3
 master-manager:
+  mode: LOCAL
   monitor-period: 30000
   tests:
     test-logs-enable: ${testLogs:true}

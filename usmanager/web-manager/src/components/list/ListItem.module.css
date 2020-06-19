@@ -29,7 +29,7 @@
 
 .listItemContent {
     padding: 15px 40px;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     width: 100%;
     color: white;
     display: flex;
@@ -40,7 +40,7 @@
 
 .nonListContent {
     padding: 7px 5px;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     width: 100%;
     color: white;
     display: flex;
@@ -52,7 +52,7 @@
 .linkedItemContent {
     padding: 15px 40px;
     width: 75%;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     color: white;
 }
 

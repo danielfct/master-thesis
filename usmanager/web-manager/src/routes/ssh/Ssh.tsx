@@ -13,25 +13,121 @@ import Tabs from "../../components/tabs/Tabs";
 import React from "react";
 import SshCommand from "./SshCommand";
 import SshFile from "./SshFile";
+import styles from "./Ssh.module.css";
+import {Resizable} from "re-resizable";
+import ScrollBar from "react-perfect-scrollbar";
+import {ReduxState} from "../../reducers";
+import {connect} from "react-redux";
+import {Direction} from "re-resizable/lib/resizer";
 
-const tabs = () => [
-  {
-    title: 'Execute command',
-    id: 'executeCommand',
-    content: () => <SshCommand/>
-  },
-  {
-    title: 'Upload file',
-    id: 'uploadFile',
-    content: () => <SshFile/>
+interface StateToProps {
+  sidenavVisible: boolean;
+}
+
+type Props = StateToProps;
+
+interface State {
+  showingCommands: boolean;
+  commandsHeight: number;
+}
+
+class Ssh extends React.Component<Props, State> {
+
+  private scrollbar: (ScrollBar | null) = null;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      showingCommands: true,
+      commandsHeight: 190
+    }
   }
-];
 
-const Ssh: React.FC = () =>
-  <MainLayout>
-    <div className="container">
-      <Tabs tabs={tabs()}/>
-    </div>
-  </MainLayout>;
+  private tabs = () => [
+      {
+        title: 'Execute command',
+        id: 'executeCommand',
+        content: () => <SshCommand/>
+      },
+      {
+        title: 'Upload file',
+        id: 'uploadFile',
+        content: () => <SshFile/>
+      }
+    ];
 
-export default Ssh;
+  private onResize = (event: MouseEvent | TouchEvent, direction: Direction, elementRef: HTMLElement) => {
+    this.scrollbar?.updateScroll();
+    if (direction === 'top') {
+      if (elementRef.clientHeight <= 38 && this.state.showingCommands) {
+        this.setState({showingCommands: false});
+      }
+      if (elementRef.clientHeight > 38 && !this.state.showingCommands) {
+        this.setState({showingCommands: true});
+      }
+    }
+  }
+
+  private updateScrollbar = () =>
+    this.scrollbar?.updateScroll();
+
+  private toggleCommands = () => {
+      this.setState({showingCommands: !this.state.showingCommands, commandsHeight: this.state.showingCommands ? 190 : 0},
+        () => setTimeout(() => this.updateScrollbar(), 500));
+    }
+
+  public render() {
+      return (
+        <MainLayout>
+          <div className="container">
+            <Tabs tabs={this.tabs()}/>
+          </div>
+          <Resizable className={`${styles.commandsContainer}`}
+                     onResize={this.onResize}
+                     size={{
+                       width: window.outerWidth - 200,
+                       height: this.state.commandsHeight }}
+                     onResizeStop={(e, direction, ref, d) => {
+                       this.setState({
+                         commandsHeight: this.state.commandsHeight + d.height,
+                       });
+                     }}>
+            <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}>
+              <div>
+                <div className={styles.commandsHeader}>
+                  <div className={styles.commandsTitle}>
+                    Commands
+                  </div>
+                  <button className={`btn-floating btn-flat ${styles.toggleCommandsButton}`} onClick={this.toggleCommands}>
+                    <i className="material-icons">{this.state.showingCommands ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}</i>
+                  </button>
+                </div>
+              </div>
+              <div className={styles.commands}>
+                <div className={styles.command}>
+                  127.0.0.1: hostname -i
+                </div>
+                Sample with default size
+                <div className={styles.command}>
+                  127.0.0.1: hostname -i
+                </div>
+                Sample with default size
+                <div className={styles.command}>
+                  127.0.0.1: hostname -i
+                </div>
+                Sample with default size
+              </div>
+            </ScrollBar>
+          </Resizable>
+        </MainLayout>
+      );
+    }
+  }
+
+  const mapStateToProps = (state: ReduxState): StateToProps => (
+  {
+    sidenavVisible: state.ui.sidenav.user && state.ui.sidenav.width,
+  }
+);
+
+  export default connect(mapStateToProps)(Ssh);

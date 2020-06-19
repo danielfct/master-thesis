@@ -181,12 +181,12 @@ const cloudHosts = new schema.Array(cloudHost);
 });*/
 
 const edgeHost: schema.Entity<IEdgeHost> = new schema.Entity('edgeHosts', undefined, {
-    idAttribute: (host: IEdgeHost) => host.hostname
+    idAttribute: (host: IEdgeHost) => host.publicDnsName || host.publicIpAddress
 });
 const edgeHosts = new schema.Array(edgeHost);
 
 const node: schema.Entity<INode> = new schema.Entity('nodes', undefined, {
-    idAttribute: (node: INode) => node.id.toString()
+    idAttribute: (node: INode) => node.id
 });
 
 const ruleHost: schema.Entity<IRuleHost> = new schema.Entity('hostRules', undefined, {

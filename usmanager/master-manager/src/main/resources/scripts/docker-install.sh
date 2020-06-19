@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
-
+# Docker CE for Linux installation script
+#
+# See https://docs.docker.com/install/ for the installation steps.
+#
 # This script is meant for quick & easy install via:
 #   $ curl -fsSL https://get.docker.com -o get-docker.sh
 #   $ sh get-docker.sh
@@ -16,7 +19,7 @@ set -e
 #
 # Git commit from https://github.com/docker/docker-install when
 # the script was uploaded (Should only be modified by upload job):
-SCRIPT_COMMIT_SHA=2f4ae48
+SCRIPT_COMMIT_SHA="26ff363bcf3b3f5a00498ac43694bf1c7d9ce16c"
 
 
 # The channel to install from:
@@ -78,6 +81,22 @@ is_dry_run() {
 	fi
 }
 
+is_wsl() {
+	case "$(uname -r)" in
+	*microsoft* ) true ;; # WSL 2
+	*Microsoft* ) true ;; # WSL 1
+	* ) false;;
+	esac
+}
+
+is_darwin() {
+	case "$(uname -s)" in
+	*darwin* ) true ;;
+	*Darwin* ) true ;;
+	* ) false;;
+	esac
+}
+
 deprecation_notice() {
 	distro=$1
 	date=$2
@@ -108,32 +127,12 @@ add_debian_backport_repo() {
 	fi
 }
 
-echo_docker_as_nonroot() {
+set_docker_as_nonroot() {
 	if is_dry_run; then
 		return
 	fi
-	if command_exists docker && [ -e /var/run/docker.sock ]; then
-		(
-			set -x
-			$sh_c 'docker version'
-		) || true
-	fi
-	#your_user=your-user
-	#[ "$user" != 'root' ] && your_user="$user"
-	## intentionally mixed spaces and tabs here -- tabs are stripped by "<<-EOF", spaces are kept in the output
-	#echo "If you would like to use Docker as a non-root user, you should now consider"
-	#echo "adding your user to the \"docker\" group with something like:"
-	#echo
-	#echo "  sudo usermod -aG docker $your_user"
-	#echo
-	#echo "Remember that you will have to log out and back in for this to take effect!"
-	#echo
-	#echo "WARNING: Adding a user to the \"docker\" group will grant the ability to run"
-	#echo "         containers which can be used to obtain root privileges on the"
-	#echo "         docker host."
-	#echo "         Refer to https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface"
-	#echo "         for more information."
-
+	sudo usermod -aG docker "$USER"
+  	echo "Docker without sudo configured. Log out and log back in so that your group membership is re-evaluated."
 }
 
 # Check if this is a forked Linux distro
@@ -173,6 +172,9 @@ check_forked() {
 				fi
 				dist_version="$(sed 's/\/.*//' /etc/debian_version | sed 's/\..*//')"
 				case "$dist_version" in
+					10)
+						dist_version="buster"
+					;;
 					9)
 						dist_version="stretch"
 					;;
@@ -191,22 +193,6 @@ semverParse() {
 	minor="${minor%%.*}"
 	patch="${1#$major.$minor.}"
 	patch="${patch%%[-.]*}"
-}
-
-ee_notice() {
-	echo
-	echo
-	echo "  WARNING: $1 is now only supported by Docker EE"
-	echo "           Check https://store.docker.com for information on Docker EE"
-	echo
-	echo
-}
-
-docker_without_sudo() {
-  sudo usermod -aG docker "$USER"
-  RED='\033[0;31m'
-  NC='\033[0m' # No Color
-  echo "Docker without sudo configured. ${RED}Log out and log back in${NC} so that your group membership is re-evaluated."
 }
 
 do_install() {
@@ -284,6 +270,18 @@ do_install() {
 	lsb_dist=$( get_distribution )
 	lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
 
+	if is_wsl; then
+		echo
+		echo "WSL DETECTED: We recommend using Docker Desktop for Windows."
+		echo "Please get Docker Desktop from https://www.docker.com/products/docker-desktop"
+		echo
+		cat >&2 <<-'EOF'
+
+			You may press Ctrl+C now to abort this script.
+		EOF
+		( set -x; sleep 20 )
+	fi
+
 	case "$lsb_dist" in
 
 		ubuntu)
@@ -298,6 +296,9 @@ do_install() {
 		debian|raspbian)
 			dist_version="$(sed 's/\/.*//' /etc/debian_version | sed 's/\..*//')"
 			case "$dist_version" in
+				10)
+					dist_version="buster"
+				;;
 				9)
 					dist_version="stretch"
 				;;
@@ -307,16 +308,11 @@ do_install() {
 			esac
 		;;
 
-		centos)
+		centos|rhel)
 			if [ -z "$dist_version" ] && [ -r /etc/os-release ]; then
 				dist_version="$(. /etc/os-release && echo "$VERSION_ID")"
 			fi
 		;;
-
-		rhel|ol|sles)
-			ee_notice "$lsb_dist"
-			exit 1
-			;;
 
 		*)
 			if command_exists lsb_release; then
@@ -352,7 +348,7 @@ do_install() {
 					set -x
 				fi
 				$sh_c 'apt-get update -qq >/dev/null'
-				$sh_c "apt-get install -y -qq $pre_reqs >/dev/null"
+				$sh_c "DEBIAN_FRONTEND=noninteractive apt-get install -y -qq $pre_reqs >/dev/null"
 				$sh_c "curl -fsSL \"$DOWNLOAD_URL/linux/$lsb_dist/gpg\" | apt-key add -qq - >/dev/null"
 				$sh_c "echo \"$apt_repo\" > /etc/apt/sources.list.d/docker.list"
 				$sh_c 'apt-get update -qq >/dev/null'
@@ -389,11 +385,10 @@ do_install() {
 				fi
 				$sh_c "apt-get install -y -qq --no-install-recommends docker-ce$pkg_version >/dev/null"
 			)
-			echo_docker_as_nonroot
-			docker_without_sudo
-      return
+			set_docker_as_nonroot
+			exit 0
 			;;
-		centos|fedora)
+		centos|fedora|rhel)
 			yum_repo="$DOWNLOAD_URL/linux/$lsb_dist/$REPO_FILE"
 			if ! curl -Ifs "$yum_repo" > /dev/null; then
 				echo "Error: Unable to curl repository file $yum_repo, is it valid?"
@@ -460,11 +455,19 @@ do_install() {
 				fi
 				$sh_c "$pkg_manager install -y -q docker-ce$pkg_version"
 			)
-			echo_docker_as_nonroot
-			docker_without_sudo
-			return
+			set_docker_as_nonroot
+			exit 0
 			;;
 		*)
+			if [ -z "$lsb_dist" ]; then
+				if is_darwin; then
+					echo
+					echo "ERROR: Unsupported operating system 'macOS'"
+					echo "Please get Docker Desktop from https://www.docker.com/products/docker-desktop"
+					echo
+					exit 1
+				fi
+			fi
 			echo
 			echo "ERROR: Unsupported distribution '$lsb_dist'"
 			echo
@@ -476,14 +479,7 @@ do_install() {
 
 # wrapped up in a function so that we have some protection against only getting
 # half the file during "curl | sh"
-
-if ! command_exists docker
-then
-	do_install
-else
-	printf "Docker already installed: "
-  docker --version
-fi
+do_install
 
 setup_docker_api() {
   DIRECTORY_DOCKER_SERVICE_API=/etc/systemd/system/docker.service.d
@@ -497,7 +493,7 @@ setup_docker_api() {
   printf "# /etc/systemd/system/docker.service.d/override.conf\n[Service]\nExecStart=\nExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2376" > "$FILE_DOCKER_SERVICE_API"
   sudo systemctl daemon-reload
   sudo systemctl restart docker.service
-  echo "Docker API configured."
+  echo "Docker API configured"
 }
 
 setup_docker_api

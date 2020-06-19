@@ -78,6 +78,11 @@ public class NodesService {
     return getNodes(availableFilter);
   }
 
+  public List<SimpleNode> getAvailableWorkers() {
+    //TODO test
+    return getAvailableNodes(node -> node.managerStatus() != null);
+  }
+
   public boolean hasNode(Predicate<Node> predicate) {
     return !getAvailableNodes(predicate).isEmpty();
   }

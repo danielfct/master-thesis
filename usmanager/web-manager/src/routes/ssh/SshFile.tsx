@@ -85,8 +85,8 @@ class SshCommand extends BaseComponent<Props, {}> {
   };
 
   private getSelectableFiles = () => {
-    //TODO get available scripts from server instead
-    return ['docker-install.sh'];
+    //TODO get available scripts from the server instead
+    return ['docker-install.sh', 'docker-uninstall.sh', 'node-exporter-install.sh'];
   };
 
   public render() {

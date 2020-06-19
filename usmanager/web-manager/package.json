@@ -33,6 +33,7 @@
     "materialize-css": "^1.0.0",
     "normalize-url": "^5.0.0",
     "normalizr": "^3.6.0",
+    "re-resizable": "^6.5.0",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-icons": "^3.8.0",

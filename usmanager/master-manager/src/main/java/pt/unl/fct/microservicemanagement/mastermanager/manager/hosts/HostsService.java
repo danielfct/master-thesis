@@ -24,7 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts;
 
+import pt.unl.fct.microservicemanagement.mastermanager.MasterManagerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.Mode;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.bash.BashCommandResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.bash.BashService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
@@ -47,13 +52,11 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshSer
 import pt.unl.fct.microservicemanagement.mastermanager.util.Text;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -71,35 +74,139 @@ public class HostsService {
   private final EdgeHostsService edgeHostsService;
   private final CloudHostsService cloudHostsService;
   private final SshService sshService;
+  private final BashService bashService;
   private final HostMetricsService hostMetricsService;
   private final PrometheusService prometheusService;
   private final LocationRequestService locationRequestService;
   private final DockerApiProxyService dockerApiProxyService;
-  private final String managerHostname;
+  private String publicIp;
+  private String privateIp;
   private final int maxWorkers;
   private final int maxInstances;
+  private final Mode mode;
 
   public HostsService(NodesService nodesService, @Lazy ContainersService containersService,
                       DockerSwarmService dockerSwarmService, EdgeHostsService edgeHostsService,
-                      CloudHostsService cloudHostsService, SshService sshService,
+                      CloudHostsService cloudHostsService, SshService sshService, BashService bashService,
                       HostMetricsService hostMetricsService,
-                      //TODO fix lazy
                       PrometheusService prometheusService, @Lazy LocationRequestService locationRequestService,
                       DockerApiProxyService dockerApiProxyService, DockerProperties dockerProperties,
-                      AwsProperties awsProperties) {
+                      AwsProperties awsProperties,
+                      MasterManagerProperties masterManagerProperties) {
     this.nodesService = nodesService;
     this.containersService = containersService;
     this.dockerSwarmService = dockerSwarmService;
     this.edgeHostsService = edgeHostsService;
     this.cloudHostsService = cloudHostsService;
     this.sshService = sshService;
+    this.bashService = bashService;
     this.hostMetricsService = hostMetricsService;
     this.prometheusService = prometheusService;
     this.locationRequestService = locationRequestService;
     this.dockerApiProxyService = dockerApiProxyService;
-    this.managerHostname = dockerProperties.getSwarm().getManager();
     this.maxWorkers = dockerProperties.getSwarm().getMaxWorkers();
     this.maxInstances = awsProperties.getInitialMaxInstances();
+    this.mode = masterManagerProperties.getMode();
+  }
+
+  public void setMachineInfo() {
+    String username = bashService.getUsername();
+    this.publicIp = bashService.getPublicIp();
+    this.privateIp = bashService.getPrivateIp();
+    if (mode == Mode.LOCAL) {
+      edgeHostsService.addEdgeHost(EdgeHostEntity.builder()
+              .username(username)
+              .publicDnsName("dpimenta.ddns.net")
+              .publicIpAddress(publicIp)
+              .privateIpAddress(privateIp)
+              .region("eu-central-1")
+              .country("pt")
+              .city("lisbon")
+              .build(),
+          false);
+    }
+  }
+
+  public String getPrivateIp() {
+    return this.privateIp;
+  }
+
+  public String getPublicIP() {
+    return this.publicIp;
+  }
+
+  public void clusterHosts() {
+    log.info("Clustering hosts into the swarm...");
+    setupHost(publicIp, privateIp, NodeRole.MANAGER);
+    getEdgeWorkerNodes().forEach(edgeHost ->
+        setupHost(edgeHost.getHostname(), edgeHost.getPrivateIpAddress(), NodeRole.WORKER)
+    );
+    if (mode == Mode.GLOBAL) {
+      getCloudWorkerNodes().forEach(cloudHost ->
+          setupHost(cloudHost.getPublicIpAddress(), cloudHost.getPrivateIpAddress(), NodeRole.WORKER)
+      );
+    }
+  }
+
+  private List<CloudHostEntity> getCloudWorkerNodes() {
+    int maxWorkers = this.maxWorkers - nodesService.getAvailableWorkers().size();
+    int maxInstances = Math.max(this.maxInstances, maxWorkers);
+    List<CloudHostEntity> cloudHosts = new ArrayList<>(maxInstances);
+    for (var i = 0; i < maxInstances; i++) {
+      cloudHosts.add(chooseCloudHost());
+    }
+    return cloudHosts;
+  }
+
+  private List<EdgeHostEntity> getEdgeWorkerNodes() {
+    int maxWorkers = this.maxWorkers - nodesService.getAvailableWorkers().size();
+    var edgeHosts = edgeHostsService.getEdgeHosts().stream();
+    if (mode == Mode.LOCAL) {
+      edgeHosts = edgeHosts.filter(edgeHost -> Objects.equals(edgeHost.getPublicIpAddress(), this.publicIp));
+    }
+    return edgeHosts
+        .filter(edgeHost -> !Objects.equals(edgeHost.getPrivateIpAddress(), this.privateIp))
+        .filter(this::isEdgeHostRunning)
+        .limit(maxWorkers)
+        .collect(Collectors.toList());
+  }
+
+  private String setupHost(String publicIpAddress, String privateIpAddress, NodeRole role) {
+    String hostname = privateIpAddress != null ? privateIpAddress : publicIpAddress;
+    log.info("Setting up host {} ({}) with role {}", hostname, privateIpAddress, role);
+    String dockerApiContainerId = dockerApiProxyService.launchDockerApiProxy(publicIpAddress);
+    String nodeId;
+    switch (role) {
+      case MANAGER:
+        nodeId = setupSwarmManager(publicIpAddress);
+        break;
+      case WORKER:
+        nodeId = setupSwarmWorker(publicIpAddress);
+        break;
+      default:
+        throw new UnsupportedOperationException();
+    }
+    log.info("Host {} is on swarm on node {}", hostname, nodeId);
+    containersService.addContainer(dockerApiContainerId);
+    prometheusService.launchPrometheus(publicIpAddress);
+    locationRequestService.launchRequestLocationMonitor(publicIpAddress);
+    return nodeId;
+  }
+
+  private String setupSwarmManager(String managerHostname) {
+    boolean isLocal = managerHostname.equalsIgnoreCase(this.publicIp);
+    return dockerSwarmService.getSwarmManagerNodeId(isLocal ? privateIp : managerHostname)
+        .or(() -> dockerSwarmService.getSwarmWorkerNodeId(managerHostname))
+        .orElseGet(() ->
+            isLocal
+                ? dockerSwarmService.initSwarm()
+                : dockerSwarmService.joinSwarm(managerHostname, NodeRole.MANAGER));
+  }
+
+  private String setupSwarmWorker(String workerHostname) {
+    return dockerSwarmService.getSwarmManagerNodeId(workerHostname)
+        .or(() -> dockerSwarmService.getSwarmWorkerNodeId(workerHostname))
+        .orElseGet(() -> dockerSwarmService.joinSwarm(workerHostname, NodeRole.WORKER));
   }
 
   public String getAvailableHost(double avgContainerMem, HostDetails hostDetails) {
@@ -195,25 +302,34 @@ public class HostsService {
           zone.substring(0, zone.length() - 1);
       return new AwsHostDetails(hostname, getContinent(region), region);
     }*/
+    String publicDnsName;
+    String publicIpAddress;
+    String privateIpAddress;
     String city;
     String country;
     String region;
     String continent;
-    if (edgeHostsService.hasEdgeHost(hostname)) {
+    try {
       EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
+      publicDnsName = edgeHost.getPublicDnsName();
+      publicIpAddress = edgeHost.getPublicIpAddress();
+      privateIpAddress = edgeHost.getPrivateIpAddress();
       city = edgeHost.getCity();
       country = edgeHost.getCountry();
       region = edgeHost.getRegion();
       continent = getContinent(region);
-    } else {
+    } catch (EntityNotFoundException e) {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
+      publicDnsName = cloudHost.getPublicDnsName();
+      publicIpAddress = cloudHost.getPublicIpAddress();
+      privateIpAddress = cloudHost.getPrivateIpAddress();
       city = "";
       country = "";
       String zone = cloudHost.getPlacement().getAvailabilityZone();
       region = Character.isDigit(zone.charAt(zone.length() - 1)) ? zone : zone.substring(0, zone.length() - 1);
       continent = getContinent(zone);
     }
-    return new HostDetails(city, country, region, continent);
+    return new HostDetails(publicDnsName, publicIpAddress, privateIpAddress, city, country, region, continent);
   }
 
   private String getContinent(String region) {
@@ -242,12 +358,34 @@ public class HostsService {
   }
 
   public SimpleNode addHost(String region, String country, String city, NodeRole role) {
-    String hostname = chooseEdgeHost(region, country, city).orElse(chooseCloudHost());
-    return addHost(hostname, role);
+    Optional<EdgeHostEntity> edgeHost = chooseEdgeHost(region, country, city);
+    if (edgeHost.isPresent()) {
+      return addHost(edgeHost.get().getHostname(), edgeHost.get().getPrivateIpAddress(), role);
+    }
+    CloudHostEntity cloudHost = chooseCloudHost();
+    return addHost(cloudHost.getPublicIpAddress(), role);
   }
 
-  public SimpleNode addHost(String hostname, NodeRole role) {
-    String nodeId = setupHost(hostname, role);
+  public SimpleNode addHost(String host, NodeRole role) {
+    String publicIpAddress;
+    String privateIpAddress;
+    try {
+      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(host);
+      publicIpAddress = edgeHost.getPublicIpAddress();
+      privateIpAddress = edgeHost.getPrivateIpAddress();
+    } catch (EntityNotFoundException e) {
+      CloudHostEntity cloudHost = cloudHostsService.getCloudHost(host);
+      if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
+        cloudHost = cloudHostsService.startCloudHost(host);
+      }
+      publicIpAddress = cloudHost.getPublicIpAddress();
+      privateIpAddress = cloudHost.getPrivateIpAddress();
+    }
+    return addHost(publicIpAddress, privateIpAddress, role);
+  }
+
+  public SimpleNode addHost(String hostname, String privateIpAddress, NodeRole role) {
+    String nodeId = setupHost(hostname, privateIpAddress, role);
     return nodesService.getNode(nodeId);
   }
 
@@ -272,123 +410,63 @@ public class HostsService {
     return !edgeHostsService.hasEdgeHost(hostname);
   }
 
-  public void clusterHosts() {
-    var hostnames = new LinkedList<String>();
-    hostnames.add(managerHostname);
-    if (isCloudHost(managerHostname)) {
-      log.info("Swarm manager '{}' is on cloud", managerHostname);
-      hostnames.addAll(getWorkerAwsNodes());
-    } else {
-      EdgeHostEntity dockerMasterHost = edgeHostsService.getEdgeHost(managerHostname);
-      if (!dockerMasterHost.isLocal()) {
-        log.info("Swarm manager '{}' is an edge node, and accessible through internet", managerHostname);
-        hostnames.addAll(getWorkerAwsNodes());
-      } else {
-        log.info("Swarm manager '{}' is local", managerHostname);
-        hostnames.addAll(getWorkerEdgeNodes());
-      }
+  private boolean isEdgeHostRunning(EdgeHostEntity edgeHost) {
+    return sshService.hasConnection(edgeHost.getHostname());
+  }
+
+  private Optional<EdgeHostEntity> chooseEdgeHost(String region, String country, String city) {
+    List<EdgeHostEntity> edgeHosts = List.of();
+    if (!Text.isNullOrEmpty(city)) {
+      edgeHosts = edgeHostsService.getHostsByCity(city);
+    } else if (!Text.isNullOrEmpty(country)) {
+      edgeHosts = edgeHostsService.getHostsByCountry(country);
+    } else if (!Text.isNullOrEmpty(region)) {
+      edgeHosts = edgeHostsService.getHostsByRegion(region);
     }
-    log.info("Clustering hosts into the swarm...");
-    try {
-      hostnames.forEach(hostname -> {
-        NodeRole role = Objects.equals(hostname, managerHostname) ? NodeRole.MANAGER : NodeRole.WORKER;
-        setupHost(hostname, role);
-      });
-    } catch (MasterManagerException e) {
-      log.debug(e.getMessage());
-    }
-  }
-
-  //TODO make sure there is an odd number of master docker nodes
-  private String setupHost(String hostname, NodeRole role) {
-    log.info("Setting up host {} with role {}", hostname, role);
-    dockerApiProxyService.launchDockerApiProxy(hostname);
-    String nodeId;
-    switch (role) {
-      case MANAGER:
-        nodeId = setupManager(hostname);
-        break;
-      case WORKER:
-        nodeId = setupWorker(hostname);
-        break;
-      default:
-        throw new UnsupportedOperationException();
-    }
-    prometheusService.launchPrometheus(hostname);
-    locationRequestService.launchRequestLocationMonitor(hostname);
-    return nodeId;
-  }
-
-  private String setupManager(String managerHostname) {
-    Optional<String> swarmId = dockerSwarmService.isASwarmManager(managerHostname);
-    swarmId.ifPresent(id -> log.info("Host {} is already a swarm manager at node {}", managerHostname, id));
-    //nodesService.deleteUnresponsiveNodes();
-    return swarmId.orElseGet(dockerSwarmService::initSwarm);
-  }
-
-  private String setupWorker(String workerHostname) {
-    return dockerSwarmService.joinSwarm(workerHostname);
-  }
-
-  private List<String> getWorkerAwsNodes() {
-    int presentWorkers = nodesService.getAvailableNodes().size() - 1; //TODO not true with multiple master nodes
-    int maxInitialWorkers = Math.max(0, maxInstances - 1);
-    int workersToAdd = maxInitialWorkers - presentWorkers;
-    List<String> hostnames = new ArrayList<>(workersToAdd);
-    for (var i = 0; i < workersToAdd; i++) {
-      hostnames.add(chooseCloudHost());
-    }
-    return hostnames;
-  }
-
-  private List<String> getWorkerEdgeNodes() {
-    String partialHostname = managerHostname.substring(0, managerHostname.lastIndexOf('.'));
-    return edgeHostsService.getHostsByPartialHostname(partialHostname).stream()
-        .map(EdgeHostEntity::getHostname)
-        .filter(hostname -> !Objects.equals(hostname, managerHostname))
-        .filter(this::isHostRunning)
-        .limit(maxWorkers)
-        .collect(Collectors.toList());
-  }
-
-  /*public void assertHostIsRunning(String hostname, long timeout) {
-    try {
-      Timing.wait(() -> assertHostIsRunning(hostname), timeout);
-    } catch (TimeoutException e) {
-      throw new HostNotRunningException("Host %s is not running", hostname);
-    }
-  }*/
-
-  private boolean isHostRunning(String hostname) {
-    return sshService.hasConnection(hostname);
-  }
-
-
-  private Optional<String> chooseEdgeHost(String region, String city, String country) {
-    List<EdgeHostEntity> edgeHosts = country.isEmpty()
-        ? edgeHostsService.getHostsByRegion(region)
-        : edgeHostsService.getHostsByCountry(country);
     return edgeHosts.stream()
-        .filter(edgeHost -> Text.isNullOrEmpty(city) || Objects.equals(edgeHost.getCity(), city))
-        .map(EdgeHostEntity::getHostname)
-        .filter(Predicate.not(nodesService::isNode))
-        .filter(this::isHostRunning)
+        .filter(edgeHost -> !nodesService.isNode(edgeHost.getHostname()))
+        .filter(this::isEdgeHostRunning)
         .findFirst();
   }
 
-  private String chooseCloudHost() {
+  //TODO choose cloud host based on region ?
+  private CloudHostEntity chooseCloudHost() {
     for (var cloudHost : cloudHostsService.getCloudHosts()) {
       int stateCode = cloudHost.getState().getCode();
       if (stateCode == AwsInstanceState.RUNNING.getCode()) {
         String hostname = cloudHost.getPublicIpAddress();
         if (!nodesService.isNode(hostname)) {
-          return hostname;
+          return cloudHost;
         }
       } else if (stateCode == AwsInstanceState.STOPPED.getCode()) {
-        return cloudHostsService.startCloudHost(cloudHost).getPublicIpAddress();
+        return cloudHostsService.startCloudHost(cloudHost);
       }
     }
-    return cloudHostsService.startCloudHost().getPublicIpAddress();
+    return cloudHostsService.startCloudHost();
+  }
+
+  public List<String> executeCommand(String command, String hostname) {
+    List<String> result = null;
+    String error = null;
+    if (this.privateIp.equalsIgnoreCase(hostname) || this.publicIp.equalsIgnoreCase(hostname)) {
+      BashCommandResult bashCommandResult = bashService.executeCommand(command);
+      if (!bashCommandResult.isSuccessful()) {
+        error = String.join("\n", bashCommandResult.getError());
+      } else {
+        result = bashCommandResult.getOutput();
+      }
+    } else {
+      SshCommandResult sshCommandResult = sshService.executeCommand(hostname, command);
+      if (!sshCommandResult.isSuccessful()) {
+        error = String.join("\n", sshCommandResult.getError());
+      } else {
+        result = sshCommandResult.getOutput();
+      }
+    }
+    if (error != null) {
+      throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname, error);
+    }
+    return result;
   }
 
   public String findAvailableExternalPort(String startExternalPort) {
@@ -396,15 +474,9 @@ public class HostsService {
   }
 
   public String findAvailableExternalPort(String hostname, String startExternalPort) {
-    var command = "lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
-    SshCommandResult sshCommandResult = sshService.execCommand(hostname, command, true);
-    if (!sshCommandResult.isSuccessful()) {
-      throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname,
-          sshCommandResult.getError());
-    }
-    Pattern isNumberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
-    List<Integer> usedExternalPorts = Arrays.stream(sshCommandResult.getOutput().split("\n"))
-        .filter(v -> isNumberPattern.matcher(v).matches())
+    var command = "sudo lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
+    List<Integer> usedExternalPorts = executeCommand(command, hostname).stream()
+        .filter(v -> Pattern.compile("-?\\d+(\\.\\d+)?").matcher(v).matches())
         .map(Integer::parseInt)
         .collect(Collectors.toList());
     for (var i = Integer.parseInt(startExternalPort); ; i++) {

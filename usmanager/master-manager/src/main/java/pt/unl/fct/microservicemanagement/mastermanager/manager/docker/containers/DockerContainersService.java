@@ -10,7 +10,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers;
 
-import com.spotify.docker.client.exceptions.DockerRequestException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
@@ -18,13 +17,10 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.Contai
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostDetails;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshCommandResult;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
@@ -43,7 +39,6 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -64,38 +59,27 @@ import org.springframework.stereotype.Service;
 public class DockerContainersService {
 
   private static final long DELAY_BETWEEN_CONTAINER_LAUNCH = TimeUnit.SECONDS.toMillis(5);
-  //TODO lower or higher sleep?
-  private static final long CPU_SLEEP = TimeUnit.MILLISECONDS.toMillis(100);
-  private static final long FIND_CONTAINER_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
 
   private final DockerCoreService dockerCoreService;
   private final NodesService nodesService;
-
   private final ServicesService servicesService;
   private final NginxLoadBalancerService nginxLoadBalancerService;
   private final EurekaService eurekaService;
   private final HostsService hostsService;
-  private final SshService sshService;
 
   private final String dockerHubUsername;
   private final int dockerDelayBeforeStopContainer;
 
-  //FIXME remove @Lazy
   public DockerContainersService(DockerCoreService dockerCoreService, NodesService nodesService,
-                                 ServicesService servicesService,
-                                 NginxLoadBalancerService nginxLoadBalancerService,
-                                 EurekaService eurekaService,
-                                 HostsService hostsService,
-                                 SshService sshService,
-                                 DockerProperties dockerProperties,
-                                 ContainerProperties containerProperties) {
+                                 ServicesService servicesService, NginxLoadBalancerService nginxLoadBalancerService,
+                                 EurekaService eurekaService, HostsService hostsService,
+                                 DockerProperties dockerProperties, ContainerProperties containerProperties) {
     this.dockerCoreService = dockerCoreService;
     this.nodesService = nodesService;
     this.servicesService = servicesService;
     this.nginxLoadBalancerService = nginxLoadBalancerService;
     this.eurekaService = eurekaService;
     this.hostsService = hostsService;
-    this.sshService = sshService;
     this.dockerHubUsername = dockerProperties.getHub().getUsername();
     this.dockerDelayBeforeStopContainer = containerProperties.getDelayBeforeStop();
   }
@@ -221,7 +205,7 @@ public class DockerContainersService {
             DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_HOSTNAME, hostname)
         );
       } catch (MasterManagerException e) {
-        log.debug(e.getMessage());
+        log.error(e.getMessage());
       }
       if (containers.size() > 0) {
         DockerContainer container = containers.get(0);
@@ -248,8 +232,8 @@ public class DockerContainersService {
         .replace("${externalPort}", externalPort)
         .replace("${internalPort}", internalPort);
     log.info("{}", launchCommand);
-    if (servicesService.serviceDependsOn(serviceName, EurekaService.EUREKA)) {
-      String outputLabel = servicesService.getService(EurekaService.EUREKA).getOutputLabel();
+    if (servicesService.serviceDependsOn(serviceName, EurekaService.EUREKA_SERVER)) {
+      String outputLabel = servicesService.getService(EurekaService.EUREKA_SERVER).getOutputLabel();
       Optional<String> eurekaAddress = eurekaService.getEurekaServerAddress(region);
       if (eurekaAddress.isPresent()) {
         launchCommand = launchCommand.replace(outputLabel, eurekaAddress.get());

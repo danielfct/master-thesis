@@ -48,7 +48,7 @@ public interface HostRuleRepository extends JpaRepository<HostRuleEntity, Long> 
 
   @Query("select r "
       + "from HostRuleEntity r join r.edgeHosts h "
-      + "where h.hostname = :hostname")
+      + "where h.publicDnsName = :hostname or h.publicIpAddress = :hostname")
   List<HostRuleEntity> findByEdgeHostname(@Param("hostname") String hostname);
 
   @Query("select r "
@@ -94,7 +94,7 @@ public interface HostRuleRepository extends JpaRepository<HostRuleEntity, Long> 
 
   @Query("select h "
       + "from HostRuleEntity r join r.edgeHosts h "
-      + "where r.name = :ruleName and h.hostname = :hostname")
+      + "where r.name = :ruleName and (h.publicDnsName = :hostname or h.publicIpAddress = :hostname)")
   Optional<EdgeHostEntity> getEdgeHost(@Param("ruleName") String ruleName, @Param("hostname") String hostname);
 
 }

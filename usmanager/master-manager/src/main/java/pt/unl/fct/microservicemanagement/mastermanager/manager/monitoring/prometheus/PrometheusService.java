@@ -44,7 +44,7 @@ public class PrometheusService {
 
   private static final double PERCENT = 0.01;
 
-  private static final String PROMETHEUS = "prometheus";
+  public static final String PROMETHEUS = "prometheus";
   private static final String DEFAULT_PORT = "9090";
   private static final String URL_FORMAT = "http://%s:%s/api/v1/query?query=%s&time=%s";
   private static final String HOST_AVAILABLE_MEMORY = "node_memory_MemAvailable_bytes";

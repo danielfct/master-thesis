@@ -68,6 +68,7 @@ class Login extends BaseComponent<Props, State> {
 
   private handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("???????")
     const {username, password} = this.state;
     basicAuthenticate(username, password)
       .then(() => {

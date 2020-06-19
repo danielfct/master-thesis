@@ -42,6 +42,10 @@ const CloudHostCard = ({cloudHost}: Props) => (
      <CardItem key={'publicIpAddress'}
               label={'publicIpAddress'}
               value={`${cloudHost.publicIpAddress}`}/>}
+    {cloudHost.privateIpAddress &&
+     <CardItem key={'privateIpAddress'}
+               label={'privateIpAddress'}
+               value={`${cloudHost.privateIpAddress}`}/>}
     <CardItem key={'placement'}
               label={'placement'}
               value={`${cloudHost.placement.availabilityZone}`}/>

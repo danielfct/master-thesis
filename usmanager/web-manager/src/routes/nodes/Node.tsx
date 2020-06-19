@@ -27,9 +27,8 @@ export interface INode {
 }
 
 interface INewNodeHost {
-  hostname?: string;
+  host?: string;
   role?: string;
-  quantity: number;
 }
 
 interface INewNodeLocation {
@@ -41,9 +40,8 @@ interface INewNodeLocation {
 }
 
 const buildNewNodeHost = (): INewNodeHost => ({
-  hostname: undefined,
+  host: undefined,
   role: undefined,
-  quantity: 1,
 });
 
 const buildNewNodeLocation = (): INewNodeLocation => ({
@@ -115,20 +113,28 @@ class Node extends BaseComponent<Props, State> {
   private isNew = () =>
     isNew(this.props.location.search);
 
-  private onPostSuccess = (reply: IReply<INode>): void => {
-    const node = reply.data;
-    super.toast(`<span class="green-text">Started node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.hostname}</span>`);
-    this.props.addNode(node);
-    if (this.mounted) {
-      this.updateNode(node);
-      this.props.history.replace(node.id);
+  private onPostSuccess = (reply: IReply<INode[]>): void => {
+    const nodes = reply.data;
+    if (nodes.length == 1) {
+      const node = nodes[0];
+      super.toast(`<span class="green-text">Started node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.hostname}</span>`);
+      this.props.addNode(node);
+      if (this.mounted) {
+        this.updateNode(node);
+        this.props.history.replace(node.id);
+      }
     }
+    else {
+      super.toast(`<span class="green-text">Started nodes <b class="white-text">${nodes.map(node => `${node.hostname} => ${node.id}`)}</b></span>`);
+      this.props.history.push("/nodes");
+    }
+
   };
 
   private onPostFailure = (reason: string, place: INewNodeHost | INewNodeLocation): void => {
     let message;
-    if ("hostname" in place && place.hostname) {
-      message = `Unable to start node at ${place.hostname}`;
+    if ("host" in place && place.host) {
+      message = `Unable to start node at ${place.host}`;
     }
     else if ("city" in place) {
       message = `Unable to start node at ${place.city}`;
@@ -190,10 +196,11 @@ class Node extends BaseComponent<Props, State> {
   private getSelectableHosts = () => {
     const nodesHostname = Object.values(this.props.nodes).map(node => node.hostname);
     const cloudHosts = Object.values(this.props.cloudHosts)
-                             .filter(instance => instance.state.code === awsInstanceStates.RUNNING.code
-                                                 && !nodesHostname.includes(instance.publicIpAddress))
-                             .map(instance => instance.publicIpAddress);
-    const edgeHosts = Object.keys(this.props.edgeHosts).filter(edgeHost => !nodesHostname.includes(edgeHost));
+                             .filter(instance => !nodesHostname.includes(instance.publicIpAddress))
+                             .map(instance => instance.instanceId);
+    const edgeHosts = Object.entries(this.props.edgeHosts)
+                            .filter(([_, edgeHost]) => !nodesHostname.includes(edgeHost.privateIpAddress))
+                            .map(([hostname, _]) => hostname);
     return cloudHosts.concat(edgeHosts);
   };
 
@@ -208,9 +215,9 @@ class Node extends BaseComponent<Props, State> {
         currentForm === 'On host'
           ?
           <>
-            <Field<string> key={'hostname'}
-                           id={'hostname'}
-                           label={'hostname'}
+            <Field<string> key={'host'}
+                           id={'host'}
+                           label={'host'}
                            type="dropdown"
                            dropdown={{
                              defaultValue: "Select host",
@@ -224,10 +231,6 @@ class Node extends BaseComponent<Props, State> {
                      defaultValue: "Select role",
                      values: ['MANAGER', 'WORKER']
                    }}/>
-            <Field key={'quantity'}
-                   id={'quantity'}
-                   label={'quantity'}
-                   type={"number"}/>
           </>
           :
           <>
@@ -297,7 +300,7 @@ class Node extends BaseComponent<Props, State> {
                 values={node}
                 isNew={isNewNode}
                 post={{
-                  textButton: isNewNode ? 'Start' : 'Save',
+                  textButton: isNewNode ? 'Join swarm' : 'Save',
                   url: 'nodes',
                   successCallback: this.onPostSuccess,
                   failureCallback: this.onPostFailure
@@ -307,7 +310,7 @@ class Node extends BaseComponent<Props, State> {
                   successCallback: this.onPutSuccess,
                   failureCallback: this.onPutFailure
                 }}
-                // delete button is never present on new nodes, so a type cast is safe
+            // delete button is never present on new nodes, so a type cast is safe
                 delete={{
                   textButton: 'Leave swarm',
                   url: `nodes/${(node as INode).id}`,

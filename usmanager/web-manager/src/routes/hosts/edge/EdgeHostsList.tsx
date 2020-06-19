@@ -39,7 +39,8 @@ class EdgeHostsList extends BaseComponent<Props, {}> {
     <EdgeHostCard key={host.id} edgeHost={host}/>;
 
   private predicate = (host: IEdgeHost, search: string): boolean =>
-    host.hostname.toLowerCase().includes(search);
+    (!!host.publicDnsName && host.publicDnsName.toLowerCase().includes(search))
+    || (!!host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search));
 
   public render() {
     return (

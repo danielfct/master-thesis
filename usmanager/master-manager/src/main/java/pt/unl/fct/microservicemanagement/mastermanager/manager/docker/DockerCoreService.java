@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class DockerCoreService {
 
-  private static final long CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
-  private static final long READ_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
+  private static final long CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
+  private static final long READ_TIMEOUT = TimeUnit.SECONDS.toMillis(120);
 
   private final SshService sshService;
 
@@ -53,6 +53,8 @@ public class DockerCoreService {
 
   public void installDocker(String hostname) {
     sshService.uploadFile(hostname, dockerScriptFile);
+    String installDockerCommand = String.format("sh %s", dockerScriptFile);
+    sshService.executeCommand(hostname, installDockerCommand);
   }
 
 }

@@ -25,8 +25,11 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshCommandResult;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRulesService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
@@ -45,15 +48,21 @@ public class EdgeHostsService {
 
   private final HostRulesService hostRulesService;
   private final SimulatedHostMetricsService simulatedHostMetricsService;
+  private final SshService sshService;
 
   private final EdgeHostRepository edgeHosts;
 
+  private final String edgeKeyFilePath;
+
   public EdgeHostsService(@Lazy HostRulesService hostRulesService,
                           @Lazy SimulatedHostMetricsService simulatedHostMetricsService,
-                          EdgeHostRepository edgeHosts) {
+                          @Lazy SshService sshService, EdgeHostRepository edgeHosts,
+                          EdgeHostsProperties edgeHostsProperties) {
     this.hostRulesService = hostRulesService;
     this.simulatedHostMetricsService = simulatedHostMetricsService;
+    this.sshService = sshService;
     this.edgeHosts = edgeHosts;
+    this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
   }
 
   public List<EdgeHostEntity> getEdgeHosts() {
@@ -61,14 +70,37 @@ public class EdgeHostsService {
   }
 
   public EdgeHostEntity getEdgeHost(String hostname) {
-    return edgeHosts.findByHostname(hostname).orElseThrow(() ->
+    return edgeHosts.findEdgeHost(hostname).orElseThrow(() ->
         new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname));
   }
 
   public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost) {
+    return addEdgeHost(edgeHost, true);
+  }
+
+  public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost, boolean setup) {
     assertHostDoesntExist(edgeHost);
+    if (setup) {
+      setupEdgeHost(edgeHost);
+    }
     log.debug("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
     return edgeHosts.save(edgeHost);
+  }
+
+  private void setupEdgeHost(EdgeHostEntity edgeHost) {
+    //TODO confirm correctness
+    String hostname = edgeHost.getHostname();
+    String username = edgeHost.getUsername();
+    log.info("Generating keys for edge host {}@{}", username, hostname);
+    var generateKeysCommand = String.format("ssh-keygen -b 2048 -t rsa -f %s/%s -q -N \"\" &&"
+            + " ssh-copy-id -i %s/%s %s", edgeKeyFilePath, username, edgeKeyFilePath, username, hostname);
+    SshCommandResult generateKeysResult = sshService.executeCommand(hostname, generateKeysCommand);
+    if (!generateKeysResult.isSuccessful()) {
+      // cleanup files
+      var cleanupCommand = String.format("rm -f %s/%s %s/%s.pub", edgeKeyFilePath, username, edgeKeyFilePath, username);
+      sshService.executeCommand(hostname, cleanupCommand);
+      throw new MasterManagerException("Unable to generate public/private keys for edge host %s", hostname);
+    }
   }
 
   public EdgeHostEntity updateEdgeHost(String hostname, EdgeHostEntity newEdgeHost) {
@@ -85,16 +117,16 @@ public class EdgeHostsService {
     edgeHosts.delete(edgeHost);
   }
 
-  public List<EdgeHostEntity> getHostsByPartialHostname(String partialHostname) {
-    return edgeHosts.findByHostnameContaining(partialHostname);
-  }
-
   public List<EdgeHostEntity> getHostsByRegion(String region) {
     return edgeHosts.findByRegion(region);
   }
 
   public List<EdgeHostEntity> getHostsByCountry(String country) {
     return edgeHosts.findByCountry(country);
+  }
+
+  public List<EdgeHostEntity> getHostsByCity(String city) {
+    return edgeHosts.findByCity(city);
   }
 
   public List<HostRuleEntity> getRules(String hostname) {
@@ -174,9 +206,9 @@ public class EdgeHostsService {
   }
 
   private void assertHostDoesntExist(EdgeHostEntity edgeHost) {
-    var hostname = edgeHost.getHostname();
+    var hostname = edgeHost.getPublicDnsName() == null ? edgeHost.getPublicIpAddress() : edgeHost.getPublicDnsName();
     if (edgeHosts.hasEdgeHost(hostname)) {
-      throw new DataIntegrityViolationException("Edge host '" + hostname + "' already exists");
+      throw new DataIntegrityViolationException("Edge host '%s - %s" + hostname + "' already exists");
     }
   }
 

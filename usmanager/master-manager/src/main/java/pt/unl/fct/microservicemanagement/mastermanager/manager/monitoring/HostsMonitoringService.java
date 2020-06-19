@@ -141,7 +141,11 @@ public class HostsMonitoringService {
     new Timer("MonitorHostTimer", true).schedule(new TimerTask() {
       @Override
       public void run() {
-        monitorHostsTask();
+        try {
+          monitorHostsTask();
+        } catch (MasterManagerException e) {
+          log.error(e.getMessage());
+        }
       }
     }, monitorInterval, monitorInterval);
   }

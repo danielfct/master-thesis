@@ -93,13 +93,13 @@ public class NginxLoadBalancerService {
   private ContainerEntity launchLoadBalancer(String hostname, String serviceName, String serverAddr, String continent,
                                              String region, String country, String city) {
     var environment = List.of(
-        "SERVER1=" + serverAddr,
-        "SERVER1_CONTINENT=" + continent,
-        "SERVER1_REGION=" + region,
-        "SERVER1_COUNTRY=" + country,
-        "SERVER1_CITY=" + city,
-        "BASIC_AUTH_USERNAME=" + dockerApiProxyUsername,
-        "BASIC_AUTH_PASSWORD=" + dockerApiProxyPassword
+        String.format("%s=%s", ContainerConstants.Environment.SERVER1, serverAddr),
+        String.format("%s=%s", ContainerConstants.Environment.SERVER1_CONTINENT, continent),
+        String.format("%s=%s", ContainerConstants.Environment.SERVER1_REGION, region),
+        String.format("%s=%s", ContainerConstants.Environment.SERVER1_COUNTRY, country),
+        String.format("%s=%s", ContainerConstants.Environment.SERVER1_CITY, city),
+        String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername),
+        String.format("%s=%s", ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword)
     );
     var labels = Map.of(
         ContainerConstants.Label.FOR_SERVICE, serviceName

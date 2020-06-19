@@ -8,22 +8,24 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.bash;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
+import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 
-@AllArgsConstructor
-@Getter
-final class AddNode {
+@Builder
+@Data
+public class BashCommandResult {
 
-  private final String host;
-  private final int quantity;
-  private final RegionEntity region;
-  private final String country;
-  private final String city;
-  private final NodeRole role;
+  private final String command;
+  private final int exitStatus;
+  private final List<String> output;
+  private final List<String> error;
+
+  public boolean isSuccessful() {
+    return exitStatus == 0;
+  }
 
 }

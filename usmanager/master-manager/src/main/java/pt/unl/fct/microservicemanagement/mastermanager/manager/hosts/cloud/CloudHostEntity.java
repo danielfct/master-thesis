@@ -81,6 +81,8 @@ public class CloudHostEntity {
 
   private String publicIpAddress;
 
+  private String privateIpAddress;
+
   private Placement placement;
 
   @Singular

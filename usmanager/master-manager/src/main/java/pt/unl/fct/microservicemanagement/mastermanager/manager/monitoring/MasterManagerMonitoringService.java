@@ -24,7 +24,9 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
+import lombok.extern.slf4j.Slf4j;
 import pt.unl.fct.microservicemanagement.mastermanager.MasterManagerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
@@ -37,10 +39,11 @@ import java.util.TimerTask;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class MasterManagerMonitoringService {
 
-  private static final String MASTER_MANAGER = "master-manager";
+  public static final String MASTER_MANAGER = "master-manager";
 
   private final ContainersService containersService;
   private final ContainersMonitoringService containersMonitoringService;
@@ -67,7 +70,11 @@ public class MasterManagerMonitoringService {
           //TODO replace diffSeconds with calculation from previous database save
           int secondsFromLastRun = (int) ((currentTime - lastTime) / 1000);
           lastTime = currentTime;
-          masterManagerMonitorTask(secondsFromLastRun);
+          try {
+            masterManagerMonitorTask(secondsFromLastRun);
+          } catch (MasterManagerException e) {
+            log.error(e.getMessage());
+          }
         }
       }, monitorPeriod, monitorPeriod);
     }

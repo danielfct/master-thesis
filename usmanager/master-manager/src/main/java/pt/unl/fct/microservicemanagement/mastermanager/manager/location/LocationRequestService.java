@@ -221,7 +221,7 @@ public class LocationRequestService {
     Collections.sort(locationsWithMinReqPerc);
 
     if (!locationsWithMinReqPerc.isEmpty()) {
-      log.info(">>> Best location for '" + serviceName + "' : " + locationsWithMinReqPerc.get(0).toString());
+      log.info("Best location for {} : {}", serviceName, locationsWithMinReqPerc.get(0).toString());
       return getHostDetailsByLocationKey(locationsWithMinReqPerc.get(0).getLocationKey());
     }
 
@@ -242,7 +242,7 @@ public class LocationRequestService {
         city = serviceLocationSplit[i];
       }
     }
-    return new HostDetails(city, country, region, "");
+    return new HostDetails(city, country, region);
   }
 
   /*public String getRegionByLocationKey(String locationKey) {

@@ -24,9 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
+import org.apache.commons.lang3.StringUtils;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
 
 import java.util.ArrayList;
@@ -62,8 +61,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AwsService {
 
-  private final DockerCoreService dockerCoreService;
-
   private final AmazonEC2 ec2;
   private final String awsInstanceAmi;
   private final String awsInstanceSecurityGroup;
@@ -74,8 +71,7 @@ public class AwsService {
   private final int awsDelayBetweenRetries;
   private final int awsConnectionTimeout;
 
-  public AwsService(DockerCoreService dockerCoreService, AwsProperties awsProperties) {
-    this.dockerCoreService = dockerCoreService;
+  public AwsService(AwsProperties awsProperties) {
     String awsAccessKey = awsProperties.getAccess().getKey();
     String awsSecretAccessKey = awsProperties.getAccess().getSecretKey();
     var awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretAccessKey);
@@ -132,7 +128,6 @@ public class AwsService {
     String instanceId = createEC2();
     Instance instance = waitInstanceState(instanceId, AwsInstanceState.RUNNING);
     String publicIpAddress = instance.getPublicIpAddress();
-    dockerCoreService.installDocker(publicIpAddress);
     log.info("New aws instance created: instanceId = {}, publicIpAddress = {}", instanceId, publicIpAddress);
     return instance;
   }

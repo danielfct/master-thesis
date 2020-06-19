@@ -103,17 +103,17 @@ class Sidenav extends React.Component<Props, {}> {
         if (show !== width) {
             this.props.showSidenavByWidth(show);
         }
+        let sidenav = M.Sidenav.getInstance(this.sidenav.current as Element);
+        let {isOpen} = sidenav;
+        if (isOpen && !width && window.innerWidth > 992) {
+            sidenav.close();
+        }
         this.scrollbar?.updateScroll();
     };
 
     private handleSidenav = () => {
         let sidenav = M.Sidenav.getInstance(this.sidenav.current as Element);
         let {isOpen} = sidenav;
-        if (isOpen) {
-            sidenav.close();
-        } else {
-            sidenav.open();
-        }
         this.props.showSidenavByUser(!isOpen);
     };
 
@@ -128,7 +128,7 @@ class Sidenav extends React.Component<Props, {}> {
     public render() {
         return (
           <ul id="slide-out" className="sidenav sidenav-fixed no-shadows"
-              style={this.props.sidenav.user ? undefined : {display: 'none'}} ref={this.sidenav}>
+              style={this.props.sidenav.user ? {width: 200, transition: 'width .25s'} : {width: 0, transition: 'width .25s'}} ref={this.sidenav}>
               <div className="sidenav-menu">
                   <a className="sidenav-icon sidenav-trigger transparent btn-floating btn-flat btn-small waves-effect waves-light"
                      data-target="slide-out"
@@ -142,7 +142,7 @@ class Sidenav extends React.Component<Props, {}> {
                     <div key={index}>
                         <li>
                             <Link className="white-text" to={link.link} onClick={this.closeSlideSidenav}>
-                                {link.name}
+                                <span style={{whiteSpace: 'nowrap'}}>{link.name}</span>
                             </Link>
                         </li>
                         {link.sub && link.sub.map((sublink, index) =>
@@ -150,7 +150,7 @@ class Sidenav extends React.Component<Props, {}> {
                               {<li><div className="divider grey darken-4"/></li>}
                               <li>
                                   <Link className="white-text sub-link" to={`${link.link}${sublink.link}`} onClick={this.closeSlideSidenav}>
-                                      {sublink.name}
+                                      <span style={{whiteSpace: 'nowrap'}}>{sublink.name}</span>
                                   </Link>
                               </li>
                           </div>

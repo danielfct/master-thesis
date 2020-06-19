@@ -24,6 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -34,8 +36,8 @@ public class SshCommandResult {
   private final String hostname;
   private final String command;
   private final int exitStatus;
-  private final String output;
-  private String error;
+  private final List<String> output;
+  private final List<String> error;
 
   public boolean isSuccessful() {
     return exitStatus == 0;

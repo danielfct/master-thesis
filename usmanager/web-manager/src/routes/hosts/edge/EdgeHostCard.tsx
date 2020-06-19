@@ -20,17 +20,23 @@ interface EdgeHostCardProps {
 type Props = EdgeHostCardProps;
 
 const EdgeHostCard = ({edgeHost}: Props) => (
-  <Card<IEdgeHost> title={edgeHost.hostname}
-                   link={{to: {pathname: `/hosts/edge/${edgeHost.hostname }`, state: edgeHost }}}
+  <Card<IEdgeHost> title={edgeHost.publicDnsName || edgeHost.publicIpAddress}
+                   link={{to: {pathname: `/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}`, state: edgeHost }}}
                    height={'215px'}
                    margin={'10px 0'}
                    hoverable>
-    <CardItem key={'sshUsername'}
-              label={'Ssh username'}
-              value={`${edgeHost.sshUsername}`}/>
-    <CardItem key={'sshPassword'}
-              label={'Ssh password (base64)'}
-              value={`${edgeHost.sshPassword}`}/>
+    <CardItem key={'username'}
+              label={'Username'}
+              value={`${edgeHost.username}`}/>
+    <CardItem key={'publicDnsName'}
+              label={'Public dns name'}
+              value={`${edgeHost.publicDnsName}`}/>
+    <CardItem key={'privateIpAddress'}
+              label={'Private ip address'}
+              value={`${edgeHost.privateIpAddress}`}/>
+    <CardItem key={'publicIpAddress'}
+              label={'Public ip address'}
+              value={`${edgeHost.publicIpAddress}`}/>
     <CardItem key={'region'}
               label={'Region'}
               value={`${edgeHost.region}`}/>
@@ -40,9 +46,6 @@ const EdgeHostCard = ({edgeHost}: Props) => (
     <CardItem key={'city'}
               label={'City'}
               value={`${edgeHost.city}`}/>
-    <CardItem key={'local'}
-              label={'Local'}
-              value={`${edgeHost.local}`}/>
   </Card>
 );
 

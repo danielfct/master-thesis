@@ -27,22 +27,24 @@ public class DockerProperties {
   private String installScript;
   private String installScriptPath;
   private String repository;
-  private final Hub hub;
+  private final Api api;
   private final ApiProxy apiProxy;
+  private final Hub hub;
   private final Swarm swarm;
 
   public DockerProperties() {
-    this.hub = new Hub();
+    this.api = new Api();
     this.apiProxy = new ApiProxy();
+    this.hub = new Hub();
     this.swarm = new Swarm();
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   @Getter
   @Setter
-  public static final class Hub {
+  public static final class Api {
 
-    private String username;
+    private int port;
 
   }
 
@@ -54,6 +56,15 @@ public class DockerProperties {
     private String username;
     private String password;
     private int port;
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  @Getter
+  @Setter
+  public static final class Hub {
+
+    private String username;
 
   }
 

@@ -76,23 +76,25 @@ class EdgeHostSimulatedMetricList extends BaseComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (prevProps.edgeHost?.hostname !== this.props.edgeHost?.hostname) {
+    const previousHostname = prevProps.edgeHost?.publicDnsName || prevProps.edgeHost?.publicIpAddress;
+    const currentHostname = this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress;
+    if (previousHostname !== currentHostname) {
       this.loadEntities();
     }
-    if (!prevProps.edgeHost?.hostname && this.props.edgeHost?.hostname) {
+    if (!previousHostname && currentHostname) {
       this.setState({entitySaved: true});
     }
   }
 
   private loadEntities = () => {
-    if (this.props.edgeHost?.hostname) {
-      const {hostname} = this.props.edgeHost;
+    const hostname = this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress;
+    if (hostname) {
       this.props.loadEdgeHostSimulatedMetrics(hostname);
     }
   };
 
   private isNew = () =>
-    this.props.edgeHost?.hostname === undefined;
+    this.props.edgeHost?.publicDnsName === undefined && this.props.edgeHost?.publicIpAddress === undefined;
 
   private simulatedMetric = (index: number, simulatedMetric: string, separate: boolean, checked: boolean,
                              handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
@@ -130,8 +132,8 @@ class EdgeHostSimulatedMetricList extends BaseComponent<Props, State> {
     this.props.onRemoveSimulatedHostMetrics(simulatedMetrics);
 
   private onDeleteSuccess = (simulatedMetrics: string[]): void => {
-    if (this.props.edgeHost?.hostname) {
-      const {hostname} = this.props.edgeHost;
+    const hostname = this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress;
+    if (hostname) {
       this.props.removeEdgeHostSimulatedMetrics(hostname, simulatedMetrics);
     }
   };
@@ -160,7 +162,7 @@ class EdgeHostSimulatedMetricList extends BaseComponent<Props, State> {
                            onAdd={this.onAdd}
                            onRemove={this.onRemove}
                            onDelete={{
-                             url: `hosts/edge/${this.props.edgeHost?.hostname}/simulated-metrics`,
+                             url: `hosts/edge/${this.props.edgeHost?.publicDnsName || this.props.edgeHost?.publicIpAddress}/simulated-metrics`,
                              successCallback: this.onDeleteSuccess,
                              failureCallback: this.onDeleteFailure
                            }}
@@ -170,7 +172,7 @@ class EdgeHostSimulatedMetricList extends BaseComponent<Props, State> {
 }
 
 function mapStateToProps(state: ReduxState, ownProps: HostSimulatedMetricListProps): StateToProps {
-  const hostname = ownProps.edgeHost?.hostname;
+  const hostname = ownProps.edgeHost?.publicDnsName || ownProps.edgeHost?.publicIpAddress;
   const host = hostname && state.entities.hosts.edge.data[hostname];
   const simulatedMetricsName = host && host.hostSimulatedMetrics;
   return {

@@ -39,17 +39,18 @@ class CloudHostsList extends BaseComponent<Props, {}> {
     <CloudHostCard key={host.instanceId} cloudHost={host}/>;
 
   private predicate = (host: ICloudHost, search: string): boolean =>
-    (host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search)) || host.instanceId.includes(search);
+    (host.publicIpAddress && host.publicIpAddress.toLowerCase().includes(search))
+    || host.instanceId.includes(search);
 
   public render() {
     return (
-        <CardList<ICloudHost>
-          isLoading={this.props.isLoading}
-          error={this.props.error}
-          emptyMessage={"No cloud instances to display"}
-          list={this.props.cloudHosts}
-          card={this.cloudHost}
-          predicate={this.predicate}/>
+      <CardList<ICloudHost>
+        isLoading={this.props.isLoading}
+        error={this.props.error}
+        emptyMessage={"No cloud instances to display"}
+        list={this.props.cloudHosts}
+        card={this.cloudHost}
+        predicate={this.predicate}/>
     )
   }
 

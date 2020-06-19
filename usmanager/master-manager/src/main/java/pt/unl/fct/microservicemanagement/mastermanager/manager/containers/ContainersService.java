@@ -72,6 +72,10 @@ public class ContainersService {
     }
   }
 
+  public Optional<ContainerEntity> addContainer(String containerId) {
+    return dockerContainersService.getContainer(containerId).map(this::addContainerFromDockerContainer);
+  }
+
   public ContainerEntity addContainer(ContainerEntity container) {
     assertContainerDoesntExist(container);
     log.debug("Saving container {}", ToStringBuilder.reflectionToString(container));

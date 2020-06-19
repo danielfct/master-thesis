@@ -24,19 +24,27 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.database;
 
+import lombok.extern.slf4j.Slf4j;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentType;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.MasterManagerMonitoringService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
@@ -46,6 +54,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
@@ -69,6 +78,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class DatabaseLoader {
 
@@ -81,7 +91,8 @@ public class DatabaseLoader {
                                  DecisionRepository decisions, FieldRepository fields,
                                  ValueModeRepository valueModes, ConditionRepository conditions,
                                  HostRuleRepository hostRules, ServiceRuleRepository serviceRules,
-                                 CloudHostsService cloudHostsService) {
+                                 CloudHostsService cloudHostsService, SshService sshService,
+                                 DockerProperties dockerProperties) {
     return args -> {
 
       // users
@@ -280,7 +291,7 @@ public class DatabaseLoader {
           .build();
       services.save(rabbitmq);
       var eurekaServer = ServiceEntity.builder()
-          .serviceName("eureka-server")
+          .serviceName(EurekaService.EUREKA_SERVER)
           .dockerRepository("registration-server")
           .defaultExternalPort("8761")
           .defaultInternalPort("8761")
@@ -294,7 +305,7 @@ public class DatabaseLoader {
           .build();
       services.save(eurekaServer);
       var loadBalancer = ServiceEntity.builder()
-          .serviceName("load-balancer")
+          .serviceName(NginxLoadBalancerService.LOAD_BALANCER)
           .dockerRepository("nginx-load-balancer")
           .defaultExternalPort("1906")
           .defaultInternalPort("80")
@@ -308,9 +319,9 @@ public class DatabaseLoader {
           .build();
       services.save(loadBalancer);
       var dockerApiProxy = ServiceEntity.builder()
-          .serviceName("docker-api-proxy")
+          .serviceName(DockerApiProxyService.DOCKER_API_PROXY)
           .dockerRepository("nginx-proxy")
-          .defaultExternalPort("2375")
+          .defaultExternalPort(String.valueOf(dockerProperties.getApiProxy().getPort()))
           .defaultInternalPort("80")
           .defaultDb("NOT_APPLICABLE")
           .launchCommand("")
@@ -322,7 +333,7 @@ public class DatabaseLoader {
           .build();
       services.save(dockerApiProxy);
       var prometheus = ServiceEntity.builder()
-          .serviceName("prometheus")
+          .serviceName(PrometheusService.PROMETHEUS)
           .dockerRepository("prometheus")
           .defaultExternalPort("9090")
           .defaultInternalPort("9090")
@@ -336,7 +347,7 @@ public class DatabaseLoader {
           .build();
       services.save(prometheus);
       var requestLocationMonitor = ServiceEntity.builder()
-          .serviceName("request-location-monitor")
+          .serviceName(LocationRequestService.REQUEST_LOCATION_MONITOR)
           .dockerRepository("request-location-monitor")
           .defaultExternalPort("1919")
           .defaultInternalPort("1919")
@@ -350,7 +361,7 @@ public class DatabaseLoader {
           .build();
       services.save(requestLocationMonitor);
       var masterManager = ServiceEntity.builder()
-          .serviceName("master-manager")
+          .serviceName(MasterManagerMonitoringService.MASTER_MANAGER)
           .dockerRepository("master-manager")
           // TODO
           .defaultExternalPort("1919")
@@ -368,6 +379,7 @@ public class DatabaseLoader {
           .build();
       services.save(masterManager);
       var localManager = ServiceEntity.builder()
+          //TODO
           .serviceName("local-manager")
           .dockerRepository("local-manager")
           // TODO
@@ -651,28 +663,6 @@ public class DatabaseLoader {
 
       // cloud hosts
       cloudHostsService.reloadCloudInstances();
-
-      // edge hosts
-      var daniel127001 = EdgeHostEntity.builder()
-          .hostname("127.0.0.1")
-          .sshUsername("daniel")
-          .sshPassword("enhj")
-          .region("eu-central-1")
-          .country("pt")
-          .city("lisbon")
-          .isLocal(true)
-          .build();
-      edgeHosts.save(daniel127001);
-      var daniel192168168 = EdgeHostEntity.builder()
-          .hostname("192.168.1.68")
-          .sshUsername("daniel")
-          .sshPassword("enhj")
-          .region("eu-central-1")
-          .country("pt")
-          .city("lisbon")
-          .isLocal(true)
-          .build();
-      edgeHosts.save(daniel192168168);
 
       // component types
       var host = ComponentTypeEntity.builder()

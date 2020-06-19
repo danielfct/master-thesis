@@ -53,13 +53,11 @@ public class NodesController {
   public List<SimpleNode> addNodes(@RequestBody AddNode addNode) {
     NodeRole role = addNode.getRole();
     int quantity = addNode.getQuantity();
-    String hostname = addNode.getHostname();
+    String host = addNode.getHost();
     List<SimpleNode> nodes = new ArrayList<>(addNode.getQuantity());
-    if (hostname != null) {
-      for (var i = 0; i < quantity; i++) {
-        SimpleNode node = hostsService.addHost(hostname, role);
-        nodes.add(node);
-      }
+    if (host != null) {
+      SimpleNode node = hostsService.addHost(host, role);
+      nodes.add(node);
     } else {
       String region = addNode.getRegion().getName();
       String country = addNode.getCountry();

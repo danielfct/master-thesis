@@ -24,18 +24,21 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
+import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.security.Security;
-import java.util.Base64;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -57,12 +60,15 @@ public class SshService {
 
   private final EdgeHostsService edgeHostsService;
 
+  private final String edgeKeyFilePath;
   private final String awsKeyFilePath;
   private final String awsUser;
   private final Map<String, String> scriptPaths;
 
-  public SshService(EdgeHostsService edgeHostsService, AwsProperties awsProperties, DockerProperties dockerProperties) {
+  public SshService(EdgeHostsService edgeHostsService, EdgeHostsProperties edgeHostsProperties,
+                    AwsProperties awsProperties, DockerProperties dockerProperties) {
     this.edgeHostsService = edgeHostsService;
+    this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
     this.awsKeyFilePath = awsProperties.getAccess().getKeyFilePath();
     this.awsUser = awsProperties.getAccess().getUsername();
     String dockerScript = dockerProperties.getInstallScript();
@@ -73,22 +79,23 @@ public class SshService {
 
   private SSHClient initClient(String hostname) throws IOException {
     var sshClient = new SSHClient();
-    //TODO try to use a more secure host key verifier
     sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-    sshClient.connect(hostname);
-    if (edgeHostsService.hasEdgeHost(hostname)) {
-      EdgeHostEntity edgeHost = edgeHostsService.getEdgeHost(hostname);
-      String username = edgeHost.getSshUsername();
-      //TODO improve security password
-      String password = new String(Base64.getDecoder().decode(edgeHost.getSshPassword()));
-      sshClient.authPassword(username, password);
-      log.info("Logged in to edge host: {}, with username: {}", hostname, username);
-    } else {
-      var keyFile = new PKCS8KeyFile();
-      keyFile.init(new File(awsKeyFilePath));
-      sshClient.authPublickey(awsUser, keyFile);
-      log.info("Logged in to cloud hostname '{}' with pem key '{}'", hostname, awsKeyFilePath);
+    String username;
+    String publicKeyFile;
+    try {
+      EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHost(hostname);
+      username = edgeHostEntity.getUsername();
+      publicKeyFile = String.format("%s/%s", edgeKeyFilePath, username);
+    } catch (EntityNotFoundException e) {
+      username = awsUser;
+      publicKeyFile = awsKeyFilePath;
     }
+    log.info("Logging in to host '{}@{}' with key '{}'", username, hostname, publicKeyFile);
+    sshClient.connect(hostname);
+    var keyFile = new PKCS8KeyFile();
+    keyFile.init(new File(publicKeyFile));
+    sshClient.authPublickey(username, keyFile);
+    log.info("Logged in to host '{}@{}'", username, hostname);
     return sshClient;
   }
 
@@ -108,34 +115,25 @@ public class SshService {
     }
   }
 
-  public SshCommandResult execCommand(String hostname, String command) {
-    return execCommand(hostname, command, false);
-  }
-
-  public SshCommandResult execCommand(String hostname, String command, boolean sudo) {
+  public SshCommandResult executeCommand(String hostname, String command) {
     try (SSHClient sshClient = initClient(hostname);
          Session session = sshClient.startSession()) {
-      String execCommand;
-      if (sudo) {
-        execCommand = edgeHostsService.hasEdgeHost(hostname)
-            ? String.format("echo %s | sudo -S %s", new String(
-                Base64.getDecoder().decode(edgeHostsService.getEdgeHost(hostname).getSshPassword())), command)
-            : String.format("sudo %s", command);
-      } else {
-        execCommand = command;
-      }
-      log.info("Executing: {}\nat host {}", execCommand, hostname);
-      Session.Command cmd = session.exec(execCommand);
-      cmd.join(EXEC_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
-      int exitStatus = cmd.getExitStatus();
-      String output = IOUtils.readFully(cmd.getInputStream()).toString().strip();
-      String error = IOUtils.readFully(cmd.getErrorStream()).toString().strip();
-      log.info("Command exited with status: {}, output: {}, error: {}", exitStatus, output, error);
-      return new SshCommandResult(hostname, command, exitStatus, output, error);
+      return executeCommand(session, hostname, command);
     } catch (IOException e) {
       e.printStackTrace();
-      return new SshCommandResult(hostname, command, -1, "", e.getMessage());
+      return new SshCommandResult(hostname, command, -1, List.of(), List.of(e.getMessage()));
     }
+  }
+
+  private SshCommandResult executeCommand(Session session, String hostname, String command) throws IOException {
+    log.info("Executing: {}, at host {}", command, hostname);
+    Session.Command cmd = session.exec(command);
+    cmd.join(EXEC_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
+    int exitStatus = cmd.getExitStatus();
+    List<String> output = Arrays.asList(IOUtils.readFully(cmd.getInputStream()).toString().strip().split("\n"));
+    List<String> error = Arrays.asList(IOUtils.readFully(cmd.getErrorStream()).toString().strip().split("\n"));
+    log.info("Command exited with\nstatus: {}\noutput: {}\nerror: {}", exitStatus, output, error);
+    return new SshCommandResult(hostname, command, exitStatus, output, error);
   }
 
   public boolean hasConnection(String hostname) {
@@ -149,5 +147,7 @@ public class SshService {
     }
     return false;
   }
+
+
 
 }

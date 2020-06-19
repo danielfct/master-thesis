@@ -373,7 +373,7 @@ class Container extends BaseComponent<Props, State> {
         {Object.values(this.props.edgeHosts).map((data, index) =>
           <li key={index} onClick={onClick}>
             <a>
-              {data.hostname}
+              {data.publicDnsName || data.publicIpAddress}
             </a>
           </li>
         )}

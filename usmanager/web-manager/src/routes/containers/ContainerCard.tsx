@@ -17,7 +17,7 @@ const ServiceCard = ({container}: Props) => (
                hoverable>
     <CardItem key={'names'}
               label={'Names'}
-              value={container.names.join(' / ')}/>
+              value={container.names.join(', ')}/>
     <CardItem key={'image'}
               label={'Image'}
               value={container.image}/>

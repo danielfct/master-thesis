@@ -18,13 +18,14 @@ import {ReduxState} from "../../reducers";
 import {loadCloudHosts, loadEdgeHosts} from "../../actions";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
+import styles from "./Ssh.module.css";
 
 interface ISshCommand {
   hostname: string;
   command: string;
   exitStatus: number;
-  output: string;
-  error: string;
+  output: string[];
+  error: string[];
 }
 
 const buildNewSshCommand = (): Partial<ISshCommand> => ({
@@ -49,10 +50,10 @@ class SshCommand extends BaseComponent<Props, {}> {
   private onPostSuccess = (reply: IReply<ISshCommand>): void => {
     const command = reply.data;
     if (command.exitStatus !== 0) {
-      super.toast(`<span>Command failed with status ${command.exitStatus}</span>`, 10000, command.error, true);
+      super.toast(`<span>Command failed with status ${command.exitStatus}</span>`, 10000, command.error.join("\n"), true);
     }
     else {
-      super.toast(`<span class="green-text">${command.command}</span>: <b>${command.output}</b>`, Number.MAX_VALUE, undefined, true);
+      super.toast(`<b>${command.output.join("\n").replace(/(?:\r\n|\r|\n)/g, '<br/>')}</b>`, 60000, undefined, true);
     }
   };
 

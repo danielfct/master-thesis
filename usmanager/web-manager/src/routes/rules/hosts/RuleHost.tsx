@@ -106,7 +106,7 @@ class RuleHost extends BaseComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-    if (prevProps.ruleHost?.generic != this.props.ruleHost?.generic) {
+    if (prevProps.ruleHost?.generic !== this.props.ruleHost?.generic) {
       this.setState({isGeneric: this.props.ruleHost?.generic || false})
     }
   }

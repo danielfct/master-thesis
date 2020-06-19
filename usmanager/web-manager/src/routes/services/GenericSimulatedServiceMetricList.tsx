@@ -53,7 +53,7 @@ class GenericSimulatedServiceMetricList extends BaseComponent<Props, {}> {
     return (
       <SimulatedMetricsList isLoading={this.props.isLoading}
                             error={this.props.error}
-                            emptyMessage={`Generic simulated host metrics list is empty`}
+                            emptyMessage={`Generic simulated metrics list is empty`}
                             list={this.props.genericSimulatedServiceMetrics}
                             show={this.simulatedMetric}/>
     );

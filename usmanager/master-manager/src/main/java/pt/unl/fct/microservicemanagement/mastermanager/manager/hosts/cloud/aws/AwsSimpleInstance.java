@@ -38,6 +38,7 @@ public final class AwsSimpleInstance {
   private final InstanceState state;
   private final String publicDnsName;
   private final String publicIpAddress;
+  private final String privateIpAddress;
   private final Placement placement;
 
   AwsSimpleInstance(Instance instance) {
@@ -47,6 +48,7 @@ public final class AwsSimpleInstance {
     this.state = instance.getState();
     this.publicDnsName = instance.getPublicDnsName();
     this.publicIpAddress = instance.getPublicIpAddress();
+    this.privateIpAddress = instance.getPrivateIpAddress();
     this.placement = instance.getPlacement();
   }
 

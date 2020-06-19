@@ -35,6 +35,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.amazonaws.services.ec2.model.Instance;
@@ -83,6 +84,10 @@ public class CloudHostsService {
     return cloudHosts.save(cloudHost);
   }
 
+  private CloudHostEntity saveCloudHostFromInstance(Instance instance) {
+    return saveCloudHostFromInstance(0L, instance);
+  }
+
   private CloudHostEntity saveCloudHostFromInstance(Long id, Instance instance) {
     CloudHostEntity cloudHost = CloudHostEntity.builder()
         .id(id)
@@ -92,13 +97,10 @@ public class CloudHostsService {
         .imageId(instance.getImageId())
         .publicDnsName(instance.getPublicDnsName())
         .publicIpAddress(instance.getPublicIpAddress())
+        .privateIpAddress(instance.getPrivateIpAddress())
         .placement(instance.getPlacement())
         .build();
     return saveCloudHost(cloudHost);
-  }
-
-  private CloudHostEntity saveCloudHostFromInstance(Instance instance) {
-    return saveCloudHostFromInstance(0L, instance);
   }
 
   private CloudHostEntity addCloudHostFromSimpleInstance(AwsSimpleInstance simpleInstance) {
@@ -109,6 +111,7 @@ public class CloudHostsService {
         .imageId(simpleInstance.getImageId())
         .publicDnsName(simpleInstance.getPublicDnsName())
         .publicIpAddress(simpleInstance.getPublicIpAddress())
+        .privateIpAddress(simpleInstance.getPrivateIpAddress())
         .placement(simpleInstance.getPlacement())
         .build();
     return saveCloudHost(cloudHost);
@@ -159,16 +162,25 @@ public class CloudHostsService {
   public List<CloudHostEntity> reloadCloudInstances() {
     List<CloudHostEntity> cloudHosts = getCloudHosts();
     List<AwsSimpleInstance> awsInstances = awsService.getSimpleInstances();
-    List<String> awsInstancesIds = awsInstances
-        .stream().map(AwsSimpleInstance::getInstanceId).collect(Collectors.toList());
+    Map<String, AwsSimpleInstance> awsInstancesIds = awsInstances
+        .stream().collect(Collectors.toMap(AwsSimpleInstance::getInstanceId, instance -> instance));
     Iterator<CloudHostEntity> cloudHostsIterator = cloudHosts.iterator();
-    // Remove invalid cloud host entities
+    // Remove invalid and update cloud host entities
     while (cloudHostsIterator.hasNext()) {
       CloudHostEntity cloudHost = cloudHostsIterator.next();
       String instanceId = cloudHost.getInstanceId();
-      if (!awsInstancesIds.contains(instanceId)) {
+      if (!awsInstancesIds.containsKey(instanceId)) {
         this.cloudHosts.delete(cloudHost);
         cloudHostsIterator.remove();
+        log.debug("Removing invalid cloud host {}", instanceId);
+      } else {
+        InstanceState currentState = awsInstancesIds.get(instanceId).getState();
+        InstanceState savedState = cloudHost.getState();
+        if (currentState != savedState) {
+          cloudHost.setState(currentState);
+          this.cloudHosts.save(cloudHost);
+          log.debug("Updating cloud host {} state from {} to {}", instanceId, savedState, currentState);
+        }
       }
     }
     // Add missing cloud host entities

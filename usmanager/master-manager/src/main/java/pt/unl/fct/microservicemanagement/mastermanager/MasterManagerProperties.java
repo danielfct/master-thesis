@@ -38,6 +38,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("master-manager")
 public class MasterManagerProperties {
 
+  private Mode mode;
   private int monitorPeriod;
   private final Tests tests;
 

@@ -28,7 +28,7 @@ export default class BaseComponent<P, S> extends React.Component<P, S> {
   toast(message: string, displayLength: number = 4000, error?: string,
         instance?: boolean, unique?: boolean): void {
     const id = this.getToastId();
-    const html = `<span>${message}${error ? `: <b class="red-text">${error}</b>` : ''}</span>`;
+    const html = `<div>${message}${error ? `: <b class="red-text">${error}</b>` : ''}</div>`;
     if (!unique || !this.toasts.some(toast => toast.toast.options.html === html)) {
       const toast = M.toast({ html , displayLength,  completeCallback: this.removeToast(id), classes:'test'});
       if (instance || unique) {

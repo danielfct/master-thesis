@@ -33,9 +33,24 @@ import lombok.Getter;
 @EqualsAndHashCode
 public class HostDetails {
 
+  //TODO make CloudHostDetails, EdgeHostDetails extends HostDetails
+
+  private final String publicDnsName;
+  private final String publicIpAddress;
+  private final String privateIpAddress;
   private final String city;
   private final String country;
   private final String region;
   private final String continent;
+
+  public HostDetails(String city, String country, String region) {
+    this.publicDnsName = null;
+    this.publicIpAddress = null;
+    this.privateIpAddress = null;
+    this.city = city;
+    this.country = country;
+    this.region = region;
+    this.continent = null;
+  }
 
 }

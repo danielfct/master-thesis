@@ -24,13 +24,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -38,39 +38,52 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EdgeHostRepository extends JpaRepository<EdgeHostEntity, Long> {
 
-  Optional<EdgeHostEntity> findByHostname(@Param("hostname") String hostname);
+  @Query("select h "
+      + "from EdgeHostEntity h "
+      + "where (h.publicDnsName = :hostname or h.publicIpAddress = :hostname) "
+      + "and h.privateIpAddress = :privateIpAddress")
+  Optional<EdgeHostEntity> findPrivateEdgeHost(@Param("hostname") String hostname,
+                                               @Param("privateIpAddress") String privateIpAddress);
 
-  List<EdgeHostEntity> findByHostnameContaining(@Param("partialHostname") String partialHostname);
+  @Query("select h "
+      + "from EdgeHostEntity h "
+      + "where h.publicDnsName = :hostname or h.publicIpAddress = :hostname")
+  Optional<EdgeHostEntity> findEdgeHost(@Param("hostname") String hostname);
 
   List<EdgeHostEntity> findByRegion(@Param("region") String region);
 
   List<EdgeHostEntity> findByCountry(@Param("country") String country);
 
+  List<EdgeHostEntity> findByCity(@Param("city") String city);
+
   @Query("select r "
       + "from EdgeHostEntity h join h.hostRules r "
-      + "where r.generic = false and h.hostname = :hostname")
+      + "where r.generic = false and (h.publicDnsName = :hostname or h.publicIpAddress = :hostname)")
   List<HostRuleEntity> getRules(@Param("hostname") String hostname);
 
 
   @Query("select r "
       + "from EdgeHostEntity h join h.hostRules r "
-      + "where r.generic = false and h.hostname = :hostname and r.name = :ruleName")
+      + "where r.generic = false "
+      + "and (h.publicDnsName = :hostname or h.publicIpAddress = :hostname) "
+      + "and r.name = :ruleName")
   Optional<HostRuleEntity> getRule(@Param("hostname") String hostname, @Param("ruleName") String ruleName);
 
   @Query("select m "
       + "from EdgeHostEntity h join h.simulatedHostMetrics m "
-      + "where h.hostname = :hostname")
+      + "where h.publicDnsName = :hostname or h.publicIpAddress = :hostname")
   List<SimulatedHostMetricEntity> getSimulatedMetrics(@Param("hostname") String hostname);
 
   @Query("select m "
       + "from EdgeHostEntity h join h.simulatedHostMetrics m "
-      + "where h.hostname = :hostname and m.name = :simulatedMetricName")
+      + "where (h.publicDnsName = :hostname or h.publicIpAddress = :hostname) "
+      + "and m.name = :simulatedMetricName")
   Optional<SimulatedHostMetricEntity> getSimulatedMetric(@Param("hostname") String hostname,
                                                          @Param("simulatedMetricName") String simulatedMetricName);
 
   @Query("select case when count(h) > 0 then true else false end "
       + "from EdgeHostEntity h "
-      + "where h.hostname = :hostname")
+      + "where (h.publicDnsName = :hostname or h.publicIpAddress = :hostname)")
   boolean hasEdgeHost(@Param("hostname") String hostname);
 
 }

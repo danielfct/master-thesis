@@ -8,22 +8,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes;
+package pt.unl.fct.microservicemanagement.mastermanager;
 
-import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
+public enum Mode {
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@AllArgsConstructor
-@Getter
-final class AddNode {
-
-  private final String host;
-  private final int quantity;
-  private final RegionEntity region;
-  private final String country;
-  private final String city;
-  private final NodeRole role;
+  LOCAL, GLOBAL
 
 }

@@ -46,6 +46,8 @@ Usa o sistema de gestão de regras de negócios Drools para gerir as regras apli
 
 [<img src="https://i.imgur.com/6f2iyaR.png" alt="" width="48" height="24"> Checkstyle](https://checkstyle.org/) - Checkstyle is a development tool to help programmers write Java code that adheres to a coding standard
 
+[<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/SSH_Communications_Security_logo.svg/1280px-SSH_Communications_Security_logo.svg.png" alt="" alt="" width="128" height="20">](https://www.ssh.com/ssh/command) - Tools for remote access
+
 ### Guias úteis
 [<img src="https://i.imgur.com/WDbhA08.png" alt="" width="48" height="42"> Spring Boot](https://spring.io/projects/spring-boot) - Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run" 
 
@@ -65,13 +67,22 @@ Sem o maven instalado:
 
 ### Troubleshooting
 
->Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
+- Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock:
+Configurar  encaminhamento `sudo setfacl --modify user:<user name or ID>:rw /var/run/docker.sock` ([solução](https://stackoverflow.com/a/54504083))
 
-`sudo setfacl --modify user:<user name or ID>:rw /var/run/docker.sock` ([solução](https://stackoverflow.com/a/54504083))
+- Se ao estabeler uma ligação com o aws ec2, bloquear, fazer o seguinte:
+https://stackoverflow.com/a/48572280 
 
->Se ao estabeler uma ligação com o aws ec2, bloquear, fazer o seguinte:
->https://stackoverflow.com/a/48572280 
-
+- Utilizar computadores pessoais. Normalmente protegidos pelo router (http://192.168.1.254 no caso de meo, http://192.168.1.1 no caso de nos ou vodafone), estão apenas acessíveis na rede local. 
+É preciso configurar os seguintes encaminhamentos de portas no painel de controlo do router: 
+    - Ssh, porta 22 TCP. Aceder usando `ssh user@ip_publico_do_router` ([ver ip público](https://ipinfo.io/ip))
+    - Docker Cluster management communications, porta 2377 TCP
+    - Communication among docker nodes, porta 7946 TCP e UDP 
+    - Docker Overlay network traffic, porta 4789 UDP 
+    
+- Adicionar novos edge hosts:
+    - Permitir executar sudo sem password, https://askubuntu.com/a/147265
+    
 ### Licença
 
 Master manager está licenciado com o [MIT license](https://github.com/usmanager/usmanager/LICENSE). Ver a licença no cabeçalho do respetivo ficheiro para confirmar.
