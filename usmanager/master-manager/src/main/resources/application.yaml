@@ -53,6 +53,8 @@ container:
 docker:
   install-script: docker-install.sh
   install-script-path: src/main/resources/scripts/docker-install.sh
+  uninstall-script: docker-uninstall.sh
+  uninstall-script-path: src/main/resources/scripts/docker-uninstall.sh
   api:
     port: 2376
   api-proxy:
@@ -66,6 +68,10 @@ docker:
     max-workers: 1
 eureka:
   port: 8761
+prometheus:
+  node-exporter:
+    install-script: node-exporter-install.sh
+    install-script-path: src/main/resources/scripts/node-exporter-install.sh
 host:
   maximum-cpu-percentage: 90
   maximum-hosts: 0

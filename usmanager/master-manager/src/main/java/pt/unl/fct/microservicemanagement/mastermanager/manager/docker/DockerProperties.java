@@ -26,6 +26,8 @@ public class DockerProperties {
 
   private String installScript;
   private String installScriptPath;
+  private String uninstallScript;
+  private String uninstallScriptPath;
   private String repository;
   private final Api api;
   private final ApiProxy apiProxy;

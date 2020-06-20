@@ -21,13 +21,15 @@ import BaseComponent from "../../components/BaseComponent";
 import Form, {IFields, required} from "../../components/form/Form";
 import Field from "../../components/form/Field";
 import React from "react";
-import {ICloudHost} from "../hosts/cloud/CloudHost";
+import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 import {ReduxState} from "../../reducers";
 import {loadCloudHosts, loadEdgeHosts} from "../../actions";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
+import {ISshCommand} from "./SshCommand";
+import {IReply} from "../../utils/api";
 
-interface ISshFile {
+export interface ISshFile {
   hostname: string;
   filename: string;
 }
@@ -47,17 +49,22 @@ interface DispatchToProps {
   loadEdgeHosts: () => void;
 }
 
-type Props = StateToProps & DispatchToProps;
+interface SshFileProps {
+  onTransferFile : (transfer: ISshFile) => void;
+}
 
-class SshCommand extends BaseComponent<Props, {}> {
+type Props = SshFileProps & StateToProps & DispatchToProps;
+
+class SshFile extends BaseComponent<Props, {}> {
 
   public componentDidMount(): void {
     this.props.loadEdgeHosts();
     this.props.loadCloudHosts();
   };
 
-  private onPostSuccess = (): void => {
+  private onPostSuccess = (reply: IReply<string>, args: ISshFile): void => {
     super.toast(`<span class="green-text">File uploaded</span>`);
+    this.props.onTransferFile(args);
   };
 
   private onPostFailure = (reason: string): void =>
@@ -79,7 +86,9 @@ class SshCommand extends BaseComponent<Props, {}> {
   );
 
   private getSelectableHosts = () => {
-    const cloudHosts = Object.values(this.props.cloudHosts).map(instance => instance.publicIpAddress);
+    const cloudHosts = Object.values(this.props.cloudHosts)
+                             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
+                             .map(instance => instance.publicIpAddress);
     const edgeHosts = Object.keys(this.props.edgeHosts);
     return cloudHosts.concat(edgeHosts);
   };
@@ -136,4 +145,4 @@ const mapDispatchToProps: DispatchToProps = {
   loadEdgeHosts,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SshCommand);
+export default connect(mapStateToProps, mapDispatchToProps)(SshFile);

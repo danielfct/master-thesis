@@ -12,12 +12,13 @@ import MainLayout from "../../views/mainLayout/MainLayout";
 import Tabs from "../../components/tabs/Tabs";
 import React from "react";
 import SshCommand, {ISshCommand} from "./SshCommand";
-import SshFile from "./SshFile";
+import SshFile, {ISshFile} from "./SshFile";
 import styles from "./Ssh.module.css";
 import {Resizable} from "re-resizable";
 import ScrollBar from "react-perfect-scrollbar";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
+import {escape} from "lodash";
 
 interface StateToProps {
   sidenavVisible: boolean;
@@ -25,16 +26,25 @@ interface StateToProps {
 
 type Props = StateToProps;
 
+interface ICommand extends ISshCommand {
+  timestamp: number;
+}
+
+interface IFileTransfer extends ISshFile {
+  timestamp: number;
+}
+
 interface State {
-  commands: ISshCommand[];
+  commands: (ICommand | IFileTransfer)[];
   commandsHeight: number;
   animate: boolean;
 }
 
 class Ssh extends React.Component<Props, State> {
 
-  private commandsScrollbar: (ScrollBar | null) = null;
-  private controlsScrollbar: (ScrollBar | null) = null;
+  private commandsContainer: any = null;
+  private commandsScrollbar: ScrollBar | null = null;
+  private controlsScrollbar: ScrollBar | null = null;
   private COMMANDS_MIN_HEIGHT = 44;
   private COMMANDS_DEFAULT_HEIGHT = 175;
 
@@ -61,17 +71,17 @@ class Ssh extends React.Component<Props, State> {
     {
       title: 'Execute command',
       id: 'executeCommand',
-      content: () => <SshCommand/>
+      content: () => <SshCommand onExecuteCommand={this.addCommand}/>
     },
     {
       title: 'Upload file',
       id: 'uploadFile',
-      content: () => <SshFile/>
+      content: () => <SshFile onTransferFile={this.addFileTransfer}/>
     }
   ];
 
   private onResize = () =>
-   this.updateScrollbars();
+    this.updateScrollbars();
 
   private updateScrollbars = () => {
     this.commandsScrollbar?.updateScroll();
@@ -84,6 +94,30 @@ class Ssh extends React.Component<Props, State> {
 
   private clearCommands = () =>
     this.setState({commands: []});
+
+  private addCommand = (sshCommand: ISshCommand) => {
+    const command = { ...sshCommand, timestamp: Date.now() };
+    this.setState({commands: this.state.commands.concat(command)}, () => {
+      this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
+    });
+  }
+
+  private addFileTransfer = (fileTransfer: ISshFile) => {
+    const transfer = { ...fileTransfer, timestamp: Date.now() };
+    this.setState({commands: this.state.commands.concat(transfer)}, () => {
+      this.commandsContainer.scrollTop = Number.MAX_SAFE_INTEGER;
+    });
+  }
+
+  private pad(n: number, width: number, padWith=0) {
+    return (String(padWith).repeat(width) + String(n)).slice(String(n).length);
+  }
+
+  private timestampToString = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    let millis = this.pad(date.getMilliseconds(), 3);
+    return `${date.toLocaleTimeString()}:${millis}`
+  }
 
   public render() {
     return (
@@ -109,7 +143,8 @@ class Ssh extends React.Component<Props, State> {
               </button>
             </ScrollBar>
           </div>
-          <ScrollBar ref = {(ref) => { this.commandsScrollbar = ref; }} style={{flexGrow: 1}}>
+          <ScrollBar ref = {(ref) => { this.commandsScrollbar = ref; }} style={{flexGrow: 1}}
+                     containerRef = {(container) => { this.commandsContainer = container; }}>
             <div>
               <div className={styles.commandsHeader}>
                 <div className={styles.commandsTitle}>
@@ -123,10 +158,23 @@ class Ssh extends React.Component<Props, State> {
             <div className={styles.commands}>
               {this.state.commands.map((command, index) => (
                 <div key={index}>
-                  <div className={styles.command}>
-                    {command.hostname}: {command.command}
-                  </div>
-                  {command.output}
+                  {'output' in command ?
+                    <>
+                      <div>
+                        <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
+                        <span className={styles.hostname}>{command.hostname} ></span>
+                        <span className={styles.command}>{command.command}</span>
+                      </div>
+                      <div dangerouslySetInnerHTML={{__html: escape(command.output.join("\n")).replace(/(?:\r\n|\r|\n)/g, '<br/>')}}/>
+                    </>
+                    :
+                    <>
+                      <div>
+                        <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
+                        File {command.filename} transferred to {command.hostname}
+                      </div>
+                    </>
+                  }
                 </div>
               ))}
             </div>

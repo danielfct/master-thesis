@@ -22,7 +22,7 @@ then
 	sudo systemctl daemon-reload
 	sudo systemctl start node_exporter
 
-	echo ">>> node_exporter installed."
+	echo "Node_exporter installed."
 else
-	echo ">>> node_exporter already installed."
+	echo "Node_exporter is already installed."
 fi

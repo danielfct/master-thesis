@@ -26,12 +26,12 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
-import pt.unl.fct.microservicemanagement.mastermanager.exceptions.NotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus.PrometheusProperties;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +56,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SshService {
 
-  private static final int EXEC_COMMAND_TIMEOUT = 120000;
+  private static final int EXECUTE_COMMAND_TIMEOUT = 120000;
 
   private final EdgeHostsService edgeHostsService;
 
@@ -66,14 +66,18 @@ public class SshService {
   private final Map<String, String> scriptPaths;
 
   public SshService(EdgeHostsService edgeHostsService, EdgeHostsProperties edgeHostsProperties,
-                    AwsProperties awsProperties, DockerProperties dockerProperties) {
+                    AwsProperties awsProperties, DockerProperties dockerProperties,
+                    PrometheusProperties prometheusProperties) {
     this.edgeHostsService = edgeHostsService;
     this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
     this.awsKeyFilePath = awsProperties.getAccess().getKeyFilePath();
     this.awsUser = awsProperties.getAccess().getUsername();
-    String dockerScript = dockerProperties.getInstallScript();
-    String dockerScriptPath = dockerProperties.getInstallScriptPath();
-    this.scriptPaths = Map.of(dockerScript, dockerScriptPath);
+    PrometheusProperties.NodeExporter nodeExporterProperties = prometheusProperties.getNodeExporter();
+    this.scriptPaths = Map.of(
+        dockerProperties.getInstallScript(), dockerProperties.getInstallScriptPath(),
+        dockerProperties.getUninstallScript(), dockerProperties.getUninstallScriptPath(),
+        nodeExporterProperties.getInstallScript(), nodeExporterProperties.getInstallScriptPath()
+    );
     Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
   }
 
@@ -104,7 +108,7 @@ public class SshService {
          SFTPClient sftpClient = sshClient.newSFTPClient()) {
       String scriptPath = scriptPaths.get(filename);
       if (scriptPath == null) {
-        throw new NotFoundException("File %s not found", filename);
+        throw new EntityNotFoundException(File.class, "name", filename);
       }
       var file = new File(scriptPath);
       log.info("Transferring file {} to host {}", filename, hostname);
@@ -128,7 +132,7 @@ public class SshService {
   private SshCommandResult executeCommand(Session session, String hostname, String command) throws IOException {
     log.info("Executing: {}, at host {}", command, hostname);
     Session.Command cmd = session.exec(command);
-    cmd.join(EXEC_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
+    cmd.join(EXECUTE_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
     int exitStatus = cmd.getExitStatus();
     List<String> output = Arrays.asList(IOUtils.readFully(cmd.getInputStream()).toString().strip().split("\n"));
     List<String> error = Arrays.asList(IOUtils.readFully(cmd.getErrorStream()).toString().strip().split("\n"));

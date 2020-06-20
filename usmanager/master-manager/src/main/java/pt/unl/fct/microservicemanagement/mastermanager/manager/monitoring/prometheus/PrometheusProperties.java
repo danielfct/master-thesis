@@ -8,7 +8,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
+package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,26 +20,22 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties("container")
-public class ContainerProperties {
+@ConfigurationProperties("prometheus")
+public class PrometheusProperties {
 
-  private int monitorPeriod;
-  private int replicateContainerOnEventCount;
-  private int migrateContainerOnEventCount;
-  private int stopContainerOnEventCount;
-  private int delayBeforeStop;
-  private final Database database;
+  private final NodeExporter nodeExporter;
 
-  public ContainerProperties() {
-    this.database = new Database();
+  public PrometheusProperties() {
+    this.nodeExporter = new NodeExporter();
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   @Getter
   @Setter
-  public static final class Database {
+  public static final class NodeExporter {
 
-    private int deployDelay;
+    private String installScript;
+    private String installScriptPath;
 
   }
 

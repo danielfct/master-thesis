@@ -42,7 +42,11 @@ interface DispatchToProps {
   loadEdgeHosts: () => void;
 }
 
-type Props = StateToProps & DispatchToProps;
+interface SshCommandProps {
+  onExecuteCommand : (command: ISshCommand) => void;
+}
+
+type Props = SshCommandProps & StateToProps & DispatchToProps;
 
 class SshCommand extends BaseComponent<Props, {}> {
 
@@ -52,8 +56,9 @@ class SshCommand extends BaseComponent<Props, {}> {
       super.toast(`<span>Command failed with status ${command.exitStatus}</span>`, 10000, command.error.join("\n"), true);
     }
     else {
-      super.toast(`<b>${command.output.join("\n").replace(/(?:\r\n|\r|\n)/g, '<br/>')}</b>`, 60000, undefined, true);
+      super.toast(`<span class="green-text">Command successfully executed</span>`);
     }
+    this.props.onExecuteCommand(command);
   };
 
   private onPostFailure = (reason: string): void =>
