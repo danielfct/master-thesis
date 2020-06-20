@@ -11,14 +11,13 @@
 import MainLayout from "../../views/mainLayout/MainLayout";
 import Tabs from "../../components/tabs/Tabs";
 import React from "react";
-import SshCommand from "./SshCommand";
+import SshCommand, {ISshCommand} from "./SshCommand";
 import SshFile from "./SshFile";
 import styles from "./Ssh.module.css";
 import {Resizable} from "re-resizable";
 import ScrollBar from "react-perfect-scrollbar";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
-import {Direction} from "re-resizable/lib/resizer";
 
 interface StateToProps {
   sidenavVisible: boolean;
@@ -27,107 +26,121 @@ interface StateToProps {
 type Props = StateToProps;
 
 interface State {
-  showingCommands: boolean;
+  commands: ISshCommand[];
   commandsHeight: number;
+  animate: boolean;
 }
 
 class Ssh extends React.Component<Props, State> {
 
-  private scrollbar: (ScrollBar | null) = null;
+  private commandsScrollbar: (ScrollBar | null) = null;
+  private controlsScrollbar: (ScrollBar | null) = null;
+  private COMMANDS_MIN_HEIGHT = 44;
+  private COMMANDS_DEFAULT_HEIGHT = 175;
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      showingCommands: true,
-      commandsHeight: 190
+      commands: [],
+      commandsHeight: this.COMMANDS_DEFAULT_HEIGHT,
+      animate: false,
+    }
+  }
+
+  componentDidMount() {
+    this.updateScrollbars();
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+    if (!this.state.animate && prevProps.sidenavVisible !== this.props.sidenavVisible) {
+      this.setState({animate: true});
     }
   }
 
   private tabs = () => [
-      {
-        title: 'Execute command',
-        id: 'executeCommand',
-        content: () => <SshCommand/>
-      },
-      {
-        title: 'Upload file',
-        id: 'uploadFile',
-        content: () => <SshFile/>
-      }
-    ];
-
-  private onResize = (event: MouseEvent | TouchEvent, direction: Direction, elementRef: HTMLElement) => {
-    this.scrollbar?.updateScroll();
-    if (direction === 'top') {
-      if (elementRef.clientHeight <= 38 && this.state.showingCommands) {
-        this.setState({showingCommands: false});
-      }
-      if (elementRef.clientHeight > 38 && !this.state.showingCommands) {
-        this.setState({showingCommands: true});
-      }
+    {
+      title: 'Execute command',
+      id: 'executeCommand',
+      content: () => <SshCommand/>
+    },
+    {
+      title: 'Upload file',
+      id: 'uploadFile',
+      content: () => <SshFile/>
     }
+  ];
+
+  private onResize = () =>
+   this.updateScrollbars();
+
+  private updateScrollbars = () => {
+    this.commandsScrollbar?.updateScroll();
+    this.controlsScrollbar?.updateScroll();
   }
 
-  private updateScrollbar = () =>
-    this.scrollbar?.updateScroll();
+  private toggleCommands = () =>
+    this.setState({commandsHeight: this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? this.COMMANDS_DEFAULT_HEIGHT : this.COMMANDS_MIN_HEIGHT},
+      () => setTimeout(() => this.updateScrollbars(), 500));
 
-  private toggleCommands = () => {
-      this.setState({showingCommands: !this.state.showingCommands, commandsHeight: this.state.showingCommands ? 190 : 0},
-        () => setTimeout(() => this.updateScrollbar(), 500));
-    }
+  private clearCommands = () =>
+    this.setState({commands: []});
 
   public render() {
-      return (
-        <MainLayout>
-          <div className="container">
-            <Tabs tabs={this.tabs()}/>
-          </div>
-          <Resizable className={`${styles.commandsContainer}`}
-                     onResize={this.onResize}
-                     size={{
-                       width: window.outerWidth - 200,
-                       height: this.state.commandsHeight }}
-                     onResizeStop={(e, direction, ref, d) => {
-                       this.setState({
-                         commandsHeight: this.state.commandsHeight + d.height,
-                       });
-                     }}>
-            <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}>
-              <div>
-                <div className={styles.commandsHeader}>
-                  <div className={styles.commandsTitle}>
-                    Commands
-                  </div>
-                  <button className={`btn-floating btn-flat ${styles.toggleCommandsButton}`} onClick={this.toggleCommands}>
-                    <i className="material-icons">{this.state.showingCommands ? 'keyboard_arrow_down' : 'keyboard_arrow_up'}</i>
-                  </button>
-                </div>
-              </div>
-              <div className={styles.commands}>
-                <div className={styles.command}>
-                  127.0.0.1: hostname -i
-                </div>
-                Sample with default size
-                <div className={styles.command}>
-                  127.0.0.1: hostname -i
-                </div>
-                Sample with default size
-                <div className={styles.command}>
-                  127.0.0.1: hostname -i
-                </div>
-                Sample with default size
-              </div>
+    return (
+      <MainLayout>
+        <div className="container">
+          <Tabs tabs={this.tabs()}/>
+        </div>
+        <Resizable className={`${styles.commandsContainer} ${this.state.animate ? (this.props.sidenavVisible ? styles.shrink : styles.expand) : ''}`}
+                   onResize={this.onResize}
+                   enable={{top: true}}
+                   size={{
+                     width: this.props.sidenavVisible ? window.innerWidth - 200 : window.innerWidth,
+                     height: this.state.commandsHeight }}
+                   onResizeStop={(e, direction, ref, d) => {
+                     this.setState({
+                       commandsHeight: this.state.commandsHeight + d.height,
+                     });
+                   }}>
+          <div className={styles.controlsMenu}>
+            <ScrollBar ref = {(ref) => { this.controlsScrollbar = ref; }}>
+              <button className='btn-floating btn-flat btn-small' onClick={this.clearCommands}>
+                <i className="material-icons grey-text">delete_sweep</i>
+              </button>
             </ScrollBar>
-          </Resizable>
-        </MainLayout>
-      );
-    }
+          </div>
+          <ScrollBar ref = {(ref) => { this.commandsScrollbar = ref; }} style={{flexGrow: 1}}>
+            <div>
+              <div className={styles.commandsHeader}>
+                <div className={styles.commandsTitle}>
+                  Commands
+                </div>
+                <button className={`btn-floating btn-flat ${styles.toggleCommandsButton}`} onClick={this.toggleCommands}>
+                  <i className="material-icons">{this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</i>
+                </button>
+              </div>
+            </div>
+            <div className={styles.commands}>
+              {this.state.commands.map((command, index) => (
+                <div key={index}>
+                  <div className={styles.command}>
+                    {command.hostname}: {command.command}
+                  </div>
+                  {command.output}
+                </div>
+              ))}
+            </div>
+          </ScrollBar>
+        </Resizable>
+      </MainLayout>
+    );
   }
+}
 
-  const mapStateToProps = (state: ReduxState): StateToProps => (
+const mapStateToProps = (state: ReduxState): StateToProps => (
   {
     sidenavVisible: state.ui.sidenav.user && state.ui.sidenav.width,
   }
 );
 
-  export default connect(mapStateToProps)(Ssh);
+export default connect(mapStateToProps)(Ssh);

@@ -35,6 +35,7 @@ import {normalize} from "normalizr";
 import {isNew} from "../../../utils/router";
 import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import CloudHostSimulatedMetricList from "./CloudHostSimulatedMetricList";
+import formStyles from "../../../components/form/Form.module.css";
 
 export interface ICloudHost extends IDatabaseData {
   instanceId: string;
@@ -234,7 +235,7 @@ class CloudHost extends BaseComponent<Props, State> {
     if (state?.includes(awsInstanceStates.STOPPED.name)) {
       buttons.push({
         button:
-          <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
+          <button className={`btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
                   onClick={this.startCloudHost}>
             Start
           </button>
@@ -243,7 +244,7 @@ class CloudHost extends BaseComponent<Props, State> {
     if (state?.includes(awsInstanceStates.RUNNING.name)) {
       buttons.push({
         button:
-          <button className={`btn-flat btn-small waves-effect waves-light blue-text`}
+          <button className={`btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
                   onClick={this.stopCloudHost}>
             Stop
           </button>
@@ -253,7 +254,7 @@ class CloudHost extends BaseComponent<Props, State> {
         && !state?.includes(awsInstanceStates.SHUTTING_DOWN.name)) {
       buttons.push({
         button:
-          <button className='modal-trigger btn-flat btn-small waves-effect waves-light red-text'
+          <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text ${formStyles.formButton}`}
                   data-target='terminate-cloudHost'>
             Terminate
           </button>,

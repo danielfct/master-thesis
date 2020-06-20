@@ -26,6 +26,7 @@ import {Schemas} from "../../middleware/api";
 import {isNew} from "../../utils/router";
 import InputDialog from "../../components/dialogs/InputDialog";
 import {IRegion} from "../region/Region";
+import formStyles from "../../components/form/Form.module.css";
 
 export interface IApp extends IDatabaseData {
   name: string;
@@ -238,7 +239,7 @@ class App extends BaseComponent<Props, State> {
       buttons.push({
         button:
           <>
-            <button className={`modal-trigger btn-flat btn-small waves-effect waves-light blue-text`}
+            <button className={`modal-trigger btn-flat btn-small waves-effect waves-light blue-text ${formStyles.formButton}`}
                     data-target={'launch-app-modal'}>
               Launch
             </button>

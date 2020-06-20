@@ -44,6 +44,7 @@ import ContainerRuleList from "./ContainerRuleList";
 import ContainerSimulatedMetricList from "./ContainerSimulatedMetricList";
 import GenericSimulatedContainerMetricList from "./GenericSimulatedContainerMetricList";
 import UnsavedChanged from "../../components/form/UnsavedChanges";
+import formStyles from "../../components/form/Form.module.css";
 
 export interface IContainer extends IDatabaseData {
   containerId: string;
@@ -211,7 +212,7 @@ class Container extends BaseComponent<Props, State> {
     buttons.push({
         button:
           <>
-            <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger`}
+            <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
                     data-target={`replicate-dropdown-hostname`}
                     ref={this.replicateDropdown}>
               Replicate
@@ -222,7 +223,7 @@ class Container extends BaseComponent<Props, State> {
       {
         button:
           <>
-            <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger`}
+            <button className={`btn-flat btn-small waves-effect waves-light blue-text dropdown-trigger ${formStyles.formButton}`}
                     data-target={`migrate-dropdown-hostname`}
                     ref={this.migrateDropdown}>
               Migrate

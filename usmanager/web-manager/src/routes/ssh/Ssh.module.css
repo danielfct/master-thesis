@@ -8,28 +8,25 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+.commandsContainer {
+    position: absolute !important;
+    bottom: 42px;
+    min-width: 135px;
+    min-height: 44px;
+    max-height: calc(100vh - 42px - 56px) !important;
+    background: #282828;
+    border: 1px solid #212121;
+    display: flex;
+    z-index: 998;
+}
+
 .commandsHeader {
     display: flex;
 }
 
 .commandsTitle {
-    margin: 8px;
+    margin: 5px;
     color: dimgrey;
-}
-
-.commandsContainer {
-    position: absolute !important;
-    bottom: 42px;
-    margin: 0 -500px 0 0;
-    min-width: 135px;
-    min-height: 40px;
-    max-height: calc(100vh - 42px - 56px) !important;
-    background: #282828;
-    border: 1px solid #212121;
-    outline-offset: 15px;
-    z-index: 998;
-    visibility: hidden;
-    /*transition: width .25s ease-in;*/
 }
 
 .command {
@@ -39,12 +36,25 @@
 .commands {
     margin: 10px;
     color: white;
-    text-overflow: clip;
 }
 
-@media only screen and (min-height: 489px) {
+.controlsMenu {
+    height: 100%;
+    border-right: 1px solid #212121;
+}
+
+.controlsMenu button {
+    margin: 5px;
+    display: block;
+}
+
+.controlsMenu button:hover {
+    background: transparent !important;
+}
+
+@media only screen and (max-height: 488px) {
     .commandsContainer {
-        visibility: visible;
+        visibility: hidden;
     }
 }
 
@@ -63,20 +73,22 @@
     background: transparent !important;
 }
 
-/*.slideIn {
-    animation: slide-in .25s forwards;
+.shrink {
+    animation: shrink .25s forwards;
 }
 
-.slideOut {
-    animation: slide-out .25s forwards;
+.expand {
+    animation: expand .25s forwards;
 }
 
-@keyframes slide-in {
-    0% { width: 0 }
-    100% { width: 100%; }
+@keyframes shrink {
+    0% { left: 0; width: 100% }
+    100% { left: 200px; width: calc(100% - 200px) }
 }
 
-@keyframes slide-out {
-    0% { width: 200px; }
-    100% { width: 0; }
-}*/
+@keyframes expand {
+    0% { left: 200px; width: calc(100% - 200px) }
+    100% { left: 0; width: 100% }
+}
+
+

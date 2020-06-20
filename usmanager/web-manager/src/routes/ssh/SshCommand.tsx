@@ -13,14 +13,13 @@ import BaseComponent from "../../components/BaseComponent";
 import Form, {IFields, required, requiredAndTrimmed} from "../../components/form/Form";
 import Field from "../../components/form/Field";
 import React from "react";
-import {ICloudHost} from "../hosts/cloud/CloudHost";
+import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
 import {ReduxState} from "../../reducers";
 import {loadCloudHosts, loadEdgeHosts} from "../../actions";
 import {connect} from "react-redux";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
-import styles from "./Ssh.module.css";
 
-interface ISshCommand {
+export interface ISshCommand {
   hostname: string;
   command: string;
   exitStatus: number;
@@ -76,7 +75,9 @@ class SshCommand extends BaseComponent<Props, {}> {
   );
 
   private getSelectableHosts = () => {
-    const cloudHosts = Object.values(this.props.cloudHosts).map(instance => instance.publicIpAddress);
+    const cloudHosts = Object.values(this.props.cloudHosts)
+                             .filter(cloudHost => cloudHost.state.code === awsInstanceStates.RUNNING.code)
+                             .map(instance => instance.publicIpAddress);
     const edgeHosts = Object.keys(this.props.edgeHosts);
     return cloudHosts.concat(edgeHosts);
   };

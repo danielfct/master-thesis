@@ -487,19 +487,19 @@ class Form extends React.Component<Props, State> {
                         </div>
                       ))}
                       {deletable !== undefined && (
-                        <button className='modal-trigger btn-flat btn-small waves-effect waves-light red-text'
+                        <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text ${styles.formButton}`}
                                 type="button"
                                 data-target={id}>
                           {this.props.delete?.textButton || 'Delete'}
                         </button>)}
-                      <button className='btn-flat btn-small waves-effect waves-light green-text slide'
+                      <button className={`btn-flat btn-small waves-effect waves-light green-text slide ${styles.formButton}`}
                               style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
                               type="submit">
                         {this.props.post?.textButton || 'Save'}
                       </button>
                     </div>
                     {editable !== undefined && (
-                      <button className='btn-floating btn-flat btn-small waves-effect waves-light right tooltipped'
+                      <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
                               data-position="bottom"
                               data-tooltip="Edit"
                               type="button"
@@ -510,14 +510,14 @@ class Form extends React.Component<Props, State> {
                   </>
                 }
                 {loading && (
-                  <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide`}
+                  <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light red-text right slide ${styles.formButton}`}
                           onClick={this.cancelRequest}>
                     Cancel
                   </button>
                 )}
                 {dropdown && (
                   <>
-                    <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                    <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
                             data-position="bottom" data-tooltip={dropdown.title}
                             data-target={`dropdown-${dropdown.id}`}
                             ref={this.dropdown}>
@@ -571,16 +571,16 @@ class Form extends React.Component<Props, State> {
           {(controlsMode === 'modal' || controlsMode === 'modal-fullscreen') && (
             <div className={`modal-footer dialog-footer ${controlsMode === 'modal-fullscreen' ? 'modal-footer-fullscreen' : ''}`}>
               <div>
-                <button className="waves-effect waves-light btn-flat red-text"
+                <button className={`waves-effect waves-light btn-flat red-text ${styles.formButton}`}
                         type="button"
                         onClick={this.clearValues}>
                   Clear
                 </button>
-                <button className="modal-close waves-effect waves-light btn-flat red-text"
+                <button className={`modal-close waves-effect waves-light btn-flat red-text ${styles.formButton}`}
                         type="button">
                   Cancel
                 </button>
-                <button className="waves-effect waves-light btn-flat green-text"
+                <button className={`waves-effect waves-light btn-flat green-text ${styles.formButton}`}
                         type="button"
                         onClick={this.onModalConfirm}>
                   Confirm
