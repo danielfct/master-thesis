@@ -4,13 +4,14 @@
 
 .scrollButton {
     position: relative;
-    top: 40px;
+    top: 48px;
+    margin-top: -40px;
 }
 
 .leftScrollButton {
-    left: -50px;
+    left: -48px;
 }
 
 .rightScrollButton {
-    left: 60px;
+    left: 48px;
 }

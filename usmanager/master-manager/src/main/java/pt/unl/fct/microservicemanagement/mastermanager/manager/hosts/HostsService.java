@@ -79,6 +79,7 @@ public class HostsService {
   private final PrometheusService prometheusService;
   private final LocationRequestService locationRequestService;
   private final DockerApiProxyService dockerApiProxyService;
+  private String localMachineDns;
   private String publicIp;
   private String privateIp;
   private final int maxWorkers;
@@ -92,7 +93,8 @@ public class HostsService {
                       PrometheusService prometheusService, @Lazy LocationRequestService locationRequestService,
                       DockerApiProxyService dockerApiProxyService, DockerProperties dockerProperties,
                       AwsProperties awsProperties,
-                      MasterManagerProperties masterManagerProperties) {
+                      MasterManagerProperties masterManagerProperties,
+                      HostProperties hostProperties) {
     this.nodesService = nodesService;
     this.containersService = containersService;
     this.dockerSwarmService = dockerSwarmService;
@@ -106,6 +108,7 @@ public class HostsService {
     this.dockerApiProxyService = dockerApiProxyService;
     this.maxWorkers = dockerProperties.getSwarm().getMaxWorkers();
     this.maxInstances = awsProperties.getInitialMaxInstances();
+    this.localMachineDns = hostProperties.getLocalMachineDns();
     this.mode = masterManagerProperties.getMode();
   }
 
@@ -116,7 +119,7 @@ public class HostsService {
     if (mode == Mode.LOCAL) {
       edgeHostsService.addEdgeHost(EdgeHostEntity.builder()
               .username(username)
-              .publicDnsName("dpimenta.ddns.net")
+              .publicDnsName(localMachineDns)
               .publicIpAddress(publicIp)
               .privateIpAddress(privateIp)
               .region("eu-central-1")
@@ -194,19 +197,25 @@ public class HostsService {
   }
 
   private String setupSwarmManager(String managerHostname) {
+    String nodeId;
     boolean isLocal = managerHostname.equalsIgnoreCase(this.publicIp);
-    return dockerSwarmService.getSwarmManagerNodeId(isLocal ? privateIp : managerHostname)
-        .or(() -> dockerSwarmService.getSwarmWorkerNodeId(managerHostname))
-        .orElseGet(() ->
-            isLocal
-                ? dockerSwarmService.initSwarm()
-                : dockerSwarmService.joinSwarm(managerHostname, NodeRole.MANAGER));
+    if (isLocal) {
+      dockerSwarmService.leaveSwarm(managerHostname);
+      nodeId = dockerSwarmService.initSwarm();
+    } else {
+      nodeId = joinSwarm(managerHostname, NodeRole.MANAGER);
+    }
+    return nodeId;
   }
 
   private String setupSwarmWorker(String workerHostname) {
-    return dockerSwarmService.getSwarmManagerNodeId(workerHostname)
-        .or(() -> dockerSwarmService.getSwarmWorkerNodeId(workerHostname))
-        .orElseGet(() -> dockerSwarmService.joinSwarm(workerHostname, NodeRole.WORKER));
+    return joinSwarm(workerHostname, NodeRole.WORKER);
+  }
+
+  private String joinSwarm(String hostname, NodeRole role) {
+    return dockerSwarmService.getSwarmManagerNodeId(hostname)
+        .or(() -> dockerSwarmService.getSwarmWorkerNodeId(hostname))
+        .orElseGet(() -> dockerSwarmService.joinSwarm(hostname, role));
   }
 
   public String getAvailableHost(double avgContainerMem, HostDetails hostDetails) {
@@ -390,16 +399,12 @@ public class HostsService {
   }
 
   public void removeHost(String hostname) {
-    //assertHostIsRunning(hostname, 10000);
-    //dockerApiProxyService.launchDockerApiProxy(hostname);
     containersService.getSystemContainers(hostname).stream()
         .filter(c -> !Objects.equals(c.getLabels().get(ContainerConstants.Label.SERVICE_NAME),
             DockerApiProxyService.DOCKER_API_PROXY))
         .forEach(c -> containersService.stopContainer(c.getContainerId()));
     nodesService.deleteHostNodes(hostname);
-    //TODO porquê 5 segundos?
-    //Timing.sleep(5, TimeUnit.SECONDS);
-    dockerSwarmService.leaveSwarm(hostname);
+    //dockerSwarmService.leaveSwarm(hostname);
     if (isCloudHost(hostname)) {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
       cloudHostsService.stopCloudHost(cloudHost.getInstanceId());

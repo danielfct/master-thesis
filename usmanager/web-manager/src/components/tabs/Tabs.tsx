@@ -48,12 +48,14 @@ class Tabs extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-    M.Tabs.init(this.tabsRef.current as Element);
     if (prevProps.sidenav !== this.props.sidenav) {
-      this.setState({
-        showScrollLeft: this.shouldShowScrollLeft(),
-        showScrollRight: this.shouldShowScrollRight(),
-      })
+      setTimeout(() => {
+        M.Tabs.getInstance(this.tabsRef.current as Element).updateTabIndicator();
+        this.setState({
+          showScrollLeft: this.shouldShowScrollLeft(),
+          showScrollRight: this.shouldShowScrollRight(),
+        })
+      }, 250);
     }
   }
 

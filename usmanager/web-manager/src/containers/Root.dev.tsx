@@ -128,22 +128,21 @@ export default class Root extends React.Component<Props, {}> {
 
     public render() {
         return (
-          <>
-              <main>
-                  <Provider store={this.props.store}>
-                      <LoadingBar showFastActions className="loading-bar"/>
-                      <Navbar/>
+          <main>
+              <Provider store={this.props.store}>
+                  <LoadingBar showFastActions className="loading-bar"/>
+                  <Navbar/>
+                  <div className='body'>
                       <Switch>
                           <Route path="/" exact component={Login} />
                           <Route path="/login" exact component={Login} />
                           {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
                             <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
                       </Switch>
-                      {/*<DevTools/>*/}
-                  </Provider>
-              </main>
+                  </div>
+              </Provider>
               <Footer/>
-          </>
+          </main>
         );
     }
 

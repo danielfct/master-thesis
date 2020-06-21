@@ -44,5 +44,6 @@ public class HostProperties {
   private int maximumHosts;
   private double maximumRamPercentage;
   private double maximumCpuPercentage;
+  private String localMachineDns;
 
 }

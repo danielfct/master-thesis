@@ -10,10 +10,9 @@
 
 .commandsContainer {
     position: absolute !important;
-    bottom: 42px;
+    bottom: 50px;
     min-width: 135px;
     min-height: 44px;
-    max-height: calc(100vh - 42px - 56px) !important;
     background: #282828;
     border: 1px solid #212121;
     display: flex;
@@ -46,6 +45,11 @@
 }
 
 .command {
+}
+
+.exitStatus {
+    margin-left: 5px;
+    color: #F44336;
 }
 
 .controlsMenu {

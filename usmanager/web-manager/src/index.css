@@ -27,6 +27,11 @@
     margin: 0;
 }
 
+main {
+    min-height: 100%;
+    position: relative;
+}
+
 .loading-bar {
     background-color: red;
     height: 3px;
@@ -60,6 +65,10 @@ body {
     min-height: 100vh;
     background: #1F1F1F;
     overflow-x: hidden;
+}
+
+.body {
+    padding-bottom: 50px;
 }
 
 nav {
@@ -217,6 +226,10 @@ ul.tabs {
 }
 
 .page-footer {
+    height: 50px;
+    position: absolute;
+    bottom:0;
+    width:100%;
     background-color: #282828;
     padding: 0;
     margin: 0;

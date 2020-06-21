@@ -310,7 +310,7 @@ class Node extends BaseComponent<Props, State> {
                   successCallback: this.onPutSuccess,
                   failureCallback: this.onPutFailure
                 }}
-            // delete button is never present on new nodes, so a type cast is safe
+                // delete button is never present on new nodes, so a type cast is safe
                 delete={{
                   textButton: 'Leave swarm',
                   url: `nodes/${(node as INode).id}`,

@@ -80,6 +80,7 @@ host:
   monitor-period: 60000
   start-host-on-events-count: 3
   stop-host-on-events-count: 3
+  local-machine-dns: dpimenta.ddns.net # from www.noip.com, to bypass router's dynamic ip
 master-manager:
   mode: LOCAL
   monitor-period: 30000

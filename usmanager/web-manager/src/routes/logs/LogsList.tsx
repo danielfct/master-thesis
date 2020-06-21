@@ -32,6 +32,7 @@ class LogsList extends React.Component<Props, {}> {
   componentWillUnmount(): void {
     if (this.reloadLogs) {
       clearTimeout(this.reloadLogs);
+      this.reloadLogs = null;
     }
   }
 
@@ -82,6 +83,7 @@ class LogsList extends React.Component<Props, {}> {
   private onReloadClick = (): void => {
     if (this.reloadLogs) {
       clearTimeout(this.reloadLogs);
+      this.reloadLogs = null;
     }
     else {
       this.reloadLogs = setInterval(this.props.loadLogs, 5000);

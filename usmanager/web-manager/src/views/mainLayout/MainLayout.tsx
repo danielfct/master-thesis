@@ -42,13 +42,11 @@ class MainLayout extends React.Component<Props, {}> {
   }
 
   public render() {
+    const paddingLeft = this.props.sidenavVisible ? 200 : 0;
     return (
       <div>
         <Sidenav/>
-        <div className="section content"
-             style={this.props.sidenavVisible
-               ? {paddingLeft: 200, transition: 'padding-left .25s'}
-               : {paddingLeft: 0, transition: 'padding-left .25s'}}>
+        <div className="section content" style={{paddingLeft, transition: 'padding-left .25s'}}>
           <div className="row col s12">
             <Breadcrumbs/>
           </div>

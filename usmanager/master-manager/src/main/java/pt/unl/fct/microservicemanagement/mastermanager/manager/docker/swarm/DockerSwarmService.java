@@ -56,7 +56,8 @@ public class DockerSwarmService {
 
   public Optional<String> getSwarmManagerNodeId(String hostname) {
     try (var docker = dockerCoreService.getDockerClient(hostname)) {
-      return docker.info().swarm().controlAvailable()
+      return Objects.equals(docker.info().swarm().localNodeState(), "active")
+          && docker.info().swarm().controlAvailable()
           ? Optional.of(nodesService.getHostNode(hostname).getId())
           : Optional.empty();
     } catch (DockerException | InterruptedException e) {
@@ -97,6 +98,7 @@ public class DockerSwarmService {
     String publicIp = hostsService.getPublicIP();
     try (DockerClient swarmManager = getSwarmManager();
          DockerClient swarmWorker = dockerCoreService.getDockerClient(hostname)) {
+      leaveSwarm(swarmWorker);
       log.info("{} is joining the docker swarm as {}", hostname, role);
       String joinToken;
       switch (role) {
@@ -131,8 +133,17 @@ public class DockerSwarmService {
 
   public void leaveSwarm(String hostname) {
     try (DockerClient docker = dockerCoreService.getDockerClient(hostname)) {
-      docker.leaveSwarm(true);
-      log.info("{} left the swarm", hostname);
+      leaveSwarm(docker);
+    }
+  }
+
+  private void leaveSwarm(DockerClient docker) {
+    try {
+      boolean isNode = !Objects.equals(docker.info().swarm().localNodeState(), "inactive");
+      if (isNode) {
+        docker.leaveSwarm(true);
+        log.info("{} left the swarm", docker.getHost());
+      }
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());

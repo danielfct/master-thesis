@@ -18,7 +18,6 @@ import {Resizable} from "re-resizable";
 import ScrollBar from "react-perfect-scrollbar";
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
-import {escape} from "lodash";
 
 interface StateToProps {
   sidenavVisible: boolean;
@@ -109,27 +108,31 @@ class Ssh extends React.Component<Props, State> {
     });
   }
 
-  private pad(n: number, width: number, padWith=0) {
+  private static pad(n: number, width: number, padWith=0) {
     return (String(padWith).repeat(width) + String(n)).slice(String(n).length);
   }
 
   private timestampToString = (timestamp: number): string => {
     const date = new Date(timestamp);
-    let millis = this.pad(date.getMilliseconds(), 3);
+    let millis = Ssh.pad(date.getMilliseconds(), 3);
     return `${date.toLocaleTimeString()}:${millis}`
   }
 
   public render() {
+    const body = document.body, html = document.documentElement;
+    const maxHeight = Math.max(body.scrollHeight, body.offsetHeight,
+      html.clientHeight, html.scrollHeight, html.offsetHeight)  - 50 - 56; // 56 for header and 50 for footer
     return (
       <MainLayout>
-        <div className="container">
+        <div className="container" style={{marginBottom: '50px'}}>
           <Tabs tabs={this.tabs()}/>
         </div>
         <Resizable className={`${styles.commandsContainer} ${this.state.animate ? (this.props.sidenavVisible ? styles.shrink : styles.expand) : ''}`}
+                   maxHeight={maxHeight}
                    onResize={this.onResize}
                    enable={{top: true}}
                    size={{
-                     width: this.props.sidenavVisible ? window.innerWidth - 200 : window.innerWidth,
+                     width: this.props.sidenavVisible ? window.innerWidth - 200 : '100%',
                      height: this.state.commandsHeight }}
                    onResizeStop={(e, direction, ref, d) => {
                      this.setState({
@@ -138,7 +141,10 @@ class Ssh extends React.Component<Props, State> {
                    }}>
           <div className={styles.controlsMenu}>
             <ScrollBar ref = {(ref) => { this.controlsScrollbar = ref; }}>
-              <button className='btn-floating btn-flat btn-small' onClick={this.clearCommands}>
+              <button className='btn-floating btn-flat btn-small tooltipped'
+                      onClick={this.clearCommands}
+                      data-position={'top'}
+                      data-tooltip={'Clear'}>
                 <i className="material-icons grey-text">delete_sweep</i>
               </button>
             </ScrollBar>
@@ -164,8 +170,11 @@ class Ssh extends React.Component<Props, State> {
                         <span className={styles.time}>{this.timestampToString(command.timestamp)}</span>
                         <span className={styles.hostname}>{command.hostname} ></span>
                         <span className={styles.command}>{command.command}</span>
+                        {command.exitStatus !== 0 && <span className={styles.exitStatus}>(exit: {command.exitStatus})</span>}
                       </div>
-                      <div dangerouslySetInnerHTML={{__html: escape(command.output.join("\n")).replace(/(?:\r\n|\r|\n)/g, '<br/>')}}/>
+                      <div dangerouslySetInnerHTML={{__html:
+                          (command.exitStatus === 0 ? command.output.join("\n") : command.error.join("\n"))
+                            .replace(/(?:\r\n|\r|\n)/g, '<br/>')}}/>
                     </>
                     :
                     <>

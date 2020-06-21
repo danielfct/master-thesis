@@ -111,7 +111,7 @@ export interface IFormContext {
   values: IValues;
   errors: IErrors;
   isEditing: boolean;
-  setValue: (id: keyof IValues, value: any) => void;
+  setValue: (id: keyof IValues, value: any, validate?: boolean) => void;
   addValue: (id: keyof IValues, value: any) => void;
   removeValue: (id: keyof IValues, value: any) => void;
   validate: (id: keyof IValues) => void;
@@ -154,7 +154,7 @@ export const lengthLimit = (values: IValues, id: keyof IValues, size: number): s
 
 export const trimmed = (values: IValues, id: keyof IValues): string =>
   typeof values[id] === 'string' && (values[id].startsWith(" ") || values[id].endsWith(" "))
-    ? `Can't start or end with spaces`
+    ? `${camelCaseToSentenceCase(id as string)} can't start or end with spaces`
     : "";
 
 export const min = (values: IValues, id: keyof IValues, args: any): string =>
@@ -307,7 +307,7 @@ class Form extends React.Component<Props, State> {
             this.setState({loading: undefined});
           }
         });
-      this.setState({loading: {method: 'delete', url: this.props.delete.url}});
+      this.setState({loading: {method: 'delete', url: this.props.delete.url}, isEditing: false});
     }
   };
 
@@ -476,7 +476,7 @@ class Form extends React.Component<Props, State> {
                   :
                   <>
                     <div className={`${styles.controlButton}`}>
-                      {customButtons?.map((button, index) => (
+                      {!loading && customButtons?.map((button, index) => (
                         <div key={index} className={styles.customButton}>
                           {button.confirm && (
                             <ConfirmDialog key={button.confirm.id}
@@ -486,19 +486,20 @@ class Form extends React.Component<Props, State> {
                           {button.button}
                         </div>
                       ))}
-                      {deletable !== undefined && (
+                      {deletable !== undefined && !loading && (
                         <button className={`modal-trigger btn-flat btn-small waves-effect waves-light red-text ${styles.formButton}`}
                                 type="button"
                                 data-target={id}>
                           {this.props.delete?.textButton || 'Delete'}
                         </button>)}
-                      <button className={`btn-flat btn-small waves-effect waves-light green-text slide ${styles.formButton}`}
-                              style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
-                              type="submit">
-                        {this.props.post?.textButton || 'Save'}
-                      </button>
+                      {!loading && (
+                        <button className={`btn-flat btn-small waves-effect waves-light green-text slide ${styles.formButton}`}
+                                style={saveRequired ? {transform: "scale(1)"} : {transform: "scale(0)"}}
+                                type="submit">
+                          {this.props.post?.textButton || 'Save'}
+                        </button>)}
                     </div>
-                    {editable !== undefined && (
+                    {editable !== undefined && !loading && (
                       <button className={`btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
                               data-position="bottom"
                               data-tooltip="Edit"

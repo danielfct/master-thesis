@@ -1,5 +1,5 @@
 import React from "react";
-import {mapLabelToIcon} from "../../utils/image";
+import {mapLabelToMaterialIcon} from "../../utils/image";
 import {camelCaseToSentenceCase} from "../../utils/text";
 import M from "materialize-css";
 import {FormContext, IErrors, IFormContext, IValues} from "./Form";
@@ -26,7 +26,8 @@ export interface FieldProps<T = string> {
   dropdown?: { defaultValue: string, values: T[], optionToString?: (v: T) => string, selectCallback?: (value: any) => void };
   number?: { min: number, max: number };
   validation?: IValidation;
-  icon?: boolean;
+  includeIcon?: boolean;
+  icon?: string;
   disabled?: boolean;
 }
 
@@ -52,7 +53,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     this.updateField();
   }
 
-  private onChange = (id: string, formContext: IFormContext, selected?: boolean) => (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+  private onChange = (id: string, formContext: IFormContext, validate: boolean, selected?: boolean) => (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
     const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
     let value = target.value;
     if (!isNaN(+value)) {
@@ -64,7 +65,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
     if (selected) {
       this.props.dropdown?.selectCallback?.(value);
     }
-    formContext.setValue(id, value);
+    formContext.setValue(id, value, validate);
   };
 
   private onSelect = (id: string, formContext: IFormContext) => (value: string) => {
@@ -89,7 +90,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
   };
 
   public render() {
-    const {id, type, label, dropdown, number, icon, disabled, valueToString} = this.props;
+    const {id, type, label, dropdown, number, includeIcon, icon, disabled, valueToString} = this.props;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
       const hasErrors = getError(errors);
@@ -109,11 +110,11 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
           formContext && (
             <div key={id}
                  className={type !== 'list' ? `input-field col s12` : `input-field col s12 ${checkboxListStyles.listWrapper}`}
-                 style={icon !== undefined && !icon ? {marginLeft: '10px'} : undefined}>
+                 style={includeIcon !== undefined && !includeIcon ? {marginLeft: '10px'} : undefined}>
               {label && type !== "list" && (
                 <>
-                  {(icon === undefined || icon) &&
-                   <i className="material-icons prefix">{mapLabelToIcon(label)}</i>}
+                  {(includeIcon === undefined || includeIcon) &&
+                   <i className="material-icons prefix">{icon ? icon : mapLabelToMaterialIcon(label, formContext.values[id])}</i>}
                   <label className="active" htmlFor={id}>
                     {camelCaseToSentenceCase(label)}
                   </label>
@@ -125,7 +126,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                             name={id}
                             value={formContext.values[id]}
                             disabled={disabled || !formContext.isEditing}
-                            onChange={this.onChange(id, formContext)}
+                            onChange={this.onChange(id, formContext, !!formContext.errors[id])}
                             valueToString={valueToString}
                             onBlur={this.onBlur(id, formContext)}/>
               )}
@@ -137,7 +138,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                            min={number && number.min}
                            max={number && number.max}
                            disabled={disabled || !formContext.isEditing}
-                           onChange={this.onChange(id, formContext)}
+                           onChange={this.onChange(id, formContext, !!formContext.errors[id])}
                            onBlur={this.onBlur(id, formContext)}/>
               )}
               {type && type.toLowerCase() === "date" && (
@@ -146,7 +147,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                          name={id}
                          value={this.getDateStringFromTimestamp(formContext.values[id])}
                          disabled={disabled || !formContext.isEditing}
-                         onChange={this.onChange(id, formContext)}
+                         onChange={this.onChange(id, formContext, !!formContext.errors[id])}
                          onBlur={this.onBlur(id, formContext)}/>
               )}
               {(type && type.toLowerCase() === "datepicker") && (
@@ -156,7 +157,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                             value={formContext.values[id]}
                             disabled={disabled || !formContext.isEditing}
                             onSelect={this.onSelect(id, formContext)}
-                            onChange={this.onChange(id, formContext)}/>
+                            onChange={this.onChange(id, formContext, !!formContext.errors[id])}/>
               )}
               {(type && type.toLowerCase() === "timepicker") && (
                 <Timepicker className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
@@ -165,7 +166,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                             value={formContext.values[id]}
                             disabled={disabled || !formContext?.isEditing}
                             onSelect={this.onSelect(id, formContext)}
-                            onChange={this.onChange(id, formContext)}/>
+                            onChange={this.onChange(id, formContext, !!formContext.errors[id])}/>
               )}
               {type && type.toLowerCase() === "multilinetext" && (
                 <MultilineTextBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}
@@ -173,7 +174,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                                   name={id}
                                   value={formContext.values[id]}
                                   disabled={disabled || !formContext.isEditing}
-                                  onChange={this.onChange(id, formContext)}
+                                  onChange={this.onChange(id, formContext, !!formContext.errors[id])}
                                   onBlur={this.onBlur(id, formContext)}/>
               )}
               {type && type.toLowerCase() === "dropdown" && dropdown && (
@@ -182,7 +183,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                           name={id}
                           value={formContext.values[id]}
                           disabled={disabled || !formContext.isEditing}
-                          onChange={this.onChange(id, formContext, true)}
+                          onChange={this.onChange(id, formContext, !!formContext.errors[id], true)}
                           onBlur={this.onBlur(id, formContext)}
                           dropdown={dropdown}/>
               )}

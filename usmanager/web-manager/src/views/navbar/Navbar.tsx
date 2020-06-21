@@ -95,7 +95,6 @@ class Navbar extends React.Component<Props, State> {
         const showSidenav = sidenavUser && sidenavWidth;
         const route = authenticatedRoutes[pathname];
         const showSearchbar = route && authenticatedRoutes[pathname].search;
-        console.log(this.state.animate)
         let loggedInUser = getLoggedInUser();
         let logoStyle;
         if (showSidenav && !loggingIn) {

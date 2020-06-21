@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
 import org.apache.commons.lang3.StringUtils;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
 
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AwsService {
 
+  private final SshService sshService;
   private final AmazonEC2 ec2;
   private final String awsInstanceAmi;
   private final String awsInstanceSecurityGroup;
@@ -71,7 +73,8 @@ public class AwsService {
   private final int awsDelayBetweenRetries;
   private final int awsConnectionTimeout;
 
-  public AwsService(AwsProperties awsProperties) {
+  public AwsService(SshService sshService, AwsProperties awsProperties) {
+    this.sshService = sshService;
     String awsAccessKey = awsProperties.getAccess().getKey();
     String awsSecretAccessKey = awsProperties.getAccess().getSecretKey();
     var awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretAccessKey);
@@ -203,6 +206,10 @@ public class AwsService {
       Instance instance = getInstance(instanceId);
       int instanceState = instance.getState().getCode();
       if (instanceState == state.getCode()) {
+        if (state == AwsInstanceState.RUNNING && !sshService.hasConnection(instance.getPublicIpAddress())) {
+          Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
+          continue;
+        }
         log.info("Instance {} is already on state {}", instanceId, state.getState());
         return instance;
       }
@@ -222,6 +229,10 @@ public class AwsService {
         }
         instance = waitInstanceState(instanceId, state);
         log.info("Setting instance {} to {} state", instanceId, state.getState());
+        if (state == AwsInstanceState.RUNNING && !sshService.hasConnection(instance.getPublicIpAddress())) {
+          Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
+          continue;
+        }
         return instance;
       } catch (MasterManagerException e) {
         log.info("Failed to set instance {} to {} state: {}", instanceId, state.getState(), e.getMessage());

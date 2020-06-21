@@ -29,7 +29,19 @@ export interface ISshCommand {
 
 const buildNewSshCommand = (): Partial<ISshCommand> => ({
   hostname: undefined,
-  command: undefined,
+  command: 'oleoleoleole\n'
+           + 'ole\n'
+           + '\n'
+           + 'oleole\n'
+           + 'ole\n'
+           + 'ole\n'
+           + 'ole\n'
+           + 'oleole\n'
+           + 'ole\n'
+           + 'ole\n'
+           + 'ole\n'
+           + 'ole\n'
+           + 'oleoleole',
 });
 
 interface StateToProps {
@@ -52,17 +64,11 @@ class SshCommand extends BaseComponent<Props, {}> {
 
   private onPostSuccess = (reply: IReply<ISshCommand>): void => {
     const command = reply.data;
-    if (command.exitStatus !== 0) {
-      super.toast(`<span>Command failed with status ${command.exitStatus}</span>`, 10000, command.error.join("\n"), true);
-    }
-    else {
-      super.toast(`<span class="green-text">Command successfully executed</span>`);
-    }
     this.props.onExecuteCommand(command);
   };
 
   private onPostFailure = (reason: string): void =>
-    super.toast(`Command failed`, 10000, reason, true);
+    super.toast(`Command execution failed`, 10000, reason, true);
 
   private getFields = (): IFields => (
     {
@@ -109,7 +115,8 @@ class SshCommand extends BaseComponent<Props, {}> {
                  values: this.getSelectableHosts()}}/>
         <Field key='command'
                id={'command'}
-               label='command'/>
+               label='command'
+               type={'multilinetext'}/>
       </Form>
     );
   }
