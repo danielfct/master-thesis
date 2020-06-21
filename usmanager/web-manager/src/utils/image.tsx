@@ -24,7 +24,9 @@
 
 
 // TODO start with specific icons, like name === 'thing', then to general icons with name.contains('thing'), then 1 generic at the end
-import {FaDocker} from "react-icons/all";
+import {FaDatabase, FaDocker} from "react-icons/all";
+import {FaDoorOpen} from "react-icons/all";
+import {FaDoorClosed} from "react-icons/all";
 import React from "react";
 
 export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.Element => {
@@ -49,10 +51,10 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     return "text_fields";
   }
   if (label.includes('external')) {
-    return 'arrow_back';
+    return <FaDoorOpen></FaDoorOpen>;
   }
   if (label.includes('internal')) {
-    return 'arrow_forward';
+    return <FaDoorClosed></FaDoorClosed>;
   }
   if (label.includes('memory')) {
     return 'memory';
@@ -65,6 +67,9 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   }
   if (label.includes('docker')) {
     return <FaDocker></FaDocker>;
+  }
+  if (label === 'defaultdb') {
+    return <FaDatabase></FaDatabase>;
   }
   if (value === true) {
     return "check";

@@ -12,6 +12,7 @@ import React from "react";
 import {IRuleService} from "./RuleService";
 import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
+import {IRuleContainer} from "../containers/RuleContainer";
 
 interface ServiceRuleCardProps {
   rule: IRuleService;
@@ -19,12 +20,13 @@ interface ServiceRuleCardProps {
 
 type Props = ServiceRuleCardProps;
 
+const CardRuleService = Card<IRuleService>();
 const RuleServiceCard = ({rule}: Props) => (
-  <Card<IRuleService> title={rule.name}
-                      link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
-                      height={'125px'}
-                      margin={'10px 0'}
-                      hoverable>
+  <CardRuleService title={rule.name}
+                   link={{to: {pathname: `/rules/services/${rule.name}`, state: rule}}}
+                   height={'125px'}
+                   margin={'10px 0'}
+                   hoverable>
     <CardItem key={'priority'}
               label={'Priority'}
               value={`${rule.priority}`}/>
@@ -34,7 +36,7 @@ const RuleServiceCard = ({rule}: Props) => (
     <CardItem key={'generic'}
               label={'Generic'}
               value={`${rule.generic}`}/>
-  </Card>
+  </CardRuleService>
 );
 
 export default RuleServiceCard;

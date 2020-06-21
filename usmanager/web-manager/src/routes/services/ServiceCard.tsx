@@ -26,6 +26,7 @@ import React from 'react';
 import CardItem from '../../components/list/CardItem';
 import {IService} from "./Service";
 import Card from "../../components/cards/Card";
+import {IRuleService} from "../rules/services/RuleService";
 
 interface ServiceCardProps {
   service: IService;
@@ -45,12 +46,13 @@ const getReplicasMessage = (minReplicas: number, maxReplicas: number): string =>
   }
 };
 
+const CardService = Card<IService>();
 const ServiceCard = ({service}: Props) => (
-  <Card<IService> title={service.serviceName}
-                  link={{to: {pathname: `/services/${service.serviceName}`, state: service}}}
-                  height={'250px'}
-                  margin={'10px 0'}
-                  hoverable>
+  <CardService title={service.serviceName}
+               link={{to: {pathname: `/services/${service.serviceName}`, state: service}}}
+               height={'250px'}
+               margin={'10px 0'}
+               hoverable>
     <CardItem key={'serviceType'}
               label={'Service type'}
               value={`${service.serviceType}`}/>
@@ -61,20 +63,20 @@ const ServiceCard = ({service}: Props) => (
               label={'Ports'}
               value={`${service.defaultExternalPort}:${service.defaultInternalPort}`}/>
     {service.launchCommand !== '' &&
-    <CardItem key={'launchCommand'}
-              label={'Launch command'}
-              value={service.launchCommand}/>}
+     <CardItem key={'launchCommand'}
+               label={'Launch command'}
+               value={service.launchCommand}/>}
     <CardItem key={'outputLabel'}
               label={'Output label'}
               value={`${service.outputLabel}`}/>
     {service.defaultDb !== 'NOT_APPLICABLE' &&
-    <CardItem key={'database'}
-              label={'Database'}
-              value={service.defaultDb}/>}
+     <CardItem key={'database'}
+               label={'Database'}
+               value={service.defaultDb}/>}
     <CardItem key={'memory'}
               label={'Memory'}
               value={`${service.expectedMemoryConsumption} bytes`}/>
-  </Card>
+  </CardService>
 );
 
 export default ServiceCard;

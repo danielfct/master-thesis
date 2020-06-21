@@ -29,11 +29,10 @@ import SimpleList from "./SimpleList";
 import {ReduxState} from "../../reducers";
 import Empty from "./Empty";
 
-interface Props<T> {
+interface FilteredListProps<T> {
     list: T[];
     show: (element: T, index: number, last: boolean) => JSX.Element;
     predicate: (x: T, s: string) => boolean;
-    search: string;
     paginate?: {
         pagesize: {
             initial: number,
@@ -46,6 +45,12 @@ interface Props<T> {
         position?: 'top' | 'bottom' | 'top-bottom';
     };
 }
+
+interface StateToProps {
+    search: string;
+}
+
+type Props<T> = FilteredListProps<T> & StateToProps;
 
 class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
 
@@ -63,7 +68,7 @@ class GenericFilteredList<T> extends React.Component<Props<T>, {}> {
 
 }
 
-const mapStateToProps = (state: ReduxState) => (
+const mapStateToProps = (state: ReduxState): StateToProps => (
   {
       search: state.ui.search.toLowerCase()
   }

@@ -10,8 +10,9 @@ interface EurekaServerCardProps {
 
 type Props = EurekaServerCardProps;
 
+const CardEurekaServer = Card<IContainer>();
 const EurekaServerCard = ({eurekaServer}: Props) => (
-  <Card<IContainer> title={eurekaServer.containerId.toString()}
+  <CardEurekaServer title={eurekaServer.containerId.toString()}
                     link={{to: {pathname: `/eureka-servers/${eurekaServer.containerId}`, state: eurekaServer}}}
                     height={'125px'}
                     margin={'10px 0'}
@@ -22,7 +23,7 @@ const EurekaServerCard = ({eurekaServer}: Props) => (
     <CardItem key={'ports'}
               label={'Ports'}
               value={`${eurekaServer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
-  </Card>
+  </CardEurekaServer>
 );
 
 export default EurekaServerCard;

@@ -3,6 +3,7 @@ import CardItem from "../../components/list/CardItem";
 import Card from "../../components/cards/Card";
 import {ILoadBalancer} from "./LoadBalancer";
 import {IContainer} from "../containers/Container";
+import {IEdgeHost} from "../hosts/edge/EdgeHost";
 
 interface LoadBalancerCardProps {
   loadBalancer: ILoadBalancer;
@@ -10,8 +11,9 @@ interface LoadBalancerCardProps {
 
 type Props = LoadBalancerCardProps;
 
+const CardLoadBalancer = Card<IContainer>();
 const LoadBalancerCard = ({loadBalancer}: Props) => (
-  <Card<IContainer> title={loadBalancer.containerId.toString()}
+  <CardLoadBalancer title={loadBalancer.containerId.toString()}
                     link={{to: {pathname: `/load-balancers/${loadBalancer.containerId}`, state: loadBalancer}}}
                     height={'125px'}
                     margin={'10px 0'}
@@ -22,7 +24,7 @@ const LoadBalancerCard = ({loadBalancer}: Props) => (
     <CardItem key={'ports'}
               label={'Ports'}
               value={`${loadBalancer.ports.map(p => `${p.privatePort}:${p.publicPort}`).join('/')}`}/>
-  </Card>
+  </CardLoadBalancer>
 );
 
 export default LoadBalancerCard;

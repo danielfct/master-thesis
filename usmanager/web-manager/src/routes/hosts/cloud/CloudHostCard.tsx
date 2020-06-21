@@ -19,12 +19,13 @@ interface CloudHostCardProps {
 
 type Props = CloudHostCardProps;
 
+const CardCloudHost = Card<ICloudHost>();
 const CloudHostCard = ({cloudHost}: Props) => (
-  <Card<ICloudHost> title={cloudHost.instanceId}
-                    link={{to: {pathname: `/hosts/cloud/${cloudHost.instanceId }`, state: cloudHost}}}
-                    height={'185px'}
-                    margin={'10px 0'}
-                    hoverable>
+  <CardCloudHost title={cloudHost.instanceId}
+                 link={{to: {pathname: `/hosts/cloud/${cloudHost.instanceId }`, state: cloudHost}}}
+                 height={'185px'}
+                 margin={'10px 0'}
+                 hoverable>
     <CardItem key={'imageId'}
               label={'imageId'}
               value={`${cloudHost.imageId}`}/>
@@ -36,12 +37,12 @@ const CloudHostCard = ({cloudHost}: Props) => (
               value={`${cloudHost.state.name}`}/>
     {cloudHost.publicDnsName &&
      <CardItem key={'publicDnsName'}
-              label={'publicDnsName'}
-              value={`${cloudHost.publicDnsName}`}/>}
+               label={'publicDnsName'}
+               value={`${cloudHost.publicDnsName}`}/>}
     {cloudHost.publicIpAddress &&
      <CardItem key={'publicIpAddress'}
-              label={'publicIpAddress'}
-              value={`${cloudHost.publicIpAddress}`}/>}
+               label={'publicIpAddress'}
+               value={`${cloudHost.publicIpAddress}`}/>}
     {cloudHost.privateIpAddress &&
      <CardItem key={'privateIpAddress'}
                label={'privateIpAddress'}
@@ -49,7 +50,7 @@ const CloudHostCard = ({cloudHost}: Props) => (
     <CardItem key={'placement'}
               label={'placement'}
               value={`${cloudHost.placement.availabilityZone}`}/>
-  </Card>
+  </CardCloudHost>
 );
 
 export default CloudHostCard;

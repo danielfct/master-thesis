@@ -69,8 +69,8 @@ class GenericList<T> extends React.Component<Props<T>, {}> {
             return <Empty message={emptyMessage}/>
         }
         if (predicate) {
-            const Filtered = FilteredList<T>();
-            return <Filtered {...this.props} predicate={predicate}/>
+            const ListFiltered = FilteredList<T>();
+            return <ListFiltered {...this.props} predicate={predicate}/>
         }
         if (paginate) {
             return <PagedList {...this.props} paginate={paginate}/>

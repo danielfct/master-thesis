@@ -65,7 +65,7 @@ interface StateToProps {
 }
 
 interface DispatchToProps {
-  loadNodes: () => void;
+  loadNodes: (nodeId: string) => void;
   addNode: (node: INode) => void;
   loadEdgeHosts: () => void;
   loadCloudHosts: () => void;
@@ -104,7 +104,10 @@ class Node extends BaseComponent<Props, State> {
   }
 
   private loadNode = () => {
-    this.props.loadNodes();
+    if (!isNew(this.props.location.search)) {
+      const nodeId = this.props.match.params.id;
+      this.props.loadNodes(nodeId);
+    }
   };
 
   private getNode = () =>
@@ -161,7 +164,7 @@ class Node extends BaseComponent<Props, State> {
     super.toast(`Unable to change role of node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`}`, 10000, reason, true);
 
   private onDeleteSuccess = (node: INode): void => {
-    super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} successfully stopped</span>`);
+    super.toast(`<span class="green-text">Node <b class="white-text">${node.id}</b> successfully removed</span>`);
     if (this.mounted) {
       this.props.history.push(`/nodes`);
     }

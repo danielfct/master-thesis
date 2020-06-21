@@ -12,6 +12,7 @@ import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 import React from "react";
 import {ISimulatedServiceMetric} from "./SimulatedServiceMetric";
+import {ISimulatedHostMetric} from "../hosts/SimulatedHostMetric";
 
 interface SimulatedServiceMetricCardProps {
   simulatedServiceMetric: ISimulatedServiceMetric;
@@ -19,12 +20,13 @@ interface SimulatedServiceMetricCardProps {
 
 type Props = SimulatedServiceMetricCardProps;
 
+const CardSimulatedServiceMetric = Card<ISimulatedServiceMetric>();
 const SimulatedServiceMetricCard = ({simulatedServiceMetric}: Props) => (
-  <Card<ISimulatedServiceMetric> title={simulatedServiceMetric.name}
-                   link={{to: {pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`, state: simulatedServiceMetric }}}
-                   height={'180px'}
-                   margin={'10px 0'}
-                   hoverable>
+  <CardSimulatedServiceMetric title={simulatedServiceMetric.name}
+                              link={{to: {pathname: `/simulated-metrics/services/${simulatedServiceMetric.name}`, state: simulatedServiceMetric }}}
+                              height={'180px'}
+                              margin={'10px 0'}
+                              hoverable>
     <CardItem key={'Field'}
               label={'Field'}
               value={`${simulatedServiceMetric.field.name}`}/>
@@ -40,7 +42,7 @@ const SimulatedServiceMetricCard = ({simulatedServiceMetric}: Props) => (
     <CardItem key={'Generic'}
               label='Generic'
               value={`${simulatedServiceMetric.generic}`}/>
-  </Card>
+  </CardSimulatedServiceMetric>
 );
 
 export default SimulatedServiceMetricCard;

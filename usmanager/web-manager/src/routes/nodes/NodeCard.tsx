@@ -2,6 +2,7 @@ import Card from "../../components/cards/Card";
 import CardItem from "../../components/list/CardItem";
 import React from "react";
 import {INode} from "./Node";
+import {ISimulatedServiceMetric} from "../metrics/services/SimulatedServiceMetric";
 
 interface NodeCardProps {
   node: INode;
@@ -9,12 +10,13 @@ interface NodeCardProps {
 
 type Props = NodeCardProps;
 
+const CardNode = Card<INode>();
 const NodeCard = ({node}: Props) => (
-  <Card<INode> title={node.id.toString()}
-               link={{to: {pathname: `/nodes/${node.id}`, state: node}}}
-               height={'125px'}
-               margin={'10px 0'}
-               hoverable>
+  <CardNode title={node.id.toString()}
+            link={{to: {pathname: `/nodes/${node.id}`, state: node}}}
+            height={'125px'}
+            margin={'10px 0'}
+            hoverable>
     <CardItem key={'hostName'}
               label={'Hostname'}
               value={node.hostname}/>
@@ -24,7 +26,7 @@ const NodeCard = ({node}: Props) => (
     <CardItem key={'role'}
               label={'Role'}
               value={node.role}/>
-  </Card>
+  </CardNode>
 );
 
 export default NodeCard;

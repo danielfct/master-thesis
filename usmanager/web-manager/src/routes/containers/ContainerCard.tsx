@@ -9,8 +9,9 @@ interface ContainerCardProps {
 
 type Props = ContainerCardProps;
 
+const CardService = Card<IContainer>();
 const ServiceCard = ({container}: Props) => (
-  <Card<IContainer> title={container.containerId.toString()}
+  <CardService title={container.containerId.toString()}
                link={{to: {pathname: `/containers/${container.containerId}`, state: container}}}
                height={'200px'}
                margin={'10px 0'}
@@ -33,7 +34,7 @@ const ServiceCard = ({container}: Props) => (
     <CardItem key={'replicable'}
               label={'Replicable'}
               value={`${container.labels['isReplicable'] !== undefined ? container.labels['isReplicable'] : true}`}/>
-  </Card>
+  </CardService>
 );
 
 export default ServiceCard;

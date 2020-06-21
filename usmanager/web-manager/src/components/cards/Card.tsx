@@ -2,6 +2,8 @@ import React, {createRef} from "react";
 import ScrollBar from "react-perfect-scrollbar";
 import {Link} from "react-router-dom";
 import CardTitle from "../list/CardTitle";
+import {ReduxState} from "../../reducers";
+import {connect} from "react-redux";
 
 interface CardProps<T> {
   title?: string;
@@ -9,11 +11,16 @@ interface CardProps<T> {
   height?: number | string;
   margin?: number | string;
   hoverable?: boolean;
+  children?: any[];
 }
 
-type Props<T> = CardProps<T>;
+interface StateToProps {
+  sidenavVisible: boolean;
+}
 
-export default class Card<T> extends React.Component<Props<T>, {}> {
+type Props<T> = CardProps<T> & StateToProps;
+
+class GenericCard<T> extends React.Component<Props<T>, {}> {
 
   private CARD_ITEM_HEIGHT = 39;
 
@@ -24,6 +31,12 @@ export default class Card<T> extends React.Component<Props<T>, {}> {
   public componentDidMount(): void {
     this.scrollbar?.updateScroll();
     this.blockBodyScroll();
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props<T>>, prevState: Readonly<{}>, snapshot?: any) {
+    if (prevProps.sidenavVisible !== this.props.sidenavVisible) {
+      this.scrollbar?.updateScroll();
+    }
   }
 
   private getChildrenCount = (): number =>
@@ -79,4 +92,15 @@ export default class Card<T> extends React.Component<Props<T>, {}> {
           : this.cardElement()}
       </div>
     )}
+
+}
+
+const mapStateToProps = (state: ReduxState): StateToProps => (
+  {
+    sidenavVisible: state.ui.sidenav.user && state.ui.sidenav.width,
+  }
+);
+
+export default function Card<T>() {
+  return connect(mapStateToProps)(GenericCard as new(props: Props<T>) => GenericCard<T>);
 }

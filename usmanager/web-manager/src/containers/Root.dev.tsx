@@ -132,7 +132,7 @@ export default class Root extends React.Component<Props, {}> {
               <Provider store={this.props.store}>
                   <LoadingBar showFastActions className="loading-bar"/>
                   <Navbar/>
-                  <div className='body'>
+                  <div className='main-content'>
                       <Switch>
                           <Route path="/" exact component={Login} />
                           <Route path="/login" exact component={Login} />

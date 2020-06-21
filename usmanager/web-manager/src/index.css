@@ -32,6 +32,11 @@ main {
     position: relative;
 }
 
+html {
+    background: #1F1F1F;
+    overflow-x: hidden;
+}
+
 .loading-bar {
     background-color: red;
     height: 3px;
@@ -51,24 +56,18 @@ main {
     }
 }
 
-html, body {
-    height: 100%;
+#body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 main {
     flex: 1 0 auto;
 }
 
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background: #1F1F1F;
-    overflow-x: hidden;
-}
-
-.body {
-    padding-bottom: 50px;
+.main-content {
+    padding-bottom: 50px; /*size of footer*/
 }
 
 nav {
@@ -152,7 +151,7 @@ nav li {
     background: #282828;
     width: 200px;
     height: 100vh;
-    z-index: 999;
+    z-index: 998;
     overflow: hidden;
 }
 
@@ -233,7 +232,7 @@ ul.tabs {
     background-color: #282828;
     padding: 0;
     margin: 0;
-    z-index: 998;
+    z-index: 996;
 }
 
 .page-footer .row {
@@ -244,7 +243,7 @@ ul.tabs {
 .sidenav-menu {
     height: 56px;
     position: relative;
-    z-index: 999;
+    z-index: 997;
 }
 
 .sidenav-menu .sidenav-icon {
@@ -821,4 +820,8 @@ select.no-validation-field ~ input.select-dropdown {
 .react-resizable-handle-s {
     bottom: 0;
     transform: rotate(45deg);
+}
+
+.prefix {
+    font-size: 25px !important;
 }

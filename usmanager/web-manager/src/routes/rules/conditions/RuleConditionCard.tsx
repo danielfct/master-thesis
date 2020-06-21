@@ -2,6 +2,7 @@ import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 import React from "react";
 import {IRuleCondition} from "./RuleCondition";
+import {INode} from "../../nodes/Node";
 
 interface ConditionCardProps {
   condition: IRuleCondition;
@@ -9,12 +10,13 @@ interface ConditionCardProps {
 
 type Props = ConditionCardProps;
 
+const CardRuleCondition = Card<IRuleCondition>();
 const RuleConditionCard = ({condition}: Props) => (
-  <Card<IRuleCondition> title={condition.name.toString()}
-                        link={{to: {pathname: `/rules/conditions/${condition.name}`, state: condition}}}
-                        height={'150px'}
-                        margin={'10px 0'}
-                        hoverable>
+  <CardRuleCondition title={condition.name.toString()}
+                     link={{to: {pathname: `/rules/conditions/${condition.name}`, state: condition}}}
+                     height={'150px'}
+                     margin={'10px 0'}
+                     hoverable>
     <CardItem key={'valueMode'}
               label={'Value mode'}
               value={condition.valueMode.name}/>
@@ -27,7 +29,7 @@ const RuleConditionCard = ({condition}: Props) => (
     <CardItem key={'value'}
               label={'Value'}
               value={condition.value.toString()}/>
-  </Card>
+  </CardRuleCondition>
 );
 
 export default RuleConditionCard;

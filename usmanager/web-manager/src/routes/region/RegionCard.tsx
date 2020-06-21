@@ -9,12 +9,13 @@ interface RegionCardProps {
 
 type Props = RegionCardProps;
 
+const CardRegion = Card<IRegion>();
 const RegionCard = ({region}: Props) => (
-  <Card<IRegion> title={region.name}
-                 link={{to: {pathname: `/regions/${region.name}`, state: region}}}
-                 height={'125px'}
-                 margin={'10px 0'}
-                 hoverable>
+  <CardRegion title={region.name}
+              link={{to: {pathname: `/regions/${region.name}`, state: region}}}
+              height={'125px'}
+              margin={'10px 0'}
+              hoverable>
     <CardItem key={'name'}
               label={'Name'}
               value={`${region.name}`}/>
@@ -24,7 +25,7 @@ const RegionCard = ({region}: Props) => (
     <CardItem key={'active'}
               label={'Active'}
               value={`${region.active}`}/>
-  </Card>
+  </CardRegion>
 );
 
 export default RegionCard;

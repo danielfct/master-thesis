@@ -12,6 +12,7 @@ import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 import React from "react";
 import {ISimulatedContainerMetric} from "./SimulatedContainerMetric";
+import {IContainer} from "../../containers/Container";
 
 interface SimulatedContainerMetricCardProps {
   simulatedContainerMetric: ISimulatedContainerMetric;
@@ -19,12 +20,13 @@ interface SimulatedContainerMetricCardProps {
 
 type Props = SimulatedContainerMetricCardProps;
 
+const CardSimulatedContainerMetric = Card<ISimulatedContainerMetric>();
 const SimulatedContainerMetricCard = ({simulatedContainerMetric}: Props) => (
-  <Card<ISimulatedContainerMetric> title={simulatedContainerMetric.name}
-                   link={{to: {pathname: `/simulated-metrics/containers/${simulatedContainerMetric.name}`, state: simulatedContainerMetric }}}
-                   height={'170px'}
-                   margin={'10px 0'}
-                   hoverable>
+  <CardSimulatedContainerMetric title={simulatedContainerMetric.name}
+                                link={{to: {pathname: `/simulated-metrics/containers/${simulatedContainerMetric.name}`, state: simulatedContainerMetric }}}
+                                height={'170px'}
+                                margin={'10px 0'}
+                                hoverable>
     <CardItem key={'Field'}
               label={'Field'}
               value={`${simulatedContainerMetric.field.name}`}/>
@@ -40,7 +42,7 @@ const SimulatedContainerMetricCard = ({simulatedContainerMetric}: Props) => (
     <CardItem key={'Generic'}
               label='Generic'
               value={`${simulatedContainerMetric.generic}`}/>
-  </Card>
+  </CardSimulatedContainerMetric>
 );
 
 export default SimulatedContainerMetricCard;

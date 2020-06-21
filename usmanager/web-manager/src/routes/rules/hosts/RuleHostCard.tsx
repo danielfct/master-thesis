@@ -19,12 +19,13 @@ interface HostRuleCardProps {
 
 type Props = HostRuleCardProps;
 
+const CardRuleHost = Card<IRuleHost>();
 const RuleHostCard = ({rule}: Props) => (
-  <Card<IRuleHost> title={rule.name}
-                   link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
-                   height={'120px'}
-                   margin={'10px 0'}
-                   hoverable>
+  <CardRuleHost title={rule.name}
+                link={{to: {pathname: `/rules/hosts/${rule.name}`, state: rule}}}
+                height={'120px'}
+                margin={'10px 0'}
+                hoverable>
     <CardItem key={'priority'}
               label={'Priority'}
               value={`${rule.priority}`}/>
@@ -34,7 +35,7 @@ const RuleHostCard = ({rule}: Props) => (
     <CardItem key={'generic'}
               label={'Generic'}
               value={`${rule.generic}`}/>
-  </Card>
+  </CardRuleHost>
 );
 
 export default RuleHostCard;

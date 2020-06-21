@@ -12,6 +12,7 @@ import React from "react";
 import {IRuleContainer} from "./RuleContainer";
 import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
+import {IRuleCondition} from "../conditions/RuleCondition";
 
 interface ContainerRuleCardProps {
   rule: IRuleContainer;
@@ -19,12 +20,13 @@ interface ContainerRuleCardProps {
 
 type Props = ContainerRuleCardProps;
 
+const CardRuleContainer = Card<IRuleContainer>();
 const RuleContainerCard = ({rule}: Props) => (
-  <Card<IRuleContainer> title={rule.name}
-                      link={{to: {pathname: `/rules/containers/${rule.name}`, state: rule}}}
-                      height={'125px'}
-                      margin={'10px 0'}
-                      hoverable>
+  <CardRuleContainer title={rule.name}
+                     link={{to: {pathname: `/rules/containers/${rule.name}`, state: rule}}}
+                     height={'125px'}
+                     margin={'10px 0'}
+                     hoverable>
     <CardItem key={'priority'}
               label={'Priority'}
               value={`${rule.priority}`}/>
@@ -34,7 +36,7 @@ const RuleContainerCard = ({rule}: Props) => (
     <CardItem key={'generic'}
               label={'Generic'}
               value={`${rule.generic}`}/>
-  </Card>
+  </CardRuleContainer>
 );
 
 export default RuleContainerCard;

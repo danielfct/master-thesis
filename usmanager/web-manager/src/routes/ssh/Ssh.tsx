@@ -43,7 +43,8 @@ class Ssh extends React.Component<Props, State> {
 
   private commandsContainer: any = null;
   private commandsScrollbar: ScrollBar | null = null;
-  private controlsScrollbar: ScrollBar | null = null;
+  private leftControlsScrollbar: ScrollBar | null = null;
+  private rightControlsScrollbar: ScrollBar | null = null;
   private COMMANDS_MIN_HEIGHT = 44;
   private COMMANDS_DEFAULT_HEIGHT = 175;
 
@@ -84,7 +85,8 @@ class Ssh extends React.Component<Props, State> {
 
   private updateScrollbars = () => {
     this.commandsScrollbar?.updateScroll();
-    this.controlsScrollbar?.updateScroll();
+    this.leftControlsScrollbar?.updateScroll();
+    this.rightControlsScrollbar?.updateScroll();
   }
 
   private toggleCommands = () =>
@@ -140,7 +142,7 @@ class Ssh extends React.Component<Props, State> {
                      });
                    }}>
           <div className={styles.controlsMenuLeft}>
-            <ScrollBar ref = {(ref) => { this.controlsScrollbar = ref; }}>
+            <ScrollBar ref = {(ref) => { this.leftControlsScrollbar = ref; }}>
               <button className='btn-floating btn-flat btn-small tooltipped'
                       onClick={this.clearCommands}
                       data-position={'right'}
@@ -186,7 +188,7 @@ class Ssh extends React.Component<Props, State> {
             </div>
           </ScrollBar>
           <div className={styles.controlsMenuRight}>
-            <ScrollBar ref = {(ref) => { this.controlsScrollbar = ref; }}>
+            <ScrollBar ref = {(ref) => { this.rightControlsScrollbar = ref; }}>
               <button className={`btn-floating btn-flat btn-small tooltipped`}
                       onClick={this.toggleCommands}
                       data-position={'left'}

@@ -406,13 +406,17 @@ public class HostsService {
     nodesService.deleteHostNodes(hostname);
     //dockerSwarmService.leaveSwarm(hostname);
     if (isCloudHost(hostname)) {
-      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
-      cloudHostsService.stopCloudHost(cloudHost.getInstanceId());
+      try {
+        CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
+        cloudHostsService.stopCloudHost(cloudHost.getInstanceId());
+      } catch (EntityNotFoundException e) {
+        //ignore, means cloudHost is already not on a started state
+      }
     }
   }
 
   private boolean isCloudHost(String hostname) {
-    return !edgeHostsService.hasEdgeHost(hostname);
+    return cloudHostsService.hasCloudHostByHostname(hostname);
   }
 
   private boolean isEdgeHostRunning(EdgeHostEntity edgeHost) {

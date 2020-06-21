@@ -8,13 +8,13 @@ interface AppCardProps {
 
 type Props = AppCardProps;
 
+const CardApp = Card<IApp>();
 const AppCard = ({app}: Props) => (
-  <Card<IApp> title={app.name}
-              link={{ to: { pathname: `/apps/${app.name}`, state: app } }}
-              height={'30px'}
-              margin={'10px 0'}
-              hoverable>
-  </Card>
+  <CardApp title={app.name}
+           link={{ to: { pathname: `/apps/${app.name}`, state: app } }}
+           height={'30px'}
+           margin={'10px 0'}
+           hoverable/>
 );
 
 export default AppCard;

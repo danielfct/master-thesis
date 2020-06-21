@@ -12,6 +12,7 @@ import Card from "../../../components/cards/Card";
 import CardItem from "../../../components/list/CardItem";
 import React from "react";
 import {ISimulatedHostMetric} from "./SimulatedHostMetric";
+import {ISimulatedContainerMetric} from "../containers/SimulatedContainerMetric";
 
 interface SimulatedHostMetricCardProps {
   simulatedHostMetric: ISimulatedHostMetric;
@@ -19,12 +20,13 @@ interface SimulatedHostMetricCardProps {
 
 type Props = SimulatedHostMetricCardProps;
 
+const CardSimulatedHostMetric = Card<ISimulatedHostMetric>();
 const SimulatedHostMetricCard = ({simulatedHostMetric}: Props) => (
-  <Card<ISimulatedHostMetric> title={simulatedHostMetric.name}
-                   link={{to: {pathname: `/simulated-metrics/hosts/${simulatedHostMetric.name}`, state: simulatedHostMetric }}}
-                   height={'170px'}
-                   margin={'10px 0'}
-                   hoverable>
+  <CardSimulatedHostMetric title={simulatedHostMetric.name}
+                           link={{to: {pathname: `/simulated-metrics/hosts/${simulatedHostMetric.name}`, state: simulatedHostMetric }}}
+                           height={'170px'}
+                           margin={'10px 0'}
+                           hoverable>
     <CardItem key={'Field'}
               label={'Field'}
               value={`${simulatedHostMetric.field.name}`}/>
@@ -40,7 +42,7 @@ const SimulatedHostMetricCard = ({simulatedHostMetric}: Props) => (
     <CardItem key={'Generic'}
               label='Generic'
               value={`${simulatedHostMetric.generic}`}/>
-  </Card>
+  </CardSimulatedHostMetric>
 );
 
 export default SimulatedHostMetricCard;

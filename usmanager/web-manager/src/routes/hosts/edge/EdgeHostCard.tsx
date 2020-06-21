@@ -19,12 +19,13 @@ interface EdgeHostCardProps {
 
 type Props = EdgeHostCardProps;
 
+const CardEdgeHost = Card<IEdgeHost>();
 const EdgeHostCard = ({edgeHost}: Props) => (
-  <Card<IEdgeHost> title={edgeHost.publicDnsName || edgeHost.publicIpAddress}
-                   link={{to: {pathname: `/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}`, state: edgeHost }}}
-                   height={'215px'}
-                   margin={'10px 0'}
-                   hoverable>
+  <CardEdgeHost title={edgeHost.publicDnsName || edgeHost.publicIpAddress}
+                link={{to: {pathname: `/hosts/edge/${edgeHost.publicDnsName || edgeHost.publicIpAddress}`, state: edgeHost }}}
+                height={'215px'}
+                margin={'10px 0'}
+                hoverable>
     <CardItem key={'username'}
               label={'Username'}
               value={`${edgeHost.username}`}/>
@@ -46,7 +47,7 @@ const EdgeHostCard = ({edgeHost}: Props) => (
     <CardItem key={'city'}
               label={'City'}
               value={`${edgeHost.city}`}/>
-  </Card>
+  </CardEdgeHost>
 );
 
 export default EdgeHostCard;

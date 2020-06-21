@@ -467,7 +467,7 @@ class Form extends React.Component<Props, State> {
                     </ul>
                   </>
                 )}
-                {isNew
+                {isNew && !loading
                   ?
                   <button className={`${styles.controlButton} btn-flat btn-small waves-effect waves-light green-text left slide`}
                           type="submit">
