@@ -124,7 +124,7 @@ class Ssh extends React.Component<Props, State> {
       html.clientHeight, html.scrollHeight, html.offsetHeight)  - 50 - 56; // 56 for header and 50 for footer
     return (
       <MainLayout>
-        <div className="container" style={{marginBottom: '50px'}}>
+        <div className={`container ${styles.tabsContainer}`}>
           <Tabs tabs={this.tabs()}/>
         </div>
         <Resizable className={`${styles.commandsContainer} ${this.state.animate ? (this.props.sidenavVisible ? styles.shrink : styles.expand) : ''}`}
@@ -139,11 +139,11 @@ class Ssh extends React.Component<Props, State> {
                        commandsHeight: this.state.commandsHeight + d.height,
                      });
                    }}>
-          <div className={styles.controlsMenu}>
+          <div className={styles.controlsMenuLeft}>
             <ScrollBar ref = {(ref) => { this.controlsScrollbar = ref; }}>
               <button className='btn-floating btn-flat btn-small tooltipped'
                       onClick={this.clearCommands}
-                      data-position={'top'}
+                      data-position={'right'}
                       data-tooltip={'Clear'}>
                 <i className="material-icons grey-text">delete_sweep</i>
               </button>
@@ -156,9 +156,6 @@ class Ssh extends React.Component<Props, State> {
                 <div className={styles.commandsTitle}>
                   Commands
                 </div>
-                <button className={`btn-floating btn-flat ${styles.toggleCommandsButton}`} onClick={this.toggleCommands}>
-                  <i className="material-icons">{this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</i>
-                </button>
               </div>
             </div>
             <div className={styles.commands}>
@@ -188,6 +185,16 @@ class Ssh extends React.Component<Props, State> {
               ))}
             </div>
           </ScrollBar>
+          <div className={styles.controlsMenuRight}>
+            <ScrollBar ref = {(ref) => { this.controlsScrollbar = ref; }}>
+              <button className={`btn-floating btn-flat btn-small tooltipped`}
+                      onClick={this.toggleCommands}
+                      data-position={'left'}
+                      data-tooltip={this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'Show' : 'Hide'}>
+                <i className="material-icons">{this.state.commandsHeight <= this.COMMANDS_MIN_HEIGHT ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</i>
+              </button>
+            </ScrollBar>
+          </div>
         </Resizable>
       </MainLayout>
     );

@@ -64,7 +64,7 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     return 'layers';
   }
   if (label.includes('docker')) {
-    return <FaDocker/>;
+    return <FaDocker></FaDocker>;
   }
   if (value === true) {
     return "check";

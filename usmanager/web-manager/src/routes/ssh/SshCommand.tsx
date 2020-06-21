@@ -29,19 +29,7 @@ export interface ISshCommand {
 
 const buildNewSshCommand = (): Partial<ISshCommand> => ({
   hostname: undefined,
-  command: 'oleoleoleole\n'
-           + 'ole\n'
-           + '\n'
-           + 'oleole\n'
-           + 'ole\n'
-           + 'ole\n'
-           + 'ole\n'
-           + 'oleole\n'
-           + 'ole\n'
-           + 'ole\n'
-           + 'ole\n'
-           + 'ole\n'
-           + 'oleoleole',
+  command: undefined,
 });
 
 interface StateToProps {

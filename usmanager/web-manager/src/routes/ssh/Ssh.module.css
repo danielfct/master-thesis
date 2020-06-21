@@ -8,6 +8,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+.tabsContainer {
+    margin-bottom: 160px;
+}
+
 .commandsContainer {
     position: absolute !important;
     bottom: 50px;
@@ -52,17 +56,30 @@
     color: #F44336;
 }
 
-.controlsMenu {
+.controlsMenuLeft {
     height: 100%;
     border-right: 1px solid #212121;
 }
 
-.controlsMenu button {
+.controlsMenuLeft button:hover {
+    background: transparent !important;
+}
+
+.controlsMenuLeft button {
     margin: 5px;
     display: block;
 }
 
-.controlsMenu button:hover {
+.controlsMenuRight {
+    height: 100%;
+}
+
+.controlsMenuRight button {
+    margin: 5px 10px 5px 5px;
+    display: block;
+}
+
+.controlsMenuRight button:hover {
     background: transparent !important;
 }
 
