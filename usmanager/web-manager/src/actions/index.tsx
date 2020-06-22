@@ -75,6 +75,13 @@ export function addApp(app: IApp): EntitiesAction {
     data: { apps: new Array(app) }
   }
 }
+export const UPDATE_APP = 'UPDATE_APP';
+export function updateApp(previousApp: IApp, currentApp: IApp): EntitiesAction {
+  return {
+    type: UPDATE_APP,
+    data: { apps: [previousApp, currentApp] }
+  }
+}
 
 export const APP_SERVICES_REQUEST = 'APP_SERVICES_REQUEST';
 export const APP_SERVICES_SUCCESS = 'APP_SERVICES_SUCCESS';
@@ -137,6 +144,13 @@ export function addService(service: IService): EntitiesAction {
   return {
     type: ADD_SERVICE,
     data: { services: new Array(service) }
+  }
+}
+export const UPDATE_SERVICE = 'UPDATE_SERVICE';
+export function updateService(previousService: IService, currentService: IService): EntitiesAction {
+  return {
+    type: UPDATE_SERVICE,
+    data: { services: [previousService, currentService] }
   }
 }
 
@@ -560,6 +574,13 @@ export function addEdgeHost(edgeHost: IEdgeHost): EntitiesAction {
     data: { edgeHosts: new Array(edgeHost) }
   }
 }
+export const UPDATE_EDGE_HOST = 'UPDATE_EDGE_HOST';
+export function updateEdgeHost(previousEdgeHost: IEdgeHost, currentEdgeHost: IEdgeHost): EntitiesAction {
+  return {
+    type: UPDATE_EDGE_HOST,
+    data: { edgeHosts: [previousEdgeHost, currentEdgeHost] }
+  }
+}
 
 export const EDGE_HOST_RULES_REQUEST = 'EDGE_HOST_RULES_REQUEST';
 export const EDGE_HOST_RULES_SUCCESS = 'EDGE_HOST_RULES_SUCCESS';
@@ -655,6 +676,13 @@ export function addNode(node: INode): EntitiesAction {
     data: { nodes: new Array(node) }
   }
 }
+export const UPDATE_NODE = 'UPDATE_NODE';
+export function updateNode(previousNode: INode, currentNode: INode): EntitiesAction {
+  return {
+    type: UPDATE_NODE,
+    data: { nodes: [previousNode, currentNode] }
+  }
+}
 
 export const RULES_HOST_REQUEST = 'RULES_HOST_REQUEST';
 export const RULES_HOST_SUCCESS = 'RULES_HOST_SUCCESS';
@@ -686,6 +714,13 @@ export function addRuleHost(ruleHost: IRuleHost): EntitiesAction {
   return {
     type: ADD_RULE_HOST,
     data: { hostRules: new Array(ruleHost) }
+  }
+}
+export const UPDATE_RULE_HOST = 'UPDATE_RULE_HOST';
+export function updateRuleHost(previousRuleHost: IRuleHost, currentRuleHost: IRuleHost): EntitiesAction {
+  return {
+    type: UPDATE_RULE_HOST,
+    data: { hostRules: [previousRuleHost, currentRuleHost] }
   }
 }
 
@@ -814,6 +849,13 @@ export function addRuleService(ruleService: IRuleService): EntitiesAction {
     data: { serviceRules: new Array(ruleService) }
   }
 }
+export const UPDATE_RULE_SERVICE = 'UPDATE_RULE_SERVICE';
+export function updateRuleService(previousRuleService: IRuleService, currentRuleService: IRuleService): EntitiesAction {
+  return {
+    type: UPDATE_RULE_SERVICE,
+    data: { serviceRules: [previousRuleService, currentRuleService] }
+  }
+}
 
 export const RULE_SERVICE_CONDITIONS_REQUEST = 'RULE_SERVICE_CONDITIONS_REQUEST';
 export const RULE_SERVICE_CONDITIONS_SUCCESS = 'RULE_SERVICE_CONDITIONS_SUCCESS';
@@ -877,9 +919,6 @@ export function removeRuleServices(ruleName: string, services: string[]): Entiti
   }
 }
 
-
-
-
 export const RULES_CONTAINER_REQUEST = 'RULES_CONTAINER_REQUEST';
 export const RULES_CONTAINER_SUCCESS = 'RULES_CONTAINER_SUCCESS';
 export const RULES_CONTAINER_FAILURE = 'RULES_CONTAINER_FAILURE';
@@ -910,6 +949,13 @@ export function addRuleContainer(ruleContainer: IRuleContainer): EntitiesAction 
   return {
     type: ADD_RULE_CONTAINER,
     data: { containerRules: new Array(ruleContainer) }
+  }
+}
+export const UPDATE_RULE_CONTAINER = 'UPDATE_RULE_CONTAINER';
+export function updateRuleContainer(previousRuleContainer: IRuleContainer, currentRuleContainer: IRuleContainer): EntitiesAction {
+  return {
+    type: UPDATE_RULE_CONTAINER,
+    data: { containerRules: [previousRuleContainer, currentRuleContainer] }
   }
 }
 
@@ -1005,6 +1051,13 @@ export function addCondition(condition: IRuleCondition): EntitiesAction {
   return {
     type: ADD_CONDITION,
     data: { conditions: new Array(condition) }
+  }
+}
+export const UPDATE_CONDITION = 'UPDATE_CONDITION';
+export function updateCondition(previousCondition: IRuleCondition, currentCondition: IRuleCondition): EntitiesAction {
+  return {
+    type: UPDATE_CONDITION,
+    data: { conditions: [previousCondition, currentCondition] }
   }
 }
 
@@ -1111,6 +1164,14 @@ export function addSimulatedHostMetric(simulatedHostMetric: ISimulatedHostMetric
     data: { simulatedHostMetrics: new Array(simulatedHostMetric) }
   }
 }
+export const UPDATE_SIMULATED_HOST_METRIC = 'UPDATE_SIMULATED_HOST_METRIC';
+export function updateSimulatedHostMetric(previousSimulatedHostMetric: ISimulatedHostMetric,
+                                          currentSimulatedHostMetric: ISimulatedHostMetric): EntitiesAction {
+  return {
+    type: UPDATE_SIMULATED_HOST_METRIC,
+    data: { simulatedHostMetrics: [previousSimulatedHostMetric, currentSimulatedHostMetric] }
+  }
+}
 
 export const SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST = 'SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST';
 export const SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS = 'SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS';
@@ -1206,6 +1267,14 @@ export function addSimulatedServiceMetric(simulatedServiceMetric: ISimulatedServ
     data: { simulatedServiceMetrics: new Array(simulatedServiceMetric) }
   }
 }
+export const UPDATE_SIMULATED_SERVICE_METRIC = 'UPDATE_SIMULATED_SERVICE_METRIC';
+export function updateSimulatedServiceMetric(previousSimulatedServiceMetric: ISimulatedServiceMetric,
+                                             currentSimulatedServiceMetric: ISimulatedServiceMetric): EntitiesAction {
+  return {
+    type: UPDATE_SIMULATED_SERVICE_METRIC,
+    data: { simulatedServiceMetrics: [previousSimulatedServiceMetric, currentSimulatedServiceMetric] }
+  }
+}
 
 export const SIMULATED_SERVICE_METRIC_SERVICES_REQUEST = 'SIMULATED_SERVICE_METRIC_SERVICES_REQUEST';
 export const SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS = 'SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS';
@@ -1270,6 +1339,14 @@ export function addSimulatedContainerMetric(simulatedContainerMetric: ISimulated
     data: { simulatedContainerMetrics: new Array(simulatedContainerMetric) }
   }
 }
+export const UPDATE_SIMULATED_CONTAINER_METRIC = 'UPDATE_SIMULATED_CONTAINER_METRIC';
+export function updateSimulatedContainerMetric(previousSimulatedContainerMetric: ISimulatedContainerMetric,
+                                               currentSimulatedContainerMetric: ISimulatedContainerMetric): EntitiesAction {
+  return {
+    type: UPDATE_SIMULATED_CONTAINER_METRIC,
+    data: { simulatedContainerMetrics: [previousSimulatedContainerMetric, currentSimulatedContainerMetric] }
+  }
+}
 
 export const SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST = 'SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST';
 export const SIMULATED_CONTAINER_METRIC_CONTAINERS_SUCCESS = 'SIMULATED_CONTAINER_METRIC_CONTAINERS_SUCCESS';
@@ -1332,6 +1409,13 @@ export function addRegion(region: IRegion): EntitiesAction {
   return {
     type: ADD_REGION,
     data: { regions: new Array(region) }
+  }
+}
+export const UPDATE_REGION = 'UPDATE_REGION';
+export function updateRegion(previousRegion: IRegion, currentRegion: IRegion): EntitiesAction {
+  return {
+    type: UPDATE_REGION,
+    data: { regions: [previousRegion, currentRegion] }
   }
 }
 

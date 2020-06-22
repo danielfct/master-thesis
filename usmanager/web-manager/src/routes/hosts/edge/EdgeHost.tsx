@@ -18,7 +18,13 @@ import Field from "../../../components/form/Field";
 import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addEdgeHost, addEdgeHostRules, addEdgeHostSimulatedMetrics, loadEdgeHosts} from "../../../actions";
+import {
+  addEdgeHost,
+  addEdgeHostRules,
+  addEdgeHostSimulatedMetrics,
+  loadEdgeHosts,
+  updateEdgeHost
+} from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import EdgeHostRuleList from "./EdgeHostRuleList";
@@ -30,6 +36,7 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import EdgeHostSimulatedMetricList from "./EdgeHostSimulatedMetricList";
 import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
+import {IService} from "../../services/Service";
 
 export interface IEdgeHost extends IDatabaseData {
   username: string;
@@ -63,6 +70,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadEdgeHosts: (hostname: string) => void;
   addEdgeHost: (edgeHost: IEdgeHost) => void;
+  updateEdgeHost: (previousEdgeHost: IEdgeHost, currentEdgeHost: IEdgeHost) => void;
   addEdgeHostRules: (hostname: string, rules: string[]) => void;
   addEdgeHostSimulatedMetrics: (hostname: string, simulatedMetrics: string[]) => void;
 }
@@ -226,6 +234,9 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private updateEdgeHost = (edgeHost: IEdgeHost) => {
     edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
+    if (this.props.edgeHost.id) {
+      this.props.updateEdgeHost(this.props.edgeHost as IEdgeHost, edgeHost);
+    }
     const formEdgeHost = { ...edgeHost };
     removeFields(formEdgeHost);
     this.setState({edgeHost: edgeHost, formEdgeHost: formEdgeHost});
@@ -392,6 +403,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadEdgeHosts,
   addEdgeHost,
+  updateEdgeHost,
   addEdgeHostRules,
   addEdgeHostSimulatedMetrics,
 };

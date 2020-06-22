@@ -10,12 +10,14 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
+
 import lombok.Data;
 
 @Data
 public class AddAppService {
 
-  private final String service;
+  private final ServiceEntity service;
   private final int launchOrder;
 
 }

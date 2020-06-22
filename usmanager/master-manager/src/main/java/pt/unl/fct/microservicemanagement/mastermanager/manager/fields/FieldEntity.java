@@ -41,6 +41,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -63,7 +64,8 @@ public class FieldEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
+  @NotNull
+  @Column(unique = true)
   private String name;
 
   @JsonIgnore

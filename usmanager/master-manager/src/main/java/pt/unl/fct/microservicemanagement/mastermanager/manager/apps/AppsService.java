@@ -128,7 +128,9 @@ public class AppsService {
     log.info("Removing services {}", services);
     app.getAppServices()
         .removeIf(service -> services.contains(service.getService().getServiceName()));
-    apps.save(app);
+    log.info(app.getAppServices().toString());
+    app = apps.save(app);
+    log.info(ToStringBuilder.reflectionToString(app));
   }
 
   private void assertAppExists(String appName) {

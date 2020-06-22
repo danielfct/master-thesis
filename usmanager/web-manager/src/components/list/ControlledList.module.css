@@ -59,3 +59,7 @@ ul.dropdown li.disabled a:hover {
 .nolabelCheckbox label span {
     margin-bottom: -7.5px;
 }
+
+.button {
+    margin-right: 10px;
+}

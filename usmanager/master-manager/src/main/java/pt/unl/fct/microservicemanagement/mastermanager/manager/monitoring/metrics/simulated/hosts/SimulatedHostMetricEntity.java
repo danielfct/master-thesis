@@ -29,6 +29,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
@@ -53,7 +54,8 @@ public class SimulatedHostMetricEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
+  @NotNull
+  @Column(unique = true)
   private String name;
 
   @ManyToOne

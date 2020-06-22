@@ -30,6 +30,7 @@ import {
   APPS_SUCCESS,
   APP_SUCCESS,
   ADD_APP,
+  UPDATE_APP,
   APP_SERVICES_REQUEST,
   APP_SERVICES_FAILURE,
   APP_SERVICES_SUCCESS,
@@ -42,6 +43,7 @@ import {
   SERVICES_SUCCESS,
   SERVICE_SUCCESS,
   ADD_SERVICE,
+  UPDATE_SERVICE,
   SERVICE_APPS_REQUEST,
   SERVICE_APPS_FAILURE,
   SERVICE_APPS_SUCCESS,
@@ -114,6 +116,7 @@ import {
   EDGE_HOSTS_SUCCESS,
   EDGE_HOST_SUCCESS,
   ADD_EDGE_HOST,
+  UPDATE_EDGE_HOST,
   EDGE_HOST_RULES_REQUEST,
   EDGE_HOST_RULES_FAILURE,
   EDGE_HOST_RULES_SUCCESS,
@@ -131,6 +134,7 @@ import {
   NODES_SUCCESS,
   NODE_SUCCESS,
   ADD_NODE,
+  UPDATE_NODE,
   RULES_HOST_REQUEST,
   RULE_HOST_REQUEST,
   RULES_HOST_FAILURE,
@@ -138,6 +142,7 @@ import {
   RULES_HOST_SUCCESS,
   RULE_HOST_SUCCESS,
   ADD_RULE_HOST,
+  UPDATE_RULE_HOST,
   RULE_HOST_CONDITIONS_REQUEST,
   RULE_HOST_CONDITIONS_FAILURE,
   RULE_HOST_CONDITIONS_SUCCESS,
@@ -160,6 +165,7 @@ import {
   RULES_SERVICE_SUCCESS,
   RULE_SERVICE_SUCCESS,
   ADD_RULE_SERVICE,
+  UPDATE_RULE_SERVICE,
   RULE_SERVICE_CONDITIONS_REQUEST,
   RULE_SERVICE_CONDITIONS_FAILURE,
   RULE_SERVICE_CONDITIONS_SUCCESS,
@@ -177,6 +183,7 @@ import {
   RULES_CONTAINER_SUCCESS,
   RULE_CONTAINER_SUCCESS,
   ADD_RULE_CONTAINER,
+  UPDATE_RULE_CONTAINER,
   RULE_CONTAINER_CONDITIONS_REQUEST,
   RULE_CONTAINER_CONDITIONS_FAILURE,
   RULE_CONTAINER_CONDITIONS_SUCCESS,
@@ -203,6 +210,7 @@ import {
   CONDITION_SUCCESS,
   CONDITIONS_SUCCESS,
   ADD_CONDITION,
+  UPDATE_CONDITION,
   DECISION_REQUEST,
   DECISIONS_REQUEST,
   DECISION_FAILURE,
@@ -216,6 +224,7 @@ import {
   SIMULATED_HOST_METRICS_SUCCESS,
   SIMULATED_HOST_METRIC_SUCCESS,
   ADD_SIMULATED_HOST_METRIC,
+  UPDATE_SIMULATED_HOST_METRIC,
   SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST,
   SIMULATED_HOST_METRIC_CLOUD_HOSTS_FAILURE,
   SIMULATED_HOST_METRIC_CLOUD_HOSTS_SUCCESS,
@@ -233,6 +242,7 @@ import {
   SIMULATED_SERVICE_METRICS_SUCCESS,
   SIMULATED_SERVICE_METRIC_SUCCESS,
   ADD_SIMULATED_SERVICE_METRIC,
+  UPDATE_SIMULATED_SERVICE_METRIC,
   SIMULATED_SERVICE_METRIC_SERVICES_REQUEST,
   SIMULATED_SERVICE_METRIC_SERVICES_FAILURE,
   SIMULATED_SERVICE_METRIC_SERVICES_SUCCESS,
@@ -245,6 +255,7 @@ import {
   SIMULATED_CONTAINER_METRICS_SUCCESS,
   SIMULATED_CONTAINER_METRIC_SUCCESS,
   ADD_SIMULATED_CONTAINER_METRIC,
+  UPDATE_SIMULATED_CONTAINER_METRIC,
   SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST,
   SIMULATED_CONTAINER_METRIC_CONTAINERS_FAILURE,
   SIMULATED_CONTAINER_METRIC_CONTAINERS_SUCCESS,
@@ -257,6 +268,7 @@ import {
   REGIONS_SUCCESS,
   REGION_SUCCESS,
   ADD_REGION,
+  UPDATE_REGION,
   LOAD_BALANCERS_REQUEST,
   LOAD_BALANCER_REQUEST,
   LOAD_BALANCERS_FAILURE,
@@ -466,11 +478,11 @@ export type EntitiesState = {
 
 export type EntitiesAction = {
   type: string,
-  entity?: number | string,
+  entity?: string | number,
   isLoading?: {},
   error?: string,
   data?: {
-    apps?: Partial<IApp>[],
+    apps?: IApp[],
     appsNames?: string[],
     appServices?: IAppService[],
     addAppServices?: IAddAppService[],
@@ -708,6 +720,22 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { apps: { data: apps, isLoadingApps: false, loadAppsError: null } });
       }
       break;
+    case UPDATE_APP:
+      if (data?.apps && data.apps?.length > 1) {
+        const previousApp = data.apps[0];
+        const filteredApps = Object.values(state.apps.data).filter(app => app.id !== previousApp.id);
+        const currentApp = data.apps[1];
+        filteredApps.push(currentApp);
+        const apps = normalize(filteredApps, Schemas.APP_ARRAY).entities.services || {};
+        return {
+          ...state,
+          apps: {
+            ...state.apps,
+            data: apps,
+          }
+        };
+      }
+      break;
     case APP_SERVICES_REQUEST:
       return merge({}, state, { apps: { isLoadingServices: true, loadServicesError: null } });
     case APP_SERVICES_SUCCESS:
@@ -729,7 +757,7 @@ const entities = (state: EntitiesState = {
         const app = state.apps.data[entity];
         if (data?.addAppServices?.length) {
           const addAppService = data?.addAppServices[0];
-          const serviceName = addAppService.service;
+          const serviceName = addAppService.service.serviceName;
           const service = state.services.data[serviceName];
           const launchOrder = addAppService.launchOrder;
           const appService = { id: 0, service, launchOrder };
@@ -789,6 +817,22 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { services: { data: services, isLoadingServices: false, loadServicesError: null } });
       }
       break;
+    case UPDATE_SERVICE:
+      if (data?.services && data.services?.length > 1) {
+        const previousService = data.services[0];
+        const filteredServices = Object.values(state.services.data).filter(service => service.id !== previousService.id);
+        const currentService = data.services[1];
+        filteredServices.push(currentService);
+        const services = normalize(filteredServices, Schemas.SERVICE_ARRAY).entities.services || {};
+        return {
+          ...state,
+          services: {
+            ...state.services,
+            data: services,
+          }
+        };
+      }
+      break;
     case SERVICE_APPS_REQUEST:
       return merge({}, state, { services: { isLoadingApps: true, loadAppsError: null } });
     case SERVICE_APPS_FAILURE:
@@ -814,7 +858,7 @@ const entities = (state: EntitiesState = {
             service.apps.unshift(...data.appsNames);
           }
           else {
-           service.apps = data.appsNames;
+            service.apps = data.appsNames;
           }
           return merge({}, state, { services: { data: { [service.serviceName]: {...service } } } });
         }
@@ -1338,6 +1382,25 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { hosts: { edge: { data: edgeHosts, isLoadingEdgeHosts: false, loadEdgeHostsError: null } } });
       }
       break;
+    case UPDATE_EDGE_HOST:
+      if (data?.edgeHosts && data.edgeHosts?.length > 1) {
+        const previousEdgeHost = data.edgeHosts[0];
+        const filteredEdgeHosts = Object.values(state.hosts.edge.data).filter(edgeHost => edgeHost.id !== previousEdgeHost.id);
+        const currentEdgeHost = data.edgeHosts[1];
+        filteredEdgeHosts.push(currentEdgeHost);
+        const edgeHosts = normalize(filteredEdgeHosts, Schemas.EDGE_HOST_ARRAY).entities.services || {};
+        return {
+          ...state,
+          hosts: {
+            ...state.hosts,
+            edge: {
+              ...state.hosts.edge,
+              data: edgeHosts,
+            }
+          }
+        }
+      }
+      break;
     case EDGE_HOST_RULES_REQUEST:
       return merge({}, state, { hosts: { edge: { isLoadingRules: true, loadRulesError: null } } });
     case EDGE_HOST_RULES_FAILURE:
@@ -1462,6 +1525,22 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { nodes: { data: nodes, isLoadingNodes: false, loadNodesError: null } });
       }
       break;
+    case UPDATE_NODE:
+      if (data?.nodes && data.nodes?.length > 1) {
+        const previousNode = data.nodes[0];
+        const filteredNodes = Object.values(state.nodes.data).filter(node => node.id !== previousNode.id);
+        const currentNode = data.nodes[1];
+        filteredNodes.push(currentNode);
+        const nodes = normalize(filteredNodes, Schemas.NODE_ARRAY).entities.services || {};
+        return {
+          ...state,
+          nodes: {
+            ...state.nodes,
+            data: nodes,
+          }
+        }
+      }
+      break;
     case RULES_HOST_REQUEST:
     case RULE_HOST_REQUEST:
       return merge({}, state, { rules: { hosts: { isLoadingRules: true, loadRulesError: null } } });
@@ -1498,6 +1577,26 @@ const entities = (state: EntitiesState = {
       if (data?.hostRules?.length) {
         const hostRules = normalize(data?.hostRules, Schemas.RULE_HOST_ARRAY).entities.hostRules;
         return merge({}, state, { rules: { hosts : { data: hostRules, isLoadingRules: false, loadRulesError: null } } });
+      }
+      break;
+    case UPDATE_RULE_HOST:
+      if (data?.hostRules && data.hostRules?.length > 1) {
+        const previousHostRule = data.hostRules[0];
+        const filteredHostRules = Object.values(state.rules.hosts.data)
+                                           .filter(hostRule => hostRule.id !== previousHostRule.id);
+        const currentHostRule = data.hostRules[1];
+        filteredHostRules.push(currentHostRule);
+        const hostRules = normalize(filteredHostRules, Schemas.RULE_HOST_ARRAY).entities.hosts || {};
+        return {
+          ...state,
+          rules: {
+            ...state.rules,
+            hosts: {
+              ...state.rules.hosts,
+              data: hostRules,
+            }
+          }
+        }
       }
       break;
     case RULE_HOST_CONDITIONS_REQUEST:
@@ -1697,6 +1796,26 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { rules: { services : { data: serviceRules, isLoadingRules: false, loadRulesError: null } } });
       }
       break;
+    case UPDATE_RULE_SERVICE:
+      if (data?.serviceRules && data.serviceRules?.length > 1) {
+        const previousServiceRule = data.serviceRules[0];
+        const filteredServiceRules = Object.values(state.rules.services.data)
+                                             .filter(serviceRule => serviceRule.id !== previousServiceRule.id);
+        const currentServiceRule = data.serviceRules[1];
+        filteredServiceRules.push(currentServiceRule);
+        const serviceRules = normalize(filteredServiceRules, Schemas.RULE_SERVICE_ARRAY).entities.services || {};
+        return {
+          ...state,
+          rules: {
+            ...state.rules,
+            services: {
+              ...state.rules.services,
+              data: serviceRules,
+            }
+          }
+        }
+      }
+      break;
     case RULE_SERVICE_CONDITIONS_REQUEST:
       return merge({}, state, { rules: { services: { isLoadingConditions: true, loadConditionsError: null } } });
     case RULE_SERVICE_CONDITIONS_FAILURE:
@@ -1838,6 +1957,26 @@ const entities = (state: EntitiesState = {
       if (data?.containerRules?.length) {
         const containerRules = normalize(data?.containerRules, Schemas.RULE_CONTAINER_ARRAY).entities.containerRules;
         return merge({}, state, { rules: { containers : { data: containerRules, isLoadingRules: false, loadRulesError: null } } });
+      }
+      break;
+    case UPDATE_RULE_CONTAINER:
+      if (data?.containerRules && data.containerRules?.length > 1) {
+        const previousContainerRule = data.containerRules[0];
+        const filteredContainerRules = Object.values(state.rules.containers.data)
+                                             .filter(containerRule => containerRule.id !== previousContainerRule.id);
+        const currentContainerRule = data.containerRules[1];
+        filteredContainerRules.push(currentContainerRule);
+        const containerRules = normalize(filteredContainerRules, Schemas.RULE_CONTAINER_ARRAY).entities.services || {};
+        return {
+          ...state,
+          rules: {
+            ...state.rules,
+            containers: {
+              ...state.rules.containers,
+              data: containerRules,
+            }
+          }
+        }
       }
       break;
     case RULE_CONTAINER_CONDITIONS_REQUEST:
@@ -1982,6 +2121,26 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { rules: { conditions : { data: conditions, isLoadingConditions: false, loadConditionsError: null } } });
       }
       break;
+    case UPDATE_CONDITION:
+      if (data?.conditions && data.conditions?.length > 1) {
+        const previousCondition = data.conditions[0];
+        const filteredConditions = Object.values(state.rules.conditions.data)
+                                        .filter(condition => condition.id !== previousCondition.id);
+        const currentCondition = data.conditions[1];
+        filteredConditions.push(currentCondition);
+        const conditions = normalize(filteredConditions, Schemas.RULE_CONDITION_ARRAY).entities.conditions || {};
+        return {
+          ...state,
+          rules: {
+            ...state.rules,
+            conditions: {
+              ...state.rules.conditions,
+              data: conditions,
+            }
+          }
+        }
+      }
+      break;
     case VALUE_MODES_REQUEST:
       return merge({}, state, { valueModes: { isLoadingValueModes: true, loadValueModesError: null } });
     case VALUE_MODES_FAILURE:
@@ -2085,6 +2244,26 @@ const entities = (state: EntitiesState = {
       if (data?.simulatedHostMetrics?.length) {
         const simulatedHostMetrics = normalize(data?.simulatedHostMetrics, Schemas.SIMULATED_HOST_METRIC_ARRAY).entities.simulatedHostMetrics;
         return merge({}, state, { simulatedMetrics: { hosts : { data: simulatedHostMetrics, isLoadingSimulatedHostMetrics: false, loadSimulatedHostMetricsError: null } } });
+      }
+      break;
+    case UPDATE_SIMULATED_HOST_METRIC:
+      if (data?.simulatedHostMetrics && data.simulatedHostMetrics?.length > 1) {
+        const previousSimulatedHostMetric = data.simulatedHostMetrics[0];
+        const filteredSimulatedHostMetrics = Object.values(state.simulatedMetrics.hosts.data)
+                                         .filter(simulatedHostMetric => simulatedHostMetric.id !== previousSimulatedHostMetric.id);
+        const currentSimulatedHostMetric = data.simulatedHostMetrics[1];
+        filteredSimulatedHostMetrics.push(currentSimulatedHostMetric);
+        const simulatedHostMetrics = normalize(filteredSimulatedHostMetrics, Schemas.SIMULATED_HOST_METRIC_ARRAY).entities.simulatedHostMetrics || {};
+        return {
+          ...state,
+          simulatedMetrics: {
+            ...state.simulatedMetrics,
+            hosts: {
+              ...state.simulatedMetrics.hosts,
+              data: simulatedHostMetrics,
+            }
+          }
+        }
       }
       break;
     case SIMULATED_HOST_METRIC_CLOUD_HOSTS_REQUEST:
@@ -2229,6 +2408,26 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { simulatedMetrics: { services : { data: simulatedServiceMetrics, isLoadingSimulatedServiceMetrics: false, loadSimulatedServiceMetricsError: null } } });
       }
       break;
+    case UPDATE_SIMULATED_SERVICE_METRIC:
+      if (data?.simulatedServiceMetrics && data.simulatedServiceMetrics?.length > 1) {
+        const previousSimulatedServiceMetric = data.simulatedServiceMetrics[0];
+        const filteredSimulatedServiceMetrics = Object.values(state.simulatedMetrics.services.data)
+                                                   .filter(simulatedServiceMetric => simulatedServiceMetric.id !== previousSimulatedServiceMetric.id);
+        const currentSimulatedServiceMetric = data.simulatedServiceMetrics[1];
+        filteredSimulatedServiceMetrics.push(currentSimulatedServiceMetric);
+        const simulatedServiceMetrics = normalize(filteredSimulatedServiceMetrics, Schemas.SIMULATED_SERVICE_METRIC_ARRAY).entities.simulatedServiceMetrics || {};
+        return {
+          ...state,
+          simulatedMetrics: {
+            ...state.simulatedMetrics,
+            services: {
+              ...state.simulatedMetrics.services,
+              data: simulatedServiceMetrics,
+            }
+          }
+        }
+      }
+      break;
     case SIMULATED_SERVICE_METRIC_SERVICES_REQUEST:
       return merge({}, state, { simulatedMetrics: { services: { isLoadingServices: true, loadServicesError: null } } });
     case SIMULATED_SERVICE_METRIC_SERVICES_FAILURE:
@@ -2319,6 +2518,26 @@ const entities = (state: EntitiesState = {
         return merge({}, state, { simulatedMetrics: { containers : { data: simulatedContainerMetrics, isLoadingSimulatedContainerMetrics: false, loadSimulatedContainerMetricsError: null } } });
       }
       break;
+    case UPDATE_SIMULATED_CONTAINER_METRIC:
+      if (data?.simulatedContainerMetrics && data.simulatedContainerMetrics?.length > 1) {
+        const previousSimulatedContainerMetric = data.simulatedContainerMetrics[0];
+        const filteredSimulatedContainerMetrics = Object.values(state.simulatedMetrics.containers.data)
+                                                      .filter(simulatedContainerMetric => simulatedContainerMetric.id !== previousSimulatedContainerMetric.id);
+        const currentSimulatedContainerMetric = data.simulatedContainerMetrics[1];
+        filteredSimulatedContainerMetrics.push(currentSimulatedContainerMetric);
+        const simulatedContainerMetrics = normalize(filteredSimulatedContainerMetrics, Schemas.SIMULATED_CONTAINER_METRIC_ARRAY).entities.simulatedContainerMetrics || {};
+        return {
+          ...state,
+          simulatedMetrics: {
+            ...state.simulatedMetrics,
+            containers: {
+              ...state.simulatedMetrics.containers,
+              data: simulatedContainerMetrics,
+            }
+          }
+        }
+      }
+      break;
     case SIMULATED_CONTAINER_METRIC_CONTAINERS_REQUEST:
       return merge({}, state, { simulatedMetrics: { containers: { isLoadingContainers: true, loadContainersError: null } } });
     case SIMULATED_CONTAINER_METRIC_CONTAINERS_FAILURE:
@@ -2400,6 +2619,22 @@ const entities = (state: EntitiesState = {
       if (data?.regions?.length) {
         const regions = normalize(data?.regions, Schemas.REGION_ARRAY).entities.regions;
         return merge({}, state, { regions: { data: regions, isLoadingRegions: false, loadRegionsError: null } });
+      }
+      break;
+    case UPDATE_REGION:
+      if (data?.regions && data.regions?.length > 1) {
+        const previousRegion = data.regions[0];
+        const filteredRegions = Object.values(state.regions.data).filter(region => region.id !== previousRegion.id);
+        const currentRegion = data.regions[1];
+        filteredRegions.push(currentRegion);
+        const regions = normalize(filteredRegions, Schemas.REGION_ARRAY).entities.services || {};
+        return {
+          ...state,
+          regions: {
+            ...state.regions,
+            data: regions,
+          }
+        }
       }
       break;
     case LOAD_BALANCERS_REQUEST:

@@ -69,7 +69,8 @@ public class ServiceRuleEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
+  @NotNull
+  @Column(unique = true)
   private String name;
 
   private int priority;

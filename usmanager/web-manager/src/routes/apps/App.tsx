@@ -16,7 +16,7 @@ import React from "react";
 import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {addApp, addAppServices, loadApps, loadRegions} from "../../actions";
+import {addApp, addAppServices, loadApps, loadRegions, updateApp} from "../../actions";
 import {connect} from "react-redux";
 import AppServicesList, {IAddAppService, IAppService} from "./AppServicesList";
 import {IReply, postData} from "../../utils/api";
@@ -55,6 +55,7 @@ interface DispatchToProps {
   loadApps: (name: string) => void;
   loadRegions: () => void;
   addApp: (app: IApp) => void;
+  updateApp: (previousApp: IApp, currentApp: IApp) => void;
   addAppServices: (appName: string, appServices: IAddAppService[]) => void;
 }
 
@@ -158,7 +159,7 @@ class App extends BaseComponent<Props, State> {
 
   private removeAppServices = (services: string[]): void => {
     this.setState({
-      unsavedServices: this.state.unsavedServices.filter(service => !services.includes(service.service))
+      unsavedServices: this.state.unsavedServices.filter(service => !services.includes(service.service.serviceName))
     });
   };
 
@@ -282,6 +283,9 @@ class App extends BaseComponent<Props, State> {
 
   private updateApp = (app: IApp) => {
     app = Object.values(normalize(app, Schemas.APP).entities.apps || {})[0];
+    if (this.props.app.id) {
+      this.props.updateApp(this.props.app as IApp, app);
+    }
     const formApp = { ...app };
     removeFields(formApp);
     this.setState({app: app, formApp: formApp, loading: undefined});
@@ -411,6 +415,7 @@ const mapDispatchToProps: DispatchToProps = {
   loadApps,
   loadRegions,
   addApp,
+  updateApp,
   addAppServices
 };
 

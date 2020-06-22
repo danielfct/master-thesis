@@ -25,8 +25,6 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Validation;
 
 import java.util.Arrays;
@@ -89,7 +87,7 @@ public final class AppsController {
   public void addAppServices(@PathVariable String appName,
                              @RequestBody AddAppService[] services) {
     Map<String, Integer> serviceOrders = Arrays.stream(services).collect(
-        Collectors.toMap(AddAppService::getService, AddAppService::getLaunchOrder));
+        Collectors.toMap(addAppService -> addAppService.getService().getServiceName(), AddAppService::getLaunchOrder));
     appsService.addServices(appName, serviceOrders);
   }
 

@@ -54,7 +54,8 @@ public class RegionEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
+  @NotNull
+  @Column(unique = true)
   private String name;
 
   private String description;

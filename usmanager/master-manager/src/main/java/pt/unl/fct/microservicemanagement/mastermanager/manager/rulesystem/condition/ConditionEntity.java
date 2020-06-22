@@ -69,7 +69,8 @@ public class ConditionEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
+  @NotNull
+  @Column(unique = true)
   private String name;
 
   @ManyToOne

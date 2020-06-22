@@ -36,7 +36,7 @@ import {
   addServiceDependencies,
   addServicePredictions,
   addServiceRules, addServiceSimulatedMetrics,
-  loadServices
+  loadServices, updateService
 } from "../../actions";
 import {connect} from "react-redux";
 import MainLayout from "../../views/mainLayout/MainLayout";
@@ -59,6 +59,7 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
 import ServiceSimulatedMetricList from "./ServiceSimulatedMetricList";
 import GenericServiceSimulatedMetricList from "./GenericSimulatedServiceMetricList";
+import {IApp} from "../apps/App";
 
 export interface IService extends IDatabaseData {
   serviceName: string;
@@ -104,6 +105,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadServices: (name: string) => void;
   addService: (service: IService) => void;
+  updateService: (previousService: IService, currentService: IService) => void;
   addServiceApps: (serviceName: string, apps: string[]) => void;
   addServiceDependencies: (serviceName: string, dependencies: string[]) => void;
   addServicePredictions: (serviceName: string, predictions: IPrediction[]) => void;
@@ -373,6 +375,9 @@ class Service extends BaseComponent<Props, State> {
 
   private updateService = (service: IService) => {
     service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];
+    if (this.props.service.id) {
+      this.props.updateService(this.props.service as IService, service);
+    }
     const formService = { ...service };
     removeFields(formService);
     this.setState({service: service, formService: formService});
@@ -597,6 +602,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadServices,
+  updateService,
   addService,
   addServiceApps,
   addServiceDependencies,

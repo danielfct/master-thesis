@@ -60,12 +60,13 @@ public class AppEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
+  @NotNull
+  @Column(unique = true)
   private String name;
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "app", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "app", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<AppServiceEntity> appServices;
 
   @Override

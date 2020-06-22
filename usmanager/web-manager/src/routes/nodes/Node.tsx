@@ -7,7 +7,7 @@ import Field, {getTypeFromValue} from "../../components/form/Field";
 import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {addNode, loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions} from "../../actions";
+import {addNode, loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions, updateNode} from "../../actions";
 import {connect} from "react-redux";
 import React from "react";
 import {IRegion} from "../region/Region";
@@ -17,6 +17,7 @@ import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
 import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
+import {IService} from "../services/Service";
 
 export interface INode {
   id: string;
@@ -67,6 +68,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadNodes: (nodeId: string) => void;
   addNode: (node: INode) => void;
+  updateNode: (previousNode: INode, currentNode: INode) => void;
   loadEdgeHosts: () => void;
   loadCloudHosts: () => void;
   loadRegions: () => void;
@@ -175,6 +177,9 @@ class Node extends BaseComponent<Props, State> {
 
   private updateNode = (node: INode) => {
     node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
+    if (this.props.node?.id) {
+      this.props.updateNode(this.props.node as INode, node);
+    }
     this.setState({node: node});
   };
 
@@ -373,6 +378,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadNodes,
   addNode,
+  updateNode,
   loadCloudHosts,
   loadEdgeHosts,
   loadRegions,

@@ -73,7 +73,8 @@ public class ServiceEntity {
   @GeneratedValue
   private Long id;
 
-  @NaturalId
+  @NotNull
+  @Column(unique = true)
   private String serviceName;
 
   @NotNull

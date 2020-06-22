@@ -252,7 +252,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
           )}
           {!error && dropdown && (
             <>
-              <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+              <button className={`dropdown-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.formButton}`}
                       data-position="bottom" data-tooltip={dropdown.title}
                       data-target={`dropdown-${dropdown.id}`}
                       ref={this.dropdown}>
@@ -280,7 +280,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
           )}
           {(!error && formModal &&
             <>
-                <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped`}
+                <button className={`modal-trigger btn-floating btn-flat btn-small waves-effect waves-light right tooltipped ${styles.button}`}
                         data-position="bottom" data-tooltip={formModal.title}
                         data-target={formModal.id}>
                     <i className="material-icons">add</i>
@@ -288,7 +288,7 @@ export default class ControlledList<T> extends BaseComponent<Props<T>, State<T>>
               {this.inputDialog(formModal)}
             </>
           )}
-          <button className="btn-flat btn-small waves-effect waves-light red-text right"
+          <button className={`btn-flat btn-small waves-effect waves-light red-text right ${styles.button}`}
                   style={!error && Object.values(this.state)
                                          .map(item => item?.isChecked || false)
                                          .some(checked => checked)

@@ -28,7 +28,7 @@ export interface IAppService extends IDatabaseData {
 }
 
 export interface IAddAppService {
-  service: string;
+  service: { serviceName: string };
   launchOrder: number;
 }
 
@@ -61,7 +61,7 @@ interface State {
   entitySaved: boolean;
 }
 
-class ServiceAppList extends BaseComponent<Props, State> {
+class AppServiceList extends BaseComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
@@ -74,10 +74,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (prevProps.app?.name !== this.props.app?.name) {
-      this.loadEntities();
-    }
-    if (!prevProps.app?.name && this.props.app?.name) {
+    if (!prevProps.app?.id && this.props.app?.id) {
       this.setState({entitySaved: true});
     }
   }
@@ -94,9 +91,9 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   private service = (index: number, service: IAppService | IAddAppService, separate: boolean, checked: boolean,
                      handleCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void): JSX.Element => {
-    const serviceName = typeof service.service === 'string' ? service.service : service.service.serviceName;
+    const serviceName = service.service.serviceName;
     const isNew = this.isNew();
-    const unsaved = this.props.unsavedServices.map(service => service.service).includes(serviceName);
+    const unsaved = this.props.unsavedServices.map(service => service.service.serviceName).includes(serviceName);
     return (
       <ListItem key={index} separate={separate}>
         <div className={`${listItemStyles.linkedItemContent}`}>
@@ -123,6 +120,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
   };
 
   private onAdd = (service: IValues): void => {
+    console.log(service)
     this.props.onAddAppService(service as IAddAppService);
     this.setState({selectedService: undefined});
   };
@@ -147,7 +145,7 @@ class ServiceAppList extends BaseComponent<Props, State> {
                                     .filter(([_, value]) => value.serviceType.toLowerCase() !== 'system')
                                     .map(([key, _]) => key);
     const serviceNames = appServices.map(appService => appService.service.serviceName);
-    const unsavedServicesNames = unsavedServices.map(service => service.service);
+    const unsavedServicesNames = unsavedServices.map(service => service.service.serviceName);
     return nonSystemServices.filter(name => !serviceNames.includes(name) && !unsavedServicesNames.includes(name));
   };
 
@@ -230,4 +228,4 @@ const mapDispatchToProps = (dispatch: any): DispatchToProps =>
     removeAppServices,
   }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ServiceAppList);
+export default connect(mapStateToProps, mapDispatchToProps)(AppServiceList);
