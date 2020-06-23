@@ -27,7 +27,7 @@ import {
   addRuleServiceConditions,
   addRuleServices,
   loadDecisions,
-  loadRulesService,
+  loadRulesService, updateRuleService,
 } from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -38,6 +38,7 @@ import RuleServiceServicesList from "./RuleServiceServicesList";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
+import {IRuleContainer} from "../containers/RuleContainer";
 
 export interface IRuleService extends IRule {
   services?: string[]
@@ -62,6 +63,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadRulesService: (name: string) => void;
   addRuleService: (ruleService: IRuleService) => void;
+  updateRuleService: (previousRuleService: IRuleService, currentRuleService: IRuleService) => void;
   loadDecisions: () => void;
   addRuleServiceConditions: (ruleName: string, conditions: string[]) => void;
   addRuleServices: (ruleName: string, services: string[]) => void;
@@ -232,6 +234,10 @@ class RuleService extends BaseComponent<Props, State> {
 
   private updateRuleService = (ruleService: IRuleService) => {
     ruleService = Object.values(normalize(ruleService, Schemas.RULE_SERVICE).entities.serviceRules || {})[0];
+    const previousRuleService = this.getRuleService();
+    if (previousRuleService?.id) {
+      this.props.updateRuleService(previousRuleService as IRuleService, ruleService);
+    }
     const formRuleService = { ...ruleService };
     removeFields(formRuleService);
     this.setState({ruleService: ruleService, formRuleService: formRuleService});
@@ -406,6 +412,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadRulesService,
   addRuleService,
+  updateRuleService,
   loadDecisions,
   addRuleServiceConditions,
   addRuleServices,

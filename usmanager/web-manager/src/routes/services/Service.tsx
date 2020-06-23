@@ -375,8 +375,9 @@ class Service extends BaseComponent<Props, State> {
 
   private updateService = (service: IService) => {
     service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];
-    if (this.props.service.id) {
-      this.props.updateService(this.props.service as IService, service);
+    const previousService = this.getService();
+    if (previousService.id) {
+      this.props.updateService(previousService as IService, service);
     }
     const formService = { ...service };
     removeFields(formService);

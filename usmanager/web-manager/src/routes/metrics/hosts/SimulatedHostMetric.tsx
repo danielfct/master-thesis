@@ -19,10 +19,8 @@ import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
-  addSimulatedHostMetric,
-  addSimulatedHostMetricCloudHosts, addSimulatedHostMetricEdgeHosts,
-  loadFields,
-  loadSimulatedHostMetrics
+  addSimulatedHostMetric, addSimulatedHostMetricCloudHosts, addSimulatedHostMetricEdgeHosts, loadFields,
+  loadSimulatedHostMetrics, updateSimulatedHostMetric
 } from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -34,6 +32,7 @@ import {Schemas} from "../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedHostMetricCloudHostList from "./SimulatedHostMetricCloudHostList";
 import SimulatedHostMetricEdgeHostList from "./SimulatedHostMetricEdgeHostList";
+import {ISimulatedContainerMetric} from "../containers/SimulatedContainerMetric";
 
 export interface ISimulatedHostMetric extends IDatabaseData {
   name: string;
@@ -66,6 +65,8 @@ interface StateToProps {
 interface DispatchToProps {
   loadSimulatedHostMetrics: (name: string) => void;
   addSimulatedHostMetric: (simulatedHostMetric: ISimulatedHostMetric) => void;
+  updateSimulatedHostMetric: (previousSimulatedHostMetric: ISimulatedHostMetric,
+                              currentSimulatedHostMetric: ISimulatedHostMetric) => void;
   loadFields: () => void;
   addSimulatedHostMetricCloudHosts: (name: string, cloudHosts: string[]) => void;
   addSimulatedHostMetricEdgeHosts: (name: string, edgeHosts: string[]) => void;
@@ -231,6 +232,10 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
 
   private updateSimulatedHostMetric = (simulatedHostMetric: ISimulatedHostMetric) => {
     simulatedHostMetric = Object.values(normalize(simulatedHostMetric, Schemas.SIMULATED_HOST_METRIC).entities.simulatedHostMetrics || {})[0];
+    const previousSimulatedHostMetric = this.getSimulatedHostMetric();
+    if (previousSimulatedHostMetric.id) {
+      this.props.updateSimulatedHostMetric(previousSimulatedHostMetric as ISimulatedContainerMetric, simulatedHostMetric);
+    }
     const formSimulatedHostMetric = { ...simulatedHostMetric };
     removeFields(formSimulatedHostMetric);
     this.setState({simulatedHostMetric: simulatedHostMetric, formSimulatedHostMetric: formSimulatedHostMetric});
@@ -303,21 +308,21 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                    optionToString: this.fieldOption}}/>
                 : key === 'override'
                 ? <Field<boolean> key={index}
-                         id={key}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{
-                           defaultValue: "Override true metrics?",
-                           values: [true, false]}}/>
+                                  id={key}
+                                  label={key}
+                                  type="dropdown"
+                                  dropdown={{
+                                    defaultValue: "Override true metrics?",
+                                    values: [true, false]}}/>
                 : key === 'generic'
                   ? <Field<boolean> key={index}
-                           id={key}
-                           label={key}
-                           type="dropdown"
-                           dropdown={{
-                             selectCallback: this.isGenericSelected,
-                             defaultValue: "Apply to all hosts?",
-                             values: [true, false]}}/>
+                                    id={key}
+                                    label={key}
+                                    type="dropdown"
+                                    dropdown={{
+                                      selectCallback: this.isGenericSelected,
+                                      defaultValue: "Apply to all hosts?",
+                                      values: [true, false]}}/>
                   : key === 'minimumValue' || key === 'maximumValue'
                     ? <Field key={index}
                              id={key}
@@ -411,6 +416,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadSimulatedHostMetrics,
   addSimulatedHostMetric,
+  updateSimulatedHostMetric,
   loadFields,
   addSimulatedHostMetricCloudHosts,
   addSimulatedHostMetricEdgeHosts

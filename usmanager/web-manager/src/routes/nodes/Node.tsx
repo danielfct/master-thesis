@@ -16,8 +16,7 @@ import {IReply} from "../../utils/api";
 import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
-import {awsInstanceStates, ICloudHost} from "../hosts/cloud/CloudHost";
-import {IService} from "../services/Service";
+import {ICloudHost} from "../hosts/cloud/CloudHost";
 
 export interface INode {
   id: string;
@@ -177,8 +176,9 @@ class Node extends BaseComponent<Props, State> {
 
   private updateNode = (node: INode) => {
     node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
-    if (this.props.node?.id) {
-      this.props.updateNode(this.props.node as INode, node);
+    const previousNode = this.getNode();
+    if (previousNode?.id) {
+      this.props.updateNode(previousNode as INode, node)
     }
     this.setState({node: node});
   };

@@ -234,8 +234,9 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private updateEdgeHost = (edgeHost: IEdgeHost) => {
     edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
-    if (this.props.edgeHost.id) {
-      this.props.updateEdgeHost(this.props.edgeHost as IEdgeHost, edgeHost);
+    const previousEdgeHost = this.getEdgeHost();
+    if (previousEdgeHost.id) {
+      this.props.updateEdgeHost(previousEdgeHost as IEdgeHost, edgeHost);
     }
     const formEdgeHost = { ...edgeHost };
     removeFields(formEdgeHost);

@@ -24,27 +24,31 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.database;
 
-import lombok.extern.slf4j.Slf4j;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppServiceRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentType;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.loadbalancer.nginx.NginxLoadBalancerService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.MasterManagerMonitoringService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.Operator;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.RuleDecision;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
@@ -52,27 +56,20 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleConditionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.services.ServiceRuleRepository;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyEntity;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.valuemodes.ValueModeRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.componenttypes.ComponentTypeRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condition.ConditionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.decision.DecisionRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.operators.OperatorRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceRepository;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.services.dependencies.ServiceDependencyRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.users.UserEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.users.UsersRepository;
 
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -86,13 +83,11 @@ public class DatabaseLoader {
   CommandLineRunner initDatabase(PasswordEncoder encoder, UsersRepository users, AppRepository apps,
                                  ServiceRepository services, AppServiceRepository appServices,
                                  ServiceDependencyRepository servicesDependencies, RegionRepository regions,
-                                 EdgeHostRepository edgeHosts,
                                  ComponentTypeRepository componentTypes, OperatorRepository operators,
                                  DecisionRepository decisions, FieldRepository fields,
                                  ValueModeRepository valueModes, ConditionRepository conditions,
                                  HostRuleRepository hostRules, ServiceRuleRepository serviceRules,
-                                 CloudHostsService cloudHostsService, SshService sshService,
-                                 DockerProperties dockerProperties) {
+                                 CloudHostsService cloudHostsService, DockerProperties dockerProperties) {
     return args -> {
 
       // users

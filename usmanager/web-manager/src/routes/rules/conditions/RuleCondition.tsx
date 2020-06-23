@@ -10,12 +10,21 @@ import {Error} from "../../../components/errors/Error";
 import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
-import {addCondition, loadConditions, loadFields, loadOperators, loadValueModes} from "../../../actions";
+import {
+  addCondition,
+  loadConditions,
+  loadFields,
+  loadOperators,
+  loadValueModes,
+  updateCondition
+} from "../../../actions";
 import {connect} from "react-redux";
 import {IReply} from "../../../utils/api";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
+import {IRegion} from "../../region/Region";
+import {INode} from "../../nodes/Node";
 
 export interface IRuleCondition extends IDatabaseData {
   name: string;
@@ -46,6 +55,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadConditions: (name: string) => void;
   addCondition: (condition: IRuleCondition) => void;
+  updateCondition: (previousCondition: IRuleCondition, currentCondition: IRuleCondition) => void;
   loadValueModes: () => void;
   loadFields: () => void;
   loadOperators: () => void;
@@ -134,6 +144,10 @@ class RuleCondition extends BaseComponent<Props, State> {
 
   private updateCondition = (condition: IRuleCondition) => {
     condition = Object.values(normalize(condition, Schemas.RULE_CONDITION).entities.conditions || {})[0];
+    const previousCondition = this.getCondition();
+    if (previousCondition?.id) {
+      this.props.updateCondition(previousCondition as IRuleCondition, condition)
+    }
     const formCondition = { ...condition };
     removeFields(formCondition);
     this.setState({condition: condition, formCondition: formCondition});
@@ -280,6 +294,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadConditions,
   addCondition,
+  updateCondition,
   loadValueModes,
   loadFields,
   loadOperators,

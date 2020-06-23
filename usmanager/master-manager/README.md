@@ -73,15 +73,13 @@ Configurar  encaminhamento `sudo setfacl --modify user:<user name or ID>:rw /var
 - Se ao estabeler uma ligação com o aws ec2, bloquear, fazer o seguinte:
 https://stackoverflow.com/a/48572280 
 
-- Utilizar computadores pessoais. Normalmente protegidos pelo router (http://192.168.1.254 no caso de meo, http://192.168.1.1 no caso de nos ou vodafone), estão apenas acessíveis na rede local. 
-É preciso configurar os seguintes encaminhamentos de portas no painel de controlo do router: 
+- Utilizar computadores pessoais. Normalmente protegidos pelo router (http://192.168.1.254 no caso de meo, http://192.168.1.1 no caso de nos ou vodafone), estão apenas acessíveis na rede local.
+Se o router usar [DHCP](https://pt.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol) para atribuir ips dinâmicos às máquinas, é preciso definir um ip estático para o host desejado, através da interface do router.
+E configurar os seguintes encaminhamentos de portas no painel de controlo do router: 
     - Ssh, porta 22 TCP. Aceder usando `ssh user@ip_publico_do_router` ([ver ip público](https://ipinfo.io/ip))
     - Docker Cluster management communications, porta 2377 TCP
     - Communication among docker nodes, porta 7946 TCP e UDP 
-    - Docker Overlay network traffic, porta 4789 UDP 
-    
-- Adicionar novos edge hosts:
-    - Permitir executar sudo sem password, https://askubuntu.com/a/147265
+    - Docker Overlay network traffic, porta 4789 UDP
     
 ### Licença
 

@@ -27,7 +27,7 @@ import {
   addRuleContainerConditions,
   addRuleContainers,
   loadDecisions,
-  loadRulesContainer,
+  loadRulesContainer, updateRuleContainer,
 } from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -38,6 +38,8 @@ import RuleContainerContainersList from "./RuleContainerContainersList";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
+import {IRuleCondition} from "../conditions/RuleCondition";
+import {INode} from "../../nodes/Node";
 
 export interface IRuleContainer extends IRule {
   containers?: string[]
@@ -62,6 +64,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadRulesContainer: (name: string) => void;
   addRuleContainer: (ruleContainer: IRuleContainer) => void;
+  updateRuleContainer: (previousRuleContainer: IRuleContainer, currentRuleContainer: IRuleContainer) => void;
   loadDecisions: () => void;
   addRuleContainerConditions: (ruleName: string, conditions: string[]) => void;
   addRuleContainers: (ruleName: string, containers: string[]) => void;
@@ -232,6 +235,10 @@ class RuleContainer extends BaseComponent<Props, State> {
 
   private updateRuleContainer = (ruleContainer: IRuleContainer) => {
     ruleContainer = Object.values(normalize(ruleContainer, Schemas.RULE_CONTAINER).entities.containerRules || {})[0];
+    const previousRuleContainer = this.getRuleContainer();
+    if (previousRuleContainer?.id) {
+      this.props.updateRuleContainer(previousRuleContainer as IRuleContainer, ruleContainer)
+    }
     const formRuleContainer = { ...ruleContainer };
     removeFields(formRuleContainer);
     this.setState({ruleContainer: ruleContainer, formRuleContainer: formRuleContainer});
@@ -406,6 +413,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadRulesContainer,
   addRuleContainer,
+  updateRuleContainer,
   loadDecisions,
   addRuleContainerConditions,
   addRuleContainers,

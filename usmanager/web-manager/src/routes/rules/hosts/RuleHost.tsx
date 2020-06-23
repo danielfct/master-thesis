@@ -29,7 +29,7 @@ import {
   addRuleHostConditions,
   addRuleEdgeHosts,
   loadDecisions,
-  loadRulesHost, addRuleHost,
+  loadRulesHost, addRuleHost, updateRuleHost,
 } from "../../../actions";
 import {IReply, postData} from "../../../utils/api";
 import HostRuleConditionList from "./RuleHostConditionList";
@@ -39,6 +39,7 @@ import HostRuleEdgeHostsList from "./RuleHostEdgeHostsList";
 import {isNew} from "../../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
+import {IEdgeHost} from "../../hosts/edge/EdgeHost";
 
 export interface IRuleHost extends IRule {
   cloudHosts?: string[],
@@ -63,6 +64,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadRulesHost: (name: string) => void;
   addRuleHost: (ruleHost: IRuleHost) => void;
+  updateRuleHost: (previousRuleHost: IRuleHost, currentRuleHost: IRuleHost) => void;
   loadDecisions: () => void;
   addRuleHostConditions: (ruleName: string, conditions: string[]) => void;
   addRuleCloudHosts: (ruleName: string, cloudHosts: string[]) => void;
@@ -268,6 +270,10 @@ class RuleHost extends BaseComponent<Props, State> {
 
   private updateRuleHost = (ruleHost: IRuleHost) => {
     ruleHost = Object.values(normalize(ruleHost, Schemas.RULE_HOST).entities.hostRules || {})[0];
+    const previousRuleHost = this.getRuleHost();
+    if (previousRuleHost.id) {
+      this.props.updateRuleHost(previousRuleHost as IRuleHost, ruleHost);
+    }
     const formRuleHost = { ...ruleHost };
     removeFields(formRuleHost);
     this.setState({ruleHost: ruleHost, formRuleHost: formRuleHost});
@@ -457,6 +463,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 
 const mapDispatchToProps: DispatchToProps = {
   loadRulesHost,
+  updateRuleHost,
   addRuleHost,
   loadDecisions,
   addRuleHostConditions,

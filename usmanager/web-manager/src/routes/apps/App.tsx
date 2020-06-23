@@ -283,8 +283,9 @@ class App extends BaseComponent<Props, State> {
 
   private updateApp = (app: IApp) => {
     app = Object.values(normalize(app, Schemas.APP).entities.apps || {})[0];
-    if (this.props.app.id) {
-      this.props.updateApp(this.props.app as IApp, app);
+    const previousApp = this.getApp();
+    if (previousApp.id) {
+      this.props.updateApp(previousApp as IApp, app);
     }
     const formApp = { ...app };
     removeFields(formApp);

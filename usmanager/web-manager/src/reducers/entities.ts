@@ -724,9 +724,9 @@ const entities = (state: EntitiesState = {
       if (data?.apps && data.apps?.length > 1) {
         const previousApp = data.apps[0];
         const filteredApps = Object.values(state.apps.data).filter(app => app.id !== previousApp.id);
-        const currentApp = data.apps[1];
+        const currentApp = {...previousApp, ...data.apps[1]};
         filteredApps.push(currentApp);
-        const apps = normalize(filteredApps, Schemas.APP_ARRAY).entities.services || {};
+        const apps = normalize(filteredApps, Schemas.APP_ARRAY).entities.apps || {};
         return {
           ...state,
           apps: {
@@ -821,7 +821,7 @@ const entities = (state: EntitiesState = {
       if (data?.services && data.services?.length > 1) {
         const previousService = data.services[0];
         const filteredServices = Object.values(state.services.data).filter(service => service.id !== previousService.id);
-        const currentService = data.services[1];
+        const currentService = {...previousService, ...data.services[1]};
         filteredServices.push(currentService);
         const services = normalize(filteredServices, Schemas.SERVICE_ARRAY).entities.services || {};
         return {
@@ -1386,9 +1386,9 @@ const entities = (state: EntitiesState = {
       if (data?.edgeHosts && data.edgeHosts?.length > 1) {
         const previousEdgeHost = data.edgeHosts[0];
         const filteredEdgeHosts = Object.values(state.hosts.edge.data).filter(edgeHost => edgeHost.id !== previousEdgeHost.id);
-        const currentEdgeHost = data.edgeHosts[1];
+        const currentEdgeHost = {...previousEdgeHost, ...data.edgeHosts[1]};
         filteredEdgeHosts.push(currentEdgeHost);
-        const edgeHosts = normalize(filteredEdgeHosts, Schemas.EDGE_HOST_ARRAY).entities.services || {};
+        const edgeHosts = normalize(filteredEdgeHosts, Schemas.EDGE_HOST_ARRAY).entities.edgeHosts || {};
         return {
           ...state,
           hosts: {
@@ -1529,9 +1529,9 @@ const entities = (state: EntitiesState = {
       if (data?.nodes && data.nodes?.length > 1) {
         const previousNode = data.nodes[0];
         const filteredNodes = Object.values(state.nodes.data).filter(node => node.id !== previousNode.id);
-        const currentNode = data.nodes[1];
+        const currentNode = {...previousNode, ...data.nodes[1]};
         filteredNodes.push(currentNode);
-        const nodes = normalize(filteredNodes, Schemas.NODE_ARRAY).entities.services || {};
+        const nodes = normalize(filteredNodes, Schemas.NODE_ARRAY).entities.nodes || {};
         return {
           ...state,
           nodes: {
@@ -1584,9 +1584,9 @@ const entities = (state: EntitiesState = {
         const previousHostRule = data.hostRules[0];
         const filteredHostRules = Object.values(state.rules.hosts.data)
                                            .filter(hostRule => hostRule.id !== previousHostRule.id);
-        const currentHostRule = data.hostRules[1];
+        const currentHostRule = {...previousHostRule, ...data.hostRules[1]};
         filteredHostRules.push(currentHostRule);
-        const hostRules = normalize(filteredHostRules, Schemas.RULE_HOST_ARRAY).entities.hosts || {};
+        const hostRules = normalize(filteredHostRules, Schemas.RULE_HOST_ARRAY).entities.hostRules || {};
         return {
           ...state,
           rules: {
@@ -1801,9 +1801,9 @@ const entities = (state: EntitiesState = {
         const previousServiceRule = data.serviceRules[0];
         const filteredServiceRules = Object.values(state.rules.services.data)
                                              .filter(serviceRule => serviceRule.id !== previousServiceRule.id);
-        const currentServiceRule = data.serviceRules[1];
+        const currentServiceRule = {...previousServiceRule, ...data.serviceRules[1]};
         filteredServiceRules.push(currentServiceRule);
-        const serviceRules = normalize(filteredServiceRules, Schemas.RULE_SERVICE_ARRAY).entities.services || {};
+        const serviceRules = normalize(filteredServiceRules, Schemas.RULE_SERVICE_ARRAY).entities.serviceRules || {};
         return {
           ...state,
           rules: {
@@ -1964,9 +1964,9 @@ const entities = (state: EntitiesState = {
         const previousContainerRule = data.containerRules[0];
         const filteredContainerRules = Object.values(state.rules.containers.data)
                                              .filter(containerRule => containerRule.id !== previousContainerRule.id);
-        const currentContainerRule = data.containerRules[1];
+        const currentContainerRule = {...previousContainerRule, ...data.containerRules[1]};
         filteredContainerRules.push(currentContainerRule);
-        const containerRules = normalize(filteredContainerRules, Schemas.RULE_CONTAINER_ARRAY).entities.services || {};
+        const containerRules = normalize(filteredContainerRules, Schemas.RULE_CONTAINER_ARRAY).entities.containerRules || {};
         return {
           ...state,
           rules: {
@@ -2126,7 +2126,7 @@ const entities = (state: EntitiesState = {
         const previousCondition = data.conditions[0];
         const filteredConditions = Object.values(state.rules.conditions.data)
                                         .filter(condition => condition.id !== previousCondition.id);
-        const currentCondition = data.conditions[1];
+        const currentCondition = {...previousCondition, ...data.conditions[1]};
         filteredConditions.push(currentCondition);
         const conditions = normalize(filteredConditions, Schemas.RULE_CONDITION_ARRAY).entities.conditions || {};
         return {
@@ -2251,7 +2251,7 @@ const entities = (state: EntitiesState = {
         const previousSimulatedHostMetric = data.simulatedHostMetrics[0];
         const filteredSimulatedHostMetrics = Object.values(state.simulatedMetrics.hosts.data)
                                          .filter(simulatedHostMetric => simulatedHostMetric.id !== previousSimulatedHostMetric.id);
-        const currentSimulatedHostMetric = data.simulatedHostMetrics[1];
+        const currentSimulatedHostMetric = {...previousSimulatedHostMetric, ...data.simulatedHostMetrics[1]};
         filteredSimulatedHostMetrics.push(currentSimulatedHostMetric);
         const simulatedHostMetrics = normalize(filteredSimulatedHostMetrics, Schemas.SIMULATED_HOST_METRIC_ARRAY).entities.simulatedHostMetrics || {};
         return {
@@ -2413,7 +2413,7 @@ const entities = (state: EntitiesState = {
         const previousSimulatedServiceMetric = data.simulatedServiceMetrics[0];
         const filteredSimulatedServiceMetrics = Object.values(state.simulatedMetrics.services.data)
                                                    .filter(simulatedServiceMetric => simulatedServiceMetric.id !== previousSimulatedServiceMetric.id);
-        const currentSimulatedServiceMetric = data.simulatedServiceMetrics[1];
+        const currentSimulatedServiceMetric = {...previousSimulatedServiceMetric, ...data.simulatedServiceMetrics[1]};
         filteredSimulatedServiceMetrics.push(currentSimulatedServiceMetric);
         const simulatedServiceMetrics = normalize(filteredSimulatedServiceMetrics, Schemas.SIMULATED_SERVICE_METRIC_ARRAY).entities.simulatedServiceMetrics || {};
         return {
@@ -2523,7 +2523,7 @@ const entities = (state: EntitiesState = {
         const previousSimulatedContainerMetric = data.simulatedContainerMetrics[0];
         const filteredSimulatedContainerMetrics = Object.values(state.simulatedMetrics.containers.data)
                                                       .filter(simulatedContainerMetric => simulatedContainerMetric.id !== previousSimulatedContainerMetric.id);
-        const currentSimulatedContainerMetric = data.simulatedContainerMetrics[1];
+        const currentSimulatedContainerMetric = {...previousSimulatedContainerMetric, ...data.simulatedContainerMetrics[1]};
         filteredSimulatedContainerMetrics.push(currentSimulatedContainerMetric);
         const simulatedContainerMetrics = normalize(filteredSimulatedContainerMetrics, Schemas.SIMULATED_CONTAINER_METRIC_ARRAY).entities.simulatedContainerMetrics || {};
         return {
@@ -2625,9 +2625,9 @@ const entities = (state: EntitiesState = {
       if (data?.regions && data.regions?.length > 1) {
         const previousRegion = data.regions[0];
         const filteredRegions = Object.values(state.regions.data).filter(region => region.id !== previousRegion.id);
-        const currentRegion = data.regions[1];
+        const currentRegion = {...previousRegion, ...data.regions[1]};
         filteredRegions.push(currentRegion);
-        const regions = normalize(filteredRegions, Schemas.REGION_ARRAY).entities.services || {};
+        const regions = normalize(filteredRegions, Schemas.REGION_ARRAY).entities.regions || {};
         return {
           ...state,
           regions: {

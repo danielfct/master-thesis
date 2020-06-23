@@ -9,12 +9,13 @@ import React from "react";
 import Tabs from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
-import {addRegion, loadRegions} from "../../actions";
+import {addRegion, loadRegions, updateRegion} from "../../actions";
 import {connect} from "react-redux";
 import {IReply} from "../../utils/api";
 import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
+import {INode} from "../nodes/Node";
 
 export interface IRegion extends IDatabaseData {
   name: string;
@@ -38,6 +39,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadRegions: (name: string) => void;
   addRegion: (region: IRegion) => void;
+  updateRegion: (previousRegion: IRegion, currentRegion: IRegion) => void;
 }
 
 interface MatchParams {
@@ -120,6 +122,10 @@ class Region extends BaseComponent<Props, State> {
 
   private updateRegion = (region: IRegion) => {
     region = Object.values(normalize(region, Schemas.REGION).entities.regions || {})[0];
+    const previousRegion = this.getRegion();
+    if (previousRegion?.id) {
+      this.props.updateRegion(previousRegion as IRegion, region)
+    }
     const formRegion = { ...region };
     removeFields(formRegion);
     this.setState({region: region, formRegion: formRegion});
@@ -244,6 +250,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadRegions,
   addRegion,
+  updateRegion,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Region);

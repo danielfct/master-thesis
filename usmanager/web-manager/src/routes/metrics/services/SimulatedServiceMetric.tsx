@@ -22,7 +22,7 @@ import {
   addSimulatedServiceMetric,
   addSimulatedServiceMetricServices,
   loadFields,
-  loadSimulatedServiceMetrics
+  loadSimulatedServiceMetrics, updateSimulatedServiceMetric
 } from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -33,6 +33,9 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedServiceMetricServiceList from "./SimulatedServiceMetricServiceList";
+import {IRuleHost} from "../../rules/hosts/RuleHost";
+import {IRuleService} from "../../rules/services/RuleService";
+import {ISimulatedContainerMetric} from "../containers/SimulatedContainerMetric";
 
 export interface ISimulatedServiceMetric extends IDatabaseData {
   name: string;
@@ -64,6 +67,8 @@ interface StateToProps {
 interface DispatchToProps {
   loadSimulatedServiceMetrics: (name: string) => void;
   addSimulatedServiceMetric: (simulatedServiceMetric: ISimulatedServiceMetric) => void;
+  updateSimulatedServiceMetric: (previousSimulatedServiceMetric: ISimulatedServiceMetric,
+                                 currentSimulatedServiceMetric: ISimulatedServiceMetric) => void;
   loadFields: () => void;
   addSimulatedServiceMetricServices: (name: string, services: string[]) => void;
 }
@@ -193,6 +198,10 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
   private updateSimulatedServiceMetric = (simulatedServiceMetric: ISimulatedServiceMetric) => {
     simulatedServiceMetric = Object.values(normalize(simulatedServiceMetric, Schemas.SIMULATED_SERVICE_METRIC).entities.simulatedServiceMetrics || {})[0];
+    const previousSimulatedServiceMetric = this.getSimulatedServiceMetric();
+    if (previousSimulatedServiceMetric.id) {
+      this.props.updateSimulatedServiceMetric(previousSimulatedServiceMetric as ISimulatedServiceMetric, simulatedServiceMetric);
+    }
     const formSimulatedServiceMetric = { ...simulatedServiceMetric };
     removeFields(formSimulatedServiceMetric);
     this.setState({simulatedServiceMetric: simulatedServiceMetric, formSimulatedServiceMetric: formSimulatedServiceMetric});
@@ -265,21 +274,21 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
                                    optionToString: this.fieldOption}}/>
                 : key === 'override'
                 ? <Field<boolean> key={index}
-                         id={key}
-                         label={key}
-                         type="dropdown"
-                         dropdown={{
-                           defaultValue: "Override true metrics?",
-                           values: [true, false]}}/>
+                                  id={key}
+                                  label={key}
+                                  type="dropdown"
+                                  dropdown={{
+                                    defaultValue: "Override true metrics?",
+                                    values: [true, false]}}/>
                 : key === 'generic'
                   ? <Field<boolean> key={index}
-                           id={key}
-                           label={key}
-                           type="dropdown"
-                           dropdown={{
-                             selectCallback: this.isGenericSelected,
-                             defaultValue: "Apply to all services?",
-                             values: [true, false]}}/>
+                                    id={key}
+                                    label={key}
+                                    type="dropdown"
+                                    dropdown={{
+                                      selectCallback: this.isGenericSelected,
+                                      defaultValue: "Apply to all services?",
+                                      values: [true, false]}}/>
                   : key === 'minimumValue' || key === 'maximumValue'
                     ? <Field key={index}
                              id={key}
@@ -358,6 +367,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadSimulatedServiceMetrics,
   addSimulatedServiceMetric,
+  updateSimulatedServiceMetric,
   loadFields,
   addSimulatedServiceMetricServices,
 };

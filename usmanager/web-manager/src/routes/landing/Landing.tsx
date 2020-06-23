@@ -24,10 +24,13 @@
 
 import React from 'react';
 import MainLayout from '../../views/mainLayout/MainLayout';
+import styles from './Landing.module.css';
 
 const Landing = () =>
     <MainLayout>
-        <img src={require('../../resources/images/architecture.png')} alt="System architecture"/>
+        <img className={`${styles.landingImage}`}
+             src={require('../../resources/images/architecture.png')}
+             alt="System architecture"/>
     </MainLayout>;
 
 export default Landing;

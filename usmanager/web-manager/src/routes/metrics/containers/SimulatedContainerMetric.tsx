@@ -22,7 +22,7 @@ import {
   addSimulatedContainerMetric,
   addSimulatedContainerMetricContainers,
   loadFields,
-  loadSimulatedContainerMetrics
+  loadSimulatedContainerMetrics, updateSimulatedContainerMetric
 } from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -33,6 +33,9 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedContainerMetricContainerList from "./SimulatedContainerMetricContainerList";
+import {IRuleHost} from "../../rules/hosts/RuleHost";
+import {IRuleCondition} from "../../rules/conditions/RuleCondition";
+import {IApp} from "../../apps/App";
 
 export interface ISimulatedContainerMetric extends IDatabaseData {
   name: string;
@@ -64,6 +67,8 @@ interface StateToProps {
 interface DispatchToProps {
   loadSimulatedContainerMetrics: (name: string) => void;
   addSimulatedContainerMetric: (simulatedContainerMetric: ISimulatedContainerMetric) => void;
+  updateSimulatedContainerMetric: (previousSimulatedContainerMetric: ISimulatedContainerMetric,
+                                   currentSimulatedContainerMetric: ISimulatedContainerMetric) => void;
   loadFields: () => void;
   addSimulatedContainerMetricContainers: (name: string, containers: string[]) => void;
 }
@@ -194,6 +199,10 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
   private updateSimulatedContainerMetric = (simulatedContainerMetric: ISimulatedContainerMetric) => {
     simulatedContainerMetric = Object.values(normalize(simulatedContainerMetric, Schemas.SIMULATED_CONTAINER_METRIC).entities.simulatedContainerMetrics || {})[0];
+    const previousSimulatedContainerMetric = this.getSimulatedContainerMetric();
+    if (previousSimulatedContainerMetric.id) {
+      this.props.updateSimulatedContainerMetric(previousSimulatedContainerMetric as ISimulatedContainerMetric, simulatedContainerMetric);
+    }
     const formSimulatedContainerMetric = { ...simulatedContainerMetric };
     removeFields(formSimulatedContainerMetric);
     this.setState({simulatedContainerMetric: simulatedContainerMetric, formSimulatedContainerMetric: formSimulatedContainerMetric});
@@ -359,6 +368,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadSimulatedContainerMetrics,
   addSimulatedContainerMetric,
+  updateSimulatedContainerMetric,
   loadFields,
   addSimulatedContainerMetricContainers,
 };
