@@ -17,13 +17,20 @@ import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
 import {ICloudHost} from "../hosts/cloud/CloudHost";
+import NodeLabelsList from "./NodeLabelList";
 
 export interface INode {
   id: string;
   hostname: string;
   state: string;
+  availability: string;
   role: string;
   version: number;
+  labels: INodeLabel;
+}
+
+export interface INodeLabel {
+  [key: string]: string
 }
 
 interface INewNodeHost {
@@ -58,6 +65,7 @@ interface StateToProps {
   newNodeHost?: INewNodeHost;
   newNodeLocation?: INewNodeLocation;
   node?: INode;
+  formNode?: Partial<INode>;
   cloudHosts: { [key: string]: ICloudHost };
   edgeHosts: { [key: string]: IEdgeHost };
   regions: { [key: string]: IRegion };
@@ -81,6 +89,7 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 
 interface State {
   node?: INode,
+  formNode?: INode,
   currentForm: 'On host' | 'On location',
 }
 
@@ -113,6 +122,9 @@ class Node extends BaseComponent<Props, State> {
 
   private getNode = () =>
     this.state.node || this.props.node;
+
+  private getFormNode = () =>
+    this.state.formNode || this.props.formNode;
 
   private isNew = () =>
     isNew(this.props.location.search);
@@ -180,7 +192,9 @@ class Node extends BaseComponent<Props, State> {
     if (previousNode?.id) {
       this.props.updateNode(previousNode as INode, node)
     }
-    this.setState({node: node});
+    const formNode = { ...node };
+    removeFields(formNode);
+    this.setState({node: node, formNode: formNode});
   };
 
   private getFields = (node: INewNodeHost | INewNodeLocation | INode): IFields =>
@@ -216,7 +230,7 @@ class Node extends BaseComponent<Props, State> {
     region.name;
 
   private formFields = (isNew: boolean) => {
-    const node = this.getNode();
+    const formNode = this.getFormNode();
     const {currentForm} = this.state;
     return (
       isNew ?
@@ -271,20 +285,20 @@ class Node extends BaseComponent<Props, State> {
                    type={"number"}/>
           </>
         :
-        node && Object.entries(node).map(([key, value], index) =>
-               key === 'role'
-                 ? <Field key={'role'}
-                          id={'role'}
-                          label={'role'}
-                          type="dropdown"
-                          dropdown={{
-                            defaultValue: "Select role",
-                            values: ['MANAGER', 'WORKER']
-                          }}/>
-                 : <Field key={index}
-                          id={key}
-                          label={key}
-                          disabled={true}/>)
+        formNode && Object.entries(formNode).map(([key, value], index) =>
+                   key === 'role'
+                     ? <Field key={'role'}
+                              id={'role'}
+                              label={'role'}
+                              type="dropdown"
+                              dropdown={{
+                                defaultValue: "Select role",
+                                values: ['MANAGER', 'WORKER']
+                              }}/>
+                     : <Field key={index}
+                              id={key}
+                              label={key}
+                              disabled={true}/>)
     );
   };
 
@@ -318,7 +332,7 @@ class Node extends BaseComponent<Props, State> {
                   successCallback: this.onPutSuccess,
                   failureCallback: this.onPutFailure
                 }}
-                // delete button is never present on new nodes, so a type cast is safe
+            // delete button is never present on new nodes, so a type cast is safe
                 delete={{
                   textButton: 'Leave swarm',
                   url: `nodes/${(node as INode).id}`,
@@ -332,12 +346,31 @@ class Node extends BaseComponent<Props, State> {
     )
   };
 
+  private labels = (): JSX.Element =>
+    <NodeLabelsList isLoadingNode={this.props.isLoading}
+                    loadNodeError={!this.isNew() ? this.props.error : undefined}
+                    node={this.getNode()}/>;
+
   private tabs = () =>
-    [{
-      title: 'Node',
-      id: 'node',
-      content: () => this.node()
-    }];
+    this.isNew()
+      ? [
+        {
+          title: 'Node',
+          id: 'newNode',
+          content: () => this.node()
+        }
+      ] : [
+        {
+          title: 'Node',
+          id: 'node',
+          content: () => this.node()
+        },
+        {
+          title: 'Labels',
+          id: 'nodeLabels',
+          content: () => this.labels()
+        },
+      ];
 
   public render() {
     return (
@@ -351,6 +384,13 @@ class Node extends BaseComponent<Props, State> {
 
 }
 
+
+function removeFields(node: Partial<INode>) {
+  if (node) {
+    delete node["labels"];
+  }
+}
+
 function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const isLoading = state.entities.nodes.isLoadingNodes;
   const error = state.entities.nodes.loadNodesError;
@@ -358,6 +398,11 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
   const newNodeHost = isNew(props.location.search) ? buildNewNodeHost() : undefined;
   const newNodeLocation = isNew(props.location.search) ? buildNewNodeLocation() : undefined;
   const node = !isNew(props.location.search) ? state.entities.nodes.data[id] : undefined;
+  let formNode;
+  if (node) {
+    formNode = { ...node };
+    removeFields(formNode);
+  }
   const nodes = state.entities.nodes.data;
   const cloudHosts = state.entities.hosts.cloud.data;
   const edgeHosts = state.entities.hosts.edge.data;
@@ -368,6 +413,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     newNodeHost,
     newNodeLocation,
     node,
+    formNode,
     nodes,
     cloudHosts,
     edgeHosts,

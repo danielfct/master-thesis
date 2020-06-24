@@ -35,6 +35,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.Contai
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.SimpleNode;
@@ -45,6 +46,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.A
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.HostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus.PrometheusService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshCommandResult;
@@ -79,7 +81,8 @@ public class HostsService {
   private final PrometheusService prometheusService;
   private final LocationRequestService locationRequestService;
   private final DockerApiProxyService dockerApiProxyService;
-  private String localMachineDns;
+  private final RegionsService regionsService;
+  private final String localMachineDns;
   private String publicIp;
   private String privateIp;
   private final int maxWorkers;
@@ -91,8 +94,8 @@ public class HostsService {
                       CloudHostsService cloudHostsService, SshService sshService, BashService bashService,
                       HostMetricsService hostMetricsService,
                       PrometheusService prometheusService, @Lazy LocationRequestService locationRequestService,
-                      DockerApiProxyService dockerApiProxyService, DockerProperties dockerProperties,
-                      AwsProperties awsProperties,
+                      DockerApiProxyService dockerApiProxyService, RegionsService regionsService,
+                      DockerProperties dockerProperties, AwsProperties awsProperties,
                       MasterManagerProperties masterManagerProperties,
                       HostProperties hostProperties) {
     this.nodesService = nodesService;
@@ -106,6 +109,7 @@ public class HostsService {
     this.prometheusService = prometheusService;
     this.locationRequestService = locationRequestService;
     this.dockerApiProxyService = dockerApiProxyService;
+    this.regionsService = regionsService;
     this.maxWorkers = dockerProperties.getSwarm().getMaxWorkers();
     this.maxInstances = awsProperties.getInitialMaxInstances();
     this.localMachineDns = hostProperties.getLocalMachineDns();
@@ -122,7 +126,7 @@ public class HostsService {
               .publicDnsName(localMachineDns)
               .publicIpAddress(publicIp)
               .privateIpAddress(privateIp)
-              .region("eu-central-1")
+              .region(regionsService.getRegion("eu-central"))
               .country("pt")
               .city("lisbon")
               .build(),
@@ -213,9 +217,7 @@ public class HostsService {
   }
 
   private String joinSwarm(String hostname, NodeRole role) {
-    return dockerSwarmService.getSwarmManagerNodeId(hostname)
-        .or(() -> dockerSwarmService.getSwarmWorkerNodeId(hostname))
-        .orElseGet(() -> dockerSwarmService.joinSwarm(hostname, role));
+    return dockerSwarmService.joinSwarm(hostname, role);
   }
 
   public String getAvailableHost(double avgContainerMem, HostDetails hostDetails) {
@@ -240,18 +242,19 @@ public class HostsService {
   }
 
   //FIXME
-  public String getAvailableHost(double avgContainerMem, String region, String country, String city) {
+  public String getAvailableHost(double expectedMemoryConsumption, String region, String country, String city) {
     //TODO try to improve method
     log.info("Looking for available nodes to host container with at least '{}' memory at region '{}', country '{}', "
-        + "city '{}'", avgContainerMem, region, country, city);
+        + "city '{}'", expectedMemoryConsumption, region, country, city);
     var otherRegionsHosts = new LinkedList<String>();
     var sameRegionHosts = new LinkedList<String>();
     var sameCountryHosts = new LinkedList<String>();
     var sameCityHosts = new LinkedList<String>();
     List<SimpleNode> nodes = nodesService.getAvailableNodes();
     nodes.stream()
-        .map(SimpleNode::getHostname)
-        .filter(hostname -> hostMetricsService.nodeHasAvailableResources(hostname, avgContainerMem))
+        .map(SimpleNode::getLabels)
+        .map(label -> label.get(NodeConstants.Label.REACHABLE_ADDRESS))
+        .filter(hostname -> hostMetricsService.nodeHasAvailableResources(hostname, expectedMemoryConsumption))
         .forEach(hostname -> {
           HostDetails hostDetails = getHostDetails(hostname);
           if (Objects.equals(hostDetails.getRegion(), region)) {
@@ -325,7 +328,7 @@ public class HostsService {
       privateIpAddress = edgeHost.getPrivateIpAddress();
       city = edgeHost.getCity();
       country = edgeHost.getCountry();
-      region = edgeHost.getRegion();
+      region = edgeHost.getRegion().getName();
       continent = getContinent(region);
     } catch (EntityNotFoundException e) {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);

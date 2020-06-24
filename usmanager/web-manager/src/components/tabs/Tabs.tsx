@@ -48,6 +48,9 @@ class Tabs extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+    if (prevProps.tabs !== this.props.tabs) {
+      M.Tabs.init(this.tabsRef.current as Element);
+    }
     if (prevProps.sidenav !== this.props.sidenav) {
       setTimeout(() => {
         M.Tabs.getInstance(this.tabsRef.current as Element).updateTabIndicator();

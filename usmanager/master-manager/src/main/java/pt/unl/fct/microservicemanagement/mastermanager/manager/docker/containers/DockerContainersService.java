@@ -113,9 +113,15 @@ public class DockerContainersService {
     var containers = new ArrayList<DockerContainer>(minReplicas);
     for (int i = 0; i < minReplicas; i++) {
       String hostname = hostsService.getAvailableHost(expectedMemoryConsumption, region, country, city);
-      Optional<DockerContainer> container = launchContainer(hostname, service, false, environment, labels,
-          dynamicLaunchParams);
-      container.ifPresent(containers::add);
+      try {
+        Optional<DockerContainer> container = launchContainer(hostname, service, false, environment, labels,
+            dynamicLaunchParams);
+        container.ifPresent(containers::add);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+
     }
     return containers;
   }

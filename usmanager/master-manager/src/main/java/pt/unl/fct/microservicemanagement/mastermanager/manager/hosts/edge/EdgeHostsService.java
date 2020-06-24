@@ -92,13 +92,15 @@ public class EdgeHostsService {
     String hostname = edgeHost.getHostname();
     String username = edgeHost.getUsername();
     log.info("Generating keys for edge host {}@{}", username, hostname);
-    var generateKeysCommand = String.format("ssh-keygen -b 2048 -t rsa -f %s/%s -q -N \"\" &&"
-            + " ssh-copy-id -i %s/%s %s", edgeKeyFilePath, username, edgeKeyFilePath, username, hostname);
-    SshCommandResult generateKeysResult = sshService.executeCommand(hostname, generateKeysCommand);
+    var generateKeysCommand = String.format("ssh-keygen -b 2048 -t rsa -f %s/%s/%s -q -N \"\" &&"
+            + " ssh-copy-id -i %s/%s %s", edgeKeyFilePath, username, System.getProperty("user.dir"), edgeKeyFilePath,
+        username, hostname);
+    SshCommandResult generateKeysResult = sshService.executeCommand(username, hostname, generateKeysCommand);
     if (!generateKeysResult.isSuccessful()) {
       // cleanup files
-      var cleanupCommand = String.format("rm -f %s/%s %s/%s.pub", edgeKeyFilePath, username, edgeKeyFilePath, username);
-      sshService.executeCommand(hostname, cleanupCommand);
+      //var cleanupCommand = String.format("rm -f %s/%s %s/%s.pub", edgeKeyFilePath, username, edgeKeyFilePath,
+      //    username);
+      //sshService.executeCommand(username, hostname, cleanupCommand);
       throw new MasterManagerException("Unable to generate public/private keys for edge host %s", hostname);
     }
   }
@@ -208,7 +210,7 @@ public class EdgeHostsService {
   private void assertHostDoesntExist(EdgeHostEntity edgeHost) {
     var hostname = edgeHost.getPublicDnsName() == null ? edgeHost.getPublicIpAddress() : edgeHost.getPublicDnsName();
     if (edgeHosts.hasEdgeHost(hostname)) {
-      throw new DataIntegrityViolationException("Edge host '%s - %s" + hostname + "' already exists");
+      throw new DataIntegrityViolationException("Edge host '" + hostname + "' already exists");
     }
   }
 

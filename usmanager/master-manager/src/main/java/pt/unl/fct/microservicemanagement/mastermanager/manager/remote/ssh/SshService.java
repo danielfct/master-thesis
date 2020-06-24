@@ -82,8 +82,6 @@ public class SshService {
   }
 
   private SSHClient initClient(String hostname) throws IOException {
-    var sshClient = new SSHClient();
-    sshClient.addHostKeyVerifier(new PromiscuousVerifier());
     String username;
     String publicKeyFile;
     try {
@@ -94,6 +92,19 @@ public class SshService {
       username = awsUser;
       publicKeyFile = awsKeyFilePath;
     }
+    return initClient(username, hostname, publicKeyFile);
+  }
+
+  private SSHClient initClient(String username, String hostname) throws IOException {
+    var sshClient = new SSHClient();
+    sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+    String publicKeyFile = String.format("%s/%s", edgeKeyFilePath, username);
+    return initClient(username, hostname, publicKeyFile);
+  }
+
+  private SSHClient initClient(String username, String hostname, String publicKeyFile) throws IOException {
+    var sshClient = new SSHClient();
+    sshClient.addHostKeyVerifier(new PromiscuousVerifier());
     log.info("Logging in to host '{}@{}' with key '{}'", username, hostname, publicKeyFile);
     sshClient.connect(hostname);
     var keyFile = new PKCS8KeyFile();
@@ -121,6 +132,16 @@ public class SshService {
 
   public SshCommandResult executeCommand(String hostname, String command) {
     try (SSHClient sshClient = initClient(hostname);
+         Session session = sshClient.startSession()) {
+      return executeCommand(session, hostname, command);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return new SshCommandResult(hostname, command, -1, List.of(), List.of(e.getMessage()));
+    }
+  }
+
+  public SshCommandResult executeCommand(String username, String hostname, String command) {
+    try (SSHClient sshClient = initClient(username, hostname);
          Session session = sshClient.startSession()) {
       return executeCommand(session, hostname, command);
     } catch (IOException e) {

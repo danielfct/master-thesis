@@ -24,7 +24,7 @@
 
 
 // TODO start with specific icons, like name === 'thing', then to general icons with name.contains('thing'), then 1 generic at the end
-import {FaDatabase, FaDocker} from "react-icons/all";
+import {FaCodeBranch, FaDatabase, FaDocker, FaFingerprint, FaMinus, FaThumbsDown, FaThumbsUp} from "react-icons/all";
 import {FaDoorOpen} from "react-icons/all";
 import {FaDoorClosed} from "react-icons/all";
 import React from "react";
@@ -71,6 +71,19 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   if (label === 'defaultdb') {
     return <FaDatabase></FaDatabase>;
   }
+  if (label === 'id') {
+    return <FaFingerprint/>
+  }
+  if (label === 'state') {
+    switch (value) {
+      case 'ready': return <FaThumbsUp></FaThumbsUp>;
+      case 'down': return <FaThumbsDown></FaThumbsDown>;
+      case 'drain': return <FaMinus></FaMinus>;
+    }
+  }
+  if (label.includes('version')) {
+    return <FaCodeBranch></FaCodeBranch>;
+  }
   if (value === true) {
     return "check";
   }
@@ -78,11 +91,6 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     return "clear";
   }
   return "account_circle";
-}
-
-export const mapLabelToFaIcon = (label: string, value: any): string => {
-  //TODO
-  return 'fa-cloud';
 }
 
 export const mapLabelToBootstrapIcon = (label: string, value: any): string => {

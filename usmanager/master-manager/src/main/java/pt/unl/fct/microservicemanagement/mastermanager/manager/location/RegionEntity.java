@@ -24,22 +24,29 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.location;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.NaturalId;
-
-import java.util.Objects;
+import lombok.Singular;
 
 @Entity
 @Builder(toBuilder = true)
@@ -62,6 +69,11 @@ public class RegionEntity {
 
   @Column(columnDefinition = "boolean default true")
   private boolean active;
+
+  @Singular
+  @JsonIgnore
+  @OneToMany(mappedBy = "region", cascade = CascadeType.ALL)
+  private Set<EdgeHostEntity> edgeHosts = new HashSet<>();
 
   @Override
   public boolean equals(Object o) {

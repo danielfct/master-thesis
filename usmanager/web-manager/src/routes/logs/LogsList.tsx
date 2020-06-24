@@ -92,7 +92,7 @@ class LogsList extends React.Component<Props, {}> {
 
   public render() {
     const {error, logs} = this.props;
-    let isLoading = this.props.isLoading && !this.reloadLogs;
+    let isLoading = this.props.isLoading;
     const LogsList = List<ILogs>();
     return (
       <>

@@ -1,3 +1,14 @@
+arquitetura:
+
+cada local manager controla 1 swarm
+
+comunica com o master manager atrvés de kafka
+
+usar o docker swarm service, usando constraints para controlar o local de deployment
+https://success.docker.com/article/using-contraints-and-labels-to-control-the-placement-of-containers
+resolve o problema do service discovery, usando o dns incorporado do docker swarm
+
+
 web-manager:
 loadbalancer 502 bad gateway
 new container erroring

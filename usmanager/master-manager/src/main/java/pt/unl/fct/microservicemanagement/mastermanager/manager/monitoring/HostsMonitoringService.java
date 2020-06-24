@@ -28,6 +28,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerE
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.SimpleNode;
@@ -156,7 +157,7 @@ public class HostsMonitoringService {
     List<SimpleNode> nodes = nodesService.getAvailableNodes();
     for (SimpleNode node : nodes) {
       log.info("On {}", node);
-      String hostname = node.getHostname();
+      String hostname = node.getLabels().get(NodeConstants.Label.REACHABLE_ADDRESS);
       Map<String, Double> newFields = hostMetricsService.getHostStats(hostname);
       newFields.forEach((field, value) -> saveMonitoringHostLog(hostname, field, value));
       HostDecisionResult hostDecisionResult = runHostRules(hostname, newFields);

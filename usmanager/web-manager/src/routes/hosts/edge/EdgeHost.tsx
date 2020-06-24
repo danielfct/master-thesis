@@ -19,11 +19,7 @@ import Tabs from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
-  addEdgeHost,
-  addEdgeHostRules,
-  addEdgeHostSimulatedMetrics,
-  loadEdgeHosts,
-  updateEdgeHost
+  addEdgeHost, addEdgeHostRules, addEdgeHostSimulatedMetrics, loadEdgeHosts, loadRegions, updateEdgeHost
 } from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -36,7 +32,7 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import EdgeHostSimulatedMetricList from "./EdgeHostSimulatedMetricList";
 import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
-import {IService} from "../../services/Service";
+import {IRegion} from "../../region/Region";
 
 export interface IEdgeHost extends IDatabaseData {
   username: string;
@@ -64,13 +60,15 @@ interface StateToProps {
   isLoading: boolean;
   error?: string | null;
   edgeHost: Partial<IEdgeHost>;
-  formEdgeHost?: Partial<IEdgeHost>,
+  formEdgeHost?: Partial<IEdgeHost>;
+  regions: { [key: string]: IRegion };
 }
 
 interface DispatchToProps {
   loadEdgeHosts: (hostname: string) => void;
   addEdgeHost: (edgeHost: IEdgeHost) => void;
   updateEdgeHost: (previousEdgeHost: IEdgeHost, currentEdgeHost: IEdgeHost) => void;
+  loadRegions: () => void;
   addEdgeHostRules: (hostname: string, rules: string[]) => void;
   addEdgeHostSimulatedMetrics: (hostname: string, simulatedMetrics: string[]) => void;
 }
@@ -98,6 +96,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   };
 
   public componentDidMount(): void {
+    this.props.loadRegions();
     this.loadEdgeHost();
     this.mounted = true;
   };
@@ -250,7 +249,7 @@ class EdgeHost extends BaseComponent<Props, State> {
           id: key,
           label: key,
           validation:
-            key === 'hostname'
+            key.toLowerCase().includes('address')
               ? { rule: requiredAndTrimmedAndNotValidIpAddress }
               : { rule: requiredAndTrimmed }
         }
@@ -261,6 +260,12 @@ class EdgeHost extends BaseComponent<Props, State> {
       }
       return fields;
     }, {});
+
+  private getSelectableRegions = () =>
+    Object.values(this.props.regions);
+
+  private regionDropdownOption = (region: IRegion) =>
+    region.name;
 
   private edgeHost = () => {
     const {isLoading, error} = this.props;
@@ -298,15 +303,24 @@ class EdgeHost extends BaseComponent<Props, State> {
             {Object.keys(formEdgeHost).map((key, index) =>
               key === 'local'
                 ? <Field<boolean> key={index}
-                         id={key}
-                         type="dropdown"
-                         label={key}
-                         dropdown={{
-                           defaultValue: "Is a local machine?",
-                           values: [true, false]}}/>
+                                  id={key}
+                                  type="dropdown"
+                                  label={key}
+                                  dropdown={{
+                                    defaultValue: "Is a local machine?",
+                                    values: [true, false]}}/>
+                : key === 'region'
+                ? <Field<IRegion> key='region'
+                                  id={'region'}
+                                  label='region'
+                                  type={'dropdown'}
+                                  dropdown={{
+                                    defaultValue: 'Select region',
+                                    values: this.getSelectableRegions(),
+                                    optionToString: this.regionDropdownOption}}/>
                 : <Field key={index}
-                         id={key}
-                         label={key}/>
+                       id={key}
+                       label={key}/>
             )}
           </Form>
         )}
@@ -398,6 +412,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
     error,
     edgeHost,
     formEdgeHost,
+    regions: state.entities.regions.data,
   }
 }
 
@@ -407,6 +422,7 @@ const mapDispatchToProps: DispatchToProps = {
   updateEdgeHost,
   addEdgeHostRules,
   addEdgeHostSimulatedMetrics,
+  loadRegions,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EdgeHost);

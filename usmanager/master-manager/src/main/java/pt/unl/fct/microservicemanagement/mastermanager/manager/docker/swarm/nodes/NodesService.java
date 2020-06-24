@@ -15,6 +15,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerE
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -41,15 +42,14 @@ public class NodesService {
   }
 
   private List<SimpleNode> getNodes(Predicate<Node> filter) {
-    //TODO use dockerClient.listNodes(Node.Criteria) instead to shorten GET result?
     try (var swarmManager = dockerSwarmService.getSwarmManager()) {
       Stream<Node> nodeStream = swarmManager.listNodes().stream();
       if (filter != null) {
         nodeStream = nodeStream.filter(filter);
       }
       return nodeStream
-          .map(n -> new SimpleNode(n.id(), n.status().addr(), n.status().state(),
-              NodeRole.valueOf(n.spec().role().toUpperCase()), n.version().index()))
+          .map(n -> new SimpleNode(n.id(), n.status().addr(), n.status().state(), n.spec().availability(),
+              NodeRole.valueOf(n.spec().role().toUpperCase()), n.version().index(), n.spec().labels()))
           .collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
       throw new MasterManagerException(e.getMessage());
@@ -117,13 +117,31 @@ public class NodesService {
   }
 
   public SimpleNode changeRole(String nodeId, NodeRole newRole) {
-    var swarmManager = dockerSwarmService.getSwarmManager();
     SimpleNode node = getNode(nodeId);
-    NodeSpec nodeSpec = NodeSpec.builder().role(newRole.name()).availability("active").build();
-    try {
+    NodeSpec nodeSpec = NodeSpec.builder()
+        .role(newRole.name())
+        .availability(node.getAvailability())
+        .build();
+    try (var swarmManager = dockerSwarmService.getSwarmManager()) {
       swarmManager.updateNode(node.getId(), node.getVersion(), nodeSpec);
       node.setRole(newRole);
       return node;
+    } catch (DockerException | InterruptedException e) {
+      e.printStackTrace();
+      throw new MasterManagerException(e.getMessage());
+    }
+  }
+
+  public void addLabel(String nodeId, String label, String value) {
+    log.info("Adding label {}={} to node {}", label, value, nodeId);
+    SimpleNode node = getNode(nodeId);
+    NodeSpec nodeSpec = NodeSpec.builder()
+        .role(node.getRole().name())
+        .availability(node.getAvailability())
+        .addLabel(label, value)
+        .build();
+    try (var swarmManager = dockerSwarmService.getSwarmManager()) {
+      swarmManager.updateNode(node.getId(), node.getVersion(), nodeSpec);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());

@@ -2,14 +2,9 @@ import IDatabaseData from "../../components/IDatabaseData";
 import BaseComponent from "../../components/BaseComponent";
 import {RouteComponentProps} from "react-router";
 import Form, {
-  ICustomButton,
-  IFields,
-  IFormLoading,
-  IValues,
-  required,
-  requiredAndTrimmed
+  ICustomButton, IFields, IFormLoading, IValues, required, requiredAndTrimmed
 } from "../../components/form/Form";
-import Field, {getTypeFromValue} from "../../components/form/Field";
+import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import React from "react";
@@ -27,6 +22,7 @@ import {isNew} from "../../utils/router";
 import InputDialog from "../../components/dialogs/InputDialog";
 import {IRegion} from "../region/Region";
 import formStyles from "../../components/form/Form.module.css";
+import {IContainer} from "../containers/Container";
 
 export interface IApp extends IDatabaseData {
   name: string;
@@ -41,6 +37,11 @@ interface ILaunchLocation {
   region: IRegion,
   country: string,
   city: string,
+}
+
+interface ILaunchService {
+  service: string;
+  container: IContainer;
 }
 
 interface StateToProps {
@@ -263,14 +264,15 @@ class App extends BaseComponent<Props, State> {
     const url = `apps/${app.name}/launch`;
     this.setState({ loading: { method: 'post', url: url } });
     postData(url, location,
-      (reply: IReply<IApp>) => this.onLaunchSuccess(reply.data),
+      (reply: IReply<ILaunchService[]>) => this.onLaunchSuccess(reply.data),
       (reason: string) => this.onLaunchFailure(reason, app));
   };
 
-  private onLaunchSuccess = (app: IApp) => {
-    super.toast(`<span class="green-text">Successfully launched services of ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app</span>`);
+  private onLaunchSuccess = (launchServices: ILaunchService[]) => {
+    super.toast(`<span>${launchServices}</span>`);
+    //super.toast(`<span class="green-text">Successfully launched services of ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app</span>`);
     if (this.mounted) {
-      this.updateApp(app);
+      this.setState({loading: undefined});
     }
   };
 

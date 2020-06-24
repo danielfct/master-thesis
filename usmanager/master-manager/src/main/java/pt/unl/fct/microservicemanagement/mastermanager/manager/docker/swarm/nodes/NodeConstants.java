@@ -10,21 +10,15 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes;
 
-import java.util.Map;
+public final class NodeConstants {
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+  private NodeConstants() {
+  }
 
-@Data
-@AllArgsConstructor
-public final class SimpleNode {
+  public static final class Label {
 
-  private final String id;
-  private final String hostname;
-  private final String state;
-  private final String availability;
-  private NodeRole role;
-  private final long version;
-  private Map<String, String> labels;
+    public static final String REACHABLE_ADDRESS = "reachableAddress";
+
+  }
 
 }

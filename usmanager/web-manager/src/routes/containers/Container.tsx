@@ -566,7 +566,7 @@ class Container extends BaseComponent<Props, State> {
         },
         {
           title: 'Labels',
-          id: 'labels',
+          id: 'containerLabels',
           content: () => this.labels()
         },
         {

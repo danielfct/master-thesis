@@ -638,19 +638,19 @@ public class DatabaseLoader {
 
       // regions
       var usEast1 = RegionEntity.builder()
-          .name("us-east-1")
+          .name("us-east")
           .description("US East (N. Virginia)")
           .active(true)
           .build();
       regions.save(usEast1);
       var euCentral1 = RegionEntity.builder()
-          .name("eu-central-1")
+          .name("eu-central")
           .description("EU (Frankfurt)")
           .active(true)
           .build();
       regions.save(euCentral1);
       var euWest2 = RegionEntity.builder()
-          .name("eu-west-2")
+          .name("eu-west")
           .description("EU (London)")
           .active(true)
           .build();

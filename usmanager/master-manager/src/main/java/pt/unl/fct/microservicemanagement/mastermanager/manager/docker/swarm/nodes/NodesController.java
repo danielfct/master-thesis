@@ -70,15 +70,15 @@ public class NodesController {
     return nodes;
   }
 
-  @PutMapping("/{nodeId}")
-  public SimpleNode updateNode(@PathVariable String nodeId, @Json String role) {
+  @PutMapping("/{id}")
+  public SimpleNode updateNode(@PathVariable String id, @Json String role) {
     NodeRole nodeRole;
     try {
       nodeRole = NodeRole.valueOf(role.toUpperCase());
     } catch (IllegalArgumentException e) {
       throw new BadRequestException("Node role %s is not supported: %s", role, Arrays.toString(NodeRole.values()));
     }
-    return nodesService.changeRole(nodeId, nodeRole);
+    return nodesService.changeRole(id, nodeRole);
   }
 
   @DeleteMapping("/{id}")

@@ -87,11 +87,11 @@ public class PrometheusService {
   }
 
   private double getStat(String hostname, String statId, String queryParam) {
-    final var currentTime = Double.toString((System.currentTimeMillis() * 1.0) / 1000.0);
+    String currentTime = Double.toString((System.currentTimeMillis() * 1.0) / 1000.0);
     var url = String.format(URL_FORMAT, hostname, DEFAULT_PORT, statId, currentTime);
     var value = "";
     try {
-      final QueryOutput queryOutput;
+      QueryOutput queryOutput;
       if (queryParam == null) {
         queryOutput = restTemplate.getForEntity(url, QueryOutput.class).getBody();
       } else {

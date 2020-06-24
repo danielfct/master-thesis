@@ -14,6 +14,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerE
 import pt.unl.fct.microservicemanagement.mastermanager.manager.bash.BashCommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.bash.BashService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
@@ -91,7 +92,9 @@ public class DockerSwarmService {
     if (!nodeIdRegexExpression.find()) {
       throw new MasterManagerException("Unable to get docker swarm node id");
     }
-    return nodeIdRegexExpression.group(0);
+    String nodeId = nodeIdRegexExpression.group(0);
+    nodesService.addLabel(nodeId, NodeConstants.Label.REACHABLE_ADDRESS, hostsService.getPublicIP());
+    return nodeId;
   }
 
   public String joinSwarm(String hostname, NodeRole role) {
@@ -117,14 +120,19 @@ public class DockerSwarmService {
           .joinToken(joinToken)
           .remoteAddrs(List.of(publicIp)).build();
       swarmWorker.joinSwarm(swarmJoin);
+      String nodeId;
       switch (role) {
         case MANAGER:
-          return getSwarmManagerNodeId(hostname).get();
+          nodeId = getSwarmManagerNodeId(hostname).get();
+          break;
         case WORKER:
-          return getSwarmWorkerNodeId(hostname).get();
+          nodeId = getSwarmWorkerNodeId(hostname).get();
+          break;
         default:
           throw new UnsupportedOperationException();
       }
+      nodesService.addLabel(nodeId, NodeConstants.Label.REACHABLE_ADDRESS, hostname);
+      return nodeId;
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
