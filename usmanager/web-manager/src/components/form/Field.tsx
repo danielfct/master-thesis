@@ -29,6 +29,7 @@ export interface FieldProps<T = string> {
   includeIcon?: boolean;
   icon?: string;
   disabled?: boolean;
+  hidden?: boolean;
 }
 
 export const getTypeFromValue = (value: any): 'text' | 'number' =>
@@ -90,7 +91,7 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
   };
 
   public render() {
-    const {id, type, label, dropdown, number, includeIcon, icon, disabled, valueToString} = this.props;
+    const {id, type, label, dropdown, number, includeIcon, icon, disabled, hidden, valueToString} = this.props;
     const getError = (errors: IErrors): string => (errors ? errors[id] : "");
     const getEditorClassname = (errors: IErrors, disabled: boolean, value: string): string => {
       const hasErrors = getError(errors);
@@ -128,7 +129,8 @@ export default class Field<T> extends React.Component<FieldProps<T>> {
                             disabled={disabled || !formContext.isEditing}
                             onChange={this.onChange(id, formContext, !!formContext.errors[id])}
                             valueToString={valueToString}
-                            onBlur={this.onBlur(id, formContext)}/>
+                            onBlur={this.onBlur(id, formContext)}
+                            hidden={hidden}/>
               )}
               {type && type.toLowerCase() === "number" && (
                 <NumberBox className={getEditorClassname(formContext.errors, !formContext.isEditing, formContext.values[id])}

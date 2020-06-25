@@ -27,6 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.AddEdgeHostRequest;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
@@ -157,9 +158,8 @@ public class HostsController {
   }
 
   @PostMapping("/edge")
-  public EdgeHostEntity addEdgeHost(@RequestBody EdgeHostEntity edgeHost) {
-    Validation.validatePostRequest(edgeHost.getId());
-    return edgeHostsService.addEdgeHost(edgeHost);
+  public EdgeHostEntity addEdgeHost(@RequestBody AddEdgeHostRequest addEdgeHostRequest) {
+    return edgeHostsService.addEdgeHost(addEdgeHostRequest);
   }
 
   @PutMapping("/edge/{hostname}")

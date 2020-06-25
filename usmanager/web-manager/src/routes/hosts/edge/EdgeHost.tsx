@@ -39,15 +39,20 @@ export interface IEdgeHost extends IDatabaseData {
   publicDnsName: string;
   privateIpAddress: string;
   publicIpAddress: string;
-  region: string;
+  region: IRegion;
   country: string;
   city: string;
   hostRules?: string[];
   hostSimulatedMetrics?: string[];
 }
 
-const buildNewEdgeHost = (): Partial<IEdgeHost> => ({
+interface INewEdgeHost extends IEdgeHost {
+  password: string;
+}
+
+const buildNewEdgeHost = (): Partial<INewEdgeHost> => ({
   username: undefined,
+  password: undefined,
   publicDnsName: undefined,
   privateIpAddress: undefined,
   publicIpAddress: undefined,
@@ -318,9 +323,14 @@ class EdgeHost extends BaseComponent<Props, State> {
                                     defaultValue: 'Select region',
                                     values: this.getSelectableRegions(),
                                     optionToString: this.regionDropdownOption}}/>
-                : <Field key={index}
-                       id={key}
-                       label={key}/>
+                : key === 'password'
+                  ? <Field key={index}
+                           id={key}
+                           label={key}
+                           hidden={true}/>
+                  : <Field key={index}
+                           id={key}
+                           label={key}/>
             )}
           </Form>
         )}

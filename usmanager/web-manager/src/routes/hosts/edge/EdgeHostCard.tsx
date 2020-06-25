@@ -40,7 +40,7 @@ const EdgeHostCard = ({edgeHost}: Props) => (
               value={`${edgeHost.publicIpAddress}`}/>
     <CardItem key={'region'}
               label={'Region'}
-              value={`${edgeHost.region}`}/>
+              value={`${edgeHost.region.name}`}/>
     <CardItem key={'country'}
               label={'Country'}
               value={`${edgeHost.country}`}/>

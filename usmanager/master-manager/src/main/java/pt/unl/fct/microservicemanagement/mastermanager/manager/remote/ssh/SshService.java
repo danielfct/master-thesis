@@ -87,29 +87,39 @@ public class SshService {
     try {
       EdgeHostEntity edgeHostEntity = edgeHostsService.getEdgeHost(hostname);
       username = edgeHostEntity.getUsername();
-      publicKeyFile = String.format("%s/%s", edgeKeyFilePath, username);
+      publicKeyFile = edgeHostsService.getKeyFilePath(edgeHostEntity);
     } catch (EntityNotFoundException e) {
       username = awsUser;
-      publicKeyFile = awsKeyFilePath;
+      publicKeyFile = String.format("%s/%s", System.getProperty("user.dir"), awsKeyFilePath);
     }
-    return initClient(username, hostname, publicKeyFile);
+    return initClient(username, hostname, new File(publicKeyFile));
   }
 
-  private SSHClient initClient(String username, String hostname) throws IOException {
+  private SSHClient initClient(String hostname, String username) throws IOException {
     var sshClient = new SSHClient();
     sshClient.addHostKeyVerifier(new PromiscuousVerifier());
     String publicKeyFile = String.format("%s/%s", edgeKeyFilePath, username);
-    return initClient(username, hostname, publicKeyFile);
+    return initClient(username, hostname, new File(publicKeyFile));
   }
 
-  private SSHClient initClient(String username, String hostname, String publicKeyFile) throws IOException {
+  private SSHClient initClient(String username, String hostname, File publicKeyFile) throws IOException {
     var sshClient = new SSHClient();
     sshClient.addHostKeyVerifier(new PromiscuousVerifier());
     log.info("Logging in to host '{}@{}' with key '{}'", username, hostname, publicKeyFile);
     sshClient.connect(hostname);
     var keyFile = new PKCS8KeyFile();
-    keyFile.init(new File(publicKeyFile));
+    keyFile.init(publicKeyFile);
     sshClient.authPublickey(username, keyFile);
+    log.info("Logged in to host '{}@{}'", username, hostname);
+    return sshClient;
+  }
+
+  private SSHClient initClient(String hostname, String username, String password) throws IOException {
+    var sshClient = new SSHClient();
+    sshClient.addHostKeyVerifier(new PromiscuousVerifier());
+    log.info("Logging in to host '{}@{}' using password", username, hostname);
+    sshClient.connect(hostname);
+    sshClient.authPassword(username, password);
     log.info("Logged in to host '{}@{}'", username, hostname);
     return sshClient;
   }
@@ -140,8 +150,8 @@ public class SshService {
     }
   }
 
-  public SshCommandResult executeCommand(String username, String hostname, String command) {
-    try (SSHClient sshClient = initClient(username, hostname);
+  public SshCommandResult executeCommand(String hostname, String username, String password, String command) {
+    try (SSHClient sshClient = initClient(hostname, username, password);
          Session session = sshClient.startSession()) {
       return executeCommand(session, hostname, command);
     } catch (IOException e) {

@@ -22,16 +22,64 @@
  * SOFTWARE.
  */
 
-
-// TODO start with specific icons, like name === 'thing', then to general icons with name.contains('thing'), then 1 generic at the end
-import {FaCodeBranch, FaDatabase, FaDocker, FaFingerprint, FaMinus, FaThumbsDown, FaThumbsUp} from "react-icons/all";
+import {
+  FaAddressCard,
+  FaCodeBranch,
+  FaDatabase,
+  FaDocker,
+  FaFingerprint, FaGlobeAmericas, FaGlobeEurope, FaIdBadge, FaMapMarkedAlt,
+  FaMapMarkerAlt, FaMapPin,
+  FaMinus,
+  FaThumbsDown,
+  FaThumbsUp
+} from "react-icons/all";
 import {FaDoorOpen} from "react-icons/all";
 import {FaDoorClosed} from "react-icons/all";
 import React from "react";
+import {IRegion} from "../routes/region/Region";
 
 export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.Element => {
-  //docker https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.iconfinder.com%2Ficons%2F4394228%2Fdocker_logo_logos_icon&psig=AOvVaw0TP60_jScefoy7AgGfY3YJ&ust=1592832646425000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCOCLpZKCk-oCFQAAAAAdAAAAABAD
   label = label.toLowerCase();
+  if (label === 'defaultdb') {
+    return <FaDatabase></FaDatabase>;
+  }
+  if (label === 'id') {
+    return <FaFingerprint/>
+  }
+  if (label === 'state') {
+    switch (value) {
+      case 'ready': return <FaThumbsUp></FaThumbsUp>;
+      case 'down': return <FaThumbsDown></FaThumbsDown>;
+      case 'drain': return <FaMinus></FaMinus>;
+    }
+  }
+  if (label === 'username') {
+    return "account_circle";
+  }
+  if (label === 'region') {
+    if (value === undefined) {
+      return <FaMapMarkerAlt></FaMapMarkerAlt>;
+    }
+    const region = value as IRegion;
+    if (region.name.includes('us')) {
+      return <FaGlobeAmericas></FaGlobeAmericas>;
+    }
+    if (region.name.includes('eu')) {
+      return <FaGlobeEurope></FaGlobeEurope>;
+    }
+  }
+  if (label === 'country') {
+    return <FaMapMarkedAlt></FaMapMarkedAlt>;
+  }
+  if (label === 'city') {
+    return <FaMapPin></FaMapPin>;
+  }
+  if (label.includes('privateip')) {
+    return <FaIdBadge></FaIdBadge>;
+  }
+  if (label.includes('publicip')) {
+    return <FaAddressCard></FaAddressCard>;
+  }
   if (label.includes('time')) {
     return "access_time";
   }
@@ -68,18 +116,9 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   if (label.includes('docker')) {
     return <FaDocker></FaDocker>;
   }
-  if (label === 'defaultdb') {
-    return <FaDatabase></FaDatabase>;
-  }
-  if (label === 'id') {
-    return <FaFingerprint/>
-  }
-  if (label === 'state') {
-    switch (value) {
-      case 'ready': return <FaThumbsUp></FaThumbsUp>;
-      case 'down': return <FaThumbsDown></FaThumbsDown>;
-      case 'drain': return <FaMinus></FaMinus>;
-    }
+
+  if (label.includes('password')) {
+    return 'vpn_key';
   }
   if (label.includes('version')) {
     return <FaCodeBranch></FaCodeBranch>;

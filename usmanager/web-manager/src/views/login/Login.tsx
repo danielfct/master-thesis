@@ -102,7 +102,8 @@ class Login extends BaseComponent<Props, State> {
               <label className="active" htmlFor="password">Password</label>
               <input id="password" name="password" value={password}
                      autoComplete="off"
-                     type={showPassword ? "text" : "password"} required
+                     type={showPassword ? "text" : "password"}
+                     required
                      onChange={this.handleChange}/>
               <i className="material-icons suffix" onClick={this.handleShowPassword}>
                 {showPassword ? "visibility_off" : "visibility"}

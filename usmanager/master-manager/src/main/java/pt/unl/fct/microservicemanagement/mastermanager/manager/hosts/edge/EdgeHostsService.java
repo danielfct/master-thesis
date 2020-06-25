@@ -26,6 +26,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.bash.BashService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshCommandResult;
@@ -49,6 +50,7 @@ public class EdgeHostsService {
   private final HostRulesService hostRulesService;
   private final SimulatedHostMetricsService simulatedHostMetricsService;
   private final SshService sshService;
+  private final BashService bashService;
 
   private final EdgeHostRepository edgeHosts;
 
@@ -56,13 +58,22 @@ public class EdgeHostsService {
 
   public EdgeHostsService(@Lazy HostRulesService hostRulesService,
                           @Lazy SimulatedHostMetricsService simulatedHostMetricsService,
-                          @Lazy SshService sshService, EdgeHostRepository edgeHosts,
+                          @Lazy SshService sshService, BashService bashService,
+                          EdgeHostRepository edgeHosts,
                           EdgeHostsProperties edgeHostsProperties) {
     this.hostRulesService = hostRulesService;
     this.simulatedHostMetricsService = simulatedHostMetricsService;
     this.sshService = sshService;
+    this.bashService = bashService;
     this.edgeHosts = edgeHosts;
     this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
+  }
+
+  public String getKeyFilePath(EdgeHostEntity edgeHostEntity) {
+    String username = edgeHostEntity.getUsername();
+    String hostname = edgeHostEntity.getHostname();
+    return String.format("%s/%s/%s_%s", System.getProperty("user.dir"), edgeKeyFilePath, username,
+        hostname.replace(".", "_"));
   }
 
   public List<EdgeHostEntity> getEdgeHosts() {
@@ -74,34 +85,43 @@ public class EdgeHostsService {
         new EntityNotFoundException(EdgeHostEntity.class, "hostname", hostname));
   }
 
-  public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost) {
-    return addEdgeHost(edgeHost, true);
+  public EdgeHostEntity addEdgeHost(AddEdgeHostRequest addEdgeHostRequest) {
+    EdgeHostEntity edgeHost = EdgeHostEntity.builder()
+        .username(addEdgeHostRequest.getUsername())
+        .publicDnsName(addEdgeHostRequest.getPublicDnsName())
+        .publicIpAddress(addEdgeHostRequest.getPublicIpAddress())
+        .privateIpAddress(addEdgeHostRequest.getPrivateIpAddress())
+        .region(addEdgeHostRequest.getRegion())
+        .country(addEdgeHostRequest.getCountry())
+        .city(addEdgeHostRequest.getCity())
+        .build();
+    return addEdgeHost(edgeHost, addEdgeHostRequest.getPassword());
   }
 
-  public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost, boolean setup) {
+  public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHostEntity) {
+    return addEdgeHost(edgeHostEntity, null);
+  }
+
+  public EdgeHostEntity addEdgeHost(EdgeHostEntity edgeHost, String password) {
     assertHostDoesntExist(edgeHost);
-    if (setup) {
-      setupEdgeHost(edgeHost);
+    if (password != null) {
+      setupEdgeHost(edgeHost, password);
     }
     log.debug("Saving edgeHost {}", ToStringBuilder.reflectionToString(edgeHost));
     return edgeHosts.save(edgeHost);
   }
 
-  private void setupEdgeHost(EdgeHostEntity edgeHost) {
-    //TODO confirm correctness
+  private void setupEdgeHost(EdgeHostEntity edgeHost, String password) {
     String hostname = edgeHost.getHostname();
     String username = edgeHost.getUsername();
+    String keyFilePath = getKeyFilePath(edgeHost);
     log.info("Generating keys for edge host {}@{}", username, hostname);
-    var generateKeysCommand = String.format("ssh-keygen -b 2048 -t rsa -f %s/%s/%s -q -N \"\" &&"
-            + " ssh-copy-id -i %s/%s %s", edgeKeyFilePath, username, System.getProperty("user.dir"), edgeKeyFilePath,
-        username, hostname);
-    SshCommandResult generateKeysResult = sshService.executeCommand(username, hostname, generateKeysCommand);
+    String generateKeysCommand = String.format("echo y | ssh-keygen -b 2048 -t rsa -f '%s' -q -N \"\" &&"
+        + " sshpass -p '%s' ssh-copy-id -i '%s' '%s'", keyFilePath, password, keyFilePath, hostname);
+    SshCommandResult generateKeysResult = sshService.executeCommand(hostname, username, password, generateKeysCommand);
     if (!generateKeysResult.isSuccessful()) {
-      // cleanup files
-      //var cleanupCommand = String.format("rm -f %s/%s %s/%s.pub", edgeKeyFilePath, username, edgeKeyFilePath,
-      //    username);
-      //sshService.executeCommand(username, hostname, cleanupCommand);
-      throw new MasterManagerException("Unable to generate public/private keys for edge host %s", hostname);
+      deleteEdgeHostConfig(edgeHost);
+      throw new MasterManagerException("Unable to generate public/private key pair for edge host %s", hostname);
     }
   }
 
@@ -117,6 +137,7 @@ public class EdgeHostsService {
   public void deleteEdgeHost(String hostname) {
     var edgeHost = getEdgeHost(hostname);
     edgeHosts.delete(edgeHost);
+    deleteEdgeHostConfig(edgeHost);
   }
 
   public List<EdgeHostEntity> getHostsByRegion(String region) {
@@ -212,6 +233,13 @@ public class EdgeHostsService {
     if (edgeHosts.hasEdgeHost(hostname)) {
       throw new DataIntegrityViolationException("Edge host '" + hostname + "' already exists");
     }
+  }
+
+  private void deleteEdgeHostConfig(EdgeHostEntity edgeHost) {
+    String privateKeyFilePath = getKeyFilePath(edgeHost);
+    String publicKeyFilePath = String.format("%s.pub", privateKeyFilePath);
+    String cleanupCommand = String.format("rm -f %s %s", privateKeyFilePath, publicKeyFilePath);
+    bashService.executeCommand(cleanupCommand);
   }
 
 }

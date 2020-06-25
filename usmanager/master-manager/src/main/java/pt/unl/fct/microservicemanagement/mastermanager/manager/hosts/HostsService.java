@@ -129,8 +129,7 @@ public class HostsService {
               .region(regionsService.getRegion("eu-central"))
               .country("pt")
               .city("lisbon")
-              .build(),
-          false);
+              .build());
     }
   }
 
