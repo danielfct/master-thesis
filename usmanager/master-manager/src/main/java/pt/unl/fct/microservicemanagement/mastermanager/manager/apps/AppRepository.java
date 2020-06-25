@@ -24,12 +24,12 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;
 
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -45,14 +45,14 @@ public interface AppRepository extends JpaRepository<AppEntity, Long> {
   @Query("select new pt.unl.fct.microservicemanagement.mastermanager.manager.services"
       + ".ServiceOrder(s.service, s.launchOrder) "
       + "from AppEntity a join a.appServices s "
-      + "where a.name = :appName order by s.launchOrder")
+      + "where lower(a.name) = lower(:appName) order by s.launchOrder")
   List<ServiceOrder> getServicesOrder(@Param("appName") String appName);
 
   Optional<AppEntity> findByNameIgnoreCase(@Param("name") String name);
 
   @Query("select s "
       + "from AppEntity a join a.appServices s "
-      + "where LOWER(a.name) = LOWER(:appName)")
+      + "where lower(a.name) = lower(:appName)")
   List<AppServiceEntity> getServices(@Param("appName") String appName);
 
 }

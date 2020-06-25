@@ -13,7 +13,7 @@ const CardService = Card<IContainer>();
 const ServiceCard = ({container}: Props) => (
   <CardService title={container.containerId.toString()}
                link={{to: {pathname: `/containers/${container.containerId}`, state: container}}}
-               height={'200px'}
+               height={'215px'}
                margin={'10px 0'}
                hoverable>
     <CardItem key={'names'}

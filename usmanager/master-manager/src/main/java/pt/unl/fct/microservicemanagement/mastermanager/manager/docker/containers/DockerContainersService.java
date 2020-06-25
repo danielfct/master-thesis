@@ -10,11 +10,13 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerPortMapping;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerProperties;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCoreService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
@@ -36,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +55,8 @@ import com.spotify.docker.client.messages.ContainerStats;
 import com.spotify.docker.client.messages.HostConfig;
 import com.spotify.docker.client.messages.PortBinding;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -60,6 +65,7 @@ public class DockerContainersService {
 
   private static final long DELAY_BETWEEN_CONTAINER_LAUNCH = TimeUnit.SECONDS.toMillis(5);
 
+  private final ContainersService containersService;
   private final DockerCoreService dockerCoreService;
   private final NodesService nodesService;
   private final ServicesService servicesService;
@@ -70,10 +76,12 @@ public class DockerContainersService {
   private final String dockerHubUsername;
   private final int dockerDelayBeforeStopContainer;
 
-  public DockerContainersService(DockerCoreService dockerCoreService, NodesService nodesService,
+  public DockerContainersService(@Lazy ContainersService containersService, DockerCoreService dockerCoreService,
+                                 NodesService nodesService,
                                  ServicesService servicesService, NginxLoadBalancerService nginxLoadBalancerService,
                                  EurekaService eurekaService, HostsService hostsService,
                                  DockerProperties dockerProperties, ContainerProperties containerProperties) {
+    this.containersService = containersService;
     this.dockerCoreService = dockerCoreService;
     this.nodesService = nodesService;
     this.servicesService = servicesService;
@@ -87,19 +95,17 @@ public class DockerContainersService {
   public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services,
                                                       String region, String country, String city) {
     var serviceContainers = new HashMap<String, List<DockerContainer>>();
-    // TODO qual a utilidade do dynamicLaunchParams?
     var dynamicLaunchParams = new HashMap<String, String>();
     services.forEach(service -> {
-      List<DockerContainer> containers = launchMicroservice(service, region, country, city,
-          dynamicLaunchParams);
+      List<DockerContainer> containers = launchMicroservice(service, region, country, city, dynamicLaunchParams);
       serviceContainers.put(service.getServiceName(), containers);
       containers.forEach(container -> {
         String hostname = container.getHostname();
-        int privatePort = container.getPorts().get(0).getPrivatePort();
-        dynamicLaunchParams.put(service.getOutputLabel(), String.format("%s:%d", hostname, privatePort));
+        int privatePort = container.getPorts().get(0).getPrivatePort(); //TODO privado ou publico?
+        String address = String.format("%s:%d", hostname, privatePort);
+        dynamicLaunchParams.put(service.getOutputLabel(), address);
       });
-      //TODO rever tempo de espera entre cada container
-      Timing.sleep(DELAY_BETWEEN_CONTAINER_LAUNCH, TimeUnit.MILLISECONDS);
+      //TODO rever tempo de espera, é preciso? Timing.sleep(DELAY_BETWEEN_CONTAINER_LAUNCH, TimeUnit.MILLISECONDS);
     });
     return serviceContainers;
   }
@@ -113,15 +119,9 @@ public class DockerContainersService {
     var containers = new ArrayList<DockerContainer>(minReplicas);
     for (int i = 0; i < minReplicas; i++) {
       String hostname = hostsService.getAvailableHost(expectedMemoryConsumption, region, country, city);
-      try {
-        Optional<DockerContainer> container = launchContainer(hostname, service, false, environment, labels,
-            dynamicLaunchParams);
-        container.ifPresent(containers::add);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-
-
+      Optional<DockerContainer> container = launchContainer(hostname, service, false, environment, labels,
+          dynamicLaunchParams);
+      container.ifPresent(containers::add);
     }
     return containers;
   }
@@ -202,7 +202,7 @@ public class DockerContainersService {
                                                     Map<String, String> labels,
                                                     Map<String, String> dynamicLaunchParams) {
     String serviceName = service.getServiceName();
-    log.info("Launching container with {} at {}...", serviceName, hostname);
+    log.info("Launching container with service '{}' at '{}'...", serviceName, hostname);
     if (singleton) {
       List<DockerContainer> containers = List.of();
       try {
@@ -257,7 +257,6 @@ public class DockerContainersService {
     for (Map.Entry<String, String> param : dynamicLaunchParams.entrySet()) {
       launchCommand = launchCommand.replace(param.getKey(), param.getValue());
     }
-    //TODO porquê repetir informação nos envs e labels?
     var containerEnvironment = new LinkedList<>(List.of(
         ContainerConstants.Environment.SERVICE_CONTINENT + "=" + continent,
         ContainerConstants.Environment.SERVICE_REGION + "=" + region,
@@ -310,29 +309,15 @@ public class DockerContainersService {
   }
 
   private String getDatabaseHostForService(String hostname, String databaseServiceName) {
-    Optional<DockerContainer> databaseContainer = findContainer(hostname,
-        DockerClient.ListContainersParam.withLabel(ContainerConstants.Label.SERVICE_NAME, databaseServiceName));
-    if (databaseContainer.isEmpty()) {
-      log.info("No database '{}' found on host '{}'", databaseServiceName, hostname);
-      databaseContainer = launchContainer(hostname, databaseServiceName);
-      /*if (container.isPresent()) {
-        long start = System.currentTimeMillis();
-        do {
-          log.info("Looking for database '{}' on container '{}'", databaseServiceName, container.get().getId());
-          databaseContainer = findContainer(container.get().getId());
-          Timing.sleep(CPU_SLEEP, TimeUnit.MILLISECONDS);
-          if (start + System.currentTimeMillis() > FIND_CONTAINER_TIMEOUT) {
-            throw new MasterManagerException("Launch database '{}' timed out", databaseServiceName);
-          }
-        } while (databaseContainer.isEmpty());
-      }*/
+    ContainerEntity databaseContainer = containersService.getHostContainersWithLabels(hostname,
+        Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, databaseServiceName)))
+        .stream().findFirst().orElseGet(() -> containersService.launchContainer(hostname, databaseServiceName));
+    if (databaseContainer == null) {
+      throw new MasterManagerException("Failed to launch database '{}' on host '{}'", databaseServiceName, hostname);
     }
-    if (databaseContainer.isEmpty()) {
-      throw new MasterManagerException("Failed to launch database '{}'", databaseServiceName);
-    }
-    String serviceAddress = databaseContainer.get().getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
-    log.info("Found database '{}' with state '{}'", serviceAddress, databaseContainer.get().getState());
-    return serviceAddress;
+    String address = databaseContainer.getLabels().get(ContainerConstants.Label.SERVICE_ADDRESS);
+    log.info("Found database '{}' on host '{}'", address, hostname);
+    return address;
   }
 
   public void stopContainer(ContainerEntity container) {

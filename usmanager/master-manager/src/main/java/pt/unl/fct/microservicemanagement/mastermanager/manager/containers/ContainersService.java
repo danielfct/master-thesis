@@ -20,6 +20,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -249,9 +250,14 @@ public class ContainersService {
     return dockerContainer.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
-  public Map<String, List<DockerContainer>> launchApp(List<ServiceEntity> services,
+  public Map<String, List<ContainerEntity>> launchApp(List<ServiceEntity> services,
                                                       String region, String country, String city) {
-    return dockerContainersService.launchApp(services, region, country, city);
+    return dockerContainersService.launchApp(services, region, country, city).entrySet()
+        .stream()
+        .collect(Collectors.toMap(
+            Map.Entry::getKey,
+            entry -> entry.getValue().stream().map(this::addContainerFromDockerContainer).collect(Collectors.toList())
+        ));
   }
 
   public void stopContainer(String id) {

@@ -39,9 +39,8 @@ interface ILaunchLocation {
   city: string,
 }
 
-interface ILaunchService {
-  service: string;
-  container: IContainer;
+interface ILaunchApp {
+  [key: string]: IContainer[]
 }
 
 interface StateToProps {
@@ -245,14 +244,6 @@ class App extends BaseComponent<Props, State> {
                     data-target={'launch-app-modal'}>
               Launch
             </button>
-            <InputDialog id={'launch-app-modal'}
-                         title={'Launch app'}
-                         fields={this.launchAppFields()}
-                         values={this.getModalValues}
-                         confirmCallback={this.launchApp}
-                         fullscreen={false}>
-              {this.launchAppModal()}
-            </InputDialog>
           </>
       });
     }
@@ -264,20 +255,25 @@ class App extends BaseComponent<Props, State> {
     const url = `apps/${app.name}/launch`;
     this.setState({ loading: { method: 'post', url: url } });
     postData(url, location,
-      (reply: IReply<ILaunchService[]>) => this.onLaunchSuccess(reply.data),
+      (reply: IReply<ILaunchApp>) => this.onLaunchSuccess(reply.data),
       (reason: string) => this.onLaunchFailure(reason, app));
   };
 
-  private onLaunchSuccess = (launchServices: ILaunchService[]) => {
-    super.toast(`<span>${launchServices}</span>`);
-    //super.toast(`<span class="green-text">Successfully launched services of ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app</span>`);
+  private onLaunchSuccess = (launchApp: ILaunchApp) => {
+    super.toast(`<span><span class="green-text">Successfully launched services<br/>
+        </span>${Object.entries(launchApp)
+                       .map(([service, containers]) => `<b>${service}</b> = [${containers.map(c =>
+                         `<a href=/containers/${c.containerId}>${c.containerId}</a>`).join(', ')}]`).join('<br/>')}</span>`,
+      20000);
     if (this.mounted) {
       this.setState({loading: undefined});
     }
   };
 
   private onLaunchFailure = (reason: string, app: Partial<IApp>) => {
-    super.toast(`Failed to launch services of ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`, 10000, reason, true);
+    super.toast(`Failed to launch services of 
+        ${this.mounted ? `<b>${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app`,
+      10000, reason, true);
     if (this.mounted) {
       this.setState({loading: undefined});
     }
@@ -322,35 +318,45 @@ class App extends BaseComponent<Props, State> {
         {!isNewApp && isLoading && <ListLoadingSpinner/>}
         {!isNewApp && !isLoading && error && <Error message={error}/>}
         {(isNewApp || !isLoading) && (isNewApp || !error) && formApp && (
-          <Form id={appKey}
-                fields={this.getFields(formApp)}
-                values={app}
-                isNew={isNew(this.props.location.search)}
-                showSaveButton={this.shouldShowSaveButton()}
-                post={{
-                  url: 'apps',
-                  successCallback: this.onPostSuccess,
-                  failureCallback: this.onPostFailure
-                }}
-                put={{
-                  url: `apps/${app.name}`,
-                  successCallback: this.onPutSuccess,
-                  failureCallback: this.onPutFailure
-                }}
-                delete={{
-                  url: `apps/${app.name}`,
-                  successCallback: this.onDeleteSuccess,
-                  failureCallback: this.onDeleteFailure
-                }}
-                customButtons={this.launchButton()}
-                saveEntities={this.saveEntities}
-                loading={this.state.loading}>
-            {Object.keys(formApp).map((key, index) =>
-              <Field key={index}
-                     id={key}
-                     label={key}/>
-            )}
-          </Form>
+          <>
+            <Form id={appKey}
+                  fields={this.getFields(formApp)}
+                  values={app}
+                  isNew={isNew(this.props.location.search)}
+                  showSaveButton={this.shouldShowSaveButton()}
+                  post={{
+                    url: 'apps',
+                    successCallback: this.onPostSuccess,
+                    failureCallback: this.onPostFailure
+                  }}
+                  put={{
+                    url: `apps/${app.name}`,
+                    successCallback: this.onPutSuccess,
+                    failureCallback: this.onPutFailure
+                  }}
+                  delete={{
+                    url: `apps/${app.name}`,
+                    successCallback: this.onDeleteSuccess,
+                    failureCallback: this.onDeleteFailure
+                  }}
+                  customButtons={this.launchButton()}
+                  saveEntities={this.saveEntities}
+                  loading={this.state.loading}>
+              {Object.keys(formApp).map((key, index) =>
+                <Field key={index}
+                       id={key}
+                       label={key}/>
+              )}
+            </Form>
+            <InputDialog id={'launch-app-modal'}
+                         title={'Launch app'}
+                         fields={this.launchAppFields()}
+                         values={this.getModalValues}
+                         confirmCallback={this.launchApp}
+                         fullscreen={false}>
+              {this.launchAppModal()}
+            </InputDialog>
+          </>
         )}
       </>
     )

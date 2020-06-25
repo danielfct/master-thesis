@@ -123,7 +123,7 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("user-db:27017")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${userDatabaseHost}")
-          .minReplicas(1)
+          .minReplicas(2)
           .maxReplicas(0)
           .outputLabel("${userHost}")
           .serviceType(ServiceType.BACKEND)
@@ -154,7 +154,7 @@ public class DatabaseLoader {
           .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${catalogueHost}")
-          .serviceType(ServiceType.DATABASE)
+          .serviceType(ServiceType.BACKEND)
           .expectedMemoryConsumption(62914560d)
           .build();
       services.save(catalogue);

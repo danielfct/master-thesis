@@ -75,13 +75,15 @@ https://stackoverflow.com/a/48572280
 
 - Utilizar computadores pessoais. Normalmente protegidos pelo router (http://192.168.1.254 no caso de meo, http://192.168.1.1 no caso de nos ou vodafone), estão apenas acessíveis na rede local.
 Editar o ficheiro sudoers usando o comando `sudo visudo` e adicionar no final do ficheiro `user ALL=(ALL) NOPASSWD: ALL`, substituindo user pelo username da conta a usar.
-Isto permite usar chaves públicas/privadas para autenticação ssh.
+Isto permite executar comandos sudo sem ser pedida a password.
 Se o router usar [DHCP](https://pt.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol) para atribuir ips dinâmicos às máquinas, é preciso definir um ip estático para o host desejado, através da interface do router.
 E por fim, configurar os seguintes encaminhamentos de portas no painel de controlo do router: 
     - Ssh, porta 22 TCP. Aceder usando `ssh user@ip_publico_do_router` ([ver ip público](https://ipinfo.io/ip))
     - Docker Cluster management communications, porta 2377 TCP
     - Communication among docker nodes, porta 7946 TCP e UDP 
     - Docker Overlay network traffic, porta 4789 UDP
+    - Prometheus, porta 9090 TCP
+De notar que, apenas com esta configuração, não será possível executar containers aplicacionais nesta máquina.
 
 ### Licença
 

@@ -475,7 +475,7 @@ public class HostsService {
       }
     }
     if (error != null) {
-      throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname, error);
+      throw new MasterManagerException("%s", error);
     }
     return result;
   }
@@ -486,14 +486,19 @@ public class HostsService {
 
   public String findAvailableExternalPort(String hostname, String startExternalPort) {
     var command = "sudo lsof -i -P -n | grep LISTEN | awk '{print $9}' | cut -d: -f2";
-    List<Integer> usedExternalPorts = executeCommand(command, hostname).stream()
-        .filter(v -> Pattern.compile("-?\\d+(\\.\\d+)?").matcher(v).matches())
-        .map(Integer::parseInt)
-        .collect(Collectors.toList());
-    for (var i = Integer.parseInt(startExternalPort); ; i++) {
-      if (!usedExternalPorts.contains(i)) {
-        return String.valueOf(i);
+    try {
+      List<Integer> usedExternalPorts = executeCommand(command, hostname).stream()
+          .filter(v -> Pattern.compile("-?\\d+(\\.\\d+)?").matcher(v).matches())
+          .map(Integer::parseInt)
+          .collect(Collectors.toList());
+      for (var i = Integer.parseInt(startExternalPort); ; i++) {
+        if (!usedExternalPorts.contains(i)) {
+          return String.valueOf(i);
+        }
       }
+    } catch (MasterManagerException e) {
+      throw new MasterManagerException("Unable to find currently used external ports at %s: %s ", hostname,
+          e.getMessage());
     }
   }
 

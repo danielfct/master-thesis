@@ -24,8 +24,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -99,10 +100,6 @@ public class AppsService {
     return apps.getServices(appName);
   }
 
-  public List<ServiceOrder> getServicesOrder(String appName) {
-    return apps.getServicesOrder(appName);
-  }
-
   public void addService(String appName, String serviceName, int order) {
     var app = getApp(appName);
     var service = servicesService.getService(serviceName);
@@ -126,11 +123,17 @@ public class AppsService {
   public void removeServices(String appName, List<String> services) {
     var app = getApp(appName);
     log.info("Removing services {}", services);
-    app.getAppServices()
-        .removeIf(service -> services.contains(service.getService().getServiceName()));
-    log.info(app.getAppServices().toString());
-    app = apps.save(app);
-    log.info(ToStringBuilder.reflectionToString(app));
+    app.getAppServices().removeIf(service -> services.contains(service.getService().getServiceName()));
+    apps.save(app);
+  }
+
+  public Map<String, List<ContainerEntity>> launch(String appName, RegionEntity region, String country, String city) {
+    log.info("Launching app {} at {}/{}/{}", appName, region.getName(), country, city);
+    List<ServiceEntity> services = apps.getServicesOrder(appName).stream()
+        .filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceType.DATABASE)
+        .map(ServiceOrder::getService)
+        .collect(Collectors.toList());
+    return containersService.launchApp(services, region.getName(), country, city);
   }
 
   private void assertAppExists(String appName) {
@@ -144,14 +147,6 @@ public class AppsService {
     if (apps.hasApp(name)) {
       throw new DataIntegrityViolationException("App '" + name + "' already exists");
     }
-  }
-
-  public Map<String, List<DockerContainer>> launch(String appName, RegionEntity region, String country, String city) {
-    log.info("Launching app {} at {}/{}/{}", appName, region.getName(), country, city);
-    List<ServiceEntity> services = getServicesOrder(appName).stream()
-        .filter(serviceOrder -> serviceOrder.getService().getServiceType() != ServiceType.DATABASE)
-        .map(ServiceOrder::getService).collect(Collectors.toList());
-    return containersService.launchApp(services, region.getName(), country, city);
   }
 
 }
