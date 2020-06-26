@@ -140,6 +140,10 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
     const simulatedMetric = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Containers/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated container metric have been saved</span>`);
     this.saveEntities(simulatedMetric);
+    const previousSimulatedContainerMetric = this.getSimulatedContainerMetric();
+    if (previousSimulatedContainerMetric.id) {
+      this.props.updateSimulatedContainerMetric(previousSimulatedContainerMetric as ISimulatedContainerMetric, simulatedMetric);
+    }
     if (this.mounted) {
       this.updateSimulatedContainerMetric(simulatedMetric);
       this.props.history.replace(simulatedMetric.name);
@@ -199,10 +203,6 @@ class SimulatedContainerMetric extends BaseComponent<Props, State> {
 
   private updateSimulatedContainerMetric = (simulatedContainerMetric: ISimulatedContainerMetric) => {
     simulatedContainerMetric = Object.values(normalize(simulatedContainerMetric, Schemas.SIMULATED_CONTAINER_METRIC).entities.simulatedContainerMetrics || {})[0];
-    const previousSimulatedContainerMetric = this.getSimulatedContainerMetric();
-    if (previousSimulatedContainerMetric.id) {
-      this.props.updateSimulatedContainerMetric(previousSimulatedContainerMetric as ISimulatedContainerMetric, simulatedContainerMetric);
-    }
     const formSimulatedContainerMetric = { ...simulatedContainerMetric };
     removeFields(formSimulatedContainerMetric);
     this.setState({simulatedContainerMetric: simulatedContainerMetric, formSimulatedContainerMetric: formSimulatedContainerMetric});

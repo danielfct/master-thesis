@@ -33,9 +33,6 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../../middleware/api";
 import {IField} from "../../rules/Rule";
 import SimulatedServiceMetricServiceList from "./SimulatedServiceMetricServiceList";
-import {IRuleHost} from "../../rules/hosts/RuleHost";
-import {IRuleService} from "../../rules/services/RuleService";
-import {ISimulatedContainerMetric} from "../containers/SimulatedContainerMetric";
 
 export interface ISimulatedServiceMetric extends IDatabaseData {
   name: string;
@@ -139,6 +136,10 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
     const simulatedMetric = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/Services/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated service metric have been saved</span>`);
     this.saveEntities(simulatedMetric);
+    const previousSimulatedServiceMetric = this.getSimulatedServiceMetric();
+    if (previousSimulatedServiceMetric.id) {
+      this.props.updateSimulatedServiceMetric(previousSimulatedServiceMetric as ISimulatedServiceMetric, simulatedMetric);
+    }
     if (this.mounted) {
       this.updateSimulatedServiceMetric(simulatedMetric);
       this.props.history.replace(simulatedMetric.name);
@@ -198,10 +199,6 @@ class SimulatedServiceMetric extends BaseComponent<Props, State> {
 
   private updateSimulatedServiceMetric = (simulatedServiceMetric: ISimulatedServiceMetric) => {
     simulatedServiceMetric = Object.values(normalize(simulatedServiceMetric, Schemas.SIMULATED_SERVICE_METRIC).entities.simulatedServiceMetrics || {})[0];
-    const previousSimulatedServiceMetric = this.getSimulatedServiceMetric();
-    if (previousSimulatedServiceMetric.id) {
-      this.props.updateSimulatedServiceMetric(previousSimulatedServiceMetric as ISimulatedServiceMetric, simulatedServiceMetric);
-    }
     const formSimulatedServiceMetric = { ...simulatedServiceMetric };
     removeFields(formSimulatedServiceMetric);
     this.setState({simulatedServiceMetric: simulatedServiceMetric, formSimulatedServiceMetric: formSimulatedServiceMetric});

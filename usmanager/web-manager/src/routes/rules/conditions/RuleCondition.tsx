@@ -123,6 +123,10 @@ class RuleCondition extends BaseComponent<Props, State> {
   private onPutSuccess = (reply: IReply<IRuleCondition>): void => {
     const condition = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${condition.name}</b>` : `<a href=/rules/conditions/${condition.name}><b>${condition.name}</b></a>`} condition have been saved</span>`);
+    const previousCondition = this.getCondition();
+    if (previousCondition?.id) {
+      this.props.updateCondition(previousCondition as IRuleCondition, condition)
+    }
     if (this.mounted) {
       this.updateCondition(condition);
       this.props.history.replace(condition.name);
@@ -144,10 +148,6 @@ class RuleCondition extends BaseComponent<Props, State> {
 
   private updateCondition = (condition: IRuleCondition) => {
     condition = Object.values(normalize(condition, Schemas.RULE_CONDITION).entities.conditions || {})[0];
-    const previousCondition = this.getCondition();
-    if (previousCondition?.id) {
-      this.props.updateCondition(previousCondition as IRuleCondition, condition)
-    }
     const formCondition = { ...condition };
     removeFields(formCondition);
     this.setState({condition: condition, formCondition: formCondition});

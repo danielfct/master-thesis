@@ -479,6 +479,13 @@ export function addCloudHost(cloudHost: ICloudHost): EntitiesAction {
     data: { cloudHosts: new Array(cloudHost) }
   }
 }
+export const UPDATE_CLOUD_HOST = 'UPDATE_CLOUD_HOST';
+export function updateCloudHost(previousCloudHost: ICloudHost, currentCloudHost: ICloudHost): EntitiesAction {
+  return {
+    type: UPDATE_CLOUD_HOST,
+    data: { cloudHosts: [previousCloudHost, currentCloudHost] }
+  }
+}
 
 export const CLOUD_HOST_RULES_REQUEST = 'CLOUD_HOST_RULES_REQUEST';
 export const CLOUD_HOST_RULES_SUCCESS = 'CLOUD_HOST_RULES_SUCCESS';

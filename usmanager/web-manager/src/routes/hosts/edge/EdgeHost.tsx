@@ -146,6 +146,10 @@ class EdgeHost extends BaseComponent<Props, State> {
     const hostname = edgeHost.publicDnsName || edgeHost.publicIpAddress;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${hostname}</b>` : `<a href=/hosts/edge/${hostname}><b>${hostname}</b></a>`} edge host have been saved</span>`);
     this.saveEntities(edgeHost);
+    const previousEdgeHost = this.getEdgeHost();
+    if (previousEdgeHost.id) {
+      this.props.updateEdgeHost(previousEdgeHost as IEdgeHost, edgeHost);
+    }
     if (this.mounted) {
       this.updateEdgeHost(edgeHost);
       this.props.history.replace(edgeHost.publicDnsName || edgeHost.publicIpAddress);
@@ -238,10 +242,6 @@ class EdgeHost extends BaseComponent<Props, State> {
 
   private updateEdgeHost = (edgeHost: IEdgeHost) => {
     edgeHost = Object.values(normalize(edgeHost, Schemas.EDGE_HOST).entities.edgeHosts || {})[0];
-    const previousEdgeHost = this.getEdgeHost();
-    if (previousEdgeHost.id) {
-      this.props.updateEdgeHost(previousEdgeHost as IEdgeHost, edgeHost);
-    }
     const formEdgeHost = { ...edgeHost };
     removeFields(formEdgeHost);
     this.setState({edgeHost: edgeHost, formEdgeHost: formEdgeHost});

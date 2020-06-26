@@ -15,7 +15,6 @@ import {IReply} from "../../utils/api";
 import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
-import {INode} from "../nodes/Node";
 
 export interface IRegion extends IDatabaseData {
   name: string;
@@ -101,6 +100,10 @@ class Region extends BaseComponent<Props, State> {
   private onPutSuccess = (reply: IReply<IRegion>): void => {
     const region = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${region.name}</b>` : `<a href=/regions/${region.name}><b>${region.name}</b></a>`} region have been saved</span>`);
+    const previousRegion = this.getRegion();
+    if (previousRegion?.id) {
+      this.props.updateRegion(previousRegion as IRegion, region)
+    }
     if (this.mounted) {
       this.updateRegion(region);
       this.props.history.replace(region.name);
@@ -122,10 +125,6 @@ class Region extends BaseComponent<Props, State> {
 
   private updateRegion = (region: IRegion) => {
     region = Object.values(normalize(region, Schemas.REGION).entities.regions || {})[0];
-    const previousRegion = this.getRegion();
-    if (previousRegion?.id) {
-      this.props.updateRegion(previousRegion as IRegion, region)
-    }
     const formRegion = { ...region };
     removeFields(formRegion);
     this.setState({region: region, formRegion: formRegion});

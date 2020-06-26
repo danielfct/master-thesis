@@ -99,6 +99,7 @@ import {
   CLOUD_HOSTS_SUCCESS,
   CLOUD_HOST_SUCCESS,
   ADD_CLOUD_HOST,
+  UPDATE_CLOUD_HOST,
   CLOUD_HOST_RULES_REQUEST,
   CLOUD_HOST_RULES_FAILURE,
   CLOUD_HOST_RULES_SUCCESS,
@@ -1249,6 +1250,25 @@ const entities = (state: EntitiesState = {
       if (data?.cloudHosts?.length) {
         const cloudHosts = normalize(data?.cloudHosts, Schemas.CLOUD_HOST_ARRAY).entities.cloudHosts;
         return merge({}, state, { hosts: { cloud: { data: cloudHosts, isLoadingCloudHosts: false, loadCloudHostsError: null } } });
+      }
+      break;
+    case UPDATE_CLOUD_HOST:
+      if (data?.cloudHosts && data.cloudHosts?.length > 1) {
+        const previousCloudHost = data.cloudHosts[0];
+        const filteredCloudHosts = Object.values(state.hosts.cloud.data).filter(cloudHost => cloudHost.id !== previousCloudHost.id);
+        const currentCloudHost = {...previousCloudHost, ...data.cloudHosts[1]};
+        filteredCloudHosts.push(currentCloudHost);
+        const cloudHosts = normalize(filteredCloudHosts, Schemas.CLOUD_HOST_ARRAY).entities.cloudHosts || {};
+        return {
+          ...state,
+          hosts: {
+            ...state.hosts,
+            cloud: {
+              ...state.hosts.cloud,
+              data: cloudHosts,
+            }
+          }
+        }
       }
       break;
     case CLOUD_HOST_RULES_REQUEST:

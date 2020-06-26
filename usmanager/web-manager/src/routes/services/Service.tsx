@@ -186,6 +186,10 @@ class Service extends BaseComponent<Props, State> {
     const service = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service have been saved</span>`);
     this.saveEntities(service);
+    const previousService = this.getService();
+    if (previousService.id) {
+      this.props.updateService(previousService as IService, service);
+    }
     if (this.mounted) {
       this.updateService(service);
       this.props.history.replace(service.serviceName);
@@ -376,11 +380,7 @@ class Service extends BaseComponent<Props, State> {
     super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
 
   private updateService = (service: IService) => {
-    const previousService = this.getService();
-    service = {...previousService, ...Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0]};
-    if (previousService.id) {
-      this.props.updateService(previousService as IService, service);
-    }
+    service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];
     const formService = { ...service };
     removeFields(formService);
     this.setState({service: service, formService: formService});

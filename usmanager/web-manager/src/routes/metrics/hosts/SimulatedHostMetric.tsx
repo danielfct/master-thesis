@@ -140,6 +140,10 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
     const simulatedMetric = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${simulatedMetric.name}</b>` : `<a href=/simulated-metrics/hosts/${simulatedMetric.name}><b>${simulatedMetric.name}</b></a>`} simulated host metric have been saved</span>`);
     this.saveEntities(simulatedMetric);
+    const previousSimulatedHostMetric = this.getSimulatedHostMetric();
+    if (previousSimulatedHostMetric.id) {
+      this.props.updateSimulatedHostMetric(previousSimulatedHostMetric as ISimulatedContainerMetric, simulatedMetric);
+    }
     if (this.mounted) {
       this.updateSimulatedHostMetric(simulatedMetric);
       this.props.history.replace(simulatedMetric.name);
@@ -232,10 +236,6 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
 
   private updateSimulatedHostMetric = (simulatedHostMetric: ISimulatedHostMetric) => {
     simulatedHostMetric = Object.values(normalize(simulatedHostMetric, Schemas.SIMULATED_HOST_METRIC).entities.simulatedHostMetrics || {})[0];
-    const previousSimulatedHostMetric = this.getSimulatedHostMetric();
-    if (previousSimulatedHostMetric.id) {
-      this.props.updateSimulatedHostMetric(previousSimulatedHostMetric as ISimulatedContainerMetric, simulatedHostMetric);
-    }
     const formSimulatedHostMetric = { ...simulatedHostMetric };
     removeFields(formSimulatedHostMetric);
     this.setState({simulatedHostMetric: simulatedHostMetric, formSimulatedHostMetric: formSimulatedHostMetric});

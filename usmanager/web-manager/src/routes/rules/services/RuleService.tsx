@@ -143,6 +143,10 @@ class RuleService extends BaseComponent<Props, State> {
     const ruleService = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${ruleService.name}</b>` : `<a href=/rules/services/${ruleService.name}><b>${ruleService.name}</b></a>`} service rule have been saved</span>`);
     this.saveEntities(ruleService);
+    const previousRuleService = this.getRuleService();
+    if (previousRuleService?.id) {
+      this.props.updateRuleService(previousRuleService as IRuleService, ruleService);
+    }
     if (this.mounted) {
       this.updateRuleService(ruleService);
       this.props.history.replace(ruleService.name);
@@ -234,10 +238,6 @@ class RuleService extends BaseComponent<Props, State> {
 
   private updateRuleService = (ruleService: IRuleService) => {
     ruleService = Object.values(normalize(ruleService, Schemas.RULE_SERVICE).entities.serviceRules || {})[0];
-    const previousRuleService = this.getRuleService();
-    if (previousRuleService?.id) {
-      this.props.updateRuleService(previousRuleService as IRuleService, ruleService);
-    }
     const formRuleService = { ...ruleService };
     removeFields(formRuleService);
     this.setState({ruleService: ruleService, formRuleService: formRuleService});

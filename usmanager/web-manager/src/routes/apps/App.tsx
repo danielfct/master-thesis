@@ -125,6 +125,10 @@ class App extends BaseComponent<Props, State> {
     const app = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${app.name}</b>` : `<a href=/apps/${app.name}><b>${app.name}</b></a>`} app have been saved</span>`);
     this.saveEntities(app);
+    const previousApp = this.getApp();
+    if (previousApp.id) {
+      this.props.updateApp(previousApp as IApp, app);
+    }
     if (this.mounted) {
       this.updateApp(app);
       this.props.history.replace(app.name);
@@ -281,10 +285,6 @@ class App extends BaseComponent<Props, State> {
 
   private updateApp = (app: IApp) => {
     app = Object.values(normalize(app, Schemas.APP).entities.apps || {})[0];
-    const previousApp = this.getApp();
-    if (previousApp.id) {
-      this.props.updateApp(previousApp as IApp, app);
-    }
     const formApp = { ...app };
     removeFields(formApp);
     this.setState({app: app, formApp: formApp, loading: undefined});

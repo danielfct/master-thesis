@@ -144,6 +144,10 @@ class RuleContainer extends BaseComponent<Props, State> {
     const ruleContainer = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${ruleContainer.name}</b>` : `<a href=/rules/containers/${ruleContainer.name}><b>${ruleContainer.name}</b></a>`} container rule have been saved</span>`);
     this.saveEntities(ruleContainer);
+    const previousRuleContainer = this.getRuleContainer();
+    if (previousRuleContainer?.id) {
+      this.props.updateRuleContainer(previousRuleContainer as IRuleContainer, ruleContainer)
+    }
     if (this.mounted) {
       this.updateRuleContainer(ruleContainer);
       this.props.history.replace(ruleContainer.name);
@@ -235,10 +239,6 @@ class RuleContainer extends BaseComponent<Props, State> {
 
   private updateRuleContainer = (ruleContainer: IRuleContainer) => {
     ruleContainer = Object.values(normalize(ruleContainer, Schemas.RULE_CONTAINER).entities.containerRules || {})[0];
-    const previousRuleContainer = this.getRuleContainer();
-    if (previousRuleContainer?.id) {
-      this.props.updateRuleContainer(previousRuleContainer as IRuleContainer, ruleContainer)
-    }
     const formRuleContainer = { ...ruleContainer };
     removeFields(formRuleContainer);
     this.setState({ruleContainer: ruleContainer, formRuleContainer: formRuleContainer});

@@ -147,6 +147,10 @@ class RuleHost extends BaseComponent<Props, State> {
     const ruleHost = reply.data;
     super.toast(`<span class="green-text">Changes to ${this.mounted ? `<b class="white-text">${ruleHost.name}</b>` : `<a href=/rules/hosts/${ruleHost.name}><b>${ruleHost.name}</b></a>`} host rule have been saved</span>`);
     this.saveEntities(ruleHost);
+    const previousRuleHost = this.getRuleHost();
+    if (previousRuleHost.id) {
+      this.props.updateRuleHost(previousRuleHost as IRuleHost, ruleHost);
+    }
     if (this.mounted) {
       this.updateRuleHost(ruleHost);
       this.props.history.replace(ruleHost.name);
@@ -270,10 +274,6 @@ class RuleHost extends BaseComponent<Props, State> {
 
   private updateRuleHost = (ruleHost: IRuleHost) => {
     ruleHost = Object.values(normalize(ruleHost, Schemas.RULE_HOST).entities.hostRules || {})[0];
-    const previousRuleHost = this.getRuleHost();
-    if (previousRuleHost.id) {
-      this.props.updateRuleHost(previousRuleHost as IRuleHost, ruleHost);
-    }
     const formRuleHost = { ...ruleHost };
     removeFields(formRuleHost);
     this.setState({ruleHost: ruleHost, formRuleHost: formRuleHost});

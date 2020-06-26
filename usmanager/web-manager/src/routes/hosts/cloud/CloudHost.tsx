@@ -22,7 +22,7 @@ import {
   addCloudHost,
   addCloudHostRule,
   addCloudHostSimulatedMetrics,
-  loadCloudHosts
+  loadCloudHosts, updateCloudHost
 } from "../../../actions";
 import {connect} from "react-redux";
 import React from "react";
@@ -36,6 +36,7 @@ import {isNew} from "../../../utils/router";
 import GenericSimulatedHostMetricList from "../GenericSimulatedHostMetricList";
 import CloudHostSimulatedMetricList from "./CloudHostSimulatedMetricList";
 import formStyles from "../../../components/form/Form.module.css";
+import {INode} from "../../nodes/Node";
 
 export interface ICloudHost extends IDatabaseData {
   instanceId: string;
@@ -89,6 +90,7 @@ interface StateToProps {
 interface DispatchToProps {
   loadCloudHosts: (instanceId: string) => void;
   addCloudHost: (cloudHost: ICloudHost) => void;
+  updateCloudHost: (previousCloudHost: ICloudHost, currentCloudHost: ICloudHost) => void;
   addCloudHostRule: (instanceId: string, ruleName: string) => void;
   addCloudHostSimulatedMetrics: (instanceId: string, simulatedMetrics: string[]) => void;
 }
@@ -279,6 +281,10 @@ class CloudHost extends BaseComponent<Props, State> {
 
   private onStartSuccess = (cloudHost: ICloudHost) => {
     super.toast(`<span class="green-text">Successfully started ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
+    const previousCloudHost = this.getCloudHost();
+    if (previousCloudHost?.id) {
+      this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
+    }
     if (this.mounted) {
       this.updateCloudHost(cloudHost);
     }
@@ -302,6 +308,10 @@ class CloudHost extends BaseComponent<Props, State> {
 
   private onStopSuccess = (cloudHost: ICloudHost) => {
     super.toast(`<span class="green-text">Successfully stopped ${this.mounted ? `<b class="white-text">${cloudHost.instanceId}</b>` : `<a href=/hosts/cloud/${cloudHost.instanceId}><b>${cloudHost.instanceId}</b></a>`} instance</span>`, 15000);
+    const previousCloudHost = this.getCloudHost();
+    if (previousCloudHost?.id) {
+      this.props.updateCloudHost(previousCloudHost as ICloudHost, cloudHost)
+    }
     if (this.mounted) {
       this.updateCloudHost(cloudHost);
     }
@@ -495,6 +505,7 @@ function mapStateToProps(state: ReduxState, props: Props): StateToProps {
 const mapDispatchToProps: DispatchToProps = {
   loadCloudHosts,
   addCloudHost,
+  updateCloudHost,
   addCloudHostRule,
   addCloudHostSimulatedMetrics,
 };

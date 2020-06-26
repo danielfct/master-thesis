@@ -167,6 +167,10 @@ class Node extends BaseComponent<Props, State> {
     const node = reply.data;
     const previousRole = this.getNode()?.role.toLowerCase();
     super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} has been ${previousRole === 'manager' ? 'demoted' : 'promoted'} to ${node.role}</span>`);
+    const previousNode = this.getNode();
+    if (previousNode?.id) {
+      this.props.updateNode(previousNode as INode, node)
+    }
     if (this.mounted) {
       this.updateNode(node);
       this.props.history.replace(node.id);
@@ -188,10 +192,6 @@ class Node extends BaseComponent<Props, State> {
 
   private updateNode = (node: INode) => {
     node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
-    const previousNode = this.getNode();
-    if (previousNode?.id) {
-      this.props.updateNode(previousNode as INode, node)
-    }
     const formNode = { ...node };
     removeFields(formNode);
     this.setState({node: node, formNode: formNode});
