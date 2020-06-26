@@ -61,12 +61,12 @@ public class DecisionEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ServiceEventEntity> serviceEvents = new HashSet<>();
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<HostEventEntity> hostEvents = new HashSet<>();
 
   /*@Singular

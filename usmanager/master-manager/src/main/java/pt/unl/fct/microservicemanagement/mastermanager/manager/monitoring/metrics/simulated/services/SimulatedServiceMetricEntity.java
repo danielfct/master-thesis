@@ -17,6 +17,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceE
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -69,8 +70,8 @@ public class SimulatedServiceMetricEntity {
 
   @Singular
   @JsonIgnore
-  @ManyToMany(mappedBy = "simulatedServiceMetrics")
-  private List<ServiceEntity> services;
+  @ManyToMany(mappedBy = "simulatedServiceMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  private Set<ServiceEntity> services;
 
   public void removeAssociations() {
     Iterator<ServiceEntity> servicesIterator = services.iterator();

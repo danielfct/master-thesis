@@ -61,7 +61,7 @@ public class HostDecisionEntity {
   private Timestamp timestamp;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "hostDecision", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<HostDecisionValueEntity> hostDecisions = new HashSet<>();
 

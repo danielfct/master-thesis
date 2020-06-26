@@ -72,7 +72,7 @@ public class RegionEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "region", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<EdgeHostEntity> edgeHosts = new HashSet<>();
 
   @Override

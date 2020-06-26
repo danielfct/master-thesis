@@ -89,17 +89,17 @@ public class ConditionEntity {
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "hostCondition", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<HostRuleConditionEntity> hostRuleConditions = new HashSet<>();
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "serviceCondition", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ServiceRuleConditionEntity> serviceConditions = new HashSet<>();
 
   @Singular
   @JsonIgnore
-  @OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "containerCondition", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ContainerRuleConditionEntity> containerConditions = new HashSet<>();
 
   @Override

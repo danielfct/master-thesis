@@ -121,7 +121,8 @@ public class EdgeHostsService {
     SshCommandResult generateKeysResult = sshService.executeCommand(hostname, username, password, generateKeysCommand);
     if (!generateKeysResult.isSuccessful()) {
       deleteEdgeHostConfig(edgeHost);
-      throw new MasterManagerException("Unable to generate public/private key pair for edge host %s", hostname);
+      throw new MasterManagerException("Unable to generate public/private key pair for '%s': %s", hostname,
+          generateKeysResult.getError().get(0));
     }
   }
 

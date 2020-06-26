@@ -69,22 +69,22 @@ public class FieldEntity {
   private String name;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<ConditionEntity> conditions = new HashSet<>();
 
   @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<SimulatedHostMetricEntity> simulatedHostMetrics = new HashSet<>();
 
   @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<SimulatedServiceMetricEntity> simulatedServiceMetrics = new HashSet<>();
 
   @JsonIgnore
-  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<ServiceDecisionValueEntity> componentDecisionValueLogs = new HashSet<>();
 

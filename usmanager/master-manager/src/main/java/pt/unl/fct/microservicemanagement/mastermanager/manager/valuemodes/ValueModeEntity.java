@@ -66,7 +66,7 @@ public class ValueModeEntity {
   private String name;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "valueMode", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "valueMode", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<ConditionEntity> conditions = new HashSet<>();
 

@@ -16,6 +16,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.fields.FieldEntit
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -70,7 +71,7 @@ public class SimulatedContainerMetricEntity {
   @Singular
   @JsonIgnore
   @ManyToMany(mappedBy = "simulatedContainerMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-  private List<ContainerEntity> containers;
+  private Set<ContainerEntity> containers;
 
   public void removeAssociations() {
     Iterator<ContainerEntity> containersIterator = containers.iterator();

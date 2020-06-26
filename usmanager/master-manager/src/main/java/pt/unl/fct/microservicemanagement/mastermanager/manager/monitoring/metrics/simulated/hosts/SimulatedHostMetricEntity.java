@@ -19,6 +19,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHo
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -73,12 +74,12 @@ public class SimulatedHostMetricEntity {
   @Singular
   @JsonIgnore
   @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-  private List<CloudHostEntity> cloudHosts;
+  private Set<CloudHostEntity> cloudHosts;
 
   @Singular
   @JsonIgnore
   @ManyToMany(mappedBy = "simulatedHostMetrics", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-  private List<EdgeHostEntity> edgeHosts;
+  private Set<EdgeHostEntity> edgeHosts;
 
   public void removeAssociations() {
     Iterator<CloudHostEntity> cloudHostsIterator = cloudHosts.iterator();

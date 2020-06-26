@@ -143,7 +143,7 @@ public class HostRulesService {
 
   public void removeConditions(String ruleName, List<String> conditionNames) {
     log.info("Removing conditions {}", conditionNames);
-    var rule = getRule(ruleName);
+    HostRuleEntity rule = getRule(ruleName);
     rule.getConditions()
         .removeIf(condition -> conditionNames.contains(condition.getHostCondition().getName()));
     rules.save(rule);

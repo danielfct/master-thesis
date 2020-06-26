@@ -66,7 +66,7 @@ public class ComponentTypeEntity {
   private ComponentType type;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "componentType", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<DecisionEntity> decisions = new HashSet<>();
 
