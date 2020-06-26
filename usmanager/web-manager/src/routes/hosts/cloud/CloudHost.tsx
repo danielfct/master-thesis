@@ -335,6 +335,7 @@ class CloudHost extends BaseComponent<Props, State> {
 
   private onTerminateSuccess = (cloudHost: Partial<ICloudHost>) => {
     super.toast(`<span class="green-text">Successfully terminated <b class="white-text">${cloudHost.instanceId}</b> instance</span>`, 15000);
+
     if (this.mounted) {
       this.props.history.push('/hosts/cloud');
     }

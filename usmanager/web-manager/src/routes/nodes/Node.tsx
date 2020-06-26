@@ -161,8 +161,6 @@ class Node extends BaseComponent<Props, State> {
     super.toast(message, 10000, reason, true);
   };
 
-
-
   private onPutSuccess = (reply: IReply<INode>): void => {
     const node = reply.data;
     const previousRole = this.getNode()?.role.toLowerCase();
