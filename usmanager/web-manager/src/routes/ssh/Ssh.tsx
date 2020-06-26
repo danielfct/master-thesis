@@ -9,7 +9,7 @@
  */
 
 import MainLayout from "../../views/mainLayout/MainLayout";
-import Tabs from "../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../components/tabs/Tabs";
 import React from "react";
 import SshCommand, {ISshCommand} from "./SshCommand";
 import SshFile, {ISshFile} from "./SshFile";
@@ -67,7 +67,7 @@ class Ssh extends React.Component<Props, State> {
     }
   }
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'Execute command',
       id: 'executeCommand',

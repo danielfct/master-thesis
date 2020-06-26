@@ -47,12 +47,6 @@ class ServiceDependentList extends BaseComponent<Props, {}> {
     this.loadEntities();
   }
 
-  public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    if (prevProps.service?.serviceName !== this.props.service?.serviceName) {
-      this.loadEntities();
-    }
-  }
-
   private loadEntities = () => {
     if (this.props.service?.serviceName) {
       const {serviceName} = this.props.service;

@@ -6,7 +6,7 @@ import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import React from "react";
-import Tabs from "../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {addRegion, loadRegions, updateRegion} from "../../actions";
@@ -205,7 +205,7 @@ class Region extends BaseComponent<Props, State> {
     )
   };
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'Region',
       id: 'region',

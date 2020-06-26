@@ -19,7 +19,7 @@ import Form, {
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs from "../../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {connect} from "react-redux";
@@ -396,7 +396,7 @@ class RuleHost extends BaseComponent<Props, State> {
                            onAddRuleEdgeHost={this.addRuleEdgeHost}
                            onRemoveRuleEdgeHosts={this.removeRuleEdgeHosts}/>;
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'Host rule',
       id: 'hostRule',

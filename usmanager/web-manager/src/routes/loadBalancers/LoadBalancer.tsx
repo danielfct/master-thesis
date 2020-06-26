@@ -15,7 +15,7 @@ import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../components/form/Field";
-import Tabs from "../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {
@@ -222,7 +222,7 @@ class LoadBalancer extends BaseComponent<Props, State> {
     )
   };
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'Load balancer',
       id: 'loadBalancer',

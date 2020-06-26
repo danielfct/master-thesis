@@ -19,7 +19,7 @@ import Form, {
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs from "../../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
@@ -352,7 +352,7 @@ class RuleContainer extends BaseComponent<Props, State> {
                              onAddRuleContainer={this.addRuleContainer}
                              onRemoveRuleContainers={this.removeRuleContainers}/>;
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'Container rule',
       id: 'containerRule',

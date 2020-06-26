@@ -87,9 +87,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
 
   public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     M.Collapsible.init(this.collapsible.current as Element);
-    if (prevProps.service?.serviceName !== this.props.service?.serviceName) {
-      this.loadEntities();
-    }
     if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
       this.setState({entitySaved: true});
     }
@@ -242,7 +239,6 @@ class ServiceAppList extends BaseComponent<Props, State> {
                                        content: this.serviceAppModal,
                                        position: '20%',
                                        scrollbar: this.scrollbar,
-                                       fullScreen: true,
                                      }
                                    }}
                                    show={this.app}

@@ -4,7 +4,7 @@ import styles from './Tabs.module.css';
 import {ReduxState} from "../../reducers";
 import {connect} from "react-redux";
 
-export type Tab = { title: string, id: string, content: () => JSX.Element, disabled?: boolean }
+export type Tab = { title: string, id: string, content: () => JSX.Element, disabled?: boolean, hidden?: boolean }
 
 interface TabsProps {
   tabs: Tab[];
@@ -157,34 +157,38 @@ class Tabs extends React.Component<Props, State> {
     return (
       <div>
         {this.state.showScrollLeft &&
-        <button className={`btn-flat btn-small white-text left ${styles.scrollButton} ${styles.leftScrollButton}`}
-                onTouchStart={this.setLeftScrollTimer}
-                onMouseDown={this.setLeftScrollTimer}
-                onTouchEnd={this.stopLeftScrollTimer}
-                onMouseUp={this.stopLeftScrollTimer}>
-          <i className="material-icons">arrow_back</i>
-        </button>}
+         <button className={`btn-flat btn-small white-text left ${styles.scrollButton} ${styles.leftScrollButton}`}
+                 onTouchStart={this.setLeftScrollTimer}
+                 onMouseDown={this.setLeftScrollTimer}
+                 onTouchEnd={this.stopLeftScrollTimer}
+                 onMouseUp={this.stopLeftScrollTimer}>
+             <i className="material-icons">arrow_back</i>
+         </button>}
         {this.state.showScrollRight &&
-        <button className={`btn-flat btn-small white-text right ${styles.scrollButton} ${styles.rightScrollButton}`}
-                onTouchStart={this.setRightScrollTimer}
-                onMouseDown={this.setRightScrollTimer}
-                onTouchEnd={this.stopRightScrollTimer}
-                onMouseUp={this.stopRightScrollTimer}>
-          <i className="material-icons">arrow_forward</i>
-        </button>}
+         <button className={`btn-flat btn-small white-text right ${styles.scrollButton} ${styles.rightScrollButton}`}
+                 onTouchStart={this.setRightScrollTimer}
+                 onMouseDown={this.setRightScrollTimer}
+                 onTouchEnd={this.stopRightScrollTimer}
+                 onMouseUp={this.stopRightScrollTimer}>
+             <i className="material-icons">arrow_forward</i>
+         </button>}
         <div className="row">
           <div className="col s12">
             <ul className="tabs tabs-fixed-width" ref={this.tabsRef}>
               {tabs.map((tab, index) =>
-                <li key={index} className={`tab ${tab.disabled ? 'disabled' : ''}`}>
-                  <a href={tabs.length === 1 ? undefined : `#${tab.id}`}>{tab.title}</a>
-                </li>
+                ((tab.hidden == undefined || !tab.hidden) && (
+                  <li key={index} className={`tab ${tab.disabled ? 'disabled' : ''}`}>
+                    <a href={tabs.length === 1 ? undefined : `#${tab.id}`}>{tab.title}</a>
+                  </li>
+                ))
               )}
             </ul>
             {tabs.map((tab, index) =>
-              <div id={tab.id} key={index} className={`tab-content ${styles.tabContent} col s12`}>
-                {tab.content()}
-              </div>
+              ((tab.hidden == undefined || !tab.hidden) && (
+                <div id={tab.id} key={index} className={`tab-content ${styles.tabContent} col s12`}>
+                  {tab.content()}
+                </div>
+              ))
             )}
           </div>
         </div>

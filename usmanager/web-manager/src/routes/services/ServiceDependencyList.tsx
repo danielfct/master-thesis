@@ -68,9 +68,6 @@ class ServiceDependencyList extends BaseComponent<Props, State> {
   }
 
   public componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if (prevProps.service?.serviceName !== this.props.service?.serviceName) {
-      this.loadEntities();
-    }
     if (!prevProps.service?.serviceName && this.props.service?.serviceName) {
       this.setState({entitySaved: true});
     }

@@ -123,7 +123,7 @@ public class DatabaseLoader {
           .defaultInternalPort("80")
           .defaultDb("user-db:27017")
           .launchCommand("${eurekaHost} ${externalPort} ${internalPort} ${hostname} ${userDatabaseHost}")
-          .minReplicas(2)
+          .minReplicas(1)
           .maxReplicas(0)
           .outputLabel("${userHost}")
           .serviceType(ServiceType.BACKEND)

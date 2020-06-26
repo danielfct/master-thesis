@@ -19,7 +19,7 @@ import Form, {
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs from "../../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
@@ -351,7 +351,7 @@ class RuleService extends BaseComponent<Props, State> {
                              onAddRuleService={this.addRuleService}
                              onRemoveRuleServices={this.removeRuleServices}/>;
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'Service rule',
       id: 'serviceRule',

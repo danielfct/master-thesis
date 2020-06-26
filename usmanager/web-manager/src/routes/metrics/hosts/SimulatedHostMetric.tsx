@@ -15,7 +15,7 @@ import Form, {IFields, requiredAndTrimmed} from "../../../components/form/Form";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs from "../../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
@@ -354,7 +354,7 @@ class SimulatedHostMetric extends BaseComponent<Props, State> {
                                      onAddEdgeHost={this.addSimulatedHostMetricEdgeHost}
                                      onRemoveEdgeHosts={this.removeSimulatedHostMetricEdgeHosts}/>;
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'Simulated metric',
       id: 'simulatedHostMetric',

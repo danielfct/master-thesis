@@ -45,7 +45,7 @@ import {ReduxState} from "../../reducers";
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import BaseComponent from "../../components/BaseComponent";
 import {Error} from "../../components/errors/Error";
-import Tabs from "../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../components/tabs/Tabs";
 import {IReply, postData} from "../../utils/api";
 import ServiceAppList, {IAddServiceApp} from "./ServiceAppList";
 import ServiceDependencyList from "./ServiceDependencyList";
@@ -59,7 +59,6 @@ import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
 import ServiceSimulatedMetricList from "./ServiceSimulatedMetricList";
 import GenericServiceSimulatedMetricList from "./GenericSimulatedServiceMetricList";
-import {IApp} from "../apps/App";
 
 export interface IService extends IDatabaseData {
   serviceName: string;
@@ -133,13 +132,16 @@ class Service extends BaseComponent<Props, State> {
 
   private mounted = false;
 
-  state: State = {
-    unsavedApps: [],
-    unsavedDependencies: [],
-    unsavedPredictions: [],
-    unsavedRules: [],
-    unsavedSimulatedMetrics: [],
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      unsavedApps: [],
+      unsavedDependencies: [],
+      unsavedPredictions: [],
+      unsavedRules: [],
+      unsavedSimulatedMetrics: [],
+    };
+  }
 
   public componentDidMount(): void {
     this.loadService();
@@ -151,7 +153,7 @@ class Service extends BaseComponent<Props, State> {
   }
 
   private loadService = () => {
-    if (!isNew(this.props.location.search)) {
+    if (!this.isNew()) {
       const serviceName = this.props.match.params.name;
       this.props.loadServices(serviceName);
     }
@@ -374,8 +376,8 @@ class Service extends BaseComponent<Props, State> {
     super.toast(`Unable to save simulated metrics of ${this.mounted ? `<b>${service.serviceName}</b>` : `<a href=/services/${service.serviceName}><b>${service.serviceName}</b></a>`} service`, 10000, reason, true);
 
   private updateService = (service: IService) => {
-    service = Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0];
     const previousService = this.getService();
+    service = {...previousService, ...Object.values(normalize(service, Schemas.SERVICE).entities.services || {})[0]};
     if (previousService.id) {
       this.props.updateService(previousService as IService, service);
     }
@@ -444,12 +446,12 @@ class Service extends BaseComponent<Props, State> {
                          label={key}
                          dropdown={{
                            defaultValue: "Choose service type",
-                           values: ["Frontend", "Backend", "Database", "System"]}}/>
+                           values: ["FRONTEND", "BACKEND", "DATABASE", "SYSTEM"]}}/>
                 : <Field key={index}
                          id={key}
                          label={key}
-                type={['defaultExternalPort', 'defaultInternalPort', 'minReplicas', 'maxReplicas',
-                  'expectedMemoryConsumption'].includes(key) ? 'number' : 'text'}/>
+                         type={['defaultExternalPort', 'defaultInternalPort', 'minReplicas', 'maxReplicas',
+                           'expectedMemoryConsumption'].includes(key) ? 'number' : 'text'}/>
             )}
           </Form>
         )}
@@ -506,59 +508,56 @@ class Service extends BaseComponent<Props, State> {
                                 onRemoveSimulatedServiceMetrics={this.removeServiceSimulatedMetrics}/>;
 
   private genericSimulatedMetrics = (): JSX.Element =>
-     <GenericServiceSimulatedMetricList/>;
+    <GenericServiceSimulatedMetricList/>;
 
-  private tabs = () => {
-    const tabs = [];
-    tabs.push({
-        title: 'Service',
-        id: 'service',
-        content: () => this.service()
-      },
-      {
-        title: 'Apps',
-        id: 'apps',
-        content: () => this.apps()
-      },
-      {
-        title: 'Dependencies',
-        id: 'dependencies',
-        content: () => this.dependencies()
-      });
-    if (!this.isNew()) {
-      tabs.push({
-        title: 'Dependents',
-        id: 'dependents',
-        content: () => this.dependents()
-      });
+  private tabs = (): Tab[] => ([
+    {
+      title: 'Service',
+      id: 'service',
+      content: () => this.service()
+    },
+    {
+      title: 'Apps',
+      id: 'apps',
+      content: () => this.apps()
+    },
+    {
+      title: 'Dependencies',
+      id: 'dependencies',
+      content: () => this.dependencies()
+    },
+    {
+      title: 'Dependents',
+      id: 'dependents',
+      content: () => this.dependents(),
+      hidden: this.isNew()
+    },
+    {
+      title: 'Predictions',
+      id: 'predictions',
+      content: () => this.predictions()
+    },
+    {
+      title: 'Rules',
+      id: 'serviceRules',
+      content: () => this.rules()
+    },
+    {
+      title: 'Generic rules',
+      id: 'genericRules',
+      content: () => this.genericRules()
+    },
+    {
+      title: 'Simulated metrics',
+      id: 'simulatedMetrics',
+      content: () => this.simulatedMetrics()
+    },
+    {
+      title: 'Generic simulated metrics',
+      id: 'genericSimulatedMetrics',
+      content: () => this.genericSimulatedMetrics()
     }
-    tabs.push({
-        title: 'Predictions',
-        id: 'predictions',
-        content: () => this.predictions()
-      },
-      {
-        title: 'Rules',
-        id: 'serviceRules',
-        content: () => this.rules()
-      },
-      {
-        title: 'Generic rules',
-        id: 'genericRules',
-        content: () => this.genericRules()
-      },
-      {
-        title: 'Simulated metrics',
-        id: 'simulatedMetrics',
-        content: () => this.simulatedMetrics()
-      },
-      {
-        title: 'Generic simulated metrics',
-        id: 'genericSimulatedMetrics',
-        content: () => this.genericSimulatedMetrics()
-      });
-    return tabs;
-  }
+  ]);
 
   public render() {
     return (

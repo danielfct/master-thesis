@@ -8,7 +8,7 @@ import Field from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import React from "react";
-import Tabs from "../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {addApp, addAppServices, loadApps, loadRegions, updateApp} from "../../actions";
@@ -370,7 +370,7 @@ class App extends BaseComponent<Props, State> {
                      onAddAppService={this.addAppService}
                      onRemoveAppServices={this.removeAppServices}/>;
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'App',
       id: 'app',

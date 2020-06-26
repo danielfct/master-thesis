@@ -4,7 +4,7 @@ import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../components/form/Field";
-import Tabs from "../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {addNode, loadCloudHosts, loadEdgeHosts, loadNodes, loadRegions, updateNode} from "../../actions";
@@ -351,26 +351,26 @@ class Node extends BaseComponent<Props, State> {
                     loadNodeError={!this.isNew() ? this.props.error : undefined}
                     node={this.getNode()}/>;
 
-  private tabs = () =>
-    this.isNew()
-      ? [
-        {
-          title: 'Node',
-          id: 'newNode',
-          content: () => this.node()
-        }
-      ] : [
-        {
-          title: 'Node',
-          id: 'node',
-          content: () => this.node()
-        },
-        {
-          title: 'Labels',
-          id: 'nodeLabels',
-          content: () => this.labels()
-        },
-      ];
+  private tabs = (): Tab[] => ([
+    {
+      title: 'Node',
+      id: 'newNode',
+      content: () => this.node(),
+      hidden: !this.isNew()
+    },
+    {
+      title: 'Node',
+      id: 'node',
+      content: () => this.node(),
+      hidden: this.isNew()
+    },
+    {
+      title: 'Labels',
+      id: 'nodeLabels',
+      content: () => this.labels(),
+      hidden: this.isNew()
+    }
+  ]);
 
   public render() {
     return (

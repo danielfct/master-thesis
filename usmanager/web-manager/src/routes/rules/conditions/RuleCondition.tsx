@@ -7,7 +7,7 @@ import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../
 import Field, {getTypeFromValue} from "../../../components/form/Field";
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
-import Tabs from "../../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
@@ -243,7 +243,7 @@ class RuleCondition extends BaseComponent<Props, State> {
     )
   };
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'Condition',
       id: 'condition',

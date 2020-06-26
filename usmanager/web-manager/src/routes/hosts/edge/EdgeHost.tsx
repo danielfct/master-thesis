@@ -15,7 +15,7 @@ import Form, {IFields, requiredAndTrimmed, requiredAndTrimmedAndNotValidIpAddres
 import ListLoadingSpinner from "../../../components/list/ListLoadingSpinner";
 import {Error} from "../../../components/errors/Error";
 import Field from "../../../components/form/Field";
-import Tabs from "../../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../../components/tabs/Tabs";
 import MainLayout from "../../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../../reducers";
 import {
@@ -360,7 +360,7 @@ class EdgeHost extends BaseComponent<Props, State> {
   private genericSimulatedMetrics = (): JSX.Element =>
     <GenericSimulatedHostMetricList/>;
 
-  private tabs = () => [
+  private tabs = (): Tab[] => [
     {
       title: 'Edge host',
       id: 'edgeHost',

@@ -9,7 +9,7 @@ import Form, {
 import Field, {getTypeFromValue} from "../../components/form/Field";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
-import Tabs from "../../components/tabs/Tabs";
+import Tabs, {Tab} from "../../components/tabs/Tabs";
 import MainLayout from "../../views/mainLayout/MainLayout";
 import {ReduxState} from "../../reducers";
 import {
@@ -551,53 +551,51 @@ class Container extends BaseComponent<Props, State> {
   private genericSimulatedMetrics = (): JSX.Element =>
     <GenericSimulatedContainerMetricList/>;
 
-  private tabs = () => {
-    const tabs = [];
-    tabs.push({
+  private tabs = (): Tab[] => ([
+    {
       title: 'Container',
       id: 'container',
       content: () => this.container()
-    });
-    if (!isNew(this.props.location.search)) {
-      tabs.push({
-          title: 'Ports',
-          id: 'ports',
-          content: () => this.ports()
-        },
-        {
-          title: 'Labels',
-          id: 'containerLabels',
-          content: () => this.labels()
-        },
-        {
-          title: 'Logs',
-          id: 'logs',
-          content: () => this.logs()
-        });
+    },
+    {
+      title: 'Ports',
+      id: 'ports',
+      content: () => this.ports(),
+      hidden: this.isNew()
+    },
+    {
+      title: 'Labels',
+      id: 'containerLabels',
+      content: () => this.labels(),
+      hidden: this.isNew()
+    },
+    {
+      title: 'Logs',
+      id: 'logs',
+      content: () => this.logs(),
+      hidden: this.isNew()
+    },
+    {
+      title: 'Rules',
+      id: 'rules',
+      content: () => this.rules()
+    },
+    {
+      title: 'Generic rules',
+      id: 'genericEdgeRules',
+      content: () => this.genericRules()
+    },
+    {
+      title: 'Simulated metrics',
+      id: 'simulatedMetrics',
+      content: () => this.simulatedMetrics()
+    },
+    {
+      title: 'Generic simulated metrics',
+      id: 'genericSimulatedMetrics',
+      content: () => this.genericSimulatedMetrics()
     }
-    tabs.push({
-        title: 'Rules',
-        id: 'rules',
-        content: () => this.rules()
-      },
-      {
-        title: 'Generic rules',
-        id: 'genericEdgeRules',
-        content: () => this.genericRules()
-      },
-      {
-        title: 'Simulated metrics',
-        id: 'simulatedMetrics',
-        content: () => this.simulatedMetrics()
-      },
-      {
-        title: 'Generic simulated metrics',
-        id: 'genericSimulatedMetrics',
-        content: () => this.genericSimulatedMetrics()
-      }
-    );
-    return tabs;
-  };
+  ]);
 
   public render() {
     return (
