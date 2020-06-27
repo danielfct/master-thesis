@@ -14,7 +14,7 @@ const CardNode = Card<INode>();
 const NodeCard = ({node}: Props) => (
   <CardNode title={node.id.toString()}
             link={{to: {pathname: `/nodes/${node.id}`, state: node}}}
-            height={'125px'}
+            height={'150px'}
             margin={'10px 0'}
             hoverable>
     <CardItem key={'hostName'}
@@ -23,6 +23,9 @@ const NodeCard = ({node}: Props) => (
     <CardItem key={'state'}
               label={'State'}
               value={node.state}/>
+    <CardItem key={'availability'}
+              label={'Availability'}
+              value={node.availability}/>
     <CardItem key={'role'}
               label={'Role'}
               value={node.role}/>

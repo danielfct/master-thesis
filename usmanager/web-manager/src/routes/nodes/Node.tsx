@@ -163,9 +163,18 @@ class Node extends BaseComponent<Props, State> {
 
   private onPutSuccess = (reply: IReply<INode>): void => {
     const node = reply.data;
-    const previousRole = this.getNode()?.role.toLowerCase();
-    super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} has been ${previousRole === 'manager' ? 'demoted' : 'promoted'} to ${node.role}</span>`);
     const previousNode = this.getNode();
+    const previousAvailability = previousNode?.availability;
+    const previousRole = previousNode?.role;
+    if (node.availability !== previousAvailability) {
+      super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} availability has been changed to ${node.availability}</span>`);
+    }
+    else if (node.role !== previousRole) {
+      super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} has been ${previousRole === 'MANAGER' ? 'demoted' : 'promoted'} to ${node.role}</span>`);
+    }
+    else {
+      super.toast(`<span class="green-text">Changes to node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} have been saved</span>`);
+    }
     if (previousNode?.id) {
       this.props.updateNode(previousNode as INode, node)
     }
@@ -219,7 +228,7 @@ class Node extends BaseComponent<Props, State> {
                              .filter(instance => !nodesHostname.includes(instance.publicIpAddress))
                              .map(instance => instance.instanceId);
     const edgeHosts = Object.entries(this.props.edgeHosts)
-                            .filter(([_, edgeHost]) => !nodesHostname.includes(edgeHost.privateIpAddress))
+                            .filter(([_, edgeHost]) => !nodesHostname.includes(edgeHost.publicIpAddress))
                             .map(([hostname, _]) => hostname);
     return cloudHosts.concat(edgeHosts);
   };
@@ -284,7 +293,16 @@ class Node extends BaseComponent<Props, State> {
           </>
         :
         formNode && Object.entries(formNode).map(([key, value], index) =>
-                   key === 'role'
+                   key === 'availability'
+                     ? <Field key={'availability'}
+                              id={'availability'}
+                              label={'availability'}
+                              type="dropdown"
+                              dropdown={{
+                                defaultValue: "Select availability",
+                                values: ['ACTIVE', 'PAUSE', 'DRAIN']
+                              }}/>
+                     : key === 'role' && formNode.state !== 'down'
                      ? <Field key={'role'}
                               id={'role'}
                               label={'role'}
@@ -294,9 +312,9 @@ class Node extends BaseComponent<Props, State> {
                                 values: ['MANAGER', 'WORKER']
                               }}/>
                      : <Field key={index}
-                              id={key}
-                              label={key}
-                              disabled={true}/>)
+                            id={key}
+                            label={key}
+                            disabled={true}/>)
     );
   };
 

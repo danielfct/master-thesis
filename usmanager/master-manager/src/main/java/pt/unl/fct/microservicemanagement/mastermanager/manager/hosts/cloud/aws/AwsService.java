@@ -126,12 +126,20 @@ public class AwsService {
     return getInstances().stream().map(AwsSimpleInstance::new).collect(Collectors.toList());
   }
 
-  public Instance createInstance() {
+  public Instance createInstance(boolean waitUntilBoot) {
     log.info("Creating new aws instance...");
     String instanceId = createEC2();
     Instance instance = waitInstanceState(instanceId, AwsInstanceState.RUNNING);
     String publicIpAddress = instance.getPublicIpAddress();
     log.info("New aws instance created: instanceId = {}, publicIpAddress = {}", instanceId, publicIpAddress);
+    if (waitUntilBoot) {
+      log.info("Waiting for instance to boot...");
+      try {
+        Timing.wait(() -> sshService.hasConnection(instance.getPublicIpAddress()), awsConnectionTimeout);
+      } catch (TimeoutException e) {
+        e.printStackTrace();
+      }
+    }
     return instance;
   }
 
@@ -206,10 +214,6 @@ public class AwsService {
       Instance instance = getInstance(instanceId);
       int instanceState = instance.getState().getCode();
       if (instanceState == state.getCode()) {
-        if (state == AwsInstanceState.RUNNING && !sshService.hasConnection(instance.getPublicIpAddress())) {
-          Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
-          continue;
-        }
         log.info("Instance {} is already on state {}", instanceId, state.getState());
         return instance;
       }
@@ -229,10 +233,6 @@ public class AwsService {
         }
         instance = waitInstanceState(instanceId, state);
         log.info("Setting instance {} to {} state", instanceId, state.getState());
-        if (state == AwsInstanceState.RUNNING && !sshService.hasConnection(instance.getPublicIpAddress())) {
-          Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
-          continue;
-        }
         return instance;
       } catch (MasterManagerException e) {
         log.info("Failed to set instance {} to {} state: {}", instanceId, state.getState(), e.getMessage());

@@ -13,7 +13,9 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nod
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -23,8 +25,10 @@ import java.util.stream.Stream;
 
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Node;
+import com.spotify.docker.client.messages.swarm.NodeInfo;
 import com.spotify.docker.client.messages.swarm.NodeSpec;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,9 +36,11 @@ import org.springframework.stereotype.Service;
 public class NodesService {
 
   private final DockerSwarmService dockerSwarmService;
+  private final HostsService hostsService;
 
-  public NodesService(DockerSwarmService dockerSwarmService) {
+  public NodesService(DockerSwarmService dockerSwarmService, HostsService hostsService) {
     this.dockerSwarmService = dockerSwarmService;
+    this.hostsService = hostsService;
   }
 
   public List<SimpleNode> getNodes() {
@@ -42,13 +48,14 @@ public class NodesService {
   }
 
   private List<SimpleNode> getNodes(Predicate<Node> filter) {
-    try (var swarmManager = dockerSwarmService.getSwarmManager()) {
+    try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
       Stream<Node> nodeStream = swarmManager.listNodes().stream();
       if (filter != null) {
         nodeStream = nodeStream.filter(filter);
       }
       return nodeStream
-          .map(n -> new SimpleNode(n.id(), n.status().addr(), n.status().state(), n.spec().availability(),
+          .map(n -> new SimpleNode(n.id(), n.status().addr(), n.status().state(),
+              NodeAvailability.valueOf(n.spec().availability().toUpperCase()),
               NodeRole.valueOf(n.spec().role().toUpperCase()), n.version().index(), n.spec().labels()))
           .collect(Collectors.toList());
     } catch (DockerException | InterruptedException e) {
@@ -78,33 +85,33 @@ public class NodesService {
     return getNodes(availableFilter);
   }
 
-  public List<SimpleNode> getAvailableWorkers() {
-    //TODO test
+  public List<SimpleNode> getAvailableManagers() {
     return getAvailableNodes(node -> node.managerStatus() != null);
   }
 
-  public boolean hasNode(Predicate<Node> predicate) {
-    return !getAvailableNodes(predicate).isEmpty();
+  public List<SimpleNode> getAvailableWorkers() {
+    return getAvailableNodes(node -> node.managerStatus() == null);
   }
 
-  public void deleteUnresponsiveNodes() {
-    log.info("Deleting unresponsive nodes...");
-    log.info("before: {}", getNodes());
-    deleteNodes(n -> !n.status().state().equals("ready"));
-    log.info("after: {}", getNodes());
+  private void removeNodes(Predicate<Node> filter) {
+    getNodes(filter).forEach(n -> removeNode(n.getId()));
   }
 
-  public void deleteHostNodes(String nodeHostname) {
-    deleteNodes(n -> n.status().addr().equals(nodeHostname));
+  public void removeHostNodes(String hostname) {
+    removeNodes(n -> Objects.equals(n.status().addr(), hostname));
   }
 
-  private void deleteNodes(Predicate<Node> filter) {
-    getNodes(filter).forEach(n -> deleteNode(n.getId()));
-  }
-
-  private void deleteNode(String nodeId) {
-    try (var swarmManager = dockerSwarmService.getSwarmManager()) {
-      swarmManager.deleteNode(nodeId, true);
+  public void removeNode(String nodeId) {
+    var node = getNode(nodeId);
+    try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
+      if (isManager(nodeId)) {
+        changeRole(nodeId, NodeRole.WORKER);
+      }
+      swarmManager.deleteNode(nodeId);
+      int hostNodes = getNodes(n -> Objects.equals(n.status().addr(), node.getHostname())).size();
+      if (hostNodes == 0) {
+        hostsService.removeHost(node.getHostname());
+      }
       log.info("Deleted node '{}'", nodeId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
@@ -116,32 +123,85 @@ public class NodesService {
     return getAvailableNodes(n -> Objects.equals(n.description().hostname(), hostname)).isEmpty();
   }
 
-  public SimpleNode changeRole(String nodeId, NodeRole newRole) {
-    SimpleNode node = getNode(nodeId);
-    NodeSpec nodeSpec = NodeSpec.builder()
-        .role(newRole.name())
-        .availability(node.getAvailability())
-        .build();
-    try (var swarmManager = dockerSwarmService.getSwarmManager()) {
-      swarmManager.updateNode(node.getId(), node.getVersion(), nodeSpec);
-      node.setRole(newRole);
-      return node;
+  public boolean isManager(String nodeId) {
+    try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
+      NodeInfo nodeInfo = swarmManager.inspectNode(nodeId);
+      return nodeInfo.managerStatus() != null;
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
     }
   }
 
-  public void addLabel(String nodeId, String label, String value) {
+  public boolean isWorker(String nodeId) {
+    try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
+      NodeInfo nodeInfo = swarmManager.inspectNode(nodeId);
+      return nodeInfo.managerStatus() == null;
+    } catch (DockerException | InterruptedException e) {
+      e.printStackTrace();
+      throw new MasterManagerException(e.getMessage());
+    }
+  }
+
+  public SimpleNode changeAvailability(String nodeId, NodeAvailability newAvailability) {
+    SimpleNode node = getNode(nodeId);
+    NodeSpec nodeSpec = NodeSpec.builder()
+        .availability(newAvailability.name())
+        .role(node.getRole().name())
+        .build();
+    return updateNode(node, nodeSpec);
+  }
+
+  public SimpleNode changeRole(String nodeId, NodeRole newRole) {
+    SimpleNode node = getNode(nodeId);
+    NodeSpec nodeSpec = NodeSpec.builder()
+        .availability(node.getAvailability().name())
+        .role(newRole.name())
+        .build();
+    return updateNode(node, nodeSpec);
+  }
+
+  public SimpleNode addLabel(String nodeId, String label, String value) {
     log.info("Adding label {}={} to node {}", label, value, nodeId);
     SimpleNode node = getNode(nodeId);
     NodeSpec nodeSpec = NodeSpec.builder()
+        .availability(node.getAvailability().name())
         .role(node.getRole().name())
-        .availability(node.getAvailability())
         .addLabel(label, value)
         .build();
-    try (var swarmManager = dockerSwarmService.getSwarmManager()) {
-      swarmManager.updateNode(node.getId(), node.getVersion(), nodeSpec);
+    return updateNode(node, nodeSpec);
+  }
+
+  public SimpleNode removeLabel(String nodeId, String label) {
+    log.info("Removing label {} from node {}", label, nodeId);
+    SimpleNode node = getNode(nodeId);
+    Map<String, String> labels = new HashMap<>(node.getLabels());
+    labels.remove(label);
+    NodeSpec nodeSpec = NodeSpec.builder()
+        .availability(node.getAvailability().name())
+        .role(node.getRole().name())
+        .labels(labels)
+        .build();
+    return updateNode(node, nodeSpec);
+  }
+
+  public SimpleNode updateNode(String nodeId, SimpleNode newNode) {
+    SimpleNode node = getNode(nodeId);
+    log.info("Updating node {} to node {}", ToStringBuilder.reflectionToString(node),
+        ToStringBuilder.reflectionToString(newNode));
+    NodeSpec nodeSpec = NodeSpec.builder()
+        .availability(newNode.getAvailability().name().toLowerCase())
+        .role(newNode.getRole().name().toLowerCase())
+        .labels(newNode.getLabels())
+        .build();
+    return updateNode(node, nodeSpec);
+  }
+
+  private SimpleNode updateNode(SimpleNode node, NodeSpec nodeSpec) {
+    try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
+      String nodeId = node.getId();
+      swarmManager.updateNode(nodeId, node.getVersion(), nodeSpec);
+      return getNode(nodeId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());

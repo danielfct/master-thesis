@@ -17,6 +17,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsServic
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,20 +72,16 @@ public class NodesController {
   }
 
   @PutMapping("/{id}")
-  public SimpleNode updateNode(@PathVariable String id, @Json String role) {
-    NodeRole nodeRole;
-    try {
-      nodeRole = NodeRole.valueOf(role.toUpperCase());
-    } catch (IllegalArgumentException e) {
-      throw new BadRequestException("Node role %s is not supported: %s", role, Arrays.toString(NodeRole.values()));
+  public SimpleNode updateNode(@PathVariable String id, @RequestBody SimpleNode node) {
+    if (!Objects.equals(id, node.getId())) {
+      throw new BadRequestException("Invalid request, path id %s and request body %s don't match", id, node.getId());
     }
-    return nodesService.changeRole(id, nodeRole);
+    return nodesService.updateNode(id, node);
   }
 
   @DeleteMapping("/{id}")
   public void removeNode(@PathVariable("id") String id) {
-    var node = nodesService.getNode(id);
-    hostsService.removeHost(node.getHostname());
+    nodesService.removeNode(id);
   }
 
 }

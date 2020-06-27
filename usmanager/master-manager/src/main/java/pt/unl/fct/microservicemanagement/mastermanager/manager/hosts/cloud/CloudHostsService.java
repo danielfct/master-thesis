@@ -118,7 +118,11 @@ public class CloudHostsService {
   }
 
   public CloudHostEntity startCloudHost() {
-    Instance instance = awsService.createInstance();
+    return startCloudHost(false);
+  }
+
+  public CloudHostEntity startCloudHost(boolean waitToBoot) {
+    Instance instance = awsService.createInstance(waitToBoot);
     return saveCloudHostFromInstance(instance);
   }
 

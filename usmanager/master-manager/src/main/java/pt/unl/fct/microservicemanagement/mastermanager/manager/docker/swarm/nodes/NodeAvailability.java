@@ -10,15 +10,8 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes;
 
-public final class NodeConstants {
+public enum NodeAvailability {
 
-  private NodeConstants() {
-  }
-
-  public static final class Label {
-
-    public static final String REACHABLE_HOSTNAME = "reachableHostname";
-
-  }
+  ACTIVE, PAUSE, DRAIN
 
 }
