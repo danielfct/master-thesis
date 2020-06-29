@@ -41,7 +41,7 @@ public final class AwsSimpleInstance {
   private final String privateIpAddress;
   private final Placement placement;
 
-  AwsSimpleInstance(Instance instance) {
+  public AwsSimpleInstance(Instance instance) {
     this.instanceId = instance.getInstanceId();
     this.imageId = instance.getImageId();
     this.instanceType = instance.getInstanceType();

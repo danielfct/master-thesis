@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
-import org.apache.commons.lang3.StringUtils;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
@@ -94,7 +93,7 @@ public class AwsService {
     this.awsConnectionTimeout = awsProperties.getConnectionTimeout();
   }
 
-  private List<Instance> getInstances() {
+  public List<Instance> getInstances() {
     var instances = new ArrayList<Instance>();
     var request = new DescribeInstancesRequest();
     DescribeInstancesResult result;
@@ -126,19 +125,16 @@ public class AwsService {
     return getInstances().stream().map(AwsSimpleInstance::new).collect(Collectors.toList());
   }
 
-  public Instance createInstance(boolean waitUntilBoot) {
+  public Instance createInstance() {
     log.info("Creating new aws instance...");
     String instanceId = createEC2();
     Instance instance = waitInstanceState(instanceId, AwsInstanceState.RUNNING);
     String publicIpAddress = instance.getPublicIpAddress();
     log.info("New aws instance created: instanceId = {}, publicIpAddress = {}", instanceId, publicIpAddress);
-    if (waitUntilBoot) {
-      log.info("Waiting for instance to boot...");
-      try {
-        Timing.wait(() -> sshService.hasConnection(instance.getPublicIpAddress()), awsConnectionTimeout);
-      } catch (TimeoutException e) {
-        e.printStackTrace();
-      }
+    try {
+      waitToBoot(instance);
+    } catch (TimeoutException e) {
+      e.printStackTrace();
     }
     return instance;
   }
@@ -163,7 +159,13 @@ public class AwsService {
 
   public Instance startInstance(String instanceId) {
     log.info("Starting instance {}", instanceId);
-    return setInstanceState(instanceId, AwsInstanceState.RUNNING);
+    Instance instance = setInstanceState(instanceId, AwsInstanceState.RUNNING);
+    try {
+      waitToBoot(instance);
+    } catch (TimeoutException e) {
+      e.printStackTrace();
+    }
+    return instance;
   }
 
   private void startInstanceById(String instanceId) {
@@ -255,6 +257,11 @@ public class AwsService {
       throw new MasterManagerException(e.getMessage());
     }
     return instance[0];
+  }
+
+  private void waitToBoot(Instance instance) throws TimeoutException {
+    log.info("Waiting for instance {} to boot...", instance.getPublicIpAddress());
+    Timing.wait(() -> sshService.hasConnection(instance.getPublicIpAddress()), awsConnectionTimeout);
   }
 
   private boolean isMicroserviceManagerInstance(Instance instance) {

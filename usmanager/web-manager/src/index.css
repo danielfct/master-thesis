@@ -824,4 +824,5 @@ select.no-validation-field ~ input.select-dropdown {
 
 .prefix {
     font-size: 25px !important;
+    padding-top: 5px;
 }

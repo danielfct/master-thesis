@@ -35,8 +35,8 @@ class Containers extends BaseComponent<Props, {}> {
 
   private predicate = (container: IContainer, search: string): boolean =>
     container.containerId.toString().toLowerCase().includes(search)
-    || container.image.toLowerCase().includes(search)
-    || container.hostname.toLowerCase().includes(search);
+    || container.hostname.toLowerCase().includes(search)
+    || container.labels['serviceType'].toLowerCase().includes(search);
 
   private reloadContainers = () => {
     this.props.reloadContainers();

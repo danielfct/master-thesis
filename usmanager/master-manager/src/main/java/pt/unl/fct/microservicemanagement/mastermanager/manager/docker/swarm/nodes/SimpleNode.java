@@ -12,6 +12,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nod
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -27,6 +28,7 @@ public final class SimpleNode {
   private final long version;
   private final Map<String, String> labels;
 
+  @JsonIgnore
   public String getReachableHostname() {
     String hostname = labels.get(NodeConstants.Label.REACHABLE_HOSTNAME);
     if (hostname == null) {

@@ -133,7 +133,7 @@ class Node extends BaseComponent<Props, State> {
     const nodes = reply.data;
     if (nodes.length == 1) {
       const node = nodes[0];
-      super.toast(`<span class="green-text">Started node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.hostname}</span>`);
+      super.toast(`<span class="green-text">Node ${this.mounted ? `<b class="white-text">${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} at ${node.hostname} has joined the swarm</span>`);
       this.props.addNode(node);
       if (this.mounted) {
         this.updateNode(node);
@@ -141,7 +141,7 @@ class Node extends BaseComponent<Props, State> {
       }
     }
     else {
-      super.toast(`<span class="green-text">Started nodes <b class="white-text">${nodes.map(node => `${node.hostname} => ${node.id}`)}</b></span>`);
+      super.toast(`<span class="green-text">Nodes <b class="white-text">${nodes.map(node => `${node.hostname} => ${node.id}`)}</b> have joined the swarm</span>`);
       this.props.history.push("/nodes");
     }
 

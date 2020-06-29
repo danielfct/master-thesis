@@ -70,7 +70,7 @@ public class DockerSwarmService {
     try (var docker = dockerCoreService.getDockerClient(hostname)) {
       return Objects.equals(docker.info().swarm().localNodeState(), "active")
           && !docker.info().swarm().controlAvailable()
-          ? Optional.of(nodesService.getHostNode(hostname).getId())
+          ? Optional.of(docker.info().swarm().nodeId())
           : Optional.empty();
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
@@ -99,17 +99,17 @@ public class DockerSwarmService {
 
   public String joinSwarm(String publicIpAddress, String privateIpAddress, NodeRole role) {
     String leaderAddress = hostsService.getPublicIP();
-    try (DockerClient swarmManager = getSwarmLeader();
-         DockerClient swarmWorker = dockerCoreService.getDockerClient(publicIpAddress)) {
-      leaveSwarm(swarmWorker);
+    try (DockerClient leaderClient = getSwarmLeader();
+         DockerClient nodeClient = dockerCoreService.getDockerClient(publicIpAddress)) {
+      leaveSwarm(nodeClient);
       log.info("{} is joining the swarm as {}", publicIpAddress, role);
       String joinToken;
       switch (role) {
         case MANAGER:
-          joinToken = swarmManager.inspectSwarm().joinTokens().manager();
+          joinToken = leaderClient.inspectSwarm().joinTokens().manager();
           break;
         case WORKER:
-          joinToken = swarmManager.inspectSwarm().joinTokens().worker();
+          joinToken = leaderClient.inspectSwarm().joinTokens().worker();
           break;
         default:
           throw new UnsupportedOperationException();
@@ -120,9 +120,9 @@ public class DockerSwarmService {
           .joinToken(joinToken)
           .remoteAddrs(List.of(leaderAddress))
           .build();
-      swarmWorker.joinSwarm(swarmJoin);
-      String nodeId;
-      switch (role) {
+      nodeClient.joinSwarm(swarmJoin);
+      String nodeId = nodeClient.info().swarm().nodeId();
+      /*switch (role) {
         case MANAGER:
           nodeId = getSwarmManagerNodeId(publicIpAddress).get();
           break;
@@ -131,7 +131,7 @@ public class DockerSwarmService {
           break;
         default:
           throw new UnsupportedOperationException();
-      }
+      }*/
       log.info("Host {} ({}) has joined the swarm as node {}", publicIpAddress, privateIpAddress, nodeId);
       return nodeId;
     } catch (DockerException | InterruptedException e) {
@@ -150,8 +150,14 @@ public class DockerSwarmService {
     try {
       boolean isNode = !Objects.equals(docker.info().swarm().localNodeState(), "inactive");
       if (isNode) {
+        String nodeId = docker.info().swarm().nodeId();
+        boolean isManager = docker.info().swarm().controlAvailable();
+        Integer managers = docker.info().swarm().managers();
+        if (isManager && managers != null && managers > 1) {
+          nodesService.changeRole(nodeId, NodeRole.WORKER);
+        }
         docker.leaveSwarm(true);
-        log.info("{} left the swarm", docker.getHost());
+        log.info("{} ({}) left the swarm", docker.getHost(), nodeId);
       }
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();

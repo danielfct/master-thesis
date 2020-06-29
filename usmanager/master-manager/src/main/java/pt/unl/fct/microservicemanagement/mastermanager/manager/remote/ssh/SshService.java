@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
+import net.schmizz.sshj.connection.ConnectionException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
@@ -35,6 +36,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.promet
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
 import java.security.Security;
@@ -171,14 +173,17 @@ public class SshService {
   }
 
   public boolean hasConnection(String hostname) {
+    log.info("Checking connectivity to {}", hostname);
     try (SSHClient client = initClient(hostname);
          Session ignored = client.startSession()) {
+      log.info("Successfully connected to {}", hostname);
       return true;
-    } catch (NoRouteToHostException | SocketTimeoutException ignored) {
+    } catch (NoRouteToHostException | SocketTimeoutException | ConnectException ignored) {
       // ignored
     } catch (IOException e) {
       e.printStackTrace();
     }
+    log.info("Failed to connect to {}", hostname);
     return false;
   }
 

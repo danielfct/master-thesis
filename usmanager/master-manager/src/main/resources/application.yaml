@@ -24,7 +24,7 @@ spring:
         show_sql: false
         use_sql_comments: false
 ssh:
-  connection-timeout: 30000
+  connection-timeout: 10000
 edge:
   access:
     key-file-path: src/main/resources/edge

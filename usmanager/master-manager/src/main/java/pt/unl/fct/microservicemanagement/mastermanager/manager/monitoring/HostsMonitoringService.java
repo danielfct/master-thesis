@@ -156,7 +156,6 @@ public class HostsMonitoringService {
     var hostDecisions = new LinkedList<HostDecisionResult>();
     List<SimpleNode> nodes = nodesService.getAvailableNodes();
     for (SimpleNode node : nodes) {
-      log.info("On {}", node);
       String hostname = node.getReachableHostname();
       Map<String, Double> newFields = hostMetricsService.getHostStats(hostname);
       newFields.forEach((field, value) -> saveMonitoringHostLog(hostname, field, value));
