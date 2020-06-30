@@ -82,7 +82,7 @@ public class HostsController {
   public CloudHostEntity changeCloudHostState(@PathVariable String instanceId, @RequestBody String action) {
     switch (action) {
       case "start":
-        return cloudHostsService.startCloudHost(instanceId);
+        return cloudHostsService.startCloudHost(instanceId, true);
       case "stop":
         return cloudHostsService.stopCloudHost(instanceId);
       default:

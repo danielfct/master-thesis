@@ -13,7 +13,6 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nod
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,11 +35,9 @@ import org.springframework.stereotype.Service;
 public class NodesService {
 
   private final DockerSwarmService dockerSwarmService;
-  private final HostsService hostsService;
 
-  public NodesService(DockerSwarmService dockerSwarmService, HostsService hostsService) {
+  public NodesService(DockerSwarmService dockerSwarmService) {
     this.dockerSwarmService = dockerSwarmService;
-    this.hostsService = hostsService;
   }
 
   public List<SimpleNode> getNodes() {
@@ -80,7 +77,7 @@ public class NodesService {
   }
 
   public List<SimpleNode> getAvailableNodes(Predicate<Node> filter) {
-    Predicate<Node> readyFilter = n -> n.status().state().equals("ready");
+    Predicate<Node> readyFilter = n -> n.status().state().equals("ready") && n.spec().availability().equals("active");
     Predicate<Node> availableFilter = filter == null ? readyFilter : filter.and(readyFilter);
     return getNodes(availableFilter);
   }
@@ -104,9 +101,6 @@ public class NodesService {
   public void removeNode(String nodeId) {
     //var node = getNode(nodeId);
     try (var swarmManager = dockerSwarmService.getSwarmLeader()) {
-      if (isManager(nodeId)) {
-        changeRole(nodeId, NodeRole.WORKER);
-      }
       swarmManager.deleteNode(nodeId);
       /*int hostNodes = getNodes(n -> Objects.equals(n.status().addr(), node.getHostname())).size();
       if (hostNodes == 0) {
@@ -119,8 +113,8 @@ public class NodesService {
     }
   }
 
-  public boolean isNode(String hostname) {
-    return getAvailableNodes(n -> Objects.equals(n.description().hostname(), hostname)).isEmpty();
+  public boolean isPartOfSwarm(String hostname) {
+    return getNodes(n -> Objects.equals(n.status().addr(), hostname)).size() > 0;
   }
 
   public boolean isManager(String nodeId) {

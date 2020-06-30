@@ -22,19 +22,15 @@ public final class SimpleNode {
 
   private final String id;
   private final String hostname;
-  private final String state;
+  private String state;
   private final NodeAvailability availability;
   private final NodeRole role;
   private final long version;
   private final Map<String, String> labels;
 
   @JsonIgnore
-  public String getReachableHostname() {
-    String hostname = labels.get(NodeConstants.Label.REACHABLE_HOSTNAME);
-    if (hostname == null) {
-      hostname = this.hostname;
-    }
-    return hostname;
+  public String getPrivateIpAddress() {
+    return labels.get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
   }
 
 }

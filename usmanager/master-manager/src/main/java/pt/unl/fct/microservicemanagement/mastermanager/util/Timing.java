@@ -42,10 +42,19 @@ public class Timing {
   }
 
   public void wait(BooleanSupplier condition, long timeout) throws TimeoutException {
+    wait(condition, 50, timeout);
+  }
+
+  public void wait(BooleanSupplier condition, long sleep, long timeout) throws TimeoutException {
     long start = System.currentTimeMillis();
     while (!condition.getAsBoolean()) {
       if (System.currentTimeMillis() - start > timeout) {
         throw new TimeoutException(String.format("Condition not meet within %s ms", timeout));
+      }
+      try {
+        Thread.sleep(sleep);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
     }
   }

@@ -24,19 +24,20 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import pt.unl.fct.microservicemanagement.mastermanager.MasterManagerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.Mode;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.bash.BashCommandResult;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.bash.BashService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeRole;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.CloudHostsService;
@@ -45,6 +46,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.A
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge.EdgeHostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.LocationRequestService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.HostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.prometheus.PrometheusService;
@@ -79,7 +81,6 @@ public class HostsService {
   private final HostMetricsService hostMetricsService;
   private final PrometheusService prometheusService;
   private final LocationRequestService locationRequestService;
-  private final DockerApiProxyService dockerApiProxyService;
   private final RegionsService regionsService;
   private final String localMachineDns;
   private String publicIp;
@@ -93,8 +94,7 @@ public class HostsService {
                       CloudHostsService cloudHostsService, SshService sshService, BashService bashService,
                       HostMetricsService hostMetricsService,
                       PrometheusService prometheusService, @Lazy LocationRequestService locationRequestService,
-                      DockerApiProxyService dockerApiProxyService, RegionsService regionsService,
-                      DockerProperties dockerProperties, AwsProperties awsProperties,
+                      RegionsService regionsService, DockerProperties dockerProperties, AwsProperties awsProperties,
                       MasterManagerProperties masterManagerProperties,
                       HostProperties hostProperties) {
     this.nodesService = nodesService;
@@ -107,7 +107,6 @@ public class HostsService {
     this.hostMetricsService = hostMetricsService;
     this.prometheusService = prometheusService;
     this.locationRequestService = locationRequestService;
-    this.dockerApiProxyService = dockerApiProxyService;
     this.regionsService = regionsService;
     this.maxWorkers = dockerProperties.getSwarm().getMaxWorkers();
     this.maxInstances = awsProperties.getInitialMaxInstances();
@@ -174,43 +173,43 @@ public class HostsService {
         .collect(Collectors.toList());
   }
 
-  private String setupHost(String publicIpAddress, String privateIpAddress, NodeRole role) {
+  private SimpleNode setupHost(String publicIpAddress, String privateIpAddress, NodeRole role) {
     log.info("Setting up host {} ({}) with role {}", publicIpAddress, privateIpAddress, role);
     containersService.launchDockerApiProxy(publicIpAddress);
-    String nodeId;
+    SimpleNode node;
     switch (role) {
       case MANAGER:
-        nodeId = setupSwarmManager(publicIpAddress, privateIpAddress);
+        node = setupSwarmManager(publicIpAddress, privateIpAddress);
         break;
       case WORKER:
-        nodeId = setupSwarmWorker(publicIpAddress, privateIpAddress);
+        node = setupSwarmWorker(publicIpAddress, privateIpAddress);
         break;
       default:
         throw new UnsupportedOperationException();
     }
     prometheusService.launchPrometheus(publicIpAddress);
     locationRequestService.launchRequestLocationMonitor(publicIpAddress);
-    return nodeId;
+    return node;
   }
 
-  private String setupSwarmManager(String publicIpAddress, String privateIpAddress) {
-    String nodeId;
+  private SimpleNode setupSwarmManager(String publicIpAddress, String privateIpAddress) {
+    SimpleNode node;
     boolean isLeader = Objects.equals(publicIpAddress, this.publicIp)
         && Objects.equals(privateIpAddress, this.privateIp);
     if (isLeader) {
       dockerSwarmService.leaveSwarm(privateIpAddress);
-      nodeId = dockerSwarmService.initSwarm();
+      node = dockerSwarmService.initSwarm();
     } else {
-      nodeId = joinSwarm(publicIpAddress, privateIpAddress, NodeRole.MANAGER);
+      node = joinSwarm(publicIpAddress, privateIpAddress, NodeRole.MANAGER);
     }
-    return nodeId;
+    return node;
   }
 
-  private String setupSwarmWorker(String publicIpAddress, String privateIpAddress) {
+  private SimpleNode setupSwarmWorker(String publicIpAddress, String privateIpAddress) {
     return joinSwarm(publicIpAddress, privateIpAddress, NodeRole.WORKER);
   }
 
-  private String joinSwarm(String publicIpAddress, String privateIpAddress, NodeRole role) {
+  private SimpleNode joinSwarm(String publicIpAddress, String privateIpAddress, NodeRole role) {
     return dockerSwarmService.joinSwarm(publicIpAddress, privateIpAddress, role);
   }
 
@@ -246,7 +245,7 @@ public class HostsService {
     var sameCityHosts = new LinkedList<String>();
     List<SimpleNode> nodes = nodesService.getAvailableNodes();
     nodes.stream()
-        .map(SimpleNode::getReachableHostname)
+        .map(SimpleNode::getHostname)
         .filter(hostname -> hostMetricsService.nodeHasAvailableResources(hostname, expectedMemoryConsumption))
         .forEach(hostname -> {
           HostDetails hostDetails = getHostDetails(hostname);
@@ -289,7 +288,7 @@ public class HostsService {
       return otherRegionsHosts.get(random.nextInt(otherRegionsHosts.size()));
     } else {
       log.info("Didn't find any available node");
-      return addHost(region, country, city, NodeRole.WORKER).getHostname();
+      return addHost(regionsService.getRegion(region), country, city, NodeRole.WORKER).getHostname();
     }
   }
 
@@ -362,13 +361,21 @@ public class HostsService {
     return continent;
   }
 
-  public SimpleNode addHost(String region, String country, String city, NodeRole role) {
+  public SimpleNode addHost(RegionEntity region, String country, String city, NodeRole role) {
+    String publicIpAddress;
+    String privateIpAddress;
     Optional<EdgeHostEntity> edgeHost = chooseEdgeHost(region, country, city);
     if (edgeHost.isPresent()) {
-      return addHost(edgeHost.get().getHostname(), edgeHost.get().getPrivateIpAddress(), role);
+      publicIpAddress = edgeHost.get().getPublicIpAddress();
+      privateIpAddress = edgeHost.get().getPrivateIpAddress();
+    } else {
+      CloudHostEntity cloudHost = chooseCloudHost();
+      publicIpAddress = cloudHost.getPublicIpAddress();
+      privateIpAddress = cloudHost.getPrivateIpAddress();
     }
-    CloudHostEntity cloudHost = chooseCloudHost();
-    return addHost(cloudHost.getPublicIpAddress(), role);
+    log.info("Found host {} ({}) to join swarm at {}/{}/{} as {}", publicIpAddress, privateIpAddress,
+        region.getName(), country, city, role.name());
+    return setupHost(publicIpAddress, privateIpAddress, role);
   }
 
   public SimpleNode addHost(String host, NodeRole role) {
@@ -381,17 +388,12 @@ public class HostsService {
     } catch (EntityNotFoundException e) {
       CloudHostEntity cloudHost = cloudHostsService.getCloudHost(host);
       if (cloudHost.getState().getCode() != AwsInstanceState.RUNNING.getCode()) {
-        cloudHost = cloudHostsService.startCloudHost(host);
+        cloudHost = cloudHostsService.startCloudHost(host, false);
       }
       publicIpAddress = cloudHost.getPublicIpAddress();
       privateIpAddress = cloudHost.getPrivateIpAddress();
     }
-    return addHost(publicIpAddress, privateIpAddress, role);
-  }
-
-  public SimpleNode addHost(String publicIpAddress, String privateIpAddress, NodeRole role) {
-    String nodeId = setupHost(publicIpAddress, privateIpAddress, role);
-    return nodesService.getNode(nodeId);
+    return setupHost(publicIpAddress, privateIpAddress, role);
   }
 
   public void removeHost(String hostname) {
@@ -400,13 +402,6 @@ public class HostsService {
             DockerApiProxyService.DOCKER_API_PROXY))
         .forEach(c -> containersService.stopContainer(c.getContainerId()));
     dockerSwarmService.leaveSwarm(hostname);
-    //nodesService.removeHostNodes(hostname);
-    /*try {
-      CloudHostEntity cloudHost = cloudHostsService.getCloudHostByHostname(hostname);
-      cloudHostsService.stopCloudHost(cloudHost.getInstanceId());
-    } catch (EntityNotFoundException e) {
-      // ignore
-    }*/
   }
 
   private boolean isCloudHost(String hostname) {
@@ -417,32 +412,32 @@ public class HostsService {
     return sshService.hasConnection(edgeHost.getHostname());
   }
 
-  private Optional<EdgeHostEntity> chooseEdgeHost(String region, String country, String city) {
+  private Optional<EdgeHostEntity> chooseEdgeHost(RegionEntity region, String country, String city) {
     List<EdgeHostEntity> edgeHosts = List.of();
     if (!Text.isNullOrEmpty(city)) {
       edgeHosts = edgeHostsService.getHostsByCity(city);
     } else if (!Text.isNullOrEmpty(country)) {
       edgeHosts = edgeHostsService.getHostsByCountry(country);
-    } else if (!Text.isNullOrEmpty(region)) {
+    } else if (region != null) {
       edgeHosts = edgeHostsService.getHostsByRegion(region);
     }
     return edgeHosts.stream()
-        .filter(edgeHost -> !nodesService.isNode(edgeHost.getHostname()))
+        .filter(edgeHost -> !nodesService.isPartOfSwarm(edgeHost.getHostname()))
         .filter(this::isEdgeHostRunning)
         .findFirst();
   }
 
-  //TODO choose cloud host based on region ?
+  //TODO choose cloud host based on region
   private CloudHostEntity chooseCloudHost() {
     for (var cloudHost : cloudHostsService.getCloudHosts()) {
       int stateCode = cloudHost.getState().getCode();
       if (stateCode == AwsInstanceState.RUNNING.getCode()) {
         String hostname = cloudHost.getPublicIpAddress();
-        if (!nodesService.isNode(hostname)) {
+        if (!nodesService.isPartOfSwarm(hostname)) {
           return cloudHost;
         }
       } else if (stateCode == AwsInstanceState.STOPPED.getCode()) {
-        return cloudHostsService.startCloudHost(cloudHost);
+        return cloudHostsService.startCloudHost(cloudHost, false);
       }
     }
     return cloudHostsService.startCloudHost();

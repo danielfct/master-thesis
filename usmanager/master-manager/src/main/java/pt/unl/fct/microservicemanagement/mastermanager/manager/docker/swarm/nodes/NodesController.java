@@ -11,6 +11,7 @@
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes;
 
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 
 @RestController
 @RequestMapping("/nodes")
@@ -32,10 +34,12 @@ public class NodesController {
 
   private final NodesService nodesService;
   private final HostsService hostsService;
+  private final DockerSwarmService dockerSwarmService;
 
-  public NodesController(NodesService nodesService, HostsService hostsService) {
+  public NodesController(NodesService nodesService, HostsService hostsService, DockerSwarmService dockerSwarmService) {
     this.nodesService = nodesService;
     this.hostsService = hostsService;
+    this.dockerSwarmService = dockerSwarmService;
   }
 
   @GetMapping
@@ -58,7 +62,7 @@ public class NodesController {
       SimpleNode node = hostsService.addHost(host, role);
       nodes.add(node);
     } else {
-      String region = addNode.getRegion().getName();
+      RegionEntity region = addNode.getRegion();
       String country = addNode.getCountry();
       String city = addNode.getCity();
       for (var i = 0; i < quantity; i++) {
@@ -80,6 +84,16 @@ public class NodesController {
   @DeleteMapping("/{id}")
   public void removeNode(@PathVariable("id") String id) {
     nodesService.removeNode(id);
+  }
+
+  @PostMapping("/{id}/join")
+  public SimpleNode rejoinSwarm(@PathVariable("id") String id) {
+    return dockerSwarmService.rejoinSwarm(id);
+  }
+
+  @DeleteMapping("/{hostname}/leave")
+  public void leaveSwarm(@PathVariable("hostname") String hostname) {
+    dockerSwarmService.leaveSwarm(hostname);
   }
 
 }

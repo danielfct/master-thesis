@@ -261,7 +261,7 @@ public class AwsService {
 
   private void waitToBoot(Instance instance) throws TimeoutException {
     log.info("Waiting for instance {} to boot...", instance.getPublicIpAddress());
-    Timing.wait(() -> sshService.hasConnection(instance.getPublicIpAddress()), awsConnectionTimeout);
+    Timing.wait(() -> sshService.hasConnection(instance.getPublicIpAddress()), 1000, awsConnectionTimeout);
   }
 
   private boolean isMicroserviceManagerInstance(Instance instance) {

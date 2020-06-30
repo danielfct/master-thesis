@@ -191,7 +191,7 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   if (label === 'valuemode') {
     return <FaList/>;
   }
-  if (label === 'value' || label === 'description') {
+  if (label === 'value' || label === 'quantity' || label === 'description') {
     return 'short_text';
   }
   if (label === 'override') {
@@ -204,7 +204,6 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     return <FaLessThanEqual/>;
   }
   if (label === 'state') {
-    console.log(value)
     const state = value as IState;
     switch (state.name) {
       case 'running': return 'check';

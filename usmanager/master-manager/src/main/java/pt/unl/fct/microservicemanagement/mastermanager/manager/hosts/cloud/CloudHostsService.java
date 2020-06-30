@@ -24,11 +24,10 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud;
 
-import com.spotify.docker.client.exceptions.DockerException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeRole;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsInstanceState;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws.AwsService;
@@ -58,6 +57,7 @@ public class CloudHostsService {
   private final HostRulesService hostRulesService;
   private final SimulatedHostMetricsService simulatedHostMetricsService;
   private final HostsService hostsService;
+  private final ContainersService containersService;
 
   private final CloudHostRepository cloudHosts;
 
@@ -65,11 +65,13 @@ public class CloudHostsService {
                            @Lazy HostRulesService hostRulesService,
                            @Lazy SimulatedHostMetricsService simulatedHostMetricsService,
                            @Lazy HostsService hostsService,
+                           @Lazy ContainersService containersService,
                            CloudHostRepository cloudHosts) {
     this.awsService = awsService;
     this.hostRulesService = hostRulesService;
     this.simulatedHostMetricsService = simulatedHostMetricsService;
     this.hostsService = hostsService;
+    this.containersService = containersService;
     this.cloudHosts = cloudHosts;
   }
 
@@ -127,14 +129,15 @@ public class CloudHostsService {
 
   public CloudHostEntity startCloudHost() {
     Instance instance = awsService.createInstance();
+    containersService.launchDockerApiProxy(instance.getPublicIpAddress());
     return saveCloudHostFromInstance(instance);
   }
 
-  public CloudHostEntity startCloudHost(CloudHostEntity cloudHost) {
-    return startCloudHost(cloudHost.getInstanceId());
+  public CloudHostEntity startCloudHost(CloudHostEntity cloudHost, boolean addToSwarm) {
+    return startCloudHost(cloudHost.getInstanceId(), addToSwarm);
   }
 
-  public CloudHostEntity startCloudHost(String instanceId) {
+  public CloudHostEntity startCloudHost(String instanceId, boolean addToSwarm) {
     CloudHostEntity cloudHost = getCloudHost(instanceId);
     InstanceState state = new InstanceState()
         .withCode(AwsInstanceState.PENDING.getCode())
@@ -142,8 +145,11 @@ public class CloudHostsService {
     cloudHost.setState(state);
     cloudHost = cloudHosts.save(cloudHost);
     Instance instance = awsService.startInstance(instanceId);
-    hostsService.addHost(cloudHost.getPublicIpAddress(), NodeRole.WORKER);
-    return saveCloudHostFromInstance(cloudHost.getId(), instance);
+    cloudHost = saveCloudHostFromInstance(cloudHost.getId(), instance);
+    if (addToSwarm) {
+      hostsService.addHost(instanceId, NodeRole.WORKER);
+    }
+    return cloudHost;
   }
 
   public CloudHostEntity stopCloudHost(String instanceId) {

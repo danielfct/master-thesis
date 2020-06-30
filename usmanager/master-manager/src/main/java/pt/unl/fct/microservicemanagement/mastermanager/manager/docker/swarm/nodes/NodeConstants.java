@@ -17,7 +17,7 @@ public final class NodeConstants {
 
   public static final class Label {
 
-    public static final String REACHABLE_HOSTNAME = "reachableHostname";
+    public static final String PRIVATE_IP_ADDRESS = "privateIpAddress";
 
   }
 

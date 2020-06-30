@@ -20,7 +20,7 @@
     background: #282828;
     border: 1px solid #212121;
     display: flex;
-    z-index: 998;
+    z-index: 997;
 }
 
 .commandsHeader {

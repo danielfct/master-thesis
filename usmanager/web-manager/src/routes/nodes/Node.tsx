@@ -1,6 +1,8 @@
 import {RouteComponentProps} from "react-router";
 import BaseComponent from "../../components/BaseComponent";
-import Form, {IFields, requiredAndNumberAndMin, requiredAndTrimmed} from "../../components/form/Form";
+import Form, {
+  ICustomButton, IFields, IFormLoading, requiredAndNumberAndMin, requiredAndTrimmed, trimmed
+} from "../../components/form/Form";
 import ListLoadingSpinner from "../../components/list/ListLoadingSpinner";
 import {Error} from "../../components/errors/Error";
 import Field, {getTypeFromValue} from "../../components/form/Field";
@@ -12,12 +14,13 @@ import {connect} from "react-redux";
 import React from "react";
 import {IRegion} from "../region/Region";
 import {IEdgeHost} from "../hosts/edge/EdgeHost";
-import {IReply} from "../../utils/api";
+import {IReply, postData} from "../../utils/api";
 import {isNew} from "../../utils/router";
 import {normalize} from "normalizr";
 import {Schemas} from "../../middleware/api";
 import {ICloudHost} from "../hosts/cloud/CloudHost";
 import NodeLabelsList from "./NodeLabelList";
+import formStyles from "../../components/form/Form.module.css";
 
 export interface INode {
   id: string;
@@ -90,12 +93,14 @@ type Props = StateToProps & DispatchToProps & RouteComponentProps<MatchParams>;
 interface State {
   node?: INode,
   formNode?: INode,
+  loading: IFormLoading,
   currentForm: 'On host' | 'On location',
 }
 
 class Node extends BaseComponent<Props, State> {
 
   state: State = {
+    loading: undefined,
     currentForm: 'On host'
   };
 
@@ -188,7 +193,7 @@ class Node extends BaseComponent<Props, State> {
     super.toast(`Unable to change role of node ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`}`, 10000, reason, true);
 
   private onDeleteSuccess = (node: INode): void => {
-    super.toast(`<span class="green-text">Node <b class="white-text">${node.id}</b> successfully removed</span>`);
+    super.toast(`<span class="green-text">Host <b class="white-text">${node.hostname}</b> ${node.state === 'down' ? 'successfully removed from the swarm' : 'left the swarm'}</span>`);
     if (this.mounted) {
       this.props.history.push(`/nodes`);
     }
@@ -196,6 +201,44 @@ class Node extends BaseComponent<Props, State> {
 
   private onDeleteFailure = (reason: string, node: INode): void =>
     super.toast(`Unable to stop ${this.mounted ? `<b>${node.id}</b>` : `<a href=/nodes/${node.id}><b>${node.id}</b></a>`} node`, 10000, reason, true);
+
+
+  private rejoinSwarmButton = (): ICustomButton[] => {
+    const buttons: ICustomButton[] = [];
+    buttons.push({
+      button:
+        <button className={`btn-flat btn-small waves-effect waves-light green-text ${formStyles.formButton}`}
+                onClick={this.rejoinSwarm}>
+          Rejoin swarm
+        </button>
+    });
+    return buttons;
+  };
+
+  private rejoinSwarm = () => {
+    const node = this.getNode();
+    const url = `nodes/${node?.id}/join`;
+    this.setState({ loading: { method: 'post', url: url } });
+    postData(url, {},
+      (reply: IReply<INode>) => this.onRejoinSwarmSuccess(reply.data),
+      (reason: string) => this.onRejoinSwarmFailure(reason, node));
+  };
+
+  private onRejoinSwarmSuccess = (node: INode) => {
+    super.toast(`<span class="green-text">Host</span> <b>${node?.hostname}</b> <span class="green-text">successfully rejoined the swarm as node</span> ${this.mounted ? `<b>${node?.id}</b>` : `<a href=/nodes/${node?.id}><b>${node?.id}</b></a>`}`);
+    if (this.mounted) {
+      this.setState({loading: undefined});
+      this.updateNode(node);
+      this.props.history.replace(node.id);
+    }
+  };
+
+  private onRejoinSwarmFailure = (reason: string, node?: INode) => {
+    super.toast(`Node ${this.mounted ? `<b>${node?.id}</b>` : `<a href=/nodes/${node?.id}><b>${node?.id}</b></a>`} failed to rejoin the swarm`, 10000, reason, true);
+    if (this.mounted) {
+      this.setState({loading: undefined});
+    }
+  };
 
   private updateNode = (node: INode) => {
     node = Object.values(normalize(node, Schemas.NODE).entities.nodes || {})[0];
@@ -212,7 +255,9 @@ class Node extends BaseComponent<Props, State> {
           label: key,
           validation: getTypeFromValue(value) === 'number'
             ? { rule: requiredAndNumberAndMin, args: 1 }
-            : { rule: requiredAndTrimmed }
+            : key === 'country' || key === 'city'
+              ? { rule: trimmed }
+              : { rule: requiredAndTrimmed }
         }
       };
     }).reduce((fields, field) => {
@@ -226,7 +271,8 @@ class Node extends BaseComponent<Props, State> {
     const nodesHostname = Object.values(this.props.nodes).map(node => node.hostname);
     const cloudHosts = Object.values(this.props.cloudHosts)
                              .filter(instance => !nodesHostname.includes(instance.publicIpAddress))
-                             .map(instance => instance.instanceId);
+                             .filter(instance => instance.state.name === 'running' || instance.state.name === 'stopped')
+                             .map(instance => instance.publicIpAddress || instance.instanceId);
     const edgeHosts = Object.entries(this.props.edgeHosts)
                             .filter(([_, edgeHost]) => !nodesHostname.includes(edgeHost.publicIpAddress))
                             .map(([hostname, _]) => hostname);
@@ -312,18 +358,26 @@ class Node extends BaseComponent<Props, State> {
                                 values: ['MANAGER', 'WORKER']
                               }}/>
                      : <Field key={index}
-                            id={key}
-                            label={key}
-                            disabled={true}/>)
+                              id={key}
+                              label={key}
+                              disabled={true}/>)
     );
   };
 
   private switchForm = (formId: 'On host' | 'On location') =>
     this.setState({currentForm: formId});
 
+  private showRejoinSwarmButton = (node: INode): boolean =>
+    !this.isNew()
+    && node.state === 'down'
+    && Object.values(this.props.cloudHosts)
+             .filter(instance => instance.state.name === 'running')
+             .map(instance => instance.publicIpAddress)
+             .includes(node.hostname);
+
   private node = () => {
     const {isLoading, error, newNodeHost, newNodeLocation} = this.props;
-    const {currentForm} = this.state;
+    const {currentForm, loading} = this.state;
     const isNewNode = this.isNew();
     const node = isNewNode ? (currentForm === 'On host' ? newNodeHost : newNodeLocation) : this.getNode();
     // @ts-ignore
@@ -337,6 +391,7 @@ class Node extends BaseComponent<Props, State> {
                 fields={this.getFields(node)}
                 values={node}
                 isNew={isNewNode}
+                loading={loading}
                 post={{
                   textButton: isNewNode ? 'Join swarm' : 'Save',
                   url: 'nodes',
@@ -350,11 +405,12 @@ class Node extends BaseComponent<Props, State> {
                 }}
             // delete button is never present on new nodes, so a type cast is safe
                 delete={{
-                  textButton: 'Leave swarm',
-                  url: `nodes/${(node as INode).id}`,
+                  textButton: (node as INode).state === 'down' ? 'Remove from swarm' : 'Leave swarm',
+                  url: (node as INode).state === 'down' ? `nodes/${(node as INode).id}` : `nodes/${(node as INode).hostname}/leave`,
                   successCallback: this.onDeleteSuccess,
                   failureCallback: this.onDeleteFailure}}
-                switchDropdown={isNewNode ? {options: ['On host', 'On location'], onSwitch: this.switchForm} : undefined}>
+                switchDropdown={isNewNode ? {options: ['On host', 'On location'], onSwitch: this.switchForm} : undefined}
+                customButtons={this.showRejoinSwarmButton(node as INode) ? this.rejoinSwarmButton() : undefined}>
             {this.formFields(isNewNode)}
           </Form>
         )}
