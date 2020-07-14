@@ -65,3 +65,5 @@ public class ServiceAffinityEntity {
   public int hashCode() {
     return Objects.hashCode(getId());
   }
+
+}
