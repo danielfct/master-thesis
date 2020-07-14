@@ -76,11 +76,11 @@ public class HostRuleEntity {
 
   private int priority;
 
-  private boolean generic;
-
   @ManyToOne
   @JoinColumn(name = "decision_id")
   private DecisionEntity decision;
+
+  private boolean generic;
 
   @Singular
   @JsonIgnore

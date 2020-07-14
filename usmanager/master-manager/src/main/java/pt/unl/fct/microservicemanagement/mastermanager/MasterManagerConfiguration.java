@@ -24,16 +24,40 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager;
 
+import pt.unl.fct.microservicemanagement.mastermanager.util.JsonPathArgumentResolver;
+
+import java.util.List;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@EnableAsync
 public class MasterManagerConfiguration implements WebMvcConfigurer {
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/**");
   }
+
+  @Override
+  public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+    var jsonPathArgumentResolver = new JsonPathArgumentResolver();
+    argumentResolvers.add(jsonPathArgumentResolver);
+  }
+
+  /*@Bean(name = "setupCloudInstanceExecutor")
+  public TaskExecutor getTaskExecutor() {
+    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+    threadPoolTaskExecutor.setCorePoolSize(1);
+    threadPoolTaskExecutor.setMaxPoolSize(5);
+    return threadPoolTaskExecutor;
+  }*/
 
 }

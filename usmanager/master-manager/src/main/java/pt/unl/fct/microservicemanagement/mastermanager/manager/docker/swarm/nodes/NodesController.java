@@ -10,22 +10,23 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes;
 
-import org.springframework.web.bind.annotation.PutMapping;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.BadRequestException;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.DockerSwarmService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.unl.fct.microservicemanagement.mastermanager.util.Json;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 
 @RestController
 @RequestMapping("/nodes")
@@ -33,10 +34,12 @@ public class NodesController {
 
   private final NodesService nodesService;
   private final HostsService hostsService;
+  private final DockerSwarmService dockerSwarmService;
 
-  public NodesController(NodesService nodesService, HostsService hostsService) {
+  public NodesController(NodesService nodesService, HostsService hostsService, DockerSwarmService dockerSwarmService) {
     this.nodesService = nodesService;
     this.hostsService = hostsService;
+    this.dockerSwarmService = dockerSwarmService;
   }
 
   @GetMapping
@@ -59,7 +62,7 @@ public class NodesController {
       SimpleNode node = hostsService.addHost(host, role);
       nodes.add(node);
     } else {
-      String region = addNode.getRegion().getName();
+      RegionEntity region = addNode.getRegion();
       String country = addNode.getCountry();
       String city = addNode.getCity();
       for (var i = 0; i < quantity; i++) {
@@ -71,20 +74,26 @@ public class NodesController {
   }
 
   @PutMapping("/{id}")
-  public SimpleNode updateNode(@PathVariable String id, @Json String role) {
-    NodeRole nodeRole;
-    try {
-      nodeRole = NodeRole.valueOf(role.toUpperCase());
-    } catch (IllegalArgumentException e) {
-      throw new BadRequestException("Node role %s is not supported: %s", role, Arrays.toString(NodeRole.values()));
+  public SimpleNode updateNode(@PathVariable String id, @RequestBody SimpleNode node) {
+    if (!Objects.equals(id, node.getId())) {
+      throw new BadRequestException("Invalid request, path id %s and request body %s don't match", id, node.getId());
     }
-    return nodesService.changeRole(id, nodeRole);
+    return nodesService.updateNode(id, node);
   }
 
   @DeleteMapping("/{id}")
   public void removeNode(@PathVariable("id") String id) {
-    var node = nodesService.getNode(id);
-    hostsService.removeHost(node.getHostname());
+    nodesService.removeNode(id);
+  }
+
+  @PostMapping("/{id}/join")
+  public SimpleNode rejoinSwarm(@PathVariable("id") String id) {
+    return dockerSwarmService.rejoinSwarm(id);
+  }
+
+  @DeleteMapping("/{hostname}/leave")
+  public void leaveSwarm(@PathVariable("hostname") String hostname) {
+    dockerSwarmService.leaveSwarm(hostname);
   }
 
 }

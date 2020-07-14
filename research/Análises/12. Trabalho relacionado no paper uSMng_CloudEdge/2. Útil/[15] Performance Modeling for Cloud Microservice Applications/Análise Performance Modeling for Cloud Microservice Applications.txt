@@ -1,6 +1,0 @@
-p25-jindal Performance Modeling for Cloud Microservice Applications
-Link: TODO
-
-Resumo:
-Continuously increasing load or a sudden load spike may yield a violation of a service level objective (SLO). To characterize the behavior of a microservice application which is appropriate for the user, we define a MicroService Capacity (MSC) as a maximal rate of requests that can be served without violating SLO.
-The paper addresses the challenge of identifying MSC individually for each microservice. Finding individual capacities of microservices ensures the flexibility of the capacity planning for an application. This challenge is addressed by sandboxing a microservice and building its performance model

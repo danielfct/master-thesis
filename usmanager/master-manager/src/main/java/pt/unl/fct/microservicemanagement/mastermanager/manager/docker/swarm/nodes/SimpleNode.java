@@ -12,6 +12,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nod
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -21,10 +22,15 @@ public final class SimpleNode {
 
   private final String id;
   private final String hostname;
-  private final String state;
-  private final String availability;
-  private NodeRole role;
+  private String state;
+  private final NodeAvailability availability;
+  private final NodeRole role;
   private final long version;
-  private Map<String, String> labels;
+  private final Map<String, String> labels;
+
+  @JsonIgnore
+  public String getPrivateIpAddress() {
+    return labels.get(NodeConstants.Label.PRIVATE_IP_ADDRESS);
+  }
 
 }

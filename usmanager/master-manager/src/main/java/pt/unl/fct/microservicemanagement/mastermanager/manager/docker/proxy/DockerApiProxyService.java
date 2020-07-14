@@ -10,7 +10,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy;
 
-import org.springframework.context.annotation.Lazy;
+
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
@@ -21,6 +21,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.services.Services
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -61,7 +62,7 @@ public class DockerApiProxyService {
             + "docker pull %s && "
             + "docker run -itd --name=docker-api-proxy -p %s:%s --rm "
             + "-e %s=%s -e %s=%s -e %s=http://$PRIVATE_IP:%s "
-            + "-l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s %s; fi",
+            + "-l %s=%s -l %s=%s -l %s=%s:%s -l %s=%s -l %s=%b -l %s=%b %s; fi",
         serviceName, dockerRepository, externalPort, internalPort,
         ContainerConstants.Environment.BASIC_AUTH_USERNAME, dockerApiProxyUsername,
         ContainerConstants.Environment.BASIC_AUTH_PASSWORD, dockerApiProxyPassword,
@@ -70,6 +71,8 @@ public class DockerApiProxyService {
         ContainerConstants.Label.SERVICE_TYPE, serviceType,
         ContainerConstants.Label.SERVICE_ADDRESS, hostname, externalPort,
         ContainerConstants.Label.SERVICE_HOSTNAME, hostname,
+        ContainerConstants.Label.IS_STOPPABLE, false,
+        ContainerConstants.Label.IS_REPLICABLE, false,
         dockerRepository);
     List<String> output = hostsService.executeCommand(command, hostname);
     return output.get(output.size() - 1);

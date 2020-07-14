@@ -101,7 +101,6 @@ export class PagedList<T> extends React.Component<IPagedList<T>, State> {
     private pageSizeOption = (option: (number | 'all')): string =>
       option.toString();
 
-
     public render() {
         const {list: l, show, paginate} = this.props;
         const {page = 0, pagesize = l.length} = this.state;

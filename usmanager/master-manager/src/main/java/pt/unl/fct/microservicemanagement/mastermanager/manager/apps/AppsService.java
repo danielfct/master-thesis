@@ -27,7 +27,6 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainersService;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceOrder;

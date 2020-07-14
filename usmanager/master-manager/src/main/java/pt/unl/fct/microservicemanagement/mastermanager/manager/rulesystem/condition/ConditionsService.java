@@ -2,7 +2,6 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.condi
 
 import org.springframework.dao.DataIntegrityViolationException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
-import pt.unl.fct.microservicemanagement.mastermanager.manager.apps.AppEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.util.ObjectUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,7 @@ public class ConditionsService {
   }
 
   public ConditionEntity getCondition(String conditionName) {
-    return conditions.findByName(conditionName).orElseThrow(() ->
+    return conditions.findByNameIgnoreCase(conditionName).orElseThrow(() ->
         new EntityNotFoundException(ConditionEntity.class, "conditionName", conditionName));
   }
 

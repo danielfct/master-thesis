@@ -17,6 +17,7 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerCore
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodeRole;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.NodesService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.swarm.nodes.SimpleNode;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.HostsService;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public class DockerSwarmService {
     this.bashService = bashService;
   }
 
-  public DockerClient getSwarmManager() {
+  public DockerClient getSwarmLeader() {
     return dockerCoreService.getDockerClient(hostsService.getPrivateIp());
   }
 
@@ -70,7 +71,7 @@ public class DockerSwarmService {
     try (var docker = dockerCoreService.getDockerClient(hostname)) {
       return Objects.equals(docker.info().swarm().localNodeState(), "active")
           && !docker.info().swarm().controlAvailable()
-          ? Optional.of(nodesService.getHostNode(hostname).getId())
+          ? Optional.of(docker.info().swarm().nodeId())
           : Optional.empty();
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
@@ -78,13 +79,15 @@ public class DockerSwarmService {
     }
   }
 
-  public String initSwarm() {
-    String privateIp = hostsService.getPrivateIp();
-    log.info("Initializing docker swarm at {}", privateIp);
-    String command = String.format("docker swarm init --advertise-addr %s", privateIp);
+  public SimpleNode initSwarm() {
+    String advertiseAddress = hostsService.getPublicIP();
+    String listenAddress = hostsService.getPrivateIp();
+    log.info("Initializing docker swarm at {}", advertiseAddress);
+    String command = String.format("docker swarm init --advertise-addr %s --listen-addr %s", /*--availability drain*/
+        advertiseAddress, listenAddress);
     BashCommandResult result = bashService.executeCommand(command);
     if (!result.isSuccessful()) {
-      throw new MasterManagerException("Unable to init docker swarm at %s: %s", privateIp, result.getError());
+      throw new MasterManagerException("Unable to init docker swarm at %s: %s", advertiseAddress, result.getError());
     }
     String output = String.join("\n", result.getOutput());
     String nodeIdRegex = "(?<=Swarm initialized: current node \\()(.*)(?=\\) is now a manager)";
@@ -93,46 +96,47 @@ public class DockerSwarmService {
       throw new MasterManagerException("Unable to get docker swarm node id");
     }
     String nodeId = nodeIdRegexExpression.group(0);
-    nodesService.addLabel(nodeId, NodeConstants.Label.REACHABLE_ADDRESS, hostsService.getPublicIP());
-    return nodeId;
+    nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, listenAddress);
+    return nodesService.getNode(nodeId);
   }
 
-  public String joinSwarm(String hostname, NodeRole role) {
-    String publicIp = hostsService.getPublicIP();
-    try (DockerClient swarmManager = getSwarmManager();
-         DockerClient swarmWorker = dockerCoreService.getDockerClient(hostname)) {
-      leaveSwarm(swarmWorker);
-      log.info("{} is joining the docker swarm as {}", hostname, role);
+  public SimpleNode rejoinSwarm(String nodeId) {
+    SimpleNode node = nodesService.getNode(nodeId);
+    String publicIpAddress = node.getHostname();
+    String privateIpAddress = node.getPrivateIpAddress();
+    NodeRole role = node.getRole();
+    nodesService.removeNode(nodeId);
+    return joinSwarm(publicIpAddress, privateIpAddress, role);
+  }
+
+  public SimpleNode joinSwarm(String publicIpAddress, String privateIpAddress, NodeRole role) {
+    String leaderAddress = hostsService.getPublicIP();
+    try (DockerClient leaderClient = getSwarmLeader();
+         DockerClient nodeClient = dockerCoreService.getDockerClient(publicIpAddress)) {
+      leaveSwarm(nodeClient);
+      log.info("{} is joining the swarm as {}", publicIpAddress, role);
       String joinToken;
       switch (role) {
         case MANAGER:
-          joinToken = swarmManager.inspectSwarm().joinTokens().manager();
+          joinToken = leaderClient.inspectSwarm().joinTokens().manager();
           break;
         case WORKER:
-          joinToken = swarmManager.inspectSwarm().joinTokens().worker();
+          joinToken = leaderClient.inspectSwarm().joinTokens().worker();
           break;
         default:
           throw new UnsupportedOperationException();
       }
       SwarmJoin swarmJoin = SwarmJoin.builder()
-          .listenAddr(hostname)
-          .advertiseAddr(hostname)
+          .advertiseAddr(publicIpAddress)
+          .listenAddr(privateIpAddress)
           .joinToken(joinToken)
-          .remoteAddrs(List.of(publicIp)).build();
-      swarmWorker.joinSwarm(swarmJoin);
-      String nodeId;
-      switch (role) {
-        case MANAGER:
-          nodeId = getSwarmManagerNodeId(hostname).get();
-          break;
-        case WORKER:
-          nodeId = getSwarmWorkerNodeId(hostname).get();
-          break;
-        default:
-          throw new UnsupportedOperationException();
-      }
-      nodesService.addLabel(nodeId, NodeConstants.Label.REACHABLE_ADDRESS, hostname);
-      return nodeId;
+          .remoteAddrs(List.of(leaderAddress))
+          .build();
+      nodeClient.joinSwarm(swarmJoin);
+      String nodeId = nodeClient.info().swarm().nodeId();
+      log.info("Host {} ({}) has joined the swarm as node {}", publicIpAddress, privateIpAddress, nodeId);
+      nodesService.addLabel(nodeId, NodeConstants.Label.PRIVATE_IP_ADDRESS, privateIpAddress);
+      return nodesService.getNode(nodeId);
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();
       throw new MasterManagerException(e.getMessage());
@@ -149,8 +153,14 @@ public class DockerSwarmService {
     try {
       boolean isNode = !Objects.equals(docker.info().swarm().localNodeState(), "inactive");
       if (isNode) {
+        String nodeId = docker.info().swarm().nodeId();
+        boolean isManager = docker.info().swarm().controlAvailable();
+        Integer managers = docker.info().swarm().managers();
+        if (isManager && managers != null && managers > 1) {
+          nodesService.changeRole(nodeId, NodeRole.WORKER);
+        }
         docker.leaveSwarm(true);
-        log.info("{} left the swarm", docker.getHost());
+        log.info("{} ({}) left the swarm", docker.getHost(), nodeId);
       }
     } catch (DockerException | InterruptedException e) {
       e.printStackTrace();

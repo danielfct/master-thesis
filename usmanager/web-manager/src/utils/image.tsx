@@ -24,33 +24,56 @@
 
 import {
   FaAddressCard,
+  FaClock,
   FaCodeBranch,
   FaDatabase,
   FaDocker,
-  FaFingerprint, FaGlobeAmericas, FaGlobeEurope, FaIdBadge, FaMapMarkedAlt,
-  FaMapMarkerAlt, FaMapPin,
+  FaGlobeAmericas,
+  FaGlobeEurope,
+  FaIdBadge,
+  FaMapMarkedAlt,
+  FaMapPin,
   FaMinus,
+  FaTerminal,
   FaThumbsDown,
-  FaThumbsUp
+  FaThumbsUp,
+  FaMapMarkerAlt,
+  FaHdd,
+  FaSdCard,
+  FaTasks,
+  FaPowerOff,
+  FaSortAmountDown,
+  FaGlobe,
+  FaToolbox,
+  FaListUl,
+  FaThList,
+  FaList,
+  FaSuperpowers,
+  FaGreaterThanEqual,
+  FaLessThanEqual,
+  FaHourglassHalf, FaBan
 } from "react-icons/all";
 import {FaDoorOpen} from "react-icons/all";
 import {FaDoorClosed} from "react-icons/all";
 import React from "react";
-import {IRegion} from "../routes/region/Region";
+import {IRegion} from "../routes/management/region/Region";
+import {IState} from "../routes/management/hosts/cloud/CloudHost";
 
+// https://fontawesome.com/icons?d=gallery&m=free
+// https://materializecss.com/icons.html
 export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.Element => {
   label = label.toLowerCase();
   if (label === 'defaultdb') {
-    return <FaDatabase></FaDatabase>;
+    return <FaDatabase/>;
   }
-  if (label === 'id') {
-    return <FaFingerprint/>
+  if (label === 'id' || label === 'containerid' || label === 'instanceid') {
+    return "fingerprint";
   }
   if (label === 'state') {
     switch (value) {
-      case 'ready': return <FaThumbsUp></FaThumbsUp>;
-      case 'down': return <FaThumbsDown></FaThumbsDown>;
-      case 'drain': return <FaMinus></FaMinus>;
+      case 'ready': return <FaThumbsUp/>;
+      case 'down': return <FaThumbsDown/>;
+      case 'drain': return <FaMinus/>;
     }
   }
   if (label === 'username') {
@@ -58,27 +81,27 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   }
   if (label === 'region') {
     if (value === undefined) {
-      return <FaMapMarkerAlt></FaMapMarkerAlt>;
+      return <FaMapMarkerAlt/>;
     }
     const region = value as IRegion;
     if (region.name.includes('us')) {
-      return <FaGlobeAmericas></FaGlobeAmericas>;
+      return <FaGlobeAmericas/>;
     }
     if (region.name.includes('eu')) {
-      return <FaGlobeEurope></FaGlobeEurope>;
+      return <FaGlobeEurope/>;
     }
   }
-  if (label === 'country') {
-    return <FaMapMarkedAlt></FaMapMarkedAlt>;
+  if (label === 'country' || label === 'placement') {
+    return <FaMapMarkedAlt/>;
   }
   if (label === 'city') {
-    return <FaMapPin></FaMapPin>;
+    return <FaMapPin/>;
   }
   if (label.includes('privateip')) {
-    return <FaIdBadge></FaIdBadge>;
+    return <FaIdBadge/>;
   }
   if (label.includes('publicip')) {
-    return <FaAddressCard></FaAddressCard>;
+    return <FaAddressCard/>;
   }
   if (label.includes('time')) {
     return "access_time";
@@ -87,7 +110,7 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     return "date_range";
   }
   if (label.includes('command')) {
-    return "text_fields";
+    return <FaTerminal/>;
   }
   if (label.includes('host')) {
     return 'devices';
@@ -99,10 +122,10 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     return "text_fields";
   }
   if (label.includes('external')) {
-    return <FaDoorOpen></FaDoorOpen>;
+    return <FaDoorOpen/>;
   }
   if (label.includes('internal')) {
-    return <FaDoorClosed></FaDoorClosed>;
+    return <FaDoorClosed/>;
   }
   if (label.includes('memory')) {
     return 'memory';
@@ -114,14 +137,81 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
     return 'layers';
   }
   if (label.includes('docker')) {
-    return <FaDocker></FaDocker>;
+    return <FaDocker/>;
   }
 
   if (label.includes('password')) {
     return 'vpn_key';
   }
   if (label.includes('version')) {
-    return <FaCodeBranch></FaCodeBranch>;
+    return <FaCodeBranch/>;
+  }
+  if (label === 'created') {
+    return <FaClock/>;
+  }
+  if (label === 'image') {
+    return <FaDocker/>;
+  }
+  if (label === 'minreplicas' || label === 'maxreplicas') {
+    return 'format_list_numbered';
+  }
+  if (label === 'instancetype') {
+    return <FaHdd/>;
+  }
+  if (label === 'imageid') {
+    return <FaSdCard/>;
+  }
+  if (label === 'role') {
+    if (value === 'MANAGER') {
+      return <FaTasks/>;
+    }
+    if (value === 'WORKER') {
+      return <FaToolbox/>;
+    }
+    return 'details';
+  }
+  if (label === 'availability') {
+    return <FaPowerOff/>;
+  }
+  if (label === 'priority') {
+    return <FaSortAmountDown/>;
+  }
+  if (label === 'decision') {
+    return 'linear_scale';
+  }
+  if (label === 'generic') {
+    return <FaGlobe/>;
+  }
+  if (label === 'field') {
+    return <FaListUl/>;
+  }
+  if (label === 'operator') {
+    return <FaThList/>;
+  }
+  if (label === 'valuemode') {
+    return <FaList/>;
+  }
+  if (label === 'value' || label === 'quantity' || label === 'description') {
+    return 'short_text';
+  }
+  if (label === 'override') {
+    return <FaSuperpowers/>;
+  }
+  if (label === 'minimumvalue' || label === 'minimumreplicas') {
+    return <FaGreaterThanEqual/>;
+  }
+  if (label === 'maximumvalue') {
+    return <FaLessThanEqual/>;
+  }
+  if (label === 'state') {
+    const state = value as IState;
+    switch (state.name) {
+      case 'running': return 'check';
+      case 'pending':
+      case 'stopping': return <FaHourglassHalf/>;
+      case 'stopped': return <FaBan/>;
+      case 'shutting_down': return '';
+    }
   }
   if (value === true) {
     return "check";
@@ -129,10 +219,5 @@ export const mapLabelToMaterialIcon = (label: string, value: any): string | JSX.
   if (value === false) {
     return "clear";
   }
-  return "account_circle";
-}
-
-export const mapLabelToBootstrapIcon = (label: string, value: any): string => {
-  //TODO
-  return 'glyphicon glyphicon-asterisk';
+  return "";
 }

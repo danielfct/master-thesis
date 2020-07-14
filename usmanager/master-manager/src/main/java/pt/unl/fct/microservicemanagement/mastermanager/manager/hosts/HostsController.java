@@ -68,9 +68,9 @@ public class HostsController {
     return cloudHostsService.getCloudHosts();
   }
 
-  @PostMapping("/cloud/reload")
-  public List<CloudHostEntity> reloadCloudInstances() {
-    return cloudHostsService.reloadCloudInstances();
+  @PostMapping("/cloud/sync")
+  public List<CloudHostEntity> syncCloudInstances() {
+    return cloudHostsService.syncCloudInstances();
   }
 
   @GetMapping("/cloud/{id}")
@@ -82,7 +82,7 @@ public class HostsController {
   public CloudHostEntity changeCloudHostState(@PathVariable String instanceId, @RequestBody String action) {
     switch (action) {
       case "start":
-        return cloudHostsService.startCloudHost(instanceId);
+        return cloudHostsService.startCloudHost(instanceId, true);
       case "stop":
         return cloudHostsService.stopCloudHost(instanceId);
       default:

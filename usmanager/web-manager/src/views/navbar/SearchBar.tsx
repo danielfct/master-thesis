@@ -46,7 +46,7 @@ class SearchBar extends React.Component<Props,{}> {
 
   public render() {
     return (
-      <form className="col s4 hide-on-med-and-down" noValidate autoComplete="off">
+      <form className="col l2 xl3 hide-on-med-and-down" noValidate autoComplete="off">
         <div className={`input-field ${styles.searchBar}`}>
           <input id="search" type="search" placeholder="Filter" value={this.props.search} onChange={this.setValue}/>
           <label className="label-icon" htmlFor="search">
@@ -67,6 +67,5 @@ const mapStateToProps = (state: ReduxState): StateToProps => (
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
   bindActionCreators({ updateSearch }, dispatch);
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);

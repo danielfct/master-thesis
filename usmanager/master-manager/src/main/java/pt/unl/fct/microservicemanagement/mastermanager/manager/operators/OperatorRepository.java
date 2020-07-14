@@ -39,6 +39,6 @@ public interface OperatorRepository extends JpaRepository<OperatorEntity, Long> 
   @Query("select case when count(o) > 0 then true else false end "
       + "from OperatorEntity o "
       + "where o.operator = :operator")
-  boolean hasOperator(@Param("operator") String operator);
+  boolean hasOperator(@Param("operator") Operator operator);
 
 }

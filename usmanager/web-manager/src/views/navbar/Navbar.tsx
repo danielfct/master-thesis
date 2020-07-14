@@ -28,21 +28,24 @@ import {FaDocker, GoMarkGithub} from "react-icons/all";
 import SearchBar from "./SearchBar";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {showSidenavByUser} from "../../actions";
+import {changeComponent, showSidenavByUser} from "../../actions";
 import './Navbar.css';
 import {ReduxState} from "../../reducers";
-import {authenticatedRoutes} from "../../containers/Root.dev";
+import {managementAuthenticatedRoutes, components, IComponent} from "../../containers/Root.dev";
 import {getLoggedInUser, logout} from "../../utils/auth";
 import {capitalize} from "../../utils/text";
+import {Dropdown} from "../../components/form/Dropdown";
 
 const logo = require("../../resources/images/logo.png");
 
 interface StateToProps {
-    sidenav: {user: boolean, width: boolean}
+    sidenav: {user: boolean, width: boolean},
+    component: IComponent,
 }
 
 interface DispatchToProps {
     showSidenavByUser: (value: boolean) => void;
+    changeComponent: (component: IComponent) => void;
 }
 
 type Props = StateToProps & DispatchToProps & RouteComponentProps;
@@ -88,13 +91,22 @@ class Navbar extends React.Component<Props, State> {
     private loggingIn = (pathname: string): boolean =>
       pathname === '/' || pathname === '/login';
 
+    private componentOption = (option: IComponent): string =>
+      option.toString();
+
+    private changeComponent = (e: React.FormEvent<HTMLSelectElement>) => {
+        const selectedComponent = e.currentTarget.value as IComponent;
+        this.props.changeComponent(selectedComponent);
+        this.props.history.push('/home');
+    }
+
     public render() {
         const {pathname} = this.props.location;
         const {user: sidenavUser, width: sidenavWidth} = this.props.sidenav;
         const loggingIn = this.loggingIn(pathname);
         const showSidenav = sidenavUser && sidenavWidth;
-        const route = authenticatedRoutes[pathname];
-        const showSearchbar = route && authenticatedRoutes[pathname].search;
+        const route = managementAuthenticatedRoutes[pathname];
+        const showSearchbar = route && managementAuthenticatedRoutes[pathname].search;
         let loggedInUser = getLoggedInUser();
         let logoStyle;
         if (showSidenav && !loggingIn) {
@@ -126,7 +138,7 @@ class Navbar extends React.Component<Props, State> {
                                <i className="material-icons">menu</i>
                            </a>}
                           <ul className="left">
-                              <li style={logoStyle}>
+                              <li style={logoStyle} className={'hide-on-med-and-down'}>
                                   <Link className="transparent brand-logo" to={"/home"}>
                                       <img src={logo} alt=""/>
                                       Web Manager
@@ -134,7 +146,19 @@ class Navbar extends React.Component<Props, State> {
                               </li>
                           </ul>
                           {showSearchbar && <SearchBar/>}
-                          <ul className="right hide-on-small-and-down">
+                          <ul className="right">
+                              <li className="components">
+                                  <Dropdown<IComponent>
+                                    id={'components'}
+                                    name={'components'}
+                                    value={this.props.component}
+                                    onChange={this.changeComponent}
+                                    dropdown={{
+                                        defaultValue: 'Component',
+                                        values: components,
+                                        optionToString: this.componentOption}}>
+                                  </Dropdown>
+                              </li>
                               <li className="username">
                                   {loggedInUser}
                               </li>
@@ -167,10 +191,11 @@ class Navbar extends React.Component<Props, State> {
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
       sidenav: state.ui.sidenav,
+      component: state.ui.component
   }
 );
 
 const mapDispatchToProps = (dispatch: any): DispatchToProps =>
-  bindActionCreators({ showSidenavByUser }, dispatch);
+  bindActionCreators({ showSidenavByUser, changeComponent }, dispatch);
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Navbar));

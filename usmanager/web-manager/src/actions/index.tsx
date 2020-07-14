@@ -24,24 +24,25 @@
 
 import {CALL_API, Schemas} from "../middleware/api";
 import {EntitiesAction} from "../reducers/entities";
-import {IApp} from "../routes/apps/App";
-import {IAddAppService} from "../routes/apps/AppServicesList";
-import {IService} from "../routes/services/Service";
-import {IPrediction} from "../routes/services/ServicePredictionList";
-import {IContainer} from "../routes/containers/Container";
-import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
-import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
-import {INode} from "../routes/nodes/Node";
-import {IRuleHost} from "../routes/rules/hosts/RuleHost";
-import {IRuleService} from "../routes/rules/services/RuleService";
-import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
-import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
-import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
-import {IRegion} from "../routes/region/Region";
-import {ILoadBalancer} from "../routes/loadBalancers/LoadBalancer";
-import {IEurekaServer} from "../routes/eurekaServers/EurekaServer";
-import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
-import {ISimulatedContainerMetric} from "../routes/metrics/containers/SimulatedContainerMetric";
+import {IApp} from "../routes/management/apps/App";
+import {IAddAppService} from "../routes/management/apps/AppServicesList";
+import {IService} from "../routes/management/services/Service";
+import {IPrediction} from "../routes/management/services/ServicePredictionList";
+import {IContainer} from "../routes/management/containers/Container";
+import {ICloudHost} from "../routes/management/hosts/cloud/CloudHost";
+import {IEdgeHost} from "../routes/management/hosts/edge/EdgeHost";
+import {INode} from "../routes/management/nodes/Node";
+import {IRuleHost} from "../routes/management/rules/hosts/RuleHost";
+import {IRuleService} from "../routes/management/rules/services/RuleService";
+import {IRuleCondition} from "../routes/management/rules/conditions/RuleCondition";
+import {ISimulatedHostMetric} from "../routes/management/metrics/hosts/SimulatedHostMetric";
+import {ISimulatedServiceMetric} from "../routes/management/metrics/services/SimulatedServiceMetric";
+import {IRegion} from "../routes/management/region/Region";
+import {ILoadBalancer} from "../routes/management/loadBalancers/LoadBalancer";
+import {IEurekaServer} from "../routes/management/eurekaServers/EurekaServer";
+import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
+import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
+import {IComponent} from "../containers/Root.dev";
 
 export const APPS_REQUEST = 'APPS_REQUEST';
 export const APPS_SUCCESS = 'APPS_SUCCESS';
@@ -463,10 +464,10 @@ const fetchCloudHosts = (instanceId?: string) => ({
         entity: 'cloudHosts'
       }
 });
-export const reloadCloudHosts = () => ({
+export const syncCloudHosts = () => ({
   [CALL_API]: {
     types: [ CLOUD_HOSTS_REQUEST, CLOUD_HOSTS_SUCCESS, CLOUD_HOSTS_FAILURE ],
-    endpoint: `hosts/cloud/reload`,
+    endpoint: `hosts/cloud/sync`,
     schema: Schemas.CLOUD_HOST_ARRAY,
     entity: 'cloudHosts',
     method: 'post'
@@ -1527,5 +1528,13 @@ export const updateSearch = (search: string) => (
   {
     type: SEARCH_UPDATE,
     search
+  }
+);
+
+export const CHANGE_COMPONENT = 'CHANGE_COMPONENT';
+export const changeComponent = (component: IComponent) => (
+  {
+    type: CHANGE_COMPONENT,
+    component
   }
 );

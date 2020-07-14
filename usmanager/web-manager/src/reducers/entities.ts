@@ -291,27 +291,27 @@ import {
 import {Schemas} from "../middleware/api";
 import {normalize} from "normalizr";
 import {merge, pick, keys } from 'lodash';
-import {IApp} from "../routes/apps/App";
-import {IAddAppService, IAppService} from "../routes/apps/AppServicesList";
-import {IService} from "../routes/services/Service";
-import {IDependent} from "../routes/services/ServiceDependentList";
-import {IPrediction} from "../routes/services/ServicePredictionList";
-import {IRuleService} from "../routes/rules/services/RuleService";
-import {IContainer} from "../routes/containers/Container";
-import {ICloudHost} from "../routes/hosts/cloud/CloudHost";
-import {IEdgeHost} from "../routes/hosts/edge/EdgeHost";
-import {INode} from "../routes/nodes/Node";
-import {IRuleHost} from "../routes/rules/hosts/RuleHost";
-import {IValueMode, IField, IOperator, IDecision} from "../routes/rules/Rule";
-import {IRuleCondition} from "../routes/rules/conditions/RuleCondition";
-import {ISimulatedHostMetric} from "../routes/metrics/hosts/SimulatedHostMetric";
-import {ISimulatedServiceMetric} from "../routes/metrics/services/SimulatedServiceMetric";
-import {IRegion} from "../routes/region/Region";
-import {ILoadBalancer} from "../routes/loadBalancers/LoadBalancer";
-import {IEurekaServer} from "../routes/eurekaServers/EurekaServer";
-import {ILogs} from "../routes/logs/Logs";
-import {IRuleContainer} from "../routes/rules/containers/RuleContainer";
-import {ISimulatedContainerMetric} from "../routes/metrics/containers/SimulatedContainerMetric";
+import {IApp} from "../routes/management/apps/App";
+import {IAddAppService, IAppService} from "../routes/management/apps/AppServicesList";
+import {IService} from "../routes/management/services/Service";
+import {IDependent} from "../routes/management/services/ServiceDependentList";
+import {IPrediction} from "../routes/management/services/ServicePredictionList";
+import {IRuleService} from "../routes/management/rules/services/RuleService";
+import {IContainer} from "../routes/management/containers/Container";
+import {ICloudHost} from "../routes/management/hosts/cloud/CloudHost";
+import {IEdgeHost} from "../routes/management/hosts/edge/EdgeHost";
+import {INode} from "../routes/management/nodes/Node";
+import {IRuleHost} from "../routes/management/rules/hosts/RuleHost";
+import {IValueMode, IField, IOperator, IDecision} from "../routes/management/rules/Rule";
+import {IRuleCondition} from "../routes/management/rules/conditions/RuleCondition";
+import {ISimulatedHostMetric} from "../routes/management/metrics/hosts/SimulatedHostMetric";
+import {ISimulatedServiceMetric} from "../routes/management/metrics/services/SimulatedServiceMetric";
+import {IRegion} from "../routes/management/region/Region";
+import {ILoadBalancer} from "../routes/management/loadBalancers/LoadBalancer";
+import {IEurekaServer} from "../routes/management/eurekaServers/EurekaServer";
+import {ILogs} from "../routes/management/logs/ManagementLogs";
+import {IRuleContainer} from "../routes/management/rules/containers/RuleContainer";
+import {ISimulatedContainerMetric} from "../routes/management/metrics/containers/SimulatedContainerMetric";
 
 export type EntitiesState = {
   apps: {

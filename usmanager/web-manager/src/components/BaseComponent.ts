@@ -25,7 +25,7 @@ export default class BaseComponent<P, S> extends React.Component<P, S> {
     }
   }
 
-  toast(message: string, displayLength: number = 4000, error?: string,
+  toast(message: string, displayLength: number = 6000, error?: string,
         instance?: boolean, unique?: boolean): void {
     const id = this.getToastId();
     const html = `<div>${message}${error ? `: <b class="red-text">${error}</b>` : ''}</div>`;

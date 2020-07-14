@@ -24,7 +24,7 @@
 
 import { combineReducers } from 'redux'
 import entities, {EntitiesState} from "./entities";
-import {loadingBar, search, sidenav, UIState} from "./ui";
+import {component, loadingBar, search, sidenav, UIState} from "./ui";
 
 export interface ReduxState {
     ui: UIState;
@@ -34,6 +34,7 @@ export interface ReduxState {
 const ui = combineReducers({
     sidenav,
     search,
+    component,
 });
 
 const rootReducer = combineReducers({

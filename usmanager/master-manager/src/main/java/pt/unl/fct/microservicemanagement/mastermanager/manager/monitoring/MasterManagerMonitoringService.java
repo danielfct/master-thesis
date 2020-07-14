@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring;
 
-import lombok.extern.slf4j.Slf4j;
 import pt.unl.fct.microservicemanagement.mastermanager.MasterManagerProperties;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
@@ -36,14 +35,13 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class MasterManagerMonitoringService {
-
-  public static final String MASTER_MANAGER = "master-manager";
 
   private final ContainersService containersService;
   private final ContainersMonitoringService containersMonitoringService;
@@ -82,7 +80,8 @@ public class MasterManagerMonitoringService {
 
   private void masterManagerMonitorTask(int secondsFromLastRun) {
     containersService
-        .getContainersWithLabels(Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME, MASTER_MANAGER)))
+        .getContainersWithLabels(Set.of(Pair.of(ContainerConstants.Label.SERVICE_NAME,
+            MasterManagerProperties.MASTER_MANAGER)))
         .stream()
         .findFirst()
         .ifPresent(c -> saveMasterManagerContainerFields(c, secondsFromLastRun));
@@ -91,7 +90,8 @@ public class MasterManagerMonitoringService {
   private void saveMasterManagerContainerFields(ContainerEntity container, int secondsFromLastRun) {
     Map<String, Double> newFields = containersMonitoringService.getContainerStats(container, secondsFromLastRun);
     newFields.forEach((field, value) ->
-        containersMonitoringService.saveMonitoringServiceLog(container.getContainerId(), MASTER_MANAGER, field, value)
+        containersMonitoringService.saveMonitoringServiceLog(container.getContainerId(),
+            MasterManagerProperties.MASTER_MANAGER, field, value)
     );
   }
 

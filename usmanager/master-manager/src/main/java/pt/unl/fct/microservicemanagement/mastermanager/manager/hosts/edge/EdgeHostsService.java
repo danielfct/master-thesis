@@ -27,6 +27,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.bash.BashService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshCommandResult;
@@ -141,7 +142,7 @@ public class EdgeHostsService {
     deleteEdgeHostConfig(edgeHost);
   }
 
-  public List<EdgeHostEntity> getHostsByRegion(String region) {
+  public List<EdgeHostEntity> getHostsByRegion(RegionEntity region) {
     return edgeHosts.findByRegion(region);
   }
 

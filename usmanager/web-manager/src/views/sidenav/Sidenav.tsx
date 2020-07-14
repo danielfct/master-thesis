@@ -30,8 +30,11 @@ import {connect} from "react-redux";
 import {showSidenavByUser, showSidenavByWidth} from "../../actions";
 import {ReduxState} from "../../reducers";
 import ScrollBar from "react-perfect-scrollbar";
+import {IComponent} from "../../containers/Root.dev";
 
-const sidenavLinks = [
+type ILink = { link: string, name: string, sub?: ILink[] }
+
+const sidenavManagementLinks: ILink[] = [
     { link: '/apps', name: 'Apps' },
     { link: '/services', name: 'Services' },
     { link: '/containers', name: 'Containers' },
@@ -55,11 +58,21 @@ const sidenavLinks = [
     { link: '/load-balancers', name: 'Load balancers' },
     { link: '/eureka-servers', name: 'Eureka servers' },
     { link: '/ssh', name: 'Ssh'},
+    { link: '/settings', name: 'Settings'},
     { link: '/logs', name: 'Logs'},
 ];
 
+const sidenavMonitoringLinks: ILink[] = [
+    { link: '/settings', name: 'Settings'},
+];
+
+const sidenavDataManagementLinks: ILink[] = [
+    { link: '/settings', name: 'Settings'},
+];
+
 interface StateToProps {
-    sidenav: {user: boolean, width: boolean}
+    sidenav: {user: boolean, width: boolean},
+    component: IComponent,
 }
 
 interface DispatchToProps {
@@ -126,6 +139,16 @@ class Sidenav extends React.Component<Props, {}> {
     };
 
     public render() {
+        let links = (function(component) {
+            switch (component) {
+                case "Management":
+                    return sidenavManagementLinks;
+                case "Monitoring":
+                    return sidenavMonitoringLinks;
+                case "Data":
+                    return sidenavDataManagementLinks;
+            }
+        })(this.props.component);
         return (
           <ul id="slide-out" className="sidenav sidenav-fixed no-shadows"
               style={this.props.sidenav.user ? {width: 200, transition: 'width .25s'} : {width: 0, transition: 'width .25s'}} ref={this.sidenav}>
@@ -138,7 +161,7 @@ class Sidenav extends React.Component<Props, {}> {
               </div>
               <ScrollBar ref = {(ref) => { this.scrollbar = ref; }}
                          component="div">
-                  {sidenavLinks.map((link, index) =>
+                  {links.map((link, index) =>
                     <div key={index}>
                         <li>
                             <Link className="white-text" to={link.link} onClick={this.closeSlideSidenav}>
@@ -155,7 +178,7 @@ class Sidenav extends React.Component<Props, {}> {
                               </li>
                           </div>
                         )}
-                        {index < sidenavLinks.length - 1 && <li><div className="divider grey darken-3"/></li>}
+                        {index < sidenavManagementLinks.length - 1 && <li><div className="divider grey darken-3"/></li>}
                     </div>
                   )}
               </ScrollBar>
@@ -167,6 +190,7 @@ class Sidenav extends React.Component<Props, {}> {
 const mapStateToProps = (state: ReduxState): StateToProps => (
   {
       sidenav: state.ui.sidenav,
+      component: state.ui.component
   }
 );
 

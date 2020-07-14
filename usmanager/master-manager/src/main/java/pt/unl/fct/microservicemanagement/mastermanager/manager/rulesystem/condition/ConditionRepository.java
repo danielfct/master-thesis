@@ -39,6 +39,6 @@ public interface ConditionRepository extends JpaRepository<ConditionEntity, Long
       + "where lower(c.name) = lower(:conditionName)")
   boolean hasCondition(@Param("conditionName") String conditionName);
 
-  Optional<ConditionEntity> findByName(String name);
+  Optional<ConditionEntity> findByNameIgnoreCase(String name);
 
 }

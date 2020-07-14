@@ -80,9 +80,10 @@ Se o router usar [DHCP](https://pt.wikipedia.org/wiki/Dynamic_Host_Configuration
 E por fim, configurar os seguintes encaminhamentos de portas no painel de controlo do router: 
     - Ssh, porta 22 TCP. Aceder usando `ssh user@ip_publico_do_router` ([ver ip público](https://ipinfo.io/ip))
     - Docker Cluster management communications, porta 2377 TCP
-    - Communication among docker nodes, porta 7946 TCP e UDP 
-    - Docker Overlay network traffic, porta 4789 UDP
+    - Communication among docker nodes/Container network discovery, porta 7946 TCP e UDP 
+    - Docker Overlay network traffic/Container ingress network, porta 4789 UDP
     - Prometheus, porta 9090 TCP
+    
 De notar que, apenas com esta configuração, não será possível executar containers aplicacionais nesta máquina.
 
 ### Licença

@@ -38,6 +38,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CloudHostRepository extends JpaRepository<CloudHostEntity, Long> {
 
+  Optional<CloudHostEntity> findByInstanceIdOrPublicIpAddress(@Param("instanceId") String instanceId,
+                                                              @Param("publicIpAddress") String publicIpAddress);
+
   Optional<CloudHostEntity> findByInstanceId(@Param("instanceId") String instanceId);
 
   Optional<CloudHostEntity> findByPublicIpAddress(@Param("publicIpAddress") String publicIpAddress);

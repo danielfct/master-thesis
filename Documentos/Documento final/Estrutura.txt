@@ -1,0 +1,15 @@
+Gestão de recursos
+
+Placement de serviços baseado em restrições
+
+Federação
+
+Monitorização
+
+Service mesh
+
+Service discovery
+
+Trabalho relacionado
+
+Trabalho futuro: workload sharing entre nós

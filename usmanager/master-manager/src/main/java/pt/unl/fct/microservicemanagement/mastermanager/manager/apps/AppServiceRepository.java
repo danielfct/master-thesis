@@ -27,7 +27,6 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.apps;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-//TODO try to delete
 @Repository
 public interface AppServiceRepository extends JpaRepository<AppServiceEntity, Long> {
 

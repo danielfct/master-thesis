@@ -25,8 +25,14 @@
 import React from "react";
 import {Link, RouteComponentProps, RouteProps, withRouter} from "react-router-dom";
 import styles from './Breadcrumbs.module.css';
-import {authenticatedRoutes} from "../../containers/Root.dev";
+import {
+    dataManagementAuthenticatedRoutes, IComponent,
+    managementAuthenticatedRoutes,
+    monitoringAuthenticatedRoutes
+} from "../../containers/Root.dev";
 import {camelCaseToSentenceCase, capitalize, snakeCaseToCamelCase} from "../../utils/text";
+import {ReduxState} from "../../reducers";
+import {connect} from "react-redux";
 
 export type IBreadcrumb = { title: string, link?: string };
 
@@ -36,11 +42,25 @@ interface State {
     breadcrumbs: IBreadcrumbs;
 }
 
-type Props = RouteProps & RouteComponentProps;
+interface StateToProps {
+    component: IComponent,
+}
+
+type Props = StateToProps & RouteProps & RouteComponentProps;
 
 class Breadcrumbs extends React.Component<Props, State> {
 
     private breadcrumbs = (props: Props): IBreadcrumbs => {
+        let routes = (function(component) {
+            switch (component) {
+                case "Management":
+                    return managementAuthenticatedRoutes;
+                case "Monitoring":
+                    return monitoringAuthenticatedRoutes;
+                case "Data":
+                    return dataManagementAuthenticatedRoutes;
+            }
+        })(this.props.component);
         let path = (props.location && props.location.pathname) || '';
         // remove the extra '/' at the end
         if (path !== '/' && path.endsWith('/')) {
@@ -67,7 +87,7 @@ class Breadcrumbs extends React.Component<Props, State> {
             if (path.startsWith('//')) {
                 path = path.substring(1);
             }
-            let title = authenticatedRoutes[path] && authenticatedRoutes[path].title;
+            let title = routes && routes[path] && routes[path].title;
             if (!title) {
                 title = capitalize(link.substring(link.lastIndexOf('/') + 1));
                 if (title.indexOf('#') !== -1) {
@@ -113,4 +133,10 @@ class Breadcrumbs extends React.Component<Props, State> {
 
 }
 
-export default withRouter(Breadcrumbs);
+const mapStateToProps = (state: ReduxState): StateToProps => (
+  {
+      component: state.ui.component
+  }
+);
+
+export default withRouter(connect(mapStateToProps, undefined)(Breadcrumbs));

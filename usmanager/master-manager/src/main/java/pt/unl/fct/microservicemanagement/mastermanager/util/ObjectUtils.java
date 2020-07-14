@@ -37,7 +37,7 @@ import lombok.experimental.UtilityClass;
 import org.springframework.beans.BeanUtils;
 
 @UtilityClass
-public final class ObjectUtils {
+public class ObjectUtils {
 
   public void copyValidProperties(Object source, Object target) {
     var ignoreProperties = new LinkedList<String>();

@@ -33,7 +33,7 @@ interface Props {
     title?: string;
 }
 
-const AuthenticatedRoute = ({exact, path, component:Component, title}: Props) =>
+const AuthenticatedRoute = ({exact, path, component: Component, title}: Props) =>
     isAuthenticated()
         ? <Route exact={exact} path={path} render={props => <Component {...props} key={path} title={title}/>}/>
         : <Redirect to="/login" />;

@@ -36,7 +36,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -47,11 +46,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class MasterManagerWebSecurity extends WebSecurityConfigurerAdapter {
 
   private final UsersService usersService;
-  private final PasswordEncoder encoder;
 
-  public MasterManagerWebSecurity(UsersService usersService, PasswordEncoder encoder) {
+  public MasterManagerWebSecurity(UsersService usersService) {
     this.usersService = usersService;
-    this.encoder = encoder;
   }
 
   @Override
@@ -79,7 +76,7 @@ public class MasterManagerWebSecurity extends WebSecurityConfigurerAdapter {
   protected void configure(AuthenticationManagerBuilder auth) {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(usersService);
-    authProvider.setPasswordEncoder(encoder);
+    authProvider.setPasswordEncoder(usersService.encoder());
     auth.authenticationProvider(authProvider);
   }
 

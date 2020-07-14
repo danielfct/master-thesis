@@ -3,9 +3,10 @@ spring:
     name: master-manager
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:migration-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    #url: jdbc:h2:mem;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:./master-manager-db
     username: sa
-    password: 'admin'
+    password: admin
     platform: h2
   h2:
     console:
@@ -23,6 +24,8 @@ spring:
         format_sql: false
         show_sql: false
         use_sql_comments: false
+ssh:
+  connection-timeout: 10000
 edge:
   access:
     key-file-path: src/main/resources/edge

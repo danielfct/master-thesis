@@ -50,10 +50,6 @@ import org.hibernate.annotations.NaturalId;
 @Table(name = "users")
 public class UserEntity {
 
-  public enum Role {
-    ROLE_SYS_ADMIN
-  }
-
   @Id
   @GeneratedValue
   private long id;
@@ -75,6 +71,6 @@ public class UserEntity {
   private String email;
 
   @Enumerated(EnumType.STRING)
-  private Role role;
+  private UserRole role;
 
 }

@@ -24,7 +24,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.cloud.aws;
 
-import org.apache.commons.lang3.StringUtils;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh.SshService;
 import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
@@ -94,7 +93,7 @@ public class AwsService {
     this.awsConnectionTimeout = awsProperties.getConnectionTimeout();
   }
 
-  private List<Instance> getInstances() {
+  public List<Instance> getInstances() {
     var instances = new ArrayList<Instance>();
     var request = new DescribeInstancesRequest();
     DescribeInstancesResult result;
@@ -132,6 +131,11 @@ public class AwsService {
     Instance instance = waitInstanceState(instanceId, AwsInstanceState.RUNNING);
     String publicIpAddress = instance.getPublicIpAddress();
     log.info("New aws instance created: instanceId = {}, publicIpAddress = {}", instanceId, publicIpAddress);
+    try {
+      waitToBoot(instance);
+    } catch (TimeoutException e) {
+      e.printStackTrace();
+    }
     return instance;
   }
 
@@ -155,7 +159,13 @@ public class AwsService {
 
   public Instance startInstance(String instanceId) {
     log.info("Starting instance {}", instanceId);
-    return setInstanceState(instanceId, AwsInstanceState.RUNNING);
+    Instance instance = setInstanceState(instanceId, AwsInstanceState.RUNNING);
+    try {
+      waitToBoot(instance);
+    } catch (TimeoutException e) {
+      e.printStackTrace();
+    }
+    return instance;
   }
 
   private void startInstanceById(String instanceId) {
@@ -206,10 +216,6 @@ public class AwsService {
       Instance instance = getInstance(instanceId);
       int instanceState = instance.getState().getCode();
       if (instanceState == state.getCode()) {
-        if (state == AwsInstanceState.RUNNING && !sshService.hasConnection(instance.getPublicIpAddress())) {
-          Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
-          continue;
-        }
         log.info("Instance {} is already on state {}", instanceId, state.getState());
         return instance;
       }
@@ -229,10 +235,6 @@ public class AwsService {
         }
         instance = waitInstanceState(instanceId, state);
         log.info("Setting instance {} to {} state", instanceId, state.getState());
-        if (state == AwsInstanceState.RUNNING && !sshService.hasConnection(instance.getPublicIpAddress())) {
-          Timing.sleep(awsDelayBetweenRetries, TimeUnit.MILLISECONDS);
-          continue;
-        }
         return instance;
       } catch (MasterManagerException e) {
         log.info("Failed to set instance {} to {} state: {}", instanceId, state.getState(), e.getMessage());
@@ -255,6 +257,11 @@ public class AwsService {
       throw new MasterManagerException(e.getMessage());
     }
     return instance[0];
+  }
+
+  private void waitToBoot(Instance instance) throws TimeoutException {
+    log.info("Waiting for instance {} to boot...", instance.getPublicIpAddress());
+    Timing.wait(() -> sshService.hasConnection(instance.getPublicIpAddress()), 1000, awsConnectionTimeout);
   }
 
   private boolean isMicroserviceManagerInstance(Instance instance) {

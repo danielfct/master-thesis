@@ -334,4 +334,7 @@ public class ServicesService {
     }
   }
 
+  public boolean hasService(String name) {
+    return services.hasService(name);
+  }
 }

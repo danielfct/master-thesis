@@ -1,4 +1,0 @@
-08700543 PESS-MinA: A Proactive Stochastic Task Allocation Algorithm for FaaS Edge-Cloud environments
-LINK: TODO
-
-Resumo: We propose a new allocation algorithm called PESS-MinA based on our novel modular model for FaaS Edge-Cloud environments. In contradiction to widely-used Max-Min and Min-Min algorithms which are both reactive and deterministic, this algorithm is based on stochastic score, and thus provides proactivity considerations.

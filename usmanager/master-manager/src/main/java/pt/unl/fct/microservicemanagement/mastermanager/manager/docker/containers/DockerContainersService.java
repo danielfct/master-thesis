@@ -10,7 +10,6 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerConstants;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.containers.ContainerEntity;
@@ -27,7 +26,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceE
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceType;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServicesService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.discovery.eureka.EurekaService;
-import pt.unl.fct.microservicemanagement.mastermanager.util.Timing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -130,9 +128,9 @@ public class DockerContainersService {
     return launchContainer(hostname, serviceName, false);
   }
 
-  public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean singleton) {
+  public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean global) {
     List<String> environment = Collections.emptyList();
-    return launchContainer(hostname, serviceName, singleton, environment);
+    return launchContainer(hostname, serviceName, global, environment);
   }
 
   public Optional<DockerContainer> launchContainer(String hostname, String serviceName, List<String> environment) {
@@ -140,9 +138,9 @@ public class DockerContainersService {
   }
 
   public Optional<DockerContainer> launchContainer(String hostname, String serviceName,
-                                                   boolean singleton, List<String> environment) {
+                                                   boolean global, List<String> environment) {
     Map<String, String> labels = Collections.emptyMap();
-    return launchContainer(hostname, serviceName, singleton, environment, labels);
+    return launchContainer(hostname, serviceName, global, environment, labels);
   }
 
   public Optional<DockerContainer> launchContainer(String hostname, String serviceName, Map<String, String> labels) {
@@ -150,9 +148,9 @@ public class DockerContainersService {
   }
 
   public Optional<DockerContainer> launchContainer(String hostname, String serviceName,
-                                                   boolean singleton, Map<String, String> labels) {
+                                                   boolean global, Map<String, String> labels) {
     List<String> environment = Collections.emptyList();
-    return launchContainer(hostname, serviceName, singleton, environment, labels);
+    return launchContainer(hostname, serviceName, global, environment, labels);
   }
 
   public Optional<DockerContainer> launchContainer(String hostname, String serviceName, List<String> environment,
@@ -167,17 +165,17 @@ public class DockerContainersService {
   }
 
   public Optional<DockerContainer> launchContainer(String hostname, String serviceName,
-                                                   boolean singleton, List<String> environment,
+                                                   boolean global, List<String> environment,
                                                    Map<String, String> labels) {
     Map<String, String> dynamicLaunchParams = Collections.emptyMap();
-    return launchContainer(hostname, serviceName, singleton, environment, labels, dynamicLaunchParams);
+    return launchContainer(hostname, serviceName, global, environment, labels, dynamicLaunchParams);
   }
 
-  public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean singleton,
+  public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean global,
                                                    List<String> environment, Map<String, String> labels,
                                                    Map<String, String> dynamicLaunchParams) {
     ServiceEntity service = servicesService.getService(serviceName);
-    return launchContainer(hostname, service, singleton, environment, labels, dynamicLaunchParams);
+    return launchContainer(hostname, service, global, environment, labels, dynamicLaunchParams);
   }
 
   public Optional<DockerContainer> launchContainer(String hostname, String serviceName, String internalPort,
@@ -185,7 +183,7 @@ public class DockerContainersService {
     return launchContainer(hostname, serviceName, false, internalPort, externalPort);
   }
 
-  public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean singleton,
+  public Optional<DockerContainer> launchContainer(String hostname, String serviceName, boolean global,
                                                    String internalPort, String externalPort) {
     ServiceEntity service = servicesService.getService(serviceName).toBuilder()
         .defaultInternalPort(internalPort)
@@ -194,16 +192,16 @@ public class DockerContainersService {
     List<String> environment = Collections.emptyList();
     Map<String, String> labels = Collections.emptyMap();
     Map<String, String> dynamicLaunchParams = Collections.emptyMap();
-    return launchContainer(hostname, service, singleton, environment, labels, dynamicLaunchParams);
+    return launchContainer(hostname, service, global, environment, labels, dynamicLaunchParams);
   }
 
   private Optional<DockerContainer> launchContainer(String hostname, ServiceEntity service,
-                                                    boolean singleton, List<String> environment,
+                                                    boolean global, List<String> environment,
                                                     Map<String, String> labels,
                                                     Map<String, String> dynamicLaunchParams) {
     String serviceName = service.getServiceName();
     log.info("Launching container with service '{}' at '{}'...", serviceName, hostname);
-    if (singleton) {
+    if (global) {
       List<DockerContainer> containers = List.of();
       try {
         containers = getContainers(
@@ -273,6 +271,10 @@ public class DockerContainersService {
         ContainerConstants.Label.SERVICE_COUNTRY, country,
         ContainerConstants.Label.SERVICE_CITY, city));
     containerLabels.putAll(labels);
+    if (global) {
+      containerLabels.put(ContainerConstants.Label.IS_STOPPABLE, String.valueOf(false));
+      containerLabels.put(ContainerConstants.Label.IS_REPLICABLE, String.valueOf(false));
+    }
     log.info("hostname = '{}', internalPort = '{}', externalPort = '{}', containerName = '{}', "
             + "dockerRepository = '{}', launchCommand = '{}', envs = '{}', labels = '{}'",
         hostname, internalPort, externalPort, containerName, dockerRepository, launchCommand, containerEnvironment,
@@ -412,13 +414,12 @@ public class DockerContainersService {
   }
 
   private Optional<DockerContainer> findContainer(String id) {
-    //TODO confirm filter correctness
     DockerClient.ListContainersParam idFilter = DockerClient.ListContainersParam.filter("id", id);
     return getContainers(idFilter).stream().findFirst();
   }
 
   private List<DockerContainer> getAllContainers(DockerClient.ListContainersParam... filter) {
-    return nodesService.getAvailableNodes().stream()
+    return nodesService.getReadyNodes().stream()
         .map(node -> getContainers(node.getHostname(), filter))
         .flatMap(List::stream)
         .collect(Collectors.toList());

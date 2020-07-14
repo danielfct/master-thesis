@@ -86,6 +86,10 @@ public class DecisionsService {
         new EntityNotFoundException(DecisionEntity.class, "id", id.toString()));
   }
 
+  public DecisionEntity addDecision(DecisionEntity decisionEntity) {
+    return decisions.save(decisionEntity);
+  }
+
   public List<DecisionEntity> getServicesPossibleDecisions() {
     return decisions.findByComponentTypeType(ComponentType.SERVICE);
   }
@@ -97,6 +101,12 @@ public class DecisionsService {
   public DecisionEntity getServicePossibleDecision(String decisionName) {
     RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
     return decisions.findByValueAndComponentTypeType(decision, ComponentType.SERVICE).orElseThrow(() ->
+        new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
+  }
+
+  public DecisionEntity getContainerPossibleDecision(String decisionName) {
+    RuleDecision decision = RuleDecision.valueOf(decisionName.toUpperCase());
+    return decisions.findByValueAndComponentTypeType(decision, ComponentType.CONTAINER).orElseThrow(() ->
         new EntityNotFoundException(DecisionEntity.class, "decisionName", decisionName));
   }
 

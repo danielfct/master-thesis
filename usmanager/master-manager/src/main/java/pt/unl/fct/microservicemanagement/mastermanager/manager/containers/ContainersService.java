@@ -13,6 +13,7 @@ package pt.unl.fct.microservicemanagement.mastermanager.manager.containers;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainer;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.containers.DockerContainersService;
+import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.proxy.DockerApiProxyService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.containers.SimulatedContainerMetricsService;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.containers.ContainerRuleEntity;
@@ -20,7 +21,6 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.
 import pt.unl.fct.microservicemanagement.mastermanager.manager.services.ServiceEntity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,16 +42,19 @@ public class ContainersService {
   private final DockerContainersService dockerContainersService;
   private final ContainerRulesService containerRulesService;
   private final SimulatedContainerMetricsService simulatedContainerMetricsService;
+  private final DockerApiProxyService dockerApiProxyService;
 
   private final ContainerRepository containers;
 
   public ContainersService(DockerContainersService dockerContainersService,
                            ContainerRulesService containerRulesService,
                            SimulatedContainerMetricsService simulatedContainerMetricsService,
+                           DockerApiProxyService dockerApiProxyService,
                            ContainerRepository containers) {
     this.dockerContainersService = dockerContainersService;
     this.containerRulesService = containerRulesService;
     this.simulatedContainerMetricsService = simulatedContainerMetricsService;
+    this.dockerApiProxyService = dockerApiProxyService;
     this.containers = containers;
   }
 
@@ -142,11 +145,14 @@ public class ContainersService {
     }
     // Add missing container entities
     dockerContainers.forEach(dockerContainer -> {
-      String containerId = dockerContainer.getId();
-      if (!hasContainer(containerId)) {
-        ContainerEntity containerEntity = addContainerFromDockerContainer(dockerContainer);
-        containers.add(containerEntity);
-        log.debug("Added missing container {}", containerId);
+      String isTraceable = dockerContainer.getLabels().get(ContainerConstants.Label.IS_TRACEABLE);
+      if (Boolean.parseBoolean(isTraceable)) {
+        String containerId = dockerContainer.getId();
+        if (!hasContainer(containerId)) {
+          ContainerEntity containerEntity = addContainerFromDockerContainer(dockerContainer);
+          containers.add(containerEntity);
+          log.debug("Added missing container {}", containerId);
+        }
       }
     });
     return containers;
@@ -157,8 +163,8 @@ public class ContainersService {
     return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
-  public ContainerEntity launchContainer(String hostname, String serviceName, boolean singleton) {
-    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, singleton);
+  public ContainerEntity launchContainer(String hostname, String serviceName, boolean global) {
+    Optional<DockerContainer> container = dockerContainersService.launchContainer(hostname, serviceName, global);
     return container.map(this::addContainerFromDockerContainer).orElse(null);
   }
 
@@ -362,6 +368,18 @@ public class ContainersService {
     assertContainerExists(containerId);
     simulatedMetricNames.forEach(simulatedMetric ->
         simulatedContainerMetricsService.removeContainer(simulatedMetric, containerId));
+  }
+
+  public String launchDockerApiProxy(String hostname) {
+    return launchDockerApiProxy(hostname, true);
+  }
+
+  public String launchDockerApiProxy(String hostname, boolean insertIntoDatabase) {
+    String containerId = dockerApiProxyService.launchDockerApiProxy(hostname);
+    if (!insertIntoDatabase) {
+      addContainer(containerId);
+    }
+    return containerId;
   }
 
   public boolean hasContainer(String containerId) {

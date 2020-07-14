@@ -125,7 +125,7 @@ public class LocationRequestService {
   }
 
   private Pair<Map<String, Map<String, Integer>>, Map<String, Integer>> getLocationMonitoring(int seconds) {
-    List<SimpleNode> nodes = nodesService.getAvailableNodes();
+    List<SimpleNode> nodes = nodesService.getReadyNodes();
     Map<String, Map<String, Integer>> serviceCountLocations = new HashMap<>();
     Map<String, Integer> serviceTotalRequestCount = new HashMap<>();
     List<LocationMonitoringResp> allLocationMonitoringData = new ArrayList<>();

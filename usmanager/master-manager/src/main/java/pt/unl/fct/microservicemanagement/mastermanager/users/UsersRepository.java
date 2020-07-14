@@ -39,4 +39,9 @@ public interface UsersRepository extends JpaRepository<UserEntity, Long> {
       + "where u.username like concat('%',:search,'%')")
   List<UserEntity> searchUsers(@Param(value = "search") String search);
 
+  @Query("select case when count(u) > 0 then true else false end "
+      + "from UserEntity u "
+      + "where u.username = :username")
+  boolean hasUser(@Param("username") String username);
+
 }

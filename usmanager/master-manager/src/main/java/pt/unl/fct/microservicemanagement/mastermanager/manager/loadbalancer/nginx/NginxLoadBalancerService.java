@@ -117,8 +117,8 @@ public class NginxLoadBalancerService {
                                 String region, String country, String city) {
     List<ContainerEntity> loadBalancers = getLoadBalancersFromService(serviceName);
     if (loadBalancers.isEmpty()) {
-      ContainerEntity container = launchLoadBalancer(hostname, serviceName, serverAddr, continent, region,
-          country, city);
+      ContainerEntity container = launchLoadBalancer(hostname, serviceName, serverAddr, continent, region, country,
+          city);
       loadBalancers = List.of(container);
     }
     loadBalancers.forEach(loadBalancer -> {

@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.hosts.edge;
 
+import pt.unl.fct.microservicemanagement.mastermanager.manager.location.RegionEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.metrics.simulated.hosts.SimulatedHostMetricEntity;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.rulesystem.rules.hosts.HostRuleEntity;
 
@@ -40,17 +41,10 @@ public interface EdgeHostRepository extends JpaRepository<EdgeHostEntity, Long> 
 
   @Query("select h "
       + "from EdgeHostEntity h "
-      + "where (h.publicDnsName = :hostname or h.publicIpAddress = :hostname) "
-      + "and h.privateIpAddress = :privateIpAddress")
-  Optional<EdgeHostEntity> findPrivateEdgeHost(@Param("hostname") String hostname,
-                                               @Param("privateIpAddress") String privateIpAddress);
-
-  @Query("select h "
-      + "from EdgeHostEntity h "
       + "where h.publicDnsName = :hostname or h.publicIpAddress = :hostname")
   Optional<EdgeHostEntity> findEdgeHost(@Param("hostname") String hostname);
 
-  List<EdgeHostEntity> findByRegion(@Param("region") String region);
+  List<EdgeHostEntity> findByRegion(@Param("region") RegionEntity region);
 
   List<EdgeHostEntity> findByCountry(@Param("country") String country);
 

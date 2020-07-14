@@ -27,58 +27,68 @@ import M from "materialize-css";
 import {Route, Switch} from "react-router-dom";
 import LoadingBar from "react-redux-loading-bar";
 import Navbar from "../views/navbar/Navbar";
-import Landing from "../routes/landing/Landing";
-import Services from "../routes/services/Services";
-import Service from "../routes/services/Service";
-import {Provider} from "react-redux";
+import ManagementLanding from "../routes/management/landing/Landing";
+import MonitoringLanding from "../routes/monitoring/landing/Landing";
+import DataManagementLanding from "../routes/dataManagement/landing/Landing";
+import Services from "../routes/management/services/Services";
+import Service from "../routes/management/services/Service";
+import {connect, Provider} from "react-redux";
 import Login from "../views/login/Login";
 import AuthenticatedRoute from "../components/AuthenticatedRoute";
-import Logs from "../routes/logs/Logs";
-import Region from "../routes/region/Region";
-import Regions from "../routes/region/Regions";
-import Nodes from "../routes/nodes/Nodes";
-import Node from "../routes/nodes/Node";
-import CloudHost from "../routes/hosts/cloud/CloudHost";
-import EdgeHost from "../routes/hosts/edge/EdgeHost";
-import Hosts from "../routes/hosts/Hosts";
-import CloudHosts from "../routes/hosts/cloud/CloudHosts";
-import EdgeHosts from "../routes/hosts/edge/EdgeHosts";
-import Containers from "../routes/containers/Containers";
-import Container from "../routes/containers/Container";
-import Apps from "../routes/apps/Apps";
-import App from "../routes/apps/App";
-import RulesHost from "../routes/rules/hosts/RulesHost";
-import RulesService from "../routes/rules/services/RulesService";
-import Rules from "../routes/rules/Rules";
-import RuleConditions from "../routes/rules/conditions/RuleConditions";
-import Condition from "../routes/rules/conditions/RuleCondition";
-import LoadBalancers from "../routes/loadBalancers/LoadBalancers";
-import LoadBalancer from "../routes/loadBalancers/LoadBalancer";
-import EurekaServers from "../routes/eurekaServers/EurekaServers";
-import EurekaServer from "../routes/eurekaServers/EurekaServer";
-import SimulatedMetrics from "../routes/metrics/SimulatedMetrics";
-import SimulatedServiceMetric from "../routes/metrics/services/SimulatedServiceMetric";
-import SimulatedHostMetric from "../routes/metrics/hosts/SimulatedHostMetric";
-import SimulatedHostMetrics from "../routes/metrics/hosts/SimulatedHostMetrics";
-import SimulatedServiceMetrics from "../routes/metrics/services/SimulatedServiceMetrics";
+import ManagementLogs from "../routes/management/logs/ManagementLogs";
+import Region from "../routes/management/region/Region";
+import Regions from "../routes/management/region/Regions";
+import Nodes from "../routes/management/nodes/Nodes";
+import Node from "../routes/management/nodes/Node";
+import CloudHost from "../routes/management/hosts/cloud/CloudHost";
+import EdgeHost from "../routes/management/hosts/edge/EdgeHost";
+import Hosts from "../routes/management/hosts/Hosts";
+import CloudHosts from "../routes/management/hosts/cloud/CloudHosts";
+import EdgeHosts from "../routes/management/hosts/edge/EdgeHosts";
+import Containers from "../routes/management/containers/Containers";
+import Container from "../routes/management/containers/Container";
+import Apps from "../routes/management/apps/Apps";
+import App from "../routes/management/apps/App";
+import RulesHost from "../routes/management/rules/hosts/RulesHost";
+import RulesService from "../routes/management/rules/services/RulesService";
+import Rules from "../routes/management/rules/Rules";
+import RuleConditions from "../routes/management/rules/conditions/RuleConditions";
+import Condition from "../routes/management/rules/conditions/RuleCondition";
+import LoadBalancers from "../routes/management/loadBalancers/LoadBalancers";
+import LoadBalancer from "../routes/management/loadBalancers/LoadBalancer";
+import EurekaServers from "../routes/management/eurekaServers/EurekaServers";
+import EurekaServer from "../routes/management/eurekaServers/EurekaServer";
+import SimulatedMetrics from "../routes/management/metrics/SimulatedMetrics";
+import SimulatedServiceMetric from "../routes/management/metrics/services/SimulatedServiceMetric";
+import SimulatedHostMetric from "../routes/management/metrics/hosts/SimulatedHostMetric";
+import SimulatedHostMetrics from "../routes/management/metrics/hosts/SimulatedHostMetrics";
+import SimulatedServiceMetrics from "../routes/management/metrics/services/SimulatedServiceMetrics";
 import {PageNotFound} from "../components/PageNotFound";
 import {Footer} from "../views/footer/Footer";
-import RulesContainer from "../routes/rules/containers/RulesContainer";
-import RuleService from "../routes/rules/services/RuleService";
-import RuleHost from "../routes/rules/hosts/RuleHost";
-import RuleContainer from "../routes/rules/containers/RuleContainer";
-import SimulatedContainerMetrics from "../routes/metrics/containers/SimulatedContainerMetrics";
-import SimulatedContainerMetric from "../routes/metrics/containers/SimulatedContainerMetric";
-import Ssh from "../routes/ssh/Ssh";
+import RulesContainer from "../routes/management/rules/containers/RulesContainer";
+import RuleService from "../routes/management/rules/services/RuleService";
+import RuleHost from "../routes/management/rules/hosts/RuleHost";
+import RuleContainer from "../routes/management/rules/containers/RuleContainer";
+import SimulatedContainerMetrics from "../routes/management/metrics/containers/SimulatedContainerMetrics";
+import SimulatedContainerMetric from "../routes/management/metrics/containers/SimulatedContainerMetric";
+import Ssh from "../routes/management/ssh/Ssh";
+import {ReduxState} from "../reducers";
+import Settings from "../routes/management/settings/Settings";
+import MonitoringSettings from "../routes/monitoring/settings/Settings";
+import DataManagementSettings from "../routes/dataManagement/settings/Settings";
 
 interface RootContainerProps {
     store: any;
 }
 
-type Props = RootContainerProps;
+interface StateToProps {
+    component: IComponent;
+}
 
-export const authenticatedRoutes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
-    "/home": { title: 'Microservices dynamic system management', component: Landing },
+type Props = StateToProps & RootContainerProps;
+
+export const managementAuthenticatedRoutes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
+    "/home": { title: 'Microservices dynamic system management', component: ManagementLanding },
     "/apps": { component: Apps, search: true },
     "/apps/:name": { component: App },
     "/services": { component: Services, search: true },
@@ -116,17 +126,46 @@ export const authenticatedRoutes: {[path: string]: { title?: string, component: 
     "/eureka-servers": { component: EurekaServers, search: true },
     "/eureka-servers/:id": { component: EurekaServer },
     "/ssh": { component: Ssh },
-    "/logs": { component: Logs, search: true },
+    "/settings": { component: Settings },
+    "/logs": { component: ManagementLogs, search: true },
     "/*": { title: "404 - Not found", component: PageNotFound },
 };
 
-export default class Root extends React.Component<Props, {}> {
+export const monitoringAuthenticatedRoutes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
+    "/home": { title: 'Microservices dynamic system monitoring', component: MonitoringLanding },
+    "/settings": { component: MonitoringSettings },
+    "/*": { title: "404 - Not found", component: PageNotFound },
+};
+
+export const dataManagementAuthenticatedRoutes: {[path: string]: { title?: string, component: any, search?: boolean }} = {
+    "/home": { title: 'Microservices dynamic system data management', component: DataManagementLanding },
+    "/settings": { component: DataManagementSettings },
+    "/*": { title: "404 - Not found", component: PageNotFound },
+};
+
+export type IComponent = 'Management' | 'Monitoring' | 'Data';
+
+export const components: IComponent[] = [
+    'Management', 'Monitoring', 'Data'
+];
+
+class Root extends React.Component<Props, {}> {
 
     public componentDidMount(): void {
         M.AutoInit();
     }
 
     public render() {
+        let routes = (function(component) {
+            switch (component) {
+                case "Management":
+                    return managementAuthenticatedRoutes;
+                case "Monitoring":
+                    return monitoringAuthenticatedRoutes;
+                case "Data":
+                    return dataManagementAuthenticatedRoutes;
+            }
+        })(this.props.component);
         return (
           <main>
               <Provider store={this.props.store}>
@@ -136,8 +175,8 @@ export default class Root extends React.Component<Props, {}> {
                       <Switch>
                           <Route path="/" exact component={Login} />
                           <Route path="/login" exact component={Login} />
-                          {Object.entries(authenticatedRoutes).map(([path, {title, component}], index) =>
-                            <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
+                          {Object.entries(routes).map(([path, {title, component}], index) =>
+                             <AuthenticatedRoute key={index} exact path={path} title={title} component={component}/>)}
                       </Switch>
                   </div>
               </Provider>
@@ -147,3 +186,11 @@ export default class Root extends React.Component<Props, {}> {
     }
 
 }
+
+function mapStateToProps(state: ReduxState): StateToProps {
+    return {
+        component: state.ui.component
+    }
+}
+
+export default connect(mapStateToProps, undefined)(Root);

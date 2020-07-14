@@ -24,6 +24,7 @@
 
 package pt.unl.fct.microservicemanagement.mastermanager.manager.remote.ssh;
 
+import net.schmizz.sshj.connection.ConnectionException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.EntityNotFoundException;
 import pt.unl.fct.microservicemanagement.mastermanager.exceptions.MasterManagerException;
 import pt.unl.fct.microservicemanagement.mastermanager.manager.docker.DockerProperties;
@@ -35,7 +36,9 @@ import pt.unl.fct.microservicemanagement.mastermanager.manager.monitoring.promet
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.List;
@@ -60,15 +63,18 @@ public class SshService {
 
   private final EdgeHostsService edgeHostsService;
 
+  private final int connectionTimeout;
   private final String edgeKeyFilePath;
   private final String awsKeyFilePath;
   private final String awsUser;
   private final Map<String, String> scriptPaths;
 
-  public SshService(EdgeHostsService edgeHostsService, EdgeHostsProperties edgeHostsProperties,
+  public SshService(EdgeHostsService edgeHostsService, SshProperties sshProperties,
+                    EdgeHostsProperties edgeHostsProperties,
                     AwsProperties awsProperties, DockerProperties dockerProperties,
                     PrometheusProperties prometheusProperties) {
     this.edgeHostsService = edgeHostsService;
+    this.connectionTimeout = sshProperties.getConnectionTimeout();
     this.edgeKeyFilePath = edgeHostsProperties.getAccess().getKeyFilePath();
     this.awsKeyFilePath = awsProperties.getAccess().getKeyFilePath();
     this.awsUser = awsProperties.getAccess().getUsername();
@@ -95,17 +101,11 @@ public class SshService {
     return initClient(username, hostname, new File(publicKeyFile));
   }
 
-  private SSHClient initClient(String hostname, String username) throws IOException {
-    var sshClient = new SSHClient();
-    sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-    String publicKeyFile = String.format("%s/%s", edgeKeyFilePath, username);
-    return initClient(username, hostname, new File(publicKeyFile));
-  }
-
   private SSHClient initClient(String username, String hostname, File publicKeyFile) throws IOException {
     var sshClient = new SSHClient();
+    sshClient.setConnectTimeout(connectionTimeout);
     sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-    log.info("Logging in to host '{}@{}' with key '{}'", username, hostname, publicKeyFile);
+    log.info("Logging in to host '{}@{}' using key '{}'", username, hostname, publicKeyFile);
     sshClient.connect(hostname);
     var keyFile = new PKCS8KeyFile();
     keyFile.init(publicKeyFile);
@@ -116,6 +116,7 @@ public class SshService {
 
   private SSHClient initClient(String hostname, String username, String password) throws IOException {
     var sshClient = new SSHClient();
+    sshClient.setConnectTimeout(connectionTimeout);
     sshClient.addHostKeyVerifier(new PromiscuousVerifier());
     log.info("Logging in to host '{}@{}' using password", username, hostname);
     sshClient.connect(hostname);
@@ -172,14 +173,17 @@ public class SshService {
   }
 
   public boolean hasConnection(String hostname) {
+    log.info("Checking connectivity to {}", hostname);
     try (SSHClient client = initClient(hostname);
          Session ignored = client.startSession()) {
+      log.info("Successfully connected to {}", hostname);
       return true;
-    } catch (NoRouteToHostException ignored) {
-      // empty
+    } catch (NoRouteToHostException | SocketTimeoutException | ConnectException ignored) {
+      // ignored
     } catch (IOException e) {
       e.printStackTrace();
     }
+    log.info("Failed to connect to {}", hostname);
     return false;
   }
 

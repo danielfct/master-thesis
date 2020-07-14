@@ -23,15 +23,18 @@
  */
 
 import {
+    CHANGE_COMPONENT,
     SEARCH_UPDATE,
     SIDENAV_SHOW_USER,
     SIDENAV_SHOW_WIDTH
 } from "../actions";
 import {loadingBarReducer} from "react-redux-loading-bar";
+import {components, IComponent} from "../containers/Root.dev";
 
 export interface UIState {
     sidenav: { user: boolean, width: boolean };
     search: string;
+    component: IComponent;
 }
 
 export const loadingBar = loadingBarReducer;
@@ -69,3 +72,17 @@ export const search = (
             return state;
     }
 };
+
+export const component = (
+  state = components[0],
+  action: { type: string, component: IComponent}
+) => {
+    const { type, component } = action;
+    switch (type) {
+        case CHANGE_COMPONENT:
+            return component;
+        default:
+            return state;
+    }
+}
+
