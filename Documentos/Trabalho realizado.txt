@@ -25,7 +25,3 @@ master manager
 readmes
 settings
 
-alguma razão em especial por não teres usado o docker swarm service, https://docs.docker.com/engine/reference/commandline/service_create/, para lançar containers nos nós do swarm?
-usando a opção --constrains para controlar onde seriam iniciadas as replicas
-porque o docker swarm já inclui um serviço dns para encontrar containers, o que podia substituir o eureka server
-e também um routing mesh, https://docs.docker.com/engine/swarm/ingress, para, caso seja preciso, expor replicas ao exterior do swarm

@@ -158,7 +158,8 @@ Microservice Dependencies,” Queue, ACM, vol. 16, no. 4, p. 10, 2018.
 [Online]. Available: https://queue.acm.org/detail.cfm?id=3277541
 
 
-
+---------- register-go ---------
+alterar algoritmo de escolha de replicas para ser baseado em geolocalização (eurekaops/util)
 
 ---------- web-manager ---------- 
 loadbalancer 502 bad gateway
@@ -252,18 +253,25 @@ mape-k distribuido
 
 Beneficios de existirem local managers:
 
-1. Os dados sao transferidos por uma distancia menor, reduzindo o nº total de bytes transferidos na rede. É principalmente relevante no caso de microserviços que produzam uma quantidade de dados elevada, como iot. O local manager tem a capacidade de filtrar os dados, e apenas enviar para o master manager o que achar relevante para a gestão global do sistema.
+1. Os dados sao transferidos por uma distancia menor, reduzindo o nº total de bytes transferidos na rede. O local manager tem a capacidade de filtrar os dados, e apenas enviar para o master manager o que achar relevante para a gestão global do sistema.
 
-2. A proximidade dos local managers aos microserviços que gere, implica um tempo de resposta menor, e consequente adaptação mais rápida, às alterações detetadas. É praticularmente relevante a microserviços que necessitam de baixa latencia (latency critical), visto que o sistema visa colocar os serviços o mais próximo possivel dos clientes.
+2. A proximidade dos local managers aos microserviços que gere, implica um tempo de resposta menor, e consequente adaptação mais rápida, às alterações detetadas. 
 
-3. Flexibilidade em caso de falha de um local manager, com a possiblidade de ser atribuido outro local manager, na proximidade, aos containers geridos pelo primeiro.
+3. Flexibilidade em caso de falha de um local manager, com a possiblidade de ser atribuido outro local manager, na proximidade, aos containers e máquinas geridos pelo primeiro.
 
-4. Federação de máquinas e privacidade. Cada local manager pode controlar um certo conjunto de máquinas que, por razaões de segurança, ou outras, não são diretamente controláveis pelo master-manager. Por exemplo, um local-manager na FCT controlaria os containers e nós nos computadores da fct, não estando estes diretamente acessiveis ao master-manager na cloud.
+4. Federação de máquinas e privacidade. Cada local manager pode controlar um certo conjunto de máquinas que, por razões de segurança, ou outras, não são diretamente controláveis pelo master-manager. Por exemplo, um local-manager na FCT controlaria os containers e nós nos computadores da fct, não estando estes diretamente acessiveis ao master-manager na cloud.
+
+5. Os local-managers podem ter a capacidade para funcionar apenas na edge, não sendo obrigatório enviarem e receberem instruções do master-manager, garantindo uma orquestração localizada e leve de nós e containers.
+
+6. Maior escabilidade. Ao adicionar mais local-managers ao sistema, é possivel gerir um número maior de máquinas e containers. Assim, o sistema não é totalmente dependente do master-manager. Embora para ser feita a orquestração global (e.g. migração de containers), seja necessaria a intervenção de um master-manager.
 
 Desavantagens:
 
-- Maior complexidade do algoritmo de gestão
+1. Maior complexidade da arquitetura
 
+2. Necessidade de comunicação entre os local managers e o master manager, com a introdução do rabbitmq para servir de message broker entre os componentes.
+
+3. Mais recursos usados na edge, com a inclusão dos containers local-manager e rabbitmq.
 
 https://imgur.com/a/U8otupj
 
@@ -384,6 +392,11 @@ https://opennebula.io/
 
 Relevante:
 
+usar o docker swarm service, https://docs.docker.com/engine/reference/commandline/service_create/, para lançar containers nos nós do swarm
+usando a opção --constrains para controlar onde seriam iniciadas as replicas
+porque o docker swarm já inclui um serviço dns para encontrar containers, o que podia substituir o eureka server
+e também um routing mesh, https://docs.docker.com/engine/swarm/ingress, para, caso seja preciso, expor replicas ao exterior do swarm
+
 Since microservices that
 make up an application have data dependencies amongst them, an
 IoT application is depicted as a Directed Acyclic Graph (DAG). each microservice is represented by vertices of the
@@ -467,3 +480,12 @@ Possível trabalho futuro:
 Um problema detetado é o tempo que a modelação pode demorar, mas como só é executado uma vez por cada tipo de workload e especificação de máquina, pode náo ser relevante. Outro problema está relacionado com a heterogeneidade das máquinas na edge, porque uma modelação só é correta para um certo tipo de máquina (e.g. 2gb ram, 3.5ghz cpu), e com o workload dinâmico na edge (i.e o nº de pedidos tanto pode ser muito baixo como muito alto).
 
 13. Incluir um algoritmo de placement (e.g. 1908.01153) para, ao iniciar o sistema, distribuir os containers pelos hosts disponíveis. Um problema detetado é o facto de ser impossível distribuir os containers consoante o workload e origem dos pedidos. Mas ao longo do tempo, os serviços deverão, eventualmente, distribuir-se consoante essas métricas.
+
+
+
+
+
+
+https://cloud.spring.io/spring-cloud-netflix/multi/multi__service_discovery_eureka_clients.html
+
+https://www.rabbitmq.com/tutorials/tutorial-one-go.html
