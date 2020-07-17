@@ -32,7 +32,7 @@ import (
 	"sync"
 	"time"
 
-	"bitbucket.org/microservicemanagement/register-go/api"
+	"github.com/danielfct/master-thesis/tree/master/usmanager/register-go/api"
 	"bitbucket.org/microservicemanagement/register-go/reglog"
 )
 

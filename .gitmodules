@@ -1,0 +1,3 @@
+[submodule "usmanager/usmanager/manager"]
+	path = usmanager/usmanager/manager
+	url = https://github.com/usmanager/manager.git

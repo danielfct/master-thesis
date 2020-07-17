@@ -19,7 +19,6 @@
         <option value="$PROJECT_DIR$/registration-server/pom.xml" />
         <option value="$PROJECT_DIR$/java-client-register-go/pom.xml" />
         <option value="$PROJECT_DIR$/launcher/pom.xml" />
-        <option value="$PROJECT_DIR$/local-manager/pom.xml" />
         <option value="$PROJECT_DIR$/master-manager/pom.xml" />
         <option value="$PROJECT_DIR$/microservices/sock-shop/carts/pom.xml" />
         <option value="$PROJECT_DIR$/microservices/sock-shop/queue-master/pom.xml" />
