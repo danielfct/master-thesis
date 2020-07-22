@@ -25,3 +25,5 @@ master manager
 readmes
 settings
 
+atualização da versão go 1.10 para 1.14.6 em todos os componentes go, passando a ser usado go modules para a gestão das dependências
+atualização dos respetivos dockerfiles
