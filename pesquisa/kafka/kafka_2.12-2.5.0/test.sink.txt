@@ -1,0 +1,6 @@
+foo
+bar
+Another line
+foo
+bar
+Another line
