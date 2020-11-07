@@ -10,3 +10,15 @@
 [submodule "usmanager/microservices"]
 	path = usmanager/microservices
 	url = https://github.com/usmanager/microservices
+[submodule "usmanager/registration-client-java"]
+	path = usmanager/registration-client-java
+	url = https://github.com/usmanager/registration-client-java
+[submodule "usmanager/registration-client-go"]
+	path = usmanager/registration-client-go
+	url = https://github.com/usmanager/registration-client-go
+[submodule "usmanager/registration-client-cpp"]
+	path = usmanager/registration-client-cpp
+	url = https://github.com/usmanager/registration-client-cpp
+[submodule "usmanager/registration-client-csharp"]
+	path = usmanager/registration-client-csharp
+	url = https://github.com/usmanager/registration-client-csharp
