@@ -498,3 +498,31 @@ melhor integração do kafka visto que a sua api está escrita em java
 soluções parecidas ao symds:
 https://www.hvr-software.com/
 https://www.netapp.com/us/products/backup-recovery/snapmirror-data-replication.aspx
+
+
+exemplos de empresas que usam microserviços:
+netflix, uber, spotify, amazon, coca cola, ebay
+
+
+Online boutique dependencias:
+
+loadgeneration -> frontend
+frontend -> ad, checkout, shipping, currency, product, recommendation, cartservice
+checkout -> email, payment, shipping, currency, cart
+recommendation -> catalogue
+
+Sockshop dependencias:
+
+frontend -> orders, user, catalogue, carts
+user -> userdb
+catalogue -> cataloguedb
+carts -> cartsdb
+orders -> ordersdb, carts, payment, shipment
+shipment -> rabbitmq
+queuemaster -> rabbitmq
+
+
+após a decisão de parar um container:
+1. deregistá lo do registration-server para que mais nenhum cliente obtenha o seu endereço. mas o container continua ativo e portanto ainda pode receber pedidos
+2. como o cache do location-request-monitor é de 10 segundos, é aceitável pará-lo passado 15 segundos
+
