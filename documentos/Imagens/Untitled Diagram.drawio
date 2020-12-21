@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2020-12-21T20:00:54.948Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" etag="hA9Tol1Dc7ylyEjZo0Rg" version="14.1.1" type="github">
+<mxfile host="app.diagrams.net" modified="2020-12-21T20:02:40.528Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" etag="hBm32nwcWVjTU02Hku6k" version="14.1.1" type="github">
   <diagram id="SW4XgfbbQJAMymbXx15_" name="Page-1">
-    <mxGraphModel dx="1137" dy="672" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1137" dy="621" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -40,7 +40,7 @@
         <mxCell id="ddDovV2OgxE7f6Ota1rO-55" style="edgeStyle=orthogonalEdgeStyle;curved=0;rounded=1;sketch=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=open;endFill=0;horizontal=1;labelBorderColor=none;fillColor=#fff2cc;strokeColor=#d6b656;jumpStyle=arc;startArrow=classic;startFill=0;" parent="1" source="ddDovV2OgxE7f6Ota1rO-53" target="ddDovV2OgxE7f6Ota1rO-47" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="EfHMIrCQeGikhzoEBX9_-29" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;rounded=1;" parent="1" source="ddDovV2OgxE7f6Ota1rO-53" target="EfHMIrCQeGikhzoEBX9_-7" edge="1">
+        <mxCell id="EfHMIrCQeGikhzoEBX9_-29" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;rounded=1;endArrow=openThin;endFill=0;" parent="1" source="ddDovV2OgxE7f6Ota1rO-53" target="EfHMIrCQeGikhzoEBX9_-7" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="360" y="384" />
@@ -204,7 +204,7 @@
         <mxCell id="4mxefijmGvkCjXQqsQpc-1" value="&lt;font style=&quot;font-size: 8px&quot;&gt;Utilizador&lt;/font&gt;" style="html=1;verticalLabelPosition=bottom;align=center;labelBackgroundColor=#ffffff;verticalAlign=top;strokeWidth=1;shadow=0;dashed=0;shape=mxgraph.ios7.icons.user;strokeColor=#007FFF;spacing=-4;fontSize=8;" vertex="1" parent="1">
           <mxGeometry x="650" y="137" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="4mxefijmGvkCjXQqsQpc-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=5;endArrow=classic;endFill=1;startArrow=classic;startFill=1;entryX=-0.008;entryY=0.594;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="ddDovV2OgxE7f6Ota1rO-62" target="4mxefijmGvkCjXQqsQpc-1">
+        <mxCell id="4mxefijmGvkCjXQqsQpc-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=5;endArrow=none;endFill=0;startArrow=openThin;startFill=0;entryX=-0.008;entryY=0.594;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="ddDovV2OgxE7f6Ota1rO-62" target="4mxefijmGvkCjXQqsQpc-1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="660" y="150" as="targetPoint" />
             <Array as="points">
