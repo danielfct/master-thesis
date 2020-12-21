@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2020-12-21T20:02:40.528Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" etag="hBm32nwcWVjTU02Hku6k" version="14.1.1" type="github">
+<mxfile host="app.diagrams.net" modified="2020-12-21T20:03:40.091Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" etag="Nrg-UjWcajs6vu0nbKr-" version="14.1.1" type="github">
   <diagram id="SW4XgfbbQJAMymbXx15_" name="Page-1">
-    <mxGraphModel dx="1137" dy="621" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="941" dy="514" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -337,6 +337,9 @@
             <mxPoint x="547.58" y="287.8" as="sourcePoint" />
             <mxPoint x="516.86" y="247.40999999999997" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="4mxefijmGvkCjXQqsQpc-28" value="Balanceador de carga" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=6;" vertex="1" parent="1">
+          <mxGeometry x="512.48" y="219.00000000000003" width="44.02" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
