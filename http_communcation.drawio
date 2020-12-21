@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2020-12-21T19:31:34.623Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" etag="OZRMU5MsL7v7DVqCqx4a" version="14.1.1" type="github">
+<mxfile host="app.diagrams.net" modified="2020-12-21T20:00:59.406Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" etag="F9PKGvoULg4zQ9t5Is9u" version="14.1.1" type="github">
   <diagram id="4UhYT9hk-Zzi39r3fxAN" name="Page-1">
     <mxGraphModel dx="1605" dy="2117" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -160,7 +160,7 @@
         <mxCell id="qUHYum_QUu2UJPCzKtRe-47" value="&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;span style=&quot;font-family: &amp;#34;helvetica&amp;#34;&quot;&gt;Restful&lt;/span&gt;&lt;br style=&quot;font-family: &amp;#34;helvetica&amp;#34;&quot;&gt;&lt;span style=&quot;font-family: &amp;#34;helvetica&amp;#34;&quot;&gt;API&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;strokeWidth=2;strokeColor=#3399FF;" vertex="1" parent="qUHYum_QUu2UJPCzKtRe-89">
           <mxGeometry width="50" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qUHYum_QUu2UJPCzKtRe-90" value="Cliente" style="html=1;verticalLabelPosition=bottom;align=center;labelBackgroundColor=#ffffff;verticalAlign=top;strokeWidth=2;shadow=0;dashed=0;shape=mxgraph.ios7.icons.user;strokeColor=#007FFF;" vertex="1" parent="1">
+        <mxCell id="qUHYum_QUu2UJPCzKtRe-90" value="Utilizador" style="html=1;verticalLabelPosition=bottom;align=center;labelBackgroundColor=#ffffff;verticalAlign=top;strokeWidth=2;shadow=0;dashed=0;shape=mxgraph.ios7.icons.user;strokeColor=#007FFF;" vertex="1" parent="1">
           <mxGeometry x="388.17999999999995" y="-270" width="50" height="50" as="geometry" />
         </mxCell>
         <mxCell id="qUHYum_QUu2UJPCzKtRe-107" value="" style="endArrow=classic;html=1;dashed=1;strokeColor=#006EAF;strokeWidth=2;startArrow=classic;startFill=1;entryX=1;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="qUHYum_QUu2UJPCzKtRe-81" target="qUHYum_QUu2UJPCzKtRe-26">
