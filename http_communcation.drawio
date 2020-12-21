@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2020-12-21T09:55:37.844Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" etag="fyKeC9bWepNODcLnYzop" version="14.1.1" type="github">
+<mxfile host="app.diagrams.net" modified="2020-12-21T10:45:23.910Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" etag="LTPdquuNAoue2AF6i1Pq" version="14.1.1" type="github">
   <diagram id="4UhYT9hk-Zzi39r3fxAN" name="Page-1">
-    <mxGraphModel dx="1364" dy="1975" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1364" dy="1914" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -14,9 +14,6 @@
           <mxGeometry width="20" height="14" relative="1" as="geometry">
             <mxPoint x="-10" y="-7" as="offset" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="qUHYum_QUu2UJPCzKtRe-27" value="Micro-serviço -&amp;gt; Cliente de registo -&amp;gt; Servidor de registo e descoberta de serviços\\&lt;br&gt;Cliente de registo e descoberta de serviços -&amp;gt; Monitorização de pedidos\\&lt;br&gt;Gestor principal -&amp;gt; Gestor local, Cliente do balanceador de carga, Monitorização de pedidos\\&lt;br&gt;Hub de gestão -&amp;gt; Gestor principal" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="122.03" y="550" width="550" height="60" as="geometry" />
         </mxCell>
         <mxCell id="qUHYum_QUu2UJPCzKtRe-31" value="" style="endArrow=classic;html=1;dashed=1;strokeColor=#006EAF;strokeWidth=2;startArrow=classic;startFill=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="qUHYum_QUu2UJPCzKtRe-30" target="qUHYum_QUu2UJPCzKtRe-26">
           <mxGeometry relative="1" as="geometry">
