@@ -45,7 +45,7 @@ paths:
           description: "App not found"
         "502":
           description: "Não foi possível obter as instâncias ao eureka"
-  /services/{service}/endpoint:
+  /services/{service}/endpoint: #TODO merge with /services/{service}/endpoints and add parameters amoung/distance
     get:
       tags:
       - "Endpoints"
