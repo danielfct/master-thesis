@@ -65,7 +65,7 @@ import java.util.Set;
 @Setter
 @Getter
 @ToString(exclude = {"containerRules", "simulatedContainerMetrics"})
-@JsonPropertyOrder({ "id", "type", "created", "name", "command", "network", "publicIpAddress", "privateIpAddress", "mounts",
+@JsonPropertyOrder({ "id", "type", "created", "name", "image", "command", "network", "publicIpAddress", "privateIpAddress", "mounts",
 		"ports", "labels", "region", "state", "managerId", "coordinates"})
 @Table(name = "containers")
 public class Container /*extends AbstractEntity<String> */ {
