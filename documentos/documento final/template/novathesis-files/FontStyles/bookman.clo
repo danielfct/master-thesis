@@ -1,0 +1,11 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% bookman.clo
+%% NOVA thesis configuration file
+%%
+%% Costumization of fonts to use Bookman fontset
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifxetexorluatex
+  \setmainfont{TeX Gyre Bonum}
+\else
+  \RequirePackage{bookman}
+\fi
